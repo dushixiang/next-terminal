@@ -1,0 +1,95 @@
+.trigger {
+    font-size: 18px;
+    line-height: 64px;
+    padding: 0 24px;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.trigger:hover {
+    color: #1890ff;
+}
+
+.logo {
+    height: 32px;
+    margin: 16px;
+    text-align: center;
+}
+
+.logo > h1 {
+    color: white;
+    font-weight: bold;
+    line-height: 32px; /*设置line-height与父级元素的height相等*/
+    text-align: center; /*设置文本水平居中*/
+    display: inline-block;
+}
+
+.site-layout .site-layout-background {
+    background: #fff;
+}
+
+.site-page-header-ghost-wrapper {
+    background-color: #FFF;
+}
+
+.global-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 16px 0 0;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+}
+
+.page-herder {
+    margin: 16px 16px 0 16px;
+}
+
+.page-search {
+    background-color: white;
+    margin: 16px 16px 0 16px;
+    padding: 16px;
+}
+
+.page-search label {
+    font-weight: bold;
+}
+
+.page-search .ant-form-item {
+    margin-bottom: 0;
+}
+
+.page-content {
+    margin: 16px;
+    padding: 24px;
+    min-height: 280px;
+}
+
+.page-card {
+    margin: 16px;
+}
+
+.user-in-menu {
+    align-items: center;
+    text-align: center;
+    margin: 10px auto;
+    color: white;
+}
+
+.user-in-menu>.nickname {
+    margin-top: 20px;
+    margin-right: auto;
+    margin-left: auto;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-style: solid;
+    border-width: 1px;
+    border-color: white;
+    width: fit-content;
+    border-radius: 5%;
+}
+
+.monitor .ant-modal-body{
+    padding: 0;
+}
