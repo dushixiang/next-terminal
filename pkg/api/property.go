@@ -1,13 +1,13 @@
 package api
 
 import (
-	"next-terminal/pkg/model"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"next-terminal/pkg/model"
 )
 
 func PropertyGetEndpoint(c echo.Context) error {
-	properties := model.FindAllProperties()
+	properties := model.FindAllTemp()
 	return Success(c, properties)
 }
 

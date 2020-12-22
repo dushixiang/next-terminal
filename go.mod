@@ -11,7 +11,6 @@ require (
 	github.com/labstack/gommon v0.3.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/sftp v1.12.0
-	github.com/shirou/gopsutil v3.20.10+incompatible
 	github.com/spf13/viper v1.7.1
 	golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
 	gorm.io/driver/mysql v1.0.1

@@ -97,8 +97,8 @@ func SetupRoutes() *echo.Echo {
 	e.GET("/properties", PropertyGetEndpoint)
 	e.PUT("/properties", PropertyUpdateEndpoint)
 
-	e.GET("/overview/status", OverviewStatusEndPoint)
 	e.GET("/overview/counter", OverviewCounterEndPoint)
+	e.GET("/overview/sessions", OverviewSessionPoint)
 
 	return e
 }

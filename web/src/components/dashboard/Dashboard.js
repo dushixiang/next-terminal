@@ -1,10 +1,11 @@
 import React, {Component} from 'react';
-import {Layout, PageHeader, Card, Row, Col, Progress, Typography, Popover, Statistic} from "antd";
-import {DesktopOutlined, IdcardOutlined, LikeOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
+import {Card, Col, Layout, PageHeader, Radio, Row, Statistic, Typography} from "antd";
+import {DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import './Dashboard.css'
 import {Link} from "react-router-dom";
+import {Area} from '@ant-design/charts';
 
 const {Content} = Layout;
 const {Title, Paragraph} = Typography;
@@ -24,78 +25,59 @@ const routes = [
 class Dashboard extends Component {
 
     state = {
-        status: {
-            load: {
-                load1: 0,
-                load5: 0,
-                load15: 0,
-            },
-            cpu: {
-                percent: 0,
-                logicalCount: 0,
-                physicalCount: 0
-            },
-            memory: {
-                usedPercent: 0,
-                available: 0,
-                total: 0,
-                used: 0
-            }
-        },
-        interval: null,
-        counter: {}
+        counter: {},
+        d: 'w',
+        session: [],
     }
 
     componentDidMount() {
         this.getCounter();
-        this.getStatus();
-
-        this.setState({
-            interval: setInterval(() => this.getStatus(), 5000)
-        })
+        this.getD();
     }
 
     componentWillUnmount() {
-        if (this.state.interval != null) {
-            clearInterval(this.state.interval);
-        }
-    }
 
-    getStatus = async () => {
-        let result = await request.get('/overview/status');
-        if (result.code === 1) {
-            this.setState({
-                status: result.data
-            })
-        }
     }
 
     getCounter = async () => {
         let result = await request.get('/overview/counter');
-        if (result.code === 1) {
+        if (result['code'] === 1) {
             this.setState({
-                counter: result.data
+                counter: result['data']
             })
         }
     }
 
+    getD = async () => {
+        let result = await request.get('/overview/sessions?d=' + this.state.d);
+        if (result['code'] === 1) {
+            this.setState({
+                session: result['data']
+            })
+            console.log('set session', this.state.session)
+        }
+    }
+
+    handleChangeD = (e) => {
+        let d = e.target.value;
+        this.setState({
+            d: d
+        }, () => this.getD())
+    }
+
     render() {
 
-        const loadContent = (
-            <div>
-                <p>最近1分钟负载：{this.state.status.load['load1'].toFixed(1)}</p>
-                <p>最近5分钟负载：{this.state.status.load['load5'].toFixed(1)}</p>
-                <p>最近15分钟负载：{this.state.status.load['load15'].toFixed(1)}</p>
-            </div>
-        );
+        const config = {
+            data: this.state.session,
+            xField: 'day',
+            yField: 'count',
+            seriesField: 'protocol',
+        };
 
-        const cpuContent = (
-            <div>
-                <p>CPU型号：{this.state.status.cpu['modelName']}</p>
-                <p>物理核心：{this.state.status.cpu['physicalCount']}</p>
-                <p>逻辑核心：{this.state.status.cpu['logicalCount']}</p>
-            </div>
-        );
+        const buttonRadio = <Radio.Group value={this.state.d} onChange={this.handleChangeD}>
+            <Radio.Button value="w">按周</Radio.Button>
+            <Radio.Button value="m">按月</Radio.Button>
+        </Radio.Group>
 
         return (
             <>
@@ -150,41 +132,8 @@ class Dashboard extends Component {
                 </div>
 
                 <div className="page-card">
-                    <Card title="状态" bordered={true}>
-                        <Row>
-                            <Col span={4}>
-                                <Title level={5} className="text-center">负载状态</Title>
-                                <Popover placement="topLeft" title={"负载详情"} content={loadContent}>
-                                    <Progress type="circle" width={100}
-                                              percent={this.state.status.load['load1'].toFixed(1)}/>
-                                </Popover>
-
-                                <Paragraph className="text-center">运行流畅</Paragraph>
-                            </Col>
-                            <Col span={4}>
-                                <Title level={5} className="text-center">CPU使用率</Title>
-                                <Popover placement="topLeft" title={"CPU详情"} content={cpuContent}>
-                                    <Progress type="circle" width={100}
-                                              percent={this.state.status.cpu['percent'].toFixed(1)}/>
-                                </Popover>
-                                <Paragraph className="text-center">{this.state.status.cpu['logicalCount']}核心</Paragraph>
-                            </Col>
-                            <Col span={4}>
-                                <Title level={5} className="text-center">内存使用率</Title>
-                                <Progress type="circle" width={100}
-                                          percent={this.state.status.memory['usedPercent'].toFixed(1)}/>
-
-                                <Paragraph className="text-center">
-                                    {Math.floor(this.state.status.memory['used'] / 1024 / 1024)}
-                                    /
-                                    {Math.floor(this.state.status.memory['total'] / 1024 / 1024)}
-                                    (MB)
-                                </Paragraph>
-                            </Col>
-                            <Col span={4}>
-
-                            </Col>
-                        </Row>
+                    <Card title="会话统计" bordered={true} extra={buttonRadio}>
+                        <Area {...config} />
                     </Card>
 
                 </div>

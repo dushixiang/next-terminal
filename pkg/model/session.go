@@ -3,6 +3,7 @@ package model
 import (
 	"next-terminal/pkg/config"
 	"next-terminal/pkg/utils"
+	"time"
 )
 
 const (
@@ -134,5 +135,33 @@ func DeleteSessionByStatus(status string) {
 
 func CountOnlineSession() (total int64, err error) {
 	err = config.DB.Where("status = ?", Connected).Find(&Session{}).Count(&total).Error
+	return
+}
+
+type D struct {
+	Day      string `json:"day"`
+	Count    int    `json:"count"`
+	Protocol string `json:"protocol"`
+}
+
+func CountSessionByDay(day int) (results []D, err error) {
+
+	today := time.Now().Format("20060102")
+	sql := "select t1.`day`, count(t2.id) as count\nfrom (\n         SELECT @date := DATE_ADD(@date, INTERVAL - 1 DAY) day\n         FROM (SELECT @date := DATE_ADD('" + today + "', INTERVAL + 1 DAY) FROM nums) as t0\n         LIMIT ?\n     )\n         as t1\n         left join\n     (\n         select DATE(s.connected_time) as day, s.id\n         from sessions as s\n         WHERE protocol = ? and DATE(connected_time) <= '" + today + "'\n           AND DATE(connected_time) > DATE_SUB('" + today + "', INTERVAL ? DAY)\n     ) as t2 on t1.day = t2.day\ngroup by t1.day"
+
+	protocols := []string{"rdp", "ssh", "vnc", "telnet"}
+
+	for i := range protocols {
+		var result []D
+		err = config.DB.Raw(sql, day, protocols[i], day).Scan(&result).Error
+		if err != nil {
+			return nil, err
+		}
+		for j := range result {
+			result[j].Protocol = protocols[i]
+		}
+		results = append(results, result...)
+	}
+
 	return
 }

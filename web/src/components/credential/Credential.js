@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "video-react/dist/video-react.css";
 
 import {Button, Col, Divider, Input, Layout, Modal, PageHeader, Row, Space, Table, Tooltip, Typography} from "antd";
 import qs from "qs";

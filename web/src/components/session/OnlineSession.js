@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "video-react/dist/video-react.css";
 
 import {
     Button,
@@ -237,13 +236,13 @@ class OnlineSession extends Component {
                 return index + 1;
             }
         }, {
-            title: '用户昵称',
-            dataIndex: 'creatorName',
-            key: 'creatorName'
-        }, {
             title: '来源IP',
             dataIndex: 'clientIp',
             key: 'clientIp'
+        }, {
+            title: '用户昵称',
+            dataIndex: 'creatorName',
+            key: 'creatorName'
         }, {
             title: '资产名称',
             dataIndex: 'assetName',
@@ -371,6 +370,13 @@ class OnlineSession extends Component {
                             <Col span={16} key={2} style={{textAlign: 'right'}}>
                                 <Space>
 
+                                    <Search
+                                        ref={this.inputRefOfClientIp}
+                                        placeholder="来源IP"
+                                        allowClear
+                                        onSearch={this.handleSearchByClientIp}
+                                    />
+
                                     <Select
                                         style={{width: 200}}
                                         showSearch
@@ -382,13 +388,6 @@ class OnlineSession extends Component {
                                     >
                                         {userOptions}
                                     </Select>
-
-                                    <Search
-                                        ref={this.inputRefOfClientIp}
-                                        placeholder="来源IP"
-                                        allowClear
-                                        onSearch={this.handleSearchByClientIp}
-                                    />
 
                                     <Select
                                         style={{width: 200}}

@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import "video-react/dist/video-react.css";
 
 import {
     Badge,

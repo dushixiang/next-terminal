@@ -11,6 +11,7 @@ import (
 	"next-terminal/pkg/handle"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
+	"strconv"
 	"time"
 )
 
@@ -34,9 +35,7 @@ func Run() error {
 		return err
 	}
 
-	users := model.FindAllUser()
-
-	if len(users) == 0 {
+	if len(model.FindAllUser()) == 0 {
 
 		var pass []byte
 		if pass, err = utils.Encoder.Encode([]byte("admin")); err != nil {
@@ -69,6 +68,18 @@ func Run() error {
 	}
 	if err := config.DB.AutoMigrate(&model.Property{}); err != nil {
 		return err
+	}
+
+	if err := config.DB.AutoMigrate(&model.Num{}); err != nil {
+		return err
+	}
+
+	if len(model.FindAllTemp()) == 0 {
+		for i := 0; i <= 30; i++ {
+			if err := model.CreateNewTemp(&model.Num{I: strconv.Itoa(i)}); err != nil {
+				return err
+			}
+		}
 	}
 
 	config.Cache = cache.New(5*time.Minute, 10*time.Minute)
