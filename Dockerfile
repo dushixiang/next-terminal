@@ -12,7 +12,7 @@ RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
 RUN apk add gcc g++
 RUN go env && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -ldflags '-linkmode external -extldflags "-static"' -o next_terminal main.go
 
-FROM alpine:3.12.3
+FROM guacamole/guacd:1.2.0
 
 LABEL MAINTAINER="helloworld1024@foxmail.com"
 
