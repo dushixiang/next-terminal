@@ -28,7 +28,7 @@ class LoginForm extends Component {
             // 跳转登录
             sessionStorage.removeItem('current');
             sessionStorage.removeItem('openKeys');
-            localStorage.setItem('X-Auth-Token', result.data);
+            localStorage.setItem('X-Auth-Token', result['data']);
             // this.props.history.push();
             window.location.href = "/"
 

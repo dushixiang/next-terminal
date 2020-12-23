@@ -8,6 +8,31 @@ import (
 	"strings"
 )
 
+const (
+	Host                = "host"
+	Port                = "port"
+	EnableRecording     = "enable-recording"
+	RecordingPath       = "recording-path"
+	CreateRecordingPath = "create-recording-path"
+
+	FontName    = "font-name"
+	FontSize    = "font-size"
+	ColorScheme = "color-scheme"
+
+	EnableDrive              = "enable-drive"
+	DriveName                = "drive-name"
+	DrivePath                = "drive-path"
+	EnableWallpaper          = "enable-wallpaper"
+	EnableTheming            = "enable-theming"
+	EnableFontSmoothing      = "enable-font-smoothing"
+	EnableFullWindowDrag     = "enable-full-window-drag"
+	EnableDesktopComposition = "enable-desktop-composition"
+	EnableMenuAnimations     = "enable-menu-animations"
+	DisableBitmapCaching     = "disable-bitmap-caching"
+	DisableOffscreenCaching  = "disable-offscreen-caching"
+	DisableGlyphCaching      = "disable-glyph-caching"
+)
+
 const Delimiter = ';'
 const Version = "VERSION_1_1_0"
 

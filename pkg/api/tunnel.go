@@ -1,14 +1,15 @@
 package api
 
 import (
-	"next-terminal/pkg/config"
-	"next-terminal/pkg/guacd"
-	"next-terminal/pkg/model"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/sftp"
 	"log"
+	"next-terminal/pkg/config"
+	"next-terminal/pkg/guacd"
+	"next-terminal/pkg/model"
+	"path"
 	"strconv"
 )
 
@@ -33,17 +34,6 @@ func TunEndpoint(c echo.Context) error {
 
 	propertyMap := model.FindAllPropertiesMap()
 
-	for name := range propertyMap {
-
-		if name == model.GuacdFontSize {
-			fontSize, _ := strconv.Atoi(propertyMap[name])
-			fontSize = fontSize * 2
-			configuration.SetParameter(name, strconv.Itoa(fontSize))
-		} else {
-			configuration.SetParameter(name, propertyMap[name])
-		}
-	}
-
 	var session model.Session
 	var sftpClient *sftp.Client
 
@@ -57,6 +47,22 @@ func TunEndpoint(c echo.Context) error {
 		session, err = model.FindSessionById(sessionId)
 		if err != nil {
 			return err
+		}
+
+		for name := range propertyMap {
+			if name == guacd.FontSize {
+				fontSize, _ := strconv.Atoi(propertyMap[name])
+				fontSize = fontSize * 2
+				configuration.SetParameter(name, strconv.Itoa(fontSize))
+			} else {
+				configuration.SetParameter(name, propertyMap[name])
+			}
+		}
+
+		if propertyMap[guacd.EnableRecording] == "true" {
+			configuration.SetParameter(guacd.CreateRecordingPath, path.Join(propertyMap[guacd.CreateRecordingPath], sessionId))
+		} else {
+			configuration.SetParameter(guacd.CreateRecordingPath, "")
 		}
 
 		configuration.Protocol = session.Protocol
@@ -97,7 +103,7 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("port", strconv.Itoa(session.Port))
 	}
 
-	addr := propertyMap[model.GuacdHost] + ":" + propertyMap[model.GuacdPort]
+	addr := propertyMap[guacd.Host] + ":" + propertyMap[guacd.Port]
 	tunnel, err := guacd.NewTunnel(addr, configuration)
 	if err != nil {
 		return err
@@ -118,6 +124,7 @@ func TunEndpoint(c echo.Context) error {
 		session.ConnectionId = tunnel.UUID
 		session.Width = intWidth
 		session.Height = intHeight
+		session.Recording = configuration.GetParameter(guacd.RecordingPath)
 
 		model.UpdateSessionById(&session, sessionId)
 	}

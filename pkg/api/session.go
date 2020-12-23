@@ -43,7 +43,7 @@ func SessionDeleteEndpoint(c echo.Context) error {
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
 		model.DeleteSessionById(split[i])
-		drivePath, err := model.GetDrivePath()
+		drivePath, err := model.GetRecordingPath()
 		if err != nil {
 			continue
 		}

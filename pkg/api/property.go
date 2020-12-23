@@ -7,7 +7,7 @@ import (
 )
 
 func PropertyGetEndpoint(c echo.Context) error {
-	properties := model.FindAllTemp()
+	properties := model.FindAllPropertiesMap()
 	return Success(c, properties)
 }
 

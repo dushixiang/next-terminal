@@ -1,6 +1,7 @@
 package handle
 
 import (
+	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
 	"os"
@@ -50,148 +51,165 @@ func RunDataFix() {
 func InitProperties() {
 	propertyMap := model.FindAllPropertiesMap()
 
-	if len(propertyMap[model.GuacdHost]) == 0 {
+	if len(propertyMap[guacd.Host]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdHost,
+			Name:  guacd.Host,
 			Value: "127.0.0.1",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdPort]) == 0 {
+	if len(propertyMap[guacd.Port]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdPort,
+			Name:  guacd.Port,
 			Value: "4822",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdDriveName]) == 0 {
+	if len(propertyMap[guacd.EnableRecording]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdDriveName,
+			Name:  guacd.EnableRecording,
+			Value: "true",
+		}
+		_ = model.CreateNewProperty(&property)
+	}
+
+	if len(propertyMap[guacd.RecordingPath]) == 0 {
+		path, _ := os.Getwd()
+		property := model.Property{
+			Name:  guacd.RecordingPath,
+			Value: path + "/recording/",
+		}
+		_ = model.CreateNewProperty(&property)
+	}
+
+	if len(propertyMap[guacd.CreateRecordingPath]) == 0 {
+		property := model.Property{
+			Name:  guacd.CreateRecordingPath,
+			Value: "true",
+		}
+		_ = model.CreateNewProperty(&property)
+	}
+
+	if len(propertyMap[guacd.DriveName]) == 0 {
+		property := model.Property{
+			Name:  guacd.DriveName,
 			Value: "File-System",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdDrivePath]) == 0 {
+	if len(propertyMap[guacd.DrivePath]) == 0 {
 
 		path, _ := os.Getwd()
 
 		property := model.Property{
-			Name:  model.GuacdDrivePath,
+			Name:  guacd.DrivePath,
 			Value: path + "/drive/",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdFontName]) == 0 {
+	if len(propertyMap[guacd.FontName]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdFontName,
+			Name:  guacd.FontName,
 			Value: "menlo",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdFontSize]) == 0 {
+	if len(propertyMap[guacd.FontSize]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdFontSize,
+			Name:  guacd.FontSize,
 			Value: "12",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdColorScheme]) == 0 {
+	if len(propertyMap[guacd.ColorScheme]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdColorScheme,
+			Name:  guacd.ColorScheme,
 			Value: "gray-black",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdEnableSftp]) == 0 {
+	if len(propertyMap[guacd.EnableDrive]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdEnableSftp,
+			Name:  guacd.EnableDrive,
 			Value: "true",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdEnableDrive]) == 0 {
+	if len(propertyMap[guacd.EnableWallpaper]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdEnableDrive,
-			Value: "true",
-		}
-		_ = model.CreateNewProperty(&property)
-	}
-
-	if len(propertyMap[model.GuacdEnableWallpaper]) == 0 {
-		property := model.Property{
-			Name:  model.GuacdEnableWallpaper,
+			Name:  guacd.EnableWallpaper,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdEnableTheming]) == 0 {
+	if len(propertyMap[guacd.EnableTheming]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdEnableTheming,
+			Name:  guacd.EnableTheming,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdEnableFontSmoothing]) == 0 {
+	if len(propertyMap[guacd.EnableFontSmoothing]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdEnableFontSmoothing,
+			Name:  guacd.EnableFontSmoothing,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdEnableFullWindowDrag]) == 0 {
+	if len(propertyMap[guacd.EnableFullWindowDrag]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdEnableFullWindowDrag,
+			Name:  guacd.EnableFullWindowDrag,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdEnableDesktopComposition]) == 0 {
+	if len(propertyMap[guacd.EnableDesktopComposition]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdEnableDesktopComposition,
+			Name:  guacd.EnableDesktopComposition,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdEnableMenuAnimations]) == 0 {
+	if len(propertyMap[guacd.EnableMenuAnimations]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdEnableMenuAnimations,
+			Name:  guacd.EnableMenuAnimations,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdDisableBitmapCaching]) == 0 {
+	if len(propertyMap[guacd.DisableBitmapCaching]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdDisableBitmapCaching,
+			Name:  guacd.DisableBitmapCaching,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdDisableOffscreenCaching]) == 0 {
+	if len(propertyMap[guacd.DisableOffscreenCaching]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdDisableOffscreenCaching,
+			Name:  guacd.DisableOffscreenCaching,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)
 	}
 
-	if len(propertyMap[model.GuacdDisableGlyphCaching]) == 0 {
+	if len(propertyMap[guacd.DisableGlyphCaching]) == 0 {
 		property := model.Property{
-			Name:  model.GuacdDisableGlyphCaching,
+			Name:  guacd.DisableGlyphCaching,
 			Value: "false",
 		}
 		_ = model.CreateNewProperty(&property)

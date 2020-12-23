@@ -26,6 +26,7 @@ type Session struct {
 	Width            int            `json:"width"`
 	Height           int            `json:"height"`
 	Status           string         `json:"status"`
+	Recording        string         `json:"recording"`
 	ConnectedTime    utils.JsonTime `json:"connectedTime"`
 	DisconnectedTime utils.JsonTime `json:"disconnectedTime"`
 }
@@ -47,6 +48,7 @@ type SessionVo struct {
 	Width            int            `json:"width"`
 	Height           int            `json:"height"`
 	Status           string         `json:"status"`
+	Recording        string         `json:"recording"`
 	ConnectedTime    utils.JsonTime `json:"connectedTime"`
 	DisconnectedTime utils.JsonTime `json:"disconnectedTime"`
 	AssetName        string         `json:"assetName"`
@@ -60,7 +62,7 @@ func FindPageSession(pageIndex, pageSize int, status, userId, clientIp, assetId,
 
 	params = append(params, status)
 
-	itemSql := "SELECT s.id, s.protocol, s.connection_id, s.asset_id, s.creator, s.client_ip, s.width, s.height, s.ip, s.port, s.username, s.status, s.connected_time, s.disconnected_time, a.name AS asset_name, u.nickname AS creator_name FROM sessions s LEFT JOIN assets a ON s.asset_id = a.id LEFT JOIN users u ON s.creator = u.id WHERE s.STATUS = ? "
+	itemSql := "SELECT s.id, s.protocol,s.recording, s.connection_id, s.asset_id, s.creator, s.client_ip, s.width, s.height, s.ip, s.port, s.username, s.status, s.connected_time, s.disconnected_time, a.name AS asset_name, u.nickname AS creator_name FROM sessions s LEFT JOIN assets a ON s.asset_id = a.id LEFT JOIN users u ON s.creator = u.id WHERE s.STATUS = ? "
 	countSql := "select count(*) from sessions as s where s.status = ? "
 
 	if len(userId) > 0 {

@@ -135,7 +135,7 @@ class App extends Component {
                                 style={{lineHeight: '64px'}}>
 
                                 <Menu.Item key="dashboard" icon={<DashboardOutlined/>}>
-                                    <Link to={'/dashboard'}>
+                                    <Link to={'/'}>
                                         控制面板
                                     </Link>
                                 </Menu.Item>
@@ -214,7 +214,7 @@ class App extends Component {
 
                                 </Header>*/}
 
-                            <Route path="/dashboard" component={Dashboard}/>
+                            <Route path="/" exact component={Dashboard}/>
                             <Route path="/user" component={User}/>
                             <Route path="/asset" component={Asset}/>
                             <Route path="/credential" component={Credential}/>

@@ -23,7 +23,8 @@ import {differTime, formatDate, itemRender} from "../../utils/utils";
 import Playback from "./Playback";
 import {message} from "antd/es";
 import {
-    DeleteOutlined, DeleteTwoTone,
+    DeleteOutlined,
+    DeleteTwoTone,
     ExclamationCircleOutlined,
     PlaySquareTwoTone,
     SyncOutlined,
@@ -293,11 +294,19 @@ class OfflineSession extends Component {
                 title: '操作',
                 key: 'action',
                 render: (text, record) => {
+                    let disabled = true;
+                    let color = '#d9d9d9'
+                    if (record['recording'] && record['recording'].length > 0) {
+                        disabled = false
+                        color = ''
+                    }
 
                     return (
                         <div>
-                            <Button type="link" size='small' icon={<PlaySquareTwoTone />} onClick={() => this.showPlayback(record.id)}>回放</Button>
-                            <Button type="link" size='small' icon={<DeleteTwoTone />} onClick={() => {
+                            <Button type="link" size='small'
+                                    disabled={disabled}
+                                    icon={<PlaySquareTwoTone twoToneColor={color}/>} onClick={() => this.showPlayback(record.id)}>回放</Button>
+                            <Button type="link" size='small' icon={<DeleteTwoTone/>} onClick={() => {
                                 confirm({
                                     title: '您确定要删除此会话吗?',
                                     content: '',

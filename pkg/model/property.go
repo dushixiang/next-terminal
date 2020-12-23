@@ -2,30 +2,7 @@ package model
 
 import (
 	"next-terminal/pkg/config"
-	"errors"
-)
-
-const (
-	GuacdHost = "host"
-	GuacdPort = "port"
-
-	GuacdFontName    = "font-name"
-	GuacdFontSize    = "font-size"
-	GuacdColorScheme = "color-scheme"
-	GuacdEnableSftp  = "enable-sftp"
-
-	GuacdEnableDrive              = "enable-drive"
-	GuacdDriveName                = "drive-name"
-	GuacdDrivePath                = "drive-path"
-	GuacdEnableWallpaper          = "enable-wallpaper"
-	GuacdEnableTheming            = "enable-theming"
-	GuacdEnableFontSmoothing      = "enable-font-smoothing"
-	GuacdEnableFullWindowDrag     = "enable-full-window-drag"
-	GuacdEnableDesktopComposition = "enable-desktop-composition"
-	GuacdEnableMenuAnimations     = "enable-menu-animations"
-	GuacdDisableBitmapCaching     = "disable-bitmap-caching"
-	GuacdDisableOffscreenCaching  = "disable-offscreen-caching"
-	GuacdDisableGlyphCaching      = "disable-glyph-caching"
+	"next-terminal/pkg/guacd"
 )
 
 type Property struct {
@@ -69,10 +46,17 @@ func FindAllPropertiesMap() map[string]string {
 }
 
 func GetDrivePath() (string, error) {
-	propertiesMap := FindAllPropertiesMap()
-	drivePath := propertiesMap[GuacdDrivePath]
-	if len(drivePath) == 0 {
-		return "", errors.New("获取RDP挂载目录失败")
+	property, err := FindPropertyByName(guacd.DrivePath)
+	if err != nil {
+		return "", err
 	}
-	return drivePath, nil
+	return property.Value, nil
+}
+
+func GetRecordingPath() (string, error) {
+	property, err := FindPropertyByName(guacd.RecordingPath)
+	if err != nil {
+		return "", err
+	}
+	return property.Value, nil
 }
