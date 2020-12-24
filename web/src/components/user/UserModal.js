@@ -1,5 +1,5 @@
 import React from 'react';
-import {Form, Input, Modal, Radio} from "antd/lib/index";
+import {Form, Input, Modal} from "antd/lib/index";
 
 const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, model}) => {
 

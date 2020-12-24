@@ -1,4 +1,0 @@
-next-terminal:
-#  dsn: root:root@tcp(127.0.0.1:3306)/next-terminal?charset=utf8mb4&parseTime=True&loc=Local
-  dsn: root:mysql@tcp(172.16.101.32:3306)/next-terminal?charset=utf8mb4&parseTime=True&loc=Local
-  addr: 0.0.0.0:8088

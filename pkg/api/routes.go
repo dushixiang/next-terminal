@@ -4,7 +4,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"net/http"
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 )
 
@@ -12,7 +12,6 @@ const Token = "X-Auth-Token"
 
 func SetupRoutes() *echo.Echo {
 
-	// Echo instance
 	e := echo.New()
 
 	e.File("/", "web/build/index.html")
@@ -22,6 +21,15 @@ func SetupRoutes() *echo.Echo {
 
 	// Middleware
 	e.Use(middleware.Logger())
+
+	//fd, _ := os.OpenFile(
+	//	"nt.log",
+	//	os.O_RDWR|os.O_APPEND,
+	//	0666,
+	//)
+	//writer := io.MultiWriter(fd, os.Stdout)
+
+	//e.Logger.SetOutput(writer)
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Skipper:      middleware.DefaultSkipper,
@@ -92,6 +100,7 @@ func SetupRoutes() *echo.Echo {
 		sessions.DELETE("/:id/rmdir", SessionRmDirEndpoint)
 		sessions.DELETE("/:id/rm", SessionRmEndpoint)
 		sessions.DELETE("/:id", SessionDeleteEndpoint)
+		sessions.GET("/:id/recording", SessionRecordingEndpoint)
 	}
 
 	e.GET("/properties", PropertyGetEndpoint)
@@ -137,7 +146,7 @@ func GetToken(c echo.Context) string {
 
 func GetCurrentAccount(c echo.Context) (model.User, bool) {
 	token := GetToken(c)
-	get, b := config.Cache.Get(token)
+	get, b := global.Cache.Get(token)
 	if b {
 		return get.(model.User), true
 	}

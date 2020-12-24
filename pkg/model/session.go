@@ -1,7 +1,7 @@
 package model
 
 import (
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 	"time"
 )
@@ -57,7 +57,7 @@ type SessionVo struct {
 
 func FindPageSession(pageIndex, pageSize int, status, userId, clientIp, assetId, protocol string) (results []SessionVo, total int64, err error) {
 
-	db := config.DB
+	db := global.DB
 	var params []interface{}
 
 	params = append(params, status)
@@ -103,40 +103,40 @@ func FindPageSession(pageIndex, pageSize int, status, userId, clientIp, assetId,
 }
 
 func FindSessionByStatus(status string) (o []Session, err error) {
-	err = config.DB.Where("status = ?", status).Find(&o).Error
+	err = global.DB.Where("status = ?", status).Find(&o).Error
 	return
 }
 
 func CreateNewSession(o *Session) (err error) {
-	err = config.DB.Create(o).Error
+	err = global.DB.Create(o).Error
 	return
 }
 
 func FindSessionById(id string) (o Session, err error) {
-	err = config.DB.Where("id = ?", id).First(&o).Error
+	err = global.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
 func FindSessionByConnectionId(connectionId string) (o Session, err error) {
-	err = config.DB.Where("connection_id = ?", connectionId).First(&o).Error
+	err = global.DB.Where("connection_id = ?", connectionId).First(&o).Error
 	return
 }
 
 func UpdateSessionById(o *Session, id string) {
 	o.ID = id
-	config.DB.Updates(o)
+	global.DB.Updates(o)
 }
 
 func DeleteSessionById(id string) {
-	config.DB.Where("id = ?", id).Delete(&Session{})
+	global.DB.Where("id = ?", id).Delete(&Session{})
 }
 
 func DeleteSessionByStatus(status string) {
-	config.DB.Where("status = ?", status).Delete(&Session{})
+	global.DB.Where("status = ?", status).Delete(&Session{})
 }
 
 func CountOnlineSession() (total int64, err error) {
-	err = config.DB.Where("status = ?", Connected).Find(&Session{}).Count(&total).Error
+	err = global.DB.Where("status = ?", Connected).Find(&Session{}).Count(&total).Error
 	return
 }
 
@@ -155,7 +155,7 @@ func CountSessionByDay(day int) (results []D, err error) {
 
 	for i := range protocols {
 		var result []D
-		err = config.DB.Raw(sql, day, protocols[i], day).Scan(&result).Error
+		err = global.DB.Raw(sql, day, protocols[i], day).Scan(&result).Error
 		if err != nil {
 			return nil, err
 		}

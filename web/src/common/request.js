@@ -18,7 +18,7 @@ const handleError = (error) => {
         return;
     }
     if (error.response !== undefined) {
-        message.error(error.response.data.message);
+        // message.error(error.response.data.message);
     }
 };
 

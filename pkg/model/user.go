@@ -1,7 +1,7 @@
 package model
 
 import (
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 	"reflect"
 )
@@ -25,7 +25,7 @@ func (r *User) IsEmpty() bool {
 }
 
 func FindAllUser() (o []User) {
-	if config.DB.Find(&o).Error != nil {
+	if global.DB.Find(&o).Error != nil {
 		return nil
 	}
 	return
@@ -33,7 +33,7 @@ func FindAllUser() (o []User) {
 
 func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []User, total int64, err error) {
 
-	db := config.DB
+	db := global.DB
 	if len(username) > 0 {
 		db = db.Where("username like ?", "%"+username+"%")
 	}
@@ -50,30 +50,30 @@ func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []User,
 }
 
 func CreateNewUser(o *User) (err error) {
-	err = config.DB.Create(o).Error
+	err = global.DB.Create(o).Error
 	return
 }
 
 func FindUserById(id string) (o User, err error) {
-	err = config.DB.Where("id = ?", id).First(&o).Error
+	err = global.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
 func FindUserByUsername(username string) (o User, err error) {
-	err = config.DB.Where("username = ?", username).First(&o).Error
+	err = global.DB.Where("username = ?", username).First(&o).Error
 	return
 }
 
 func UpdateUserById(o *User, id string) {
 	o.ID = id
-	config.DB.Updates(o)
+	global.DB.Updates(o)
 }
 
 func DeleteUserById(id string) {
-	config.DB.Where("id = ?", id).Delete(&User{})
+	global.DB.Where("id = ?", id).Delete(&User{})
 }
 
 func CountUser() (total int64, err error) {
-	err = config.DB.Find(&User{}).Count(&total).Error
+	err = global.DB.Find(&User{}).Count(&total).Error
 	return
 }

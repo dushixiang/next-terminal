@@ -1,7 +1,7 @@
 package model
 
 import (
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 )
 
@@ -15,24 +15,24 @@ func (r *Property) TableName() string {
 }
 
 func FindAllProperties() (o []Property) {
-	if config.DB.Find(&o).Error != nil {
+	if global.DB.Find(&o).Error != nil {
 		return nil
 	}
 	return
 }
 
 func CreateNewProperty(o *Property) (err error) {
-	err = config.DB.Create(o).Error
+	err = global.DB.Create(o).Error
 	return
 }
 
 func UpdatePropertyByName(o *Property, name string) {
 	o.Name = name
-	config.DB.Updates(o)
+	global.DB.Updates(o)
 }
 
 func FindPropertyByName(name string) (o Property, err error) {
-	err = config.DB.Where("name = ?", name).First(&o).Error
+	err = global.DB.Where("name = ?", name).First(&o).Error
 	return
 }
 

@@ -48,7 +48,7 @@ func RunDataFix() {
 	}
 }
 
-func InitProperties() {
+func InitProperties() error {
 	propertyMap := model.FindAllPropertiesMap()
 
 	if len(propertyMap[guacd.Host]) == 0 {
@@ -56,7 +56,9 @@ func InitProperties() {
 			Name:  guacd.Host,
 			Value: "127.0.0.1",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.Port]) == 0 {
@@ -64,7 +66,9 @@ func InitProperties() {
 			Name:  guacd.Port,
 			Value: "4822",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableRecording]) == 0 {
@@ -72,7 +76,9 @@ func InitProperties() {
 			Name:  guacd.EnableRecording,
 			Value: "true",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.RecordingPath]) == 0 {
@@ -81,7 +87,14 @@ func InitProperties() {
 			Name:  guacd.RecordingPath,
 			Value: path + "/recording/",
 		}
-		_ = model.CreateNewProperty(&property)
+		if !utils.Exists(property.Value) {
+			if err := os.Mkdir(property.Value, os.ModePerm); err != nil {
+				return err
+			}
+		}
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.CreateRecordingPath]) == 0 {
@@ -89,7 +102,9 @@ func InitProperties() {
 			Name:  guacd.CreateRecordingPath,
 			Value: "true",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.DriveName]) == 0 {
@@ -97,7 +112,9 @@ func InitProperties() {
 			Name:  guacd.DriveName,
 			Value: "File-System",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.DrivePath]) == 0 {
@@ -108,7 +125,14 @@ func InitProperties() {
 			Name:  guacd.DrivePath,
 			Value: path + "/drive/",
 		}
-		_ = model.CreateNewProperty(&property)
+		if !utils.Exists(property.Value) {
+			if err := os.Mkdir(property.Value, os.ModePerm); err != nil {
+				return err
+			}
+		}
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.FontName]) == 0 {
@@ -116,7 +140,9 @@ func InitProperties() {
 			Name:  guacd.FontName,
 			Value: "menlo",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.FontSize]) == 0 {
@@ -124,7 +150,9 @@ func InitProperties() {
 			Name:  guacd.FontSize,
 			Value: "12",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.ColorScheme]) == 0 {
@@ -132,7 +160,9 @@ func InitProperties() {
 			Name:  guacd.ColorScheme,
 			Value: "gray-black",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableDrive]) == 0 {
@@ -140,7 +170,9 @@ func InitProperties() {
 			Name:  guacd.EnableDrive,
 			Value: "true",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableWallpaper]) == 0 {
@@ -148,7 +180,9 @@ func InitProperties() {
 			Name:  guacd.EnableWallpaper,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableTheming]) == 0 {
@@ -156,7 +190,9 @@ func InitProperties() {
 			Name:  guacd.EnableTheming,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableFontSmoothing]) == 0 {
@@ -164,7 +200,9 @@ func InitProperties() {
 			Name:  guacd.EnableFontSmoothing,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableFullWindowDrag]) == 0 {
@@ -172,7 +210,9 @@ func InitProperties() {
 			Name:  guacd.EnableFullWindowDrag,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableDesktopComposition]) == 0 {
@@ -180,7 +220,9 @@ func InitProperties() {
 			Name:  guacd.EnableDesktopComposition,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.EnableMenuAnimations]) == 0 {
@@ -188,7 +230,9 @@ func InitProperties() {
 			Name:  guacd.EnableMenuAnimations,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.DisableBitmapCaching]) == 0 {
@@ -196,7 +240,9 @@ func InitProperties() {
 			Name:  guacd.DisableBitmapCaching,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.DisableOffscreenCaching]) == 0 {
@@ -204,7 +250,9 @@ func InitProperties() {
 			Name:  guacd.DisableOffscreenCaching,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
 
 	if len(propertyMap[guacd.DisableGlyphCaching]) == 0 {
@@ -212,6 +260,9 @@ func InitProperties() {
 			Name:  guacd.DisableGlyphCaching,
 			Value: "false",
 		}
-		_ = model.CreateNewProperty(&property)
+		if err := model.CreateNewProperty(&property); err != nil {
+			return err
+		}
 	}
+	return nil
 }

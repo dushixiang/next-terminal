@@ -1,12 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"github.com/labstack/gommon/log"
 	"github.com/patrickmn/go-cache"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/handle"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -19,18 +22,24 @@ func main() {
 }
 
 func Run() error {
-	config.NextTerminal = config.SetupConfig()
+	global.Config = config.SetupConfig()
 
 	var err error
-	//config.DB, err = gorm.Open(mysql.Open(config.NextTerminal.Dsn), &gorm.Config{
-	//	Logger: logger.Default.LogMode(logger.Info),
-	//})
-	config.DB, err = gorm.Open(sqlite.Open("next-terminal.db"), &gorm.Config{})
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		global.Config.Mysql.Username,
+		global.Config.Mysql.Password,
+		global.Config.Mysql.Hostname,
+		global.Config.Mysql.Port,
+		global.Config.Mysql.Database,
+	)
+	global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+		Logger: logger.Default.LogMode(logger.Info),
+	})
 	if err != nil {
 		log.Fatal("连接数据库异常", err)
 	}
 
-	if err := config.DB.AutoMigrate(&model.User{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.User{}); err != nil {
 		return err
 	}
 
@@ -53,23 +62,23 @@ func Run() error {
 		}
 	}
 
-	if err := config.DB.AutoMigrate(&model.Asset{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.Asset{}); err != nil {
 		return err
 	}
-	if err := config.DB.AutoMigrate(&model.Session{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.Session{}); err != nil {
 		return err
 	}
-	if err := config.DB.AutoMigrate(&model.Command{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.Command{}); err != nil {
 		return err
 	}
-	if err := config.DB.AutoMigrate(&model.Credential{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.Credential{}); err != nil {
 		return err
 	}
-	if err := config.DB.AutoMigrate(&model.Property{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.Property{}); err != nil {
 		return err
 	}
 
-	if err := config.DB.AutoMigrate(&model.Num{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.Num{}); err != nil {
 		return err
 	}
 
@@ -81,13 +90,15 @@ func Run() error {
 		}
 	}
 
-	config.Cache = cache.New(5*time.Minute, 10*time.Minute)
-	config.Store = config.NewStore()
+	global.Cache = cache.New(5*time.Minute, 10*time.Minute)
+	global.Store = global.NewStore()
 	e := api.SetupRoutes()
+	if err := handle.InitProperties(); err != nil {
+		return err
+	}
 	// 启动定时任务
 	//go handle.RunTicker()
 	go handle.RunDataFix()
-	go handle.InitProperties()
 
-	return e.Start(config.NextTerminal.Addr)
+	return e.Start(global.Config.Server.Addr)
 }

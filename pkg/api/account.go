@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
 	"time"
@@ -29,7 +29,7 @@ func LoginEndpoint(c echo.Context) error {
 
 	token := utils.UUID()
 
-	config.Cache.Set(token, user, time.Minute*time.Duration(30))
+	global.Cache.Set(token, user, time.Minute*time.Duration(30))
 
 	model.UpdateUserById(&model.User{Online: true}, user.ID)
 
@@ -38,7 +38,7 @@ func LoginEndpoint(c echo.Context) error {
 
 func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
-	config.Cache.Delete(token)
+	global.Cache.Delete(token)
 	return Success(c, nil)
 }
 

@@ -6,7 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/sftp"
 	"log"
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"path"
@@ -60,9 +60,9 @@ func TunEndpoint(c echo.Context) error {
 		}
 
 		if propertyMap[guacd.EnableRecording] == "true" {
-			configuration.SetParameter(guacd.CreateRecordingPath, path.Join(propertyMap[guacd.CreateRecordingPath], sessionId))
+			configuration.SetParameter(guacd.RecordingPath, path.Join(propertyMap[guacd.RecordingPath], sessionId))
 		} else {
-			configuration.SetParameter(guacd.CreateRecordingPath, "")
+			configuration.SetParameter(guacd.RecordingPath, "")
 		}
 
 		configuration.Protocol = session.Protocol
@@ -110,15 +110,15 @@ func TunEndpoint(c echo.Context) error {
 	}
 
 	fmt.Printf("=====================================================\n")
-	fmt.Printf("connect to %v with config: %+v\n", addr, configuration)
+	fmt.Printf("connect to %v with global: %+v\n", addr, configuration)
 	fmt.Printf("=====================================================\n")
 
-	tun := config.Tun{
+	tun := global.Tun{
 		Tun:        tunnel,
 		SftpClient: sftpClient,
 	}
 
-	config.Store.Set(sessionId, tun)
+	global.Store.Set(sessionId, tun)
 
 	if len(session.ConnectionId) == 0 {
 		session.ConnectionId = tunnel.UUID

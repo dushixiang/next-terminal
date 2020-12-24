@@ -1,14 +1,11 @@
 import React, {Component} from 'react';
-import {Card, Col, Layout, PageHeader, Radio, Row, Statistic, Typography} from "antd";
+import {Card, Col, PageHeader, Radio, Row, Statistic} from "antd";
 import {DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import './Dashboard.css'
 import {Link} from "react-router-dom";
 import {Area} from '@ant-design/charts';
-
-const {Content} = Layout;
-const {Title, Paragraph} = Typography;
 
 
 const routes = [

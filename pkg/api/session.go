@@ -5,10 +5,11 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
 	"os"
@@ -42,12 +43,14 @@ func SessionDeleteEndpoint(c echo.Context) error {
 	sessionIds := c.Param("id")
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
-		model.DeleteSessionById(split[i])
 		drivePath, err := model.GetRecordingPath()
 		if err != nil {
 			continue
 		}
-		_ = os.Remove(path.Join(drivePath, split[i]))
+		if err := os.RemoveAll(path.Join(drivePath, split[i])); err != nil {
+			return err
+		}
+		model.DeleteSessionById(split[i])
 	}
 
 	return Success(c, nil)
@@ -70,7 +73,7 @@ func SessionDiscontentEndpoint(c echo.Context) error {
 
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
-		tun, ok := config.Store.Get(split[i])
+		tun, ok := global.Store.Get(split[i])
 		if ok {
 			CloseSession(split[i], tun)
 		}
@@ -78,9 +81,9 @@ func SessionDiscontentEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func CloseSession(sessionId string, tun config.Tun) {
+func CloseSession(sessionId string, tun global.Tun) {
 	_ = tun.Tun.Close()
-	config.Store.Del(sessionId)
+	global.Store.Del(sessionId)
 
 	session := model.Session{}
 	session.ID = sessionId
@@ -172,7 +175,7 @@ func SessionUploadEndpoint(c echo.Context) error {
 	remoteFile := path.Join(remoteDir, filename)
 
 	if "ssh" == session.Protocol {
-		tun, ok := config.Store.Get(sessionId)
+		tun, ok := global.Store.Get(sessionId)
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
@@ -226,7 +229,7 @@ func SessionDownloadEndpoint(c echo.Context) error {
 	remoteFile := c.QueryParam("file")
 
 	if "ssh" == session.Protocol {
-		tun, ok := config.Store.Get(sessionId)
+		tun, ok := global.Store.Get(sessionId)
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
@@ -273,7 +276,7 @@ func SessionLsEndpoint(c echo.Context) error {
 	}
 	remoteDir := c.QueryParam("dir")
 	if "ssh" == session.Protocol {
-		tun, ok := config.Store.Get(sessionId)
+		tun, ok := global.Store.Get(sessionId)
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
@@ -334,7 +337,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 	}
 	remoteDir := c.QueryParam("dir")
 	if "ssh" == session.Protocol {
-		tun, ok := config.Store.Get(sessionId)
+		tun, ok := global.Store.Get(sessionId)
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
@@ -365,7 +368,7 @@ func SessionRmDirEndpoint(c echo.Context) error {
 	}
 	remoteDir := c.QueryParam("dir")
 	if "ssh" == session.Protocol {
-		tun, ok := config.Store.Get(sessionId)
+		tun, ok := global.Store.Get(sessionId)
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
@@ -407,7 +410,7 @@ func SessionRmEndpoint(c echo.Context) error {
 	}
 	remoteFile := c.QueryParam("file")
 	if "ssh" == session.Protocol {
-		tun, ok := config.Store.Get(sessionId)
+		tun, ok := global.Store.Get(sessionId)
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
@@ -427,4 +430,15 @@ func SessionRmEndpoint(c echo.Context) error {
 		return Success(c, nil)
 	}
 	return nil
+}
+
+func SessionRecordingEndpoint(c echo.Context) error {
+	sessionId := c.Param("id")
+	recordingPath, err := model.GetRecordingPath()
+	if err != nil {
+		return err
+	}
+	recording := path.Join(recordingPath, sessionId, "recording")
+	log.Printf("读取录屏文件：%s", recording)
+	return c.File(recording)
 }

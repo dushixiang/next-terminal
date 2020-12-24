@@ -8,22 +8,33 @@ WORKDIR /app
 
 COPY . .
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
-RUN apk add gcc g++
-RUN go env && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -ldflags '-linkmode external -extldflags "-static"' -o next_terminal main.go
+RUN go env && CGO_ENABLED=0 go build -o nt main.go
 
 FROM guacamole/guacd:1.2.0
 
 LABEL MAINTAINER="helloworld1024@foxmail.com"
 
-WORKDIR /opt/next_terminal
+RUN apt-get update && apt-get -y install supervisor
+RUN mkdir -p /var/log/supervisor
+COPY --from=builder /app/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-COPY --from=builder /app/next_terminal ./
-COPY --from=builder /app/next-terminal.yml ./
+ENV MYSQL_HOSTNAME 127.0.0.1
+ENV MYSQL_PORT 3306
+ENV MYSQL_USERNAME mysql
+ENV MYSQL_PASSWORD mysql
+ENV MYSQL_DATABASE next_terminal
+ENV SERVER_PORT 8088
+
+WORKDIR /usr/local/nt
+
+COPY --from=builder /app/nt ./
+COPY --from=builder /app/config.yml ./
 COPY --from=builder /app/web/build ./web/build
+COPY --from=builder /app/web/src/fonts/Menlo-Regular-1.ttf /usr/share/fonts/
 
-RUN touch next-terminal.db & chmod +x next_terminal
+RUN mkfontscale && mkfontdir && fc-cache
 
-EXPOSE 8088
+EXPOSE $SERVER_PORT
 
-ENTRYPOINT ./next_terminal
+RUN mkdir recording && mkdir drive
+ENTRYPOINT /usr/bin/supervisord

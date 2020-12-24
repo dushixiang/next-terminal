@@ -1,7 +1,7 @@
 package model
 
 import (
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 )
 
@@ -18,12 +18,12 @@ func (r *Credential) TableName() string {
 }
 
 func FindAllCredential() (o []Credential, err error) {
-	err = config.DB.Find(&o).Error
+	err = global.DB.Find(&o).Error
 	return
 }
 
 func FindPageCredential(pageIndex, pageSize int, name string) (o []Credential, total int64, err error) {
-	db := config.DB
+	db := global.DB
 	if len(name) > 0 {
 		db = db.Where("name like ?", "%"+name+"%")
 	}
@@ -36,7 +36,7 @@ func FindPageCredential(pageIndex, pageSize int, name string) (o []Credential, t
 }
 
 func CreateNewCredential(o *Credential) (err error) {
-	if err = config.DB.Create(o).Error; err != nil {
+	if err = global.DB.Create(o).Error; err != nil {
 		return err
 	}
 	return nil
@@ -44,20 +44,20 @@ func CreateNewCredential(o *Credential) (err error) {
 
 func FindCredentialById(id string) (o Credential, err error) {
 
-	err = config.DB.Where("id = ?", id).First(&o).Error
+	err = global.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
 func UpdateCredentialById(o *Credential, id string) {
 	o.ID = id
-	config.DB.Updates(o)
+	global.DB.Updates(o)
 }
 
 func DeleteCredentialById(id string) {
-	config.DB.Where("id = ?", id).Delete(&Credential{})
+	global.DB.Where("id = ?", id).Delete(&Credential{})
 }
 
 func CountCredential() (total int64, err error) {
-	err = config.DB.Find(&Credential{}).Count(&total).Error
+	err = global.DB.Find(&Credential{}).Count(&total).Error
 	return
 }

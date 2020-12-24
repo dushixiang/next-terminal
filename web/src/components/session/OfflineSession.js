@@ -259,14 +259,6 @@ class OfflineSession extends Component {
                 return `${record.username}@${record.ip}:${record.port}`;
             }
         }, {
-            title: '屏幕大小',
-            dataIndex: 'screen',
-            key: 'screen',
-            render: (text, record) => {
-
-                return `${record.width}x${record.height}`;
-            }
-        }, {
             title: '连接协议',
             dataIndex: 'protocol',
             key: 'protocol',
@@ -385,7 +377,7 @@ class OfflineSession extends Component {
                                     />
 
                                     <Select
-                                        style={{width: 200}}
+                                        style={{width: 150}}
                                         showSearch
                                         value={this.state.queryParams.userId}
                                         placeholder='用户昵称'
@@ -397,7 +389,7 @@ class OfflineSession extends Component {
                                     </Select>
 
                                     <Select
-                                        style={{width: 200}}
+                                        style={{width: 150}}
                                         showSearch
                                         value={this.state.queryParams.assetId}
                                         placeholder='资产名称'

@@ -1,7 +1,7 @@
 package model
 
 import (
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 )
 
@@ -27,12 +27,12 @@ func (r *Asset) TableName() string {
 }
 
 func FindAllAsset() (o []Asset, err error) {
-	err = config.DB.Find(&o).Error
+	err = global.DB.Find(&o).Error
 	return
 }
 
 func FindAssetByConditions(protocol string) (o []Asset, err error) {
-	db := config.DB
+	db := global.DB
 
 	if len(protocol) > 0 {
 		db = db.Where("protocol = ?", protocol)
@@ -42,7 +42,7 @@ func FindAssetByConditions(protocol string) (o []Asset, err error) {
 }
 
 func FindPageAsset(pageIndex, pageSize int, name, protocol string) (o []Asset, total int64, err error) {
-	db := config.DB
+	db := global.DB
 	if len(name) > 0 {
 		db = db.Where("name like ?", "%"+name+"%")
 	}
@@ -60,27 +60,27 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol string) (o []Asset, t
 }
 
 func CreateNewAsset(o *Asset) (err error) {
-	if err = config.DB.Create(o).Error; err != nil {
+	if err = global.DB.Create(o).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func FindAssetById(id string) (o Asset, err error) {
-	err = config.DB.Where("id = ?", id).First(&o).Error
+	err = global.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
 func UpdateAssetById(o *Asset, id string) {
 	o.ID = id
-	config.DB.Updates(o)
+	global.DB.Updates(o)
 }
 
 func DeleteAssetById(id string) {
-	config.DB.Where("id = ?", id).Delete(&Asset{})
+	global.DB.Where("id = ?", id).Delete(&Asset{})
 }
 
 func CountAsset() (total int64, err error) {
-	err = config.DB.Find(&Asset{}).Count(&total).Error
+	err = global.DB.Find(&Asset{}).Count(&total).Error
 	return
 }

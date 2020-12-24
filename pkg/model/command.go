@@ -1,7 +1,7 @@
 package model
 
 import (
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 )
 
@@ -18,7 +18,7 @@ func (r *Command) TableName() string {
 
 func FindPageCommand(pageIndex, pageSize int, name, content string) (o []Command, total int64, err error) {
 
-	db := config.DB
+	db := global.DB
 	if len(name) > 0 {
 		db = db.Where("name like ?", "%"+name+"%")
 	}
@@ -35,22 +35,22 @@ func FindPageCommand(pageIndex, pageSize int, name, content string) (o []Command
 }
 
 func CreateNewCommand(o *Command) (err error) {
-	if err = config.DB.Create(o).Error; err != nil {
+	if err = global.DB.Create(o).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
 func FindCommandById(id string) (o Command, err error) {
-	err = config.DB.Where("id = ?", id).First(&o).Error
+	err = global.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
 func UpdateCommandById(o *Command, id string) {
 	o.ID = id
-	config.DB.Updates(o)
+	global.DB.Updates(o)
 }
 
 func DeleteCommandById(id string) {
-	config.DB.Where("id = ?", id).Delete(&Command{})
+	global.DB.Where("id = ?", id).Delete(&Command{})
 }

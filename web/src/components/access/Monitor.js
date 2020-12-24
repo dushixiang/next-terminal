@@ -3,7 +3,6 @@ import Guacamole from 'guacamole-common-js';
 import {message, Modal} from 'antd'
 import qs from "qs";
 import {prefix, wsServer} from "../../common/constants";
-import {LoadingOutlined} from '@ant-design/icons';
 import {getToken} from "../../utils/utils";
 import './Access.css'
 
@@ -13,8 +12,6 @@ const STATE_WAITING = 2;
 const STATE_CONNECTED = 3;
 const STATE_DISCONNECTING = 4;
 const STATE_DISCONNECTED = 5;
-
-const antIcon = <LoadingOutlined/>;
 
 class Access extends Component {
 

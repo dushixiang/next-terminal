@@ -1,7 +1,7 @@
 package model
 
 import (
-	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
 )
 
 type Num struct {
@@ -13,13 +13,13 @@ func (r *Num) TableName() string {
 }
 
 func FindAllTemp() (o []Num) {
-	if config.DB.Find(&o).Error != nil {
+	if global.DB.Find(&o).Error != nil {
 		return nil
 	}
 	return
 }
 
 func CreateNewTemp(o *Num) (err error) {
-	err = config.DB.Create(o).Error
+	err = global.DB.Create(o).Error
 	return
 }

@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {Layout, PageHeader} from "antd";
+import {Button, Form, Input, Layout, PageHeader} from "antd";
 import {itemRender} from '../../utils/utils'
-import {Form, Input, Button, Checkbox} from "antd";
 import request from "../../common/request";
 import {message} from "antd/es";
 
@@ -110,7 +109,8 @@ class Info extends Component {
                                 },
                             ]}
                         >
-                            <Input type='password' placeholder="新的密码" onChange={(value) => this.onNewPasswordChange(value)}/>
+                            <Input type='password' placeholder="新的密码"
+                                   onChange={(value) => this.onNewPasswordChange(value)}/>
                         </Form.Item>
 
                         <Form.Item
@@ -126,7 +126,8 @@ class Info extends Component {
                             validateStatus={this.state.validateStatus}
                             help={this.state.errorMsg || ''}
                         >
-                            <Input type='password' placeholder="请和上面输入新的密码保持一致" onChange={(value) => this.onNewPassword2Change(value)}/>
+                            <Input type='password' placeholder="请和上面输入新的密码保持一致"
+                                   onChange={(value) => this.onNewPassword2Change(value)}/>
                         </Form.Item>
 
                         <Form.Item {...formTailLayout}>
