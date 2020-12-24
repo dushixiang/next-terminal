@@ -766,12 +766,12 @@ class Access extends Component {
 
         return (
             <div>
+
                 <div className="container" style={{
                     overflow: this.state.containerOverflow,
                     width: this.state.containerWidth,
                     height: this.state.containerHeight
                 }}>
-
                     <div id="display"/>
                 </div>
 

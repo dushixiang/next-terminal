@@ -27,6 +27,8 @@ type Session struct {
 	Height           int            `json:"height"`
 	Status           string         `json:"status"`
 	Recording        string         `json:"recording"`
+	PrivateKey       string         `json:"privateKey"`
+	Passphrase       string         `json:"passphrase"`
 	ConnectedTime    utils.JsonTime `json:"connectedTime"`
 	DisconnectedTime utils.JsonTime `json:"disconnectedTime"`
 }

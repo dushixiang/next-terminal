@@ -477,6 +477,7 @@ class OnlineSession extends Component {
                         className='monitor'
                         title={this.state.sessionTitle}
                         centered
+                        maskClosable={false}
                         visible={this.state.accessVisible}
                         footer={null}
                         width={window.innerWidth * 0.8}

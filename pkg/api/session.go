@@ -125,16 +125,18 @@ func SessionCreateEndpoint(c echo.Context) error {
 	}
 
 	session := &model.Session{
-		ID:       utils.UUID(),
-		AssetId:  asset.ID,
-		Username: asset.Username,
-		Password: asset.Password,
-		Protocol: asset.Protocol,
-		IP:       asset.IP,
-		Port:     asset.Port,
-		Status:   model.NoConnect,
-		Creator:  user.ID,
-		ClientIP: c.RealIP(),
+		ID:         utils.UUID(),
+		AssetId:    asset.ID,
+		Username:   asset.Username,
+		Password:   asset.Password,
+		PrivateKey: asset.PrivateKey,
+		Passphrase: asset.Passphrase,
+		Protocol:   asset.Protocol,
+		IP:         asset.IP,
+		Port:       asset.Port,
+		Status:     model.NoConnect,
+		Creator:    user.ID,
+		ClientIP:   c.RealIP(),
 	}
 
 	if asset.AccountType == "credential" {

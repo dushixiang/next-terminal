@@ -80,10 +80,15 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter("enable-sftp", "")
 			break
 		case "ssh":
-			configuration.SetParameter("username", session.Username)
-			configuration.SetParameter("password", session.Password)
+			if session.PrivateKey == "-" {
+				configuration.SetParameter("username", session.Username)
+				configuration.SetParameter("password", session.Password)
+			} else {
+				configuration.SetParameter("private-key", session.PrivateKey)
+				configuration.SetParameter("passphrase", session.Passphrase)
+			}
 
-			sftpClient, err = CreateSftpClient(session.Username, session.Password, session.IP, session.Port)
+			sftpClient, err = CreateSftpClient(session.AssetId)
 			if err != nil {
 				return err
 			}

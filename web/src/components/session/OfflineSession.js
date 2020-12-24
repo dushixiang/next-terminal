@@ -481,12 +481,14 @@ class OfflineSession extends Component {
 
                     <Modal
                         title="会话回放"
+                        centered
                         visible={this.state.playbackVisible}
                         onCancel={this.hidePlayback}
 
                         width={window.innerWidth * 0.8}
                         footer={null}
                         destroyOnClose
+                        maskClosable={false}
                     >
                         <Playback sessionId={this.state.playbackSessionId}/>
                     </Modal>

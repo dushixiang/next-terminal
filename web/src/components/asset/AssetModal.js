@@ -17,6 +17,14 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
         setAccountType(model.accountType);
     });
 
+    for (let key in model) {
+        if (model.hasOwnProperty(key)) {
+            if (model[key] === '-') {
+                model[key] = '';
+            }
+        }
+    }
+
     const formItemLayout = {
         labelCol: {span: 6},
         wrapperCol: {span: 14},
@@ -54,7 +62,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
         <Modal
             title={title}
             visible={visible}
-            maskClosable={true}
+            maskClosable={false}
             onOk={() => {
                 form
                     .validateFields()
@@ -62,7 +70,8 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                         form.resetFields();
                         handleOk(values);
                     })
-                    .catch(info => {});
+                    .catch(info => {
+                    });
             }}
             onCancel={handleCancel}
             confirmLoading={confirmLoading}
@@ -103,7 +112,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     }}>
                         <Option value="custom">自定义</Option>
                         <Option value="credential">授权凭证</Option>
-                        <Option value="secret-key">密钥</Option>
+                        <Option value="private-key">私钥</Option>
                     </Select>
                 </Form.Item>
 
@@ -143,10 +152,17 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                 }
 
                 {
-                    accountType === 'secret-key' ?
-                        <Form.Item label="私钥" name='passphrase' rules={[{required: true, message: '请输入私钥'}]}>
-                            <TextArea rows={4}/>
-                        </Form.Item>
+                    accountType === 'private-key' ?
+                        <>
+                            <Form.Item label="私钥" name='privateKey' rules={[{required: true, message: '请输入私钥'}]}>
+                                <TextArea rows={4}/>
+                            </Form.Item>
+                            <Form.Item label="私钥密码" name='passphrase'>
+                                <TextArea rows={1}/>
+                            </Form.Item>
+                        </>
+
+
                         : null
                 }
             </Form>

@@ -1,9 +1,9 @@
 package api
 
 import (
+	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
-	"github.com/labstack/echo/v4"
 	"strconv"
 	"strings"
 )
@@ -50,6 +50,21 @@ func AssetUpdateEndpoint(c echo.Context) error {
 	var item model.Asset
 	if err := c.Bind(&item); err != nil {
 		return err
+	}
+	switch item.AccountType {
+	case "credential":
+		item.Username = "-"
+		item.Password = "-"
+		item.PrivateKey = "-"
+		item.Passphrase = "-"
+	case "private-key":
+		item.Username = "-"
+		item.Password = "-"
+		item.CredentialId = "-"
+	case "custom":
+		item.PrivateKey = "-"
+		item.Passphrase = "-"
+		item.CredentialId = "-"
 	}
 
 	model.UpdateAssetById(&item, id)

@@ -1,12 +1,13 @@
 import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Input} from "antd";
+import {Button, Card, Checkbox, Form, Input, Typography} from "antd";
 import './Login.css'
 import request from "../common/request";
 import {message} from "antd/es";
 import {withRouter} from "react-router-dom";
-import {
-    UserOutlined, LockOutlined
-} from '@ant-design/icons';
+import {LockOutlined, UserOutlined} from '@ant-design/icons';
+
+
+const {Title} = Typography;
 
 class LoginForm extends Component {
 
@@ -48,9 +49,12 @@ class LoginForm extends Component {
     };
 
     render() {
-
         return (
-                <Card className='login-card' title="登录">
+            <div className='login-bg' style={{width: window.innerWidth, height: window.innerHeight, backgroundColor: '#F0F2F5'}}>
+                <Card className='login-card' title={null}>
+                    <div style={{textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff'}}>
+                        <Title level={1}>Next Terminal</Title>
+                    </div>
                     <Form onFinish={this.handleSubmit} className="login-form">
                         <Form.Item name='username' rules={[{required: true, message: '请输入登录账号！'}]}>
                             <Input prefix={<UserOutlined/>} placeholder="登录账号"/>
@@ -71,6 +75,8 @@ class LoginForm extends Component {
                         </Form.Item>
                     </Form>
                 </Card>
+            </div>
+
         );
     }
 }
