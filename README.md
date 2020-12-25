@@ -15,6 +15,8 @@ Next Terminal基于Apache Guacamole开发，使用到了guacd服务。
 
 ```shell
 mkdir /etc/next-terminal
+mkdir /etc/next-terminal/recording
+mkdir /etc/next-terminal/drive
 cat <<EOF >> /etc/next-terminal/config.yaml
 mysql:
   hostname: 172.17.0.1
@@ -30,6 +32,8 @@ EOF
 docker run -d \
   -p 8088:8088 \
   -v /etc/next-terminal/config.yaml:/etc/next-terminal/config.yaml \
+  -v /etc/next-terminal/recording/:/usr/local/next-terminal/recording/ \
+  -v /etc/next-terminal/drive/:/usr/local/next-terminal/drive/ \
   --name next-terminal \
   --restart always dushixiang/next-terminal:0.0.1
 ```
