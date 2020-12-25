@@ -7,6 +7,21 @@ Next Terminal是使用Golang和React开发的一款HTML5的远程桌面网关，
 
 Next Terminal基于Apache Guacamole开发，使用到了guacd服务。
 
+目前支持的功能有：
+
+- 授权凭证管理
+- 资产管理（支持RDP、SSH、VNC、TELNET协议）
+- 指令管理
+- 批量执行命令
+- 在线会话管理（监控、强制断开）
+- 离线会话管理（查看录屏）
+
+## 在线体验
+
+https://next-terminal.typesafe.cn/
+
+admin/admin
+
 ## 快速安装
 
 ### docker安装
