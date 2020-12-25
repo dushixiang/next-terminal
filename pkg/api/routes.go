@@ -23,7 +23,7 @@ func SetupRoutes() *echo.Echo {
 	e.Use(middleware.Logger())
 
 	//fd, _ := os.OpenFile(
-	//	"nt.log",
+	//	"next-terminal.log",
 	//	os.O_RDWR|os.O_APPEND,
 	//	0666,
 	//)

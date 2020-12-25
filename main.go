@@ -36,7 +36,7 @@ func Run() error {
 		Logger: logger.Default.LogMode(logger.Info),
 	})
 	if err != nil {
-		log.Fatal("连接数据库异常", err)
+		return err
 	}
 
 	if err := global.DB.AutoMigrate(&model.User{}); err != nil {

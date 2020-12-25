@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY . .
 
-RUN go env && CGO_ENABLED=0 go build -o nt main.go
+RUN go env && CGO_ENABLED=0 go build -o next-terminal main.go
 
 FROM guacamole/guacd:1.2.0
 
@@ -25,10 +25,9 @@ ENV MYSQL_PASSWORD mysql
 ENV MYSQL_DATABASE next_terminal
 ENV SERVER_PORT 8088
 
-WORKDIR /usr/local/nt
+WORKDIR /usr/local/next-terminal
 
-COPY --from=builder /app/nt ./
-COPY --from=builder /app/config.yml ./
+COPY --from=builder /app/next-terminal ./
 COPY --from=builder /app/web/build ./web/build
 COPY --from=builder /app/web/src/fonts/Menlo-Regular-1.ttf /usr/share/fonts/
 

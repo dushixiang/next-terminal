@@ -14,14 +14,31 @@ Next Terminal基于Apache Guacamole开发，使用到了guacd服务。
 因为程序依赖了mysql，所以在启动时需要指定mysql的连接信息。
 
 ```shell
-docker run -p 8088:8088 --env MYSQL_HOSTNAME=d-mysql-57  --env MYSQL_USERNAME=root --env MYSQL_PASSWORD=root --name next-terminal --link d-mysql-57 dushixiang/next-terminal:0.0.1 
+mkdir /etc/next-terminal
+cat <<EOF >> /etc/next-terminal/config.yaml
+mysql:
+  hostname: 172.17.0.1
+  port: 3306
+  username: root
+  password: root
+  database: next_terminal
+server:
+  addr: 0.0.0.0:8088
+EOF
+```
+```shell
+docker run -d \
+  -p 8088:8088 \
+  -v /etc/next-terminal/config.yaml:/etc/next-terminal/config.yaml \
+  --name next-terminal \
+  --restart always dushixiang/next-terminal:0.0.1
 ```
 
-程序安装目录地址为 `/usr/local/nt`
+程序安装目录地址为 `/usr/local/next-terminal`
 
-录屏文件存放目录为 `/usr/local/nt/recording`
+录屏文件存放目录为 `/usr/local/next-terminal/recording`
 
-远程桌面挂载目录为 `/usr/local/nt/drive`
+远程桌面挂载目录为 `/usr/local/next-terminal/drive`
 
 可以通过 `-v` 参数将宿主机器的目录映射到docker中
 
