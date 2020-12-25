@@ -49,18 +49,9 @@ func TunEndpoint(c echo.Context) error {
 			return err
 		}
 
-		for name := range propertyMap {
-			if name == guacd.FontSize {
-				fontSize, _ := strconv.Atoi(propertyMap[name])
-				fontSize = fontSize * 2
-				configuration.SetParameter(name, strconv.Itoa(fontSize))
-			} else {
-				configuration.SetParameter(name, propertyMap[name])
-			}
-		}
-
 		if propertyMap[guacd.EnableRecording] == "true" {
 			configuration.SetParameter(guacd.RecordingPath, path.Join(propertyMap[guacd.RecordingPath], sessionId))
+			configuration.SetParameter(guacd.CreateRecordingPath, propertyMap[guacd.CreateRecordingPath])
 		} else {
 			configuration.SetParameter(guacd.RecordingPath, "")
 		}
@@ -77,16 +68,33 @@ func TunEndpoint(c echo.Context) error {
 
 			configuration.SetParameter("dpi", "96")
 			configuration.SetParameter("resize-method", "reconnect")
-			configuration.SetParameter("enable-sftp", "")
+			configuration.SetParameter(guacd.EnableDrive, propertyMap[guacd.EnableDrive])
+			configuration.SetParameter(guacd.DriveName, propertyMap[guacd.DriveName])
+			configuration.SetParameter(guacd.DrivePath, propertyMap[guacd.DrivePath])
+			configuration.SetParameter(guacd.EnableWallpaper, propertyMap[guacd.EnableWallpaper])
+			configuration.SetParameter(guacd.EnableTheming, propertyMap[guacd.EnableTheming])
+			configuration.SetParameter(guacd.EnableFontSmoothing, propertyMap[guacd.EnableFontSmoothing])
+			configuration.SetParameter(guacd.EnableFullWindowDrag, propertyMap[guacd.EnableFullWindowDrag])
+			configuration.SetParameter(guacd.EnableDesktopComposition, propertyMap[guacd.EnableDesktopComposition])
+			configuration.SetParameter(guacd.EnableMenuAnimations, propertyMap[guacd.EnableMenuAnimations])
+			configuration.SetParameter(guacd.DisableBitmapCaching, propertyMap[guacd.DisableBitmapCaching])
+			configuration.SetParameter(guacd.DisableOffscreenCaching, propertyMap[guacd.DisableOffscreenCaching])
+			configuration.SetParameter(guacd.DisableGlyphCaching, propertyMap[guacd.DisableGlyphCaching])
 			break
 		case "ssh":
-			if session.PrivateKey == "-" {
-				configuration.SetParameter("username", session.Username)
-				configuration.SetParameter("password", session.Password)
-			} else {
+			if len(session.PrivateKey) > 0 && session.PrivateKey != "-" {
 				configuration.SetParameter("private-key", session.PrivateKey)
 				configuration.SetParameter("passphrase", session.Passphrase)
+			} else {
+				configuration.SetParameter("username", session.Username)
+				configuration.SetParameter("password", session.Password)
 			}
+
+			fontSize, _ := strconv.Atoi(propertyMap[guacd.FontSize])
+			fontSize = fontSize * 2
+			configuration.SetParameter(guacd.FontSize, strconv.Itoa(fontSize))
+			configuration.SetParameter(guacd.FontName, propertyMap[guacd.FontName])
+			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
 
 			sftpClient, err = CreateSftpClient(session.AssetId)
 			if err != nil {

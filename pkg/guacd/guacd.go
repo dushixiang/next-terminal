@@ -34,7 +34,7 @@ const (
 )
 
 const Delimiter = ';'
-const Version = "VERSION_1_1_0"
+const Version = "VERSION_1_2_0"
 
 type Configuration struct {
 	ConnectionID string

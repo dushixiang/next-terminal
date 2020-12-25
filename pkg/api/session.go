@@ -33,6 +33,22 @@ func SessionPagingEndpoint(c echo.Context) error {
 		return err
 	}
 
+	for i := 0; i < len(items); i++ {
+		if len(items[i].Recording) > 0 {
+			recording := items[i].Recording + "/recording"
+
+			if utils.FileExists(recording) {
+				log.Infof("检测到录屏文件[%v]存在", recording)
+				items[i].Recording = "1"
+			} else {
+				log.Warnf("检测到录屏文件[%v]不存在", recording)
+				items[i].Recording = "0"
+			}
+		} else {
+			items[i].Recording = "0"
+		}
+	}
+
 	return Success(c, H{
 		"total": total,
 		"items": items,
@@ -436,11 +452,11 @@ func SessionRmEndpoint(c echo.Context) error {
 
 func SessionRecordingEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	recordingPath, err := model.GetRecordingPath()
+	session, err := model.FindSessionById(sessionId)
 	if err != nil {
 		return err
 	}
-	recording := path.Join(recordingPath, sessionId, "recording")
+	recording := path.Join(session.Recording, "recording")
 	log.Printf("读取录屏文件：%s", recording)
 	return c.File(recording)
 }

@@ -62,10 +62,18 @@ func UserUpdateEndpoint(c echo.Context) error {
 }
 
 func UserDeleteEndpoint(c echo.Context) error {
-	id := c.Param("id")
-	split := strings.Split(id, ",")
+	ids := c.Param("id")
+	account, found := GetCurrentAccount(c)
+	if !found {
+		return Fail(c, -1, "获取当前登录账户失败")
+	}
+	split := strings.Split(ids, ",")
 	for i := range split {
-		model.DeleteUserById(split[i])
+		userId := split[i]
+		if account.ID == userId {
+			return Fail(c, -1, "不允许删除自身账户")
+		}
+		model.DeleteUserById(userId)
 	}
 
 	return Success(c, nil)

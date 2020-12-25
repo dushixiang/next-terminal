@@ -87,7 +87,7 @@ func InitProperties() error {
 			Name:  guacd.RecordingPath,
 			Value: path + "/recording/",
 		}
-		if !utils.Exists(property.Value) {
+		if !utils.FileExists(property.Value) {
 			if err := os.Mkdir(property.Value, os.ModePerm); err != nil {
 				return err
 			}
@@ -125,7 +125,7 @@ func InitProperties() error {
 			Name:  guacd.DrivePath,
 			Value: path + "/drive/",
 		}
-		if !utils.Exists(property.Value) {
+		if !utils.FileExists(property.Value) {
 			if err := os.Mkdir(property.Value, os.ModePerm); err != nil {
 				return err
 			}
