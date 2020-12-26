@@ -36,6 +36,7 @@ func SetupRoutes() *echo.Echo {
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
+	e.Use(ErrorHandler)
 	e.Use(Auth)
 
 	e.POST("/login", LoginEndpoint)

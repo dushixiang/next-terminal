@@ -3,6 +3,7 @@ import {Button, Form, Input, Layout, PageHeader, Select, Switch, Tabs, Typograph
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import {message} from "antd/es";
+import Logout from "../user/Logout";
 
 const {Content} = Layout;
 const {Option} = Select;
@@ -107,6 +108,9 @@ class Setting extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="系统设置"
                 >
                 </PageHeader>

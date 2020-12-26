@@ -28,6 +28,7 @@ import {
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
+import Logout from "./Logout";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -308,6 +309,9 @@ class User extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="平台用户管理"
                 >
                 </PageHeader>

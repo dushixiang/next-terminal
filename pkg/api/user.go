@@ -16,7 +16,7 @@ func UserCreateEndpoint(c echo.Context) error {
 
 	var pass []byte
 	var err error
-	if pass, err = utils.Encoder.Encode([]byte("admin")); err != nil {
+	if pass, err = utils.Encoder.Encode([]byte(item.Password)); err != nil {
 		return err
 	}
 	item.Password = string(pass)

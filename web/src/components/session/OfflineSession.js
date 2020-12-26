@@ -31,6 +31,7 @@ import {
     UndoOutlined
 } from "@ant-design/icons";
 import {PROTOCOL_COLORS} from "../../common/constants";
+import Logout from "../user/Logout";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
@@ -357,6 +358,9 @@ class OfflineSession extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="离线会话管理"
                 >
                 </PageHeader>

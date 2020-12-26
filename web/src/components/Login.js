@@ -12,8 +12,19 @@ const {Title} = Typography;
 class LoginForm extends Component {
 
     state = {
-        inLogin: false
+        inLogin: false,
+        height: window.innerHeight,
+        width: window.innerWidth
     };
+
+    componentDidMount() {
+        window.addEventListener('resize', () => {
+            this.setState({
+                height: window.innerHeight,
+                width: window.innerWidth
+            })
+        });
+    }
 
     handleSubmit = async params => {
         this.setState({
@@ -50,7 +61,8 @@ class LoginForm extends Component {
 
     render() {
         return (
-            <div className='login-bg' style={{width: window.innerWidth, height: window.innerHeight, backgroundColor: '#F0F2F5'}}>
+            <div className='login-bg'
+                 style={{width: this.state.width, height: this.state.height, backgroundColor: '#F0F2F5'}}>
                 <Card className='login-card' title={null}>
                     <div style={{textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff'}}>
                         <Title level={1}>Next Terminal</Title>

@@ -7,6 +7,16 @@ import (
 	"time"
 )
 
+func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+
+		if err := next(c); err != nil {
+			return Fail(c, 0, err.Error())
+		}
+		return nil
+	}
+}
+
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 	urls := []string{"download", "recording", "login", "static", "favicon", "logo"}

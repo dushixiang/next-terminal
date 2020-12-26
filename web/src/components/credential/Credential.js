@@ -14,6 +14,7 @@ import {
     UndoOutlined
 } from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
+import Logout from "../user/Logout";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -280,6 +281,9 @@ class Credential extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="访问资产的账户、密钥等"
                 >
                 </PageHeader>

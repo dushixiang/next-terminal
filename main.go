@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/patrickmn/go-cache"
 	"gorm.io/driver/mysql"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"next-terminal/pkg/api"
@@ -22,19 +23,27 @@ func main() {
 }
 
 func Run() error {
-	global.Config = config.SetupConfig()
-
 	var err error
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-		global.Config.Mysql.Username,
-		global.Config.Mysql.Password,
-		global.Config.Mysql.Hostname,
-		global.Config.Mysql.Port,
-		global.Config.Mysql.Database,
-	)
-	global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-		Logger: logger.Default.LogMode(logger.Info),
-	})
+	global.Config, err = config.SetupConfig()
+	if err != nil {
+		return err
+	}
+
+	if global.Config.DB == "mysql" {
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+			global.Config.Mysql.Username,
+			global.Config.Mysql.Password,
+			global.Config.Mysql.Hostname,
+			global.Config.Mysql.Port,
+			global.Config.Mysql.Database,
+		)
+		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		})
+	} else {
+		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{})
+	}
+
 	if err != nil {
 		return err
 	}

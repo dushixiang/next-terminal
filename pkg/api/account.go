@@ -13,6 +13,11 @@ type LoginAccount struct {
 	Password string `json:"password"`
 }
 
+type ChangePassword struct {
+	NewPassword string `json:"newPassword"`
+	OldPassword string `json:"oldPassword"`
+}
+
 func LoginEndpoint(c echo.Context) error {
 	var loginAccount LoginAccount
 	if err := c.Bind(&loginAccount); err != nil {
@@ -21,10 +26,10 @@ func LoginEndpoint(c echo.Context) error {
 
 	user, err := model.FindUserByUsername(loginAccount.Username)
 	if err != nil {
-		return err
+		return Fail(c, -1, "您输入的账号或密码不正确")
 	}
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
-		return err
+		return Fail(c, -1, "您输入的账号或密码不正确")
 	}
 
 	token := utils.UUID()
@@ -43,7 +48,28 @@ func LogoutEndpoint(c echo.Context) error {
 }
 
 func ChangePasswordEndpoint(c echo.Context) error {
-	return nil
+	account, _ := GetCurrentAccount(c)
+
+	var changePassword ChangePassword
+	if err := c.Bind(&changePassword); err != nil {
+		return err
+	}
+
+	if err := utils.Encoder.Match([]byte(account.Password), []byte(changePassword.OldPassword)); err != nil {
+		return Fail(c, -1, "您输入的原密码不正确")
+	}
+
+	passwd, err := utils.Encoder.Encode([]byte(changePassword.NewPassword))
+	if err != nil {
+		return err
+	}
+	u := &model.User{
+		Password: string(passwd),
+	}
+
+	model.UpdateUserById(u, account.ID)
+
+	return LogoutEndpoint(c)
 }
 
 func InfoEndpoint(c echo.Context) error {

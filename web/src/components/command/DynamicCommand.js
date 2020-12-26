@@ -30,6 +30,7 @@ import {
     UndoOutlined
 } from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
+import Logout from "../user/Logout";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
@@ -359,6 +360,9 @@ class DynamicCommand extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="批量动态指令执行"
                 >
                 </PageHeader>

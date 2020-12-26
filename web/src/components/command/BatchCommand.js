@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {List, Card, Input, PageHeader} from "antd";
 import Console from "../access/Console";
 import {itemRender} from "../../utils/utils";
+import Logout from "../user/Logout";
 const {Search} = Input;
 const routes = [
     {
@@ -55,6 +56,9 @@ class BatchCommand extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="动态指令"
                 >
                 </PageHeader>

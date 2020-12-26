@@ -3,6 +3,7 @@ import {Button, Form, Input, Layout, PageHeader} from "antd";
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import {message} from "antd/es";
+import Logout from "./Logout";
 
 const {Content} = Layout;
 
@@ -61,7 +62,8 @@ class Info extends Component {
     changePassword = async (values) => {
         let result = await request.post('/change-password', values);
         if (result.code === 1) {
-            message.success('密码修改成功');
+            message.success('密码修改成功，即将跳转至登录页面');
+            window.location.href = '/#';
         } else {
             message.error(result.message);
         }
@@ -77,6 +79,9 @@ class Info extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="个人中心"
                 >
                 </PageHeader>

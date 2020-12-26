@@ -1,8 +1,11 @@
+db: mysql
 mysql:
-  hostname: 127.0.0.1
+  hostname: 172.16.101.32
   port: 3306
   username: root
-  password: root
-  database: next_terminal
+  password: mysql
+  database: next-terminal
+sqlite:
+  file: 'next-terminal.db'
 server:
   addr: 0.0.0.0:8088

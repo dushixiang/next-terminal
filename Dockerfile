@@ -8,22 +8,23 @@ WORKDIR /app
 
 COPY . .
 
-RUN go env && CGO_ENABLED=0 go build -o next-terminal main.go
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+RUN apk add gcc g++
+RUN go env && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -ldflags '-linkmode external -extldflags "-static"' -o next-terminal main.go
 
 FROM guacamole/guacd:1.2.0
 
 LABEL MAINTAINER="helloworld1024@foxmail.com"
 
+RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
 RUN apt-get update && apt-get -y install supervisor
 RUN mkdir -p /var/log/supervisor
 COPY --from=builder /app/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-ENV MYSQL_HOSTNAME 127.0.0.1
-ENV MYSQL_PORT 3306
-ENV MYSQL_USERNAME mysql
-ENV MYSQL_PASSWORD mysql
-ENV MYSQL_DATABASE next_terminal
+ENV DB sqlite
+ENV SQLITE_FILE 'next-terminal.db'
 ENV SERVER_PORT 8088
+ENV SERVER_ADDR 0.0.0.0:$SERVER_PORT
 
 WORKDIR /usr/local/next-terminal
 

@@ -31,6 +31,7 @@ import {
     UndoOutlined
 } from "@ant-design/icons";
 import Monitor from "../access/Monitor";
+import Logout from "../user/Logout";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
@@ -348,6 +349,9 @@ class OnlineSession extends Component {
                         routes: routes,
                         itemRender: itemRender
                     }}
+                    extra={[
+                        <Logout/>
+                    ]}
                     subTitle="查询实时在线会话"
                 >
                 </PageHeader>
