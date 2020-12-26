@@ -87,3 +87,16 @@ ssh
 批量执行命令
 
 ![批量执行命令](./screenshot/command.png)
+
+
+## 联系方式
+
+- 邮箱 helloworld1024@foxmail.com
+  
+- 微信群
+
+  <img src="screenshot/wx1.jpg" width="200"  height="auto"/>
+
+如果群失效，请添加微信，备注"加入next-terminal交流群"
+
+  <img src="screenshot/wx2.jpg" width="200"  height="auto"/>
