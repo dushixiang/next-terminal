@@ -1,9 +1,11 @@
 package config
 
 import (
+	"log"
+	"strings"
+
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	"log"
 )
 
 type Config struct {
@@ -30,6 +32,8 @@ func SetupConfig() *Config {
 	viper.AddConfigPath("/etc/next-terminal/")
 	viper.AddConfigPath("$HOME/.next-terminal")
 	viper.AddConfigPath(".")
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 
 	//pflag.String("mysql.hostname", "127.0.0.1", "mysql hostname")
 	//pflag.Int("mysql.port", 3306, "mysql port")
