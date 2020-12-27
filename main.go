@@ -29,7 +29,7 @@ func main() {
 func Run() error {
 
 	var err error
-	logrus.SetReportCaller(true)
+	//logrus.SetReportCaller(true)
 	logrus.SetFormatter(&nested.Formatter{
 		HideKeys:    true,
 		FieldsOrder: []string{"component", "category"},
