@@ -109,7 +109,7 @@ class Setting extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="系统设置"
                 >

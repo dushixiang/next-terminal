@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
+	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -16,6 +17,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func SessionPagingEndpoint(c echo.Context) error {
@@ -38,10 +40,10 @@ func SessionPagingEndpoint(c echo.Context) error {
 			recording := items[i].Recording + "/recording"
 
 			if utils.FileExists(recording) {
-				log.Infof("检测到录屏文件[%v]存在", recording)
+				logrus.Debugf("检测到录屏文件[%v]存在", recording)
 				items[i].Recording = "1"
 			} else {
-				log.Warnf("检测到录屏文件[%v]不存在", recording)
+				logrus.Warnf("检测到录屏文件[%v]不存在", recording)
 				items[i].Recording = "0"
 			}
 		} else {
@@ -89,16 +91,18 @@ func SessionDiscontentEndpoint(c echo.Context) error {
 
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
-		tun, ok := global.Store.Get(split[i])
-		if ok {
-			CloseSession(split[i], tun)
-		}
+		CloseSessionById(split[i], 2001, "管理员强制关闭了此次接入。")
 	}
 	return Success(c, nil)
 }
 
-func CloseSession(sessionId string, tun global.Tun) {
-	_ = tun.Tun.Close()
+func CloseSessionById(sessionId string, code int, reason string) {
+	tun, _ := global.Store.Get(sessionId)
+	if tun != nil {
+		_ = tun.Tun.Close()
+		CloseSessionByWebSocket(tun.WebSocket, code, reason)
+	}
+
 	global.Store.Del(sessionId)
 
 	session := model.Session{}
@@ -107,6 +111,21 @@ func CloseSession(sessionId string, tun global.Tun) {
 	session.DisconnectedTime = utils.NowJsonTime()
 
 	model.UpdateSessionById(&session, sessionId)
+}
+
+func CloseSessionByWebSocket(ws *websocket.Conn, c int, t string) {
+	if ws == nil {
+		return
+	}
+	ws.SetCloseHandler(func(code int, text string) error {
+		var message []byte
+		if code != websocket.CloseNoStatusReceived {
+			message = websocket.FormatCloseMessage(c, t)
+		}
+		_ = ws.WriteControl(websocket.CloseMessage, message, time.Now().Add(time.Second))
+		return nil
+	})
+	defer ws.Close()
 }
 
 func SessionResizeEndpoint(c echo.Context) error {
@@ -457,6 +476,6 @@ func SessionRecordingEndpoint(c echo.Context) error {
 		return err
 	}
 	recording := path.Join(session.Recording, "recording")
-	log.Printf("读取录屏文件：%s", recording)
+	logrus.Debugf("读取录屏文件：%s", recording)
 	return c.File(recording)
 }

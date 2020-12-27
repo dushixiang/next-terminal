@@ -361,7 +361,7 @@ class DynamicCommand extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="批量动态指令执行"
                 >

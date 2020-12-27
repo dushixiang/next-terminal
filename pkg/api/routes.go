@@ -19,9 +19,6 @@ func SetupRoutes() *echo.Echo {
 	e.File("/favicon.ico", "web/build/favicon.ico")
 	e.Static("/static", "web/build/static")
 
-	// Middleware
-	e.Use(middleware.Logger())
-
 	//fd, _ := os.OpenFile(
 	//	"next-terminal.log",
 	//	os.O_RDWR|os.O_APPEND,

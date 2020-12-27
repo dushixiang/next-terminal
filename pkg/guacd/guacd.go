@@ -106,13 +106,14 @@ type Tunnel struct {
 	IsOpen bool
 }
 
-func NewTunnel(address string, config Configuration) (ret Tunnel, err error) {
+func NewTunnel(address string, config Configuration) (ret *Tunnel, err error) {
 
 	conn, err := net.Dial("tcp", address)
 	if err != nil {
 		return
 	}
 
+	ret = &Tunnel{}
 	ret.conn = conn
 	ret.rw = bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
 	ret.Config = config
@@ -123,7 +124,7 @@ func NewTunnel(address string, config Configuration) (ret Tunnel, err error) {
 	}
 
 	if err := ret.WriteInstructionAndFlush(NewInstruction("select", selectArg)); err != nil {
-		return Tunnel{}, err
+		return nil, err
 	}
 
 	args, err := ret.expect("args")
@@ -135,21 +136,21 @@ func NewTunnel(address string, config Configuration) (ret Tunnel, err error) {
 	height := config.GetParameter("height")
 	// send size
 	if err := ret.WriteInstructionAndFlush(NewInstruction("size", width, height, "96")); err != nil {
-		return Tunnel{}, err
+		return nil, err
 	}
 
 	if err := ret.WriteInstructionAndFlush(NewInstruction("audio")); err != nil {
-		return Tunnel{}, err
+		return nil, err
 	}
 	if err := ret.WriteInstructionAndFlush(NewInstruction("video")); err != nil {
-		return Tunnel{}, err
+		return nil, err
 	}
 	if err := ret.WriteInstructionAndFlush(NewInstruction("image")); err != nil {
-		return Tunnel{}, err
+		return nil, err
 	}
 
 	if err := ret.WriteInstructionAndFlush(NewInstruction("timezone", "Asia/Shanghai")); err != nil {
-		return Tunnel{}, err
+		return nil, err
 	}
 
 	parameters := make([]string, len(args.Args))
@@ -163,7 +164,7 @@ func NewTunnel(address string, config Configuration) (ret Tunnel, err error) {
 	}
 	// send connect
 	if err := ret.WriteInstructionAndFlush(NewInstruction("connect", parameters...)); err != nil {
-		return Tunnel{}, err
+		return nil, err
 	}
 
 	ready, err := ret.expect("ready")
@@ -172,7 +173,7 @@ func NewTunnel(address string, config Configuration) (ret Tunnel, err error) {
 	}
 
 	if len(ready.Args) == 0 {
-		return ret, errors.New("no connection id received")
+		return nil, errors.New("no connection id received")
 	}
 
 	ret.UUID = ready.Args[0]
@@ -225,7 +226,6 @@ func (opt *Tunnel) ReadInstruction() (instruction Instruction, err error) {
 	if err != nil {
 		return instruction, err
 	}
-	fmt.Printf("<- %v \n", msg)
 	return instruction.Parse(msg), err
 }
 

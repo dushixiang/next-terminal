@@ -359,7 +359,7 @@ class OfflineSession extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="离线会话管理"
                 >

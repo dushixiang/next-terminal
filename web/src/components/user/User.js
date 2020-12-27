@@ -310,7 +310,7 @@ class User extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="平台用户管理"
                 >

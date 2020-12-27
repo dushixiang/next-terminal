@@ -57,7 +57,7 @@ class BatchCommand extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="动态指令"
                 >

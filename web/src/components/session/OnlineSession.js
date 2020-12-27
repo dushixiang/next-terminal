@@ -350,7 +350,7 @@ class OnlineSession extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="查询实时在线会话"
                 >

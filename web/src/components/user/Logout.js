@@ -18,6 +18,7 @@ class Logout extends Component {
         return (
             <div>
                 <Popconfirm
+                    key='login-btn-pop'
                     title="您确定要退出登录吗?"
                     onConfirm={this.confirm}
                     okText="确定"

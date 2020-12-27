@@ -6,8 +6,8 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/sftp"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
-	"log"
 	"net/http"
 	"next-terminal/pkg/model"
 	"strconv"
@@ -111,7 +111,7 @@ func SSHEndpoint(c echo.Context) error {
 		}
 		_, err = stdinPipe.Write(message)
 		if err != nil {
-			log.Println("Tunnel write:", err)
+			logrus.Debugf("Tunnel write: %v", err)
 		}
 	}
 	return err
@@ -173,7 +173,7 @@ func WriteMessage(ws *websocket.Conn, message string) {
 func WriteByteMessage(ws *websocket.Conn, p []byte) {
 	err := ws.WriteMessage(websocket.TextMessage, p)
 	if err != nil {
-		log.Println("write:", err)
+		logrus.Debugf("write: %v", err)
 	}
 }
 

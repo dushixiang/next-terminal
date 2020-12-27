@@ -80,7 +80,7 @@ class Info extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="个人中心"
                 >

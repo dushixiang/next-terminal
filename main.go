@@ -1,19 +1,23 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/labstack/gommon/log"
 	"github.com/patrickmn/go-cache"
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/handle"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
+	"os"
 	"strconv"
 	"time"
 )
@@ -23,12 +27,29 @@ func main() {
 }
 
 func Run() error {
+
 	var err error
+	logrus.SetReportCaller(true)
+	logrus.SetFormatter(&nested.Formatter{
+		HideKeys:    true,
+		FieldsOrder: []string{"component", "category"},
+	})
+
+	writer1 := &bytes.Buffer{}
+	writer2 := os.Stdout
+	writer3, err := os.OpenFile("next-terminal.log", os.O_WRONLY|os.O_CREATE, 0755)
+	if err != nil {
+		log.Fatalf("create file log.txt failed: %v", err)
+	}
+
+	logrus.SetOutput(io.MultiWriter(writer1, writer2, writer3))
+
 	global.Config, err = config.SetupConfig()
 	if err != nil {
 		return err
 	}
 
+	logrus.Infof("当前数据库模式为：%v", global.Config.DB)
 	if global.Config.DB == "mysql" {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			global.Config.Mysql.Username,
@@ -38,13 +59,14 @@ func Run() error {
 			global.Config.Mysql.Database,
 		)
 		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
+			//Logger: logger.Default.LogMode(logger.Info),
 		})
 	} else {
 		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{})
 	}
 
 	if err != nil {
+		logrus.Errorf("连接数据库异常：%v", err.Error())
 		return err
 	}
 

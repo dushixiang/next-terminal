@@ -282,7 +282,7 @@ class Credential extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                     subTitle="访问资产的账户、密钥等"
                 >

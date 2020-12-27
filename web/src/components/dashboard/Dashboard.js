@@ -88,7 +88,7 @@ class Dashboard extends Component {
                     }}
                     subTitle="仪表盘"
                     extra={[
-                        <Logout/>
+                        <Logout key='logout'/>
                     ]}
                 >
                 </PageHeader>

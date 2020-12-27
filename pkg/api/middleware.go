@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 	"next-terminal/pkg/global"
 	"strings"
 	"time"
@@ -35,7 +36,7 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		token := GetToken(c)
 		user, found := global.Cache.Get(token)
 		if !found {
-			c.Logger().Error("您的登录信息已失效，请重新登录后再试。")
+			logrus.Debugf("您的登录信息已失效，请重新登录后再试。")
 			return Fail(c, 403, "您的登录信息已失效，请重新登录后再试。")
 		}
 		global.Cache.Set(token, user, time.Minute*time.Duration(30))
