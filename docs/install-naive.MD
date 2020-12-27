@@ -96,5 +96,61 @@ EOF
 /etc/init.d/guacd start
 ```
 
-### 安装 Next Terminal
+### 安装字体（SSH使用）
 
+安装字体管理软件
+```shell
+yum install -y fontconfig mkfontscale
+```
+
+下载字体文件并移动到` /usr/share/fonts/`目录下
+```shell
+cd  /usr/share/fonts/
+wget https://raw.githubusercontent.com/dushixiang/next-terminal/master/web/src/fonts/Menlo-Regular-1.ttf
+```
+
+更新字体
+```shell
+mkfontscale
+mkfontdir
+fc-cache
+```
+### 安装 Next Terminal
+建立next-terminal目录
+```shell
+mkdir ~/next-terminal & cd ~/next-terminal
+```
+
+下载
+```shell
+wget https://github.com/dushixiang/next-terminal/releases/download/v0.0.2/next-terminal.tgz
+```
+
+解压
+```shell
+tar -xvf next-terminal.tgz
+cd next-terminal
+```
+
+修改配置文件`config.yml`
+```shell
+db: sqlite
+# 当db为sqlite时mysql的配置无效
+#mysql:
+#  hostname: 172.16.101.32
+#  port: 3306
+#  username: root
+#  password: mysql
+#  database: next-terminal
+
+# 当db为mysql时sqlite的配置无效
+sqlite:
+  file: 'next-terminal.db'
+server:
+  addr: 0.0.0.0:8088
+```
+
+启动
+```shell
+./next-terminal
+```

@@ -48,7 +48,7 @@ func SetupConfig() (*Config, error) {
 	pflag.String("mysql.password", "mysql", "mysql password")
 	pflag.String("mysql.database", "next_terminal", "mysql database")
 
-	pflag.String("server.addr", "0.0.0.0:8088", "server listen addr")
+	pflag.String("server.addr", "", "server listen addr")
 
 	pflag.Parse()
 	_ = viper.BindPFlags(pflag.CommandLine)
