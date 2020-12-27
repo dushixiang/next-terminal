@@ -19,14 +19,6 @@ func SetupRoutes() *echo.Echo {
 	e.File("/favicon.ico", "web/build/favicon.ico")
 	e.Static("/static", "web/build/static")
 
-	//fd, _ := os.OpenFile(
-	//	"next-terminal.log",
-	//	os.O_RDWR|os.O_APPEND,
-	//	0666,
-	//)
-	//writer := io.MultiWriter(fd, os.Stdout)
-
-	//e.Logger.SetOutput(writer)
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		Skipper:      middleware.DefaultSkipper,

@@ -24,42 +24,8 @@ admin/admin
 
 ## 快速安装
 
-### docker安装
-
-因为程序依赖了mysql，所以在启动时需要指定mysql的连接信息。
-
-```shell
-mkdir /etc/next-terminal
-mkdir /etc/next-terminal/recording
-mkdir /etc/next-terminal/drive
-cat <<EOF >> /etc/next-terminal/config.yaml
-mysql:
-  hostname: 172.17.0.1
-  port: 3306
-  username: root
-  password: root
-  database: next_terminal
-server:
-  addr: 0.0.0.0:8088
-EOF
-```
-```shell
-docker run -d \
-  -p 8088:8088 \
-  -v /etc/next-terminal/config.yaml:/etc/next-terminal/config.yaml \
-  -v /etc/next-terminal/recording/:/usr/local/next-terminal/recording/ \
-  -v /etc/next-terminal/drive/:/usr/local/next-terminal/drive/ \
-  --name next-terminal \
-  --restart always dushixiang/next-terminal:0.0.1
-```
-
-程序安装目录地址为 `/usr/local/next-terminal`
-
-录屏文件存放目录为 `/usr/local/next-terminal/recording`
-
-远程桌面挂载目录为 `/usr/local/next-terminal/drive`
-
-可以通过 `-v` 参数将宿主机器的目录映射到docker中
+- [使用docker安装](docs/install-docker.MD)
+- [原生安装](docs/install-naive.MD)
 
 
 ## 相关截图
