@@ -138,9 +138,13 @@ class Access extends Component {
             clipboardText: data.data
         })
         if (this.state.protocol === 'ssh') {
-            message.success('您输入的内容已复制到远程服务器上，使用右键将自动粘贴。');
+            if (data.data && data.data.length > 0) {
+                message.success('您输入的内容已复制到远程服务器上，使用右键将自动粘贴。');
+            }
         } else {
-            message.success('您输入的内容已复制到远程服务器上');
+            if (data.data && data.data.length > 0) {
+                message.success('您输入的内容已复制到远程服务器上');
+            }
         }
 
     }
@@ -852,15 +856,20 @@ class Access extends Component {
 
                 </Affix>
 
-                <Affix style={{position: 'absolute', top: 50, right: 50}}>
-                    <Button
-                        icon={<FolderOpenOutlined/>}
-                        onClick={() => {
-                            this.showFileSystem();
-                        }}
-                    >
-                    </Button>
-                </Affix>
+                {
+                    this.state.protocol === 'ssh' || this.state.protocol === 'rdp' ?
+                        <Affix style={{position: 'absolute', top: 50, right: 50}}>
+                            <Button
+                                icon={<FolderOpenOutlined/>}
+                                onClick={() => {
+                                    this.showFileSystem();
+                                }}
+                            >
+                            </Button>
+                        </Affix>
+                        : null
+                }
+
 
                 <Drawer
                     title={title}

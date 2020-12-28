@@ -6,7 +6,7 @@
 docker run -d \
   -p 8088:8088 \
   --name next-terminal \
-  --restart always dushixiang/next-terminal:0.0.2
+  --restart always dushixiang/next-terminal:latest
 ```
 
 ### 使用`mysql`存储数据
@@ -21,7 +21,7 @@ docker run -d \
   -e MYSQL_PASSWORD=mysql \
   -e MYSQL_DATABASE=next_terminal \
   --name next-terminal \
-  --restart always dushixiang/next-terminal:0.0.2
+  --restart always dushixiang/next-terminal:latest
 ```
 
 ### 注意事项 ⚠️
