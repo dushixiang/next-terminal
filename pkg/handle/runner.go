@@ -11,20 +11,17 @@ import (
 func RunTicker() {
 	var ch chan int
 	//定时任务
-	ticker := time.NewTicker(time.Minute * 5)
+	ticker := time.NewTicker(time.Minute * 60)
 	go func() {
 		for range ticker.C {
-			items, _ := model.FindAllAsset()
-
-			for i := range items {
-				item := items[i]
-				active := utils.Tcping(item.IP, item.Port)
-
-				asset := model.Asset{
-					Active: active,
+			sessions, _ := model.FindSessionByStatus(model.NoConnect)
+			if sessions != nil && len(sessions) > 0 {
+				now := time.Now()
+				for i := range sessions {
+					if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
+						model.DeleteSessionById(sessions[i].ID)
+					}
 				}
-
-				model.UpdateAssetById(&asset, item.ID)
 			}
 		}
 		ch <- 1

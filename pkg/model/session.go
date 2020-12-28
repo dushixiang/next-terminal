@@ -7,9 +7,10 @@ import (
 )
 
 const (
+	NoConnect    = "no_connect"
+	Connecting   = "connecting"
 	Connected    = "connected"
 	Disconnected = "disconnected"
-	NoConnect    = "no_connect"
 )
 
 type Session struct {
@@ -29,6 +30,8 @@ type Session struct {
 	Recording        string         `json:"recording"`
 	PrivateKey       string         `json:"privateKey"`
 	Passphrase       string         `json:"passphrase"`
+	Code             int            `json:"code"`
+	Message          string         `json:"message"`
 	ConnectedTime    utils.JsonTime `json:"connectedTime"`
 	DisconnectedTime utils.JsonTime `json:"disconnectedTime"`
 }

@@ -128,7 +128,7 @@ func Run() error {
 		return err
 	}
 	// 启动定时任务
-	//go handle.RunTicker()
+	go handle.RunTicker()
 	go handle.RunDataFix()
 
 	return e.Start(global.Config.Server.Addr)

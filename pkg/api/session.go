@@ -91,7 +91,7 @@ func SessionDiscontentEndpoint(c echo.Context) error {
 
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
-		CloseSessionById(split[i], 2001, "管理员强制关闭了此次接入。")
+		CloseSessionById(split[i], ForcedDisconnect, "管理员强制关闭了此次接入。")
 	}
 	return Success(c, nil)
 }
@@ -105,10 +105,15 @@ func CloseSessionById(sessionId string, code int, reason string) {
 
 	global.Store.Del(sessionId)
 
+	if code == Normal {
+		return
+	}
 	session := model.Session{}
 	session.ID = sessionId
 	session.Status = model.Disconnected
 	session.DisconnectedTime = utils.NowJsonTime()
+	session.Code = code
+	session.Message = reason
 
 	model.UpdateSessionById(&session, sessionId)
 }
@@ -318,6 +323,15 @@ func SessionLsEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
+		if tun.SftpClient == nil {
+			sftpClient, err := CreateSftpClient(session.AssetId)
+			if err != nil {
+				logrus.Errorf("创建sftp客户端失败：%v", err.Error())
+				return err
+			}
+			tun.SftpClient = sftpClient
+		}
+
 		fileInfos, err := tun.SftpClient.ReadDir(remoteDir)
 		if err != nil {
 			return err
@@ -478,4 +492,13 @@ func SessionRecordingEndpoint(c echo.Context) error {
 	recording := path.Join(session.Recording, "recording")
 	logrus.Debugf("读取录屏文件：%s", recording)
 	return c.File(recording)
+}
+
+func SessionGetEndpoint(c echo.Context) error {
+	sessionId := c.Param("id")
+	session, err := model.FindSessionById(sessionId)
+	if err != nil {
+		return err
+	}
+	return Success(c, session)
 }

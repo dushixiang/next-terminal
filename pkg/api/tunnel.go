@@ -11,6 +11,14 @@ import (
 	"strconv"
 )
 
+const (
+	Normal             int = 0
+	NotFoundSession    int = 2000
+	NewTunnelError     int = 2001
+	NewSftpClientError int = 2002
+	ForcedDisconnect   int = 2003
+)
+
 func TunEndpoint(c echo.Context) error {
 
 	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
@@ -38,12 +46,14 @@ func TunEndpoint(c echo.Context) error {
 	if len(connectionId) > 0 {
 		session, err = model.FindSessionByConnectionId(connectionId)
 		if err != nil {
+			CloseSessionById(sessionId, NotFoundSession, "会话不存在")
 			return err
 		}
 		configuration.ConnectionID = connectionId
 	} else {
 		session, err = model.FindSessionById(sessionId)
 		if err != nil {
+			CloseSessionById(sessionId, NotFoundSession, "会话不存在")
 			return err
 		}
 
@@ -95,13 +105,12 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
 			break
 		case "vnc":
+			configuration.SetParameter("username", session.Username)
 			configuration.SetParameter("password", session.Password)
-			configuration.SetParameter("enable-sftp", "")
 			break
 		case "telnet":
 			configuration.SetParameter("username", session.Username)
 			configuration.SetParameter("password", session.Password)
-			configuration.SetParameter("enable-sftp", "")
 			break
 		}
 
@@ -115,6 +124,8 @@ func TunEndpoint(c echo.Context) error {
 
 	tunnel, err := guacd.NewTunnel(addr, configuration)
 	if err != nil {
+		CloseSessionById(sessionId, NewTunnelError, err.Error())
+		logrus.Printf("建立连接失败: %v", err.Error())
 		return err
 	}
 
@@ -129,35 +140,22 @@ func TunEndpoint(c echo.Context) error {
 		session.ConnectionId = tunnel.UUID
 		session.Width = intWidth
 		session.Height = intHeight
+		session.Status = model.Connecting
 		session.Recording = configuration.GetParameter(guacd.RecordingPath)
 
 		model.UpdateSessionById(&session, sessionId)
 	}
 
 	go func() {
-		sftpClient, err := CreateSftpClient(session.AssetId)
-		if err != nil {
-			CloseSessionById(sessionId, 2002, err.Error())
-			logrus.Errorf("创建sftp客户端失败：%v", err.Error())
-		}
-		item, ok := global.Store.Get(sessionId)
-		if ok {
-			item.SftpClient = sftpClient
-		}
-	}()
-
-	go func() {
 		for true {
 			instruction, err := tunnel.Read()
 			if err != nil {
-				CloseSessionById(sessionId, 523, err.Error())
-				logrus.Printf("WebSocket读取错误: %v", err)
+				CloseSessionById(sessionId, Normal, "")
 				break
 			}
 			err = ws.WriteMessage(websocket.TextMessage, instruction)
 			if err != nil {
-				CloseSessionById(sessionId, 523, err.Error())
-				logrus.Printf("WebSocket写入错误: %v", err)
+				CloseSessionById(sessionId, Normal, "")
 				break
 			}
 		}
@@ -166,14 +164,12 @@ func TunEndpoint(c echo.Context) error {
 	for true {
 		_, message, err := ws.ReadMessage()
 		if err != nil {
-			CloseSessionById(sessionId, 523, err.Error())
-			logrus.Printf("隧道读取错误: %v", err)
+			CloseSessionById(sessionId, Normal, "")
 			break
 		}
 		_, err = tunnel.WriteAndFlush(message)
 		if err != nil {
-			CloseSessionById(sessionId, 523, err.Error())
-			logrus.Printf("隧道写入错误: %v", err)
+			CloseSessionById(sessionId, Normal, "")
 			break
 		}
 	}

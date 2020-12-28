@@ -266,10 +266,11 @@ class Access extends Component {
         }
     };
 
-    showMessage(message) {
+    showMessage(msg) {
+        message.destroy();
         Modal.error({
             title: '提示',
-            content: message,
+            content: msg,
         });
     }
 
@@ -464,11 +465,24 @@ class Access extends Component {
 
         keyboard.onkeydown = this.onKeyDown;
         keyboard.onkeyup = this.onKeyUp;
+
+        let stateChecker = setInterval(async () => {
+            let result = await request.get(`/sessions/${sessionId}`);
+            if (result['code'] !== 1) {
+                message.error(result['message']);
+            } else {
+                let session = result['data'];
+                if (session['status'] === 'disconnected') {
+                    this.showMessage(session['message']);
+                    clearInterval(stateChecker);
+                }
+            }
+        }, 1000)
         this.setState({
             client: client,
             containerWidth: width,
             containerHeight: height,
-            keyboard: keyboard
+            keyboard: keyboard,
         });
     }
 
