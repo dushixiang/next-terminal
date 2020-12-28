@@ -118,6 +118,12 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("hostname", session.IP)
 		configuration.SetParameter("port", strconv.Itoa(session.Port))
 	}
+	for name := range configuration.Parameters {
+		// 替换数据库空格字符串占位符为真正的空格
+		if configuration.Parameters[name] == "-" {
+			configuration.Parameters[name] = ""
+		}
+	}
 
 	addr := propertyMap[guacd.Host] + ":" + propertyMap[guacd.Port]
 
