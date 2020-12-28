@@ -60,6 +60,12 @@ func AssetUpdateEndpoint(c echo.Context) error {
 	case "private-key":
 		item.Password = "-"
 		item.CredentialId = "-"
+		if len(item.Username) == 0 {
+			item.Username = "-"
+		}
+		if len(item.Passphrase) == 0 {
+			item.Passphrase = "-"
+		}
 	case "custom":
 		item.PrivateKey = "-"
 		item.Passphrase = "-"
