@@ -67,7 +67,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                 handleAccountTypeChange('custom');
                 break;
             case 'vnc':
-                port = 5901;
+                port = 5900;
                 setAccountTypes(protocolMapping['vnc']);
                 form.setFieldsValue({
                     accountType: 'custom',
@@ -188,6 +188,10 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                 {
                     accountType === 'private-key' ?
                         <>
+                            <Form.Item label="授权账户" name='username'>
+                                <Input placeholder="输入授权账户"/>
+                            </Form.Item>
+
                             <Form.Item label="私钥" name='privateKey' rules={[{required: true, message: '请输入私钥'}]}>
                                 <TextArea rows={4}/>
                             </Form.Item>

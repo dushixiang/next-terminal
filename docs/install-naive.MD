@@ -80,7 +80,7 @@ ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/
 
 配置guacamole-server
 ```shell
-cat <<EOF >> /etc/guacamole/guacd.conf
+mkdir /etc/guacamole/ & cat <<EOF >> /etc/guacamole/guacd.conf
 [daemon]
 pid_file = /var/run/guacd.pid
 log_level = info

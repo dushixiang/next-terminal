@@ -81,6 +81,7 @@ class Access extends Component {
         confirmLoading: false,
         uploadVisible: false,
         uploadLoading: false,
+        startTime: new Date()
     };
 
     async componentDidMount() {
@@ -226,7 +227,11 @@ class Access extends Component {
                 this.showMessage('资源已关闭');
                 break;
             case 519:
-                this.showMessage('远程服务未找到');
+                if (new Date().getTime() - this.state.startTime.getTime() <= 1000 * 30) {
+                    this.showMessage('认证失败');
+                } else {
+                    this.showMessage('远程服务未找到');
+                }
                 break;
             case 520:
                 this.showMessage('远程服务不可用');
@@ -472,6 +477,11 @@ class Access extends Component {
                 message.error(result['message']);
             } else {
                 let session = result['data'];
+                if (session['status'] === 'connected') {
+                    clearInterval(stateChecker);
+                    return
+                }
+
                 if (session['status'] === 'disconnected') {
                     this.showMessage(session['message']);
                     clearInterval(stateChecker);
@@ -697,6 +707,8 @@ class Access extends Component {
         let result = await request.get(url);
 
         if (result.code !== 1) {
+            message.error(result['message']);
+            message.error(result['message']);
             return [];
         }
 

@@ -91,6 +91,7 @@ func TunEndpoint(c echo.Context) error {
 			break
 		case "ssh":
 			if len(session.PrivateKey) > 0 && session.PrivateKey != "-" {
+				configuration.SetParameter("username", session.Username)
 				configuration.SetParameter("private-key", session.PrivateKey)
 				configuration.SetParameter("passphrase", session.Passphrase)
 			} else {
