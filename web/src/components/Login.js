@@ -1,14 +1,12 @@
-import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Input, Typography} from "antd";
+import React, { Component } from 'react';
+import { Button, Card, Checkbox, Form, Input, Typography } from "antd";
 import './Login.css'
 import request from "../common/request";
-import {message} from "antd/es";
-import {withRouter} from "react-router-dom";
-import {LockOutlined, UserOutlined} from '@ant-design/icons';
+import { message } from "antd/es";
+import { withRouter } from "react-router-dom";
+import { OneToOneOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 
-
-const {Title} = Typography;
-
+const { Title } = Typography;
 class LoginForm extends Component {
 
     state = {
@@ -62,26 +60,27 @@ class LoginForm extends Component {
     render() {
         return (
             <div className='login-bg'
-                 style={{width: this.state.width, height: this.state.height, backgroundColor: '#F0F2F5'}}>
+                style={{ width: this.state.width, height: this.state.height, backgroundColor: '#F0F2F5' }}>
                 <Card className='login-card' title={null}>
-                    <div style={{textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff'}}>
+                    <div style={{ textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff' }}>
                         <Title level={1}>Next Terminal</Title>
                     </div>
                     <Form onFinish={this.handleSubmit} className="login-form">
-                        <Form.Item name='username' rules={[{required: true, message: '请输入登录账号！'}]}>
-                            <Input prefix={<UserOutlined/>} placeholder="登录账号"/>
+                        <Form.Item name='username' rules={[{ required: true, message: '请输入登录账号！' }]}>
+                            <Input prefix={<UserOutlined />} placeholder="登录账号" />
                         </Form.Item>
-                        <Form.Item name='password' rules={[{required: true, message: '请输入登录密码！'}]}>
-                            <Input.Password prefix={<LockOutlined/>} placeholder="登录密码"/>
+                        <Form.Item name='password' rules={[{ required: true, message: '请输入登录密码！' }]}>
+                            <Input.Password prefix={<LockOutlined />} placeholder="登录密码" />
+                        </Form.Item>
+                        <Form.Item name='totp' rules={[]}>
+                            <Input prefix={<OneToOneOutlined />} placeholder="TOTP" />
                         </Form.Item>
                         <Form.Item name='remember' valuePropName='checked' initialValue={false}>
                             <Checkbox>记住登录</Checkbox>
-
-
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary" htmlType="submit" className="login-form-button"
-                                    loading={this.state.inLogin}>
+                                loading={this.state.inLogin}>
                                 登录
                             </Button>
                         </Form.Item>

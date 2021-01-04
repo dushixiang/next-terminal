@@ -1,11 +1,12 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"net/http"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
+
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 const Token = "X-Auth-Token"
@@ -35,6 +36,8 @@ func SetupRoutes() *echo.Echo {
 
 	e.POST("/logout", LogoutEndpoint)
 	e.POST("/change-password", ChangePasswordEndpoint)
+	e.POST("/reset-totp", ResetTOTPEndpoint)
+	e.POST("/confirm-totp", ConfirmTOTPEndpoint)
 	e.GET("/info", InfoEndpoint)
 
 	users := e.Group("/users")

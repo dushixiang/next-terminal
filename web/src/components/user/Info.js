@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import {Button, Form, Input, Layout, PageHeader} from "antd";
-import {itemRender} from '../../utils/utils'
+import React, { Component } from 'react';
+import { Button, Form, Input, Layout, PageHeader, Image } from "antd";
+import { itemRender } from '../../utils/utils'
 import request from "../../common/request";
-import {message} from "antd/es";
+import { message } from "antd/es";
 import Logout from "./Logout";
 
-const {Content} = Layout;
+const { Content } = Layout;
 
 const routes = [
     {
@@ -19,12 +19,12 @@ const routes = [
 ];
 
 const formItemLayout = {
-    labelCol: {span: 3},
-    wrapperCol: {span: 6},
+    labelCol: { span: 3 },
+    wrapperCol: { span: 6 },
 };
 const formTailLayout = {
-    labelCol: {span: 3},
-    wrapperCol: {span: 6, offset: 3},
+    labelCol: { span: 3 },
+    wrapperCol: { span: 6, offset: 3 },
 };
 
 class Info extends Component {
@@ -69,6 +69,32 @@ class Info extends Component {
         }
     }
 
+    confirmTOTP = async (values) => {
+        values['secret'] = this.state.secret
+        let result = await request.post('/confirm-totp', values);
+        if (result.code === 1) {
+            message.success('TOTP启用成功');
+            this.setState({
+                qr: "",
+                secret: ""
+            })
+        } else {
+            message.error(result.message);
+        }
+    }
+
+    resetTOTP = async () => {
+        let result = await request.post('/reset-totp');
+        if (result.code === 1) {
+            this.setState({
+                qr: result.data.qr,
+                secret: result.data.secret,
+            })
+        } else {
+            message.error(result.message);
+        }
+    }
+
     render() {
         return (
             <>
@@ -80,14 +106,12 @@ class Info extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout key='logout'/>
+                        <Logout key='logout' />
                     ]}
                     subTitle="个人中心"
-                >
-                </PageHeader>
+                />
 
                 <Content className="site-layout-background page-content">
-
                     <h1>修改密码</h1>
                     <Form ref={this.passwordFormRef} name="password" onFinish={this.changePassword}>
                         <Form.Item
@@ -101,7 +125,7 @@ class Info extends Component {
                                 },
                             ]}
                         >
-                            <Input type='password' placeholder="请输入原始密码"/>
+                            <Input type='password' placeholder="请输入原始密码" />
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -115,9 +139,8 @@ class Info extends Component {
                             ]}
                         >
                             <Input type='password' placeholder="新的密码"
-                                   onChange={(value) => this.onNewPasswordChange(value)}/>
+                                onChange={(value) => this.onNewPasswordChange(value)} />
                         </Form.Item>
-
                         <Form.Item
                             {...formItemLayout}
                             name="newPassword2"
@@ -132,12 +155,42 @@ class Info extends Component {
                             help={this.state.errorMsg || ''}
                         >
                             <Input type='password' placeholder="请和上面输入新的密码保持一致"
-                                   onChange={(value) => this.onNewPassword2Change(value)}/>
+                                onChange={(value) => this.onNewPassword2Change(value)} />
                         </Form.Item>
-
                         <Form.Item {...formTailLayout}>
                             <Button type="primary" htmlType="submit">
                                 提交
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                </Content>
+                <Content className="site-layout-background page-content">
+                    <h1>双因素认证</h1>
+                    <Form hidden={this.state.qr} onFinish={this.resetTOTP}>
+                        <Form.Item {...formTailLayout}>
+                            <Button type="primary" htmlType="submit">
+                                重置 TOTP
+                            </Button>
+                        </Form.Item>
+                    </Form>
+                    <Form hidden={!this.state.qr} onFinish={this.confirmTOTP}>
+                        <Form.Item {...formItemLayout} label="使用TOTP应用扫码">
+                            <Image
+                                width={200}
+                                src={"data:image/png;base64, " + this.state.qr}
+                            />
+                        </Form.Item>
+                        <Form.Item
+                            {...formItemLayout}
+                            name="totp"
+                            label="TOTP"
+                            rules={[]}
+                        >
+                            <Input placeholder="请输入显示的数字" />
+                        </Form.Item>
+                        <Form.Item {...formTailLayout}>
+                            <Button type="primary" htmlType="submit">
+                                确认
                             </Button>
                         </Form.Item>
                     </Form>
