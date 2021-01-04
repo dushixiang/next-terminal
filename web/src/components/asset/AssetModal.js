@@ -1,25 +1,25 @@
-import React, {useEffect, useState} from 'react';
-import {Form, Input, InputNumber, Modal, Radio, Select, Tooltip} from "antd/lib/index";
-import {isEmpty} from "../../utils/utils";
+import React, { useEffect, useState } from 'react';
+import { Form, Input, InputNumber, Modal, Radio, Select, Tooltip } from "antd/lib/index";
+import { isEmpty } from "../../utils/utils";
 
-const {TextArea} = Input;
-const {Option} = Select;
+const { TextArea } = Input;
+const { Option } = Select;
 
 // 子级页面
 // Ant form create 表单内置方法
 
 const protocolMapping = {
     'ssh': [
-        {text: '自定义', value: 'custom'},
-        {text: '授权凭证', value: 'credential'},
-        {text: '私钥', value: 'private-key'}
+        { text: '自定义', value: 'custom' },
+        { text: '授权凭证', value: 'credential' },
+        { text: '私钥', value: 'private-key' }
     ],
-    'rdp': [{text: '自定义', value: 'custom'}, {text: '授权凭证', value: 'credential'}],
-    'vnc': [{text: '自定义', value: 'custom'}, {text: '授权凭证', value: 'credential'}],
-    'telnet': [{text: '自定义', value: 'custom'}, {text: '授权凭证', value: 'credential'}]
+    'rdp': [{ text: '自定义', value: 'custom' }, { text: '授权凭证', value: 'credential' }],
+    'vnc': [{ text: '自定义', value: 'custom' }, { text: '授权凭证', value: 'credential' }],
+    'telnet': [{ text: '自定义', value: 'custom' }, { text: '授权凭证', value: 'credential' }]
 }
 
-const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoading, credentials, tags, model}) {
+const AssetModal = function ({ title, visible, handleOk, handleCancel, confirmLoading, credentials, tags, model }) {
 
     const [form] = Form.useForm();
 
@@ -33,7 +33,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
     useEffect(() => {
         setAccountType(model.accountType);
-    });
+    }, [model.accountType]);
 
     for (let key in model) {
         if (model.hasOwnProperty(key)) {
@@ -53,8 +53,8 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     model['tags'] = undefined;
 
     const formItemLayout = {
-        labelCol: {span: 6},
-        wrapperCol: {span: 14},
+        labelCol: { span: 6 },
+        wrapperCol: { span: 14 },
     };
 
     const handleProtocolChange = e => {
@@ -135,18 +135,18 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
             <Form form={form} {...formItemLayout} initialValues={model}>
                 <Form.Item name='id' noStyle>
-                    <Input hidden={true}/>
+                    <Input hidden={true} />
                 </Form.Item>
 
-                <Form.Item label="资产名称" name='name' rules={[{required: true, message: "请输入资产名称"}]}>
-                    <Input placeholder="请输入资产名称"/>
+                <Form.Item label="资产名称" name='name' rules={[{ required: true, message: "请输入资产名称" }]}>
+                    <Input placeholder="请输入资产名称" />
                 </Form.Item>
 
-                <Form.Item label="IP" name='ip' rules={[{required: true, message: '请输入资产IP'}]}>
-                    <Input placeholder="请输入资产IP"/>
+                <Form.Item label="IP" name='ip' rules={[{ required: true, message: '请输入资产IP' }]}>
+                    <Input placeholder="请输入资产IP" />
                 </Form.Item>
 
-                <Form.Item label="接入协议" name='protocol' rules={[{required: true, message: '请选择接入协议'}]}>
+                <Form.Item label="接入协议" name='protocol' rules={[{ required: true, message: '请选择接入协议' }]}>
                     <Radio.Group onChange={handleProtocolChange}>
                         <Radio value="rdp">rdp</Radio>
                         <Radio value="ssh">ssh</Radio>
@@ -155,11 +155,11 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     </Radio.Group>
                 </Form.Item>
 
-                <Form.Item label="端口" name='port' rules={[{required: true, message: '请输入资产端口'}]}>
-                    <InputNumber min={1} max={65535}/>
+                <Form.Item label="端口" name='port' rules={[{ required: true, message: '请输入资产端口' }]}>
+                    <InputNumber min={1} max={65535} />
                 </Form.Item>
 
-                <Form.Item label="账户类型" name='accountType' rules={[{required: true, message: '请选择接账户类型'}]}>
+                <Form.Item label="账户类型" name='accountType' rules={[{ required: true, message: '请选择接账户类型' }]}>
                     <Select onChange={handleAccountTypeChange}>
                         {accountTypes.map(item => {
                             return (<Option key={item.value} value={item.value}>{item.text}</Option>)
@@ -169,7 +169,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
                 {
                     accountType === 'credential' ?
-                        <Form.Item label="授权凭证" name='credentialId' rules={[{required: true, message: '请选择授权凭证'}]}>
+                        <Form.Item label="授权凭证" name='credentialId' rules={[{ required: true, message: '请选择授权凭证' }]}>
                             <Select onChange={() => null}>
                                 {credentials.map(item => {
                                     return (
@@ -189,11 +189,11 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     accountType === 'custom' ?
                         <>
                             <Form.Item label="授权账户" name='username' noStyle={!(accountType === 'custom')}>
-                                <Input placeholder="输入授权账户"/>
+                                <Input placeholder="输入授权账户" />
                             </Form.Item>
 
                             <Form.Item label="授权密码" name='password' noStyle={!(accountType === 'custom')}>
-                                <Input placeholder="输入授权密码"/>
+                                <Input placeholder="输入授权密码" />
                             </Form.Item>
                         </>
                         : null
@@ -203,14 +203,14 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     accountType === 'private-key' ?
                         <>
                             <Form.Item label="授权账户" name='username'>
-                                <Input placeholder="输入授权账户"/>
+                                <Input placeholder="输入授权账户" />
                             </Form.Item>
 
-                            <Form.Item label="私钥" name='privateKey' rules={[{required: true, message: '请输入私钥'}]}>
-                                <TextArea rows={4}/>
+                            <Form.Item label="私钥" name='privateKey' rules={[{ required: true, message: '请输入私钥' }]}>
+                                <TextArea rows={4} />
                             </Form.Item>
                             <Form.Item label="私钥密码" name='passphrase'>
-                                <TextArea rows={1}/>
+                                <TextArea rows={1} />
                             </Form.Item>
                         </>
 

@@ -1,11 +1,11 @@
-import React, {Component} from 'react';
-import {Button, Card, Col, PageHeader, Radio, Row, Statistic} from "antd";
-import {DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
-import {itemRender} from '../../utils/utils'
+import React, { Component } from 'react';
+import { Card, Col, PageHeader, Radio, Row, Statistic } from "antd";
+import { DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined } from '@ant-design/icons';
+import { itemRender } from '../../utils/utils'
 import request from "../../common/request";
 import './Dashboard.css'
-import {Link} from "react-router-dom";
-import {Area} from '@ant-design/charts';
+import { Link } from "react-router-dom";
+import { Area } from '@ant-design/charts';
 import Logout from "../user/Logout";
 
 
@@ -88,7 +88,7 @@ class Dashboard extends Component {
                     }}
                     subTitle="仪表盘"
                     extra={[
-                        <Logout key='logout'/>
+                        <Logout key='logout' />
                     ]}
                 >
                 </PageHeader>
@@ -100,7 +100,7 @@ class Dashboard extends Component {
                             <Card bordered={true}>
                                 <Link to={'/user'}>
                                     <Statistic title="在线用户" value={this.state.counter['user']}
-                                               prefix={<UserOutlined/>}/>
+                                        prefix={<UserOutlined />} />
                                 </Link>
                             </Card>
                         </Col>
@@ -108,7 +108,7 @@ class Dashboard extends Component {
                             <Card bordered={true}>
                                 <Link to={'/asset'}>
                                     <Statistic title="存活资产" value={this.state.counter['asset']}
-                                               prefix={<DesktopOutlined/>}/>
+                                        prefix={<DesktopOutlined />} />
                                 </Link>
                             </Card>
                         </Col>
@@ -116,7 +116,7 @@ class Dashboard extends Component {
                             <Card bordered={true}>
                                 <Link to={'/credential'}>
                                     <Statistic title="授权凭证" value={this.state.counter['credential']}
-                                               prefix={<IdcardOutlined/>}/>
+                                        prefix={<IdcardOutlined />} />
                                 </Link>
 
                             </Card>
@@ -125,7 +125,7 @@ class Dashboard extends Component {
                             <Card bordered={true}>
                                 <Link to={'/online-session'}>
                                     <Statistic title="在线会话" value={this.state.counter['onlineSession']}
-                                               prefix={<LinkOutlined/>}/>
+                                        prefix={<LinkOutlined />} />
                                 </Link>
                             </Card>
                         </Col>
