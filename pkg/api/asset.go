@@ -114,3 +114,11 @@ func AssetTcpingEndpoint(c echo.Context) (err error) {
 	model.UpdateAssetById(&asset, item.ID)
 	return Success(c, active)
 }
+
+func AssetTagsEndpoint(c echo.Context) (err error) {
+	var items []string
+	if items, err = model.FindAssetTags(); err != nil {
+		return err
+	}
+	return Success(c, items)
+}

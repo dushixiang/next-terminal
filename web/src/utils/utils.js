@@ -143,3 +143,7 @@ export function differTime(start, end) {
     }
     return show;
 }
+
+export const isEmpty = (text) =>{
+    return text === undefined || text == null || text.length === 0;
+}

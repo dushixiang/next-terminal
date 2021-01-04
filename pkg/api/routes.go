@@ -57,6 +57,8 @@ func SetupRoutes() *echo.Echo {
 		assets.GET("/:id", AssetGetEndpoint)
 	}
 
+	e.GET("/tags", AssetTagsEndpoint)
+
 	commands := e.Group("/commands")
 	{
 		commands.GET("/paging", CommandPagingEndpoint)
@@ -93,6 +95,16 @@ func SetupRoutes() *echo.Echo {
 		sessions.GET("/:id/recording", SessionRecordingEndpoint)
 		sessions.GET("/:id", SessionGetEndpoint)
 	}
+
+	//tags := e.Group("/tags")
+	//{
+	//	tags.POST("", TagAllEndpoint)
+	//	tags.GET("/paging", TagPagingEndpoint)
+	//	tags.POST("", TagCreateEndpoint)
+	//	tags.PUT("/:id", TagUpdateEndpoint)
+	//	tags.DELETE("/:id", TagDeleteEndpoint)
+	//	tags.GET("/:id", TagGetEndpoint)
+	//}
 
 	e.GET("/properties", PropertyGetEndpoint)
 	e.PUT("/properties", PropertyUpdateEndpoint)

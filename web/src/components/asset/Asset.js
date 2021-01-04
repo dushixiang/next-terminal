@@ -70,6 +70,7 @@ class Asset extends Component {
         modalTitle: '',
         modalConfirmLoading: false,
         credentials: [],
+        tags: [],
         model: {},
         selectedRowKeys: [],
         delBtnLoading: false,
@@ -193,17 +194,31 @@ class Asset extends Component {
         await this.showModal('复制资产', result.data);
     }
 
-    async showModal(title, assets = {}) {
-        let result = await request.get('/credentials');
+    async showModal(title, asset = {}) {
+        // 并行请求
+        let getCredentials = request.get('/credentials');
+        let getTags = request.get('/tags');
+
         let credentials = [];
-        if (result.code === 1) {
-            credentials = result.data;
+        let tags = [];
+
+        let r1 = await getCredentials;
+        let r2 = await getTags;
+
+        if (r1['code'] === 1) {
+            credentials = r1['data'];
         }
+
+        if (r2['code'] === 1) {
+            tags = r2['data'];
+        }
+
         this.setState({
             modalTitle: title,
             modalVisible: true,
             credentials: credentials,
-            model: assets
+            tags: tags,
+            model: asset
         });
     };
 
@@ -219,6 +234,8 @@ class Asset extends Component {
         this.setState({
             modalConfirmLoading: true
         });
+
+        formData.tags = formData.tags.join(',');
 
         if (formData.id) {
             // 向后台提交数据
@@ -501,6 +518,7 @@ class Asset extends Component {
                                 handleCancel={this.handleCancelModal}
                                 confirmLoading={this.state.modalConfirmLoading}
                                 credentials={this.state.credentials}
+                                tags={this.state.tags}
                                 model={this.state.model}
                             />
                             : null

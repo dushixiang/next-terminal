@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Form, Input, InputNumber, Modal, Radio, Select, Tooltip} from "antd/lib/index";
+import {isEmpty} from "../../utils/utils";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -18,7 +19,7 @@ const protocolMapping = {
     'telnet': [{text: '自定义', value: 'custom'}, {text: '授权凭证', value: 'credential'}]
 }
 
-const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoading, credentials, model}) {
+const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoading, credentials, tags, model}) {
 
     const [form] = Form.useForm();
 
@@ -41,6 +42,15 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
             }
         }
     }
+
+    let initAssetTags = []
+    if (!isEmpty(model['tags'])) {
+        initAssetTags = model['tags'].split(',');
+    }
+
+    let [assetTags, setAssetTags] = useState(initAssetTags);
+    console.log('初始元素', assetTags)
+    model['tags'] = undefined;
 
     const formItemLayout = {
         labelCol: {span: 6},
@@ -94,6 +104,11 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     const handleAccountTypeChange = v => {
         setAccountType(v);
         model.accountType = v;
+    }
+
+    const handleTagsChange = v => {
+        console.log(v)
+        setAssetTags(v);
     }
 
     return (
@@ -152,7 +167,6 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     </Select>
                 </Form.Item>
 
-
                 {
                     accountType === 'credential' ?
                         <Form.Item label="授权凭证" name='credentialId' rules={[{required: true, message: '请选择授权凭证'}]}>
@@ -203,6 +217,14 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
                         : null
                 }
+
+                <Form.Item label="标签" name='tags'>
+                    <Select mode="tags" placeholder="请选择标签" defaultValue={assetTags} onChange={handleTagsChange}>
+                        {tags.map(tag => {
+                            return (<Option key={tag}>{tag}</Option>)
+                        })}
+                    </Select>
+                </Form.Item>
             </Form>
         </Modal>
     )
