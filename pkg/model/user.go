@@ -7,13 +7,14 @@ import (
 )
 
 type User struct {
-	ID       string         `gorm:"primary_key" json:"id"`
-	Username string         `json:"username"`
-	Password string         `json:"password"`
-	Nickname string         `json:"nickname"`
-	Online   bool           `json:"online"`
-	Enabled  bool           `json:"enabled"`
-	Created  utils.JsonTime `json:"created"`
+	ID         string         `gorm:"primary_key" json:"id"`
+	Username   string         `json:"username"`
+	Password   string         `json:"password"`
+	Nickname   string         `json:"nickname"`
+	TOTPSecret string         `json:"-"`
+	Online     bool           `json:"online"`
+	Enabled    bool           `json:"enabled"`
+	Created    utils.JsonTime `json:"created"`
 }
 
 func (r *User) TableName() string {
@@ -32,7 +33,6 @@ func FindAllUser() (o []User) {
 }
 
 func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []User, total int64, err error) {
-
 	db := global.DB
 	if len(username) > 0 {
 		db = db.Where("username like ?", "%"+username+"%")

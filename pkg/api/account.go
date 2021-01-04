@@ -1,16 +1,26 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
+	"log"
+	"time"
+
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
+	"next-terminal/pkg/totp"
 	"next-terminal/pkg/utils"
-	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type LoginAccount struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	TOTP     string `json:"totp"`
+}
+
+type ConfirmTOTP struct {
+	Secret string `json:"secret"`
+	TOTP   string `json:"totp"`
 }
 
 type ChangePassword struct {
@@ -28,8 +38,15 @@ func LoginEndpoint(c echo.Context) error {
 	if err != nil {
 		return Fail(c, -1, "您输入的账号或密码不正确")
 	}
+
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
 		return Fail(c, -1, "您输入的账号或密码不正确")
+	}
+
+	log.Println(user, loginAccount)
+
+	if !totp.Validate(loginAccount.TOTP, user.TOTPSecret) {
+		return Fail(c, -2, "您的TOTP不匹配")
 	}
 
 	token := utils.UUID()
@@ -45,6 +62,54 @@ func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
 	global.Cache.Delete(token)
 	return Success(c, nil)
+}
+
+func ConfirmTOTPEndpoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+
+	var confirmTOTP ConfirmTOTP
+	if err := c.Bind(&confirmTOTP); err != nil {
+		return err
+	}
+
+	if !totp.Validate(confirmTOTP.TOTP, confirmTOTP.Secret) {
+		return Fail(c, -1, "TOTP 验证失败，请重试")
+	}
+
+	u := &model.User{
+		TOTPSecret: confirmTOTP.Secret,
+	}
+
+	model.UpdateUserById(u, account.ID)
+
+	return Success(c, nil)
+}
+
+func ResetTOTPEndpoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+
+	key, err := totp.NewTOTP(totp.GenerateOpts{
+		Issuer:      c.Request().Host,
+		AccountName: account.Username,
+	})
+	if err != nil {
+		return Fail(c, -1, err.Error())
+	}
+
+	qrcode, err := key.Image(200, 200)
+	if err != nil {
+		return Fail(c, -1, err.Error())
+	}
+
+	qrEncode, err := utils.ImageToBase64Encode(qrcode)
+	if err != nil {
+		return Fail(c, -1, err.Error())
+	}
+
+	return Success(c, map[string]string{
+		"qr":     qrEncode,
+		"secret": key.Secret(),
+	})
 }
 
 func ChangePasswordEndpoint(c echo.Context) error {

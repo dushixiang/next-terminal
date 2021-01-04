@@ -1,14 +1,19 @@
 package utils
 
 import (
+	"bytes"
 	"database/sql/driver"
+	"encoding/base64"
 	"fmt"
-	"github.com/gofrs/uuid"
-	"golang.org/x/crypto/bcrypt"
+	"image"
+	"image/png"
 	"net"
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/gofrs/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type JsonTime struct {
@@ -79,6 +84,14 @@ func Tcping(ip string, port int) bool {
 	}
 	defer conn.Close()
 	return true
+}
+
+func ImageToBase64Encode(img image.Image) (string, error) {
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, img); err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(buf.Bytes()), nil
 }
 
 // 判断所给路径文件/文件夹是否存在

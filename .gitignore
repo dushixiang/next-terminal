@@ -1,0 +1,6 @@
+yarn.lock
+web/build
+*.log
+*.db
+.DS_Store
+.eslintcache
