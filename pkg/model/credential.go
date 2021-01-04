@@ -43,7 +43,6 @@ func CreateNewCredential(o *Credential) (err error) {
 }
 
 func FindCredentialById(id string) (o Credential, err error) {
-
 	err = global.DB.Where("id = ?", id).First(&o).Error
 	return
 }

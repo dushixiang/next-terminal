@@ -3,6 +3,7 @@ package model
 import (
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
+	"strings"
 )
 
 type Asset struct {
@@ -20,6 +21,7 @@ type Asset struct {
 	Description  string         `json:"description"`
 	Active       bool           `json:"active"`
 	Created      utils.JsonTime `json:"created"`
+	Tags         string         `json:"tags"`
 }
 
 func (r *Asset) TableName() string {
@@ -83,4 +85,25 @@ func DeleteAssetById(id string) {
 func CountAsset() (total int64, err error) {
 	err = global.DB.Find(&Asset{}).Count(&total).Error
 	return
+}
+
+func FindAssetTags() (o []string, err error) {
+	var assets []Asset
+	err = global.DB.Not("tags = ?", "").Find(&assets).Error
+	if err != nil {
+		return nil, err
+	}
+
+	o = make([]string, 0)
+
+	for i := range assets {
+		if len(assets[i].Tags) == 0 {
+			continue
+		}
+		split := strings.Split(assets[i].Tags, ",")
+
+		o = append(o, split...)
+	}
+
+	return o, nil
 }
