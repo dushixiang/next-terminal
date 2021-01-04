@@ -72,6 +72,10 @@ func AssetUpdateEndpoint(c echo.Context) error {
 		item.CredentialId = "-"
 	}
 
+	if len(item.Tags) == 0 {
+		item.Tags = "-"
+	}
+
 	model.UpdateAssetById(&item, id)
 
 	return Success(c, nil)

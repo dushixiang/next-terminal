@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Form, Input, InputNumber, Modal, Radio, Select, Tooltip} from "antd/lib/index";
 import {isEmpty} from "../../utils/utils";
 
@@ -31,10 +31,6 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     }
     let [accountTypes, setAccountTypes] = useState(initAccountTypes);
 
-    useEffect(() => {
-        setAccountType(model.accountType);
-    });
-
     for (let key in model) {
         if (model.hasOwnProperty(key)) {
             if (model[key] === '-') {
@@ -43,14 +39,12 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
         }
     }
 
-    let initAssetTags = []
+    let initAssetTags = [];
     if (!isEmpty(model['tags'])) {
         initAssetTags = model['tags'].split(',');
     }
 
     let [assetTags, setAssetTags] = useState(initAssetTags);
-    console.log('初始元素', assetTags)
-    model['tags'] = undefined;
 
     const formItemLayout = {
         labelCol: {span: 6},
@@ -107,7 +101,6 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     }
 
     const handleTagsChange = v => {
-        console.log(v)
         setAssetTags(v);
     }
 
@@ -213,14 +206,15 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                                 <TextArea rows={1}/>
                             </Form.Item>
                         </>
-
-
                         : null
                 }
 
-                <Form.Item label="标签" name='tags'>
+                <Form.Item label="标签" name='tagArr'>
                     <Select mode="tags" placeholder="请选择标签" defaultValue={assetTags} onChange={handleTagsChange}>
                         {tags.map(tag => {
+                            if (tag === '-') {
+                                return undefined;
+                            }
                             return (<Option key={tag}>{tag}</Option>)
                         })}
                     </Select>

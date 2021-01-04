@@ -235,7 +235,9 @@ class Asset extends Component {
             modalConfirmLoading: true
         });
 
-        formData.tags = formData.tags.join(',');
+        if (formData['tagArr']) {
+            formData.tags = formData['tagArr'].join(',');
+        }
 
         if (formData.id) {
             // 向后台提交数据
