@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Col, PageHeader, Radio, Row, Statistic} from "antd";
+import {Card, Col, PageHeader, Radio, Row, Statistic} from "antd";
 import {DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
