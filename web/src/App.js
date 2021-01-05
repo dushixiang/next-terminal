@@ -33,6 +33,7 @@ import request from "./common/request";
 import {message} from "antd/es";
 import Setting from "./components/setting/Setting";
 import BatchCommand from "./components/command/BatchCommand";
+import {NT_PACKAGE} from "./utils/utils";
 
 const {Footer, Sider} = Layout;
 
@@ -46,7 +47,8 @@ class App extends Component {
         openKeys: sessionStorage.getItem('openKeys') ? JSON.parse(sessionStorage.getItem('openKeys')) : [],
         user: {
             'nickname': '未定义'
-        }
+        },
+        package: NT_PACKAGE()
     };
 
     toggle = () => {
@@ -226,7 +228,7 @@ class App extends Component {
                             <Route path="/setting" component={Setting}/>
 
                             <Footer style={{textAlign: 'center'}}>
-                                Next Terminal ©2020 dushixiang Version:0.0.4
+                                Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
                             </Footer>
                         </Layout>
 

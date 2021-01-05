@@ -144,6 +144,16 @@ export function differTime(start, end) {
     return show;
 }
 
-export const isEmpty = (text) =>{
+export const isEmpty = (text) => {
     return text === undefined || text == null || text.length === 0;
+}
+
+export const NT_PACKAGE = () => {
+    const _package = require("../../package.json");
+    const name = _package.name;
+    const version = _package.version;
+    return {
+        name: name,
+        version: version
+    }
 }
