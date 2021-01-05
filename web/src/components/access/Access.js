@@ -401,6 +401,7 @@ class Access extends Component {
             message.error(result.message, 10);
             return;
         }
+        document.title = result.data['ip'] + ':' + result.data['port'];
         return result.data['id'];
     }
 

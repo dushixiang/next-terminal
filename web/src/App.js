@@ -226,7 +226,7 @@ class App extends Component {
                             <Route path="/setting" component={Setting}/>
 
                             <Footer style={{textAlign: 'center'}}>
-                                Next Terminal ©2020 dushixiang Version:0.0.3
+                                Next Terminal ©2020 dushixiang Version:0.0.4
                             </Footer>
                         </Layout>
 
