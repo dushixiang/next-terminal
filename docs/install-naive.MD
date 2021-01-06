@@ -1,14 +1,24 @@
 # 原生安装
 
-## Centos
+## 安装 Apache Guacamole-Server
 
-### 安装 Apache Guacamole-Server
-
-安装Apache Guacamole-Server依赖文件
+### Centos 安装Apache Guacamole-Server依赖文件
 
 ```shell
-yum install -y gcc cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel freerdp-devel freerdp-plugins pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel
+yum install -y gcc cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel freerdp-devel pango-devel libssh2-devel libtelnet-devel libvncserver-devel pulseaudio-libs-devel openssl-devel libvorbis-devel libwebp-devel libwebsockets-devel libtool
 ```
+
+### Ubuntu 安装Apache Guacamole-Server依赖文件
+```shell
+sudo apt-get install libcairo2-dev libjpeg-turbo8-dev libpng12-dev libtool-bin libossp-uuid-dev freerdp2-dev libpango1.0-dev libssh2-1-dev 	libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
+```
+
+### Debian 安装Apache Guacamole-Server依赖文件
+```shell
+sudo apt-get install libcairo2-dev libjpeg62-turbo-dev libpng12-dev libtool-bin libossp-uuid-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
+```
+
+如有疑问可参考guacamole[官方安装文档](!https://guacamole.apache.org/doc/gug/installing-guacamole.html)
 
 下载&解压&configure
 ```shell
@@ -68,14 +78,7 @@ Type "make" to compile guacamole-server.
 编译和安装
 
 ```shell
-make && make install & ldconfig
-```
-
-建立软链接
-
-```shell
-ln -s /usr/local/lib/freerdp/guacsnd.so /usr/lib64/freerdp/
-ln -s /usr/local/lib/freerdp/guacdr.so /usr/lib64/freerdp/
+make && make install && ldconfig
 ```
 
 配置guacamole-server
@@ -86,7 +89,7 @@ pid_file = /var/run/guacd.pid
 log_level = info
 
 [server]
-bind_host = 127.0.0.1
+bind_host = 0.0.0.0
 bind_port = 4822
 EOF
 ```
@@ -123,7 +126,7 @@ mkdir ~/next-terminal & cd ~/next-terminal
 
 下载
 ```shell
-wget https://github.com/dushixiang/next-terminal/releases/download/v0.0.2/next-terminal.tgz
+wget https://github.com/dushixiang/next-terminal/releases/download/v0.0.4/next-terminal.tgz
 ```
 
 解压

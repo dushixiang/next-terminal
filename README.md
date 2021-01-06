@@ -15,6 +15,7 @@ Next Terminal基于Apache Guacamole开发，使用到了guacd服务。
 - 批量执行命令
 - 在线会话管理（监控、强制断开）
 - 离线会话管理（查看录屏）
+- 双因素认证 感谢 [naiba](!https://github.com/naiba) 贡献
 
 ## 在线体验
 
