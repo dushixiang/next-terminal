@@ -119,3 +119,16 @@ func IsDir(path string) bool {
 func IsFile(path string) bool {
 	return !IsDir(path)
 }
+
+// 去除重复元素
+func Distinct(list []string) []string {
+	result := make([]string, 0, len(list))
+	temp := map[string]struct{}{}
+	for _, item := range list {
+		if _, ok := temp[item]; !ok {
+			temp[item] = struct{}{}
+			result = append(result, item)
+		}
+	}
+	return result
+}

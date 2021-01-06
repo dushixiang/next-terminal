@@ -21,6 +21,7 @@ import qs from "qs";
 import AssetModal from "./AssetModal";
 import request from "../../common/request";
 import {message} from "antd/es";
+import {isEmpty, itemRender} from "../../utils/utils";
 
 
 import {
@@ -34,7 +35,6 @@ import {
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import {itemRender} from "../../utils/utils";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import Logout from "../user/Logout";
 
@@ -77,7 +77,14 @@ class Asset extends Component {
     };
 
     async componentDidMount() {
-        await this.loadTableData();
+        this.loadTableData();
+
+        let result = await request.get('/tags');
+        if (result['code'] === 1) {
+            this.setState({
+                tags: result['data']
+            })
+        }
     }
 
     async delete(id) {
@@ -150,6 +157,21 @@ class Asset extends Component {
 
         this.loadTableData(query);
     };
+
+    handleTagsChange = tags => {
+        console.log(tags)
+        // this.setState({
+        //     tags: tags
+        // })
+        let query = {
+            ...this.state.queryParams,
+            'pageIndex': 1,
+            'pageSize': this.state.queryParams.pageSize,
+            'tags': tags.join(','),
+        }
+
+        this.loadTableData(query);
+    }
 
     handleSearchByProtocol = protocol => {
         let query = {
@@ -335,13 +357,13 @@ class Asset extends Component {
                 );
             }
         }, {
-            title: 'IP',
+            title: '网络',
             dataIndex: 'ip',
             key: 'ip',
-        }, {
-            title: '端口',
-            dataIndex: 'port',
-            key: 'port',
+            render: (text, record) => {
+
+                return record['ip'] + ':' + record['port'];
+            }
         }, {
             title: '连接协议',
             dataIndex: 'protocol',
@@ -359,6 +381,23 @@ class Asset extends Component {
                     return (<Badge status="processing" text="运行中"/>);
                 } else {
                     return (<Badge status="error" text="不可用"/>);
+                }
+            }
+        }, {
+            title: '标签',
+            dataIndex: 'tags',
+            key: 'tags',
+            render: tags => {
+                if (!isEmpty(tags)) {
+                    let tagDocuments = []
+                    let tagArr = tags.split(',');
+                    for (let i = 0; i < tagArr.length; i++) {
+                        if (tags[i] === '-') {
+                            continue;
+                        }
+                        tagDocuments.push(<Tag>{tagArr[i]}</Tag>)
+                    }
+                    return tagDocuments;
                 }
             }
         }, {
@@ -426,6 +465,18 @@ class Asset extends Component {
                                         allowClear
                                         onSearch={this.handleSearchByName}
                                     />
+
+                                    <Select mode="multiple"
+                                            allowClear
+                                            placeholder="请选择标签" onChange={this.handleTagsChange}
+                                            style={{minWidth: 150}}>
+                                        {this.state.tags.map(tag => {
+                                            if (tag === '-') {
+                                                return undefined;
+                                            }
+                                            return (<Select.Option key={tag}>{tag}</Select.Option>)
+                                        })}
+                                    </Select>
 
                                     <Select onChange={this.handleSearchByProtocol}
                                             value={this.state.queryParams.protocol ? this.state.queryParams.protocol : ''}

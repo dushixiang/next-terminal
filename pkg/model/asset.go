@@ -43,7 +43,7 @@ func FindAssetByConditions(protocol string) (o []Asset, err error) {
 	return
 }
 
-func FindPageAsset(pageIndex, pageSize int, name, protocol string) (o []Asset, total int64, err error) {
+func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string) (o []Asset, total int64, err error) {
 	db := global.DB
 	if len(name) > 0 {
 		db = db.Where("name like ?", "%"+name+"%")
@@ -51,6 +51,13 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol string) (o []Asset, t
 
 	if len(protocol) > 0 {
 		db = db.Where("protocol = ?", protocol)
+	}
+
+	if len(tags) > 0 {
+		tagArr := strings.Split(tags, ",")
+		for i := range tagArr {
+			db = db.Where("find_in_set(?, tags)", tagArr[i])
+		}
 	}
 
 	err = db.Order("created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Error
@@ -105,5 +112,5 @@ func FindAssetTags() (o []string, err error) {
 		o = append(o, split...)
 	}
 
-	return o, nil
+	return utils.Distinct(o), nil
 }

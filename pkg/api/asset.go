@@ -29,8 +29,9 @@ func AssetPagingEndpoint(c echo.Context) error {
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	name := c.QueryParam("name")
 	protocol := c.QueryParam("protocol")
+	tags := c.QueryParam("tags")
 
-	items, total, _ := model.FindPageAsset(pageIndex, pageSize, name, protocol)
+	items, total, _ := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags)
 
 	return Success(c, H{
 		"total": total,
