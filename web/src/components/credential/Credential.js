@@ -20,7 +20,7 @@ import Logout from "../user/Logout";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
-const {Title, Text, Paragraph} = Typography;
+const {Title, Text} = Typography;
 const {Content} = Layout;
 const routes = [
     {
