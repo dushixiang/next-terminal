@@ -112,11 +112,8 @@ func AssetTcpingEndpoint(c echo.Context) (err error) {
 	}
 
 	active := utils.Tcping(item.IP, item.Port)
-	asset := model.Asset{
-		Active: active,
-	}
 
-	model.UpdateAssetById(&asset, item.ID)
+	model.UpdateAssetActiveById(active, item.ID)
 	return Success(c, active)
 }
 

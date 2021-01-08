@@ -41,13 +41,6 @@ class LoginForm extends Component {
             localStorage.setItem('X-Auth-Token', result['data']);
             // this.props.history.push();
             window.location.href = "/"
-
-            let r = await request.get('/info');
-            if (r.code === 1) {
-                this.props.updateUser(r.data);
-            } else {
-                message.error(r.message);
-            }
         } catch (e) {
             message.error(e.message);
         } finally {

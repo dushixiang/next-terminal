@@ -1,13 +1,11 @@
 package api
 
 import (
-	"log"
-	"time"
-
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/totp"
 	"next-terminal/pkg/utils"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -15,6 +13,7 @@ import (
 type LoginAccount struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Remember bool   `json:"remember"`
 	TOTP     string `json:"totp"`
 }
 
@@ -26,6 +25,12 @@ type ConfirmTOTP struct {
 type ChangePassword struct {
 	NewPassword string `json:"newPassword"`
 	OldPassword string `json:"oldPassword"`
+}
+
+type Authorization struct {
+	Token    string
+	Remember bool
+	User     model.User
 }
 
 func LoginEndpoint(c echo.Context) error {
@@ -43,15 +48,24 @@ func LoginEndpoint(c echo.Context) error {
 		return Fail(c, -1, "您输入的账号或密码不正确")
 	}
 
-	log.Println(user, loginAccount)
-
 	if !totp.Validate(loginAccount.TOTP, user.TOTPSecret) {
 		return Fail(c, -2, "您的TOTP不匹配")
 	}
 
 	token := utils.UUID()
 
-	global.Cache.Set(token, user, time.Minute*time.Duration(30))
+	authorization := Authorization{
+		Token:    token,
+		Remember: loginAccount.Remember,
+		User:     user,
+	}
+
+	if authorization.Remember {
+		// 记住登录有效期两周
+		global.Cache.Set(token, authorization, time.Hour*time.Duration(24*14))
+	} else {
+		global.Cache.Set(token, authorization, time.Hour*time.Duration(2))
+	}
 
 	model.UpdateUserById(&model.User{Online: true}, user.ID)
 

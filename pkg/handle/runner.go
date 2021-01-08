@@ -10,7 +10,7 @@ import (
 
 func RunTicker() {
 	var ch chan int
-	//定时任务
+	// 定时任务，每隔一小时删除一次未使用的会话信息
 	ticker := time.NewTicker(time.Minute * 60)
 	go func() {
 		for range ticker.C {

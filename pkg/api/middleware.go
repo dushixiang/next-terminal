@@ -34,12 +34,19 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		token := GetToken(c)
-		user, found := global.Cache.Get(token)
+		authorization, found := global.Cache.Get(token)
 		if !found {
 			logrus.Debugf("您的登录信息已失效，请重新登录后再试。")
 			return Fail(c, 403, "您的登录信息已失效，请重新登录后再试。")
 		}
-		global.Cache.Set(token, user, time.Minute*time.Duration(30))
+
+		if authorization.(Authorization).Remember {
+			// 记住登录有效期两周
+			global.Cache.Set(token, authorization, time.Hour*time.Duration(24*14))
+		} else {
+			global.Cache.Set(token, authorization, time.Hour*time.Duration(2))
+		}
+
 		return next(c)
 	}
 }

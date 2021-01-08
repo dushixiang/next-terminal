@@ -49,6 +49,7 @@ func (w *NextWriter) Read() ([]byte, int, error) {
 func SSHEndpoint(c echo.Context) error {
 	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
+		logrus.Errorf("升级为WebSocket协议失败：%v", err.Error())
 		return err
 	}
 
@@ -58,11 +59,13 @@ func SSHEndpoint(c echo.Context) error {
 
 	sshClient, err := CreateSshClient(assetId)
 	if err != nil {
+		logrus.Errorf("创建SSH客户端失败：%v", err.Error())
 		return err
 	}
 
 	session, err := sshClient.NewSession()
 	if err != nil {
+		logrus.Errorf("创建SSH会话失败：%v", err.Error())
 		return err
 	}
 	defer session.Close()
@@ -123,36 +126,62 @@ func CreateSshClient(assetId string) (*ssh.Client, error) {
 		return nil, err
 	}
 
+	var (
+		accountType = asset.AccountType
+		username    = asset.Username
+		password    = asset.Password
+		privateKey  = asset.PrivateKey
+		passphrase  = asset.Passphrase
+	)
+
 	var authMethod ssh.AuthMethod
-	if asset.AccountType == "credential" {
+	if accountType == "credential" {
+
 		credential, err := model.FindCredentialById(asset.CredentialId)
 		if err != nil {
 			return nil, err
 		}
-		asset.Username = credential.Username
-		asset.Password = credential.Password
-		authMethod = ssh.Password(asset.Password)
-	} else if asset.AccountType == "private-key" {
+		accountType = credential.Type
+		username = credential.Username
+		password = credential.Password
+		privateKey = credential.PrivateKey
+		passphrase = credential.Passphrase
+	}
+
+	if username == "-" {
+		username = ""
+	}
+	if password == "-" {
+		password = ""
+	}
+	if privateKey == "-" {
+		privateKey = ""
+	}
+	if passphrase == "-" {
+		passphrase = ""
+	}
+
+	if accountType == model.PrivateKey {
 		var key ssh.Signer
-		if len(asset.Passphrase) > 0 {
-			key, err = ssh.ParsePrivateKeyWithPassphrase([]byte(asset.PrivateKey), []byte(asset.Passphrase))
+		if len(passphrase) > 0 {
+			key, err = ssh.ParsePrivateKeyWithPassphrase([]byte(privateKey), []byte(passphrase))
 			if err != nil {
 				return nil, err
 			}
 		} else {
-			key, err = ssh.ParsePrivateKey([]byte(asset.PrivateKey))
+			key, err = ssh.ParsePrivateKey([]byte(privateKey))
 			if err != nil {
 				return nil, err
 			}
 		}
 		authMethod = ssh.PublicKeys(key)
 	} else {
-		authMethod = ssh.Password(asset.Password)
+		authMethod = ssh.Password(password)
 	}
 
 	config := &ssh.ClientConfig{
 		Timeout:         1 * time.Second,
-		User:            asset.Username,
+		User:            username,
 		Auth:            []ssh.AuthMethod{authMethod},
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}

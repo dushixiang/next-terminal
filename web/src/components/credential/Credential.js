@@ -6,9 +6,11 @@ import CredentialModal from "./CredentialModal";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {
-    DeleteOutlined, DeleteTwoTone,
+    DeleteOutlined,
+    DeleteTwoTone,
     EditTwoTone,
     ExclamationCircleOutlined,
+    EyeTwoTone,
     PlusOutlined,
     SyncOutlined,
     UndoOutlined
@@ -18,7 +20,7 @@ import Logout from "../user/Logout";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
-const {Title, Text} = Typography;
+const {Title, Text, Paragraph} = Typography;
 const {Content} = Layout;
 const routes = [
     {
@@ -135,7 +137,8 @@ class Credential extends Component {
             okType: 'danger',
             cancelText: '取消',
             onOk() {
-                self.delete(id).then(r => {});
+                self.delete(id).then(r => {
+                });
             }
         });
     };
@@ -240,13 +243,26 @@ class Credential extends Component {
                 );
             }
         }, {
+            title: '凭证类型',
+            dataIndex: 'type',
+            key: 'type',
+            render: (type, record) => {
+
+                if (type === 'private-key') {
+                    return (
+                        <Text strong type="success">密钥</Text>
+                    );
+                } else {
+                    return (
+                        <Text strong type="warning">密码</Text>
+                    );
+                }
+
+            }
+        }, {
             title: '授权账户',
             dataIndex: 'username',
             key: 'username',
-        }, {
-            title: '授权密码',
-            dataIndex: 'password',
-            key: 'password',
         },
             {
                 title: '操作',
@@ -255,8 +271,12 @@ class Credential extends Component {
 
                     return (
                         <div>
-                            <Button type="link" size='small' icon={<EditTwoTone/>} onClick={() => this.showModal('更新凭证', record)}>编辑</Button>
-                            <Button type="link" size='small' icon={<DeleteTwoTone />} onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            <Button type="link" size='small' icon={<EyeTwoTone/>}
+                                    onClick={() => this.showModal('查看凭证', record)}>查看</Button>
+                            <Button type="link" size='small' icon={<EditTwoTone/>}
+                                    onClick={() => this.showModal('更新凭证', record)}>编辑</Button>
+                            <Button type="link" size='small' icon={<DeleteTwoTone/>}
+                                    onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
                         </div>
                     )
                 },
@@ -388,6 +408,7 @@ class Credential extends Component {
                                 handleCancel={this.handleCancelModal}
                                 confirmLoading={this.state.modalConfirmLoading}
                                 model={this.state.model}
+                                footer={this.state.modalTitle.indexOf('查看') > -1 ? null : undefined}
                             >
 
                             </CredentialModal>

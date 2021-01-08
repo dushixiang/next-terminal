@@ -308,7 +308,6 @@ class Access extends Component {
                 if (navigator.clipboard) {
                     await navigator.clipboard.writeText(data);
                 }
-
             };
 
         }
@@ -433,6 +432,10 @@ class Access extends Component {
 
         let width = window.innerWidth;
         let height = window.innerHeight;
+        let dpi = 96;
+        if (protocol === 'ssh' || protocol === 'telnet') {
+            dpi = dpi * 2;
+        }
 
         let token = getToken();
 
@@ -440,6 +443,7 @@ class Access extends Component {
             'sessionId': sessionId,
             'width': width,
             'height': height,
+            'dpi': dpi,
             'X-Auth-Token': token
         };
 
@@ -848,6 +852,7 @@ class Access extends Component {
 
                 <Affix style={{position: 'absolute', top: 50, right: 100}}>
                     <Button
+                        shape="circle"
                         icon={<CopyOutlined/>}
                         onClick={() => {
                             this.showClipboard();
@@ -861,6 +866,7 @@ class Access extends Component {
                     this.state.protocol === 'ssh' || this.state.protocol === 'rdp' ?
                         <Affix style={{position: 'absolute', top: 50, right: 50}}>
                             <Button
+                                shape="circle"
                                 icon={<FolderOpenOutlined/>}
                                 onClick={() => {
                                     this.showFileSystem();

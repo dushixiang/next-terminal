@@ -10,13 +10,13 @@ const {Option} = Select;
 
 const protocolMapping = {
     'ssh': [
-        {text: '自定义', value: 'custom'},
+        {text: '密码', value: 'custom'},
+        {text: '密钥', value: 'private-key'},
         {text: '授权凭证', value: 'credential'},
-        {text: '私钥', value: 'private-key'}
     ],
-    'rdp': [{text: '自定义', value: 'custom'}, {text: '授权凭证', value: 'credential'}],
-    'vnc': [{text: '自定义', value: 'custom'}, {text: '授权凭证', value: 'credential'}],
-    'telnet': [{text: '自定义', value: 'custom'}, {text: '授权凭证', value: 'credential'}]
+    'rdp': [{text: '密码', value: 'custom'}, {text: '授权凭证', value: 'credential'}],
+    'vnc': [{text: '密码', value: 'custom'}, {text: '授权凭证', value: 'credential'}],
+    'telnet': [{text: '密码', value: 'custom'}, {text: '授权凭证', value: 'credential'}]
 }
 
 const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoading, credentials, tags, model}) {

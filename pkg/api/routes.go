@@ -154,7 +154,7 @@ func GetCurrentAccount(c echo.Context) (model.User, bool) {
 	token := GetToken(c)
 	get, b := global.Cache.Get(token)
 	if b {
-		return get.(model.User), true
+		return get.(Authorization).User, true
 	}
 	return model.User{}, false
 }

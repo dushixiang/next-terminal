@@ -468,7 +468,7 @@ class Asset extends Component {
 
                                     <Select mode="multiple"
                                             allowClear
-                                            placeholder="请选择标签" onChange={this.handleTagsChange}
+                                            placeholder="资产标签" onChange={this.handleTagsChange}
                                             style={{minWidth: 150}}>
                                         {this.state.tags.map(tag => {
                                             if (tag === '-') {

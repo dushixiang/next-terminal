@@ -85,6 +85,11 @@ func UpdateAssetById(o *Asset, id string) {
 	global.DB.Updates(o)
 }
 
+func UpdateAssetActiveById(active bool, id string) {
+	sql := "update assets set active = ? where id = ?"
+	global.DB.Exec(sql, active, id)
+}
+
 func DeleteAssetById(id string) {
 	global.DB.Where("id = ?", id).Delete(&Asset{})
 }

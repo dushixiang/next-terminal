@@ -134,8 +134,10 @@ func NewTunnel(address string, config Configuration) (ret *Tunnel, err error) {
 
 	width := config.GetParameter("width")
 	height := config.GetParameter("height")
+	dpi := config.GetParameter("dpi")
+
 	// send size
-	if err := ret.WriteInstructionAndFlush(NewInstruction("size", width, height, "96")); err != nil {
+	if err := ret.WriteInstructionAndFlush(NewInstruction("size", width, height, dpi)); err != nil {
 		return nil, err
 	}
 

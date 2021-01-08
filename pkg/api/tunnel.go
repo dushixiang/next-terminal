@@ -29,6 +29,7 @@ func TunEndpoint(c echo.Context) error {
 
 	width := c.QueryParam("width")
 	height := c.QueryParam("height")
+	dpi := c.QueryParam("dpi")
 	sessionId := c.QueryParam("sessionId")
 	connectionId := c.QueryParam("connectionId")
 
@@ -38,6 +39,7 @@ func TunEndpoint(c echo.Context) error {
 	configuration := guacd.NewConfiguration()
 	configuration.SetParameter("width", width)
 	configuration.SetParameter("height", height)
+	configuration.SetParameter("dpi", dpi)
 
 	propertyMap := model.FindAllPropertiesMap()
 
@@ -73,8 +75,6 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter("security", "any")
 			configuration.SetParameter("ignore-cert", "true")
 			configuration.SetParameter("create-drive-path", "true")
-
-			configuration.SetParameter("dpi", "96")
 			configuration.SetParameter("resize-method", "reconnect")
 			configuration.SetParameter(guacd.EnableDrive, propertyMap[guacd.EnableDrive])
 			configuration.SetParameter(guacd.DriveName, propertyMap[guacd.DriveName])
@@ -99,9 +99,7 @@ func TunEndpoint(c echo.Context) error {
 				configuration.SetParameter("password", session.Password)
 			}
 
-			fontSize, _ := strconv.Atoi(propertyMap[guacd.FontSize])
-			fontSize = fontSize * 2
-			configuration.SetParameter(guacd.FontSize, strconv.Itoa(fontSize))
+			configuration.SetParameter(guacd.FontSize, propertyMap[guacd.FontSize])
 			configuration.SetParameter(guacd.FontName, propertyMap[guacd.FontName])
 			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
 			break

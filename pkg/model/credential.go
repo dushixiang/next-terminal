@@ -5,12 +5,21 @@ import (
 	"next-terminal/pkg/utils"
 )
 
+// 密码
+const Custom = "custom"
+
+// 密钥
+const PrivateKey = "private-key"
+
 type Credential struct {
-	ID       string         `gorm:"primary_key" json:"id"`
-	Name     string         `json:"name"`
-	Username string         `json:"username"`
-	Password string         `json:"password"`
-	Created  utils.JsonTime `json:"created"`
+	ID         string         `gorm:"primary_key" json:"id"`
+	Name       string         `json:"name"`
+	Type       string         `json:"type"`
+	Username   string         `json:"username"`
+	Password   string         `json:"password"`
+	PrivateKey string         `json:"privateKey"`
+	Passphrase string         `json:"passphrase"`
+	Created    utils.JsonTime `json:"created"`
 }
 
 func (r *Credential) TableName() string {

@@ -21,6 +21,31 @@ func CredentialCreateEndpoint(c echo.Context) error {
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
+	switch item.Type {
+	case model.Custom:
+		item.PrivateKey = "-"
+		item.Passphrase = "-"
+		if len(item.Username) == 0 {
+			item.Username = "-"
+		}
+		if len(item.Password) == 0 {
+			item.Password = "-"
+		}
+	case model.PrivateKey:
+		item.Password = "-"
+		if len(item.Username) == 0 {
+			item.Username = "-"
+		}
+		if len(item.PrivateKey) == 0 {
+			item.PrivateKey = "-"
+		}
+		if len(item.Passphrase) == 0 {
+			item.Passphrase = "-"
+		}
+	default:
+		return Fail(c, -1, "类型错误")
+	}
+
 	if err := model.CreateNewCredential(&item); err != nil {
 		return err
 	}
@@ -47,6 +72,31 @@ func CredentialUpdateEndpoint(c echo.Context) error {
 	var item model.Credential
 	if err := c.Bind(&item); err != nil {
 		return err
+	}
+
+	switch item.Type {
+	case model.Custom:
+		item.PrivateKey = "-"
+		item.Passphrase = "-"
+		if len(item.Username) == 0 {
+			item.Username = "-"
+		}
+		if len(item.Password) == 0 {
+			item.Password = "-"
+		}
+	case model.PrivateKey:
+		item.Password = "-"
+		if len(item.Username) == 0 {
+			item.Username = "-"
+		}
+		if len(item.PrivateKey) == 0 {
+			item.PrivateKey = "-"
+		}
+		if len(item.Passphrase) == 0 {
+			item.Passphrase = "-"
+		}
+	default:
+		return Fail(c, -1, "类型错误")
 	}
 
 	model.UpdateCredentialById(&item, id)

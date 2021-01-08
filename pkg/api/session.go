@@ -185,8 +185,14 @@ func SessionCreateEndpoint(c echo.Context) error {
 			return err
 		}
 
-		session.Username = credential.Username
-		session.Password = credential.Password
+		if credential.Type == model.Custom {
+			session.Username = credential.Username
+			session.Password = credential.Password
+		} else {
+			session.Username = credential.Username
+			session.PrivateKey = credential.PrivateKey
+			session.Passphrase = credential.Passphrase
+		}
 	}
 
 	if err := model.CreateNewSession(session); err != nil {
@@ -223,11 +229,10 @@ func SessionUploadEndpoint(c echo.Context) error {
 		}
 
 		dstFile, err := tun.SftpClient.Create(remoteFile)
+		defer dstFile.Close()
 		if err != nil {
 			return err
 		}
-
-		defer dstFile.Close()
 
 		buf := make([]byte, 1024)
 		for {
@@ -282,7 +287,9 @@ func SessionDownloadEndpoint(c echo.Context) error {
 		}
 
 		defer dstFile.Close()
-		c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", remoteFile))
+		// 获取带后缀的文件名称
+		filenameWithSuffix := path.Base(remoteFile)
+		c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filenameWithSuffix))
 
 		var buff bytes.Buffer
 		if _, err := dstFile.WriteTo(&buff); err != nil {
