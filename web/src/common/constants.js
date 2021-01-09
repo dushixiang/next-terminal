@@ -1,6 +1,6 @@
 // prod
-export const server = '/';
-export const wsServer = '/';
+export const server = '';
+export const wsServer = '';
 export const prefix = '';
 
 // dev
