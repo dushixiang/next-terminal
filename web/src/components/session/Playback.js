@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Guacamole from "guacamole-common-js";
-import {prefix, server} from "../../common/constants";
+import {server} from "../../common/constants";
 
 class Playback extends Component {
 
@@ -14,7 +14,7 @@ class Playback extends Component {
     }
 
     initPlayer(sessionId) {
-        var RECORDING_URL = `${server + prefix}/sessions/${sessionId}/recording`;
+        var RECORDING_URL = `${server}/sessions/${sessionId}/recording`;
 
         var player = document.getElementById('player');
         var display = document.getElementById('display');

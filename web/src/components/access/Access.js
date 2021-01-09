@@ -19,7 +19,7 @@ import {
 } from 'antd'
 import qs from "qs";
 import request from "../../common/request";
-import {prefix, server, wsServer} from "../../common/constants";
+import {server, wsServer} from "../../common/constants";
 import {
     CloudDownloadOutlined,
     CloudUploadOutlined,
@@ -406,7 +406,7 @@ class Access extends Component {
 
     async renderDisplay(sessionId, protocol) {
 
-        let tunnel = new Guacamole.WebSocketTunnel(wsServer + prefix + '/tunnel');
+        let tunnel = new Guacamole.WebSocketTunnel(wsServer + '/tunnel');
 
         tunnel.onstatechange = this.onTunnelStateChange;
         // Get new client instance
@@ -658,7 +658,7 @@ class Access extends Component {
             message.warning('当前只支持下载文件');
             return;
         }
-        download(`${server}${prefix}/sessions/${this.state.sessionId}/download?file=${this.state.selectNode.key}`);
+        download(`${server}/sessions/${this.state.sessionId}/download?file=${this.state.selectNode.key}`);
     }
 
     rmdir = async () => {
@@ -711,7 +711,7 @@ class Access extends Component {
     }
 
     getTreeNodes = async (key) => {
-        const url = server + prefix + '/sessions/' + this.state.sessionId + '/ls?dir=' + key;
+        const url = server + '/sessions/' + this.state.sessionId + '/ls?dir=' + key;
 
         let result = await request.get(url);
 
@@ -845,7 +845,7 @@ class Access extends Component {
                     onCancel={this.handleUploadCancel}
                 >
                     <Upload
-                        action={server + prefix + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.selectNode.key}>
+                        action={server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.selectNode.key}>
                         <Button icon={<UploadOutlined/>}>上传文件</Button>
                     </Upload>
                 </Modal>

@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Guacamole from 'guacamole-common-js';
 import {message, Modal} from 'antd'
 import qs from "qs";
-import {prefix, wsServer} from "../../common/constants";
+import {wsServer} from "../../common/constants";
 import {getToken} from "../../utils/utils";
 import './Access.css'
 
@@ -178,7 +178,7 @@ class Access extends Component {
 
     async renderDisplay(connectionId, protocol) {
 
-        let tunnel = new Guacamole.WebSocketTunnel(wsServer + prefix + '/tunnel');
+        let tunnel = new Guacamole.WebSocketTunnel(wsServer + '/tunnel');
 
         tunnel.onstatechange = this.onTunnelStateChange;
         let client = new Guacamole.Client(tunnel);

@@ -3,7 +3,7 @@ import "xterm/css/xterm.css"
 import {Terminal} from "xterm";
 import {AttachAddon} from 'xterm-addon-attach';
 import qs from "qs";
-import {prefix, wsServer} from "../../common/constants";
+import {wsServer} from "../../common/constants";
 import "./Console.css"
 import {getToken} from "../../utils/utils";
 
@@ -61,7 +61,7 @@ class Console extends Component {
 
         let token = getToken();
 
-        let webSocket = new WebSocket(wsServer + prefix + '/ssh?X-Auth-Token=' + token + '&' + paramStr);
+        let webSocket = new WebSocket(wsServer + '/ssh?X-Auth-Token=' + token + '&' + paramStr);
         term.loadAddon(new AttachAddon(webSocket));
         this.props.appendWebsocket(webSocket);
 

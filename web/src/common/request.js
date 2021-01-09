@@ -1,12 +1,12 @@
 import axios from 'axios'
-import {prefix, server} from "./constants";
+import {server} from "./constants";
 import {message} from 'antd';
 import {getHeaders} from "../utils/utils";
 
 // 测试地址
 // axios.defaults.baseURL = server;
 // 线上地址
-axios.defaults.baseURL = server + prefix;
+axios.defaults.baseURL = server;
 
 const handleError = (error) => {
     if ("Network Error" === error.toString()) {
@@ -35,14 +35,14 @@ const request = {
 
         return new Promise((resolve, reject) => {
             axios.get(url, {headers: headers})
-                    .then((response) => {
-                        handleResult(response.data);
-                        resolve(response.data);
-                    })
-                    .catch((error) => {
-                        handleError(error);
-                        reject(error);
-                    });
+                .then((response) => {
+                    handleResult(response.data);
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    handleError(error);
+                    reject(error);
+                });
         })
     },
 
@@ -52,14 +52,14 @@ const request = {
 
         return new Promise((resolve, reject) => {
             axios.post(url, params, {headers: headers})
-                    .then((response) => {
-                        handleResult(response.data);
-                        resolve(response.data);
-                    })
-                    .catch((error) => {
-                        handleError(error);
-                        reject(error);
-                    });
+                .then((response) => {
+                    handleResult(response.data);
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    handleError(error);
+                    reject(error);
+                });
         })
     },
 
@@ -69,14 +69,14 @@ const request = {
 
         return new Promise((resolve, reject) => {
             axios.put(url, params, {headers: headers})
-                    .then((response) => {
-                        handleResult(response.data);
-                        resolve(response.data);
-                    })
-                    .catch((error) => {
-                        handleError(error);
-                        reject(error);
-                    });
+                .then((response) => {
+                    handleResult(response.data);
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    handleError(error);
+                    reject(error);
+                });
         })
     },
 
@@ -85,14 +85,14 @@ const request = {
 
         return new Promise((resolve, reject) => {
             axios.delete(url, {headers: headers})
-                    .then((response) => {
-                        handleResult(response.data);
-                        resolve(response.data);
-                    })
-                    .catch((error) => {
-                        handleError(error);
-                        reject(error);
-                    });
+                .then((response) => {
+                    handleResult(response.data);
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    handleError(error);
+                    reject(error);
+                });
         })
     },
 
@@ -101,14 +101,14 @@ const request = {
 
         return new Promise((resolve, reject) => {
             axios.patch(url, params, {headers: headers})
-                    .then((response) => {
-                        handleResult(response.data);
-                        resolve(response.data);
-                    })
-                    .catch((error) => {
-                        handleError(error);
-                        reject(error);
-                    });
+                .then((response) => {
+                    handleResult(response.data);
+                    resolve(response.data);
+                })
+                .catch((error) => {
+                    handleError(error);
+                    reject(error);
+                });
         })
     },
 };
