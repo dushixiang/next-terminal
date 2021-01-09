@@ -15,7 +15,7 @@ sudo apt-get install libcairo2-dev libjpeg-turbo8-dev libpng12-dev libtool-bin l
 
 ### Debian 安装Apache Guacamole-Server依赖文件
 ```shell
-sudo apt-get install libcairo2-dev libjpeg62-turbo-dev libpng12-dev libtool-bin libossp-uuid-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
+sudo apt-get install libcairo2-dev libjpeg62-turbo-dev libpng-dev libtool-bin libossp-uuid-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
 ```
 
 如有疑问可参考guacamole[官方安装文档](!https://guacamole.apache.org/doc/gug/installing-guacamole.html)
@@ -83,7 +83,7 @@ make && make install && ldconfig
 
 配置guacamole-server
 ```shell
-mkdir /etc/guacamole/ & cat <<EOF >> /etc/guacamole/guacd.conf
+mkdir /etc/guacamole/ && cat <<EOF >> /etc/guacamole/guacd.conf
 [daemon]
 pid_file = /var/run/guacd.pid
 log_level = info
