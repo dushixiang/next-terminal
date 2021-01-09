@@ -1,6 +1,6 @@
 // prod
 let wsPrefix;
-if (window.location.protocol === 'https') {
+if (window.location.protocol === 'https:') {
     wsPrefix = 'wss:'
 } else {
     wsPrefix = 'ws:'
@@ -8,7 +8,7 @@ if (window.location.protocol === 'https') {
 
 export const server = '';
 export const wsServer = wsPrefix + window.location.host;
-export const prefix = window.location.protocol + ':' + window.location.host;
+export const prefix = window.location.protocol + '//' + window.location.host;
 
 // dev
 // export const server = '//127.0.0.1:8088';

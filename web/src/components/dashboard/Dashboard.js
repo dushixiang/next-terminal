@@ -52,7 +52,6 @@ class Dashboard extends Component {
             this.setState({
                 session: result['data']
             })
-            console.log('set session', this.state.session)
         }
     }
 
