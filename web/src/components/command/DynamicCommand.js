@@ -294,13 +294,13 @@ class DynamicCommand extends Component {
             dataIndex: 'name',
             key: 'name',
             render: (name, record) => {
-                if (name && name.length > 20) {
-                    name = name.substring(0, 20) + "...";
+                let short = name;
+                if (short && short.length > 20) {
+                    short = short.substring(0, 20) + " ...";
                 }
-
                 return (
                     <Tooltip placement="topLeft" title={name}>
-                        {name}
+                        {short}
                     </Tooltip>
                 );
             }
@@ -308,6 +308,18 @@ class DynamicCommand extends Component {
             title: '指令内容',
             dataIndex: 'content',
             key: 'content',
+            render: (content, record) => {
+                let short = content;
+                if (short && short.length > 20) {
+                    short = short.substring(0, 20) + " ...";
+                }
+
+                return (
+                    <Tooltip placement="topLeft" title={content}>
+                        {short}
+                    </Tooltip>
+                );
+            }
         }, {
             title: '操作',
             key: 'action',

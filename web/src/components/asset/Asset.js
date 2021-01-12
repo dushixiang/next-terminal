@@ -346,13 +346,13 @@ class Asset extends Component {
             dataIndex: 'name',
             key: 'name',
             render: (name, record) => {
-                if (name && name.length > 20) {
-                    name = name.substring(0, 20) + "...";
+                let short = name;
+                if (short && short.length > 20) {
+                    short = short.substring(0, 20) + " ...";
                 }
-
                 return (
                     <Tooltip placement="topLeft" title={name}>
-                        {name}
+                        {short}
                     </Tooltip>
                 );
             }
