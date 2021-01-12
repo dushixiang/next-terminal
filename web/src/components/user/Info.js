@@ -1,11 +1,12 @@
-import React, { Component } from 'react';
-import { Button, Form, Input, Layout, PageHeader, Image } from "antd";
-import { itemRender } from '../../utils/utils'
+import React, {Component} from 'react';
+import {Button, Card, Form, Image, Input, Layout, PageHeader} from "antd";
+import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
-import { message } from "antd/es";
+import {message} from "antd/es";
 import Logout from "./Logout";
 
-const { Content } = Layout;
+const {Content} = Layout;
+const {Meta} = Card;
 
 const routes = [
     {
@@ -19,12 +20,12 @@ const routes = [
 ];
 
 const formItemLayout = {
-    labelCol: { span: 3 },
-    wrapperCol: { span: 6 },
+    labelCol: {span: 3},
+    wrapperCol: {span: 6},
 };
 const formTailLayout = {
-    labelCol: { span: 3 },
-    wrapperCol: { span: 6, offset: 3 },
+    labelCol: {span: 3},
+    wrapperCol: {span: 6, offset: 3},
 };
 
 class Info extends Component {
@@ -106,7 +107,7 @@ class Info extends Component {
                         itemRender: itemRender
                     }}
                     extra={[
-                        <Logout key='logout' />
+                        <Logout key='logout'/>
                     ]}
                     subTitle="个人中心"
                 />
@@ -125,7 +126,7 @@ class Info extends Component {
                                 },
                             ]}
                         >
-                            <Input type='password' placeholder="请输入原始密码" />
+                            <Input type='password' placeholder="请输入原始密码"/>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -139,7 +140,7 @@ class Info extends Component {
                             ]}
                         >
                             <Input type='password' placeholder="新的密码"
-                                onChange={(value) => this.onNewPasswordChange(value)} />
+                                   onChange={(value) => this.onNewPasswordChange(value)}/>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -155,7 +156,7 @@ class Info extends Component {
                             help={this.state.errorMsg || ''}
                         >
                             <Input type='password' placeholder="请和上面输入新的密码保持一致"
-                                onChange={(value) => this.onNewPassword2Change(value)} />
+                                   onChange={(value) => this.onNewPassword2Change(value)}/>
                         </Form.Item>
                         <Form.Item {...formTailLayout}>
                             <Button type="primary" htmlType="submit">
@@ -174,11 +175,19 @@ class Info extends Component {
                         </Form.Item>
                     </Form>
                     <Form hidden={!this.state.qr} onFinish={this.confirmTOTP}>
-                        <Form.Item {...formItemLayout} label="使用TOTP应用扫码">
-                            <Image
-                                width={200}
-                                src={"data:image/png;base64, " + this.state.qr}
-                            />
+                        <Form.Item {...formItemLayout} label="二维码">
+
+                            <Card
+                                hoverable
+                                style={{width: 280}}
+                                cover={<Image
+                                    style={{margin: 40, marginBottom: 20}}
+                                    width={200}
+                                    src={"data:image/png;base64, " + this.state.qr}
+                                />}
+                            >
+                                <Meta title="双因素认证二维码" description="有效期30秒，在扫描后请尽快输入。"/>
+                            </Card>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -186,7 +195,7 @@ class Info extends Component {
                             label="TOTP"
                             rules={[]}
                         >
-                            <Input placeholder="请输入显示的数字" />
+                            <Input placeholder="请输入双因素认证APP中显示的授权码"/>
                         </Form.Item>
                         <Form.Item {...formTailLayout}>
                             <Button type="primary" htmlType="submit">

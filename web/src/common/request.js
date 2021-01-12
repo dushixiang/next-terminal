@@ -25,6 +25,7 @@ const handleError = (error) => {
 const handleResult = (result) => {
     if (result['code'] === 403) {
         window.location.href = '#/login';
+        return;
     }
 }
 

@@ -48,6 +48,45 @@ func LoginEndpoint(c echo.Context) error {
 		return Fail(c, -1, "您输入的账号或密码不正确")
 	}
 
+	if user.TOTPSecret != "" {
+		return Fail(c, 0, "")
+	}
+
+	token := utils.UUID()
+
+	authorization := Authorization{
+		Token:    token,
+		Remember: loginAccount.Remember,
+		User:     user,
+	}
+
+	if authorization.Remember {
+		// 记住登录有效期两周
+		global.Cache.Set(token, authorization, time.Hour*time.Duration(24*14))
+	} else {
+		global.Cache.Set(token, authorization, time.Hour*time.Duration(2))
+	}
+
+	model.UpdateUserById(&model.User{Online: true}, user.ID)
+
+	return Success(c, token)
+}
+
+func loginWithTotpEndpoint(c echo.Context) error {
+	var loginAccount LoginAccount
+	if err := c.Bind(&loginAccount); err != nil {
+		return err
+	}
+
+	user, err := model.FindUserByUsername(loginAccount.Username)
+	if err != nil {
+		return Fail(c, -1, "您输入的账号或密码不正确")
+	}
+
+	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
+		return Fail(c, -1, "您输入的账号或密码不正确")
+	}
+
 	if !totp.Validate(loginAccount.TOTP, user.TOTPSecret) {
 		return Fail(c, -2, "您的TOTP不匹配")
 	}

@@ -30,6 +30,7 @@ func SetupRoutes() *echo.Echo {
 	e.Use(Auth)
 
 	e.POST("/login", LoginEndpoint)
+	e.POST("/loginWithTotp", loginWithTotpEndpoint)
 
 	e.GET("/tunnel", TunEndpoint)
 	e.GET("/ssh", SSHEndpoint)
