@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	TunnelClosed       int = -1
 	Normal             int = 0
 	NotFoundSession    int = 2000
 	NewTunnelError     int = 2001
@@ -155,12 +156,12 @@ func TunEndpoint(c echo.Context) error {
 		for true {
 			instruction, err := tunnel.Read()
 			if err != nil {
-				CloseSessionById(sessionId, Normal, "")
+				CloseSessionById(sessionId, TunnelClosed, "隧道已关闭")
 				break
 			}
 			err = ws.WriteMessage(websocket.TextMessage, instruction)
 			if err != nil {
-				CloseSessionById(sessionId, Normal, "")
+				CloseSessionById(sessionId, TunnelClosed, "隧道已关闭")
 				break
 			}
 		}
@@ -169,12 +170,12 @@ func TunEndpoint(c echo.Context) error {
 	for true {
 		_, message, err := ws.ReadMessage()
 		if err != nil {
-			CloseSessionById(sessionId, Normal, "")
+			CloseSessionById(sessionId, Normal, "用户主动关闭了会话")
 			break
 		}
 		_, err = tunnel.WriteAndFlush(message)
 		if err != nil {
-			CloseSessionById(sessionId, Normal, "")
+			CloseSessionById(sessionId, Normal, "用户主动关闭了会话")
 			break
 		}
 	}

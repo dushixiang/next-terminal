@@ -112,6 +112,11 @@ func FindSessionByStatus(status string) (o []Session, err error) {
 	return
 }
 
+func FindSessionByStatusIn(statuses []string) (o []Session, err error) {
+	err = global.DB.Where("status in ?", statuses).Find(&o).Error
+	return
+}
+
 func CreateNewSession(o *Session) (err error) {
 	err = global.DB.Create(o).Error
 	return

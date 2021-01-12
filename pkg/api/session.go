@@ -104,10 +104,6 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	}
 
 	global.Store.Del(sessionId)
-
-	if code == Normal {
-		return
-	}
 	session := model.Session{}
 	session.ID = sessionId
 	session.Status = model.Disconnected
