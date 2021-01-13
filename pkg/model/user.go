@@ -6,6 +6,11 @@ import (
 	"reflect"
 )
 
+const (
+	RoleUser  = "user"
+	RoleAdmin = "admin"
+)
+
 type User struct {
 	ID         string         `gorm:"primary_key" json:"id"`
 	Username   string         `json:"username"`
@@ -57,6 +62,11 @@ func CreateNewUser(o *User) (err error) {
 
 func FindUserById(id string) (o User, err error) {
 	err = global.DB.Where("id = ?", id).First(&o).Error
+	return
+}
+
+func FindUserByIdIn(ids []string) (o []User, err error) {
+	err = global.DB.Where("id in ?", ids).First(&o).Error
 	return
 }
 

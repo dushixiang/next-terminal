@@ -27,20 +27,34 @@ func (r *Credential) TableName() string {
 	return "credentials"
 }
 
+type CredentialVo struct {
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Type        string         `json:"type"`
+	Username    string         `json:"username"`
+	Created     utils.JsonTime `json:"created"`
+	Creator     string         `json:"creator"`
+	CreatorName string         `json:"creatorName"`
+}
+
 func FindAllCredential() (o []Credential, err error) {
 	err = global.DB.Find(&o).Error
 	return
 }
 
-func FindPageCredential(pageIndex, pageSize int, name string) (o []Credential, total int64, err error) {
+func FindPageCredential(pageIndex, pageSize int, name, creator string) (o []CredentialVo, total int64, err error) {
 	db := global.DB
+	db = db.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.creator,credentials.created,users.nickname as creator_name").Joins("left join users on credentials.creator = users.id")
 	if len(name) > 0 {
-		db = db.Where("name like ?", "%"+name+"%")
+		db = db.Where("credentials.name like ?", "%"+name+"%")
+	}
+	if len(creator) > 0 {
+		db = db.Where("credentials.creator = ?", creator)
 	}
 
-	err = db.Order("created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Error
+	err = db.Order("credentials.created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Error
 	if o == nil {
-		o = make([]Credential, 0)
+		o = make([]CredentialVo, 0)
 	}
 	return
 }

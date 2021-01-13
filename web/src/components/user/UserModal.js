@@ -1,5 +1,5 @@
 import React from 'react';
-import {Form, Input, Modal} from "antd/lib/index";
+import {Form, Input, Modal, Radio} from "antd/lib/index";
 
 const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, model}) => {
 
@@ -22,7 +22,8 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
                         form.resetFields();
                         handleOk(values);
                     })
-                    .catch(info => {});
+                    .catch(info => {
+                    });
             }}
             onCancel={handleCancel}
             confirmLoading={confirmLoading}
@@ -41,6 +42,13 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
 
                 <Form.Item label="用户昵称" name='nickname' rules={[{required: true, message: '请输入用户昵称'}]}>
                     <Input placeholder="请输入用户昵称"/>
+                </Form.Item>
+
+                <Form.Item label="用户角色" name='role' rules={[{required: true, message: '请选择用户角色'}]}>
+                    <Radio.Group >
+                        <Radio value={'user'}>普通用户</Radio>
+                        <Radio value={'admin'}>管理用户</Radio>
+                    </Radio.Group>
                 </Form.Item>
 
                 {

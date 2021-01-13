@@ -1,20 +1,25 @@
 import React, {Component} from 'react';
 
-import {Button, Col, Divider, Input, Layout, Modal, PageHeader, Row, Space, Table, Tooltip, Typography} from "antd";
+import {
+    Button,
+    Col,
+    Divider,
+    Input,
+    Layout,
+    Modal,
+    PageHeader,
+    Row,
+    Space,
+    Table,
+    Tag,
+    Tooltip,
+    Typography
+} from "antd";
 import qs from "qs";
 import CredentialModal from "./CredentialModal";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {
-    DeleteOutlined,
-    DeleteTwoTone,
-    EditTwoTone,
-    ExclamationCircleOutlined,
-    EyeTwoTone,
-    PlusOutlined,
-    SyncOutlined,
-    UndoOutlined
-} from '@ant-design/icons';
+import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
 
@@ -251,11 +256,11 @@ class Credential extends Component {
 
                 if (type === 'private-key') {
                     return (
-                        <Text strong type="success">密钥</Text>
+                        <Tag color="green">密钥</Tag>
                     );
                 } else {
                     return (
-                        <Text strong type="warning">密码</Text>
+                        <Tag color="red">密码</Tag>
                     );
                 }
 
@@ -264,6 +269,14 @@ class Credential extends Component {
             title: '授权账户',
             dataIndex: 'username',
             key: 'username',
+        }, {
+            title: '创建人',
+            dataIndex: 'creatorName',
+            key: 'creatorName',
+        }, {
+            title: '创建时间',
+            dataIndex: 'created',
+            key: 'created',
         },
             {
                 title: '操作',
@@ -272,11 +285,9 @@ class Credential extends Component {
 
                     return (
                         <div>
-                            <Button type="link" size='small' icon={<EyeTwoTone/>}
-                                    onClick={() => this.showModal('查看凭证', record)}>查看</Button>
-                            <Button type="link" size='small' icon={<EditTwoTone/>}
+                            <Button type="link" size='small'
                                     onClick={() => this.showModal('更新凭证', record)}>编辑</Button>
-                            <Button type="link" size='small' icon={<DeleteTwoTone/>}
+                            <Button type="link" size='small'
                                     onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
                         </div>
                     )

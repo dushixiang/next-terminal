@@ -58,7 +58,17 @@ func CredentialPagingEndpoint(c echo.Context) error {
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	name := c.QueryParam("name")
 
-	items, total, _ := model.FindPageCredential(pageIndex, pageSize, name)
+	var (
+		total int64
+		items []model.CredentialVo
+	)
+
+	account, _ := GetCurrentAccount(c)
+	if account.Role == model.RoleUser {
+		items, total, _ = model.FindPageCredential(pageIndex, pageSize, name, account.ID)
+	} else {
+		items, total, _ = model.FindPageCredential(pageIndex, pageSize, name, "")
+	}
 
 	return Success(c, H{
 		"total": total,

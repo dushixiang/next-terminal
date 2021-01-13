@@ -5,8 +5,10 @@ import {
     Button,
     Col,
     Divider,
+    Dropdown,
     Input,
     Layout,
+    Menu,
     Modal,
     PageHeader,
     Row,
@@ -25,11 +27,8 @@ import {isEmpty, itemRender} from "../../utils/utils";
 
 
 import {
-    CodeTwoTone,
-    CopyTwoTone,
     DeleteOutlined,
-    DeleteTwoTone,
-    EditTwoTone,
+    DownOutlined,
     ExclamationCircleOutlined,
     PlusOutlined,
     SyncOutlined,
@@ -409,16 +408,37 @@ class Asset extends Component {
                 title: '操作',
                 key: 'action',
                 render: (text, record) => {
+
+                    const menu = (
+                        <Menu>
+                            <Menu.Item key="1">
+                                <Button type="text" size='small'
+                                        onClick={() => this.update(record.id)}>编辑</Button>
+                            </Menu.Item>
+
+                            <Menu.Item key="2">
+                                <Button type="text" size='small'
+                                        onClick={() => this.copy(record.id)}>复制</Button>
+                            </Menu.Item>
+
+                            <Menu.Divider/>
+                            <Menu.Item key="3">
+                                <Button type="text" size='small' danger
+                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            </Menu.Item>
+                        </Menu>
+                    );
+
                     return (
                         <div>
-                            <Button type="link" size='small' icon={<CodeTwoTone/>}
+                            <Button type="link" size='small'
                                     onClick={() => this.access(record.id, record.protocol)}>接入</Button>
-                            <Button type="link" size='small' icon={<EditTwoTone/>}
-                                    onClick={() => this.update(record.id)}>编辑</Button>
-                            <Button type="link" size='small' icon={<CopyTwoTone/>}
-                                    onClick={() => this.copy(record.id)}>复制</Button>
-                            <Button type="link" size='small' icon={<DeleteTwoTone/>}
-                                    onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+
+                            <Dropdown overlay={menu}>
+                                <Button type="link" size='small'>
+                                    更多 <DownOutlined/>
+                                </Button>
+                            </Dropdown>
                         </div>
                     )
                 },
