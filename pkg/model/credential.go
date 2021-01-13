@@ -20,6 +20,7 @@ type Credential struct {
 	PrivateKey string         `json:"privateKey"`
 	Passphrase string         `json:"passphrase"`
 	Created    utils.JsonTime `json:"created"`
+	Creator    string         `json:"creator"`
 }
 
 func (r *Credential) TableName() string {

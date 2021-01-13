@@ -14,6 +14,7 @@ const Token = "X-Auth-Token"
 func SetupRoutes() *echo.Echo {
 
 	e := echo.New()
+	e.HideBanner = true
 
 	e.File("/", "web/build/index.html")
 	e.File("/logo.svg", "web/build/logo.svg")

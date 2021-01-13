@@ -10,6 +10,7 @@ type Command struct {
 	Name    string         `json:"name"`
 	Content string         `json:"content"`
 	Created utils.JsonTime `json:"created"`
+	Creator string         `json:"creator"`
 }
 
 func (r *Command) TableName() string {

@@ -28,6 +28,16 @@ func main() {
 
 func Run() error {
 
+	fmt.Printf(`
+ _______                   __    ___________                  .__              .__   
+ \      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |  
+ /   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |  
+/    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
+\____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
+        \/     \/      \/                     \/            \/        \/     \/      
+
+`)
+
 	var err error
 	//logrus.SetReportCaller(true)
 	logrus.SetFormatter(&nested.Formatter{
@@ -49,7 +59,7 @@ func Run() error {
 		return err
 	}
 
-	logrus.Infof("当前数据库模式为：%v", global.Config.DB)
+	fmt.Printf("当前数据库模式为：%v\n", global.Config.DB)
 	if global.Config.DB == "mysql" {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 			global.Config.Mysql.Username,
@@ -123,6 +133,7 @@ func Run() error {
 
 	global.Cache = cache.New(5*time.Minute, 10*time.Minute)
 	global.Store = global.NewStore()
+
 	e := api.SetupRoutes()
 	if err := handle.InitProperties(); err != nil {
 		return err

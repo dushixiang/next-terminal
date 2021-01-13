@@ -15,6 +15,7 @@ type User struct {
 	Online     bool           `json:"online"`
 	Enabled    bool           `json:"enabled"`
 	Created    utils.JsonTime `json:"created"`
+	Role       string         `json:"role"`
 }
 
 func (r *User) TableName() string {

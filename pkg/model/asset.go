@@ -22,6 +22,7 @@ type Asset struct {
 	Active       bool           `json:"active"`
 	Created      utils.JsonTime `json:"created"`
 	Tags         string         `json:"tags"`
+	Creator      string         `json:"creator"`
 }
 
 func (r *Asset) TableName() string {

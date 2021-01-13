@@ -5,9 +5,10 @@ import {
     Badge,
     Button,
     Col,
-    Divider,
+    Divider, Dropdown,
     Input,
     Layout,
+    Menu,
     Modal,
     PageHeader,
     Row,
@@ -21,10 +22,10 @@ import UserModal from "./UserModal";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {
-    DeleteOutlined, DeleteTwoTone,
-    EditTwoTone,
-    ExclamationCircleOutlined,
-    PlusOutlined,
+    DeleteOutlined, DownOutlined,
+    ExclamationCircleOutlined, IssuesCloseOutlined,
+    PlusOutlined, SmileOutlined,
+    StopOutlined,
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
@@ -127,7 +128,8 @@ class User extends Component {
             queryParams: queryParams
         });
 
-        this.loadTableData(queryParams).then(r => {})
+        this.loadTableData(queryParams).then(r => {
+        })
     };
 
     showDeleteConfirm(id, content) {
@@ -279,12 +281,34 @@ class User extends Component {
                 title: '操作',
                 key: 'action',
                 render: (text, record) => {
+
+                    const menu = (
+                        <Menu>
+                            <Menu.Item key="1">
+                                <Button type="text" size='small'
+                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>禁用</Button>
+                            </Menu.Item>
+                            <Menu.Item key="2">
+                                <Button type="text" size='small'
+                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>启用</Button>
+                            </Menu.Item>
+                            <Menu.Divider />
+                            <Menu.Item key="3">
+                                <Button type="text" size='small'
+                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            </Menu.Item>
+                        </Menu>
+                    );
+
                     return (
                         <div>
-                            <Button type="link" size='small' icon={<EditTwoTone/>}
+                            <Button type="link" size='small'
                                     onClick={() => this.showModal('更新用户', record)}>编辑</Button>
-                            <Button type="link" size='small' icon={<DeleteTwoTone/>}
-                                    onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            <Dropdown overlay={menu}>
+                                <Button type="link" size='small'>
+                                    更多 <DownOutlined />
+                                </Button>
+                            </Dropdown>
                         </div>
                     )
                 },
@@ -363,6 +387,52 @@ class User extends Component {
                                         <Button icon={<SyncOutlined/>} onClick={() => {
                                             this.loadTableData(this.state.queryParams)
                                         }}>
+
+                                        </Button>
+                                    </Tooltip>
+
+                                    <Tooltip title="批量启用">
+                                        <Button type="dashed" danger disabled={!hasSelected} icon={<IssuesCloseOutlined />}
+                                                loading={this.state.delBtnLoading}
+                                                onClick={() => {
+                                                    const content = <div>
+                                                        您确定要启用选中的<Text style={{color: '#1890FF'}}
+                                                                       strong>{this.state.selectedRowKeys.length}</Text>条记录吗？
+                                                    </div>;
+                                                    confirm({
+                                                        icon: <ExclamationCircleOutlined/>,
+                                                        content: content,
+                                                        onOk: () => {
+
+                                                        },
+                                                        onCancel() {
+
+                                                        },
+                                                    });
+                                                }}>
+
+                                        </Button>
+                                    </Tooltip>
+
+                                    <Tooltip title="批量禁用">
+                                        <Button type="default" danger disabled={!hasSelected} icon={<StopOutlined/>}
+                                                loading={this.state.delBtnLoading}
+                                                onClick={() => {
+                                                    const content = <div>
+                                                        您确定要禁用选中的<Text style={{color: '#1890FF'}}
+                                                                       strong>{this.state.selectedRowKeys.length}</Text>条记录吗？
+                                                    </div>;
+                                                    confirm({
+                                                        icon: <ExclamationCircleOutlined/>,
+                                                        content: content,
+                                                        onOk: () => {
+
+                                                        },
+                                                        onCancel() {
+
+                                                        },
+                                                    });
+                                                }}>
 
                                         </Button>
                                     </Tooltip>
