@@ -12,6 +12,7 @@ import {
     Modal,
     PageHeader,
     Row,
+    Select,
     Space,
     Table,
     Tag,
@@ -25,8 +26,7 @@ import {message} from "antd/es";
 import {
     DeleteOutlined,
     DownOutlined,
-    ExclamationCircleOutlined,
-    OneToOneOutlined,
+    ExclamationCircleOutlined, FormOutlined,
     PlusOutlined,
     SyncOutlined,
     UndoOutlined
@@ -70,6 +70,8 @@ class Credential extends Component {
         delBtnLoading: false,
         changeOwnerModalVisible: false,
         changeOwnerConfirmLoading: false,
+        users: [],
+        selected: undefined,
     };
 
     componentDidMount() {
@@ -257,6 +259,18 @@ class Credential extends Component {
         }
     }
 
+    handleSearchByNickname = async nickname => {
+        const result = await request.get(`/users/paging?pageIndex=1&pageSize=100&nickname=${nickname}`);
+        if (result.code !== 1) {
+            message.error(result.message, 10);
+            return;
+        }
+
+        this.setState({
+            users: result.data.items
+        })
+    }
+
     render() {
 
         const columns = [{
@@ -321,9 +335,19 @@ class Credential extends Component {
                             <Menu.Item key="1">
                                 <Button type="text" size='small'
                                         onClick={() => {
-                                            this.setState({
-                                                changeOwnerModalVisible: true
-                                            })
+                                            this.handleSearchByNickname('')
+                                                .then(() => {
+                                                    this.setState({
+                                                        changeOwnerModalVisible: true,
+                                                        selected: record,
+                                                    })
+                                                    this.changeOwnerFormRef
+                                                        .current
+                                                        .setFieldsValue({
+                                                            owner: record['owner']
+                                                        })
+                                                });
+
                                         }}>更换所有者</Button>
                             </Menu.Item>
 
@@ -363,6 +387,9 @@ class Credential extends Component {
             },
         };
         const hasSelected = selectedRowKeys.length > 0;
+
+        const userOptions = this.state.users.map(d => <Select.Option key={d.id}
+                                                                     value={d.id}>{d.nickname}</Select.Option>);
 
         return (
             <>
@@ -490,21 +517,51 @@ class Credential extends Component {
                     <Modal title="更换所有者" visible={this.state.changeOwnerModalVisible}
                            confirmLoading={this.state.changeOwnerConfirmLoading}
                            onOk={() => {
-                               this.changeOwnerFormRef.current
-                                   .validateFields()
-                                   .then(values => {
-                                       this.changeOwnerFormRef.current.resetFields();
+                               this.setState({
+                                   changeOwnerConfirmLoading: true
+                               });
 
+                               let changeOwnerModalVisible = false;
+                               this.changeOwnerFormRef
+                                   .current
+                                   .validateFields()
+                                   .then(async values => {
+                                       let result = await request.post(`/credentials/${this.state.selected['id']}/change-owner?owner=${values['owner']}`);
+                                       if (result['code'] === 1) {
+                                           message.success('操作成功');
+                                           this.loadTableData();
+                                       } else {
+                                           message.success(result['message'], 10);
+                                           changeOwnerModalVisible = true;
+                                       }
                                    })
                                    .catch(info => {
 
+                                   })
+                                   .finally(() => {
+                                       this.setState({
+                                           changeOwnerConfirmLoading: false,
+                                           changeOwnerModalVisible: changeOwnerModalVisible
+                                       })
                                    });
                            }}
-                           onCancel={this.handleCancel}>
+                           onCancel={() => {
+                               this.setState({
+                                   changeOwnerModalVisible: false
+                               })
+                           }}
+                    >
 
                         <Form ref={this.changeOwnerFormRef}>
-                            <Form.Item name='totp' rules={[{required: true, message: '请选择所有者'}]}>
-                                <Input prefix={<OneToOneOutlined/>} placeholder="请选择所有者"/>
+                            <Form.Item name='owner' rules={[{required: true, message: '请选择所有者'}]}>
+                                <Select
+                                    showSearch
+                                    placeholder='请选择所有者'
+                                    onSearch={this.handleSearchByNickname}
+                                    filterOption={false}
+                                >
+                                    {userOptions}
+                                </Select>
                             </Form.Item>
                         </Form>
                     </Modal>
