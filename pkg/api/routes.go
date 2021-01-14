@@ -81,6 +81,7 @@ func SetupRoutes() *echo.Echo {
 		credentials.PUT("/:id", CredentialUpdateEndpoint)
 		credentials.DELETE("/:id", CredentialDeleteEndpoint)
 		credentials.GET("/:id", CredentialGetEndpoint)
+		credentials.POST("/:id/change-owner", CredentialChangeOwnerEndpoint)
 	}
 
 	sessions := e.Group("/sessions")

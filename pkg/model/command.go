@@ -28,7 +28,7 @@ func FindPageCommand(pageIndex, pageSize int, name, content string) (o []Command
 		db = db.Where("content like ?", "%"+content+"%")
 	}
 
-	err = db.Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Error
+	err = db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Find(&o).Error
 	if o == nil {
 		o = make([]Command, 0)
 	}

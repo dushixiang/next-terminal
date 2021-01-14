@@ -4,8 +4,11 @@ import {
     Button,
     Col,
     Divider,
+    Dropdown,
+    Form,
     Input,
     Layout,
+    Menu,
     Modal,
     PageHeader,
     Row,
@@ -19,7 +22,15 @@ import qs from "qs";
 import CredentialModal from "./CredentialModal";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    DownOutlined,
+    ExclamationCircleOutlined,
+    OneToOneOutlined,
+    PlusOutlined,
+    SyncOutlined,
+    UndoOutlined
+} from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
 
@@ -41,6 +52,7 @@ const routes = [
 class Credential extends Component {
 
     inputRefOfName = React.createRef();
+    changeOwnerFormRef = React.createRef();
 
     state = {
         items: [],
@@ -56,6 +68,8 @@ class Credential extends Component {
         model: null,
         selectedRowKeys: [],
         delBtnLoading: false,
+        changeOwnerModalVisible: false,
+        changeOwnerConfirmLoading: false,
     };
 
     componentDidMount() {
@@ -148,11 +162,30 @@ class Credential extends Component {
         });
     };
 
-    showModal(title, idcard = null) {
+    showModal = async (title, id = null, index) => {
+
+        let items = this.state.items;
+        items[index].updateBtnLoading = true;
+        this.setState({
+            items: items
+        });
+
+        let result = await request.get('/credentials/' + id);
+        if (result['code'] !== 1) {
+            message.error(result['message']);
+            items[index].updateBtnLoading = false;
+            this.setState({
+                items: items
+            });
+            return;
+        }
+
+        items[index].updateBtnLoading = false;
         this.setState({
             modalTitle: title,
             modalVisible: true,
-            model: idcard
+            model: result['data'],
+            items: items
         });
     };
 
@@ -270,9 +303,9 @@ class Credential extends Component {
             dataIndex: 'username',
             key: 'username',
         }, {
-            title: '创建人',
-            dataIndex: 'creatorName',
-            key: 'creatorName',
+            title: '所有者',
+            dataIndex: 'ownerName',
+            key: 'ownerName',
         }, {
             title: '创建时间',
             dataIndex: 'created',
@@ -281,14 +314,41 @@ class Credential extends Component {
             {
                 title: '操作',
                 key: 'action',
-                render: (text, record) => {
+                render: (text, record, index) => {
+
+                    const menu = (
+                        <Menu>
+                            <Menu.Item key="1">
+                                <Button type="text" size='small'
+                                        onClick={() => {
+                                            this.setState({
+                                                changeOwnerModalVisible: true
+                                            })
+                                        }}>更换所有者</Button>
+                            </Menu.Item>
+
+                            <Menu.Item key="2">
+                                <Button type="text" size='small'
+                                        onClick={() => this.copy(record.id)}>分享</Button>
+                            </Menu.Item>
+
+                            <Menu.Divider/>
+                            <Menu.Item key="3">
+                                <Button type="text" size='small' danger
+                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            </Menu.Item>
+                        </Menu>
+                    );
 
                     return (
                         <div>
-                            <Button type="link" size='small'
-                                    onClick={() => this.showModal('更新凭证', record)}>编辑</Button>
-                            <Button type="link" size='small'
-                                    onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            <Button type="link" size='small' loading={this.state.items[index].updateBtnLoading}
+                                    onClick={() => this.showModal('更新凭证', record.id, index)}>编辑</Button>
+                            <Dropdown overlay={menu}>
+                                <Button type="link" size='small'>
+                                    更多 <DownOutlined/>
+                                </Button>
+                            </Dropdown>
                         </div>
                     )
                 },
@@ -426,6 +486,28 @@ class Credential extends Component {
                             </CredentialModal>
                             : null
                     }
+
+                    <Modal title="更换所有者" visible={this.state.changeOwnerModalVisible}
+                           confirmLoading={this.state.changeOwnerConfirmLoading}
+                           onOk={() => {
+                               this.changeOwnerFormRef.current
+                                   .validateFields()
+                                   .then(values => {
+                                       this.changeOwnerFormRef.current.resetFields();
+
+                                   })
+                                   .catch(info => {
+
+                                   });
+                           }}
+                           onCancel={this.handleCancel}>
+
+                        <Form ref={this.changeOwnerFormRef}>
+                            <Form.Item name='totp' rules={[{required: true, message: '请选择所有者'}]}>
+                                <Input prefix={<OneToOneOutlined/>} placeholder="请选择所有者"/>
+                            </Form.Item>
+                        </Form>
+                    </Modal>
 
                 </Content>
             </>

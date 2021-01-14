@@ -22,7 +22,20 @@ type Asset struct {
 	Active       bool           `json:"active"`
 	Created      utils.JsonTime `json:"created"`
 	Tags         string         `json:"tags"`
-	Creator      string         `json:"creator"`
+	Owner        string         `json:"owner"`
+}
+
+type AssetVo struct {
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	IP        string         `json:"ip"`
+	Protocol  string         `json:"protocol"`
+	Port      int            `json:"port"`
+	Active    bool           `json:"active"`
+	Created   utils.JsonTime `json:"created"`
+	Tags      string         `json:"tags"`
+	Owner     string         `json:"owner"`
+	OwnerName string         `json:"ownerName"`
 }
 
 func (r *Asset) TableName() string {
@@ -44,27 +57,28 @@ func FindAssetByConditions(protocol string) (o []Asset, err error) {
 	return
 }
 
-func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string) (o []Asset, total int64, err error) {
+func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string) (o []AssetVo, total int64, err error) {
 	db := global.DB
+	db = db.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as creator_name").Joins("left join users on assets.owner = users.id")
 	if len(name) > 0 {
-		db = db.Where("name like ?", "%"+name+"%")
+		db = db.Where("assets.name like ?", "%"+name+"%")
 	}
 
 	if len(protocol) > 0 {
-		db = db.Where("protocol = ?", protocol)
+		db = db.Where("assets.protocol = ?", protocol)
 	}
 
 	if len(tags) > 0 {
 		tagArr := strings.Split(tags, ",")
 		for i := range tagArr {
-			db = db.Where("find_in_set(?, tags)", tagArr[i])
+			db = db.Where("find_in_set(?, assets.tags)", tagArr[i])
 		}
 	}
 
-	err = db.Order("created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Error
+	err = db.Order("assets.created desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Count(&total).Error
 
 	if o == nil {
-		o = make([]Asset, 0)
+		o = make([]AssetVo, 0)
 	}
 	return
 }

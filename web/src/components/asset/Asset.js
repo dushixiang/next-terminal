@@ -23,7 +23,7 @@ import qs from "qs";
 import AssetModal from "./AssetModal";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {isEmpty, itemRender} from "../../utils/utils";
+import {itemRender} from "../../utils/utils";
 
 
 import {
@@ -383,22 +383,9 @@ class Asset extends Component {
                 }
             }
         }, {
-            title: '标签',
-            dataIndex: 'tags',
-            key: 'tags',
-            render: tags => {
-                if (!isEmpty(tags)) {
-                    let tagDocuments = []
-                    let tagArr = tags.split(',');
-                    for (let i = 0; i < tagArr.length; i++) {
-                        if (tags[i] === '-') {
-                            continue;
-                        }
-                        tagDocuments.push(<Tag>{tagArr[i]}</Tag>)
-                    }
-                    return tagDocuments;
-                }
-            }
+            title: '所有者',
+            dataIndex: 'ownerName',
+            key: 'ownerName'
         }, {
             title: '创建日期',
             dataIndex: 'created',
@@ -473,10 +460,10 @@ class Asset extends Component {
                 <Content key='page-content' className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={12} key={1}>
+                            <Col span={8} key={1}>
                                 <Title level={3}>资产列表</Title>
                             </Col>
-                            <Col span={12} key={2} style={{textAlign: 'right'}}>
+                            <Col span={16} key={2} style={{textAlign: 'right'}}>
                                 <Space>
 
                                     <Search

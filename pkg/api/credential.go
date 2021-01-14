@@ -126,7 +126,17 @@ func CredentialDeleteEndpoint(c echo.Context) error {
 
 func CredentialGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	item, _ := model.FindCredentialById(id)
+	item, err := model.FindCredentialById(id)
+	if err != nil {
+		return err
+	}
 
 	return Success(c, item)
+}
+
+func CredentialChangeOwnerEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	owner := c.QueryParam("owner")
+	model.UpdateCredentialById(&model.Credential{Owner: owner}, id)
+	return Success(c, "")
 }
