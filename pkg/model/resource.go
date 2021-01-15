@@ -6,9 +6,10 @@ import (
 )
 
 type Resource struct {
-	ID         string `gorm:"primary_key" json:"name"`
-	ResourceId string `json:"resourceId"`
-	UserId     string `json:"userId"`
+	ID           string `gorm:"primary_key" json:"name"`
+	ResourceId   string `json:"resourceId"`
+	ResourceType string `json:"resourceType"`
+	UserId       string `json:"userId"`
 }
 
 func (r *Resource) TableName() string {
@@ -24,7 +25,7 @@ func FindUserIdsByResourceId(resourceId string) (r []string, err error) {
 	return
 }
 
-func OverwriteUserIdsByResourceId(resourceId string, userIds []string) {
+func OverwriteUserIdsByResourceId(resourceId, resourceType string, userIds []string) {
 	db := global.DB.Begin()
 	db.Where("resource_id = ?", resourceId).Delete(&Resource{})
 
@@ -33,11 +34,12 @@ func OverwriteUserIdsByResourceId(resourceId string, userIds []string) {
 		if len(userId) == 0 {
 			continue
 		}
-		id := utils.Sign([]string{resourceId, userId})
+		id := utils.Sign([]string{resourceId, resourceType, userId})
 		resource := &Resource{
-			ID:         id,
-			ResourceId: resourceId,
-			UserId:     userId,
+			ID:           id,
+			ResourceId:   resourceId,
+			ResourceType: resourceType,
+			UserId:       userId,
 		}
 		_ = db.Create(resource).Error
 	}

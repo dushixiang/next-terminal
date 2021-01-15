@@ -34,7 +34,7 @@ import {
 } from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
-import {hasPermission} from "../../service/permission";
+import {hasPermission, isAdmin} from "../../service/permission";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -55,7 +55,6 @@ class Credential extends Component {
 
     inputRefOfName = React.createRef();
     changeOwnerFormRef = React.createRef();
-    changeSharerFormRef = React.createRef();
 
     state = {
         items: [],
@@ -173,26 +172,32 @@ class Credential extends Component {
     showModal = async (title, id = null, index) => {
 
         let items = this.state.items;
-        items[index].updateBtnLoading = true;
-        this.setState({
-            items: items
-        });
 
-        let result = await request.get('/credentials/' + id);
-        if (result['code'] !== 1) {
-            message.error(result['message']);
-            items[index].updateBtnLoading = false;
+        let model = {}
+        if (id) {
+            items[index].updateBtnLoading = true;
             this.setState({
                 items: items
             });
-            return;
+
+            let result = await request.get('/credentials/' + id);
+            if (result['code'] !== 1) {
+                message.error(result['message']);
+                items[index].updateBtnLoading = false;
+                this.setState({
+                    items: items
+                });
+                return;
+            }
+
+            items[index].updateBtnLoading = false;
+            model = result['data']
         }
 
-        items[index].updateBtnLoading = false;
         this.setState({
             modalTitle: title,
             modalVisible: true,
-            model: result['data'],
+            model: model,
             items: items
         });
     };
@@ -287,7 +292,7 @@ class Credential extends Component {
         })
     }
 
-    handleShowSharer = async (record, disabled) => {
+    handleShowSharer = async (record) => {
         let r1 = this.handleSearchByNickname('');
         let r2 = request.get(`/resources/${record['id']}/assign`);
 
@@ -368,32 +373,35 @@ class Credential extends Component {
 
                     const menu = (
                         <Menu>
-                            <Menu.Item key="1">
-                                <Button type="text" size='small'
-                                        disabled={!hasPermission(record['owner'])}
-                                        onClick={() => {
-                                            this.handleSearchByNickname('')
-                                                .then(() => {
-                                                    this.setState({
-                                                        changeOwnerModalVisible: true,
-                                                        selected: record,
-                                                    })
-                                                    this.changeOwnerFormRef
-                                                        .current
-                                                        .setFieldsValue({
-                                                            owner: record['owner']
+                            {isAdmin() ?
+                                <Menu.Item key="1">
+                                    <Button type="text" size='small'
+                                            disabled={!hasPermission(record['owner'])}
+                                            onClick={() => {
+                                                this.handleSearchByNickname('')
+                                                    .then(() => {
+                                                        this.setState({
+                                                            changeOwnerModalVisible: true,
+                                                            selected: record,
                                                         })
-                                                });
+                                                        this.changeOwnerFormRef
+                                                            .current
+                                                            .setFieldsValue({
+                                                                owner: record['owner']
+                                                            })
+                                                    });
 
-                                        }}>更换所有者</Button>
-                            </Menu.Item>
+                                            }}>更换所有者</Button>
+                                </Menu.Item> : undefined
+                            }
+
 
                             <Menu.Item key="2">
                                 <Button type="text" size='small'
                                         disabled={!hasPermission(record['owner'])}
                                         onClick={async () => {
-                                            await this.handleShowSharer(record, false);
-                                        }}>授权</Button>
+                                            await this.handleShowSharer(record);
+                                        }}>更新授权人</Button>
                             </Menu.Item>
 
                             <Menu.Divider/>
@@ -421,14 +429,14 @@ class Credential extends Component {
             }
         ];
 
-        if(hasPermission()){
-            columns.splice(5,0,{
+        if (isAdmin()) {
+            columns.splice(5, 0, {
                 title: '授权人数',
                 dataIndex: 'sharerCount',
                 key: 'sharerCount',
                 render: (text, record, index) => {
                     return <Button type='link' onClick={async () => {
-                        await this.handleShowSharer(record, true);
+                        await this.handleShowSharer(record);
                     }}>{text}</Button>
                 }
             });
@@ -490,7 +498,7 @@ class Credential extends Component {
 
                                     <Tooltip title="新增">
                                         <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增凭证', null)}>
+                                                onClick={() => this.showModal('新增凭证')}>
 
                                         </Button>
                                     </Tooltip>
@@ -559,14 +567,13 @@ class Credential extends Component {
                                 handleCancel={this.handleCancelModal}
                                 confirmLoading={this.state.modalConfirmLoading}
                                 model={this.state.model}
-                                footer={this.state.modalTitle.indexOf('查看') > -1 ? null : undefined}
                             >
 
                             </CredentialModal>
                             : null
                     }
 
-                    <Modal title={`更换授权凭证「${this.state.selected['name']}」的所有者`}
+                    <Modal title={<text>更换资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的所有者</text>}
                            visible={this.state.changeOwnerModalVisible}
                            confirmLoading={this.state.changeOwnerConfirmLoading}
                            onOk={() => {
@@ -620,7 +627,7 @@ class Credential extends Component {
                         </Form>
                     </Modal>
 
-                    <Modal title={`授权凭证「${this.state.selected['name']}」的授权者`}
+                    <Modal title={<text>更新资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的授权人</text>}
                            visible={this.state.changeSharerModalVisible}
                            confirmLoading={this.state.changeSharerConfirmLoading}
                            onOk={async () => {
@@ -630,12 +637,12 @@ class Credential extends Component {
 
                                let changeSharerModalVisible = false;
 
-                               let result = await request.post(`/resources/${this.state.selected['id']}/assign?userIds=${this.state.selectedSharers.join(',')}`);
+                               let result = await request.post(`/resources/${this.state.selected['id']}/assign?type=credential&userIds=${this.state.selectedSharers.join(',')}`);
                                if (result['code'] === 1) {
                                    message.success('操作成功');
                                    this.loadTableData();
                                } else {
-                                   message.success(result['message'], 10);
+                                   message.error(result['message'], 10);
                                    changeSharerModalVisible = true;
                                }
 
@@ -658,6 +665,10 @@ class Credential extends Component {
                             showSearch
                             titles={['未授权', '已授权']}
                             operations={['授权', '移除']}
+                            listStyle={{
+                                width: 250,
+                                height: 300,
+                            }}
                             targetKeys={this.state.selectedSharers}
                             onChange={this.handleSharersChange}
                             render={item => `${item.nickname}`}

@@ -7,3 +7,10 @@ export function hasPermission(owner) {
 
     return user['id'] === owner;
 }
+
+export function isAdmin(){
+    let userJsonStr = sessionStorage.getItem('user');
+    let user = JSON.parse(userJsonStr);
+    return user['role'] === 'admin';
+
+}

@@ -26,16 +26,17 @@ type Asset struct {
 }
 
 type AssetVo struct {
-	ID        string         `json:"id"`
-	Name      string         `json:"name"`
-	IP        string         `json:"ip"`
-	Protocol  string         `json:"protocol"`
-	Port      int            `json:"port"`
-	Active    bool           `json:"active"`
-	Created   utils.JsonTime `json:"created"`
-	Tags      string         `json:"tags"`
-	Owner     string         `json:"owner"`
-	OwnerName string         `json:"ownerName"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	IP          string         `json:"ip"`
+	Protocol    string         `json:"protocol"`
+	Port        int            `json:"port"`
+	Active      bool           `json:"active"`
+	Created     utils.JsonTime `json:"created"`
+	Tags        string         `json:"tags"`
+	Owner       string         `json:"owner"`
+	OwnerName   string         `json:"ownerName"`
+	SharerCount int64          `json:"sharerCount"`
 }
 
 func (r *Asset) TableName() string {
@@ -57,9 +58,14 @@ func FindAssetByConditions(protocol string) (o []Asset, err error) {
 	return
 }
 
-func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string) (o []AssetVo, total int64, err error) {
-	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name").Joins("left join users on assets.owner = users.id")
-	dbCounter := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name").Joins("left join users on assets.owner = users.id")
+func FindPageAsset(pageIndex, pageSize int, name, protocol, tags, owner string) (o []AssetVo, total int64, err error) {
+	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id").Group("assets.id")
+	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id")
+
+	if len(owner) > 0 {
+		db = db.Where("assets.owner = ? or resources.user_id = ?", owner, owner)
+		dbCounter = dbCounter.Where("assets.owner = ? or resources.user_id = ?", owner, owner)
+	}
 
 	if len(name) > 0 {
 		db = db.Where("assets.name like ?", "%"+name+"%")

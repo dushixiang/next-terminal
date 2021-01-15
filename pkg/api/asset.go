@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -31,7 +32,17 @@ func AssetPagingEndpoint(c echo.Context) error {
 	protocol := c.QueryParam("protocol")
 	tags := c.QueryParam("tags")
 
-	items, total, _ := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags)
+	var (
+		total int64
+		items []model.AssetVo
+	)
+
+	account, _ := GetCurrentAccount(c)
+	if account.Role == model.RoleUser {
+		items, total, _ = model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account.ID)
+	} else {
+		items, total, _ = model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, "")
+	}
 
 	return Success(c, H{
 		"total": total,
@@ -123,4 +134,28 @@ func AssetTagsEndpoint(c echo.Context) (err error) {
 		return err
 	}
 	return Success(c, items)
+}
+
+func AssetChangeOwnerEndpoint(c echo.Context) (err error) {
+	id := c.Param("id")
+
+	if err := PreCheckAssetPermission(c, id); err != nil {
+		return err
+	}
+
+	owner := c.QueryParam("owner")
+	model.UpdateAssetById(&model.Asset{Owner: owner}, id)
+	return Success(c, "")
+}
+
+func PreCheckAssetPermission(c echo.Context, id string) error {
+	item, err := model.FindAssetById(id)
+	if err != nil {
+		return err
+	}
+
+	if !HasPermission(c, item.Owner) {
+		return errors.New("permission denied")
+	}
+	return nil
 }

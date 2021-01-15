@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -79,6 +80,10 @@ func CredentialPagingEndpoint(c echo.Context) error {
 func CredentialUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
+	if err := PreCheckCredentialPermission(c, id); err != nil {
+		return err
+	}
+
 	var item model.Credential
 	if err := c.Bind(&item); err != nil {
 		return err
@@ -118,6 +123,9 @@ func CredentialDeleteEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	split := strings.Split(id, ",")
 	for i := range split {
+		if err := PreCheckCredentialPermission(c, split[i]); err != nil {
+			return err
+		}
 		model.DeleteCredentialById(split[i])
 	}
 
@@ -126,9 +134,14 @@ func CredentialDeleteEndpoint(c echo.Context) error {
 
 func CredentialGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
+
 	item, err := model.FindCredentialById(id)
 	if err != nil {
 		return err
+	}
+
+	if !HasPermission(c, item.Owner) {
+		return errors.New("permission denied")
 	}
 
 	return Success(c, item)
@@ -136,7 +149,24 @@ func CredentialGetEndpoint(c echo.Context) error {
 
 func CredentialChangeOwnerEndpoint(c echo.Context) error {
 	id := c.Param("id")
+
+	if err := PreCheckCredentialPermission(c, id); err != nil {
+		return err
+	}
+
 	owner := c.QueryParam("owner")
 	model.UpdateCredentialById(&model.Credential{Owner: owner}, id)
 	return Success(c, "")
+}
+
+func PreCheckCredentialPermission(c echo.Context, id string) error {
+	item, err := model.FindCredentialById(id)
+	if err != nil {
+		return err
+	}
+
+	if !HasPermission(c, item.Owner) {
+		return errors.New("permission denied")
+	}
+	return nil
 }

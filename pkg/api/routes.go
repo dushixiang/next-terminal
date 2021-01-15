@@ -60,6 +60,7 @@ func SetupRoutes() *echo.Echo {
 		assets.PUT("/:id", AssetUpdateEndpoint)
 		assets.DELETE("/:id", AssetDeleteEndpoint)
 		assets.GET("/:id", AssetGetEndpoint)
+		assets.POST("/:id/change-owner", AssetChangeOwnerEndpoint)
 	}
 
 	e.GET("/tags", AssetTagsEndpoint)
@@ -156,4 +157,20 @@ func GetCurrentAccount(c echo.Context) (model.User, bool) {
 		return get.(Authorization).User, true
 	}
 	return model.User{}, false
+}
+
+func HasPermission(c echo.Context, owner string) bool {
+	// 检测是否为创建者
+	account, found := GetCurrentAccount(c)
+	if !found {
+		return false
+	}
+	if model.RoleAdmin == account.Role {
+		return true
+	}
+
+	if owner == account.ID {
+		return true
+	}
+	return false
 }

@@ -18,9 +18,10 @@ func ResourceGetAssignEndPoint(c echo.Context) error {
 func ResourceOverwriteAssignEndPoint(c echo.Context) error {
 	resourceId := c.Param("id")
 	userIds := c.QueryParam("userIds")
+	resourceType := c.QueryParam("type")
 	uIds := strings.Split(userIds, ",")
 
-	model.OverwriteUserIdsByResourceId(resourceId, uIds)
+	model.OverwriteUserIdsByResourceId(resourceId, resourceType, uIds)
 
 	return Success(c, "")
 }

@@ -38,7 +38,12 @@ type CredentialVo struct {
 	SharerCount int64          `json:"sharerCount"`
 }
 
-func FindAllCredential() (o []Credential, err error) {
+type CredentialSimpleVo struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+}
+
+func FindAllCredential() (o []CredentialSimpleVo, err error) {
 	err = global.DB.Find(&o).Error
 	return
 }
