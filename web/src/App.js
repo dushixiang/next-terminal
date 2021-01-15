@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import {Divider, Layout} from "antd";
-import {Switch, Route, Link} from "react-router-dom";
-import {Menu} from 'antd';
+import {Divider, Layout, Menu} from "antd";
+import {Link, Route, Switch} from "react-router-dom";
 import Dashboard from "./components/dashboard/Dashboard";
 import Asset from "./components/asset/Asset";
 import Access from "./components/access/Access";
@@ -14,19 +13,20 @@ import Login from "./components/Login";
 import DynamicCommand from "./components/command/DynamicCommand";
 import Credential from "./components/credential/Credential";
 import {
-    DashboardOutlined,
-    UserOutlined,
-    IdcardOutlined,
+    AuditOutlined,
+    BlockOutlined,
     CloudServerOutlined,
     CodeOutlined,
-    BlockOutlined,
-    AuditOutlined,
+    DashboardOutlined,
     DesktopOutlined,
     DisconnectOutlined,
-    MenuUnfoldOutlined,
+    IdcardOutlined,
+    LinkOutlined,
     MenuFoldOutlined,
+    MenuUnfoldOutlined,
+    SettingOutlined,
     SolutionOutlined,
-    SettingOutlined, LinkOutlined
+    UserOutlined
 } from '@ant-design/icons';
 import Info from "./components/user/Info";
 import request from "./common/request";
@@ -69,12 +69,13 @@ class App extends Component {
         }
 
         let result = await request.get('/info');
-        if (result.code === 1) {
+        if (result['code'] === 1) {
             this.setState({
-                user: result.data
+                user: result['data']
             })
+            sessionStorage.setItem('user', JSON.stringify(result['data']));
         } else {
-            message.error(result.message);
+            message.error(result['message']);
         }
     }
 
@@ -170,7 +171,7 @@ class App extends Component {
                                 </SubMenu>
 
                                 <SubMenu key='audit' title='操作审计' icon={<AuditOutlined/>}>
-                                    <Menu.Item key="online-session" icon={<LinkOutlined />}>
+                                    <Menu.Item key="online-session" icon={<LinkOutlined/>}>
                                         <Link to={'/online-session'}>
                                             在线会话
                                         </Link>

@@ -58,24 +58,32 @@ func FindAssetByConditions(protocol string) (o []Asset, err error) {
 }
 
 func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string) (o []AssetVo, total int64, err error) {
-	db := global.DB
-	db = db.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as creator_name").Joins("left join users on assets.owner = users.id")
+	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name").Joins("left join users on assets.owner = users.id")
+	dbCounter := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name").Joins("left join users on assets.owner = users.id")
+
 	if len(name) > 0 {
 		db = db.Where("assets.name like ?", "%"+name+"%")
+		dbCounter = dbCounter.Where("assets.name like ?", "%"+name+"%")
 	}
 
 	if len(protocol) > 0 {
 		db = db.Where("assets.protocol = ?", protocol)
+		dbCounter = dbCounter.Where("assets.protocol = ?", protocol)
 	}
 
 	if len(tags) > 0 {
 		tagArr := strings.Split(tags, ",")
 		for i := range tagArr {
 			db = db.Where("find_in_set(?, assets.tags)", tagArr[i])
+			dbCounter = dbCounter.Where("find_in_set(?, assets.tags)", tagArr[i])
 		}
 	}
 
-	err = db.Order("assets.created desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Count(&total).Error
+	err = dbCounter.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	err = db.Order("assets.created desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
 
 	if o == nil {
 		o = make([]AssetVo, 0)

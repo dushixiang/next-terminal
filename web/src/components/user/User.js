@@ -6,10 +6,8 @@ import {
     Button,
     Col,
     Divider,
-    Dropdown,
     Input,
     Layout,
-    Menu,
     Modal,
     PageHeader,
     Row,
@@ -271,7 +269,7 @@ class User extends Component {
             key: 'role',
             render: (role, record) => {
 
-                if (role === 'normal') {
+                if (role === 'user') {
                     return (
                         <Tag>普通用户</Tag>
                     );

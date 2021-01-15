@@ -28,13 +28,14 @@ func (r *Credential) TableName() string {
 }
 
 type CredentialVo struct {
-	ID        string         `json:"id"`
-	Name      string         `json:"name"`
-	Type      string         `json:"type"`
-	Username  string         `json:"username"`
-	Created   utils.JsonTime `json:"created"`
-	Owner     string         `json:"owner"`
-	OwnerName string         `json:"ownerName"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Type        string         `json:"type"`
+	Username    string         `json:"username"`
+	Created     utils.JsonTime `json:"created"`
+	Owner       string         `json:"owner"`
+	OwnerName   string         `json:"ownerName"`
+	SharerCount int64          `json:"sharerCount"`
 }
 
 func FindAllCredential() (o []Credential, err error) {
@@ -43,16 +44,24 @@ func FindAllCredential() (o []Credential, err error) {
 }
 
 func FindPageCredential(pageIndex, pageSize int, name, owner string) (o []CredentialVo, total int64, err error) {
-	db := global.DB
-	db = db.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name").Joins("left join users on credentials.owner = users.id")
-	if len(name) > 0 {
-		db = db.Where("credentials.name like ?", "%"+name+"%")
-	}
+	db := global.DB.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on credentials.owner = users.id").Joins("left join resources on credentials.id = resources.resource_id").Group("credentials.id")
+	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name").Joins("left join users on credentials.owner = users.id").Joins("left join resources on credentials.id = resources.resource_id")
+
 	if len(owner) > 0 {
-		db = db.Where("credentials.owner = ?", owner)
+		db = db.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)
+		dbCounter = dbCounter.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)
 	}
 
-	err = db.Order("credentials.created desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Count(&total).Error
+	if len(name) > 0 {
+		db = db.Where("credentials.name like ?", "%"+name+"%")
+		dbCounter = dbCounter.Where("credentials.name like ?", "%"+name+"%")
+	}
+
+	err = dbCounter.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	err = db.Order("credentials.created desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
 	if o == nil {
 		o = make([]CredentialVo, 0)
 	}

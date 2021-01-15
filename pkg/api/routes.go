@@ -102,15 +102,11 @@ func SetupRoutes() *echo.Echo {
 		sessions.GET("/:id", SessionGetEndpoint)
 	}
 
-	//tags := e.Group("/tags")
-	//{
-	//	tags.POST("", TagAllEndpoint)
-	//	tags.GET("/paging", TagPagingEndpoint)
-	//	tags.POST("", TagCreateEndpoint)
-	//	tags.PUT("/:id", TagUpdateEndpoint)
-	//	tags.DELETE("/:id", TagDeleteEndpoint)
-	//	tags.GET("/:id", TagGetEndpoint)
-	//}
+	resources := e.Group("/resources")
+	{
+		resources.GET("/:id/assign", ResourceGetAssignEndPoint)
+		resources.POST("/:id/assign", ResourceOverwriteAssignEndPoint)
+	}
 
 	e.GET("/properties", PropertyGetEndpoint)
 	e.PUT("/properties", PropertyUpdateEndpoint)

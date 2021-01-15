@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"crypto/md5"
 	"database/sql/driver"
 	"encoding/base64"
 	"fmt"
@@ -9,7 +10,9 @@ import (
 	"image/png"
 	"net"
 	"os"
+	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gofrs/uuid"
@@ -121,14 +124,22 @@ func IsFile(path string) bool {
 }
 
 // 去除重复元素
-func Distinct(list []string) []string {
-	result := make([]string, 0, len(list))
+func Distinct(a []string) []string {
+	result := make([]string, 0, len(a))
 	temp := map[string]struct{}{}
-	for _, item := range list {
+	for _, item := range a {
 		if _, ok := temp[item]; !ok {
 			temp[item] = struct{}{}
 			result = append(result, item)
 		}
 	}
 	return result
+}
+
+// 排序+拼接+摘要
+func Sign(a []string) string {
+	sort.Strings(a)
+	data := []byte(strings.Join(a, ""))
+	has := md5.Sum(data)
+	return fmt.Sprintf("%x", has)
 }

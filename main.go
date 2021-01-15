@@ -10,6 +10,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
@@ -69,7 +70,7 @@ func Run() error {
 			global.Config.Mysql.Database,
 		)
 		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			//Logger: logger.Default.LogMode(logger.Info),
+			Logger: logger.Default.LogMode(logger.Info),
 		})
 	} else {
 		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{})
@@ -118,7 +119,9 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.Property{}); err != nil {
 		return err
 	}
-
+	if err := global.DB.AutoMigrate(&model.Resource{}); err != nil {
+		return err
+	}
 	if err := global.DB.AutoMigrate(&model.Num{}); err != nil {
 		return err
 	}
