@@ -10,27 +10,52 @@ type Command struct {
 	Name    string         `json:"name"`
 	Content string         `json:"content"`
 	Created utils.JsonTime `json:"created"`
-	Creator string         `json:"creator"`
+	Owner   string         `json:"owner"`
+}
+
+type CommandVo struct {
+	ID          string         `gorm:"primary_key" json:"id"`
+	Name        string         `json:"name"`
+	Content     string         `json:"content"`
+	Created     utils.JsonTime `json:"created"`
+	Owner       string         `json:"owner"`
+	OwnerName   string         `json:"ownerName"`
+	SharerCount int64          `json:"sharerCount"`
 }
 
 func (r *Command) TableName() string {
 	return "commands"
 }
 
-func FindPageCommand(pageIndex, pageSize int, name, content string) (o []Command, total int64, err error) {
+func FindPageCommand(pageIndex, pageSize int, name, content string, account User) (o []CommandVo, total int64, err error) {
 
-	db := global.DB
+	db := global.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resources on commands.id = resources.resource_id").Group("commands.id")
+	dbCounter := global.DB.Table("commands").Select("DISTINCT commands.id").Joins("left join resources on commands.id = resources.resource_id")
+
+	if RoleUser == account.Role {
+		owner := account.ID
+		db = db.Where("commands.owner = ? or resources.user_id = ?", owner, owner)
+		dbCounter = dbCounter.Where("commands.owner = ? or resources.user_id = ?", owner, owner)
+	}
+
 	if len(name) > 0 {
-		db = db.Where("name like ?", "%"+name+"%")
+		db = db.Where("commands.name like ?", "%"+name+"%")
+		dbCounter = dbCounter.Where("commands.name like ?", "%"+name+"%")
 	}
 
 	if len(content) > 0 {
-		db = db.Where("content like ?", "%"+content+"%")
+		db = db.Where("commands.content like ?", "%"+content+"%")
+		dbCounter = dbCounter.Where("commands.content like ?", "%"+content+"%")
 	}
 
-	err = db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Find(&o).Error
+	err = dbCounter.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
 	if o == nil {
-		o = make([]Command, 0)
+		o = make([]CommandVo, 0)
 	}
 	return
 }

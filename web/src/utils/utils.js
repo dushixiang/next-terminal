@@ -157,3 +157,17 @@ export const NT_PACKAGE = () => {
         version: version
     }
 }
+
+export function compare(p) {
+    return function (m, n) {
+        const a = m[p];
+        const b = n[p];
+        if (a > b) {
+            return 1;
+        }
+        if (a < b) {
+            return -1;
+        }
+        return 0;
+    }
+}

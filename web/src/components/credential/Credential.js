@@ -591,7 +591,7 @@ class Credential extends Component {
                                            message.success('操作成功');
                                            this.loadTableData();
                                        } else {
-                                           message.success(result['message'], 10);
+                                           message.error(result['message'], 10);
                                            changeOwnerModalVisible = true;
                                        }
                                    })

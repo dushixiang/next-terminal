@@ -72,6 +72,7 @@ func SetupRoutes() *echo.Echo {
 		commands.PUT("/:id", CommandUpdateEndpoint)
 		commands.DELETE("/:id", CommandDeleteEndpoint)
 		commands.GET("/:id", CommandGetEndpoint)
+		commands.POST("/:id/change-owner", CommandChangeOwnerEndpoint)
 	}
 
 	credentials := e.Group("/credentials")

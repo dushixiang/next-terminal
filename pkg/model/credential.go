@@ -43,16 +43,21 @@ type CredentialSimpleVo struct {
 	Name string `json:"name"`
 }
 
-func FindAllCredential() (o []CredentialSimpleVo, err error) {
-	err = global.DB.Find(&o).Error
+func FindAllCredential(account User) (o []CredentialSimpleVo, err error) {
+	db := global.DB.Table("credentials").Select("DISTINCT credentials.id,credentials.name").Joins("left join resources on credentials.id = resources.resource_id")
+	if account.Role == RoleUser {
+		db = db.Where("credentials.owner = ? or resources.user_id = ?", account.ID, account.ID)
+	}
+	err = db.Find(&o).Error
 	return
 }
 
-func FindPageCredential(pageIndex, pageSize int, name, owner string) (o []CredentialVo, total int64, err error) {
+func FindPageCredential(pageIndex, pageSize int, name string, account User) (o []CredentialVo, total int64, err error) {
 	db := global.DB.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on credentials.owner = users.id").Joins("left join resources on credentials.id = resources.resource_id").Group("credentials.id")
-	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name").Joins("left join users on credentials.owner = users.id").Joins("left join resources on credentials.id = resources.resource_id")
+	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id").Joins("left join resources on credentials.id = resources.resource_id")
 
-	if len(owner) > 0 {
+	if RoleUser == account.Role {
+		owner := account.ID
 		db = db.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)
 	}

@@ -34,6 +34,7 @@ import {message} from "antd/es";
 import Setting from "./components/setting/Setting";
 import BatchCommand from "./components/command/BatchCommand";
 import {NT_PACKAGE} from "./utils/utils";
+import {isAdmin} from "./service/permission";
 
 const {Footer, Sider} = Layout;
 
@@ -170,25 +171,31 @@ class App extends Component {
                                             </Menu.Item>*/}
                                 </SubMenu>
 
-                                <SubMenu key='audit' title='操作审计' icon={<AuditOutlined/>}>
-                                    <Menu.Item key="online-session" icon={<LinkOutlined/>}>
-                                        <Link to={'/online-session'}>
-                                            在线会话
-                                        </Link>
-                                    </Menu.Item>
+                                {
+                                    isAdmin() ?
+                                        <>
+                                            <SubMenu key='audit' title='操作审计' icon={<AuditOutlined/>}>
+                                                <Menu.Item key="online-session" icon={<LinkOutlined/>}>
+                                                    <Link to={'/online-session'}>
+                                                        在线会话
+                                                    </Link>
+                                                </Menu.Item>
 
-                                    <Menu.Item key="offline-session" icon={<DisconnectOutlined/>}>
-                                        <Link to={'/offline-session'}>
-                                            历史会话
-                                        </Link>
-                                    </Menu.Item>
-                                </SubMenu>
+                                                <Menu.Item key="offline-session" icon={<DisconnectOutlined/>}>
+                                                    <Link to={'/offline-session'}>
+                                                        历史会话
+                                                    </Link>
+                                                </Menu.Item>
+                                            </SubMenu>
 
-                                <Menu.Item key="user" icon={<UserOutlined/>}>
-                                    <Link to={'/user'}>
-                                        用户管理
-                                    </Link>
-                                </Menu.Item>
+                                            <Menu.Item key="user" icon={<UserOutlined/>}>
+                                                <Link to={'/user'}>
+                                                    用户管理
+                                                </Link>
+                                            </Menu.Item>
+                                        </> : undefined
+                                }
+
 
                                 <Menu.Item key="info" icon={<SolutionOutlined/>}>
                                     <Link to={'/info'}>
@@ -196,11 +203,16 @@ class App extends Component {
                                     </Link>
                                 </Menu.Item>
 
-                                <Menu.Item key="setting" icon={<SettingOutlined/>}>
-                                    <Link to={'/setting'}>
-                                        系统设置
-                                    </Link>
-                                </Menu.Item>
+                                {
+                                    isAdmin() ?
+                                        <>
+                                            <Menu.Item key="setting" icon={<SettingOutlined/>}>
+                                                <Link to={'/setting'}>
+                                                    系统设置
+                                                </Link>
+                                            </Menu.Item>
+                                        </> : undefined
+                                }
                             </Menu>
 
                             <div>

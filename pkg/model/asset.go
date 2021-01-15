@@ -48,21 +48,27 @@ func FindAllAsset() (o []Asset, err error) {
 	return
 }
 
-func FindAssetByConditions(protocol string) (o []Asset, err error) {
-	db := global.DB
+func FindAssetByConditions(protocol string, account User) (o []Asset, err error) {
+	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id").Group("assets.id")
+
+	if RoleUser == account.Role {
+		owner := account.ID
+		db = db.Where("assets.owner = ? or resources.user_id = ?", owner, owner)
+	}
 
 	if len(protocol) > 0 {
-		db = db.Where("protocol = ?", protocol)
+		db = db.Where("assets.protocol = ?", protocol)
 	}
 	err = db.Find(&o).Error
 	return
 }
 
-func FindPageAsset(pageIndex, pageSize int, name, protocol, tags, owner string) (o []AssetVo, total int64, err error) {
+func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account User) (o []AssetVo, total int64, err error) {
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id").Group("assets.id")
-	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id")
+	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resources on assets.id = resources.resource_id")
 
-	if len(owner) > 0 {
+	if RoleUser == account.Role {
+		owner := account.ID
 		db = db.Where("assets.owner = ? or resources.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("assets.owner = ? or resources.user_id = ?", owner, owner)
 	}

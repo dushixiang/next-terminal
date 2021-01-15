@@ -1,18 +1,24 @@
 import React, {Component} from 'react';
 
 import {
+    Alert,
     Button,
     Checkbox,
     Col,
     Divider,
+    Dropdown,
+    Form,
     Input,
     Layout,
+    Menu,
     Modal,
     PageHeader,
     Row,
+    Select,
     Space,
     Table,
     Tooltip,
+    Transfer,
     Typography
 } from "antd";
 import qs from "qs";
@@ -20,22 +26,22 @@ import request from "../../common/request";
 import {message} from "antd/es";
 import DynamicCommandModal from "./DynamicCommandModal";
 import {
-    CodeTwoTone,
     DeleteOutlined,
-    DeleteTwoTone,
-    EditTwoTone,
+    DownOutlined,
     ExclamationCircleOutlined,
     PlusOutlined,
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import {itemRender} from "../../utils/utils";
+import {compare, itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
+import {hasPermission, isAdmin} from "../../service/permission";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
+const CheckboxGroup = Checkbox.Group;
 const routes = [
     {
         path: '',
@@ -51,6 +57,7 @@ class DynamicCommand extends Component {
 
     inputRefOfName = React.createRef();
     inputRefOfContent = React.createRef();
+    changeOwnerFormRef = React.createRef();
 
     state = {
         items: [],
@@ -70,6 +77,15 @@ class DynamicCommand extends Component {
         model: null,
         selectedRowKeys: [],
         delBtnLoading: false,
+        changeOwnerModalVisible: false,
+        changeSharerModalVisible: false,
+        changeOwnerConfirmLoading: false,
+        changeSharerConfirmLoading: false,
+        users: [],
+        selected: {},
+        selectedSharers: [],
+        indeterminate: true,
+        checkAllChecked: false
     };
 
     componentDidMount() {
@@ -185,23 +201,6 @@ class DynamicCommand extends Component {
         });
     };
 
-    handleChecked = e => {
-        let checkedAssets = this.state.checkedAssets;
-        if (e.target.checked) {
-            checkedAssets.push(e.target.value);
-        } else {
-            for (let i = 0; i < checkedAssets.length; i++) {
-                if (checkedAssets[i].id === e.target.value.id) {
-                    checkedAssets.splice(i, 1);
-                }
-            }
-        }
-
-        this.setState({
-            checkedAssets: checkedAssets
-        });
-    };
-
     executeCommand = e => {
         let checkedAssets = this.state.checkedAssets;
         if (checkedAssets.length === 0) {
@@ -209,14 +208,22 @@ class DynamicCommand extends Component {
             return;
         }
 
-        let assets = checkedAssets.map(item => {
+        let assets = this.state.assets;
+        let cAssets = checkedAssets.map(item => {
+            let name = '';
+            for (let i = 0; i < assets.length; i++) {
+                if (assets[i]['id'] === item) {
+                    name = assets[i]['name'];
+                    break;
+                }
+            }
             return {
-                id: item.id,
-                name: item.name
+                id: item,
+                name: name
             }
         });
 
-        window.location.href = '#/batch-command?command=' + this.state.command + '&assets=' + JSON.stringify(assets);
+        window.location.href = '#/batch-command?command=' + this.state.command + '&assets=' + JSON.stringify(cAssets);
     };
 
     handleOk = async (formData) => {
@@ -280,6 +287,65 @@ class DynamicCommand extends Component {
         }
     }
 
+    handleSearchByNickname = async nickname => {
+        const result = await request.get(`/users/paging?pageIndex=1&pageSize=100&nickname=${nickname}`);
+        if (result.code !== 1) {
+            message.error(result.message, 10);
+            return;
+        }
+
+        const items = result['data']['items'].map(item => {
+            return {'key': item['id'], ...item}
+        })
+
+        this.setState({
+            users: items
+        })
+    }
+
+    handleSharersChange = async targetKeys => {
+        this.setState({
+            selectedSharers: targetKeys
+        })
+    }
+
+    handleShowSharer = async (record) => {
+        let r1 = this.handleSearchByNickname('');
+        let r2 = request.get(`/resources/${record['id']}/assign`);
+
+        await r1;
+        let result = await r2;
+
+        let selectedSharers = [];
+        if (result['code'] !== 1) {
+            message.error(result['message']);
+        } else {
+            selectedSharers = result['data'];
+        }
+
+        this.setState({
+            selectedSharers: selectedSharers,
+            selected: record,
+            changeSharerModalVisible: true
+        })
+    }
+
+    onCheckAllChange = (event) => {
+        this.setState({
+            checkedAssets: event.target.checked ? this.state.assets.map(item => item['id']) : [],
+            indeterminate: false,
+            checkAllChecked: event.target.checked
+        })
+    }
+
+    onChange = (list) => {
+        this.setState({
+            checkedAssets: list,
+            indeterminate: !!list.length && list.length < this.state.assets.length,
+            checkAllChecked: list.length === this.state.assets.length
+        })
+    }
+
     render() {
 
         const columns = [{
@@ -321,17 +387,69 @@ class DynamicCommand extends Component {
                 );
             }
         }, {
+            title: '所有者',
+            dataIndex: 'ownerName',
+            key: 'ownerName'
+        }, {
+            title: '创建日期',
+            dataIndex: 'created',
+            key: 'created'
+        }, {
             title: '操作',
             key: 'action',
             render: (text, record) => {
 
+                const menu = (
+                    <Menu>
+                        <Menu.Item key="0">
+                            <Button type="text" size='small'
+                                    disabled={!hasPermission(record['owner'])}
+                                    onClick={() => this.showModal('更新指令', record)}>编辑</Button>
+                        </Menu.Item>
+
+                        {isAdmin() ?
+                            <Menu.Item key="1">
+                                <Button type="text" size='small'
+                                        disabled={!hasPermission(record['owner'])}
+                                        onClick={() => {
+                                            this.handleSearchByNickname('')
+                                                .then(() => {
+                                                    this.setState({
+                                                        changeOwnerModalVisible: true,
+                                                        selected: record,
+                                                    })
+                                                    this.changeOwnerFormRef
+                                                        .current
+                                                        .setFieldsValue({
+                                                            owner: record['owner']
+                                                        })
+                                                });
+
+                                        }}>更换所有者</Button>
+                            </Menu.Item> : undefined
+                        }
+
+
+                        <Menu.Item key="2">
+                            <Button type="text" size='small'
+                                    disabled={!hasPermission(record['owner'])}
+                                    onClick={async () => {
+                                        await this.handleShowSharer(record);
+                                    }}>更新授权人</Button>
+                        </Menu.Item>
+
+                        <Menu.Divider/>
+                        <Menu.Item key="3">
+                            <Button type="text" size='small' danger
+                                    disabled={!hasPermission(record['owner'])}
+                                    onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                        </Menu.Item>
+                    </Menu>
+                );
+
                 return (
                     <div>
-                        <Button type="link" size='small' icon={<EditTwoTone/>}
-                                onClick={() => this.showModal('更新指令', record)}>编辑</Button>
-                        <Button type="link" size='small' icon={<DeleteTwoTone/>}
-                                onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
-                        <Button type="link" size='small' icon={<CodeTwoTone/>} onClick={async () => {
+                        <Button type="link" size='small' onClick={async () => {
 
                             this.setState({
                                 assetsVisible: true,
@@ -340,19 +458,40 @@ class DynamicCommand extends Component {
 
                             let result = await request.get('/assets?protocol=ssh');
                             if (result.code === 1) {
+                                let assets = result.data;
+                                assets.sort(compare('name'));
                                 this.setState({
-                                    assets: result.data
+                                    assets: assets
                                 });
                             } else {
                                 message.error(result.message);
                             }
                         }}>执行</Button>
 
+                        <Dropdown overlay={menu}>
+                            <Button type="link" size='small'>
+                                更多 <DownOutlined/>
+                            </Button>
+                        </Dropdown>
+
                     </div>
                 )
             },
         }
         ];
+
+        if (isAdmin()) {
+            columns.splice(4, 0, {
+                title: '授权人数',
+                dataIndex: 'sharerCount',
+                key: 'sharerCount',
+                render: (text, record, index) => {
+                    return <Button type='link' onClick={async () => {
+                        await this.handleShowSharer(record, true);
+                    }}>{text}</Button>
+                }
+            });
+        }
 
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
@@ -502,10 +641,127 @@ class DynamicCommand extends Component {
                             });
                         }}
                     >
-                        {this.state.assets.map(item => {
-                            return (<Checkbox key={item.id} value={item}
-                                              onChange={this.handleChecked}>{item.name}</Checkbox>);
-                        })}
+                        <Checkbox indeterminate={this.state.indeterminate} onChange={this.onCheckAllChange}
+                                  checked={this.state.checkAllChecked}>
+                            全选
+                        </Checkbox>
+                        <Divider/>
+
+                        <CheckboxGroup options={this.state.assets.map((item) => {
+                            return {
+                                label: item.name,
+                                value: item.id,
+                                key: item.id,
+                            }
+                        })} value={this.state.checkedAssets} onChange={this.onChange}/>
+                    </Modal>
+
+
+                    <Modal title={<text>更换资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的所有者
+                    </text>}
+                           visible={this.state.changeOwnerModalVisible}
+                           confirmLoading={this.state.changeOwnerConfirmLoading}
+                           onOk={() => {
+                               this.setState({
+                                   changeOwnerConfirmLoading: true
+                               });
+
+                               let changeOwnerModalVisible = false;
+                               this.changeOwnerFormRef
+                                   .current
+                                   .validateFields()
+                                   .then(async values => {
+                                       let result = await request.post(`/commands/${this.state.selected['id']}/change-owner?owner=${values['owner']}`);
+                                       if (result['code'] === 1) {
+                                           message.success('操作成功');
+                                           this.loadTableData();
+                                       } else {
+                                           message.error(result['message'], 10);
+                                           changeOwnerModalVisible = true;
+                                       }
+                                   })
+                                   .catch(info => {
+
+                                   })
+                                   .finally(() => {
+                                       this.setState({
+                                           changeOwnerConfirmLoading: false,
+                                           changeOwnerModalVisible: changeOwnerModalVisible
+                                       })
+                                   });
+                           }}
+                           onCancel={() => {
+                               this.setState({
+                                   changeOwnerModalVisible: false
+                               })
+                           }}
+                    >
+
+                        <Form ref={this.changeOwnerFormRef}>
+
+                            <Form.Item name='owner' rules={[{required: true, message: '请选择所有者'}]}>
+                                <Select
+                                    showSearch
+                                    placeholder='请选择所有者'
+                                    onSearch={this.handleSearchByNickname}
+                                    filterOption={false}
+                                >
+                                    {this.state.users.map(d => <Select.Option key={d.id}
+                                                                              value={d.id}>{d.nickname}</Select.Option>)}
+                                </Select>
+                            </Form.Item>
+                            <Alert message="更换资产所有者不会影响授权凭证的所有者" type="info" showIcon/>
+
+                        </Form>
+                    </Modal>
+
+                    <Modal title={<text>更新资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的授权人
+                    </text>}
+                           visible={this.state.changeSharerModalVisible}
+                           confirmLoading={this.state.changeSharerConfirmLoading}
+                           onOk={async () => {
+                               this.setState({
+                                   changeSharerConfirmLoading: true
+                               });
+
+                               let changeSharerModalVisible = false;
+
+                               let result = await request.post(`/resources/${this.state.selected['id']}/assign?type=command&userIds=${this.state.selectedSharers.join(',')}`);
+                               if (result['code'] === 1) {
+                                   message.success('操作成功');
+                                   this.loadTableData();
+                               } else {
+                                   message.error(result['message'], 10);
+                                   changeSharerModalVisible = true;
+                               }
+
+                               this.setState({
+                                   changeSharerConfirmLoading: false,
+                                   changeSharerModalVisible: changeSharerModalVisible
+                               })
+                           }}
+                           onCancel={() => {
+                               this.setState({
+                                   changeSharerModalVisible: false
+                               })
+                           }}
+                           okButtonProps={{disabled: !hasPermission(this.state.selected['owner'])}}
+                    >
+
+                        <Transfer
+                            dataSource={this.state.users}
+                            disabled={!hasPermission(this.state.selected['owner'])}
+                            showSearch
+                            titles={['未授权', '已授权']}
+                            operations={['授权', '移除']}
+                            listStyle={{
+                                width: 250,
+                                height: 300,
+                            }}
+                            targetKeys={this.state.selectedSharers}
+                            onChange={this.handleSharersChange}
+                            render={item => `${item.nickname}`}
+                        />
                     </Modal>
 
                 </Content>

@@ -455,11 +455,13 @@ class Asset extends Component {
                         <Menu>
                             <Menu.Item key="1">
                                 <Button type="text" size='small'
+                                        disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.update(record.id)}>编辑</Button>
                             </Menu.Item>
 
                             <Menu.Item key="2">
                                 <Button type="text" size='small'
+                                        disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.copy(record.id)}>复制</Button>
                             </Menu.Item>
 
@@ -497,6 +499,7 @@ class Asset extends Component {
                             <Menu.Divider/>
                             <Menu.Item key="3">
                                 <Button type="text" size='small' danger
+                                        disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
                             </Menu.Item>
                         </Menu>
@@ -703,7 +706,7 @@ class Asset extends Component {
                                            message.success('操作成功');
                                            this.loadTableData();
                                        } else {
-                                           message.success(result['message'], 10);
+                                           message.error(result['message'], 10);
                                            changeOwnerModalVisible = true;
                                        }
                                    })
@@ -737,7 +740,7 @@ class Asset extends Component {
                                                                               value={d.id}>{d.nickname}</Select.Option>)}
                                 </Select>
                             </Form.Item>
-                            <Alert message="更换资源所有者不会影响授权凭证的所有者" type="info" showIcon/>
+                            <Alert message="更换资产所有者不会影响授权凭证的所有者" type="info" showIcon/>
 
                         </Form>
                     </Modal>

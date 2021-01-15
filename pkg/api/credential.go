@@ -10,7 +10,8 @@ import (
 )
 
 func CredentialAllEndpoint(c echo.Context) error {
-	items, _ := model.FindAllCredential()
+	account, _ := GetCurrentAccount(c)
+	items, _ := model.FindAllCredential(account)
 	return Success(c, items)
 }
 func CredentialCreateEndpoint(c echo.Context) error {
@@ -19,6 +20,8 @@ func CredentialCreateEndpoint(c echo.Context) error {
 		return err
 	}
 
+	account, _ := GetCurrentAccount(c)
+	item.Owner = account.ID
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
@@ -59,17 +62,8 @@ func CredentialPagingEndpoint(c echo.Context) error {
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	name := c.QueryParam("name")
 
-	var (
-		total int64
-		items []model.CredentialVo
-	)
-
 	account, _ := GetCurrentAccount(c)
-	if account.Role == model.RoleUser {
-		items, total, _ = model.FindPageCredential(pageIndex, pageSize, name, account.ID)
-	} else {
-		items, total, _ = model.FindPageCredential(pageIndex, pageSize, name, "")
-	}
+	items, total, _ := model.FindPageCredential(pageIndex, pageSize, name, account)
 
 	return Success(c, H{
 		"total": total,

@@ -15,6 +15,8 @@ func AssetCreateEndpoint(c echo.Context) error {
 		return err
 	}
 
+	account, _ := GetCurrentAccount(c)
+	item.Owner = account.ID
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
@@ -32,17 +34,8 @@ func AssetPagingEndpoint(c echo.Context) error {
 	protocol := c.QueryParam("protocol")
 	tags := c.QueryParam("tags")
 
-	var (
-		total int64
-		items []model.AssetVo
-	)
-
 	account, _ := GetCurrentAccount(c)
-	if account.Role == model.RoleUser {
-		items, total, _ = model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account.ID)
-	} else {
-		items, total, _ = model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, "")
-	}
+	items, total, _ := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account)
 
 	return Success(c, H{
 		"total": total,
@@ -52,7 +45,8 @@ func AssetPagingEndpoint(c echo.Context) error {
 
 func AssetAllEndpoint(c echo.Context) error {
 	protocol := c.QueryParam("protocol")
-	items, _ := model.FindAssetByConditions(protocol)
+	account, _ := GetCurrentAccount(c)
+	items, _ := model.FindAssetByConditions(protocol, account)
 	return Success(c, items)
 }
 

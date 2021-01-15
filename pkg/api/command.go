@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -14,6 +15,8 @@ func CommandCreateEndpoint(c echo.Context) error {
 		return err
 	}
 
+	account, _ := GetCurrentAccount(c)
+	item.Owner = account.ID
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
@@ -29,8 +32,9 @@ func CommandPagingEndpoint(c echo.Context) error {
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	name := c.QueryParam("name")
 	content := c.QueryParam("content")
+	account, _ := GetCurrentAccount(c)
 
-	items, total, _ := model.FindPageCommand(pageIndex, pageSize, name, content)
+	items, total, _ := model.FindPageCommand(pageIndex, pageSize, name, content, account)
 
 	return Success(c, H{
 		"total": total,
@@ -67,4 +71,28 @@ func CommandGetEndpoint(c echo.Context) (err error) {
 		return err
 	}
 	return Success(c, item)
+}
+
+func CommandChangeOwnerEndpoint(c echo.Context) (err error) {
+	id := c.Param("id")
+
+	if err := PreCheckCommandPermission(c, id); err != nil {
+		return err
+	}
+
+	owner := c.QueryParam("owner")
+	model.UpdateCommandById(&model.Command{Owner: owner}, id)
+	return Success(c, "")
+}
+
+func PreCheckCommandPermission(c echo.Context, id string) error {
+	item, err := model.FindCommandById(id)
+	if err != nil {
+		return err
+	}
+
+	if !HasPermission(c, item.Owner) {
+		return errors.New("permission denied")
+	}
+	return nil
 }
