@@ -18,7 +18,7 @@ func RunTicker() {
 	c := cron.New(cron.WithSeconds()) //精确到秒
 
 	// 定时任务，每隔一小时删除一次未使用的会话信息
-	_, _ = c.AddFunc("0 0/1 0/1 * * ?", func() {
+	_, _ = c.AddFunc("0 0 0/1 * * ?", func() {
 		sessions, _ := model.FindSessionByStatusIn([]string{model.NoConnect, model.Connecting})
 		if sessions != nil && len(sessions) > 0 {
 			now := time.Now()
@@ -26,7 +26,7 @@ func RunTicker() {
 				if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
 					model.DeleteSessionById(sessions[i].ID)
 					s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
-					logrus.Debugf("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
+					logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
 				}
 			}
 		}
@@ -37,11 +37,11 @@ func RunTicker() {
 		sessions, _ := model.FindSessionByStatus(model.Connected)
 		if sessions != nil && len(sessions) > 0 {
 			for i := range sessions {
-				_, found := global.Cache.Get(sessions[i].ID)
+				_, found := global.Store.Get(sessions[i].ID)
 				if !found {
 					api.CloseSessionById(sessions[i].ID, api.Normal, "")
 					s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
-					logrus.Debugf("会话「%v」ID「%v」已离线，修改状态为「关闭」。", s, sessions[i].ID)
+					logrus.Infof("会话「%v」ID「%v」已离线，修改状态为「关闭」。", s, sessions[i].ID)
 				}
 			}
 		}
