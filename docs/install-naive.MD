@@ -10,7 +10,7 @@ yum install -y gcc cairo-devel libjpeg-turbo-devel libpng-devel uuid-devel freer
 
 ### Ubuntu 安装Apache Guacamole-Server依赖文件
 ```shell
-sudo apt-get install libcairo2-dev libjpeg-turbo8-dev libpng12-dev libtool-bin libossp-uuid-dev freerdp2-dev libpango1.0-dev libssh2-1-dev 	libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
+sudo apt-get install libcairo2-dev libjpeg-turbo8-dev libpng-dev libtool-bin libossp-uuid-dev freerdp2-dev libpango1.0-dev libssh2-1-dev 	libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
 ```
 
 ### Debian 安装Apache Guacamole-Server依赖文件
