@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	RoleUser  = "user"
-	RoleAdmin = "admin"
+	TypeUser  = "user"
+	TypeAdmin = "admin"
 )
 
 type User struct {
@@ -20,7 +20,7 @@ type User struct {
 	Online     bool           `json:"online"`
 	Enabled    bool           `json:"enabled"`
 	Created    utils.JsonTime `json:"created"`
-	Role       string         `json:"role"`
+	Type       string         `json:"type"`
 }
 
 func (r *User) TableName() string {

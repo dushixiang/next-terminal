@@ -298,9 +298,8 @@ class OfflineSession extends Component {
                         <div>
                             <Button type="link" size='small'
                                     disabled={disabled}
-                                    icon={<PlaySquareTwoTone twoToneColor={color}/>}
                                     onClick={() => this.showPlayback(record.id)}>回放</Button>
-                            <Button type="link" size='small' icon={<DeleteTwoTone/>} onClick={() => {
+                            <Button type="link" size='small' onClick={() => {
                                 confirm({
                                     title: '您确定要删除此会话吗?',
                                     content: '',

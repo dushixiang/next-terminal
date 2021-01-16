@@ -85,7 +85,8 @@ func Run() error {
 		return err
 	}
 
-	if len(model.FindAllUser()) == 0 {
+	users := model.FindAllUser()
+	if len(users) == 0 {
 
 		var pass []byte
 		if pass, err = utils.Encoder.Encode([]byte("admin")); err != nil {
@@ -97,10 +98,22 @@ func Run() error {
 			Username: "admin",
 			Password: string(pass),
 			Nickname: "超级管理员",
+			Type:     model.TypeAdmin,
 			Created:  utils.NowJsonTime(),
 		}
 		if err := model.CreateNewUser(&user); err != nil {
 			return err
+		}
+	} else {
+		for i := range users {
+			// 修正默认用户类型为管理员
+			if users[i].Type == "" {
+				user := model.User{
+					Type: model.TypeAdmin,
+				}
+				model.UpdateUserById(&user, users[i].ID)
+				logrus.Infof("自动修正用户「%v」ID「%v」类型为管理员", users[i].Nickname, users[i].ID)
+			}
 		}
 	}
 

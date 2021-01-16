@@ -166,7 +166,7 @@ func HasPermission(c echo.Context, owner string) bool {
 	if !found {
 		return false
 	}
-	if model.RoleAdmin == account.Role {
+	if model.TypeAdmin == account.Type {
 		return true
 	}
 

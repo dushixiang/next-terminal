@@ -264,21 +264,21 @@ class User extends Component {
             dataIndex: 'nickname',
             key: 'nickname',
         }, {
-            title: '用户角色',
-            dataIndex: 'role',
-            key: 'role',
-            render: (role, record) => {
+            title: '用户类型',
+            dataIndex: 'type',
+            key: 'type',
+            render: (text, record) => {
 
-                if (role === 'user') {
+                if (text === 'user') {
                     return (
                         <Tag>普通用户</Tag>
                     );
-                } else if (role === 'admin') {
+                } else if (text === 'admin') {
                     return (
                         <Tag color="blue">管理用户</Tag>
                     );
                 } else {
-                    return role;
+                    return text;
                 }
 
             }

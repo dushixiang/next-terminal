@@ -1,7 +1,9 @@
+import {isEmpty} from "../utils/utils";
+
 export function hasPermission(owner) {
     let userJsonStr = sessionStorage.getItem('user');
     let user = JSON.parse(userJsonStr);
-    if (user['role'] === 'admin') {
+    if (user['type'] === 'admin') {
         return true;
     }
 
@@ -10,7 +12,9 @@ export function hasPermission(owner) {
 
 export function isAdmin(){
     let userJsonStr = sessionStorage.getItem('user');
+    if(isEmpty(userJsonStr)){
+        return false;
+    }
     let user = JSON.parse(userJsonStr);
-    return user['role'] === 'admin';
-
+    return user['type'] === 'admin';
 }

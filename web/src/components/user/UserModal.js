@@ -19,7 +19,7 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
                 form
                     .validateFields()
                     .then(values => {
-                        form.resetFields();
+                        // form.resetFields();
                         handleOk(values);
                     })
                     .catch(info => {
@@ -44,7 +44,7 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
                     <Input placeholder="请输入用户昵称"/>
                 </Form.Item>
 
-                <Form.Item label="用户角色" name='role' rules={[{required: true, message: '请选择用户角色'}]}>
+                <Form.Item label="用户类型" name='type' rules={[{required: true, message: '请选择用户角色'}]}>
                     <Radio.Group >
                         <Radio value={'user'}>普通用户</Radio>
                         <Radio value={'admin'}>管理用户</Radio>

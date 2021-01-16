@@ -45,7 +45,7 @@ type CredentialSimpleVo struct {
 
 func FindAllCredential(account User) (o []CredentialSimpleVo, err error) {
 	db := global.DB.Table("credentials").Select("DISTINCT credentials.id,credentials.name").Joins("left join resources on credentials.id = resources.resource_id")
-	if account.Role == RoleUser {
+	if account.Type == TypeUser {
 		db = db.Where("credentials.owner = ? or resources.user_id = ?", account.ID, account.ID)
 	}
 	err = db.Find(&o).Error
@@ -56,7 +56,7 @@ func FindPageCredential(pageIndex, pageSize int, name string, account User) (o [
 	db := global.DB.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on credentials.owner = users.id").Joins("left join resources on credentials.id = resources.resource_id").Group("credentials.id")
 	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id").Joins("left join resources on credentials.id = resources.resource_id")
 
-	if RoleUser == account.Role {
+	if TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)

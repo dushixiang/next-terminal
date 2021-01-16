@@ -51,7 +51,7 @@ func FindAllAsset() (o []Asset, err error) {
 func FindAssetByConditions(protocol string, account User) (o []Asset, err error) {
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id").Group("assets.id")
 
-	if RoleUser == account.Role {
+	if TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("assets.owner = ? or resources.user_id = ?", owner, owner)
 	}
@@ -67,7 +67,7 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id").Group("assets.id")
 	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resources on assets.id = resources.resource_id")
 
-	if RoleUser == account.Role {
+	if TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("assets.owner = ? or resources.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("assets.owner = ? or resources.user_id = ?", owner, owner)

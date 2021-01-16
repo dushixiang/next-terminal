@@ -21,6 +21,9 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 	urls := []string{"download", "recording", "login", "static", "favicon", "logo"}
+	permissionUrls := H{
+		"/users": "admin",
+	}
 
 	return func(c echo.Context) error {
 		// 路由拦截 - 登录身份、资源权限判断等
@@ -37,7 +40,15 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		authorization, found := global.Cache.Get(token)
 		if !found {
 			logrus.Debugf("您的登录信息已失效，请重新登录后再试。")
-			return Fail(c, 403, "您的登录信息已失效，请重新登录后再试。")
+			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+		}
+
+		for url := range permissionUrls {
+			if strings.HasPrefix(c.Request().RequestURI, url) {
+				if authorization.(Authorization).User.Type != permissionUrls[url] {
+					return Fail(c, 403, "permission denied")
+				}
+			}
 		}
 
 		if authorization.(Authorization).Remember {

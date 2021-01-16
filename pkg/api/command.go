@@ -44,6 +44,9 @@ func CommandPagingEndpoint(c echo.Context) error {
 
 func CommandUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
+	if err := PreCheckCommandPermission(c, id); err != nil {
+		return err
+	}
 
 	var item model.Command
 	if err := c.Bind(&item); err != nil {
@@ -59,6 +62,9 @@ func CommandDeleteEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	split := strings.Split(id, ",")
 	for i := range split {
+		if err := PreCheckCommandPermission(c, id); err != nil {
+			return err
+		}
 		model.DeleteCommandById(split[i])
 	}
 	return Success(c, nil)

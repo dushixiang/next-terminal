@@ -25,8 +25,8 @@ import {
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     SettingOutlined,
-    SolutionOutlined,
-    UserOutlined
+    SolutionOutlined, TeamOutlined,
+    UserOutlined, UserSwitchOutlined
 } from '@ant-design/icons';
 import Info from "./components/user/Info";
 import request from "./common/request";
@@ -188,11 +188,26 @@ class App extends Component {
                                                 </Menu.Item>
                                             </SubMenu>
 
+                                            {/*<SubMenu key='user-team' title='用户管理' icon={<UserSwitchOutlined />}>*/}
+                                            {/*     <Menu.Item key="team" icon={<TeamOutlined />}>*/}
+                                            {/*        <Link to={'/team'}>*/}
+                                            {/*            用户组管理*/}
+                                            {/*        </Link>*/}
+                                            {/*    </Menu.Item>*/}
+
+                                            {/*    <Menu.Item key="user" icon={<UserOutlined/>}>*/}
+                                            {/*        <Link to={'/user'}>*/}
+                                            {/*            用户管理*/}
+                                            {/*        </Link>*/}
+                                            {/*    </Menu.Item>*/}
+                                            {/*</SubMenu>*/}
+
                                             <Menu.Item key="user" icon={<UserOutlined/>}>
                                                 <Link to={'/user'}>
                                                     用户管理
                                                 </Link>
                                             </Menu.Item>
+
                                         </> : undefined
                                 }
 

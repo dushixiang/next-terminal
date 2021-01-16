@@ -32,7 +32,7 @@ func FindPageCommand(pageIndex, pageSize int, name, content string, account User
 	db := global.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resources on commands.id = resources.resource_id").Group("commands.id")
 	dbCounter := global.DB.Table("commands").Select("DISTINCT commands.id").Joins("left join resources on commands.id = resources.resource_id")
 
-	if RoleUser == account.Role {
+	if TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("commands.owner = ? or resources.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("commands.owner = ? or resources.user_id = ?", owner, owner)

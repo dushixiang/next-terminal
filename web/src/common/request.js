@@ -11,22 +11,25 @@ axios.defaults.baseURL = server;
 const handleError = (error) => {
     if ("Network Error" === error.toString()) {
         message.error('网络异常');
-        return;
+        return false;
     }
-    if (error.response !== undefined && error.response.status === 403) {
+    if (error.response !== undefined && error.response.status === 401) {
         window.location.href = '#/login';
-        return;
+        return false;
     }
     if (error.response !== undefined) {
-        // message.error(error.response.data.message);
+        message.error(error.response.data.message);
+        return false;
     }
+    return true;
 };
 
 const handleResult = (result) => {
-    if (result['code'] === 403) {
+    if (result['code'] === 401) {
         window.location.href = '#/login';
-        return;
+        return false;
     }
+    return true;
 }
 
 const request = {
@@ -37,11 +40,15 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.get(url, {headers: headers})
                 .then((response) => {
-                    handleResult(response.data);
+                    if (!handleResult(response.data)) {
+                        return;
+                    }
                     resolve(response.data);
                 })
                 .catch((error) => {
-                    handleError(error);
+                    if (!handleError(error)) {
+                        return;
+                    }
                     reject(error);
                 });
         })
@@ -54,11 +61,15 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.post(url, params, {headers: headers})
                 .then((response) => {
-                    handleResult(response.data);
+                    if (!handleResult(response.data)) {
+                        return;
+                    }
                     resolve(response.data);
                 })
                 .catch((error) => {
-                    handleError(error);
+                    if (!handleError(error)) {
+                        return;
+                    }
                     reject(error);
                 });
         })
@@ -71,11 +82,15 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.put(url, params, {headers: headers})
                 .then((response) => {
-                    handleResult(response.data);
+                    if (!handleResult(response.data)) {
+                        return;
+                    }
                     resolve(response.data);
                 })
                 .catch((error) => {
-                    handleError(error);
+                    if (!handleError(error)) {
+                        return;
+                    }
                     reject(error);
                 });
         })
@@ -87,11 +102,15 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.delete(url, {headers: headers})
                 .then((response) => {
-                    handleResult(response.data);
+                    if (!handleResult(response.data)) {
+                        return;
+                    }
                     resolve(response.data);
                 })
                 .catch((error) => {
-                    handleError(error);
+                    if (!handleError(error)) {
+                        return;
+                    }
                     reject(error);
                 });
         })
@@ -103,11 +122,15 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.patch(url, params, {headers: headers})
                 .then((response) => {
-                    handleResult(response.data);
+                    if (!handleResult(response.data)) {
+                        return;
+                    }
                     resolve(response.data);
                 })
                 .catch((error) => {
-                    handleError(error);
+                    if (!handleError(error)) {
+                        return;
+                    }
                     reject(error);
                 });
         })
