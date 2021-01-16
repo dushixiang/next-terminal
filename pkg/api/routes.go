@@ -51,6 +51,17 @@ func SetupRoutes() *echo.Echo {
 		users.GET("/:id", UserGetEndpoint)
 	}
 
+	userGroups := e.Group("/user-groups")
+	{
+		userGroups.POST("", UserGroupCreateEndpoint)
+		userGroups.GET("/paging", UserGroupPagingEndpoint)
+		userGroups.PUT("/:id", UserGroupUpdateEndpoint)
+		userGroups.DELETE("/:id", UserGroupDeleteEndpoint)
+		userGroups.GET("/:id", UserGroupGetEndpoint)
+		userGroups.POST("/:id/members", UserGroupAddMembersEndpoint)
+		userGroups.DELETE("/:id/members/:memberId", UserGroupDelMembersEndpoint)
+	}
+
 	assets := e.Group("/assets", Auth)
 	{
 		assets.GET("", AssetAllEndpoint)

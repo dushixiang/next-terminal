@@ -35,6 +35,7 @@ import Setting from "./components/setting/Setting";
 import BatchCommand from "./components/command/BatchCommand";
 import {NT_PACKAGE} from "./utils/utils";
 import {isAdmin} from "./service/permission";
+import UserGroup from "./components/user/UserGroup";
 
 const {Footer, Sider} = Layout;
 
@@ -188,25 +189,18 @@ class App extends Component {
                                                 </Menu.Item>
                                             </SubMenu>
 
-                                            {/*<SubMenu key='user-team' title='用户管理' icon={<UserSwitchOutlined />}>*/}
-                                            {/*     <Menu.Item key="team" icon={<TeamOutlined />}>*/}
-                                            {/*        <Link to={'/team'}>*/}
-                                            {/*            用户组管理*/}
-                                            {/*        </Link>*/}
-                                            {/*    </Menu.Item>*/}
-
-                                            {/*    <Menu.Item key="user" icon={<UserOutlined/>}>*/}
-                                            {/*        <Link to={'/user'}>*/}
-                                            {/*            用户管理*/}
-                                            {/*        </Link>*/}
-                                            {/*    </Menu.Item>*/}
-                                            {/*</SubMenu>*/}
-
-                                            <Menu.Item key="user" icon={<UserOutlined/>}>
-                                                <Link to={'/user'}>
-                                                    用户管理
-                                                </Link>
-                                            </Menu.Item>
+                                            <SubMenu key='user-group' title='用户管理' icon={<UserSwitchOutlined />}>
+                                                <Menu.Item key="user" icon={<UserOutlined/>}>
+                                                    <Link to={'/user'}>
+                                                        用户管理
+                                                    </Link>
+                                                </Menu.Item>
+                                                <Menu.Item key="user-group" icon={<TeamOutlined />}>
+                                                    <Link to={'/user-group'}>
+                                                        用户组管理
+                                                    </Link>
+                                                </Menu.Item>
+                                            </SubMenu>
 
                                         </> : undefined
                                 }
@@ -246,6 +240,7 @@ class App extends Component {
 
                             <Route path="/" exact component={Dashboard}/>
                             <Route path="/user" component={User}/>
+                            <Route path="/user-group" component={UserGroup}/>
                             <Route path="/asset" component={Asset}/>
                             <Route path="/credential" component={Credential}/>
                             <Route path="/dynamic-command" component={DynamicCommand}/>

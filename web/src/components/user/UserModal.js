@@ -19,7 +19,7 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
                 form
                     .validateFields()
                     .then(values => {
-                        // form.resetFields();
+                        form.resetFields();
                         handleOk(values);
                     })
                     .catch(info => {

@@ -165,7 +165,7 @@ class OfflineSession extends Component {
     }
 
     handleSearchByNickname = async nickname => {
-        const result = await request.get(`/users/paging?pageIndex=1&pageSize=100&nickname=${nickname}`);
+        const result = await request.get(`/users/paging?pageIndex=1&pageSize=1000&nickname=${nickname}`);
         if (result.code !== 1) {
             message.error(result.message, 10);
             return;

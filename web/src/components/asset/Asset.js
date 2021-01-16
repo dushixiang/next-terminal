@@ -466,7 +466,7 @@ class Asset extends Component {
                             </Menu.Item>
 
                             {isAdmin() ?
-                                <Menu.Item key="1">
+                                <Menu.Item key="3">
                                     <Button type="text" size='small'
                                             disabled={!hasPermission(record['owner'])}
                                             onClick={() => {
@@ -488,7 +488,7 @@ class Asset extends Component {
                             }
 
 
-                            <Menu.Item key="2">
+                            <Menu.Item key="4">
                                 <Button type="text" size='small'
                                         disabled={!hasPermission(record['owner'])}
                                         onClick={async () => {
@@ -497,7 +497,7 @@ class Asset extends Component {
                             </Menu.Item>
 
                             <Menu.Divider/>
-                            <Menu.Item key="3">
+                            <Menu.Item key="5">
                                 <Button type="text" size='small' danger
                                         disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>

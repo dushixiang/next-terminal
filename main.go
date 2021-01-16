@@ -135,6 +135,12 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.Resource{}); err != nil {
 		return err
 	}
+	if err := global.DB.AutoMigrate(&model.UserGroup{}); err != nil {
+		return err
+	}
+	if err := global.DB.AutoMigrate(&model.UserGroupMember{}); err != nil {
+		return err
+	}
 	if err := global.DB.AutoMigrate(&model.Num{}); err != nil {
 		return err
 	}

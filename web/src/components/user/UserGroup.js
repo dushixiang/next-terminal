@@ -1,37 +1,13 @@
 import React, {Component} from 'react';
 import {itemRender} from '../../utils/utils'
 
-import {
-    Badge,
-    Button,
-    Col,
-    Divider,
-    Input,
-    Layout,
-    Modal,
-    PageHeader,
-    Row,
-    Space,
-    Table,
-    Tag,
-    Tooltip,
-    Typography,
-} from "antd";
+import {Button, Col, Divider, Input, Layout, Modal, PageHeader, Row, Space, Table, Tooltip, Typography,} from "antd";
 import qs from "qs";
-import UserModal from "./UserModal";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {
-    DeleteOutlined,
-    DownOutlined,
-    ExclamationCircleOutlined,
-    IssuesCloseOutlined,
-    PlusOutlined,
-    StopOutlined,
-    SyncOutlined,
-    UndoOutlined
-} from '@ant-design/icons';
+import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import Logout from "./Logout";
+import UserGroupModal from "./UserGroupModal";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -45,14 +21,13 @@ const routes = [
     },
     {
         path: 'user',
-        breadcrumbName: '用户',
+        breadcrumbName: '用户组',
     }
 ];
 
-class User extends Component {
+class UserGroup extends Component {
 
-    inputRefOfNickname = React.createRef();
-    inputRefOfUsername = React.createRef();
+    inputRefOfName = React.createRef();
 
     state = {
         items: [],
@@ -68,6 +43,8 @@ class User extends Component {
         model: null,
         selectedRowKeys: [],
         delBtnLoading: false,
+        users: [],
+        members: []
     };
 
     componentDidMount() {
@@ -75,7 +52,7 @@ class User extends Component {
     }
 
     async delete(id) {
-        let result = await request.delete('/users/' + id);
+        let result = await request.delete('/user-groups/' + id);
         if (result.code === 1) {
             message.success('操作成功', 3);
             await this.loadTableData(this.state.queryParams);
@@ -99,7 +76,7 @@ class User extends Component {
         };
 
         try {
-            let result = await request.get('/users/paging?' + paramsStr);
+            let result = await request.get('/user-groups/paging?' + paramsStr);
             if (result.code === 1) {
                 data = result.data;
             } else {
@@ -137,7 +114,7 @@ class User extends Component {
     showDeleteConfirm(id, content) {
         let self = this;
         confirm({
-            title: '您确定要删除此用户吗?',
+            title: '您确定要删除此用户组吗?',
             content: content,
             okText: '确定',
             okType: 'danger',
@@ -149,6 +126,8 @@ class User extends Component {
     };
 
     showModal(title, user = {}) {
+
+        this.handleSearchByNickname('');
         this.setState({
             model: user,
             modalVisible: true,
@@ -171,7 +150,7 @@ class User extends Component {
 
         if (formData.id) {
             // 向后台提交数据
-            const result = await request.put('/users/' + formData.id, formData);
+            const result = await request.put('/user-groups/' + formData.id, formData);
             if (result.code === 1) {
                 message.success('操作成功', 3);
 
@@ -184,7 +163,7 @@ class User extends Component {
             }
         } else {
             // 向后台提交数据
-            const result = await request.post('/users', formData);
+            const result = await request.post('/user-groups', formData);
             if (result.code === 1) {
                 message.success('操作成功', 3);
 
@@ -202,23 +181,12 @@ class User extends Component {
         });
     };
 
-    handleSearchByUsername = username => {
+    handleSearchByName = name => {
         let query = {
             ...this.state.queryParams,
             'pageIndex': 1,
             'pageSize': this.state.queryParams.pageSize,
-            'username': username,
-        }
-
-        this.loadTableData(query);
-    };
-
-    handleSearchByNickname = nickname => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'nickname': nickname,
+            'name': name,
         }
 
         this.loadTableData(query);
@@ -229,7 +197,7 @@ class User extends Component {
             delBtnLoading: true
         })
         try {
-            let result = await request.delete('/users/' + this.state.selectedRowKeys.join(','));
+            let result = await request.delete('/user-groups/' + this.state.selectedRowKeys.join(','));
             if (result.code === 1) {
                 message.success('操作成功', 3);
                 this.setState({
@@ -246,6 +214,18 @@ class User extends Component {
         }
     }
 
+    handleSearchByNickname = async nickname => {
+        const result = await request.get(`/users/paging?pageIndex=1&pageSize=1000&nickname=${nickname}`);
+        if (result.code !== 1) {
+            message.error(result.message, 10);
+            return;
+        }
+
+        this.setState({
+            users: result.data.items
+        })
+    }
+
     render() {
 
         const columns = [{
@@ -256,42 +236,16 @@ class User extends Component {
                 return index + 1;
             }
         }, {
-            title: '登录账号',
-            dataIndex: 'username',
-            key: 'username',
+            title: '名称',
+            dataIndex: 'name',
         }, {
-            title: '用户昵称',
-            dataIndex: 'nickname',
-            key: 'nickname',
-        }, {
-            title: '用户类型',
-            dataIndex: 'type',
-            key: 'type',
-            render: (text, record) => {
-
-                if (text === 'user') {
-                    return (
-                        <Tag>普通用户</Tag>
-                    );
-                } else if (text === 'admin') {
-                    return (
-                        <Tag color="blue">管理用户</Tag>
-                    );
-                } else {
-                    return text;
-                }
-
-            }
-        }, {
-            title: '在线状态',
-            dataIndex: 'online',
-            key: 'online',
-            render: text => {
-                if (text) {
-                    return (<Badge status="success" text="在线"/>);
-                } else {
-                    return (<Badge status="default" text="离线"/>);
-                }
+            title: '成员人数',
+            dataIndex: 'memberCount',
+            key: 'memberCount',
+            render: (text, record, index) => {
+                return <Button type='link' onClick={async () => {
+                    await this.handleShowSharer(record, true);
+                }}>{text}</Button>
             }
         }, {
             title: '创建日期',
@@ -307,7 +261,7 @@ class User extends Component {
                     return (
                         <div>
                             <Button type="link" size='small'
-                                    onClick={() => this.showModal('更新用户', record)}>编辑</Button>
+                                    onClick={() => this.showModal('更新用户组', record)}>编辑</Button>
                             <Button type="link" size='small'
                                     onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
                         </div>
@@ -329,7 +283,7 @@ class User extends Component {
             <>
                 <PageHeader
                     className="site-page-header-ghost-wrapper page-herder"
-                    title="用户管理"
+                    title="用户组管理"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
@@ -345,30 +299,22 @@ class User extends Component {
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
                             <Col span={8} key={1}>
-                                <Title level={3}>用户列表</Title>
+                                <Title level={3}>用户组列表</Title>
                             </Col>
                             <Col span={16} key={2} style={{textAlign: 'right'}}>
                                 <Space>
 
                                     <Search
-                                        ref={this.inputRefOfNickname}
-                                        placeholder="用户昵称"
+                                        ref={this.inputRefOfName}
+                                        placeholder="名称"
                                         allowClear
-                                        onSearch={this.handleSearchByNickname}
-                                    />
-
-                                    <Search
-                                        ref={this.inputRefOfUsername}
-                                        placeholder="登录账号"
-                                        allowClear
-                                        onSearch={this.handleSearchByUsername}
+                                        onSearch={this.handleSearchByName}
                                     />
 
                                     <Tooltip title='重置查询'>
 
                                         <Button icon={<UndoOutlined/>} onClick={() => {
-                                            this.inputRefOfUsername.current.setValue('');
-                                            this.inputRefOfNickname.current.setValue('');
+                                            this.inputRefOfName.current.setValue('');
                                             this.loadTableData({pageIndex: 1, pageSize: 10})
                                         }}>
 
@@ -379,7 +325,7 @@ class User extends Component {
 
                                     <Tooltip title="新增">
                                         <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增用户', {})}>
+                                                onClick={() => this.showModal('新增用户组', {})}>
 
                                         </Button>
                                     </Tooltip>
@@ -391,53 +337,6 @@ class User extends Component {
 
                                         </Button>
                                     </Tooltip>
-
-                                    {/*<Tooltip title="批量启用">*/}
-                                    {/*    <Button type="dashed" danger disabled={!hasSelected}*/}
-                                    {/*            icon={<IssuesCloseOutlined/>}*/}
-                                    {/*            loading={this.state.delBtnLoading}*/}
-                                    {/*            onClick={() => {*/}
-                                    {/*                const content = <div>*/}
-                                    {/*                    您确定要启用选中的<Text style={{color: '#1890FF'}}*/}
-                                    {/*                                   strong>{this.state.selectedRowKeys.length}</Text>条记录吗？*/}
-                                    {/*                </div>;*/}
-                                    {/*                confirm({*/}
-                                    {/*                    icon: <ExclamationCircleOutlined/>,*/}
-                                    {/*                    content: content,*/}
-                                    {/*                    onOk: () => {*/}
-
-                                    {/*                    },*/}
-                                    {/*                    onCancel() {*/}
-
-                                    {/*                    },*/}
-                                    {/*                });*/}
-                                    {/*            }}>*/}
-
-                                    {/*    </Button>*/}
-                                    {/*</Tooltip>*/}
-
-                                    {/*<Tooltip title="批量禁用">*/}
-                                    {/*    <Button type="default" danger disabled={!hasSelected} icon={<StopOutlined/>}*/}
-                                    {/*            loading={this.state.delBtnLoading}*/}
-                                    {/*            onClick={() => {*/}
-                                    {/*                const content = <div>*/}
-                                    {/*                    您确定要禁用选中的<Text style={{color: '#1890FF'}}*/}
-                                    {/*                                   strong>{this.state.selectedRowKeys.length}</Text>条记录吗？*/}
-                                    {/*                </div>;*/}
-                                    {/*                confirm({*/}
-                                    {/*                    icon: <ExclamationCircleOutlined/>,*/}
-                                    {/*                    content: content,*/}
-                                    {/*                    onOk: () => {*/}
-
-                                    {/*                    },*/}
-                                    {/*                    onCancel() {*/}
-
-                                    {/*                    },*/}
-                                    {/*                });*/}
-                                    {/*            }}>*/}
-
-                                    {/*    </Button>*/}
-                                    {/*</Tooltip>*/}
 
                                     <Tooltip title="批量删除">
                                         <Button type="primary" danger disabled={!hasSelected} icon={<DeleteOutlined/>}
@@ -483,19 +382,22 @@ class User extends Component {
                            loading={this.state.loading}
                     />
 
-                    <UserModal
+                    <UserGroupModal
                         visible={this.state.modalVisible}
                         title={this.state.modalTitle}
                         handleOk={this.handleOk}
                         handleCancel={this.handleCancelModal}
                         confirmLoading={this.state.modalConfirmLoading}
                         model={this.state.model}
+                        users={this.state.users}
+                        members={this.state.members}
                     >
-                    </UserModal>
+                    </UserGroupModal>
+
                 </Content>
             </>
         );
     }
 }
 
-export default User;
+export default UserGroup;
