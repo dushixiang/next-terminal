@@ -88,6 +88,7 @@ class Asset extends Component {
     };
 
     async componentDidMount() {
+
         this.loadTableData();
 
         let result = await request.get('/tags');

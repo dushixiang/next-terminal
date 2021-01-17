@@ -21,17 +21,9 @@ import qs from "qs";
 import UserModal from "./UserModal";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {
-    DeleteOutlined,
-    DownOutlined,
-    ExclamationCircleOutlined,
-    IssuesCloseOutlined,
-    PlusOutlined,
-    StopOutlined,
-    SyncOutlined,
-    UndoOutlined
-} from '@ant-design/icons';
+import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import Logout from "./Logout";
+import UserShareAsset from "./UserShareAsset";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -68,6 +60,7 @@ class User extends Component {
         model: null,
         selectedRowKeys: [],
         delBtnLoading: false,
+        assetVisible: false
     };
 
     componentDidMount() {
@@ -230,20 +223,27 @@ class User extends Component {
         })
         try {
             let result = await request.delete('/users/' + this.state.selectedRowKeys.join(','));
-            if (result.code === 1) {
+            if (result['code'] === 1) {
                 message.success('操作成功', 3);
                 this.setState({
                     selectedRowKeys: []
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result['message'], 10);
             }
         } finally {
             this.setState({
                 delBtnLoading: false
             })
         }
+    }
+
+    handleAssetCancel = () => {
+        this.loadTableData()
+        this.setState({
+            assetVisible: false
+        })
     }
 
     render() {
@@ -292,6 +292,18 @@ class User extends Component {
                 } else {
                     return (<Badge status="default" text="离线"/>);
                 }
+            }
+        }, {
+            title: '共享资产',
+            dataIndex: 'sharerAssetCount',
+            key: 'sharerAssetCount',
+            render: (text, record, index) => {
+                return <Button type='link' onClick={async () => {
+                    this.setState({
+                        assetVisible: true,
+                        sharer: record['id']
+                    })
+                }}>{text}</Button>
             }
         }, {
             title: '创建日期',
@@ -483,15 +495,39 @@ class User extends Component {
                            loading={this.state.loading}
                     />
 
-                    <UserModal
-                        visible={this.state.modalVisible}
-                        title={this.state.modalTitle}
-                        handleOk={this.handleOk}
-                        handleCancel={this.handleCancelModal}
-                        confirmLoading={this.state.modalConfirmLoading}
-                        model={this.state.model}
+                    {/* 为了屏蔽ant modal 关闭后数据仍然遗留的问题*/}
+                    {
+                        this.state.modalVisible ?
+                            <UserModal
+                                visible={this.state.modalVisible}
+                                title={this.state.modalTitle}
+                                handleOk={this.handleOk}
+                                handleCancel={this.handleCancelModal}
+                                confirmLoading={this.state.modalConfirmLoading}
+                                model={this.state.model}
+                            >
+                            </UserModal> : undefined
+                    }
+
+                    <Modal
+                        width={window.innerWidth * 0.8}
+                        title='已共享资产'
+                        visible={this.state.assetVisible}
+                        maskClosable={false}
+                        destroyOnClose={true}
+                        onOk={() => {
+
+                        }}
+                        onCancel={this.handleAssetCancel}
+                        okText='确定'
+                        cancelText='取消'
+                        footer={null}
                     >
-                    </UserModal>
+                        <UserShareAsset
+                            sharer={this.state.sharer}
+                            owner={this.state.owner}
+                        />
+                    </Modal>
                 </Content>
             </>
         );

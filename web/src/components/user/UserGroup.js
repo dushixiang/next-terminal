@@ -40,11 +40,10 @@ class UserGroup extends Component {
         modalVisible: false,
         modalTitle: '',
         modalConfirmLoading: false,
-        model: null,
+        model: undefined,
         selectedRowKeys: [],
         delBtnLoading: false,
         users: [],
-        members: []
     };
 
     componentDidMount() {
@@ -125,11 +124,35 @@ class UserGroup extends Component {
         });
     };
 
-    showModal(title, user = {}) {
+    showModal = async (title, id, index) => {
 
-        this.handleSearchByNickname('');
+        let items = this.state.items;
+
+        let model = {}
+        if (id) {
+            items[index].updateBtnLoading = true;
+            this.setState({
+                items: items
+            });
+
+            let result = await request.get('/user-groups/' + id);
+            if (result['code'] !== 1) {
+                message.error(result['message']);
+                items[index].updateBtnLoading = false;
+                this.setState({
+                    items: items
+                });
+                return;
+            }
+
+            items[index].updateBtnLoading = false;
+            model = result['data']
+        }
+
+        await this.handleSearchByNickname('');
+        console.log(model)
         this.setState({
-            model: user,
+            model: model,
             modalVisible: true,
             modalTitle: title
         });
@@ -138,7 +161,8 @@ class UserGroup extends Component {
     handleCancelModal = e => {
         this.setState({
             modalVisible: false,
-            modalTitle: ''
+            modalTitle: '',
+            model: undefined
         });
     };
 
@@ -243,9 +267,7 @@ class UserGroup extends Component {
             dataIndex: 'memberCount',
             key: 'memberCount',
             render: (text, record, index) => {
-                return <Button type='link' onClick={async () => {
-                    await this.handleShowSharer(record, true);
-                }}>{text}</Button>
+                return <Button type='link' onClick={() => this.showModal('更新用户组', record['id'], index)}>{text}</Button>
             }
         }, {
             title: '创建日期',
@@ -255,13 +277,12 @@ class UserGroup extends Component {
             {
                 title: '操作',
                 key: 'action',
-                render: (text, record) => {
-
-
+                render: (text, record, index) => {
                     return (
                         <div>
                             <Button type="link" size='small'
-                                    onClick={() => this.showModal('更新用户组', record)}>编辑</Button>
+                                    loading={this.state.items[index].updateBtnLoading}
+                                    onClick={() => this.showModal('更新用户组', record['id'], index)}>编辑</Button>
                             <Button type="link" size='small'
                                     onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
                         </div>
@@ -325,7 +346,7 @@ class UserGroup extends Component {
 
                                     <Tooltip title="新增">
                                         <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增用户组', {})}>
+                                                onClick={() => this.showModal('新增用户组')}>
 
                                         </Button>
                                     </Tooltip>
@@ -382,17 +403,20 @@ class UserGroup extends Component {
                            loading={this.state.loading}
                     />
 
-                    <UserGroupModal
-                        visible={this.state.modalVisible}
-                        title={this.state.modalTitle}
-                        handleOk={this.handleOk}
-                        handleCancel={this.handleCancelModal}
-                        confirmLoading={this.state.modalConfirmLoading}
-                        model={this.state.model}
-                        users={this.state.users}
-                        members={this.state.members}
-                    >
-                    </UserGroupModal>
+                    {/* 为了屏蔽ant modal 关闭后数据仍然遗留的问题*/}
+                    {this.state.modalVisible ?
+                        <UserGroupModal
+                            visible={this.state.modalVisible}
+                            title={this.state.modalTitle}
+                            handleOk={this.handleOk}
+                            handleCancel={this.handleCancelModal}
+                            confirmLoading={this.state.modalConfirmLoading}
+                            model={this.state.model}
+                            users={this.state.users}
+                        >
+                        </UserGroupModal> : undefined
+                    }
+
 
                 </Content>
             </>

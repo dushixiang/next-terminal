@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {Form, Input, Modal, Select} from "antd/lib/index";
 
 const UserGroupModal = ({
@@ -9,7 +9,6 @@ const UserGroupModal = ({
                             confirmLoading,
                             model,
                             users,
-                            members,
                         }) => {
 
     const [form] = Form.useForm();
@@ -24,6 +23,7 @@ const UserGroupModal = ({
             title={title}
             visible={visible}
             maskClosable={false}
+            destroyOnClose={true}
             onOk={() => {
                 form
                     .validateFields()

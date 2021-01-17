@@ -86,9 +86,28 @@ func FindUserGroupById(id string) (o UserGroup, err error) {
 	return
 }
 
-func UpdateUserGroupById(o *UserGroup, id string) {
-	o.ID = id
-	global.DB.Updates(o)
+func UpdateUserGroupById(o *UserGroup, members []string, id string) error {
+	return global.DB.Transaction(func(tx *gorm.DB) error {
+		o.ID = id
+		err := tx.Updates(o).Error
+		if err != nil {
+			return err
+		}
+
+		err = tx.Where("user_group_id = ?", id).Delete(&UserGroupMember{}).Error
+		if err != nil {
+			return err
+		}
+		if members != nil {
+			userGroupId := o.ID
+			err = AddUserGroupMembers(tx, members, userGroupId)
+			if err != nil {
+				return err
+			}
+		}
+		return err
+	})
+
 }
 
 func DeleteUserGroupById(id string) {

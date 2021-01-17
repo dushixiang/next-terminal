@@ -58,8 +58,8 @@ func SetupRoutes() *echo.Echo {
 		userGroups.PUT("/:id", UserGroupUpdateEndpoint)
 		userGroups.DELETE("/:id", UserGroupDeleteEndpoint)
 		userGroups.GET("/:id", UserGroupGetEndpoint)
-		userGroups.POST("/:id/members", UserGroupAddMembersEndpoint)
-		userGroups.DELETE("/:id/members/:memberId", UserGroupDelMembersEndpoint)
+		//userGroups.POST("/:id/members", UserGroupAddMembersEndpoint)
+		//userGroups.DELETE("/:id/members/:memberId", UserGroupDelMembersEndpoint)
 	}
 
 	assets := e.Group("/assets", Auth)
@@ -119,6 +119,8 @@ func SetupRoutes() *echo.Echo {
 	{
 		resources.GET("/:id/assign", ResourceGetAssignEndPoint)
 		resources.POST("/:id/assign", ResourceOverwriteAssignEndPoint)
+		resources.POST("/remove", ResourceRemoveByUserIdAssignEndPoint)
+		resources.POST("/add", ResourceAddByUserIdAssignEndPoint)
 	}
 
 	e.GET("/properties", PropertyGetEndpoint)

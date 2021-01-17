@@ -171,3 +171,9 @@ export function compare(p) {
         return 0;
     }
 }
+
+export function difference(a, b) {
+    let aSet = new Set(a)
+    let bSet = new Set(b)
+    return Array.from(new Set(a.concat(b).filter(v => !aSet.has(v) || !bSet.has(v))))
+}

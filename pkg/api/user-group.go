@@ -10,6 +10,7 @@ import (
 )
 
 type UserGroup struct {
+	Id      string   `json:"id"`
 	Name    string   `json:"name"`
 	Members []string `json:"members"`
 }
@@ -52,12 +53,17 @@ func UserGroupPagingEndpoint(c echo.Context) error {
 func UserGroupUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	var item model.UserGroup
+	var item UserGroup
 	if err := c.Bind(&item); err != nil {
 		return err
 	}
+	userGroup := model.UserGroup{
+		Name: item.Name,
+	}
 
-	model.UpdateUserGroupById(&item, id)
+	if err := model.UpdateUserGroupById(&userGroup, item.Members, id); err != nil {
+		return err
+	}
 
 	return Success(c, nil)
 }
@@ -81,7 +87,18 @@ func UserGroupGetEndpoint(c echo.Context) error {
 		return err
 	}
 
-	return Success(c, item)
+	members, err := model.FindUserGroupMembersByUserGroupId(id)
+	if err != nil {
+		return err
+	}
+
+	userGroup := UserGroup{
+		Id:      item.ID,
+		Name:    item.Name,
+		Members: members,
+	}
+
+	return Success(c, userGroup)
 }
 
 func UserGroupAddMembersEndpoint(c echo.Context) error {

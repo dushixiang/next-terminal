@@ -1,6 +1,7 @@
 package model
 
 import (
+	"gorm.io/gorm"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 )
@@ -44,4 +45,29 @@ func OverwriteUserIdsByResourceId(resourceId, resourceType string, userIds []str
 		_ = db.Create(resource).Error
 	}
 	db.Commit()
+}
+
+func DeleteByUserIdAndResourceTypeAndResourceIdIn(userId, resourceType string, resourceIds []string) error {
+	return global.DB.Where("user_id = ? and resource_type = ? and resource_id in ?", userId, resourceType, resourceIds).Delete(&Resource{}).Error
+}
+
+func AddSharerResources(userId, resourceType string, resourceIds []string) error {
+	return global.DB.Transaction(func(tx *gorm.DB) (err error) {
+
+		for i := range resourceIds {
+			resourceId := resourceIds[i]
+			id := utils.Sign([]string{resourceId, resourceType, userId})
+			resource := &Resource{
+				ID:           id,
+				ResourceId:   resourceId,
+				ResourceType: resourceType,
+				UserId:       userId,
+			}
+			err = tx.Create(resource).Error
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 }

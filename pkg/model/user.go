@@ -23,6 +23,18 @@ type User struct {
 	Type       string         `json:"type"`
 }
 
+type UserVo struct {
+	ID       string         `gorm:"primary_key" json:"id"`
+	Username string         `json:"username"`
+	Nickname string         `json:"nickname"`
+	Online   bool           `json:"online"`
+	Enabled  bool           `json:"enabled"`
+	Created  utils.JsonTime `json:"created"`
+	Type     string         `json:"type"`
+	//OwnerAssetCount  int64          `json:"ownerAssetCount"`
+	SharerAssetCount int64 `json:"sharerAssetCount"`
+}
+
 func (r *User) TableName() string {
 	return "users"
 }
@@ -38,19 +50,27 @@ func FindAllUser() (o []User) {
 	return
 }
 
-func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []User, total int64, err error) {
-	db := global.DB
+func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []UserVo, total int64, err error) {
+	db := global.DB.Table("users").Select("users.id,users.username,users.nickname,users.online,users.enabled,users.created,users.type, count(resources.user_id) as sharer_asset_count").Joins("left join resources on users.id = resources.user_id and resources.resource_type = 'asset'").Group("users.id")
+	dbCounter := global.DB.Table("users")
 	if len(username) > 0 {
-		db = db.Where("username like ?", "%"+username+"%")
+		db = db.Where("users.username like ?", "%"+username+"%")
+		dbCounter = dbCounter.Where("username like ?", "%"+username+"%")
 	}
 
 	if len(nickname) > 0 {
-		db = db.Where("nickname like ?", "%"+nickname+"%")
+		db = db.Where("users.nickname like ?", "%"+nickname+"%")
+		dbCounter = dbCounter.Where("nickname like ?", "%"+nickname+"%")
 	}
 
-	err = db.Order("created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Count(&total).Error
+	err = dbCounter.Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+
+	err = db.Order("users.created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
 	if o == nil {
-		o = make([]User, 0)
+		o = make([]UserVo, 0)
 	}
 	return
 }

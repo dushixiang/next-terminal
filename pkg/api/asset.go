@@ -33,9 +33,11 @@ func AssetPagingEndpoint(c echo.Context) error {
 	name := c.QueryParam("name")
 	protocol := c.QueryParam("protocol")
 	tags := c.QueryParam("tags")
+	owner := c.QueryParam("owner")
+	sharer := c.QueryParam("sharer")
 
 	account, _ := GetCurrentAccount(c)
-	items, total, _ := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account)
+	items, total, _ := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account, owner, sharer)
 
 	return Success(c, H{
 		"total": total,
