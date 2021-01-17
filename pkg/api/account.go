@@ -5,6 +5,7 @@ import (
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/totp"
 	"next-terminal/pkg/utils"
+	"strings"
 	"time"
 
 	"github.com/labstack/echo/v4"
@@ -52,7 +53,7 @@ func LoginEndpoint(c echo.Context) error {
 		return Fail(c, 0, "")
 	}
 
-	token := utils.UUID()
+	token := strings.Join([]string{utils.UUID(), utils.UUID(), utils.UUID(), utils.UUID()}, "")
 
 	authorization := Authorization{
 		Token:    token,
@@ -91,7 +92,7 @@ func loginWithTotpEndpoint(c echo.Context) error {
 		return Fail(c, -2, "您的TOTP不匹配")
 	}
 
-	token := utils.UUID()
+	token := strings.Join([]string{utils.UUID(), utils.UUID(), utils.UUID(), utils.UUID()}, "")
 
 	authorization := Authorization{
 		Token:    token,
