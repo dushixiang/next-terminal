@@ -43,6 +43,11 @@ func (r *Asset) TableName() string {
 	return "assets"
 }
 
+func FindAllAsset() (o []Asset, err error) {
+	err = global.DB.Find(&o).Error
+	return
+}
+
 func FindAssetByConditions(protocol string, account User) (o []Asset, err error) {
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resources on assets.id = resources.resource_id").Group("assets.id")
 

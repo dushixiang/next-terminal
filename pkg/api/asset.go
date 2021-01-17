@@ -24,6 +24,12 @@ func AssetCreateEndpoint(c echo.Context) error {
 		return err
 	}
 
+	// 创建后自动检测资产是否存活
+	go func() {
+		active := utils.Tcping(item.IP, item.Port)
+		model.UpdateAssetActiveById(active, item.ID)
+	}()
+
 	return Success(c, item)
 }
 

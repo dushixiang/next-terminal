@@ -17,8 +17,8 @@ func RunTicker() {
 
 	c := cron.New(cron.WithSeconds()) //精确到秒
 
-	// 定时任务，每隔一小时删除一次未使用的会话信息
 	_, _ = c.AddFunc("0 0 0/1 * * ?", func() {
+		// 定时任务，每隔一小时删除一次未使用的会话信息
 		sessions, _ := model.FindSessionByStatusIn([]string{model.NoConnect, model.Connecting})
 		if sessions != nil && len(sessions) > 0 {
 			now := time.Now()
@@ -28,6 +28,16 @@ func RunTicker() {
 					s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
 					logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
 				}
+			}
+		}
+		// 每隔一小时检测一次资产是否存活
+		assets, _ := model.FindAllAsset()
+		if assets != nil && len(assets) > 0 {
+			for i := range assets {
+				asset := assets[i]
+				active := utils.Tcping(asset.IP, asset.Port)
+				model.UpdateAssetActiveById(active, asset.ID)
+				logrus.Infof("资产「%v」ID「%v」存活状态检测完成，存活「%v」。", asset.Name, asset.ID, active)
 			}
 		}
 	})
