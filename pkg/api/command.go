@@ -62,7 +62,7 @@ func CommandDeleteEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	split := strings.Split(id, ",")
 	for i := range split {
-		if err := PreCheckCommandPermission(c, id); err != nil {
+		if err := PreCheckCommandPermission(c, split[i]); err != nil {
 			return err
 		}
 		model.DeleteCommandById(split[i])

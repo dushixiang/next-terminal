@@ -102,7 +102,7 @@ func AssetDeleteEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	split := strings.Split(id, ",")
 	for i := range split {
-		if err := PreCheckAssetPermission(c, id); err != nil {
+		if err := PreCheckAssetPermission(c, split[i]); err != nil {
 			return err
 		}
 		model.DeleteAssetById(split[i])
