@@ -113,7 +113,7 @@ func SetupRoutes() *echo.Echo {
 		sessions.DELETE("/:id/rmdir", SessionRmDirEndpoint)
 		sessions.DELETE("/:id/rm", SessionRmEndpoint)
 		sessions.DELETE("/:id", SessionDeleteEndpoint)
-		sessions.GET("/:id/recording", Admin(SessionRecordingEndpoint))
+		sessions.GET("/:id/recording", SessionRecordingEndpoint)
 		sessions.GET("/:id", SessionGetEndpoint)
 	}
 
