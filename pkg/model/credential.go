@@ -44,22 +44,22 @@ type CredentialSimpleVo struct {
 }
 
 func FindAllCredential(account User) (o []CredentialSimpleVo, err error) {
-	db := global.DB.Table("credentials").Select("DISTINCT credentials.id,credentials.name").Joins("left join resources on credentials.id = resources.resource_id")
+	db := global.DB.Table("credentials").Select("DISTINCT credentials.id,credentials.name").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id")
 	if account.Type == TypeUser {
-		db = db.Where("credentials.owner = ? or resources.user_id = ?", account.ID, account.ID)
+		db = db.Where("credentials.owner = ? or resource_sharers.user_id = ?", account.ID, account.ID)
 	}
 	err = db.Find(&o).Error
 	return
 }
 
 func FindPageCredential(pageIndex, pageSize int, name string, account User) (o []CredentialVo, total int64, err error) {
-	db := global.DB.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on credentials.owner = users.id").Joins("left join resources on credentials.id = resources.resource_id").Group("credentials.id")
-	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id").Joins("left join resources on credentials.id = resources.resource_id")
+	db := global.DB.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on credentials.owner = users.id").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id").Group("credentials.id")
+	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id")
 
 	if TypeUser == account.Type {
 		owner := account.ID
-		db = db.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)
-		dbCounter = dbCounter.Where("credentials.owner = ? or resources.user_id = ?", owner, owner)
+		db = db.Where("credentials.owner = ? or resource_sharers.user_id = ?", owner, owner)
+		dbCounter = dbCounter.Where("credentials.owner = ? or resource_sharers.user_id = ?", owner, owner)
 	}
 
 	if len(name) > 0 {

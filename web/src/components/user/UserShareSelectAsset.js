@@ -1,21 +1,6 @@
 import React, {Component} from 'react';
 
-import {
-    Badge,
-    Button,
-    Col,
-    Divider,
-    Input,
-    Layout,
-    Modal,
-    Row,
-    Select,
-    Space,
-    Table,
-    Tag,
-    Tooltip,
-    Typography
-} from "antd";
+import {Badge, Button, Col, Divider, Input, Layout, Row, Select, Space, Table, Tag, Tooltip, Typography} from "antd";
 import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
@@ -24,10 +9,9 @@ import {message} from "antd/es";
 import {PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import {PROTOCOL_COLORS} from "../../common/constants";
 
-const confirm = Modal.confirm;
 const {Search} = Input;
 const {Content} = Layout;
-const {Title, Text} = Typography;
+const {Title} = Typography;
 
 class UserShareAsset extends Component {
 
@@ -63,23 +47,30 @@ class UserShareAsset extends Component {
         this.setState({
             sharer: this.props.sharer
         })
-        let r2 = await request.get('/assets/paging?pageIndex=1&pageSize=1000&sharer=' + this.props.sharer);
-        if (r2['code'] === 1) {
-            let items = r2['data']['items'];
-
-            this.setState({
-                totalSelectedRows: items
-            })
-        }
 
         this.loadTableData();
+        this.init(this.props.sharer)
+    }
 
-        let result = await request.get('/tags');
-        if (result['code'] === 1) {
+    async init(sharer) {
+        let q1 = request.get('/tags');
+        let q2 = request.get('/assets/paging?pageIndex=1&pageSize=1000&sharer=' + sharer);
+
+        let r1 = await q1;
+        let r2 = await q2;
+
+        if (r1['code'] === 1) {
             this.setState({
-                tags: result['data']
+                tags: r1['data']
             })
         }
+
+        if (r2['code'] === 1) {
+            this.setState({
+                totalSelectedRows: r2['data']['items']
+            })
+        }
+
     }
 
     async loadTableData(queryParams) {
@@ -107,8 +98,13 @@ class UserShareAsset extends Component {
         } catch (e) {
 
         } finally {
+            let sharer = this.state.sharer;
             const items = data.items.map(item => {
-                return {'key': item['id'], ...item}
+                let disabled = false;
+                if (sharer === item['owner']) {
+                    disabled = true;
+                }
+                return {...item, 'key': item['id'], 'disabled': disabled}
             })
             let totalSelectedRows = this.state.totalSelectedRows;
             let selectedRowKeys = totalSelectedRows.map(item => item['id']);
@@ -172,7 +168,7 @@ class UserShareAsset extends Component {
 
     unSelectRow = async (assetId) => {
         let userId = this.state.sharer;
-        let result = await request.post(`/resources/remove`, {
+        let result = await request.post(`/resource-sharers/remove-resources`, {
             userId: userId,
             resourceType: 'asset',
             resourceIds: [assetId]
@@ -259,6 +255,9 @@ class UserShareAsset extends Component {
             onChange: (selectedRowKeys, selectedRows) => {
                 this.setState({selectedRowKeys, selectedRows});
             },
+            getCheckboxProps: (record) => ({
+                disabled: record['disabled'],
+            }),
         };
         let hasSelected = false;
         if (selectedRowKeys.length > 0) {
@@ -275,7 +274,7 @@ class UserShareAsset extends Component {
 
         return (
             <>
-                <Title level={3}>共享资产列表</Title>
+                <Title level={3}>授权资产列表</Title>
                 <div>
                     {
                         this.state.totalSelectedRows.map(item => {
@@ -350,7 +349,7 @@ class UserShareAsset extends Component {
                                         </Button>
                                     </Tooltip>
 
-                                    <Tooltip title="添加共享">
+                                    <Tooltip title="添加授权">
                                         <Button type="primary" disabled={!hasSelected} icon={<PlusOutlined/>}
                                                 onClick={async () => {
                                                     console.log(this.state.selectedRows)
@@ -369,7 +368,7 @@ class UserShareAsset extends Component {
                                                     }
 
                                                     let userId = this.state.sharer;
-                                                    let result = await request.post(`/resources/add`, {
+                                                    let result = await request.post(`/resource-sharers/add-resources`, {
                                                         userId: userId,
                                                         resourceType: 'asset',
                                                         resourceIds: newRowKeys

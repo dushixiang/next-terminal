@@ -27,7 +27,6 @@ func UserCreateEndpoint(c echo.Context) error {
 	if err := model.CreateNewUser(&item); err != nil {
 		return err
 	}
-
 	return Success(c, item)
 }
 
@@ -88,4 +87,28 @@ func UserGetEndpoint(c echo.Context) error {
 	}
 
 	return Success(c, item)
+}
+
+func UserChangePasswordEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	password := c.QueryParam("password")
+
+	passwd, err := utils.Encoder.Encode([]byte(password))
+	if err != nil {
+		return err
+	}
+	u := &model.User{
+		Password: string(passwd),
+	}
+	model.UpdateUserById(u, id)
+	return Success(c, "")
+}
+
+func UserResetTotpEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	u := &model.User{
+		TOTPSecret: "-",
+	}
+	model.UpdateUserById(u, id)
+	return Success(c, "")
 }

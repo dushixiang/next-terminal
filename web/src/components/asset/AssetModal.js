@@ -39,13 +39,6 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
         }
     }
 
-    let initAssetTags = [];
-    if (!isEmpty(model['tags'])) {
-        initAssetTags = model['tags'].split(',');
-    }
-
-    let [assetTags, setAssetTags] = useState(initAssetTags);
-
     const formItemLayout = {
         labelCol: {span: 6},
         wrapperCol: {span: 14},
@@ -98,10 +91,6 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     const handleAccountTypeChange = v => {
         setAccountType(v);
         model.accountType = v;
-    }
-
-    const handleTagsChange = v => {
-        setAssetTags(v);
     }
 
     return (
@@ -209,8 +198,8 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                         : null
                 }
 
-                <Form.Item label="标签" name='tagArr'>
-                    <Select mode="tags" placeholder="请选择标签" defaultValue={assetTags} onChange={handleTagsChange}>
+                <Form.Item label="标签" name='tags'>
+                    <Select mode="tags" placeholder="请选择标签">
                         {tags.map(tag => {
                             if (tag === '-') {
                                 return undefined;

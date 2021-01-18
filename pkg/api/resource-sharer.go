@@ -3,7 +3,6 @@ package api
 import (
 	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
-	"strings"
 )
 
 type RU struct {
@@ -12,8 +11,14 @@ type RU struct {
 	ResourceIds  []string `json:"resourceIds"`
 }
 
-func ResourceGetAssignEndPoint(c echo.Context) error {
-	resourceId := c.Param("id")
+type UR struct {
+	ResourceId   string   `json:"resourceId"`
+	ResourceType string   `json:"resourceType"`
+	UserIds      []string `json:"userIds"`
+}
+
+func RSGetSharersEndPoint(c echo.Context) error {
+	resourceId := c.QueryParam("resourceId")
 	userIds, err := model.FindUserIdsByResourceId(resourceId)
 	if err != nil {
 		return err
@@ -21,13 +26,15 @@ func ResourceGetAssignEndPoint(c echo.Context) error {
 	return Success(c, userIds)
 }
 
-func ResourceOverwriteAssignEndPoint(c echo.Context) error {
-	resourceId := c.Param("id")
-	userIds := c.QueryParam("userIds")
-	resourceType := c.QueryParam("type")
-	uIds := strings.Split(userIds, ",")
+func RSOverwriteSharersEndPoint(c echo.Context) error {
+	var ur UR
+	if err := c.Bind(&ur); err != nil {
+		return err
+	}
 
-	model.OverwriteUserIdsByResourceId(resourceId, resourceType, uIds)
+	if err := model.OverwriteUserIdsByResourceId(ur.ResourceId, ur.ResourceType, ur.UserIds); err != nil {
+		return err
+	}
 
 	return Success(c, "")
 }

@@ -29,13 +29,13 @@ func (r *Command) TableName() string {
 
 func FindPageCommand(pageIndex, pageSize int, name, content string, account User) (o []CommandVo, total int64, err error) {
 
-	db := global.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resources.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resources on commands.id = resources.resource_id").Group("commands.id")
-	dbCounter := global.DB.Table("commands").Select("DISTINCT commands.id").Joins("left join resources on commands.id = resources.resource_id")
+	db := global.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
+	dbCounter := global.DB.Table("commands").Select("DISTINCT commands.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id")
 
 	if TypeUser == account.Type {
 		owner := account.ID
-		db = db.Where("commands.owner = ? or resources.user_id = ?", owner, owner)
-		dbCounter = dbCounter.Where("commands.owner = ? or resources.user_id = ?", owner, owner)
+		db = db.Where("commands.owner = ? or resource_sharers.user_id = ?", owner, owner)
+		dbCounter = dbCounter.Where("commands.owner = ? or resource_sharers.user_id = ?", owner, owner)
 	}
 
 	if len(name) > 0 {

@@ -24,15 +24,14 @@ type User struct {
 }
 
 type UserVo struct {
-	ID       string         `gorm:"primary_key" json:"id"`
-	Username string         `json:"username"`
-	Nickname string         `json:"nickname"`
-	Online   bool           `json:"online"`
-	Enabled  bool           `json:"enabled"`
-	Created  utils.JsonTime `json:"created"`
-	Type     string         `json:"type"`
-	//OwnerAssetCount  int64          `json:"ownerAssetCount"`
-	SharerAssetCount int64 `json:"sharerAssetCount"`
+	ID               string         `gorm:"primary_key" json:"id"`
+	Username         string         `json:"username"`
+	Nickname         string         `json:"nickname"`
+	Online           bool           `json:"online"`
+	Enabled          bool           `json:"enabled"`
+	Created          utils.JsonTime `json:"created"`
+	Type             string         `json:"type"`
+	SharerAssetCount int64          `json:"sharerAssetCount"`
 }
 
 func (r *User) TableName() string {
@@ -51,7 +50,7 @@ func FindAllUser() (o []User) {
 }
 
 func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []UserVo, total int64, err error) {
-	db := global.DB.Table("users").Select("users.id,users.username,users.nickname,users.online,users.enabled,users.created,users.type, count(resources.user_id) as sharer_asset_count").Joins("left join resources on users.id = resources.user_id and resources.resource_type = 'asset'").Group("users.id")
+	db := global.DB.Table("users").Select("users.id,users.username,users.nickname,users.online,users.enabled,users.created,users.type, count(resource_sharers.user_id) as sharer_asset_count").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
 	dbCounter := global.DB.Table("users")
 	if len(username) > 0 {
 		db = db.Where("users.username like ?", "%"+username+"%")

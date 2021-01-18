@@ -95,10 +95,6 @@ class App extends Component {
     }
 
     subMenuChange = (openKeys) => {
-
-        console.debug("current open keys");
-        console.table(openKeys);
-
         this.setState({
             openKeys: openKeys
         })

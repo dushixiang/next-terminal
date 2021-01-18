@@ -103,6 +103,15 @@ func CloseSessionById(sessionId string, code int, reason string) {
 		CloseSessionByWebSocket(tun.WebSocket, code, reason)
 	}
 
+	s, err := model.FindSessionById(sessionId)
+	if err != nil {
+		return
+	}
+
+	if s.Status == model.Disconnected {
+		return
+	}
+
 	global.Store.Del(sessionId)
 	session := model.Session{}
 	session.ID = sessionId

@@ -22,14 +22,7 @@ import request from "../../common/request";
 import {differTime, formatDate, itemRender} from "../../utils/utils";
 import Playback from "./Playback";
 import {message} from "antd/es";
-import {
-    DeleteOutlined,
-    DeleteTwoTone,
-    ExclamationCircleOutlined,
-    PlaySquareTwoTone,
-    SyncOutlined,
-    UndoOutlined
-} from "@ant-design/icons";
+import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import Logout from "../user/Logout";
 

@@ -22,14 +22,7 @@ import request from "../../common/request";
 import {differTime, formatDate, itemRender} from "../../utils/utils";
 import {message} from "antd/es";
 import {PROTOCOL_COLORS} from "../../common/constants";
-import {
-    ApiTwoTone,
-    DisconnectOutlined,
-    ExclamationCircleOutlined,
-    EyeTwoTone,
-    SyncOutlined,
-    UndoOutlined
-} from "@ant-design/icons";
+import {DisconnectOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 import Monitor from "../access/Monitor";
 import Logout from "../user/Logout";
 
@@ -287,10 +280,10 @@ class OnlineSession extends Component {
 
                     return (
                         <div>
-                            <Button type="link" size='small' icon={<EyeTwoTone/>} onClick={() => {
+                            <Button type="link" size='small' onClick={() => {
                                 this.showMonitor(record)
                             }}>监控</Button>
-                            <Button type="link" size='small' icon={<ApiTwoTone/>} onClick={async () => {
+                            <Button type="link" size='small' onClick={async () => {
 
                                 confirm({
                                     title: '您确定要断开此会话吗?',

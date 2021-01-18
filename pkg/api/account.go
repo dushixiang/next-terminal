@@ -49,7 +49,7 @@ func LoginEndpoint(c echo.Context) error {
 		return Fail(c, -1, "您输入的账号或密码不正确")
 	}
 
-	if user.TOTPSecret != "" {
+	if user.TOTPSecret != "" && user.TOTPSecret != "-" {
 		return Fail(c, 0, "")
 	}
 

@@ -44,11 +44,11 @@ const DynamicCommandModal = ({title, visible, handleOk, handleCancel, confirmLoa
                 </Form.Item>
 
                 <Form.Item label="指令名称" name='name' rules={[{required: true, message: '请输入指令名称'}]}>
-                    <Input placeholder="请输入指令内容"/>
+                    <Input placeholder="请输入指令名称"/>
                 </Form.Item>
 
                 <Form.Item label="指令内容" name='content' rules={[{required: true, message: '请输入指令内容'}]}>
-                    <TextArea autoSize={{ minRows: 5, maxRows: 10 }} placeholder="一行一个命令"/>
+                    <TextArea autoSize={{minRows: 5, maxRows: 10}} placeholder="多行指令也会当做一行执行，请使用 && 或 其他方式进行连接"/>
                 </Form.Item>
 
             </Form>

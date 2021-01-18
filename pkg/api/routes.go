@@ -44,20 +44,22 @@ func SetupRoutes() *echo.Echo {
 
 	users := e.Group("/users")
 	{
-		users.POST("", UserCreateEndpoint)
+		users.POST("", Admin(UserCreateEndpoint))
 		users.GET("/paging", UserPagingEndpoint)
-		users.PUT("/:id", UserUpdateEndpoint)
-		users.DELETE("/:id", UserDeleteEndpoint)
-		users.GET("/:id", UserGetEndpoint)
+		users.PUT("/:id", Admin(UserUpdateEndpoint))
+		users.DELETE("/:id", Admin(UserDeleteEndpoint))
+		users.GET("/:id", Admin(UserGetEndpoint))
+		users.POST("/:id/change-password", Admin(UserChangePasswordEndpoint))
+		users.POST("/:id/reset-totp", Admin(UserResetTotpEndpoint))
 	}
 
 	userGroups := e.Group("/user-groups")
 	{
-		userGroups.POST("", UserGroupCreateEndpoint)
-		userGroups.GET("/paging", UserGroupPagingEndpoint)
-		userGroups.PUT("/:id", UserGroupUpdateEndpoint)
-		userGroups.DELETE("/:id", UserGroupDeleteEndpoint)
-		userGroups.GET("/:id", UserGroupGetEndpoint)
+		userGroups.POST("", Admin(UserGroupCreateEndpoint))
+		userGroups.GET("/paging", Admin(UserGroupPagingEndpoint))
+		userGroups.PUT("/:id", Admin(UserGroupUpdateEndpoint))
+		userGroups.DELETE("/:id", Admin(UserGroupDeleteEndpoint))
+		userGroups.GET("/:id", Admin(UserGroupGetEndpoint))
 		//userGroups.POST("/:id/members", UserGroupAddMembersEndpoint)
 		//userGroups.DELETE("/:id/members/:memberId", UserGroupDelMembersEndpoint)
 	}
@@ -71,7 +73,7 @@ func SetupRoutes() *echo.Echo {
 		assets.PUT("/:id", AssetUpdateEndpoint)
 		assets.DELETE("/:id", AssetDeleteEndpoint)
 		assets.GET("/:id", AssetGetEndpoint)
-		assets.POST("/:id/change-owner", AssetChangeOwnerEndpoint)
+		assets.POST("/:id/change-owner", Admin(AssetChangeOwnerEndpoint))
 	}
 
 	e.GET("/tags", AssetTagsEndpoint)
@@ -83,7 +85,7 @@ func SetupRoutes() *echo.Echo {
 		commands.PUT("/:id", CommandUpdateEndpoint)
 		commands.DELETE("/:id", CommandDeleteEndpoint)
 		commands.GET("/:id", CommandGetEndpoint)
-		commands.POST("/:id/change-owner", CommandChangeOwnerEndpoint)
+		commands.POST("/:id/change-owner", Admin(CommandChangeOwnerEndpoint))
 	}
 
 	credentials := e.Group("/credentials")
@@ -94,7 +96,7 @@ func SetupRoutes() *echo.Echo {
 		credentials.PUT("/:id", CredentialUpdateEndpoint)
 		credentials.DELETE("/:id", CredentialDeleteEndpoint)
 		credentials.GET("/:id", CredentialGetEndpoint)
-		credentials.POST("/:id/change-owner", CredentialChangeOwnerEndpoint)
+		credentials.POST("/:id/change-owner", Admin(CredentialChangeOwnerEndpoint))
 	}
 
 	sessions := e.Group("/sessions")
@@ -102,7 +104,7 @@ func SetupRoutes() *echo.Echo {
 		sessions.POST("", SessionCreateEndpoint)
 		sessions.GET("/paging", SessionPagingEndpoint)
 		sessions.POST("/:id/content", SessionContentEndpoint)
-		sessions.POST("/:id/discontent", SessionDiscontentEndpoint)
+		sessions.POST("/:id/discontent", Admin(SessionDiscontentEndpoint))
 		sessions.POST("/:id/resize", SessionResizeEndpoint)
 		sessions.POST("/:id/upload", SessionUploadEndpoint)
 		sessions.GET("/:id/download", SessionDownloadEndpoint)
@@ -111,20 +113,20 @@ func SetupRoutes() *echo.Echo {
 		sessions.DELETE("/:id/rmdir", SessionRmDirEndpoint)
 		sessions.DELETE("/:id/rm", SessionRmEndpoint)
 		sessions.DELETE("/:id", SessionDeleteEndpoint)
-		sessions.GET("/:id/recording", SessionRecordingEndpoint)
+		sessions.GET("/:id/recording", Admin(SessionRecordingEndpoint))
 		sessions.GET("/:id", SessionGetEndpoint)
 	}
 
-	resources := e.Group("/resources")
+	resourceSharers := e.Group("/resource-sharers")
 	{
-		resources.GET("/:id/assign", ResourceGetAssignEndPoint)
-		resources.POST("/:id/assign", ResourceOverwriteAssignEndPoint)
-		resources.POST("/remove", ResourceRemoveByUserIdAssignEndPoint)
-		resources.POST("/add", ResourceAddByUserIdAssignEndPoint)
+		resourceSharers.GET("/sharers", RSGetSharersEndPoint)
+		resourceSharers.POST("/overwrite-sharers", RSOverwriteSharersEndPoint)
+		resourceSharers.POST("/remove-resources", Admin(ResourceRemoveByUserIdAssignEndPoint))
+		resourceSharers.POST("/add-resources", Admin(ResourceAddByUserIdAssignEndPoint))
 	}
 
 	e.GET("/properties", PropertyGetEndpoint)
-	e.PUT("/properties", PropertyUpdateEndpoint)
+	e.PUT("/properties", Admin(PropertyUpdateEndpoint))
 
 	e.GET("/overview/counter", OverviewCounterEndPoint)
 	e.GET("/overview/sessions", OverviewSessionPoint)
@@ -174,15 +176,16 @@ func GetCurrentAccount(c echo.Context) (model.User, bool) {
 }
 
 func HasPermission(c echo.Context, owner string) bool {
-	// 检测是否为创建者
+	// 检测是否登录
 	account, found := GetCurrentAccount(c)
 	if !found {
 		return false
 	}
+	// 检测是否为管理人员
 	if model.TypeAdmin == account.Type {
 		return true
 	}
-
+	// 检测是否为所有者
 	if owner == account.ID {
 		return true
 	}

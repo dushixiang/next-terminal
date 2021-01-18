@@ -6,8 +6,11 @@ import {
     Button,
     Col,
     Divider,
+    Dropdown,
+    Form,
     Input,
     Layout,
+    Menu,
     Modal,
     PageHeader,
     Row,
@@ -21,9 +24,18 @@ import qs from "qs";
 import UserModal from "./UserModal";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
+import {
+    DeleteOutlined,
+    DownOutlined,
+    ExclamationCircleOutlined,
+    LockOutlined,
+    PlusOutlined,
+    SyncOutlined,
+    UndoOutlined
+} from '@ant-design/icons';
 import Logout from "./Logout";
 import UserShareAsset from "./UserShareAsset";
+import {hasPermission} from "../../service/permission";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -45,6 +57,7 @@ class User extends Component {
 
     inputRefOfNickname = React.createRef();
     inputRefOfUsername = React.createRef();
+    changePasswordFormRef = React.createRef()
 
     state = {
         items: [],
@@ -60,7 +73,10 @@ class User extends Component {
         model: null,
         selectedRowKeys: [],
         delBtnLoading: false,
-        assetVisible: false
+        assetVisible: false,
+        changePasswordVisible: false,
+        changePasswordConfirmLoading: false,
+        selectedRow: {}
     };
 
     componentDidMount() {
@@ -246,6 +262,24 @@ class User extends Component {
         })
     }
 
+    handleChangePassword = async (values) => {
+        this.setState({
+            changePasswordConfirmLoading: true
+        })
+
+        let result = await request.post(`/users/${this.state.selectedRow['id']}/change-password?password=${values['password']}`);
+        if (result['code'] === 1) {
+            message.success('操作成功', 3);
+        } else {
+            message.error(result['message'], 10);
+        }
+
+        this.setState({
+            changePasswordConfirmLoading: false,
+            changePasswordVisible: false
+        })
+    }
+
     render() {
 
         const columns = [{
@@ -294,7 +328,7 @@ class User extends Component {
                 }
             }
         }, {
-            title: '共享资产',
+            title: '授权资产',
             dataIndex: 'sharerAssetCount',
             key: 'sharerAssetCount',
             render: (text, record, index) => {
@@ -315,13 +349,56 @@ class User extends Component {
                 key: 'action',
                 render: (text, record) => {
 
+                    const menu = (
+                        <Menu>
+                            <Menu.Item key="1">
+                                <Button type="text" size='small'
+                                        onClick={() => {
+                                            this.setState({
+                                                changePasswordVisible: true,
+                                                selectedRow: record
+                                            })
+                                        }}>修改密码</Button>
+                            </Menu.Item>
+
+                            <Menu.Item key="2">
+                                <Button type="text" size='small'
+                                        onClick={() => {
+                                            confirm({
+                                                title: '您确定要重置此用户的双因素认证吗?',
+                                                content: record['name'],
+                                                okText: '确定',
+                                                cancelText: '取消',
+                                                onOk: async () => {
+                                                    let result = await request.post(`/users/${record['id']}/reset-totp`);
+                                                    if (result['code'] === 1) {
+                                                        message.success('操作成功', 3);
+                                                    } else {
+                                                        message.error(result['message'], 10);
+                                                    }
+                                                }
+                                            });
+                                        }}>重置双因素认证</Button>
+                            </Menu.Item>
+
+                            <Menu.Divider/>
+                            <Menu.Item key="5">
+                                <Button type="text" size='small' danger
+                                        disabled={!hasPermission(record['owner'])}
+                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            </Menu.Item>
+                        </Menu>
+                    );
 
                     return (
                         <div>
                             <Button type="link" size='small'
                                     onClick={() => this.showModal('更新用户', record)}>编辑</Button>
-                            <Button type="link" size='small'
-                                    onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                            <Dropdown overlay={menu}>
+                                <Button type="link" size='small'>
+                                    更多 <DownOutlined/>
+                                </Button>
+                            </Dropdown>
                         </div>
                     )
                 },
@@ -511,7 +588,7 @@ class User extends Component {
 
                     <Modal
                         width={window.innerWidth * 0.8}
-                        title='已共享资产'
+                        title='已授权资产'
                         visible={this.state.assetVisible}
                         maskClosable={false}
                         destroyOnClose={true}
@@ -528,6 +605,37 @@ class User extends Component {
                             owner={this.state.owner}
                         />
                     </Modal>
+
+                    {
+                        this.state.changePasswordVisible ?
+                            <Modal title="修改密码" visible={this.state.changePasswordVisible}
+                                   confirmLoading={this.state.changePasswordConfirmLoading}
+                                   onOk={() => {
+                                       this.changePasswordFormRef.current
+                                           .validateFields()
+                                           .then(values => {
+                                               this.changePasswordFormRef.current.resetFields();
+                                               this.handleChangePassword(values);
+                                           })
+                                           .catch(info => {
+
+                                           });
+                                   }}
+                                   onCancel={() => {
+                                       this.setState({
+                                           changePasswordVisible: false
+                                       })
+                                   }}>
+
+                                <Form ref={this.changePasswordFormRef}>
+
+                                    <Form.Item name='password' rules={[{required: true, message: '请输入新密码'}]}>
+                                        <Input prefix={<LockOutlined/>} placeholder="请输入新密码"/>
+                                    </Form.Item>
+                                </Form>
+                            </Modal> : undefined
+                    }
+
                 </Content>
             </>
         );

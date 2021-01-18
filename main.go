@@ -132,7 +132,7 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.Property{}); err != nil {
 		return err
 	}
-	if err := global.DB.AutoMigrate(&model.Resource{}); err != nil {
+	if err := global.DB.AutoMigrate(&model.ResourceSharer{}); err != nil {
 		return err
 	}
 	if err := global.DB.AutoMigrate(&model.UserGroup{}); err != nil {

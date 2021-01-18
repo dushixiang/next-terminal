@@ -278,7 +278,7 @@ class Credential extends Component {
         }
 
         const items = result['data']['items'].map(item => {
-            return {'key': item['id'], ...item}
+            return {'key': item['id'], 'disabled': false, ...item}
         })
 
         this.setState({
@@ -294,7 +294,7 @@ class Credential extends Component {
 
     handleShowSharer = async (record) => {
         let r1 = this.handleSearchByNickname('');
-        let r2 = request.get(`/resources/${record['id']}/assign`);
+        let r2 = request.get(`/resource-sharers/sharers?resourceId=${record['id']}`);
 
         await r1;
         let result = await r2;
@@ -306,10 +306,20 @@ class Credential extends Component {
             selectedSharers = result['data'];
         }
 
+        let users = this.state.users;
+        users = users.map(item => {
+            let disabled = false;
+            if (record['owner'] === item['id']) {
+                disabled = true;
+            }
+            return {...item, 'disabled': disabled}
+        });
+
         this.setState({
             selectedSharers: selectedSharers,
             selected: record,
-            changeSharerModalVisible: true
+            changeSharerModalVisible: true,
+            users: users
         })
     }
 
@@ -573,7 +583,8 @@ class Credential extends Component {
                             : null
                     }
 
-                    <Modal title={<text>更换资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的所有者</text>}
+                    <Modal title={<Text>更换资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的所有者
+                    </Text>}
                            visible={this.state.changeOwnerModalVisible}
                            confirmLoading={this.state.changeOwnerConfirmLoading}
                            onOk={() => {
@@ -627,53 +638,63 @@ class Credential extends Component {
                         </Form>
                     </Modal>
 
-                    <Modal title={<text>更新资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的授权人</text>}
-                           visible={this.state.changeSharerModalVisible}
-                           confirmLoading={this.state.changeSharerConfirmLoading}
-                           onOk={async () => {
-                               this.setState({
-                                   changeSharerConfirmLoading: true
-                               });
+                    {
+                        this.state.changeSharerModalVisible ?
+                            <Modal title={<Text>更新资源「<strong
+                                style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的授权人
+                            </Text>}
+                                   visible={this.state.changeSharerModalVisible}
+                                   confirmLoading={this.state.changeSharerConfirmLoading}
+                                   onOk={async () => {
+                                       this.setState({
+                                           changeSharerConfirmLoading: true
+                                       });
 
-                               let changeSharerModalVisible = false;
+                                       let changeSharerModalVisible = false;
 
-                               let result = await request.post(`/resources/${this.state.selected['id']}/assign?type=credential&userIds=${this.state.selectedSharers.join(',')}`);
-                               if (result['code'] === 1) {
-                                   message.success('操作成功');
-                                   this.loadTableData();
-                               } else {
-                                   message.error(result['message'], 10);
-                                   changeSharerModalVisible = true;
-                               }
+                                       let result = await request.post(`/resource-sharers/overwrite-sharers`, {
+                                           resourceId: this.state.selected['id'],
+                                           resourceType: 'credential',
+                                           userIds: this.state.selectedSharers
+                                       });
+                                       if (result['code'] === 1) {
+                                           message.success('操作成功');
+                                           this.loadTableData();
+                                       } else {
+                                           message.error(result['message'], 10);
+                                           changeSharerModalVisible = true;
+                                       }
 
-                               this.setState({
-                                   changeSharerConfirmLoading: false,
-                                   changeSharerModalVisible: changeSharerModalVisible
-                               })
-                           }}
-                           onCancel={() => {
-                               this.setState({
-                                   changeSharerModalVisible: false
-                               })
-                           }}
-                           okButtonProps={{disabled: !hasPermission(this.state.selected['owner'])}}
-                    >
+                                       this.setState({
+                                           changeSharerConfirmLoading: false,
+                                           changeSharerModalVisible: changeSharerModalVisible
+                                       })
+                                   }}
+                                   onCancel={() => {
+                                       this.setState({
+                                           changeSharerModalVisible: false
+                                       })
+                                   }}
+                                   okButtonProps={{disabled: !hasPermission(this.state.selected['owner'])}}
+                            >
 
-                        <Transfer
-                            dataSource={this.state.users}
-                            disabled={!hasPermission(this.state.selected['owner'])}
-                            showSearch
-                            titles={['未授权', '已授权']}
-                            operations={['授权', '移除']}
-                            listStyle={{
-                                width: 250,
-                                height: 300,
-                            }}
-                            targetKeys={this.state.selectedSharers}
-                            onChange={this.handleSharersChange}
-                            render={item => `${item.nickname}`}
-                        />
-                    </Modal>
+                                <Transfer
+                                    dataSource={this.state.users}
+                                    disabled={!hasPermission(this.state.selected['owner'])}
+                                    showSearch
+                                    titles={['未授权', '已授权']}
+                                    operations={['授权', '移除']}
+                                    listStyle={{
+                                        width: 250,
+                                        height: 300,
+                                    }}
+                                    targetKeys={this.state.selectedSharers}
+                                    onChange={this.handleSharersChange}
+                                    render={item => `${item.nickname}`}
+                                />
+                            </Modal> : undefined
+                    }
+
                 </Content>
             </>
         );

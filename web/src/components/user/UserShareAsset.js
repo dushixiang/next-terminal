@@ -233,7 +233,7 @@ class UserShareAsset extends Component {
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
                             <Col span={8} key={1}>
-                                <Title level={3}>共享资产列表</Title>
+                                <Title level={3}>授权资产列表</Title>
                             </Col>
                             <Col span={16} key={2} style={{textAlign: 'right'}}>
                                 <Space>
@@ -284,7 +284,7 @@ class UserShareAsset extends Component {
 
                                     <Divider type="vertical"/>
 
-                                    <Tooltip title="新增">
+                                    <Tooltip title="添加授权资产">
                                         <Button type="dashed" icon={<PlusOutlined/>}
                                                 onClick={() => {
                                                     this.setState({
@@ -303,20 +303,20 @@ class UserShareAsset extends Component {
                                         </Button>
                                     </Tooltip>
 
-                                    <Tooltip title="移除共享">
+                                    <Tooltip title="移除授权资产">
                                         <Button type="dashed" danger disabled={!hasSelected} icon={<DeleteOutlined/>}
                                                 loading={this.state.delBtnLoading}
                                                 onClick={() => {
                                                     const content = <div>
                                                         您确定要移除选中的<Text style={{color: '#1890FF'}}
-                                                                       strong>{this.state.selectedRowKeys.length}</Text>条共享记录吗？
+                                                                       strong>{this.state.selectedRowKeys.length}</Text>条授权记录吗？
                                                     </div>;
                                                     confirm({
                                                         icon: <ExclamationCircleOutlined/>,
                                                         content: content,
                                                         onOk: async () => {
                                                             let userId = this.state.queryParams.sharer;
-                                                            let result = await request.post(`/resources/remove`, {
+                                                            let result = await request.post(`/resource-sharers/remove-resources`, {
                                                                 userId: userId,
                                                                 resourceType: 'asset',
                                                                 resourceIds: this.state.selectedRowKeys
@@ -363,7 +363,7 @@ class UserShareAsset extends Component {
 
                     {this.state.chooseAssetVisible ?
                         <Drawer
-                            title="添加资产"
+                            title="添加授权资产"
                             placement="right"
                             closable={true}
                             onClose={() => {
