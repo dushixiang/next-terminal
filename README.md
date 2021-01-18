@@ -1,4 +1,5 @@
 # Next Terminal
+
 你的下一个终端。
 
 ![Docker image](https://github.com/dushixiang/next-terminal/workflows/Docker%20image/badge.svg?branch=master)
@@ -30,6 +31,7 @@ admin/admin
 - [使用docker安装](docs/install-docker.MD)
 - [原生安装](docs/install-naive.MD)
 
+默认账号密码为 admin/admin
 
 ## 相关截图
 
@@ -57,15 +59,14 @@ ssh
 
 ![批量执行命令](./screenshot/command.png)
 
-
 ## 联系方式
 
 - 邮箱 helloworld1024@foxmail.com
-  
+
 - 微信群
 
   <img src="screenshot/wx1.png" width="300"  height="auto"/>
-  
+
 - 微信号（如果群失效，请添加微信，备注"加入next-terminal交流群"）
 
   <img src="screenshot/wx2.png" width="300"  height="auto"/>

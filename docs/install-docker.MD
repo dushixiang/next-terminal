@@ -9,6 +9,15 @@ docker run -d \
   --restart always ghcr.io/dushixiang/next-terminal:latest
 ```
 
+或者从Docker Hub拉取
+
+```shell
+docker run -d \
+  -p 8088:8088 \
+  --name next-terminal \
+  --restart always dushixiang/next-terminal:latest
+```
+
 ### 使用`mysql`存储数据
 
 ```shell
@@ -24,7 +33,23 @@ docker run -d \
   --restart always ghcr.io/dushixiang/next-terminal:latest
 ```
 
+或者从Docker Hub拉取
+
+```shell
+docker run -d \
+  -p 8088:8088 \
+  -e DB=mysql \
+  -e MYSQL_HOSTNAME=172.1.0.1 \
+  -e MYSQL_PORT=3306 \
+  -e MYSQL_USERNAME=root \
+  -e MYSQL_PASSWORD=mysql \
+  -e MYSQL_DATABASE=next_terminal \
+  --name next-terminal \
+  --restart always dushixiang/next-terminal:latest
+```
+
 ### 注意事项 ⚠️
+
 1. docker连接宿主机器上的`mysql`时连接地址不是`127.0.0.1`，请使用`ipconfig`或`ifconfig`确认宿主机器的IP。
 2. 使用其他容器内部的`mysql`时请使用`--link <some-mysql-name>`，环境变量参数为`-e MYSQL_HOSTNAME=<some-mysql-name>`
 
@@ -42,6 +67,7 @@ docker run -d \
 | SERVER_ADDR  |  服务器监听地址，默认`0.0.0.0:8088` |
 
 ## 其他
+
 `next-terminal` 使用了`supervisord`来管理服务，因此相关日志在 `/var/log/supervisor/next-terminal-*.log`
 
 程序安装目录地址为：`/usr/local/next-terminal`
