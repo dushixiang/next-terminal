@@ -24,7 +24,7 @@ Next Terminal基于Apache Guacamole开发，使用到了guacd服务。
 
 https://next-terminal.typesafe.cn/
 
-admin/admin
+test/test
 
 ## 快速安装
 
