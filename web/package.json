@@ -12,6 +12,7 @@
     "react": "^16.14.0",
     "react-contexify": "^4.1.1",
     "react-dom": "^16.14.0",
+    "react-draggable": "^4.4.3",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.0",
