@@ -7,8 +7,10 @@ import {
     Card,
     Col,
     Drawer,
+    Dropdown,
     Form,
     Input,
+    Menu,
     message,
     Modal,
     Row,
@@ -21,22 +23,26 @@ import qs from "qs";
 import request from "../../common/request";
 import {server, wsServer} from "../../common/constants";
 import {
+    AppstoreTwoTone,
     CloudDownloadOutlined,
     CloudUploadOutlined,
+    CopyOutlined,
     DeleteOutlined,
+    DesktopOutlined,
+    FileZipOutlined,
     FolderAddOutlined,
     LoadingOutlined,
     ReloadOutlined,
     UploadOutlined
 } from '@ant-design/icons';
-import CopyOutlined from "@ant-design/icons/lib/icons/CopyOutlined";
-import FolderOpenOutlined from "@ant-design/icons/lib/icons/FolderOpenOutlined";
 import Upload from "antd/es/upload";
 import {download, getToken} from "../../utils/utils";
 import './Access.css'
+import Draggable from 'react-draggable';
 
 const {TextArea} = Input;
 const {DirectoryTree} = Tree;
+const {SubMenu} = Menu;
 
 const STATE_IDLE = 0;
 const STATE_CONNECTING = 1;
@@ -339,6 +345,7 @@ class Access extends Component {
             return true;
         }
 
+        console.log(keysym)
         this.state.client.sendKeyEvent(1, keysym);
         if (keysym === 65288) {
             return false;
@@ -763,6 +770,15 @@ class Access extends Component {
         });
     }
 
+    sendCombinationKey = (keys) => {
+        for (let i = 0; i < keys.length; i++) {
+            this.state.client.sendKeyEvent(1, keys[i]);
+        }
+        for (let j = 0; j < keys.length; j++) {
+            this.state.client.sendKeyEvent(0, keys[j]);
+        }
+    }
+
     render() {
 
         const title = (
@@ -797,6 +813,23 @@ class Access extends Component {
                     </Tooltip>
                 </Space>
             </Row>
+        );
+
+        const menu = (
+            <Menu>
+                <Menu.Item key="1" icon={<CopyOutlined/>} onClick={this.showClipboard}>
+                    剪贴板
+                </Menu.Item>
+                <Menu.Item key="2" icon={<FileZipOutlined/>} onClick={this.showFileSystem}>
+                    文件管理
+                </Menu.Item>
+                <SubMenu title="发送快捷键" icon={<DesktopOutlined/>}>
+                    <Menu.Item
+                        onClick={() => this.sendCombinationKey(['65507', '65513', '65535'])}>Ctrl+Alt+Delete</Menu.Item>
+                    <Menu.Item
+                        onClick={() => this.sendCombinationKey(['65507', '65513', '65288'])}>Ctrl+Alt+Backspace</Menu.Item>
+                </SubMenu>
+            </Menu>
         );
 
         return (
@@ -850,32 +883,29 @@ class Access extends Component {
                     </Upload>
                 </Modal>
 
-                <Affix style={{position: 'absolute', top: 50, right: 100}}>
-                    <Button
-                        shape="circle"
-                        icon={<CopyOutlined/>}
-                        onClick={() => {
-                            this.showClipboard();
-                        }}
-                    >
-                    </Button>
 
-                </Affix>
+                <Draggable>
+                    <Affix style={{position: 'absolute', top: 50, right: 100}}>
+                        <Dropdown overlay={menu} trigger={['click']} placement="bottomLeft">
+                            <Button icon={<AppstoreTwoTone/>}/>
+                        </Dropdown>
+                    </Affix>
+                </Draggable>
 
-                {
-                    this.state.protocol === 'ssh' || this.state.protocol === 'rdp' ?
-                        <Affix style={{position: 'absolute', top: 50, right: 50}}>
-                            <Button
-                                shape="circle"
-                                icon={<FolderOpenOutlined/>}
-                                onClick={() => {
-                                    this.showFileSystem();
-                                }}
-                            >
-                            </Button>
-                        </Affix>
-                        : null
-                }
+                {/*{*/}
+                {/*    this.state.protocol === 'ssh' || this.state.protocol === 'rdp' ?*/}
+                {/*        <Affix style={{position: 'absolute', top: 50, right: 50}}>*/}
+                {/*            <Button*/}
+                {/*                shape="circle"*/}
+                {/*                icon={<FolderOpenOutlined/>}*/}
+                {/*                onClick={() => {*/}
+                {/*                    this.showFileSystem();*/}
+                {/*                }}*/}
+                {/*            >*/}
+                {/*            </Button>*/}
+                {/*        </Affix>*/}
+                {/*        : null*/}
+                {/*}*/}
 
 
                 <Drawer

@@ -281,10 +281,8 @@ class OfflineSession extends Component {
                 key: 'action',
                 render: (text, record) => {
                     let disabled = true;
-                    let color = '#d9d9d9'
                     if (record['recording'] && record['recording'] === '1') {
                         disabled = false
-                        color = ''
                     }
 
                     return (

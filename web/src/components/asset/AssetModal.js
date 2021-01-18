@@ -1,6 +1,5 @@
 import React, {useState} from 'react';
 import {Form, Input, InputNumber, Modal, Radio, Select, Tooltip} from "antd/lib/index";
-import {isEmpty} from "../../utils/utils";
 
 const {TextArea} = Input;
 const {Option} = Select;
