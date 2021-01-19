@@ -65,7 +65,7 @@ func FindAssetByConditions(protocol string, account User) (o []Asset, err error)
 
 func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account User, owner, sharer string) (o []AssetVo, total int64, err error) {
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
-	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id")
+	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 
 	if TypeUser == account.Type {
 		owner := account.ID

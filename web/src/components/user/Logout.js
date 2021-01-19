@@ -27,7 +27,7 @@ class Logout extends Component {
                 >
                     <Button key="login-btn" type="dashed">
                         退出登录
-                    </Button>,
+                    </Button>
                 </Popconfirm>
 
             </div>

@@ -54,7 +54,7 @@ func FindAllCredential(account User) (o []CredentialSimpleVo, err error) {
 
 func FindPageCredential(pageIndex, pageSize int, name string, account User) (o []CredentialVo, total int64, err error) {
 	db := global.DB.Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on credentials.owner = users.id").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id").Group("credentials.id")
-	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id")
+	dbCounter := global.DB.Table("credentials").Select("DISTINCT credentials.id").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id").Group("credentials.id")
 
 	if TypeUser == account.Type {
 		owner := account.ID

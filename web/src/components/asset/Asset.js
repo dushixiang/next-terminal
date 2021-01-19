@@ -171,10 +171,6 @@ class Asset extends Component {
     };
 
     handleTagsChange = tags => {
-        console.log(tags)
-        // this.setState({
-        //     tags: tags
-        // })
         let query = {
             ...this.state.queryParams,
             'pageIndex': 1,
@@ -248,7 +244,7 @@ class Asset extends Component {
         }
 
         if (asset['tags'] && typeof (asset['tags']) === 'string') {
-            if (asset['tags'] === '-') {
+            if (asset['tags'] === '' || asset['tags'] === '-') {
                 asset['tags'] = [];
             } else {
                 asset['tags'] = asset['tags'].split(',');
