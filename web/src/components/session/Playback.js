@@ -1,8 +1,21 @@
 import React, {Component} from 'react';
 import Guacamole from "guacamole-common-js";
 import {server} from "../../common/constants";
+import {Button, Col, Row, Slider, Typography} from "antd";
+import {PauseCircleOutlined, PlayCircleOutlined} from '@ant-design/icons';
+import {Tooltip} from "antd/lib/index";
+
+const {Text} = Typography;
 
 class Playback extends Component {
+
+    state = {
+        playPauseIcon: <PlayCircleOutlined/>,
+        playPauseIconTitle: '播放',
+        recording: undefined,
+        percent: 0,
+        max: 0,
+    }
 
     componentDidMount() {
         let sessionId = this.props.sessionId;
@@ -16,12 +29,7 @@ class Playback extends Component {
     initPlayer(sessionId) {
         var RECORDING_URL = `${server}/sessions/${sessionId}/recording`;
 
-        var player = document.getElementById('player');
         var display = document.getElementById('display');
-        var playPause = document.getElementById('play-pause');
-        var position = document.getElementById('position');
-        var positionSlider = document.getElementById('position-slider');
-        var duration = document.getElementById('duration');
 
         var tunnel = new Guacamole.StaticHTTPTunnel(RECORDING_URL);
         var recording = new Guacamole.SessionRecording(tunnel);
@@ -87,22 +95,25 @@ class Playback extends Component {
         recording.connect();
 
         // If playing, the play/pause button should read "Pause"
-        recording.onplay = function () {
-            playPause.textContent = 'Pause';
+        recording.onplay = () => {
+            // 暂停
+            this.setState({
+                playPauseIcon: <PauseCircleOutlined/>,
+                playPauseIconTitle: '暂停',
+            })
         };
 
         // If paused, the play/pause button should read "Play"
-        recording.onpause = function () {
-            playPause.textContent = 'Play';
+        recording.onpause = () => {
+            // 播放
+            this.setState({
+                playPauseIcon: <PlayCircleOutlined/>,
+                playPauseIconTitle: '播放',
+            })
         };
 
         // Toggle play/pause when display or button are clicked
-        display.onclick = playPause.onclick = function () {
-            if (!recording.isPlaying())
-                recording.play();
-            else
-                recording.pause();
-        };
+        display.onclick = this.handlePlayPause;
 
         // Fit display within containing div
         recordingDisplay.onresize = function displayResized(width, height) {
@@ -113,36 +124,59 @@ class Playback extends Component {
 
             // Scale display to fit width of container
             recordingDisplay.scale(display.offsetWidth / width);
-
         };
 
-        // Update slider and status when playback position changes
-        recording.onseek = function positionChanged(millis) {
-            position.textContent = formatTime(millis);
-            positionSlider.value = millis;
+        recording.onseek = (millis) => {
+            this.setState({
+                percent: millis,
+                position: formatTime(millis)
+            })
         };
 
-        // Update slider and status when duration changes
-        recording.onprogress = function durationChanged(millis) {
-            duration.textContent = formatTime(millis);
-            positionSlider.max = millis;
+        recording.onprogress = (millis) => {
+            this.setState({
+                max: millis,
+                duration: formatTime(millis)
+            })
         };
 
-        // Seek within recording if slider is moved
-        positionSlider.onchange = function sliderPositionChanged() {
+        this.setState({
+            recording: recording
+        })
+    }
 
+    handlePlayPause = () => {
+        let recording = this.state.recording;
+        if (recording) {
+            if (this.state.percent === this.state.max) {
+                // 重播
+                console.log('重新播放')
+                this.setState({
+                    percent: 0
+                }, () => {
+                    recording.seek(0, () => {
+                        recording.play();
+                    });
+                });
+            }
+
+            if (!recording.isPlaying()) {
+                recording.play();
+            } else {
+                recording.pause();
+            }
+        }
+    }
+
+    handleProgressChange = (value) => {
+        let recording = this.state.recording;
+        if (recording) {
             // Request seek
-            recording.seek(positionSlider.value, function seekComplete() {
-
-                // Seek has completed
-                player.className = '';
-
+            recording.seek(value, () => {
+                console.log('complete');
             });
+        }
 
-            // Seek is in progress
-            player.className = 'seeking';
-
-        };
     }
 
     render() {
@@ -157,14 +191,21 @@ class Playback extends Component {
                         </div>
                     </div>
 
-                    <div className="controls">
-                        <button id="play-pause">Play</button>
-                        <input id="position-slider" type="range"/>
-                        <span id="position">00:00</span>
-                        <span>/</span>
-                        <span id="duration">00:00</span>
-                    </div>
-
+                    <Row justify="space-around" align="middle" style={{marginLeft: 7, marginRight: 7, marginTop: 3}}
+                         gutter={[5, 5]}>
+                        <Col flex="none">
+                            <Tooltip title={this.state.playPauseIconTitle}>
+                                <Button size='small' onClick={this.handlePlayPause} icon={this.state.playPauseIcon}/>
+                            </Tooltip>
+                        </Col>
+                        <Col flex="auto">
+                            <Slider value={this.state.percent} max={this.state.max} tooltipVisible={false}
+                                    onChange={this.handleProgressChange}/>
+                        </Col>
+                        <Col flex='none'>
+                            <Text>{this.state.position}</Text>/ <Text>{this.state.duration}</Text>
+                        </Col>
+                    </Row>
                 </div>
             </div>
         );

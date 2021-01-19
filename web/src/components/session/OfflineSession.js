@@ -475,6 +475,7 @@ class OfflineSession extends Component {
                     />
 
                     <Modal
+                        className='monitor'
                         title="会话回放"
                         centered
                         visible={this.state.playbackVisible}
