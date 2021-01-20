@@ -30,3 +30,11 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/next-terminal -f Dockerfile .
           docker push ghcr.io/${{ github.repository_owner }}/next-terminal
+      
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: ${{ github.repository_owner }}/next-terminal
+          tag_with_ref: true
