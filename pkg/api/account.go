@@ -13,7 +13,7 @@ import (
 
 const (
 	RememberEffectiveTime    = time.Hour * time.Duration(24*14)
-	NotRememberEffectiveTime = time.Minute * time.Duration(2)
+	NotRememberEffectiveTime = time.Hour * time.Duration(2)
 )
 
 type LoginAccount struct {
