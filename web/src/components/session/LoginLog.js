@@ -13,17 +13,14 @@ import {
     Select,
     Space,
     Table,
-    Tag,
     Tooltip,
     Typography
 } from "antd";
 import qs from "qs";
 import request from "../../common/request";
-import {differTime, formatDate, itemRender} from "../../utils/utils";
-import Playback from "./Playback";
+import {formatDate, isEmpty, itemRender} from "../../utils/utils";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
-import {PROTOCOL_COLORS} from "../../common/constants";
 import Logout from "../user/Logout";
 
 const confirm = Modal.confirm;
@@ -36,12 +33,12 @@ const routes = [
         breadcrumbName: '首页',
     },
     {
-        path: 'offlineSession',
-        breadcrumbName: '离线会话',
+        path: 'loginLog',
+        breadcrumbName: '登录日志',
     }
 ];
 
-class OfflineSession extends Component {
+class LoginLog extends Component {
 
     inputRefOfClientIp = React.createRef();
 
@@ -51,30 +48,21 @@ class OfflineSession extends Component {
         queryParams: {
             pageIndex: 1,
             pageSize: 10,
-            protocol: '',
             userId: undefined,
-            assetId: undefined
         },
         loading: false,
-        playbackVisible: false,
-        playbackSessionId: null,
-        videoPlayerVisible: false,
-        videoPlayerSource: null,
         selectedRowKeys: [],
         delBtnLoading: false,
         users: [],
-        assets: [],
     };
 
     componentDidMount() {
         this.loadTableData();
         this.handleSearchByNickname('');
-        this.handleSearchByAssetName('');
     }
 
     async loadTableData(queryParams) {
         queryParams = queryParams || this.state.queryParams;
-        queryParams['status'] = 'disconnected';
 
         this.setState({
             queryParams: queryParams,
@@ -90,7 +78,7 @@ class OfflineSession extends Component {
         };
 
         try {
-            let result = await request.get('/sessions/paging?' + paramsStr);
+            let result = await request.get('/login-logs/paging?' + paramsStr);
             if (result.code === 1) {
                 data = result.data;
             } else {
@@ -121,20 +109,6 @@ class OfflineSession extends Component {
         });
 
         this.loadTableData(queryParams)
-    };
-
-    showPlayback = (sessionId) => {
-        this.setState({
-            playbackVisible: true,
-            playbackSessionId: sessionId
-        });
-    };
-
-    hidePlayback = () => {
-        this.setState({
-            playbackVisible: false,
-            playbackSessionId: null
-        });
     };
 
     handleSearchByClientIp = clientIp => {
@@ -179,34 +153,12 @@ class OfflineSession extends Component {
         this.loadTableData(query);
     }
 
-    handleSearchByAssetName = async assetName => {
-        const result = await request.get(`/assets/paging?pageIndex=1&pageSize=100&name=${assetName}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-
-        this.setState({
-            assets: result.data.items
-        })
-    }
-
-    handleChangeByAssetId = (assetId, options) => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'assetId': assetId,
-        }
-        this.loadTableData(query);
-    }
-
     batchDelete = async () => {
         this.setState({
             delBtnLoading: true
         })
         try {
-            let result = await request.delete('/sessions/' + this.state.selectedRowKeys.join(','));
+            let result = await request.delete('/login-logs/' + this.state.selectedRowKeys.join(','));
             if (result.code === 1) {
                 message.success('操作成功', 3);
                 this.setState({
@@ -233,67 +185,56 @@ class OfflineSession extends Component {
                 return index + 1;
             }
         }, {
+            title: '用户昵称',
+            dataIndex: 'userName',
+            key: 'userName'
+        }, {
             title: '来源IP',
             dataIndex: 'clientIp',
             key: 'clientIp'
         }, {
-            title: '用户昵称',
-            dataIndex: 'creatorName',
-            key: 'creatorName'
-        }, {
-            title: '资产名称',
-            dataIndex: 'assetName',
-            key: 'assetName'
-        }, {
-            title: '远程连接',
-            dataIndex: 'access',
-            key: 'access',
+            title: '浏览器',
+            dataIndex: 'clientUserAgent',
+            key: 'clientUserAgent',
             render: (text, record) => {
-
-                return `${record.username}@${record.ip}:${record.port}`;
+                if (isEmpty(text)) {
+                    return '未知';
+                }
+                return (
+                    <Tooltip placement="topLeft" title={text}>
+                        {text.split(' ')[0]}
+                    </Tooltip>
+                )
             }
         }, {
-            title: '连接协议',
-            dataIndex: 'protocol',
-            key: 'protocol',
-            render: (text, record) => {
-
-                return (<Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>);
-            }
-        }, {
-            title: '接入时间',
-            dataIndex: 'connectedTime',
-            key: 'connectedTime',
+            title: '登录时间',
+            dataIndex: 'loginTime',
+            key: 'loginTime',
             render: (text, record) => {
 
                 return formatDate(text, 'yyyy-MM-dd hh:mm:ss');
             }
         }, {
-            title: '接入时长',
-            dataIndex: 'connectedTime',
-            key: 'connectedTime',
+            title: '注销时间',
+            dataIndex: 'logoutTime',
+            key: 'logoutTime',
             render: (text, record) => {
-                return differTime(new Date(record['connectedTime']), new Date(record['disconnectedTime']));
+                if (isEmpty(text) || text === '0001-01-01 00:00:00') {
+                    return '';
+                }
+                return text;
             }
         },
             {
                 title: '操作',
                 key: 'action',
                 render: (text, record) => {
-                    let disabled = true;
-                    if (record['recording'] && record['recording'] === '1') {
-                        disabled = false
-                    }
-
                     return (
                         <div>
-                            <Button type="link" size='small'
-                                    disabled={disabled}
-                                    onClick={() => this.showPlayback(record.id)}>回放</Button>
                             <Button type="link" size='small' onClick={() => {
                                 confirm({
-                                    title: '您确定要删除此会话吗?',
-                                    content: '',
+                                    title: '您确定要删除此条登录日志吗?',
+                                    content: '删除用户未注销的登录日志将会强制用户下线',
                                     okText: '确定',
                                     okType: 'danger',
                                     cancelText: '取消',
@@ -303,7 +244,7 @@ class OfflineSession extends Component {
                                 });
 
                                 const del = async (id) => {
-                                    const result = await request.delete(`/sessions/${id}`);
+                                    const result = await request.delete(`/login-logs/${id}`);
                                     if (result.code === 1) {
                                         notification['success']({
                                             message: '提示',
@@ -336,14 +277,12 @@ class OfflineSession extends Component {
 
         const userOptions = this.state.users.map(d => <Select.Option key={d.id}
                                                                      value={d.id}>{d.nickname}</Select.Option>);
-        const assetOptions = this.state.assets.map(d => <Select.Option key={d.id}
-                                                                       value={d.id}>{d.name}</Select.Option>);
 
         return (
             <>
                 <PageHeader
                     className="site-page-header-ghost-wrapper page-herder"
-                    title="离线会话"
+                    title="登录日志"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
@@ -351,7 +290,7 @@ class OfflineSession extends Component {
                     extra={[
                         <Logout key='logout'/>
                     ]}
-                    subTitle="离线会话管理"
+                    subTitle="只有登录成功的才会保存日志"
                 >
                 </PageHeader>
 
@@ -359,7 +298,7 @@ class OfflineSession extends Component {
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
                             <Col span={8} key={1}>
-                                <Title level={3}>离线会话列表</Title>
+                                <Title level={3}>登录日志列表</Title>
                             </Col>
                             <Col span={16} key={2} style={{textAlign: 'right'}}>
                                 <Space>
@@ -381,28 +320,6 @@ class OfflineSession extends Component {
                                         filterOption={false}
                                     >
                                         {userOptions}
-                                    </Select>
-
-                                    <Select
-                                        style={{width: 150}}
-                                        showSearch
-                                        value={this.state.queryParams.assetId}
-                                        placeholder='资产名称'
-                                        onSearch={this.handleSearchByAssetName}
-                                        onChange={this.handleChangeByAssetId}
-                                        filterOption={false}
-                                    >
-                                        {assetOptions}
-                                    </Select>
-
-                                    <Select onChange={this.handleChangeByProtocol}
-                                            value={this.state.queryParams.protocol ? this.state.queryParams.protocol : ''}
-                                            style={{width: 100}}>
-                                        <Select.Option value="">全部协议</Select.Option>
-                                        <Select.Option value="rdp">rdp</Select.Option>
-                                        <Select.Option value="ssh">ssh</Select.Option>
-                                        <Select.Option value="vnc">vnc</Select.Option>
-                                        <Select.Option value="telnet">telnet</Select.Option>
                                     </Select>
 
                                     <Tooltip title='重置查询'>
@@ -473,29 +390,10 @@ class OfflineSession extends Component {
                            }}
                            loading={this.state.loading}
                     />
-
-                    {
-                        this.state.playbackVisible ?
-                            <Modal
-                                className='monitor'
-                                title="会话回放"
-                                centered
-                                visible={this.state.playbackVisible}
-                                onCancel={this.hidePlayback}
-
-                                width={window.innerWidth * 0.8}
-                                footer={null}
-                                destroyOnClose
-                                maskClosable={false}
-                            >
-                                <Playback sessionId={this.state.playbackSessionId}/>
-                            </Modal> : undefined
-                    }
-
                 </Content>
             </>
         );
     }
 }
 
-export default OfflineSession;
+export default LoginLog;

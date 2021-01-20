@@ -126,7 +126,7 @@ mkdir ~/next-terminal & cd ~/next-terminal
 
 下载
 ```shell
-wget https://github.com/dushixiang/next-terminal/releases/download/v0.0.4/next-terminal.tgz
+wget https://github.com/dushixiang/next-terminal/releases/latest/download/next-terminal.tgz
 ```
 
 解压

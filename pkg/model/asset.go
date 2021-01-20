@@ -15,14 +15,14 @@ type Asset struct {
 	AccountType  string         `json:"accountType"`
 	Username     string         `json:"username"`
 	Password     string         `json:"password"`
-	CredentialId string         `json:"credentialId"`
+	CredentialId string         `gorm:"index" json:"credentialId"`
 	PrivateKey   string         `json:"privateKey"`
 	Passphrase   string         `json:"passphrase"`
 	Description  string         `json:"description"`
 	Active       bool           `json:"active"`
 	Created      utils.JsonTime `json:"created"`
 	Tags         string         `json:"tags"`
-	Owner        string         `json:"owner"`
+	Owner        string         `gorm:"index" json:"owner"`
 }
 
 type AssetVo struct {

@@ -53,13 +53,13 @@ func SetupRoutes() *echo.Echo {
 		users.POST("/:id/reset-totp", Admin(UserResetTotpEndpoint))
 	}
 
-	userGroups := e.Group("/user-groups")
+	userGroups := e.Group("/user-groups", Admin)
 	{
-		userGroups.POST("", Admin(UserGroupCreateEndpoint))
-		userGroups.GET("/paging", Admin(UserGroupPagingEndpoint))
-		userGroups.PUT("/:id", Admin(UserGroupUpdateEndpoint))
-		userGroups.DELETE("/:id", Admin(UserGroupDeleteEndpoint))
-		userGroups.GET("/:id", Admin(UserGroupGetEndpoint))
+		userGroups.POST("", UserGroupCreateEndpoint)
+		userGroups.GET("/paging", UserGroupPagingEndpoint)
+		userGroups.PUT("/:id", UserGroupUpdateEndpoint)
+		userGroups.DELETE("/:id", UserGroupDeleteEndpoint)
+		userGroups.GET("/:id", UserGroupGetEndpoint)
 		//userGroups.POST("/:id/members", UserGroupAddMembersEndpoint)
 		//userGroups.DELETE("/:id/members/:memberId", UserGroupDelMembersEndpoint)
 	}
@@ -123,6 +123,12 @@ func SetupRoutes() *echo.Echo {
 		resourceSharers.POST("/overwrite-sharers", RSOverwriteSharersEndPoint)
 		resourceSharers.POST("/remove-resources", Admin(ResourceRemoveByUserIdAssignEndPoint))
 		resourceSharers.POST("/add-resources", Admin(ResourceAddByUserIdAssignEndPoint))
+	}
+
+	loginLogs := e.Group("login-logs", Admin)
+	{
+		loginLogs.GET("/paging", LoginLogPagingEndpoint)
+		loginLogs.DELETE("/:id", LoginLogDeleteEndpoint)
 	}
 
 	e.GET("/properties", PropertyGetEndpoint)

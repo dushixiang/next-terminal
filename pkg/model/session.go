@@ -19,14 +19,14 @@ type Session struct {
 	IP               string         `json:"ip"`
 	Port             int            `json:"port"`
 	ConnectionId     string         `json:"connectionId"`
-	AssetId          string         `json:"assetId"`
+	AssetId          string         `gorm:"index" json:"assetId"`
 	Username         string         `json:"username"`
 	Password         string         `json:"password"`
-	Creator          string         `json:"creator"`
+	Creator          string         `gorm:"index" json:"creator"`
 	ClientIP         string         `json:"clientIp"`
 	Width            int            `json:"width"`
 	Height           int            `json:"height"`
-	Status           string         `json:"status"`
+	Status           string         `gorm:"index" json:"status"`
 	Recording        string         `json:"recording"`
 	PrivateKey       string         `json:"privateKey"`
 	Passphrase       string         `json:"passphrase"`

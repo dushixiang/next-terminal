@@ -8,10 +8,11 @@ import (
 )
 
 type ResourceSharer struct {
-	ID           string `gorm:"primary_key" json:"name"`
-	ResourceId   string `json:"resourceId"`
-	ResourceType string `json:"resourceType"`
-	UserId       string `json:"userId"`
+	ID           string `gorm:"primary_key" json:"id"`
+	ResourceId   string `gorm:"index" json:"resourceId"`
+	ResourceType string `gorm:"index" json:"resourceType"`
+	UserId       string `gorm:"index" json:"userId"`
+	UserGroupId  string `gorm:"index" json:"userGroupId"`
 }
 
 func (r *ResourceSharer) TableName() string {

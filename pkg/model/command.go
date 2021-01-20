@@ -10,7 +10,7 @@ type Command struct {
 	Name    string         `json:"name"`
 	Content string         `json:"content"`
 	Created utils.JsonTime `json:"created"`
-	Owner   string         `json:"owner"`
+	Owner   string         `gorm:"index" json:"owner"`
 }
 
 type CommandVo struct {

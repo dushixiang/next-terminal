@@ -11,6 +11,11 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+const (
+	RememberEffectiveTime    = time.Hour * time.Duration(24*14)
+	NotRememberEffectiveTime = time.Minute * time.Duration(2)
+)
+
 type LoginAccount struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -53,7 +58,16 @@ func LoginEndpoint(c echo.Context) error {
 		return Fail(c, 0, "")
 	}
 
-	token := strings.Join([]string{utils.UUID(), utils.UUID(), utils.UUID(), utils.UUID()}, "")
+	token, err := Login(c, loginAccount, user)
+	if err != nil {
+		return err
+	}
+
+	return Success(c, token)
+}
+
+func Login(c echo.Context, loginAccount LoginAccount, user model.User) (token string, err error) {
+	token = strings.Join([]string{utils.UUID(), utils.UUID(), utils.UUID(), utils.UUID()}, "")
 
 	authorization := Authorization{
 		Token:    token,
@@ -63,14 +77,28 @@ func LoginEndpoint(c echo.Context) error {
 
 	if authorization.Remember {
 		// 记住登录有效期两周
-		global.Cache.Set(token, authorization, time.Hour*time.Duration(24*14))
+		global.Cache.Set(token, authorization, RememberEffectiveTime)
 	} else {
-		global.Cache.Set(token, authorization, time.Hour*time.Duration(2))
+		global.Cache.Set(token, authorization, NotRememberEffectiveTime)
 	}
 
-	model.UpdateUserById(&model.User{Online: true}, user.ID)
+	// 保存登录日志
+	loginLog := model.LoginLog{
+		ID:              token,
+		UserId:          user.ID,
+		ClientIP:        c.RealIP(),
+		ClientUserAgent: c.Request().UserAgent(),
+		LoginTime:       utils.NowJsonTime(),
+		Remember:        authorization.Remember,
+	}
 
-	return Success(c, token)
+	if model.CreateNewLoginLog(&loginLog) != nil {
+		return "", err
+	}
+
+	// 修改登录状态
+	model.UpdateUserById(&model.User{Online: true}, user.ID)
+	return token, nil
 }
 
 func loginWithTotpEndpoint(c echo.Context) error {
@@ -92,22 +120,10 @@ func loginWithTotpEndpoint(c echo.Context) error {
 		return Fail(c, -2, "您的TOTP不匹配")
 	}
 
-	token := strings.Join([]string{utils.UUID(), utils.UUID(), utils.UUID(), utils.UUID()}, "")
-
-	authorization := Authorization{
-		Token:    token,
-		Remember: loginAccount.Remember,
-		User:     user,
+	token, err := Login(c, loginAccount, user)
+	if err != nil {
+		return err
 	}
-
-	if authorization.Remember {
-		// 记住登录有效期两周
-		global.Cache.Set(token, authorization, time.Hour*time.Duration(24*14))
-	} else {
-		global.Cache.Set(token, authorization, time.Hour*time.Duration(2))
-	}
-
-	model.UpdateUserById(&model.User{Online: true}, user.ID)
 
 	return Success(c, token)
 }
@@ -115,6 +131,7 @@ func loginWithTotpEndpoint(c echo.Context) error {
 func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
 	global.Cache.Delete(token)
+	model.Logout(token)
 	return Success(c, nil)
 }
 

@@ -4,8 +4,8 @@ import "next-terminal/pkg/global"
 
 type UserGroupMember struct {
 	ID          string `gorm:"primary_key" json:"name"`
-	UserId      string `json:"userId"`
-	UserGroupId string `json:"userGroupId"`
+	UserId      string `gorm:"index" json:"userId"`
+	UserGroupId string `gorm:"index" json:"userGroupId"`
 }
 
 func (r *UserGroupMember) TableName() string {

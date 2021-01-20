@@ -13,7 +13,7 @@ const (
 
 type User struct {
 	ID         string         `gorm:"primary_key" json:"id"`
-	Username   string         `json:"username"`
+	Username   string         `gorm:"index:unique" json:"username"`
 	Password   string         `json:"password"`
 	Nickname   string         `json:"nickname"`
 	TOTPSecret string         `json:"-"`
@@ -24,7 +24,7 @@ type User struct {
 }
 
 type UserVo struct {
-	ID               string         `gorm:"primary_key" json:"id"`
+	ID               string         `json:"id"`
 	Username         string         `json:"username"`
 	Nickname         string         `json:"nickname"`
 	Online           bool           `json:"online"`

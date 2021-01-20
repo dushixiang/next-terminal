@@ -13,7 +13,7 @@ type UserGroup struct {
 }
 
 type UserGroupVo struct {
-	ID          string         `gorm:"primary_key" json:"id"`
+	ID          string         `json:"id"`
 	Name        string         `json:"name"`
 	Created     utils.JsonTime `json:"created"`
 	MemberCount int64          `json:"memberCount"`

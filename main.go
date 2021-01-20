@@ -10,7 +10,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
@@ -22,6 +21,8 @@ import (
 	"strconv"
 	"time"
 )
+
+const Version = "v0.0.9"
 
 func main() {
 	log.Fatal(Run())
@@ -35,12 +36,11 @@ func Run() error {
  /   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |  
 /    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
 \____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
-        \/     \/      \/                     \/            \/        \/     \/      
-
-`)
+        \/     \/      \/                     \/            \/        \/     \/      ` + Version + "\n")
 
 	var err error
 	//logrus.SetReportCaller(true)
+	logrus.SetLevel(logrus.DebugLevel)
 	logrus.SetFormatter(&nested.Formatter{
 		HideKeys:    true,
 		FieldsOrder: []string{"component", "category"},
@@ -70,7 +70,7 @@ func Run() error {
 			global.Config.Mysql.Database,
 		)
 		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
+			//Logger: logger.Default.LogMode(logger.Info),
 		})
 	} else {
 		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{})
@@ -88,8 +88,9 @@ func Run() error {
 	users := model.FindAllUser()
 	if len(users) == 0 {
 
+		initPassword := "admin"
 		var pass []byte
-		if pass, err = utils.Encoder.Encode([]byte("admin")); err != nil {
+		if pass, err = utils.Encoder.Encode([]byte(initPassword)); err != nil {
 			return err
 		}
 
@@ -104,6 +105,7 @@ func Run() error {
 		if err := model.CreateNewUser(&user); err != nil {
 			return err
 		}
+		logrus.Infof("初始用户创建成功，账号：「%v」密码：「%v」", user.Username, initPassword)
 	} else {
 		for i := range users {
 			// 修正默认用户类型为管理员
@@ -141,6 +143,9 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.UserGroupMember{}); err != nil {
 		return err
 	}
+	if err := global.DB.AutoMigrate(&model.LoginLog{}); err != nil {
+		return err
+	}
 	if err := global.DB.AutoMigrate(&model.Num{}); err != nil {
 		return err
 	}
@@ -153,8 +158,42 @@ func Run() error {
 		}
 	}
 
+	// 配置缓存器
 	global.Cache = cache.New(5*time.Minute, 10*time.Minute)
+	global.Cache.OnEvicted(func(key string, value interface{}) {
+		logrus.Debugf("用户Token「%v」过期", key)
+		model.Logout(key)
+	})
 	global.Store = global.NewStore()
+
+	loginLogs, err := model.FindAliveLoginLogs()
+	if err != nil {
+		return err
+	}
+
+	for i := range loginLogs {
+		loginLog := loginLogs[i]
+		token := loginLog.ID
+		user, err := model.FindUserById(loginLog.UserId)
+		if err != nil {
+			logrus.Debugf("用户「%v」获取失败，忽略", loginLog.UserId)
+			continue
+		}
+
+		authorization := api.Authorization{
+			Token:    token,
+			Remember: loginLog.Remember,
+			User:     user,
+		}
+
+		if authorization.Remember {
+			// 记住登录有效期两周
+			global.Cache.Set(token, authorization, api.RememberEffectiveTime)
+		} else {
+			global.Cache.Set(token, authorization, api.NotRememberEffectiveTime)
+		}
+		logrus.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
+	}
 
 	e := api.SetupRoutes()
 	if err := handle.InitProperties(); err != nil {

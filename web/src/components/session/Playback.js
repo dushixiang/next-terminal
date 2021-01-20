@@ -142,7 +142,9 @@ class Playback extends Component {
 
         this.setState({
             recording: recording
-        })
+        }, () => {
+            this.handlePlayPause();
+        });
     }
 
     handlePlayPause = () => {
@@ -150,7 +152,6 @@ class Playback extends Component {
         if (recording) {
             if (this.state.percent === this.state.max) {
                 // 重播
-                console.log('重新播放')
                 this.setState({
                     percent: 0
                 }, () => {

@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"strings"
@@ -44,7 +43,6 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		token := GetToken(c)
 		authorization, found := global.Cache.Get(token)
 		if !found {
-			logrus.Debugf("您的登录信息已失效，请重新登录后再试。")
 			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
 		}
 
@@ -62,7 +60,10 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 func Admin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		account, _ := GetCurrentAccount(c)
+		account, found := GetCurrentAccount(c)
+		if !found {
+			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+		}
 
 		if account.Type != model.TypeAdmin {
 			return Fail(c, 403, "permission denied")

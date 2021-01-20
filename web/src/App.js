@@ -22,11 +22,14 @@ import {
     DisconnectOutlined,
     IdcardOutlined,
     LinkOutlined,
+    LoginOutlined,
     MenuFoldOutlined,
     MenuUnfoldOutlined,
     SettingOutlined,
-    SolutionOutlined, TeamOutlined,
-    UserOutlined, UserSwitchOutlined
+    SolutionOutlined,
+    TeamOutlined,
+    UserOutlined,
+    UserSwitchOutlined
 } from '@ant-design/icons';
 import Info from "./components/user/Info";
 import request from "./common/request";
@@ -36,6 +39,7 @@ import BatchCommand from "./components/command/BatchCommand";
 import {NT_PACKAGE} from "./utils/utils";
 import {isAdmin} from "./service/permission";
 import UserGroup from "./components/user/UserGroup";
+import LoginLog from "./components/session/LoginLog";
 
 const {Footer, Sider} = Layout;
 
@@ -142,15 +146,14 @@ class App extends Component {
                                 </Menu.Item>
 
                                 <SubMenu key='resource' title='资源管理' icon={<CloudServerOutlined/>}>
-                                    <Menu.Item key="idcard" icon={<IdcardOutlined/>}>
-                                        <Link to={'/credential'}>
-                                            授权凭证
-                                        </Link>
-                                    </Menu.Item>
-
                                     <Menu.Item key="asset" icon={<DesktopOutlined/>}>
                                         <Link to={'/asset'}>
                                             资产列表
+                                        </Link>
+                                    </Menu.Item>
+                                    <Menu.Item key="idcard" icon={<IdcardOutlined/>}>
+                                        <Link to={'/credential'}>
+                                            授权凭证
                                         </Link>
                                     </Menu.Item>
                                 </SubMenu>
@@ -183,15 +186,21 @@ class App extends Component {
                                                         历史会话
                                                     </Link>
                                                 </Menu.Item>
+
+                                                <Menu.Item key="login-log" icon={<LoginOutlined/>}>
+                                                    <Link to={'/login-log'}>
+                                                        登录日志
+                                                    </Link>
+                                                </Menu.Item>
                                             </SubMenu>
 
-                                            <SubMenu key='user-group' title='用户管理' icon={<UserSwitchOutlined />}>
+                                            <SubMenu key='user-group' title='用户管理' icon={<UserSwitchOutlined/>}>
                                                 <Menu.Item key="user" icon={<UserOutlined/>}>
                                                     <Link to={'/user'}>
                                                         用户管理
                                                     </Link>
                                                 </Menu.Item>
-                                                <Menu.Item key="user-group" icon={<TeamOutlined />}>
+                                                <Menu.Item key="user-group" icon={<TeamOutlined/>}>
                                                     <Link to={'/user-group'}>
                                                         用户组管理
                                                     </Link>
@@ -243,6 +252,7 @@ class App extends Component {
                             <Route path="/batch-command" component={BatchCommand}/>
                             <Route path="/online-session" component={OnlineSession}/>
                             <Route path="/offline-session" component={OfflineSession}/>
+                            <Route path="/login-log" component={LoginLog}/>
                             <Route path="/info" component={Info}/>
                             <Route path="/setting" component={Setting}/>
 
