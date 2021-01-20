@@ -18,7 +18,7 @@ sudo apt-get install libcairo2-dev libjpeg-turbo8-dev libpng12-dev libtool-bin l
 sudo apt-get install libcairo2-dev libjpeg62-turbo-dev libpng-dev libtool-bin libossp-uuid-dev freerdp2-dev libpango1.0-dev libssh2-1-dev libtelnet-dev libvncserver-dev libwebsockets-dev libpulse-dev libssl-dev libvorbis-dev libwebp-dev
 ```
 
-如有疑问可参考guacamole[官方安装文档](!https://guacamole.apache.org/doc/gug/installing-guacamole.html)
+如有疑问可参考 [Guacamole官方安装文档](!https://guacamole.apache.org/doc/gug/installing-guacamole.html)
 
 下载&解压&configure
 ```shell
@@ -121,7 +121,7 @@ fc-cache
 ### 安装 Next Terminal
 建立next-terminal目录
 ```shell
-mkdir ~/next-terminal & cd ~/next-terminal
+mkdir ~/next-terminal && cd ~/next-terminal
 ```
 
 下载
