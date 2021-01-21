@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Button, message, Popconfirm} from "antd";
+import {Button, Dropdown, Menu, message, Popconfirm} from "antd";
 import request from "../../common/request";
+import {getCurrentUser} from "../../service/permission";
 
 class Logout extends Component {
 
@@ -14,22 +15,36 @@ class Logout extends Component {
         }
     }
 
+
     render() {
+
+        const menu = (
+            <Menu>
+
+                <Menu.Item>
+
+                    <Popconfirm
+                        key='login-btn-pop'
+                        title="您确定要退出登录吗?"
+                        onConfirm={this.confirm}
+                        okText="确定"
+                        cancelText="取消"
+                        placement="left"
+                    >
+                        退出登录
+                    </Popconfirm>
+                </Menu.Item>
+
+            </Menu>
+        );
+
         return (
             <div>
-                <Popconfirm
-                    key='login-btn-pop'
-                    title="您确定要退出登录吗?"
-                    onConfirm={this.confirm}
-                    okText="确定"
-                    cancelText="取消"
-                    placement="left"
-                >
+                <Dropdown overlay={menu}>
                     <Button key="login-btn" type="dashed">
-                        退出登录
+                        {getCurrentUser()['nickname']}
                     </Button>
-                </Popconfirm>
-
+                </Dropdown>
             </div>
         );
     }

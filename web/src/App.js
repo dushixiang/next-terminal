@@ -36,7 +36,7 @@ import request from "./common/request";
 import {message} from "antd/es";
 import Setting from "./components/setting/Setting";
 import BatchCommand from "./components/command/BatchCommand";
-import {NT_PACKAGE} from "./utils/utils";
+import {isEmpty, NT_PACKAGE} from "./utils/utils";
 import {isAdmin} from "./service/permission";
 import UserGroup from "./components/user/UserGroup";
 import LoginLog from "./components/session/LoginLog";
@@ -64,15 +64,16 @@ class App extends Component {
     };
 
     componentDidMount() {
-        this.getInfo().then(r => {
-        });
+        let hash = window.location.hash;
+        let current = hash.replace('#/', '');
+        if(isEmpty(current)){
+            current = 'dashboard';
+        }
+        this.setCurrent(current);
+        this.getInfo();
     }
 
     async getInfo() {
-
-        if ('/login' === window.location.pathname) {
-            return;
-        }
 
         let result = await request.get('/info');
         if (result['code'] === 1) {
@@ -151,7 +152,7 @@ class App extends Component {
                                             资产列表
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="idcard" icon={<IdcardOutlined/>}>
+                                    <Menu.Item key="credential" icon={<IdcardOutlined/>}>
                                         <Link to={'/credential'}>
                                             授权凭证
                                         </Link>
