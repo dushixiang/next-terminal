@@ -8,6 +8,7 @@ import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import Logout from "./Logout";
 import UserGroupModal from "./UserGroupModal";
+import UserShareAsset from "./UserShareAsset";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -250,6 +251,13 @@ class UserGroup extends Component {
         })
     }
 
+    handleAssetCancel = () => {
+        this.loadTableData()
+        this.setState({
+            assetVisible: false
+        })
+    }
+
     render() {
 
         const columns = [{
@@ -263,11 +271,16 @@ class UserGroup extends Component {
             title: '名称',
             dataIndex: 'name',
         }, {
-            title: '成员人数',
-            dataIndex: 'memberCount',
-            key: 'memberCount',
+            title: '授权资产',
+            dataIndex: 'assetCount',
+            key: 'assetCount',
             render: (text, record, index) => {
-                return <Button type='link' onClick={() => this.showModal('更新用户组', record['id'], index)}>{text}</Button>
+                return <Button type='link' onClick={async () => {
+                    this.setState({
+                        assetVisible: true,
+                        userGroupId: record['id']
+                    })
+                }}>{text}</Button>
             }
         }, {
             title: '创建日期',
@@ -417,6 +430,24 @@ class UserGroup extends Component {
                         </UserGroupModal> : undefined
                     }
 
+                    <Modal
+                        width={window.innerWidth * 0.8}
+                        title='已授权资产'
+                        visible={this.state.assetVisible}
+                        maskClosable={false}
+                        destroyOnClose={true}
+                        onOk={() => {
+
+                        }}
+                        onCancel={this.handleAssetCancel}
+                        okText='确定'
+                        cancelText='取消'
+                        footer={null}
+                    >
+                        <UserShareAsset
+                            userGroupId={this.state.userGroupId}
+                        />
+                    </Modal>
 
                 </Content>
             </>

@@ -63,7 +63,7 @@ func FindAssetByConditions(protocol string, account User) (o []Asset, err error)
 	return
 }
 
-func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account User, owner, sharer string) (o []AssetVo, total int64, err error) {
+func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account User, owner, sharer, userGroupId string) (o []AssetVo, total int64, err error) {
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 
@@ -71,6 +71,17 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 		owner := account.ID
 		db = db.Where("assets.owner = ? or resource_sharers.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("assets.owner = ? or resource_sharers.user_id = ?", owner, owner)
+
+		// 查询用户所在用户组列表
+		userGroupIds, err := FindUserGroupIdsByUserId(account.ID)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		if userGroupIds != nil && len(userGroupIds) > 0 {
+			db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
+			dbCounter = dbCounter.Or("resource_sharers.user_group_id in ?", userGroupIds)
+		}
 	} else {
 		if len(owner) > 0 {
 			db = db.Where("assets.owner = ?", owner)
@@ -79,6 +90,11 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 		if len(sharer) > 0 {
 			db = db.Where("resource_sharers.user_id = ?", sharer)
 			dbCounter = dbCounter.Where("resource_sharers.user_id = ?", sharer)
+		}
+
+		if len(userGroupId) > 0 {
+			db = db.Where("resource_sharers.user_group_id = ?", userGroupId)
+			dbCounter = dbCounter.Where("resource_sharers.user_group_id = ?", userGroupId)
 		}
 	}
 

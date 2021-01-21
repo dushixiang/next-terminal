@@ -24,7 +24,7 @@ import {message} from "antd/es";
 
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import {PROTOCOL_COLORS} from "../../common/constants";
-import UserShareChooseAsset from "./UserShareSelectAsset";
+import UserShareSelectedAsset from "./UserShareSelectedAsset";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -61,7 +61,8 @@ class UserShareAsset extends Component {
 
     async componentDidMount() {
         let sharer = this.props.sharer;
-        this.loadTableData({sharer: sharer});
+        let userGroupId = this.props.userGroupId;
+        this.loadTableData({sharer: sharer, userGroupId: userGroupId});
 
         let result = await request.get('/tags');
         if (result['code'] === 1) {
@@ -132,10 +133,6 @@ class UserShareAsset extends Component {
     };
 
     handleTagsChange = tags => {
-        console.log(tags)
-        // this.setState({
-        //     tags: tags
-        // })
         let query = {
             ...this.state.queryParams,
             'pageIndex': 1,
@@ -375,11 +372,12 @@ class UserShareAsset extends Component {
                             visible={this.state.chooseAssetVisible}
                             width={window.innerWidth * 0.8}
                         >
-                            <UserShareChooseAsset
+                            <UserShareSelectedAsset
                                 sharer={this.state.queryParams.sharer}
+                                userGroupId={this.state.queryParams.userGroupId}
                             >
 
-                            </UserShareChooseAsset>
+                            </UserShareSelectedAsset>
                         </Drawer> : undefined
                     }
 

@@ -13,10 +13,10 @@ type UserGroup struct {
 }
 
 type UserGroupVo struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	Created     utils.JsonTime `json:"created"`
-	MemberCount int64          `json:"memberCount"`
+	ID         string         `json:"id"`
+	Name       string         `json:"name"`
+	Created    utils.JsonTime `json:"created"`
+	AssetCount int64          `json:"assetCount"`
 }
 
 func (r *UserGroup) TableName() string {
@@ -24,7 +24,7 @@ func (r *UserGroup) TableName() string {
 }
 
 func FindPageUserGroup(pageIndex, pageSize int, name string) (o []UserGroupVo, total int64, err error) {
-	db := global.DB.Table("user_groups").Select("user_groups.id, user_groups.name, user_groups.created, count(user_group_members.user_id) as member_count").Joins("left join user_group_members on user_groups.id = user_group_members.user_group_id").Group("user_groups.id")
+	db := global.DB.Table("user_groups").Select("user_groups.id, user_groups.name, user_groups.created, count(resource_sharers.user_group_id) as asset_count").Joins("left join resource_sharers on user_groups.id = resource_sharers.user_group_id and resource_sharers.resource_type = 'asset'").Group("user_groups.id")
 	dbCounter := global.DB.Table("user_groups")
 	if len(name) > 0 {
 		db = db.Where("user_groups.name like ?", "%"+name+"%")
@@ -83,6 +83,11 @@ func AddUserGroupMembers(tx *gorm.DB, userIds []string, userGroupId string) erro
 
 func FindUserGroupById(id string) (o UserGroup, err error) {
 	err = global.DB.Where("id = ?", id).First(&o).Error
+	return
+}
+
+func FindUserGroupIdsByUserId(userId string) (o []string, err error) {
+	err = global.DB.Table("user_groups").Select("user_groups.id").Joins("right join user_group_members on user_groups.id = user_group_members.user_group_id").Where("user_group_members.user_id = ?", userId).Find(&o).Error
 	return
 }
 

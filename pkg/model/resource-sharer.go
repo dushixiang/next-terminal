@@ -81,11 +81,28 @@ func OverwriteUserIdsByResourceId(resourceId, resourceType string, userIds []str
 	return nil
 }
 
-func DeleteByUserIdAndResourceTypeAndResourceIdIn(userId, resourceType string, resourceIds []string) error {
-	return global.DB.Where("user_id = ? and resource_type = ? and resource_id in ?", userId, resourceType, resourceIds).Delete(&ResourceSharer{}).Error
+func DeleteByUserIdAndResourceTypeAndResourceIdIn(userGroupId, userId, resourceType string, resourceIds []string) error {
+	db := global.DB
+	if userGroupId != "" {
+		db = db.Where("user_group_id = ?", userGroupId)
+	}
+
+	if userId != "" {
+		db = db.Where("user_id = ?", userId)
+	}
+
+	if resourceType != "" {
+		db = db.Where("resource_type = ?", resourceType)
+	}
+
+	if resourceIds != nil {
+		db = db.Where("resource_id in ?", resourceIds)
+	}
+
+	return db.Delete(&ResourceSharer{}).Error
 }
 
-func AddSharerResources(userId, resourceType string, resourceIds []string) error {
+func AddSharerResources(userGroupId, userId, resourceType string, resourceIds []string) error {
 	return global.DB.Transaction(func(tx *gorm.DB) (err error) {
 
 		for i := range resourceIds {
@@ -112,12 +129,13 @@ func AddSharerResources(userId, resourceType string, resourceIds []string) error
 				return echo.NewHTTPError(400, "参数错误")
 			}
 
-			id := utils.Sign([]string{resourceId, resourceType, userId})
+			id := utils.Sign([]string{resourceId, resourceType, userId, userGroupId})
 			resource := &ResourceSharer{
 				ID:           id,
 				ResourceId:   resourceId,
 				ResourceType: resourceType,
 				UserId:       userId,
+				UserGroupId:  userGroupId,
 			}
 			err = tx.Create(resource).Error
 			if err != nil {

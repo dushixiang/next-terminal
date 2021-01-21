@@ -10,6 +10,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
@@ -36,7 +37,7 @@ func Run() error {
  /   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |  
 /    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
 \____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
-        \/     \/      \/                     \/            \/        \/     \/      ` + Version + "\n")
+        \/     \/      \/                     \/            \/        \/     \/      ` + Version + "\n\n")
 
 	var err error
 	//logrus.SetReportCaller(true)
@@ -70,7 +71,7 @@ func Run() error {
 			global.Config.Mysql.Database,
 		)
 		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			//Logger: logger.Default.LogMode(logger.Info),
+			Logger: logger.Default.LogMode(logger.Info),
 		})
 	} else {
 		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{})
