@@ -13,7 +13,7 @@ const {Search} = Input;
 const {Content} = Layout;
 const {Title} = Typography;
 
-class UserShareAsset extends Component {
+class UserShareSelectedAsset extends Component {
 
     inputRefOfName = React.createRef();
     changeOwnerFormRef = React.createRef();
@@ -45,16 +45,17 @@ class UserShareAsset extends Component {
     async componentDidMount() {
 
         this.setState({
-            sharer: this.props.sharer
+            sharer: this.props.sharer,
+            userGroupId: this.props.userGroupId
         })
 
         this.loadTableData();
-        this.init(this.props.sharer)
+        this.init(this.props.sharer, this.props.userGroupId)
     }
 
-    async init(sharer) {
+    async init(sharer, userGroupId) {
         let q1 = request.get('/tags');
-        let q2 = request.get('/assets/paging?pageIndex=1&pageSize=1000&sharer=' + sharer);
+        let q2 = request.get(`/assets/paging?pageIndex=1&pageSize=1000&sharer=${sharer}&userGroupId=${userGroupId}`);
 
         let r1 = await q1;
         let r2 = await q2;
@@ -168,7 +169,9 @@ class UserShareAsset extends Component {
 
     unSelectRow = async (assetId) => {
         let userId = this.state.sharer;
+        let userGroupId = this.state.userGroupId;
         let result = await request.post(`/resource-sharers/remove-resources`, {
+            userGroupId: userGroupId,
             userId: userId,
             resourceType: 'asset',
             resourceIds: [assetId]
@@ -368,7 +371,9 @@ class UserShareAsset extends Component {
                                                     }
 
                                                     let userId = this.state.sharer;
+                                                    let userGroupId = this.state.userGroupId;
                                                     let result = await request.post(`/resource-sharers/add-resources`, {
+                                                        userGroupId: userGroupId,
                                                         userId: userId,
                                                         resourceType: 'asset',
                                                         resourceIds: newRowKeys
@@ -412,4 +417,4 @@ class UserShareAsset extends Component {
     }
 }
 
-export default UserShareAsset;
+export default UserShareSelectedAsset;

@@ -5,9 +5,8 @@
   "dependencies": {
     "@ant-design/icons": "^4.3.0",
     "antd": "^4.8.4",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "guacamole-common-js": "^1.2.0",
-    "http-proxy-middleware": "^1.0.6",
     "qs": "^6.9.4",
     "react": "^16.14.0",
     "react-contexify": "^4.1.1",

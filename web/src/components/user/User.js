@@ -602,7 +602,6 @@ class User extends Component {
                     >
                         <UserShareAsset
                             sharer={this.state.sharer}
-                            owner={this.state.owner}
                         />
                     </Modal>
 

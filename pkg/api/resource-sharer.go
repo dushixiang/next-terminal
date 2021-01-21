@@ -6,6 +6,7 @@ import (
 )
 
 type RU struct {
+	UserGroupId  string   `json:"userGroupId"`
 	UserId       string   `json:"userId"`
 	ResourceType string   `json:"resourceType"`
 	ResourceIds  []string `json:"resourceIds"`
@@ -45,7 +46,7 @@ func ResourceRemoveByUserIdAssignEndPoint(c echo.Context) error {
 		return err
 	}
 
-	if err := model.DeleteByUserIdAndResourceTypeAndResourceIdIn(ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := model.DeleteByUserIdAndResourceTypeAndResourceIdIn(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 
@@ -58,7 +59,7 @@ func ResourceAddByUserIdAssignEndPoint(c echo.Context) error {
 		return err
 	}
 
-	if err := model.AddSharerResources(ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := model.AddSharerResources(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 
