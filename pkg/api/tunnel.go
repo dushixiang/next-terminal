@@ -89,6 +89,7 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.DisableBitmapCaching, propertyMap[guacd.DisableBitmapCaching])
 			configuration.SetParameter(guacd.DisableOffscreenCaching, propertyMap[guacd.DisableOffscreenCaching])
 			configuration.SetParameter(guacd.DisableGlyphCaching, propertyMap[guacd.DisableGlyphCaching])
+			configuration.SetParameter("server-layout", "en-us-qwerty")
 			break
 		case "ssh":
 			if len(session.PrivateKey) > 0 && session.PrivateKey != "-" {

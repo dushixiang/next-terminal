@@ -28,7 +28,7 @@ import {
     CloudUploadOutlined,
     CopyOutlined,
     DeleteOutlined,
-    DesktopOutlined,
+    DesktopOutlined, ExpandOutlined,
     FileZipOutlined,
     FolderAddOutlined,
     LoadingOutlined,
@@ -36,7 +36,7 @@ import {
     UploadOutlined
 } from '@ant-design/icons';
 import Upload from "antd/es/upload";
-import {download, getToken} from "../../utils/utils";
+import {download, exitFull, getToken, requestFullScreen} from "../../utils/utils";
 import './Access.css'
 import Draggable from 'react-draggable';
 
@@ -87,7 +87,9 @@ class Access extends Component {
         confirmLoading: false,
         uploadVisible: false,
         uploadLoading: false,
-        startTime: new Date()
+        startTime: new Date(),
+        fullScreen: false,
+        fullScreenBtnText: '进入全屏'
     };
 
     async componentDidMount() {
@@ -345,6 +347,7 @@ class Access extends Component {
             return true;
         }
 
+        console.log('--------------------')
         console.log(keysym)
         this.state.client.sendKeyEvent(1, keysym);
         if (keysym === 65288) {
@@ -369,6 +372,24 @@ class Access extends Component {
             fileSystemVisible: false,
         });
     };
+
+    fullScreen = () => {
+        let fs = this.state.fullScreen;
+        if(fs){
+            exitFull();
+            this.setState({
+                fullScreen: false,
+                fullScreenBtnText: '进入全屏'
+            })
+        }else {
+            requestFullScreen(document.documentElement);
+            this.setState({
+                fullScreen: true,
+                fullScreenBtnText: '退出全屏'
+            })
+        }
+
+    }
 
     showClipboard = () => {
         this.setState({
@@ -823,11 +844,18 @@ class Access extends Component {
                 <Menu.Item key="2" icon={<FileZipOutlined/>} onClick={this.showFileSystem}>
                     文件管理
                 </Menu.Item>
+                <Menu.Item key="3" icon={<ExpandOutlined />} onClick={this.fullScreen}>
+                    {this.state.fullScreenBtnText}
+                </Menu.Item>
                 <SubMenu title="发送快捷键" icon={<DesktopOutlined/>}>
                     <Menu.Item
                         onClick={() => this.sendCombinationKey(['65507', '65513', '65535'])}>Ctrl+Alt+Delete</Menu.Item>
                     <Menu.Item
                         onClick={() => this.sendCombinationKey(['65507', '65513', '65288'])}>Ctrl+Alt+Backspace</Menu.Item>
+                    <Menu.Item
+                        onClick={() => this.sendCombinationKey(['65515', '114'])}>Windows+R</Menu.Item>
+                    <Menu.Item
+                        onClick={() => this.sendCombinationKey(['65515'])}>Windows</Menu.Item>
                 </SubMenu>
             </Menu>
         );
@@ -891,22 +919,6 @@ class Access extends Component {
                         </Dropdown>
                     </Affix>
                 </Draggable>
-
-                {/*{*/}
-                {/*    this.state.protocol === 'ssh' || this.state.protocol === 'rdp' ?*/}
-                {/*        <Affix style={{position: 'absolute', top: 50, right: 50}}>*/}
-                {/*            <Button*/}
-                {/*                shape="circle"*/}
-                {/*                icon={<FolderOpenOutlined/>}*/}
-                {/*                onClick={() => {*/}
-                {/*                    this.showFileSystem();*/}
-                {/*                }}*/}
-                {/*            >*/}
-                {/*            </Button>*/}
-                {/*        </Affix>*/}
-                {/*        : null*/}
-                {/*}*/}
-
 
                 <Drawer
                     title={title}

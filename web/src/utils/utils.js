@@ -78,7 +78,7 @@ export const cloneObj = (obj, ignoreFields) => {
 export function download(url) {
     let aElement = document.createElement('a');
     aElement.setAttribute('download', '');
-    aElement.setAttribute('target', '_blank');
+    // aElement.setAttribute('target', '_blank');
     aElement.setAttribute('href', url);
     aElement.click();
 }
@@ -176,4 +176,37 @@ export function difference(a, b) {
     let aSet = new Set(a)
     let bSet = new Set(b)
     return Array.from(new Set(a.concat(b).filter(v => !aSet.has(v) || !bSet.has(v))))
+}
+
+export function requestFullScreen(element) {
+    // 判断各种浏览器，找到正确的方法
+    const requestMethod = element.requestFullScreen || //W3C
+        element.webkitRequestFullScreen || //FireFox
+        element.mozRequestFullScreen || //Chrome等
+        element.msRequestFullScreen; //IE11
+    if (requestMethod) {
+        requestMethod.call(element);
+    } else if (typeof window.ActiveXObject !== "undefined") { //for Internet Explorer
+        const wScript = new window.ActiveXObject("WScript.Shell");
+        if (wScript !== null) {
+            wScript.SendKeys("{F11}");
+        }
+    }
+}
+
+//退出全屏 判断浏览器种类
+export function exitFull() {
+    // 判断各种浏览器，找到正确的方法
+    const exitMethod = document.exitFullscreen || //W3C
+        document.mozCancelFullScreen || //FireFox
+        document.webkitExitFullscreen || //Chrome等
+        document.webkitExitFullscreen; //IE11
+    if (exitMethod) {
+        exitMethod.call(document);
+    } else if (typeof window.ActiveXObject !== "undefined") { //for Internet Explorer
+        const wScript = new window.ActiveXObject("WScript.Shell");
+        if (wScript !== null) {
+            wScript.SendKeys("{F11}");
+        }
+    }
 }

@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -46,6 +47,22 @@ func (w *NextWriter) Read() ([]byte, int, error) {
 	return buf, read, err
 }
 
+const (
+	Data   = "data"
+	Resize = "resize"
+	Closed = "closed"
+)
+
+type Message struct {
+	Type    string `json:"type"`
+	Content string `json:"content"`
+}
+
+type WindowSize struct {
+	Height int `json:"height"`
+	Width  int `json:"width"`
+}
+
 func SSHEndpoint(c echo.Context) error {
 	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
@@ -60,12 +77,22 @@ func SSHEndpoint(c echo.Context) error {
 	sshClient, err := CreateSshClient(assetId)
 	if err != nil {
 		logrus.Errorf("创建SSH客户端失败：%v", err.Error())
+		msg := Message{
+			Type:    Closed,
+			Content: err.Error(),
+		}
+		err := WriteMessage(ws, msg)
 		return err
 	}
 
 	session, err := sshClient.NewSession()
 	if err != nil {
 		logrus.Errorf("创建SSH会话失败：%v", err.Error())
+		msg := Message{
+			Type:    Closed,
+			Content: err.Error(),
+		}
+		err := WriteMessage(ws, msg)
 		return err
 	}
 	defer session.Close()
@@ -93,15 +120,39 @@ func SSHEndpoint(c echo.Context) error {
 		return err
 	}
 
-	go func() {
+	msg := Message{
+		Type:    Data,
+		Content: "Connect to server successfully.",
+	}
+	_ = WriteMessage(ws, msg)
 
+	var mut sync.Mutex
+	var active = true
+
+	go func() {
 		for true {
+			mut.Lock()
+			if !active {
+				logrus.Debugf("会话: %v -> %v 关闭", sshClient.LocalAddr().String(), sshClient.RemoteAddr().String())
+				break
+			}
+			mut.Unlock()
+
 			p, n, err := b.Read()
 			if err != nil {
 				continue
 			}
 			if n > 0 {
-				WriteByteMessage(ws, p)
+				msg := Message{
+					Type:    Data,
+					Content: string(p),
+				}
+				message, err := json.Marshal(msg)
+				if err != nil {
+					logrus.Warnf("生成Json失败 %v", err)
+					continue
+				}
+				WriteByteMessage(ws, message)
 			}
 			time.Sleep(time.Duration(100) * time.Millisecond)
 		}
@@ -110,13 +161,50 @@ func SSHEndpoint(c echo.Context) error {
 	for true {
 		_, message, err := ws.ReadMessage()
 		if err != nil {
+			// web socket会话关闭后主动关闭ssh会话
+			_ = session.Close()
+			mut.Lock()
+			active = false
+			mut.Unlock()
+			break
+		}
+
+		var msg Message
+		err = json.Unmarshal(message, &msg)
+		if err != nil {
+			logrus.Warnf("解析Json失败: %v, 原始字符串：%v", err, string(message))
 			continue
 		}
-		_, err = stdinPipe.Write(message)
-		if err != nil {
-			logrus.Debugf("Tunnel write: %v", err)
+
+		switch msg.Type {
+		case Resize:
+			var winSize WindowSize
+			err = json.Unmarshal([]byte(msg.Content), &winSize)
+			if err != nil {
+				logrus.Warnf("解析SSH会话窗口大小失败: %v", err)
+				continue
+			}
+			if err := session.WindowChange(winSize.Height, winSize.Height); err != nil {
+				logrus.Warnf("更改SSH会话窗口大小失败: %v", err)
+				continue
+			}
+		case Data:
+			_, err = stdinPipe.Write([]byte(msg.Content))
+			if err != nil {
+				logrus.Debugf("SSH会话写入失败: %v", err)
+			}
 		}
+
 	}
+	return err
+}
+
+func WriteMessage(ws *websocket.Conn, msg Message) error {
+	message, err := json.Marshal(msg)
+	if err != nil {
+		logrus.Warnf("生成Json失败 %v", err)
+	}
+	WriteByteMessage(ws, message)
 	return err
 }
 
@@ -193,10 +281,6 @@ func CreateSshClient(assetId string) (*ssh.Client, error) {
 		return nil, err
 	}
 	return sshClient, nil
-}
-
-func WriteMessage(ws *websocket.Conn, message string) {
-	WriteByteMessage(ws, []byte(message))
 }
 
 func WriteByteMessage(ws *websocket.Conn, p []byte) {

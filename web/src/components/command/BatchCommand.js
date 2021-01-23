@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
-import {List, Card, Input, PageHeader} from "antd";
+import {Card, Input, List, PageHeader, Popconfirm} from "antd";
 import Console from "../access/Console";
 import {itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
+import './Command.css'
+
 const {Search} = Input;
 const routes = [
     {
@@ -25,7 +27,8 @@ class BatchCommand extends Component {
 
     state = {
         webSockets: [],
-        assets: []
+        assets: [],
+        active: undefined,
     }
 
     componentDidMount() {
@@ -66,7 +69,13 @@ class BatchCommand extends Component {
                 <div className="page-search">
                     <Search ref={this.commandRef} placeholder="请输入指令" onSearch={value => {
                         for (let i = 0; i < this.state.webSockets.length; i++) {
-                            this.state.webSockets[i].send(value + String.fromCharCode(13))
+                            let ws = this.state.webSockets[i]['ws'];
+                            if (ws.readyState === WebSocket.OPEN) {
+                                ws.send(JSON.stringify({
+                                    type: 'data',
+                                    content: value + String.fromCharCode(13)
+                                }));
+                            }
                         }
                         this.commandRef.current.setValue('');
                     }} enterButton='执行'/>
@@ -78,10 +87,23 @@ class BatchCommand extends Component {
                         dataSource={this.state.assets}
                         renderItem={item => (
                             <List.Item>
-                                <Card title={item.name}>
+                                <Card title={item.name}
+                                      className={this.state.active === item['id'] ? 'command-active' : ''}
+                                      onClick={() => {
+                                          if (this.state.active === item['id']) {
+                                              this.setState({
+                                                  active: undefined
+                                              })
+                                          } else {
+                                              this.setState({
+                                                  active: item['id']
+                                              })
+                                          }
+                                      }}
+                                      >
                                     <Console assetId={item.id} command={this.state.command}
                                              width={(window.innerWidth - 350) / 2}
-                                             height={400}
+                                             height={420}
                                              appendWebsocket={this.appendWebsocket}/>
                                 </Card>
                             </List.Item>
