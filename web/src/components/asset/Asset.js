@@ -249,6 +249,8 @@ class Asset extends Component {
             } else {
                 asset['tags'] = asset['tags'].split(',');
             }
+        }else {
+            asset['tags'] = [];
         }
 
         this.setState({
