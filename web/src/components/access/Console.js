@@ -7,13 +7,6 @@ import "./Console.css"
 import {getToken} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit'
 
-
-function getGeometry(width, height) {
-    const cols = Math.floor(width / 9);
-    const rows = Math.floor(height / 17) - 1;
-    return [cols, rows];
-}
-
 class Console extends Component {
 
     state = {
@@ -99,6 +92,8 @@ class Console extends Component {
                 case 'closed':
                     term.writeln(`\x1B[1;3;31m${msg['content']}\x1B[0m `)
                     webSocket.close();
+                    break;
+                default:
                     break;
             }
 
