@@ -102,6 +102,7 @@ func CloseSessionById(sessionId string, code int, reason string) {
 		_ = tun.Tun.Close()
 		CloseSessionByWebSocket(tun.WebSocket, code, reason)
 	}
+	global.Store.Del(sessionId)
 
 	s, err := model.FindSessionById(sessionId)
 	if err != nil {
@@ -112,7 +113,12 @@ func CloseSessionById(sessionId string, code int, reason string) {
 		return
 	}
 
-	global.Store.Del(sessionId)
+	if s.Status == model.Connecting {
+		// 会话还未建立成功，无需保留数据
+		model.DeleteSessionById(sessionId)
+		return
+	}
+
 	session := model.Session{}
 	session.ID = sessionId
 	session.Status = model.Disconnected
