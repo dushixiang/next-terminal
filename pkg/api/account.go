@@ -156,7 +156,7 @@ func ConfirmTOTPEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func ResetTOTPEndpoint(c echo.Context) error {
+func ReloadTOTPEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
 
 	key, err := totp.NewTOTP(totp.GenerateOpts{
@@ -181,6 +181,15 @@ func ResetTOTPEndpoint(c echo.Context) error {
 		"qr":     qrEncode,
 		"secret": key.Secret(),
 	})
+}
+
+func ResetTOTPEndpoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+	u := &model.User{
+		TOTPSecret: "-",
+	}
+	model.UpdateUserById(u, account.ID)
+	return Success(c, "")
 }
 
 func ChangePasswordEndpoint(c echo.Context) error {
@@ -208,7 +217,28 @@ func ChangePasswordEndpoint(c echo.Context) error {
 	return LogoutEndpoint(c)
 }
 
+type AccountInfo struct {
+	Id         string `json:"id"`
+	Username   string `json:"username"`
+	Nickname   string `json:"nickname"`
+	Type       string `json:"type"`
+	EnableTotp bool   `json:"enableTotp"`
+}
+
 func InfoEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
-	return Success(c, account)
+
+	user, err := model.FindUserById(account.ID)
+	if err != nil {
+		return err
+	}
+
+	info := AccountInfo{
+		Id:         user.ID,
+		Username:   user.Username,
+		Nickname:   user.Nickname,
+		Type:       user.Type,
+		EnableTotp: user.TOTPSecret != "" && user.TOTPSecret != "-",
+	}
+	return Success(c, info)
 }
