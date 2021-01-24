@@ -38,6 +38,7 @@ func SetupRoutes() *echo.Echo {
 
 	e.POST("/logout", LogoutEndpoint)
 	e.POST("/change-password", ChangePasswordEndpoint)
+	e.GET("/reload-totp", ReloadTOTPEndpoint)
 	e.POST("/reset-totp", ResetTOTPEndpoint)
 	e.POST("/confirm-totp", ConfirmTOTPEndpoint)
 	e.GET("/info", InfoEndpoint)
