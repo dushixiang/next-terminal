@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Card, Input, List, PageHeader, Popconfirm} from "antd";
+import {Card, Input, List, PageHeader} from "antd";
 import Console from "../access/Console";
 import {itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
@@ -100,7 +100,7 @@ class BatchCommand extends Component {
                                               })
                                           }
                                       }}
-                                      >
+                                >
                                     <Console assetId={item.id} command={this.state.command}
                                              width={(window.innerWidth - 350) / 2}
                                              height={420}
