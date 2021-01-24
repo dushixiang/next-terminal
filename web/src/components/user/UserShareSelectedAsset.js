@@ -49,13 +49,21 @@ class UserShareSelectedAsset extends Component {
             userGroupId: this.props.userGroupId
         })
 
+        this.init(this.props.sharer, this.props.userGroupId);
         this.loadTableData();
-        this.init(this.props.sharer, this.props.userGroupId)
     }
 
     async init(sharer, userGroupId) {
+
+        let params = {
+            pageIndex: 1,
+            pageSize: 1000,
+            sharer: sharer,
+            userGroupId: userGroupId
+        }
+        let paramStr = qs.stringify(params);
         let q1 = request.get('/tags');
-        let q2 = request.get(`/assets/paging?pageIndex=1&pageSize=1000&sharer=${sharer}&userGroupId=${userGroupId}`);
+        let q2 = request.get(`/assets/paging?${paramStr}`);
 
         let r1 = await q1;
         let r2 = await q2;

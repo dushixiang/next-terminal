@@ -28,7 +28,8 @@ import {
     CloudUploadOutlined,
     CopyOutlined,
     DeleteOutlined,
-    DesktopOutlined, ExpandOutlined,
+    DesktopOutlined,
+    ExpandOutlined,
     FileZipOutlined,
     FolderAddOutlined,
     LoadingOutlined,
@@ -65,6 +66,7 @@ class Access extends Component {
     state = {
         sessionId: '',
         client: {},
+        clientState: STATE_IDLE,
         clipboardVisible: false,
         clipboardText: '',
         containerOverflow: 'hidden',
@@ -107,16 +109,13 @@ class Access extends Component {
         this.renderDisplay(sessionId, protocol);
 
         window.addEventListener('resize', this.onWindowResize);
-        window.addEventListener('onfocus', this.onWindowFocus);
+        window.onfocus = this.onWindowFocus;
     }
 
     componentWillUnmount() {
         if (this.state.client) {
             this.state.client.disconnect();
         }
-
-        window.removeEventListener('resize', this.onWindowResize);
-        document.removeEventListener("onfocus", this.onWindowFocus);
     }
 
     sendClipboard(data) {
@@ -158,7 +157,7 @@ class Access extends Component {
     }
 
     onTunnelStateChange = (state) => {
-        console.log('onTunnelStateChange', state);
+
     };
 
     updateSessionStatus = async (sessionId) => {
@@ -169,24 +168,23 @@ class Access extends Component {
     }
 
     onClientStateChange = (state) => {
+        this.setState({
+            clientState: state
+        });
         switch (state) {
             case STATE_IDLE:
-                console.log('初始化');
                 message.destroy();
                 message.loading('正在初始化中...', 0);
                 break;
             case STATE_CONNECTING:
-                console.log('正在连接...');
                 message.destroy();
                 message.loading('正在努力连接中...', 0);
                 break;
             case STATE_WAITING:
-                console.log('正在等待...');
                 message.destroy();
                 message.loading('正在等待服务器响应...', 0);
                 break;
             case STATE_CONNECTED:
-                console.log('连接成功。');
                 this.onWindowResize(null);
                 message.destroy();
                 message.success('连接成功');
@@ -195,12 +193,10 @@ class Access extends Component {
                 })
                 break;
             case STATE_DISCONNECTING:
-                console.log('连接正在关闭中...');
                 message.destroy();
                 message.loading('正在关闭连接...', 0);
                 break;
             case STATE_DISCONNECTED:
-                console.log('连接关闭。');
                 message.destroy();
                 message.error('连接关闭');
                 break;
@@ -346,9 +342,6 @@ class Access extends Component {
         if (true === this.state.clipboardVisible || true === this.state.confirmVisible) {
             return true;
         }
-
-        console.log('--------------------')
-        console.log(keysym)
         this.state.client.sendKeyEvent(1, keysym);
         if (keysym === 65288) {
             return false;
@@ -375,13 +368,13 @@ class Access extends Component {
 
     fullScreen = () => {
         let fs = this.state.fullScreen;
-        if(fs){
+        if (fs) {
             exitFull();
             this.setState({
                 fullScreen: false,
                 fullScreenBtnText: '进入全屏'
             })
-        }else {
+        } else {
             requestFullScreen(document.documentElement);
             this.setState({
                 fullScreen: true,
@@ -399,7 +392,6 @@ class Access extends Component {
             if (element) {
                 element.value = this.state.clipboardText;
             }
-
         });
     };
 
@@ -567,7 +559,7 @@ class Access extends Component {
     }
 
     onWindowFocus = (e) => {
-        if (navigator.clipboard) {
+        if (navigator.clipboard && this.state.clientState === STATE_CONNECTED) {
             navigator.clipboard.readText().then((text) => {
                 this.sendClipboard({
                     'data': text,
@@ -844,7 +836,7 @@ class Access extends Component {
                 <Menu.Item key="2" icon={<FileZipOutlined/>} onClick={this.showFileSystem}>
                     文件管理
                 </Menu.Item>
-                <Menu.Item key="3" icon={<ExpandOutlined />} onClick={this.fullScreen}>
+                <Menu.Item key="3" icon={<ExpandOutlined/>} onClick={this.fullScreen}>
                     {this.state.fullScreenBtnText}
                 </Menu.Item>
                 <SubMenu title="发送快捷键" icon={<DesktopOutlined/>}>
@@ -853,7 +845,13 @@ class Access extends Component {
                     <Menu.Item
                         onClick={() => this.sendCombinationKey(['65507', '65513', '65288'])}>Ctrl+Alt+Backspace</Menu.Item>
                     <Menu.Item
+                        onClick={() => this.sendCombinationKey(['65515', '100'])}>Windows+D</Menu.Item>
+                    <Menu.Item
+                        onClick={() => this.sendCombinationKey(['65515', '101'])}>Windows+E</Menu.Item>
+                    <Menu.Item
                         onClick={() => this.sendCombinationKey(['65515', '114'])}>Windows+R</Menu.Item>
+                    <Menu.Item
+                        onClick={() => this.sendCombinationKey(['65515', '120'])}>Windows+X</Menu.Item>
                     <Menu.Item
                         onClick={() => this.sendCombinationKey(['65515'])}>Windows</Menu.Item>
                 </SubMenu>

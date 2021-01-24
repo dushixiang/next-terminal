@@ -43,18 +43,12 @@ class Access extends Component {
             rate: rate,
         })
         this.renderDisplay(connectionId);
-
-        window.addEventListener('resize', this.onWindowResize);
-        window.addEventListener('onfocus', this.onWindowFocus);
     }
 
     componentWillUnmount() {
         if (this.state.client) {
             this.state.client.disconnect();
         }
-
-        window.removeEventListener('resize', this.onWindowResize);
-        document.removeEventListener("onfocus", this.onWindowFocus);
     }
 
     onTunnelStateChange = (state) => {
