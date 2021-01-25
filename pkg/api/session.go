@@ -36,7 +36,7 @@ func SessionPagingEndpoint(c echo.Context) error {
 	}
 
 	for i := 0; i < len(items); i++ {
-		if len(items[i].Recording) > 0 {
+		if status == model.Disconnected && len(items[i].Recording) > 0 {
 			recording := items[i].Recording + "/recording"
 
 			if utils.FileExists(recording) {
@@ -82,7 +82,9 @@ func SessionContentEndpoint(c echo.Context) error {
 	session.Status = model.Connected
 	session.ConnectedTime = utils.NowJsonTime()
 
-	model.UpdateSessionById(&session, sessionId)
+	if err := model.UpdateSessionById(&session, sessionId); err != nil {
+		return err
+	}
 	return Success(c, nil)
 }
 
@@ -91,16 +93,20 @@ func SessionDiscontentEndpoint(c echo.Context) error {
 
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
-		CloseSessionById(split[i], ForcedDisconnect, "管理员强制关闭了此次接入。")
+		CloseSessionById(split[i], ForcedDisconnect, "强制断开")
 	}
 	return Success(c, nil)
 }
 
 func CloseSessionById(sessionId string, code int, reason string) {
-	tun, _ := global.Store.Get(sessionId)
-	if tun != nil {
-		_ = tun.Tun.Close()
-		CloseSessionByWebSocket(tun.WebSocket, code, reason)
+	observable, _ := global.Store.Get(sessionId)
+	if observable != nil {
+		_ = observable.Subject.Tunnel.Close()
+		for i := 0; i < len(observable.Observers); i++ {
+			_ = observable.Observers[i].Tunnel.Close()
+			CloseWebSocket(observable.Observers[i].WebSocket, code, reason)
+		}
+		CloseWebSocket(observable.Subject.WebSocket, code, reason)
 	}
 	global.Store.Del(sessionId)
 
@@ -126,10 +132,10 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	session.Code = code
 	session.Message = reason
 
-	model.UpdateSessionById(&session, sessionId)
+	_ = model.UpdateSessionById(&session, sessionId)
 }
 
-func CloseSessionByWebSocket(ws *websocket.Conn, c int, t string) {
+func CloseWebSocket(ws *websocket.Conn, c int, t string) {
 	if ws == nil {
 		return
 	}
@@ -157,13 +163,10 @@ func SessionResizeEndpoint(c echo.Context) error {
 
 	intHeight, _ := strconv.Atoi(height)
 
-	session := model.Session{}
-	session.ID = sessionId
-	session.Width = intWidth
-	session.Height = intHeight
-
-	model.UpdateSessionById(&session, sessionId)
-	return Success(c, session)
+	if err := model.UpdateSessionWindowSizeById(intWidth, intHeight, sessionId); err != nil {
+		return err
+	}
+	return Success(c, "")
 }
 
 func SessionCreateEndpoint(c echo.Context) error {
@@ -239,7 +242,7 @@ func SessionUploadEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		dstFile, err := tun.SftpClient.Create(remoteFile)
+		dstFile, err := tun.Subject.SftpClient.Create(remoteFile)
 		defer dstFile.Close()
 		if err != nil {
 			return err
@@ -292,7 +295,7 @@ func SessionDownloadEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		dstFile, err := tun.SftpClient.Open(remoteFile)
+		dstFile, err := tun.Subject.SftpClient.Open(remoteFile)
 		if err != nil {
 			return err
 		}
@@ -341,16 +344,16 @@ func SessionLsEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		if tun.SftpClient == nil {
+		if tun.Subject.SftpClient == nil {
 			sftpClient, err := CreateSftpClient(session.AssetId)
 			if err != nil {
 				logrus.Errorf("创建sftp客户端失败：%v", err.Error())
 				return err
 			}
-			tun.SftpClient = sftpClient
+			tun.Subject.SftpClient = sftpClient
 		}
 
-		fileInfos, err := tun.SftpClient.ReadDir(remoteDir)
+		fileInfos, err := tun.Subject.SftpClient.ReadDir(remoteDir)
 		if err != nil {
 			return err
 		}
@@ -410,7 +413,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
-		if err := tun.SftpClient.Mkdir(remoteDir); err != nil {
+		if err := tun.Subject.SftpClient.Mkdir(remoteDir); err != nil {
 			return err
 		}
 		return Success(c, nil)
@@ -441,18 +444,18 @@ func SessionRmDirEndpoint(c echo.Context) error {
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
-		fileInfos, err := tun.SftpClient.ReadDir(remoteDir)
+		fileInfos, err := tun.Subject.SftpClient.ReadDir(remoteDir)
 		if err != nil {
 			return err
 		}
 
 		for i := range fileInfos {
-			if err := tun.SftpClient.Remove(path.Join(remoteDir, fileInfos[i].Name())); err != nil {
+			if err := tun.Subject.SftpClient.Remove(path.Join(remoteDir, fileInfos[i].Name())); err != nil {
 				return err
 			}
 		}
 
-		if err := tun.SftpClient.RemoveDirectory(remoteDir); err != nil {
+		if err := tun.Subject.SftpClient.RemoveDirectory(remoteDir); err != nil {
 			return err
 		}
 		return Success(c, nil)
@@ -483,7 +486,7 @@ func SessionRmEndpoint(c echo.Context) error {
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
-		if err := tun.SftpClient.Remove(remoteFile); err != nil {
+		if err := tun.Subject.SftpClient.Remove(remoteFile); err != nil {
 			return err
 		}
 		return Success(c, nil)

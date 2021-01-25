@@ -470,27 +470,32 @@ class OnlineSession extends Component {
                            loading={this.state.loading}
                     />
 
-                    <Modal
-                        className='monitor'
-                        title={this.state.sessionTitle}
-                        centered
-                        maskClosable={false}
-                        visible={this.state.accessVisible}
-                        footer={null}
-                        width={window.innerWidth * 0.8}
-                        height={window.innerWidth * 0.8 / this.state.sessionWidth * this.state.sessionHeight}
-                        onCancel={() => {
-                            this.setState({accessVisible: false})
-                        }}
-                    >
-                        <Monitor connectionId={this.state.connectionId}
-                                 width={this.state.sessionWidth}
-                                 height={this.state.sessionHeight}
-                                 protocol={this.state.sessionProtocol}
-                                 rate={window.innerWidth * 0.8 / this.state.sessionWidth}>
+                    {
+                        this.state.accessVisible ?
+                            <Modal
+                                className='monitor'
+                                title={this.state.sessionTitle}
+                                centered
+                                maskClosable={false}
+                                visible={this.state.accessVisible}
+                                footer={null}
+                                width={window.innerWidth * 0.8}
+                                height={window.innerWidth * 0.8 / this.state.sessionWidth * this.state.sessionHeight}
+                                onCancel={() => {
+                                    message.destroy();
+                                    this.setState({accessVisible: false})
+                                }}
+                            >
+                                <Monitor connectionId={this.state.connectionId}
+                                         width={this.state.sessionWidth}
+                                         height={this.state.sessionHeight}
+                                         protocol={this.state.sessionProtocol}
+                                         rate={window.innerWidth * 0.8 / this.state.sessionWidth}>
 
-                        </Monitor>
-                    </Modal>
+                                </Monitor>
+                            </Modal> : undefined
+                    }
+
                 </Content>
             </>
         );
