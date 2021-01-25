@@ -132,9 +132,17 @@ func FindSessionByConnectionId(connectionId string) (o Session, err error) {
 	return
 }
 
-func UpdateSessionById(o *Session, id string) {
+func UpdateSessionById(o *Session, id string) error {
 	o.ID = id
-	global.DB.Updates(o)
+	return global.DB.Updates(o).Error
+}
+
+func UpdateSessionWindowSizeById(width, height int, id string) error {
+	session := Session{}
+	session.Width = width
+	session.Height = height
+
+	return UpdateSessionById(&session, id)
 }
 
 func DeleteSessionById(id string) {

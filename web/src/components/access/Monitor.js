@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Guacamole from 'guacamole-common-js';
-import {message, Modal} from 'antd'
+import {Modal, Result, Spin} from 'antd'
 import qs from "qs";
 import {wsServer} from "../../common/constants";
 import {getToken} from "../../utils/utils";
@@ -20,9 +20,12 @@ class Access extends Component {
     state = {
         client: {},
         containerOverflow: 'hidden',
-        containerWidth: 0,
-        containerHeight: 0,
-        rate: 1
+        width: 0,
+        height: 0,
+        rate: 1,
+        loading: false,
+        tip: '',
+        closed: false,
     };
 
     async componentDidMount() {
@@ -38,8 +41,8 @@ class Access extends Component {
             height = height * 2;
         }
         this.setState({
-            containerWidth: width * rate,
-            containerHeight: height * rate,
+            width: width * rate,
+            height: height * rate,
             rate: rate,
         })
         this.renderDisplay(connectionId);
@@ -53,40 +56,47 @@ class Access extends Component {
 
     onTunnelStateChange = (state) => {
         console.log('onTunnelStateChange', state);
+        if (state === Guacamole.Tunnel.State.CLOSED) {
+            this.setState({
+                loading: false,
+                closed: true,
+            });
+        }
     };
 
     onClientStateChange = (state) => {
         switch (state) {
             case STATE_IDLE:
-                console.log('初始化');
-                message.destroy();
-                message.loading('正在初始化中...', 0);
+                this.setState({
+                    loading: true,
+                    tip: '正在初始化中...'
+                });
                 break;
             case STATE_CONNECTING:
-                console.log('正在连接...');
-                message.destroy();
-                message.loading('正在努力连接中...', 0);
+                this.setState({
+                    loading: true,
+                    tip: '正在努力连接中...'
+                });
                 break;
             case STATE_WAITING:
-                console.log('正在等待...');
-                message.destroy();
-                message.loading('正在等待服务器响应...', 0);
+                this.setState({
+                    loading: true,
+                    tip: '正在等待服务器响应...'
+                });
                 break;
             case STATE_CONNECTED:
-                console.log('连接成功。');
-                message.destroy();
-                message.success('连接成功');
+                this.setState({
+                    loading: false
+                });
                 if (this.state.client) {
                     this.state.client.getDisplay().scale(this.state.rate);
                 }
                 break;
             case STATE_DISCONNECTING:
-                console.log('连接正在关闭中...');
-                message.destroy();
+
                 break;
             case STATE_DISCONNECTED:
-                console.log('连接关闭。');
-                message.destroy();
+
                 break;
             default:
                 break;
@@ -211,16 +221,26 @@ class Access extends Component {
     render() {
 
         return (
-            <div>
-                <div className="container" style={{
-                    overflow: this.state.containerOverflow,
-                    width: this.state.containerWidth,
-                    height: this.state.containerHeight
-                }}>
+            <Spin spinning={this.state.loading} tip={this.state.tip}>
+                <div>
+                    {
+                        this.state.closed ?
+                            <Result
+                                title="远程连接已关闭"
+                            /> :
+                            <div className="container" style={{
+                                overflow: this.state.containerOverflow,
+                                width: this.state.width,
+                                height: this.state.height
+                            }}>
 
-                    <div id="display"/>
+                                <div id="display"/>
+                            </div>
+                    }
+
+
                 </div>
-            </div>
+            </Spin>
         );
     }
 }

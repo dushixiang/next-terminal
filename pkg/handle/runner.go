@@ -3,8 +3,6 @@ package handle
 import (
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	"next-terminal/pkg/api"
-	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -42,21 +40,6 @@ func RunTicker() {
 		}
 	})
 
-	// 定时任务，每隔一分钟校验一次运行中的会话信息
-	_, _ = c.AddFunc("0 0/1 0/1 * * ?", func() {
-		sessions, _ := model.FindSessionByStatus(model.Connected)
-		if sessions != nil && len(sessions) > 0 {
-			for i := range sessions {
-				_, found := global.Store.Get(sessions[i].ID)
-				if !found {
-					api.CloseSessionById(sessions[i].ID, api.Normal, "")
-					s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
-					logrus.Infof("会话「%v」ID「%v」已离线，修改状态为「关闭」。", s, sessions[i].ID)
-				}
-			}
-		}
-	})
-
 	c.Start()
 }
 
@@ -72,7 +55,7 @@ func RunDataFix() {
 			DisconnectedTime: utils.NowJsonTime(),
 		}
 
-		model.UpdateSessionById(&session, sessions[i].ID)
+		_ = model.UpdateSessionById(&session, sessions[i].ID)
 	}
 }
 

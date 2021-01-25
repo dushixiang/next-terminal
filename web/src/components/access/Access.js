@@ -503,7 +503,7 @@ class Access extends Component {
         let stateChecker = setInterval(async () => {
             let result = await request.get(`/sessions/${sessionId}`);
             if (result['code'] !== 1) {
-                message.error(result['message']);
+                clearInterval(stateChecker);
             } else {
                 let session = result['data'];
                 if (session['status'] === 'connected') {

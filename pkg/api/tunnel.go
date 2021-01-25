@@ -1,6 +1,8 @@
 package api
 
 import (
+	"errors"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -49,8 +51,12 @@ func TunEndpoint(c echo.Context) error {
 	if len(connectionId) > 0 {
 		session, err = model.FindSessionByConnectionId(connectionId)
 		if err != nil {
-			CloseSessionById(sessionId, NotFoundSession, "会话不存在")
+			CloseWebSocket(ws, NotFoundSession, "会话不存在")
 			return err
+		}
+		if session.Status != model.Connected {
+			CloseWebSocket(ws, NotFoundSession, "会话未在线")
+			return errors.New("会话未在线")
 		}
 		configuration.ConnectionID = connectionId
 	} else {
@@ -131,38 +137,62 @@ func TunEndpoint(c echo.Context) error {
 
 	tunnel, err := guacd.NewTunnel(addr, configuration)
 	if err != nil {
-		CloseSessionById(sessionId, NewTunnelError, err.Error())
+		if connectionId == "" {
+			CloseSessionById(sessionId, NewTunnelError, err.Error())
+		}
 		logrus.Printf("建立连接失败: %v", err.Error())
 		return err
 	}
 
 	tun := global.Tun{
-		Tun:       tunnel,
+		Tunnel:    tunnel,
 		WebSocket: ws,
 	}
 
-	global.Store.Set(sessionId, &tun)
-
 	if len(session.ConnectionId) == 0 {
+		var observers []global.Tun
+		observable := global.Observable{
+			Subject:   &tun,
+			Observers: observers,
+		}
+
+		global.Store.Set(sessionId, &observable)
+		// 创建新会话
 		session.ConnectionId = tunnel.UUID
 		session.Width = intWidth
 		session.Height = intHeight
 		session.Status = model.Connecting
 		session.Recording = configuration.GetParameter(guacd.RecordingPath)
 
-		model.UpdateSessionById(&session, sessionId)
+		if err := model.UpdateSessionById(&session, sessionId); err != nil {
+			return err
+		}
+	} else {
+		// TODO 处理监控会话的退出
+		// 监控会话
+		observable, ok := global.Store.Get(sessionId)
+		if ok {
+			observers := append(observable.Observers, tun)
+			observable.Observers = observers
+			global.Store.Set(sessionId, observable)
+		}
 	}
 
 	go func() {
 		for true {
 			instruction, err := tunnel.Read()
+			fmt.Printf("<- %v \n", string(instruction))
 			if err != nil {
-				CloseSessionById(sessionId, TunnelClosed, "隧道已关闭")
+				if connectionId == "" {
+					CloseSessionById(sessionId, TunnelClosed, "远程连接关闭")
+				}
 				break
 			}
 			err = ws.WriteMessage(websocket.TextMessage, instruction)
 			if err != nil {
-				CloseSessionById(sessionId, TunnelClosed, "隧道已关闭")
+				if connectionId == "" {
+					CloseSessionById(sessionId, Normal, "正常退出")
+				}
 				break
 			}
 		}
@@ -171,12 +201,16 @@ func TunEndpoint(c echo.Context) error {
 	for true {
 		_, message, err := ws.ReadMessage()
 		if err != nil {
-			CloseSessionById(sessionId, Normal, "用户主动关闭了会话")
+			if connectionId == "" {
+				CloseSessionById(sessionId, Normal, "正常退出")
+			}
 			break
 		}
 		_, err = tunnel.WriteAndFlush(message)
 		if err != nil {
-			CloseSessionById(sessionId, Normal, "用户主动关闭了会话")
+			if connectionId == "" {
+				CloseSessionById(sessionId, TunnelClosed, "远程连接关闭")
+			}
 			break
 		}
 	}
