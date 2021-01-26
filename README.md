@@ -33,6 +33,7 @@ test/test
 
 - [使用docker安装](docs/install-docker.md)
 - [原生安装](docs/install-naive.md)
+- [FAQ](docs/faq.md)
 
 默认账号密码为 admin/admin
 
