@@ -609,6 +609,7 @@ class User extends Component {
                         this.state.changePasswordVisible ?
                             <Modal title="修改密码" visible={this.state.changePasswordVisible}
                                    confirmLoading={this.state.changePasswordConfirmLoading}
+                                   maskClosable={false}
                                    onOk={() => {
                                        this.changePasswordFormRef.current
                                            .validateFields()
