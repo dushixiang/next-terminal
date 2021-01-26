@@ -2,7 +2,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -40,9 +39,6 @@ func TunEndpoint(c echo.Context) error {
 	intHeight, _ := strconv.Atoi(height)
 
 	configuration := guacd.NewConfiguration()
-	configuration.SetParameter("width", width)
-	configuration.SetParameter("height", height)
-	configuration.SetParameter("dpi", dpi)
 
 	propertyMap := model.FindAllPropertiesMap()
 
@@ -59,7 +55,14 @@ func TunEndpoint(c echo.Context) error {
 			return errors.New("会话未在线")
 		}
 		configuration.ConnectionID = connectionId
+		sessionId = session.ID
+		configuration.SetParameter("width", strconv.Itoa(session.Width))
+		configuration.SetParameter("height", strconv.Itoa(session.Height))
+		configuration.SetParameter("dpi", "96")
 	} else {
+		configuration.SetParameter("width", width)
+		configuration.SetParameter("height", height)
+		configuration.SetParameter("dpi", dpi)
 		session, err = model.FindSessionById(sessionId)
 		if err != nil {
 			CloseSessionById(sessionId, NotFoundSession, "会话不存在")
@@ -95,7 +98,6 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.DisableBitmapCaching, propertyMap[guacd.DisableBitmapCaching])
 			configuration.SetParameter(guacd.DisableOffscreenCaching, propertyMap[guacd.DisableOffscreenCaching])
 			configuration.SetParameter(guacd.DisableGlyphCaching, propertyMap[guacd.DisableGlyphCaching])
-			configuration.SetParameter("server-layout", "en-us-qwerty")
 			break
 		case "ssh":
 			if len(session.PrivateKey) > 0 && session.PrivateKey != "-" {
@@ -133,8 +135,6 @@ func TunEndpoint(c echo.Context) error {
 
 	addr := propertyMap[guacd.Host] + ":" + propertyMap[guacd.Port]
 
-	logrus.Infof("connect to %v with global: %+v", addr, configuration)
-
 	tunnel, err := guacd.NewTunnel(addr, configuration)
 	if err != nil {
 		if connectionId == "" {
@@ -150,6 +150,7 @@ func TunEndpoint(c echo.Context) error {
 	}
 
 	if len(session.ConnectionId) == 0 {
+
 		var observers []global.Tun
 		observable := global.Observable{
 			Subject:   &tun,
@@ -157,31 +158,33 @@ func TunEndpoint(c echo.Context) error {
 		}
 
 		global.Store.Set(sessionId, &observable)
-		// 创建新会话
-		session.ConnectionId = tunnel.UUID
-		session.Width = intWidth
-		session.Height = intHeight
-		session.Status = model.Connecting
-		session.Recording = configuration.GetParameter(guacd.RecordingPath)
 
-		if err := model.UpdateSessionById(&session, sessionId); err != nil {
+		sess := model.Session{
+			ConnectionId: tunnel.UUID,
+			Width:        intWidth,
+			Height:       intHeight,
+			Status:       model.Connecting,
+			Recording:    configuration.GetParameter(guacd.RecordingPath),
+		}
+		// 创建新会话
+		logrus.Debugf("创建新会话 %v", sess.ConnectionId)
+		if err := model.UpdateSessionById(&sess, sessionId); err != nil {
 			return err
 		}
 	} else {
-		// TODO 处理监控会话的退出
 		// 监控会话
 		observable, ok := global.Store.Get(sessionId)
 		if ok {
 			observers := append(observable.Observers, tun)
 			observable.Observers = observers
 			global.Store.Set(sessionId, observable)
+			logrus.Debugf("加入会话%v,当前观察者数量为：%v", session.ConnectionId, len(observers))
 		}
 	}
 
 	go func() {
 		for true {
 			instruction, err := tunnel.Read()
-			fmt.Printf("<- %v \n", string(instruction))
 			if err != nil {
 				if connectionId == "" {
 					CloseSessionById(sessionId, TunnelClosed, "远程连接关闭")
