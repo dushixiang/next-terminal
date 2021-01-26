@@ -3,6 +3,7 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -11,6 +12,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	"net/http"
 	"next-terminal/pkg/model"
+	"next-terminal/pkg/utils"
 	"strconv"
 	"sync"
 	"time"
@@ -73,6 +75,19 @@ func SSHEndpoint(c echo.Context) error {
 	assetId := c.QueryParam("assetId")
 	width, _ := strconv.Atoi(c.QueryParam("width"))
 	height, _ := strconv.Atoi(c.QueryParam("height"))
+
+	user, _ := GetCurrentAccount(c)
+	if model.TypeUser == user.Type {
+		// 检测是否有访问权限
+		assetIds, err := model.FindAssetIdsByUserId(user.ID)
+		if err != nil {
+			return err
+		}
+
+		if !utils.Contains(assetIds, assetId) {
+			return errors.New("您没有权限访问此资产")
+		}
+	}
 
 	sshClient, err := CreateSshClient(assetId)
 	if err != nil {
