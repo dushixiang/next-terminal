@@ -81,15 +81,15 @@ func FindLoginLogById(id string) (o LoginLog, err error) {
 	return
 }
 
-func Logout(id string) {
+func Logout(token string) {
 
-	loginLog, err := FindLoginLogById(id)
+	loginLog, err := FindLoginLogById(token)
 	if err != nil {
-		logrus.Warnf("登录日志「%v」获取失败", id)
+		logrus.Warnf("登录日志「%v」获取失败", token)
 		return
 	}
 
-	global.DB.Table("login_logs").Where("id = ?", id).Update("logout_time", utils.NowJsonTime())
+	global.DB.Table("login_logs").Where("token = ?", token).Update("logout_time", utils.NowJsonTime())
 
 	loginLogs, err := FindAliveLoginLogsByUserId(loginLog.UserId)
 	if err != nil {

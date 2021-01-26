@@ -28,7 +28,8 @@ import {
     CloudUploadOutlined,
     CopyOutlined,
     DeleteOutlined,
-    DesktopOutlined, ExclamationCircleOutlined,
+    DesktopOutlined,
+    ExclamationCircleOutlined,
     ExpandOutlined,
     FileZipOutlined,
     FolderAddOutlined,
@@ -37,7 +38,7 @@ import {
     UploadOutlined
 } from '@ant-design/icons';
 import Upload from "antd/es/upload";
-import {download, exitFull, getToken, requestFullScreen} from "../../utils/utils";
+import {download, exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
 import './Access.css'
 import Draggable from 'react-draggable';
 
@@ -100,6 +101,9 @@ class Access extends Component {
         let assetsId = params.get('assetsId');
         let protocol = params.get('protocol');
         let sessionId = await this.createSession(assetsId);
+        if (isEmpty(sessionId)) {
+            return;
+        }
 
         this.setState({
             sessionId: sessionId,
@@ -157,7 +161,7 @@ class Access extends Component {
     }
 
     onTunnelStateChange = (state) => {
-        if(state === Guacamole.Tunnel.State.CLOSED){
+        if (state === Guacamole.Tunnel.State.CLOSED) {
             this.showMessage('连接已关闭');
         }
     };
@@ -285,7 +289,7 @@ class Access extends Component {
         message.destroy();
         Modal.confirm({
             title: '提示',
-            icon: <ExclamationCircleOutlined />,
+            icon: <ExclamationCircleOutlined/>,
             content: msg,
             centered: true,
             okText: '重新连接',
@@ -428,12 +432,12 @@ class Access extends Component {
 
     async createSession(assetsId) {
         let result = await request.post(`/sessions?assetId=${assetsId}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
+        if (result['code'] !== 1) {
+            this.showMessage(result['message']);
+            return null;
         }
-        document.title = result.data['ip'] + ':' + result.data['port'];
-        return result.data['id'];
+        document.title = result['data']['ip'] + ':' + result['data']['port'];
+        return result['data']['id'];
     }
 
     async renderDisplay(sessionId, protocol) {
