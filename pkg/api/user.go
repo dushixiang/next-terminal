@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
 	"strconv"
@@ -79,6 +80,7 @@ func UserDeleteEndpoint(c echo.Context) error {
 		}
 		if loginLogs != nil && len(loginLogs) > 0 {
 			for j := range loginLogs {
+				global.Cache.Delete(loginLogs[j].ID)
 				model.Logout(loginLogs[j].ID)
 			}
 		}
