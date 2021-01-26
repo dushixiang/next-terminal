@@ -75,7 +75,7 @@ func SessionDeleteEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func SessionContentEndpoint(c echo.Context) error {
+func SessionConnectEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
 
 	session := model.Session{}
@@ -89,7 +89,7 @@ func SessionContentEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func SessionDiscontentEndpoint(c echo.Context) error {
+func SessionDisconnectEndpoint(c echo.Context) error {
 	sessionIds := c.Param("id")
 
 	split := strings.Split(sessionIds, ",")

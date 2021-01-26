@@ -297,7 +297,7 @@ class OnlineSession extends Component {
                                 });
 
                                 const dis = async (id) => {
-                                    const result = await request.post(`/sessions/${id}/discontent`);
+                                    const result = await request.post(`/sessions/${id}/disconnect`);
                                     if (result.code === 1) {
                                         notification['success']({
                                             message: '提示',
