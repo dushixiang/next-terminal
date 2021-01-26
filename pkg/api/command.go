@@ -34,7 +34,10 @@ func CommandPagingEndpoint(c echo.Context) error {
 	content := c.QueryParam("content")
 	account, _ := GetCurrentAccount(c)
 
-	items, total, _ := model.FindPageCommand(pageIndex, pageSize, name, content, account)
+	items, total, err := model.FindPageCommand(pageIndex, pageSize, name, content, account)
+	if err != nil {
+		return err
+	}
 
 	return Success(c, H{
 		"total": total,

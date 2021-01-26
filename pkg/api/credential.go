@@ -63,7 +63,10 @@ func CredentialPagingEndpoint(c echo.Context) error {
 	name := c.QueryParam("name")
 
 	account, _ := GetCurrentAccount(c)
-	items, total, _ := model.FindPageCredential(pageIndex, pageSize, name, account)
+	items, total, err := model.FindPageCredential(pageIndex, pageSize, name, account)
+	if err != nil {
+		return err
+	}
 
 	return Success(c, H{
 		"total": total,
