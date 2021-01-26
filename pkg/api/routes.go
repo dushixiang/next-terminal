@@ -115,7 +115,7 @@ func SetupRoutes() *echo.Echo {
 		sessions.DELETE("/:id/rm", SessionRmEndpoint)
 		sessions.DELETE("/:id", SessionDeleteEndpoint)
 		sessions.GET("/:id/recording", SessionRecordingEndpoint)
-		sessions.GET("/:id", SessionGetEndpoint)
+		sessions.GET("/:id/status", SessionGetStatusEndpoint)
 	}
 
 	resourceSharers := e.Group("/resource-sharers")

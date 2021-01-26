@@ -17,6 +17,7 @@ import (
 	"path"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -98,13 +99,19 @@ func SessionDiscontentEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
+var mutex sync.Mutex
+
 func CloseSessionById(sessionId string, code int, reason string) {
+	mutex.Lock()
+	defer mutex.Unlock()
 	observable, _ := global.Store.Get(sessionId)
 	if observable != nil {
+		logrus.Debugf("会话%v创建者退出", observable.Subject.Tunnel.UUID)
 		_ = observable.Subject.Tunnel.Close()
 		for i := 0; i < len(observable.Observers); i++ {
 			_ = observable.Observers[i].Tunnel.Close()
 			CloseWebSocket(observable.Observers[i].WebSocket, code, reason)
+			logrus.Debugf("强制踢出会话%v的观察者", observable.Observers[i].Tunnel.UUID)
 		}
 		CloseWebSocket(observable.Subject.WebSocket, code, reason)
 	}
@@ -515,11 +522,13 @@ func SessionRecordingEndpoint(c echo.Context) error {
 	return c.File(recording)
 }
 
-func SessionGetEndpoint(c echo.Context) error {
+func SessionGetStatusEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
 	session, err := model.FindSessionById(sessionId)
 	if err != nil {
 		return err
 	}
-	return Success(c, session)
+	return Success(c, H{
+		"status": session.Status,
+	})
 }

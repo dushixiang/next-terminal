@@ -28,7 +28,7 @@ import {
     CloudUploadOutlined,
     CopyOutlined,
     DeleteOutlined,
-    DesktopOutlined,
+    DesktopOutlined, ExclamationCircleOutlined,
     ExpandOutlined,
     FileZipOutlined,
     FolderAddOutlined,
@@ -146,18 +146,20 @@ class Access extends Component {
         })
         if (this.state.protocol === 'ssh') {
             if (data.data && data.data.length > 0) {
-                message.success('您输入的内容已复制到远程服务器上，使用右键将自动粘贴。');
+                // message.success('您输入的内容已复制到远程服务器上，使用右键将自动粘贴。');
             }
         } else {
             if (data.data && data.data.length > 0) {
-                message.success('您输入的内容已复制到远程服务器上');
+                // message.success('您输入的内容已复制到远程服务器上');
             }
         }
 
     }
 
     onTunnelStateChange = (state) => {
-
+        if(state === Guacamole.Tunnel.State.CLOSED){
+            this.showMessage('连接已关闭');
+        }
     };
 
     updateSessionStatus = async (sessionId) => {
@@ -281,9 +283,19 @@ class Access extends Component {
 
     showMessage(msg) {
         message.destroy();
-        Modal.error({
+        Modal.confirm({
             title: '提示',
+            icon: <ExclamationCircleOutlined />,
             content: msg,
+            centered: true,
+            okText: '重新连接',
+            cancelText: '关闭页面',
+            onOk() {
+                window.location.reload();
+            },
+            onCancel() {
+                window.close();
+            },
         });
     }
 
@@ -304,7 +316,7 @@ class Access extends Component {
             // Set clipboard contents once stream is finished
             reader.onend = async () => {
 
-                message.success('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
+                // message.success('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
                 this.setState({
                     clipboardText: data
                 });
@@ -501,7 +513,7 @@ class Access extends Component {
         keyboard.onkeyup = this.onKeyUp;
 
         let stateChecker = setInterval(async () => {
-            let result = await request.get(`/sessions/${sessionId}`);
+            let result = await request.get(`/sessions/${sessionId}/status`);
             if (result['code'] !== 1) {
                 clearInterval(stateChecker);
             } else {

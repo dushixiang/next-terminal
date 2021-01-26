@@ -140,7 +140,6 @@ func NewTunnel(address string, config Configuration) (ret *Tunnel, err error) {
 	if err := ret.WriteInstructionAndFlush(NewInstruction("size", width, height, dpi)); err != nil {
 		return nil, err
 	}
-
 	if err := ret.WriteInstructionAndFlush(NewInstruction("audio")); err != nil {
 		return nil, err
 	}
@@ -150,10 +149,9 @@ func NewTunnel(address string, config Configuration) (ret *Tunnel, err error) {
 	if err := ret.WriteInstructionAndFlush(NewInstruction("image")); err != nil {
 		return nil, err
 	}
-
-	//if err := ret.WriteInstructionAndFlush(NewInstruction("timezone", "Asia/Shanghai")); err != nil {
-	//	return nil, err
-	//}
+	if err := ret.WriteInstructionAndFlush(NewInstruction("timezone", "Asia/Shanghai")); err != nil {
+		return nil, err
+	}
 
 	parameters := make([]string, len(args.Args))
 	for i := range args.Args {
@@ -198,7 +196,7 @@ func (opt *Tunnel) WriteInstruction(instruction Instruction) error {
 }
 
 func (opt *Tunnel) WriteAndFlush(p []byte) (int, error) {
-	fmt.Printf("-> %v \n", string(p))
+	//fmt.Printf("-> %v \n", string(p))
 	nn, err := opt.rw.Write(p)
 	if err != nil {
 		return nn, err
@@ -211,7 +209,7 @@ func (opt *Tunnel) WriteAndFlush(p []byte) (int, error) {
 }
 
 func (opt *Tunnel) Write(p []byte) (int, error) {
-	fmt.Printf("-> %v \n", string(p))
+	//fmt.Printf("-> %v \n", string(p))
 	nn, err := opt.rw.Write(p)
 	if err != nil {
 		return nn, err
@@ -225,15 +223,17 @@ func (opt *Tunnel) Flush() error {
 
 func (opt *Tunnel) ReadInstruction() (instruction Instruction, err error) {
 	msg, err := opt.rw.ReadString(Delimiter)
-	fmt.Printf("<- %v \n", msg)
+	//fmt.Printf("<- %v \n", msg)
 	if err != nil {
 		return instruction, err
 	}
 	return instruction.Parse(msg), err
 }
 
-func (opt *Tunnel) Read() ([]byte, error) {
-	return opt.rw.ReadBytes(Delimiter)
+func (opt *Tunnel) Read() (p []byte, err error) {
+	p, err = opt.rw.ReadBytes(Delimiter)
+	//fmt.Printf("<- %v \n", string(p))
+	return
 }
 
 func (opt *Tunnel) expect(opcode string) (instruction Instruction, err error) {
