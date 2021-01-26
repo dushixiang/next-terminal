@@ -145,3 +145,21 @@ func AddSharerResources(userGroupId, userId, resourceType string, resourceIds []
 		return nil
 	})
 }
+
+func FindAssetIdsByUserId(userId string) (assetIds []string, err error) {
+	groupIds, err := FindUserGroupIdsByUserId(userId)
+	if err != nil {
+		return nil, err
+	}
+
+	db := global.DB
+	db = db.Table("resource_sharers").Select("resource_id").Where("user_id = ?", userId)
+	if groupIds != nil && len(groupIds) > 0 {
+		db = db.Or("user_group_id in ?", groupIds)
+	}
+	err = db.Find(&assetIds).Error
+	if assetIds == nil {
+		assetIds = make([]string, 0)
+	}
+	return
+}

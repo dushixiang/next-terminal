@@ -72,6 +72,17 @@ func UserDeleteEndpoint(c echo.Context) error {
 		if account.ID == userId {
 			return Fail(c, -1, "不允许删除自身账户")
 		}
+		// 将用户强制下线
+		loginLogs, err := model.FindAliveLoginLogsByUserId(userId)
+		if err != nil {
+			return err
+		}
+		if loginLogs != nil && len(loginLogs) > 0 {
+			for j := range loginLogs {
+				model.Logout(loginLogs[j].ID)
+			}
+		}
+		// 删除用户
 		model.DeleteUserById(userId)
 	}
 

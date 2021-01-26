@@ -101,6 +101,10 @@ func UpdateUserById(o *User, id string) {
 
 func DeleteUserById(id string) {
 	global.DB.Where("id = ?", id).Delete(&User{})
+	// 删除用户组中的用户关系
+	global.DB.Where("user_id = ?", id).Delete(&UserGroupMember{})
+	// 删除用户分享到的资产
+	global.DB.Where("user_id = ?", id).Delete(&ResourceSharer{})
 }
 
 func CountUser() (total int64, err error) {

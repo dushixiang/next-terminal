@@ -180,6 +180,18 @@ func SessionCreateEndpoint(c echo.Context) error {
 	assetId := c.QueryParam("assetId")
 	user, _ := GetCurrentAccount(c)
 
+	if model.TypeUser == user.Type {
+		// 检测是否有访问权限
+		assetIds, err := model.FindAssetIdsByUserId(user.ID)
+		if err != nil {
+			return err
+		}
+
+		if !utils.Contains(assetIds, assetId) {
+			return errors.New("您没有权限访问此资产")
+		}
+	}
+
 	asset, err := model.FindAssetById(assetId)
 	if err != nil {
 		return err

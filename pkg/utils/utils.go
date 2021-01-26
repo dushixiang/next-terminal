@@ -143,3 +143,12 @@ func Sign(a []string) string {
 	has := md5.Sum(data)
 	return fmt.Sprintf("%x", has)
 }
+
+func Contains(s []string, str string) bool {
+	for _, v := range s {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
