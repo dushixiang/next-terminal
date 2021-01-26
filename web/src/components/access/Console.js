@@ -101,7 +101,10 @@ class Console extends Component {
                 if (command !== '') {
                     let webSocket = this.state.webSocket;
                     if (webSocket !== undefined && webSocket.readyState === WebSocket.OPEN) {
-                        webSocket.send(JSON.stringify({type: 'data', content: command + String.fromCharCode(13)}));
+                        webSocket.send(JSON.stringify({
+                            type: 'data',
+                            content: command + String.fromCharCode(13)
+                        }));
                     }
                 }
                 executedCommand = true;
@@ -142,7 +145,7 @@ class Console extends Component {
             }
 
             term.focus();
-            if(webSocket.readyState === WebSocket.OPEN){
+            if (webSocket.readyState === WebSocket.OPEN) {
                 webSocket.send(JSON.stringify({type: 'resize', content: JSON.stringify({height, width})}));
             }
         }

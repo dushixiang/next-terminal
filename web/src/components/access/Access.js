@@ -167,7 +167,7 @@ class Access extends Component {
     };
 
     updateSessionStatus = async (sessionId) => {
-        let result = await request.post(`/sessions/${sessionId}/content`);
+        let result = await request.post(`/sessions/${sessionId}/connect`);
         if (result.code !== 1) {
             message.error(result.message);
         }

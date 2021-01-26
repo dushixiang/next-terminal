@@ -73,7 +73,7 @@ class DynamicCommand extends Component {
         assetsVisible: false,
         assets: [],
         checkedAssets: [],
-        command: '',
+        commandId: '',
         model: null,
         selectedRowKeys: [],
         delBtnLoading: false,
@@ -223,7 +223,7 @@ class DynamicCommand extends Component {
             }
         });
 
-        window.location.href = '#/batch-command?command=' + this.state.command + '&assets=' + JSON.stringify(cAssets);
+        window.location.href = '#/batch-command?commandId=' + this.state.commandId + '&assets=' + JSON.stringify(cAssets);
     };
 
     handleOk = async (formData) => {
@@ -463,7 +463,7 @@ class DynamicCommand extends Component {
 
                             this.setState({
                                 assetsVisible: true,
-                                command: record.content
+                                commandId: record['id']
                             });
 
                             let result = await request.get('/assets?protocol=ssh');

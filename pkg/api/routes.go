@@ -104,8 +104,8 @@ func SetupRoutes() *echo.Echo {
 	{
 		sessions.POST("", SessionCreateEndpoint)
 		sessions.GET("/paging", SessionPagingEndpoint)
-		sessions.POST("/:id/content", SessionContentEndpoint)
-		sessions.POST("/:id/discontent", Admin(SessionDiscontentEndpoint))
+		sessions.POST("/:id/connect", SessionConnectEndpoint)
+		sessions.POST("/:id/disconnect", Admin(SessionDisconnectEndpoint))
 		sessions.POST("/:id/resize", SessionResizeEndpoint)
 		sessions.POST("/:id/upload", SessionUploadEndpoint)
 		sessions.GET("/:id/download", SessionDownloadEndpoint)
