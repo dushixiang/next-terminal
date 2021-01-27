@@ -50,9 +50,10 @@ func (w *NextWriter) Read() ([]byte, int, error) {
 }
 
 const (
-	Data   = "data"
-	Resize = "resize"
-	Closed = "closed"
+	Connected = "connected"
+	Data      = "data"
+	Resize    = "resize"
+	Closed    = "closed"
 )
 
 type Message struct {
@@ -61,8 +62,8 @@ type Message struct {
 }
 
 type WindowSize struct {
-	Height int `json:"height"`
-	Width  int `json:"width"`
+	Cols int `json:"cols"`
+	Rows int `json:"rows"`
 }
 
 func SSHEndpoint(c echo.Context) error {
@@ -136,8 +137,8 @@ func SSHEndpoint(c echo.Context) error {
 	}
 
 	msg := Message{
-		Type:    Data,
-		Content: "Connect to server successfully.",
+		Type:    Connected,
+		Content: "Connect to server successfully.\r\n",
 	}
 	_ = WriteMessage(ws, msg)
 
@@ -199,7 +200,7 @@ func SSHEndpoint(c echo.Context) error {
 				logrus.Warnf("解析SSH会话窗口大小失败: %v", err)
 				continue
 			}
-			if err := session.WindowChange(winSize.Height, winSize.Height); err != nil {
+			if err := session.WindowChange(winSize.Rows, winSize.Cols); err != nil {
 				logrus.Warnf("更改SSH会话窗口大小失败: %v", err)
 				continue
 			}

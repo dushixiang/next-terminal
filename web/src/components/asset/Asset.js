@@ -319,7 +319,11 @@ class Asset extends Component {
         if (result.code === 1) {
             if (result.data === true) {
                 message.success({content: '检测完成，您访问的资产在线，即将打开窗口进行访问。', key: id, duration: 3});
-                window.open(`#/access?assetsId=${id}&protocol=${protocol}`);
+                if(protocol === 'ssh'){
+                    window.open(`#/access-ssh?assetId=${id}`);
+                }else {
+                    window.open(`#/access?assetsId=${id}&protocol=${protocol}`);
+                }
             } else {
                 message.warn('您访问的资产未在线，请确认网络状态。', 10);
             }
