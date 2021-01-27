@@ -67,7 +67,7 @@ ssh
 
 - 邮箱 helloworld1024@foxmail.com
 
-- QQ群 938125468
+- QQ群 938145268
 
   <img src="screenshot/qq.png" width="300"  height="auto"/>
 
