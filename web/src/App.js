@@ -40,6 +40,7 @@ import {isEmpty, NT_PACKAGE} from "./utils/utils";
 import {isAdmin} from "./service/permission";
 import UserGroup from "./components/user/UserGroup";
 import LoginLog from "./components/session/LoginLog";
+import AccessSSH from "./components/access/AccessSSH";
 
 const {Footer, Sider} = Layout;
 
@@ -66,7 +67,7 @@ class App extends Component {
     componentDidMount() {
         let hash = window.location.hash;
         let current = hash.replace('#/', '');
-        if(isEmpty(current)){
+        if (isEmpty(current)) {
             current = 'dashboard';
         }
         this.setCurrent(current);
@@ -113,6 +114,7 @@ class App extends Component {
 
             <Switch>
                 <Route path="/access" component={Access}/>
+                <Route path="/access-ssh" component={AccessSSH}/>
                 <Route path="/login"><Login updateUser={this.updateUser}/></Route>
 
                 <Route path="/">
