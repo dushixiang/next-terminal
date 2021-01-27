@@ -8,7 +8,7 @@
 
 Next Terminal是使用Golang和React开发的一款HTML5的远程桌面网关，具有小巧、易安装、易使用、资源占用小的特点，支持RDP、SSH、VNC和Telnet协议的连接和管理。
 
-Next Terminal基于 [Apache Guacamole](!https://guacamole.apache.org/) 开发，使用到了guacd服务。
+Next Terminal基于 [Apache Guacamole](https://guacamole.apache.org/) 开发，使用到了guacd服务。
 
 目前支持的功能有：
 
@@ -18,7 +18,7 @@ Next Terminal基于 [Apache Guacamole](!https://guacamole.apache.org/) 开发，
 - 批量执行命令
 - 在线会话管理（监控、强制断开）
 - 离线会话管理（查看录屏）
-- 双因素认证 感谢 [naiba](!https://github.com/naiba) 贡献
+- 双因素认证 感谢 [naiba](https://github.com/naiba) 贡献
 - 资产标签
 - 资产授权
 - 用户分组
