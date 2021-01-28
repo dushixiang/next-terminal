@@ -103,7 +103,7 @@ const CredentialModal = ({title, visible, handleOk, handleCancel, confirmLoading
                             </Form.Item>
 
                             <Form.Item label="授权密码" name='password'>
-                                <Input placeholder="输入授权密码"/>
+                                <Input.Password placeholder="输入授权密码"/>
                             </Form.Item>
                         </>
 
