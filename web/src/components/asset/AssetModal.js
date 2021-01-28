@@ -174,7 +174,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                             </Form.Item>
 
                             <Form.Item label="授权密码" name='password' noStyle={!(accountType === 'custom')}>
-                                <Input placeholder="输入授权密码"/>
+                                <Input.Password placeholder="输入授权密码"/>
                             </Form.Item>
                         </>
                         : null
