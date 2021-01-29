@@ -1,0 +1,22 @@
+.xterm .xterm-viewport {
+    /* On OS X this is required in order for the scroll bar to appear fully opaque */
+    background-color: transparent;
+    overflow-y: scroll;
+    cursor: default;
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    --scrollbar-color: var(--highlight) var(--dark);
+    --scrollbar-width: thin;
+}
+
+.xterm-viewport::-webkit-scrollbar {
+    background-color: var(--dark);
+    width: 5px;
+}
+
+.xterm-viewport::-webkit-scrollbar-thumb {
+    background: var(--highlight);
+}

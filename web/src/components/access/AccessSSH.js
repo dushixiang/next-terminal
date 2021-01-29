@@ -6,6 +6,7 @@ import {wsServer} from "../../common/constants";
 import "./Console.css"
 import {getToken} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
+import "./Access.css"
 
 class AccessSSH extends Component {
 
@@ -33,10 +34,10 @@ class AccessSSH extends Component {
         let term = new Terminal({
             fontFamily: 'monaco, Consolas, "Lucida Console", monospace',
             fontSize: 14,
-            theme: {
-                background: '#1b1b1b',
-                lineHeight: 17
-            },
+            // theme: {
+            //     background: '#1b1b1b',
+            //     lineHeight: 17
+            // },
             rightClickSelectsWord: true,
         });
 

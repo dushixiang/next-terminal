@@ -142,6 +142,24 @@ func SSHEndpoint(c echo.Context) error {
 	}
 	_ = WriteMessage(ws, msg)
 
+	recorder, err := NewRecorder("./" + assetId + ".cast")
+	if err != nil {
+		return err
+	}
+
+	header := &Header{
+		Title:     "test",
+		Version:   2,
+		Height:    height,
+		Width:     width,
+		Env:       Env{Shell: "/bin/bash", Term: "xterm-256color"},
+		Timestamp: int(time.Now().Unix()),
+	}
+
+	if err := recorder.WriteHeader(header); err != nil {
+		return err
+	}
+
 	var mut sync.Mutex
 	var active = true
 
@@ -150,6 +168,7 @@ func SSHEndpoint(c echo.Context) error {
 			mut.Lock()
 			if !active {
 				logrus.Debugf("会话: %v -> %v 关闭", sshClient.LocalAddr().String(), sshClient.RemoteAddr().String())
+				recorder.Close()
 				break
 			}
 			mut.Unlock()
@@ -159,10 +178,14 @@ func SSHEndpoint(c echo.Context) error {
 				continue
 			}
 			if n > 0 {
+				s := string(p)
 				msg := Message{
 					Type:    Data,
-					Content: string(p),
+					Content: s,
 				}
+				// 录屏
+				_ = recorder.WriteData(s)
+
 				message, err := json.Marshal(msg)
 				if err != nil {
 					logrus.Warnf("生成Json失败 %v", err)
