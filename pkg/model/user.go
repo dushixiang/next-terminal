@@ -13,7 +13,7 @@ const (
 
 type User struct {
 	ID         string         `gorm:"primary_key" json:"id"`
-	Username   string         `gorm:"uniqueIndex" json:"username"`
+	Username   string         `gorm:"index" json:"username"`
 	Password   string         `json:"password"`
 	Nickname   string         `json:"nickname"`
 	TOTPSecret string         `json:"-"`
