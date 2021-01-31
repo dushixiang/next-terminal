@@ -42,3 +42,11 @@ docker rm <container-id> -f
 再重新执行一次 [docker方式安装命令](install-naive.md)
 
 </details>
+
+<details>
+    <summary>连接rdp协议的windows7或者windows server 2008直接断开？</summary>
+
+因为freerdp的一个问题导致的，把 设置>RDP 下面的禁用字形缓存打开即可。
+详情可参考 https://issues.apache.org/jira/browse/GUACAMOLE-1191
+
+</details>
