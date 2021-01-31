@@ -8,6 +8,7 @@ import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
 import "./Access.css"
 import request from "../../common/request";
+import {message} from "antd";
 
 class AccessSSH extends Component {
 
@@ -111,8 +112,8 @@ class AccessSSH extends Component {
             switch (msg['type']) {
                 case 'connected':
                     term.clear();
-                    console.log(msg['content'])
                     this.onWindowResize();
+                    this.updateSessionStatus(sessionId);
                     break;
                 case 'data':
                     term.write(msg['content']);
@@ -150,6 +151,13 @@ class AccessSSH extends Component {
         }
         document.title = result['data']['name'];
         return result['data']['id'];
+    }
+
+    updateSessionStatus = async (sessionId) => {
+        let result = await request.post(`/sessions/${sessionId}/connect`);
+        if (result['code'] !== 1) {
+            message.error(result['message']);
+        }
     }
 
     terminalSize() {

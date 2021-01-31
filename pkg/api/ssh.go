@@ -10,8 +10,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 	"net/http"
+	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
+	"path"
 	"strconv"
 	"sync"
 	"time"
@@ -65,7 +67,7 @@ type WindowSize struct {
 	Rows int `json:"rows"`
 }
 
-func SSHEndpoint(c echo.Context) error {
+func SSHEndpoint(c echo.Context) (err error) {
 	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
 		logrus.Errorf("升级为WebSocket协议失败：%v", err.Error())
@@ -149,29 +151,43 @@ func SSHEndpoint(c echo.Context) error {
 		return err
 	}
 
+	var recorder *Recorder
+	var recording string
+	property, _ := model.FindPropertyByName(guacd.RecordingPath)
+	if property.Value != "" {
+		dir := path.Join(property.Value, sessionId)
+		recorder, recording, err = NewRecorder(dir)
+		if err != nil {
+			msg := Message{
+				Type:    Closed,
+				Content: "创建录屏文件失败 :( " + err.Error(),
+			}
+			return WriteMessage(ws, msg)
+		}
+
+		header := &Header{
+			Title:     "test",
+			Version:   2,
+			Height:    height,
+			Width:     width,
+			Env:       Env{Shell: "/bin/bash", Term: "xterm-256color"},
+			Timestamp: int(time.Now().Unix()),
+		}
+
+		if err := recorder.WriteHeader(header); err != nil {
+			return err
+		}
+
+		if err := model.UpdateSessionById(&model.Session{Recording: recording}, sessionId); err != nil {
+			return err
+		}
+	}
+
 	msg := Message{
 		Type:    Connected,
 		Content: "Connect to server successfully.\r\n",
 	}
 	_ = WriteMessage(ws, msg)
-
-	recorder, err := NewRecorder("./" + sessionId + ".cast")
-	if err != nil {
-		return err
-	}
-
-	header := &Header{
-		Title:     "test",
-		Version:   2,
-		Height:    height,
-		Width:     width,
-		Env:       Env{Shell: "/bin/bash", Term: "xterm-256color"},
-		Timestamp: int(time.Now().Unix()),
-	}
-
-	if err := recorder.WriteHeader(header); err != nil {
-		return err
-	}
 
 	var mut sync.Mutex
 	var active = true
@@ -181,7 +197,10 @@ func SSHEndpoint(c echo.Context) error {
 			mut.Lock()
 			if !active {
 				logrus.Debugf("会话: %v -> %v 关闭", sshClient.LocalAddr().String(), sshClient.RemoteAddr().String())
-				recorder.Close()
+				if recorder != nil {
+					recorder.Close()
+				}
+				CloseSessionById(sessionId, Normal, "正常退出")
 				break
 			}
 			mut.Unlock()
@@ -192,8 +211,10 @@ func SSHEndpoint(c echo.Context) error {
 			}
 			if n > 0 {
 				s := string(p)
-				// 录屏
-				_ = recorder.WriteData(s)
+				if recorder != nil {
+					// 录屏
+					_ = recorder.WriteData(s)
+				}
 				msg := Message{
 					Type:    Data,
 					Content: s,

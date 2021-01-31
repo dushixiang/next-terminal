@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"next-terminal/pkg/utils"
 	"os"
+	"path"
 	"time"
 )
 
@@ -26,22 +27,29 @@ type Recorder struct {
 	timestamp int
 }
 
-func NewRecorder(filename string) (recorder *Recorder, err error) {
+func NewRecorder(dir string) (recorder *Recorder, filename string, err error) {
 	recorder = &Recorder{}
 
-	if utils.FileExists(filename) {
-		if err := os.RemoveAll(filename); err != nil {
-			return nil, err
+	if utils.FileExists(dir) {
+		if err := os.RemoveAll(dir); err != nil {
+			return nil, "", err
 		}
 	}
+
+	if err = os.MkdirAll(dir, 0777); err != nil {
+		return
+	}
+
+	filename = path.Join(dir, "recording.cast")
+
 	var file *os.File
 	file, err = os.Create(filename)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	recorder.file = file
-	return recorder, nil
+	return recorder, filename, nil
 }
 
 func (recorder *Recorder) Close() {

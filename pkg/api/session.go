@@ -38,7 +38,13 @@ func SessionPagingEndpoint(c echo.Context) error {
 
 	for i := 0; i < len(items); i++ {
 		if status == model.Disconnected && len(items[i].Recording) > 0 {
-			recording := items[i].Recording + "/recording"
+
+			var recording string
+			if items[i].Protocol == "rdp" || items[i].Protocol == "vnc" {
+				recording = items[i].Recording + "/recording"
+			} else {
+				recording = items[i].Recording
+			}
 
 			if utils.FileExists(recording) {
 				logrus.Debugf("检测到录屏文件[%v]存在", recording)
@@ -107,12 +113,14 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	observable, _ := global.Store.Get(sessionId)
 	if observable != nil {
 		logrus.Debugf("会话%v创建者退出", observable.Subject.Tunnel.UUID)
-		_ = observable.Subject.Tunnel.Close()
+		observable.Subject.Close()
+
 		for i := 0; i < len(observable.Observers); i++ {
-			_ = observable.Observers[i].Tunnel.Close()
+			observable.Observers[i].Close()
 			CloseWebSocket(observable.Observers[i].WebSocket, code, reason)
 			logrus.Debugf("强制踢出会话%v的观察者", observable.Observers[i].Tunnel.UUID)
 		}
+
 		CloseWebSocket(observable.Subject.WebSocket, code, reason)
 	}
 	global.Store.Del(sessionId)
@@ -529,8 +537,15 @@ func SessionRecordingEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	recording := path.Join(session.Recording, "recording")
-	logrus.Debugf("读取录屏文件：%s", recording)
+
+	var recording string
+	if session.Protocol == "rdp" || session.Protocol == "vnc" {
+		recording = session.Recording + "/recording"
+	} else {
+		recording = session.Recording
+	}
+
+	logrus.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
 	return c.File(recording)
 }
 
