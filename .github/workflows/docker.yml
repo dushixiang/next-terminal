@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - ".gitignore"
       - "*.md"
+      - "*.png"
 
 jobs:
   deploy:
