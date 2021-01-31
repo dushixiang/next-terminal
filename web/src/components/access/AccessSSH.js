@@ -4,9 +4,10 @@ import {Terminal} from "xterm";
 import qs from "qs";
 import {wsServer} from "../../common/constants";
 import "./Console.css"
-import {getToken} from "../../utils/utils";
+import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
 import "./Access.css"
+import request from "../../common/request";
 
 class AccessSSH extends Component {
 
@@ -18,15 +19,20 @@ class AccessSSH extends Component {
         fitAddon: undefined
     };
 
-    componentDidMount() {
+    componentDidMount = async () => {
 
         let urlParams = new URLSearchParams(this.props.location.search);
         let assetId = urlParams.get('assetId');
 
+        let sessionId = await this.createSession(assetId);
+        if (isEmpty(sessionId)) {
+            return;
+        }
+
         let params = {
             'width': this.state.width,
             'height': this.state.height,
-            'assetId': assetId
+            'sessionId': sessionId
         };
 
         let paramStr = qs.stringify(params);
@@ -104,6 +110,7 @@ class AccessSSH extends Component {
             let msg = JSON.parse(e.data);
             switch (msg['type']) {
                 case 'connected':
+                    term.clear();
                     console.log(msg['content'])
                     this.onWindowResize();
                     break;
@@ -133,6 +140,16 @@ class AccessSSH extends Component {
         if (webSocket) {
             webSocket.close()
         }
+    }
+
+    async createSession(assetsId) {
+        let result = await request.post(`/sessions?assetId=${assetsId}`);
+        if (result['code'] !== 1) {
+            this.showMessage(result['message']);
+            return null;
+        }
+        document.title = result['data']['name'];
+        return result['data']['id'];
     }
 
     terminalSize() {
@@ -169,8 +186,9 @@ class AccessSSH extends Component {
                 <div ref='terminal' id='terminal' style={{
                     height: this.state.height,
                     width: this.state.width,
+                    backgroundColor: 'black',
                     overflowX: 'hidden',
-                    overflowY: 'hidden'
+                    overflowY: 'hidden',
                 }}/>
             </div>
         );

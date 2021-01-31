@@ -436,7 +436,7 @@ class Access extends Component {
             this.showMessage(result['message']);
             return null;
         }
-        document.title = result['data']['ip'] + ':' + result['data']['port'];
+        document.title = result['data']['name'];
         return result['data']['id'];
     }
 

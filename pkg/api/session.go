@@ -364,7 +364,7 @@ func SessionLsEndpoint(c echo.Context) error {
 		}
 
 		if tun.Subject.SftpClient == nil {
-			sftpClient, err := CreateSftpClient(session.AssetId)
+			sftpClient, err := CreateSftpClient(session)
 			if err != nil {
 				logrus.Errorf("创建sftp客户端失败：%v", err.Error())
 				return err
