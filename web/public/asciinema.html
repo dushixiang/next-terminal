@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" type="text/css" href="asciinema-player.css"/>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+<asciinema-player id='asciinema-player' src=""></asciinema-player>
+<script src="asciinema-player.js"></script>
+</body>
+
+<script>
+
+    const server = 'http://localhost:8088';
+
+    function getQueryVariable(variable) {
+        const query = window.location.search.substring(1);
+        const vars = query.split("&");
+        for (let i = 0; i < vars.length; i++) {
+            const pair = vars[i].split("=");
+            if (pair[0] === variable) {
+                return pair[1];
+            }
+        }
+        return false;
+    }
+
+    let sessionId = getQueryVariable('sessionId');
+    document.getElementById('asciinema-player').setAttribute('src', `${server}/sessions/${sessionId}/recording`);
+</script>
+</html>

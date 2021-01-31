@@ -3,14 +3,26 @@ package global
 import (
 	"github.com/gorilla/websocket"
 	"github.com/pkg/sftp"
+	"golang.org/x/crypto/ssh"
 	"next-terminal/pkg/guacd"
 	"sync"
 )
 
 type Tun struct {
+	Protocol   string
 	Tunnel     *guacd.Tunnel
+	SshClient  *ssh.Client
 	SftpClient *sftp.Client
 	WebSocket  *websocket.Conn
+}
+
+func (r *Tun) Close() {
+	if r.Protocol == "rdp" || r.Protocol == "vnc" {
+		_ = r.Tunnel.Close()
+	} else {
+		_ = r.SshClient.Close()
+		_ = r.SftpClient.Close()
+	}
 }
 
 type Observable struct {

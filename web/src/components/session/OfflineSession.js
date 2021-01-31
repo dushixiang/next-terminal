@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-
 import {
     Button,
     Col,
@@ -64,6 +63,7 @@ class OfflineSession extends Component {
         delBtnLoading: false,
         users: [],
         assets: [],
+        selectedRow: {},
     };
 
     componentDidMount() {
@@ -123,10 +123,10 @@ class OfflineSession extends Component {
         this.loadTableData(queryParams)
     };
 
-    showPlayback = (sessionId) => {
+    showPlayback = (row) => {
         this.setState({
             playbackVisible: true,
-            playbackSessionId: sessionId
+            selectedRow: row
         });
     };
 
@@ -289,7 +289,7 @@ class OfflineSession extends Component {
                         <div>
                             <Button type="link" size='small'
                                     disabled={disabled}
-                                    onClick={() => this.showPlayback(record.id)}>回放</Button>
+                                    onClick={() => this.showPlayback(record)}>回放</Button>
                             <Button type="link" size='small' onClick={() => {
                                 confirm({
                                     title: '您确定要删除此会话吗?',
@@ -488,7 +488,30 @@ class OfflineSession extends Component {
                                 destroyOnClose
                                 maskClosable={false}
                             >
-                                <Playback sessionId={this.state.playbackSessionId}/>
+                                {
+                                    this.state.selectedRow['protocol'] === 'rdp' || this.state.selectedRow['protocol'] === 'vnc' ?
+                                        <Playback sessionId={this.state.selectedRow['id']}/>
+                                        :
+                                        <iframe
+                                            style={{
+                                                width: '100%',
+                                                // height: this.state.iFrameHeight,
+                                                overflow: 'visible'
+                                            }}
+                                            onLoad={() => {
+                                                // const obj = ReactDOM.findDOMNode(this);
+                                                // this.setState({
+                                                //     "iFrameHeight": obj.contentWindow.document.body.scrollHeight + 'px'
+                                                // });
+                                            }}
+                                            ref="iframe"
+                                            src={'./asciinema.html?sessionId=' + this.state.selectedRow['id']}
+                                            width="100%"
+                                            height={window.innerHeight * 0.8}
+                                            frameBorder="0"
+                                        />
+                                }
+
                             </Modal> : undefined
                     }
 

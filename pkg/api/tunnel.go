@@ -145,6 +145,7 @@ func TunEndpoint(c echo.Context) error {
 	}
 
 	tun := global.Tun{
+		Protocol:  configuration.Protocol,
 		Tunnel:    tunnel,
 		WebSocket: ws,
 	}
