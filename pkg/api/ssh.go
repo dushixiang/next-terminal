@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
@@ -73,9 +72,19 @@ func SSHEndpoint(c echo.Context) error {
 		return err
 	}
 
-	assetId := c.QueryParam("assetId")
+	sessionId := c.QueryParam("sessionId")
 	width, _ := strconv.Atoi(c.QueryParam("width"))
 	height, _ := strconv.Atoi(c.QueryParam("height"))
+
+	aSession, err := model.FindSessionById(sessionId)
+	if err != nil {
+		msg := Message{
+			Type:    Closed,
+			Content: "get session error." + err.Error(),
+		}
+		_ = WriteMessage(ws, msg)
+		return err
+	}
 
 	user, _ := GetCurrentAccount(c)
 	if model.TypeUser == user.Type {
@@ -85,12 +94,16 @@ func SSHEndpoint(c echo.Context) error {
 			return err
 		}
 
-		if !utils.Contains(assetIds, assetId) {
-			return errors.New("您没有权限访问此资产")
+		if !utils.Contains(assetIds, aSession.AssetId) {
+			msg := Message{
+				Type:    Closed,
+				Content: "您没有权限访问此资产",
+			}
+			return WriteMessage(ws, msg)
 		}
 	}
 
-	sshClient, err := CreateSshClient(assetId)
+	sshClient, err := CreateSshClientBySession(aSession)
 	if err != nil {
 		logrus.Errorf("创建SSH客户端失败：%v", err.Error())
 		msg := Message{
@@ -142,7 +155,7 @@ func SSHEndpoint(c echo.Context) error {
 	}
 	_ = WriteMessage(ws, msg)
 
-	recorder, err := NewRecorder("./" + assetId + ".cast")
+	recorder, err := NewRecorder("./" + sessionId + ".cast")
 	if err != nil {
 		return err
 	}
@@ -179,13 +192,12 @@ func SSHEndpoint(c echo.Context) error {
 			}
 			if n > 0 {
 				s := string(p)
+				// 录屏
+				_ = recorder.WriteData(s)
 				msg := Message{
 					Type:    Data,
 					Content: s,
 				}
-				// 录屏
-				_ = recorder.WriteData(s)
-
 				message, err := json.Marshal(msg)
 				if err != nil {
 					logrus.Warnf("生成Json失败 %v", err)
@@ -231,6 +243,11 @@ func SSHEndpoint(c echo.Context) error {
 			_, err = stdinPipe.Write([]byte(msg.Content))
 			if err != nil {
 				logrus.Debugf("SSH会话写入失败: %v", err)
+				msg := Message{
+					Type:    Closed,
+					Content: "the remote connection is closed.",
+				}
+				_ = WriteMessage(ws, msg)
 			}
 		}
 
@@ -247,36 +264,17 @@ func WriteMessage(ws *websocket.Conn, msg Message) error {
 	return err
 }
 
-func CreateSshClient(assetId string) (*ssh.Client, error) {
-	asset, err := model.FindAssetById(assetId)
-	if err != nil {
-		return nil, err
-	}
-
+func CreateSshClientBySession(session model.Session) (sshClient *ssh.Client, err error) {
 	var (
-		accountType = asset.AccountType
-		username    = asset.Username
-		password    = asset.Password
-		privateKey  = asset.PrivateKey
-		passphrase  = asset.Passphrase
+		username   = session.Username
+		password   = session.Password
+		privateKey = session.PrivateKey
+		passphrase = session.Passphrase
 	)
 
 	var authMethod ssh.AuthMethod
-	if accountType == "credential" {
-
-		credential, err := model.FindCredentialById(asset.CredentialId)
-		if err != nil {
-			return nil, err
-		}
-		accountType = credential.Type
-		username = credential.Username
-		password = credential.Password
-		privateKey = credential.PrivateKey
-		passphrase = credential.Passphrase
-	}
-
-	if username == "-" {
-		username = ""
+	if username == "-" || username == "" {
+		username = "root"
 	}
 	if password == "-" {
 		password = ""
@@ -288,7 +286,7 @@ func CreateSshClient(assetId string) (*ssh.Client, error) {
 		passphrase = ""
 	}
 
-	if accountType == model.PrivateKey {
+	if privateKey != "" {
 		var key ssh.Signer
 		if len(passphrase) > 0 {
 			key, err = ssh.ParsePrivateKeyWithPassphrase([]byte(privateKey), []byte(passphrase))
@@ -313,9 +311,9 @@ func CreateSshClient(assetId string) (*ssh.Client, error) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
-	addr := fmt.Sprintf("%s:%d", asset.IP, asset.Port)
+	addr := fmt.Sprintf("%s:%d", session.IP, session.Port)
 
-	sshClient, err := ssh.Dial("tcp", addr, config)
+	sshClient, err = ssh.Dial("tcp", addr, config)
 	if err != nil {
 		return nil, err
 	}
@@ -329,8 +327,8 @@ func WriteByteMessage(ws *websocket.Conn, p []byte) {
 	}
 }
 
-func CreateSftpClient(assetId string) (sftpClient *sftp.Client, err error) {
-	sshClient, err := CreateSshClient(assetId)
+func CreateSftpClient(session model.Session) (sftpClient *sftp.Client, err error) {
+	sshClient, err := CreateSshClientBySession(session)
 	if err != nil {
 		return nil, err
 	}
