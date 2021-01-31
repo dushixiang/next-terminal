@@ -71,14 +71,6 @@ ssh
 
   <img src="screenshot/qq.png" width="300"  height="auto"/>
 
-- 微信群
-
-  <img src="screenshot/wx1.png" width="300"  height="auto"/>
-
-- 微信号（如果群失效，请添加微信，备注"加入next-terminal交流群"）
-
-  <img src="screenshot/wx2.png" width="300"  height="auto"/>
-
 - Telegram
 
   https://t.me/next_terminal
