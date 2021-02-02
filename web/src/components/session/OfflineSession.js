@@ -489,10 +489,9 @@ class OfflineSession extends Component {
                                 maskClosable={false}
                             >
                                 {
-                                    this.state.selectedRow['protocol'] === 'rdp' || this.state.selectedRow['protocol'] === 'vnc' ?
-                                        <Playback sessionId={this.state.selectedRow['id']}/>
-                                        :
+                                    this.state.selectedRow['mode'] === 'naive' ?
                                         <iframe
+                                            title='recording'
                                             style={{
                                                 width: '100%',
                                                 // height: this.state.iFrameHeight,
@@ -510,6 +509,7 @@ class OfflineSession extends Component {
                                             height={window.innerHeight * 0.8}
                                             frameBorder="0"
                                         />
+                                        : <Playback sessionId={this.state.selectedRow['id']}/>
                                 }
 
                             </Modal> : undefined

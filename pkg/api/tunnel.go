@@ -13,12 +13,11 @@ import (
 )
 
 const (
-	TunnelClosed       int = -1
-	Normal             int = 0
-	NotFoundSession    int = 2000
-	NewTunnelError     int = 2001
-	NewSftpClientError int = 2002
-	ForcedDisconnect   int = 2003
+	TunnelClosed     int = -1
+	Normal           int = 0
+	NotFoundSession  int = 800
+	NewTunnelError   int = 801
+	ForcedDisconnect int = 802
 )
 
 func TunEndpoint(c echo.Context) error {
@@ -145,7 +144,7 @@ func TunEndpoint(c echo.Context) error {
 	}
 
 	tun := global.Tun{
-		Protocol:  configuration.Protocol,
+		Protocol:  session.Protocol,
 		Tunnel:    tunnel,
 		WebSocket: ws,
 	}

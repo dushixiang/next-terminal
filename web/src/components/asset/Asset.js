@@ -249,7 +249,7 @@ class Asset extends Component {
             } else {
                 asset['tags'] = asset['tags'].split(',');
             }
-        }else {
+        } else {
             asset['tags'] = [];
         }
 
@@ -313,17 +313,22 @@ class Asset extends Component {
         });
     };
 
-    access = async (id, protocol) => {
+    access = async (record) => {
+        const id = record['id'];
+        const protocol = record['protocol'];
+        const name = record['name'];
+
         message.loading({content: '正在检测资产是否在线...', key: id});
         let result = await request.post(`/assets/${id}/tcping`);
         if (result.code === 1) {
             if (result.data === true) {
                 message.success({content: '检测完成，您访问的资产在线，即将打开窗口进行访问。', key: id, duration: 3});
-                if(protocol === 'ssh'){
-                    window.open(`#/access-ssh?assetId=${id}`);
-                }else {
-                    window.open(`#/access?assetsId=${id}&protocol=${protocol}`);
-                }
+                window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
+                // if (protocol === 'ssh') {
+                //     window.open(`#/access-naive?assetId=${id}&assetName=${name}`);
+                // } else {
+                //     window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
+                // }
             } else {
                 message.warn('您访问的资产未在线，请确认网络状态。', 10);
             }
@@ -530,7 +535,7 @@ class Asset extends Component {
                     return (
                         <div>
                             <Button type="link" size='small'
-                                    onClick={() => this.access(record.id, record.protocol)}>接入</Button>
+                                    onClick={() => this.access(record)}>接入</Button>
 
                             <Dropdown overlay={menu}>
                                 <Button type="link" size='small'>

@@ -20,8 +20,13 @@ func (r *Tun) Close() {
 	if r.Protocol == "rdp" || r.Protocol == "vnc" {
 		_ = r.Tunnel.Close()
 	} else {
-		_ = r.SshClient.Close()
-		_ = r.SftpClient.Close()
+		if r.SshClient != nil {
+			_ = r.SshClient.Close()
+		}
+
+		if r.SftpClient != nil {
+			_ = r.SftpClient.Close()
+		}
 	}
 }
 

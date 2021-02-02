@@ -3,14 +3,13 @@ import "xterm/css/xterm.css"
 import {Terminal} from "xterm";
 import qs from "qs";
 import {wsServer} from "../../common/constants";
-import "./Console.css"
 import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
 import "./Access.css"
 import request from "../../common/request";
 import {message} from "antd";
 
-class AccessSSH extends Component {
+class AccessNaive extends Component {
 
     state = {
         width: window.innerWidth,
@@ -24,6 +23,7 @@ class AccessSSH extends Component {
 
         let urlParams = new URLSearchParams(this.props.location.search);
         let assetId = urlParams.get('assetId');
+        document.title = urlParams.get('assetName');
 
         let sessionId = await this.createSession(assetId);
         if (isEmpty(sessionId)) {
@@ -144,12 +144,11 @@ class AccessSSH extends Component {
     }
 
     async createSession(assetsId) {
-        let result = await request.post(`/sessions?assetId=${assetsId}`);
+        let result = await request.post(`/sessions?assetId=${assetsId}&mode=naive`);
         if (result['code'] !== 1) {
             this.showMessage(result['message']);
             return null;
         }
-        document.title = result['data']['name'];
         return result['data']['id'];
     }
 
@@ -203,4 +202,4 @@ class AccessSSH extends Component {
     }
 }
 
-export default AccessSSH;
+export default AccessNaive;
