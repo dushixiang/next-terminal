@@ -33,7 +33,6 @@ const STATE_DISCONNECTED = 5;
 
 class Access extends Component {
 
-    formRef = React.createRef();
     clipboardFormRef = React.createRef();
 
     state = {

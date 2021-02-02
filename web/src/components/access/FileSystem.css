@@ -1,0 +1,18 @@
+.dode {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+}
+
+.selectedRow {
+    background-color: #69c0ff;
+}
+
+.selectedRow > .ant-table-column-sort {
+    background-color: #69c0ff;
+}
+
+.ant-table .ant-table-tbody > tr:hover:not(.ant-table-expanded-row .selectedRow) > td {
+    background: #bae7ff;
+}
