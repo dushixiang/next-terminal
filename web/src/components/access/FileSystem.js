@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, message, Modal, Row, Space, Table, Tooltip, Tree} from "antd";
+import {Button, Card, Form, Input, message, Modal, Row, Space, Table, Tooltip} from "antd";
 import {
     CloudDownloadOutlined,
     CloudUploadOutlined,
@@ -15,7 +15,6 @@ import {
     FolderAddOutlined,
     FolderTwoTone,
     LinkOutlined,
-    LoadingOutlined,
     ReloadOutlined,
     UploadOutlined
 } from "@ant-design/icons";
@@ -23,26 +22,25 @@ import qs from "qs";
 import request from "../../common/request";
 import {server} from "../../common/constants";
 import Upload from "antd/es/upload";
-import {download, getToken, renderSize} from "../../utils/utils";
-
-const antIcon = <LoadingOutlined/>;
+import {download, getToken, isEmpty, renderSize} from "../../utils/utils";
+import './FileSystem.css'
 
 const formItemLayout = {
     labelCol: {span: 6},
     wrapperCol: {span: 14},
 };
 
-const {DirectoryTree} = Tree;
-
 class FileSystem extends Component {
+
+    mkdirFormRef = React.createRef();
 
     state = {
         sessionId: undefined,
         currentDirectory: '/',
         files: [],
         loading: false,
-        selectNode: {},
-        selectedRowKeys: []
+        selectedRowKeys: [],
+        selectedRow: {}
     }
 
     componentDidMount() {
@@ -50,22 +48,14 @@ class FileSystem extends Component {
         this.setState({
             sessionId: sessionId
         }, () => {
-            this.loadFiles('/');
+            this.loadFiles(this.state.currentDirectory);
         });
     }
 
-    onSelect = (keys, event) => {
-        this.setState({
-            selectNode: {
-                key: keys[0],
-                isLeaf: event.node.isLeaf
-            }
-        })
-    };
 
     handleOk = async (values) => {
         let params = {
-            'dir': this.state.selectNode.key + '/' + values['dir']
+            'dir': this.state.selectedRow.key + '/' + values['dir']
         }
         let paramStr = qs.stringify(params);
 
@@ -75,12 +65,7 @@ class FileSystem extends Component {
         let result = await request.post(`/sessions/${this.state.sessionId}/mkdir?${paramStr}`);
         if (result.code === 1) {
             message.success('创建成功');
-            let parentPath = this.state.selectNode.key;
-            let items = await this.getTreeNodes(parentPath);
-            this.setState({
-                treeData: this.updateTreeData(this.state.treeData, parentPath, items),
-                selectNode: {}
-            });
+            this.loadFiles(this.state.currentDirectory);
         } else {
             message.error(result.message);
         }
@@ -91,82 +76,49 @@ class FileSystem extends Component {
         })
     }
 
-    handleConfirmCancel = () => {
-        this.setState({
-            confirmVisible: false
-        })
-    }
-
-    handleUploadCancel = () => {
-        this.setState({
-            uploadVisible: false
-        })
-    }
-
     mkdir = () => {
-        if (!this.state.selectNode.key || this.state.selectNode.isLeaf) {
-            message.warning('请选择一个目录');
-            return;
-        }
         this.setState({
             confirmVisible: true
         })
     }
 
     upload = () => {
-        if (!this.state.selectNode.key || this.state.selectNode.isLeaf) {
-            message.warning('请选择一个目录进行上传');
-            return;
-        }
         this.setState({
             uploadVisible: true
         })
     }
 
     download = () => {
-        if (!this.state.selectNode.key || !this.state.selectNode.isLeaf) {
-            message.warning('当前只支持下载文件');
-            return;
-        }
-        download(`${server}/sessions/${this.state.sessionId}/download?file=${this.state.selectNode.key}`);
+        download(`${server}/sessions/${this.state.sessionId}/download?file=${this.state.selectedRow.key}`);
     }
 
     rmdir = async () => {
-        if (!this.state.selectNode.key) {
+        if (!this.state.selectedRow.key) {
             message.warning('请选择一个文件或目录');
             return;
         }
         let result;
-        if (this.state.selectNode.isLeaf) {
-            result = await request.delete(`/sessions/${this.state.sessionId}/rm?file=${this.state.selectNode.key}`);
+        if (this.state.selectedRow.isLeaf) {
+            result = await request.delete(`/sessions/${this.state.sessionId}/rm?file=${this.state.selectedRow.key}`);
         } else {
-            result = await request.delete(`/sessions/${this.state.sessionId}/rmdir?dir=${this.state.selectNode.key}`);
+            result = await request.delete(`/sessions/${this.state.sessionId}/rmdir?dir=${this.state.selectedRow.key}`);
         }
         if (result.code !== 1) {
             message.error(result.message);
         } else {
             message.success('删除成功');
-            let path = this.state.selectNode.key;
+            let path = this.state.selectedRow.key;
             let parentPath = path.substring(0, path.lastIndexOf('/'));
             let items = await this.getTreeNodes(parentPath);
             this.setState({
                 treeData: this.updateTreeData(this.state.treeData, parentPath, items),
-                selectNode: {}
+                selectedRow: {}
             });
         }
     }
 
     refresh = async () => {
-        if (!this.state.selectNode.key || this.state.selectNode.isLeaf) {
-            await this.loadDirData('/');
-        } else {
-            let key = this.state.selectNode.key;
-            let items = await this.getTreeNodes(key);
-            this.setState({
-                treeData: this.updateTreeData(this.state.treeData, key, items),
-            });
-        }
-        message.success('刷新目录成功');
+        this.loadFiles(this.state.currentDirectory);
     }
 
     loadFiles = async (key) => {
@@ -174,6 +126,9 @@ class FileSystem extends Component {
             loading: true
         })
         try {
+            if (isEmpty(key)) {
+                key = '/';
+            }
             let result = await request.get(`${server}/sessions/${this.state.sessionId}/ls?dir=${key}`);
             if (result['code'] !== 1) {
                 message.error(result['message']);
@@ -184,10 +139,16 @@ class FileSystem extends Component {
 
             const items = data.map(item => {
                 return {'key': item['path'], ...item}
-            })
+            });
+
+            if (key !== '/') {
+                items.splice(0, 0, {key: '..', name: '..', path: '..', isDir: true})
+            }
 
             this.setState({
-                files: items
+                files: items,
+                currentDirectory: key,
+                selectedRow: {}
             })
         } finally {
             this.setState({
@@ -195,64 +156,6 @@ class FileSystem extends Component {
             })
         }
 
-    }
-
-    loadDirData = async (key) => {
-        let items = await this.getTreeNodes(key);
-        this.setState({
-            treeData: items,
-        });
-    }
-
-    getTreeNodes = async (key) => {
-        const url = server + '/sessions/' + this.state.sessionId + '/ls?dir=' + key;
-
-        let result = await request.get(url);
-
-        if (result.code !== 1) {
-            message.error(result['message']);
-            return [];
-        }
-
-        let data = result.data;
-
-        return data.map(item => {
-            return {
-                title: item['name'],
-                key: item['path'],
-                isLeaf: !item['isDir'] && !item['isLink'],
-            }
-        });
-    }
-
-
-    onLoadData = ({key, children}) => {
-
-        return new Promise(async (resolve) => {
-            if (children) {
-                resolve();
-                return;
-            }
-
-            let items = await this.getTreeNodes(key);
-            this.setState({
-                treeData: this.updateTreeData(this.state.treeData, key, items),
-            });
-
-            resolve();
-        });
-    }
-
-    updateTreeData = (list, key, children) => {
-        return list.map((node) => {
-            if (node.key === key) {
-                return {...node, children};
-            } else if (node.children) {
-                return {...node, children: this.updateTreeData(node.children, key, children)};
-            }
-
-            return node;
-        });
     }
 
     uploadChange = (info) => {
@@ -327,9 +230,18 @@ class FileSystem extends Component {
                         }
                     }
 
-                    return <>{icon}&nbsp;&nbsp;{item['name']}</>;
+                    return <span className={'dode'}>{icon}&nbsp;&nbsp;{item['name']}</span>;
                 },
-                sorter: (a, b) => a.name - b.name,
+                sorter: (a, b) => {
+                    if (a['key'] === '..') {
+                        return 0;
+                    }
+
+                    if (b['key'] === '..') {
+                        return 0;
+                    }
+                    return a.name.localeCompare(b.name);
+                },
                 sortDirections: ['descend', 'ascend'],
             },
             {
@@ -338,29 +250,47 @@ class FileSystem extends Component {
                 key: 'size',
                 render: (value, item) => {
                     if (!item['isDir'] && !item['isLink']) {
-                        return renderSize(value)
+                        return <span className={'dode'}>{renderSize(value)}</span>;
                     }
-                    return '-';
+                    return <span className={'dode'}/>;
                 },
-                sorter: (a, b) => a.size - b.size,
-            },
-            {
+                sorter: (a, b) => {
+                    if (a['key'] === '..') {
+                        return 0;
+                    }
+
+                    if (b['key'] === '..') {
+                        return 0;
+                    }
+                    return a.size - b.size;
+                },
+            }, {
                 title: '修改日期',
                 dataIndex: 'modTime',
                 key: 'modTime',
-                sorter: (a, b) => a.modTime - b.modTime,
+                sorter: (a, b) => {
+                    if (a['key'] === '..') {
+                        return 0;
+                    }
+
+                    if (b['key'] === '..') {
+                        return 0;
+                    }
+                    return a.modTime.localeCompare(b.modTime);
+                },
                 sortDirections: ['descend', 'ascend'],
+                render: (value, item) => {
+                    return <span className={'dode'}>{value}</span>;
+                },
+            }, {
+                title: '属性',
+                dataIndex: 'mode',
+                key: 'mode',
+                render: (value, item) => {
+                    return <span className={'dode'}>{value}</span>;
+                },
             }
         ];
-
-        const {loading, selectedRowKeys} = this.state;
-        const rowSelection = {
-            selectedRowKeys,
-            onChange: () => {
-
-            },
-        };
-        const hasSelected = selectedRowKeys.length > 0;
 
         const title = (
             <Row>
@@ -380,11 +310,12 @@ class FileSystem extends Component {
 
                     <Tooltip title="下载">
                         <Button type="primary" size="small" icon={<CloudDownloadOutlined/>}
+                                disabled={isEmpty(this.state.selectedRow['key']) || this.state.selectedRow['isDir'] || this.state.selectedRow['isLink']}
                                 onClick={this.download} ghost/>
                     </Tooltip>
 
                     <Tooltip title="删除文件">
-                        <Button type="dashed" size="small" icon={<DeleteOutlined/>} onClick={this.rmdir}
+                        <Button type="dashed" size="small" icon={<DeleteOutlined/>} disabled={isEmpty(this.state.selectedRow['key'])} onClick={this.rmdir}
                                 danger/>
                     </Tooltip>
 
@@ -400,7 +331,6 @@ class FileSystem extends Component {
             <div>
                 <Card title={title} bordered={true} size="small">
                     <Table columns={columns}
-                           rowSelection={rowSelection}
                            dataSource={this.state.files}
                            size={'small'}
                            pagination={false}
@@ -408,18 +338,38 @@ class FileSystem extends Component {
                            onRow={record => {
                                return {
                                    onClick: event => {
-
+                                       this.setState({
+                                           selectedRow: record
+                                       });
                                    }, // 点击行
                                    onDoubleClick: event => {
-                                       this.loadFiles(record['path']);
+                                       if (record['isDir'] || record['isLink']) {
+                                           if (record['path'] === '..') {
+                                               // 获取当前目录的上级目录
+                                               let currentDirectory = this.state.currentDirectory;
+                                               console.log(currentDirectory)
+                                               let parentDirectory = currentDirectory.substring(0, currentDirectory.lastIndexOf('/'));
+                                               this.loadFiles(parentDirectory);
+                                           } else {
+                                               this.loadFiles(record['path']);
+                                           }
+                                       } else {
+
+                                       }
                                    },
                                    onContextMenu: event => {
+
                                    },
                                    onMouseEnter: event => {
+
                                    }, // 鼠标移入行
                                    onMouseLeave: event => {
                                    },
                                };
+                           }}
+
+                           rowClassName={(record) => {
+                               return record['key'] === this.state.selectedRow['key'] ? 'selectedRow' : '';
                            }}
                     />
                 </Card>
@@ -431,10 +381,14 @@ class FileSystem extends Component {
 
                     }}
                     confirmLoading={this.state.uploadLoading}
-                    onCancel={this.handleUploadCancel}
+                    onCancel={()=>{
+                        this.setState({
+                            uploadVisible: false
+                        })
+                    }}
                 >
                     <Upload
-                        action={server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.selectNode.key}>
+                        action={server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.selectedRow.key}>
                         <Button icon={<UploadOutlined/>}>上传文件</Button>
                     </Upload>
                 </Modal>
@@ -455,7 +409,11 @@ class FileSystem extends Component {
                             });
                     }}
                     confirmLoading={this.state.confirmLoading}
-                    onCancel={this.handleConfirmCancel}
+                    onCancel={()=>{
+                        this.setState({
+                            confirmVisible: false
+                        })
+                    }}
                 >
                     <Form ref={this.formRef} {...formItemLayout}>
 
