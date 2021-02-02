@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"next-terminal/pkg/global"
+	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
 	"os"
@@ -18,7 +19,6 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
 
 func SessionPagingEndpoint(c echo.Context) error {
@@ -40,10 +40,10 @@ func SessionPagingEndpoint(c echo.Context) error {
 		if status == model.Disconnected && len(items[i].Recording) > 0 {
 
 			var recording string
-			if items[i].Protocol == "rdp" || items[i].Protocol == "vnc" {
-				recording = items[i].Recording + "/recording"
-			} else {
+			if items[i].Mode == model.Naive {
 				recording = items[i].Recording
+			} else {
+				recording = items[i].Recording + "/recording"
 			}
 
 			if utils.FileExists(recording) {
@@ -100,7 +100,7 @@ func SessionDisconnectEndpoint(c echo.Context) error {
 
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
-		CloseSessionById(split[i], ForcedDisconnect, "强制断开")
+		CloseSessionById(split[i], ForcedDisconnect, "forced disconnect")
 	}
 	return Success(c, nil)
 }
@@ -154,15 +154,11 @@ func CloseWebSocket(ws *websocket.Conn, c int, t string) {
 	if ws == nil {
 		return
 	}
-	ws.SetCloseHandler(func(code int, text string) error {
-		var message []byte
-		if code != websocket.CloseNoStatusReceived {
-			message = websocket.FormatCloseMessage(c, t)
-		}
-		_ = ws.WriteControl(websocket.CloseMessage, message, time.Now().Add(time.Second))
-		return nil
-	})
-	defer ws.Close()
+	err := guacd.NewInstruction("error", "", strconv.Itoa(c))
+	_ = ws.WriteMessage(websocket.TextMessage, []byte(err.String()))
+	disconnect := guacd.NewInstruction("disconnect")
+	_ = ws.WriteMessage(websocket.TextMessage, []byte(disconnect.String()))
+	//defer ws.Close()
 }
 
 func SessionResizeEndpoint(c echo.Context) error {
@@ -186,6 +182,14 @@ func SessionResizeEndpoint(c echo.Context) error {
 
 func SessionCreateEndpoint(c echo.Context) error {
 	assetId := c.QueryParam("assetId")
+	mode := c.QueryParam("mode")
+
+	if mode == model.Naive {
+		mode = model.Naive
+	} else {
+		mode = model.Guacd
+	}
+
 	user, _ := GetCurrentAccount(c)
 
 	if model.TypeUser == user.Type {
@@ -218,6 +222,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 		Status:     model.NoConnect,
 		Creator:    user.ID,
 		ClientIP:   c.RealIP(),
+		Mode:       mode,
 	}
 
 	if asset.AccountType == "credential" {
@@ -351,11 +356,13 @@ func SessionDownloadEndpoint(c echo.Context) error {
 }
 
 type File struct {
-	Name   string `json:"name"`
-	Path   string `json:"path"`
-	IsDir  bool   `json:"isDir"`
-	Mode   string `json:"mode"`
-	IsLink bool   `json:"isLink"`
+	Name    string         `json:"name"`
+	Path    string         `json:"path"`
+	IsDir   bool           `json:"isDir"`
+	Mode    string         `json:"mode"`
+	IsLink  bool           `json:"isLink"`
+	ModTime utils.JsonTime `json:"modTime"`
+	Size    int64          `json:"size"`
 }
 
 func SessionLsEndpoint(c echo.Context) error {
@@ -387,12 +394,20 @@ func SessionLsEndpoint(c echo.Context) error {
 
 		var files = make([]File, 0)
 		for i := range fileInfos {
+
+			// 忽略因此文件
+			if strings.HasPrefix(fileInfos[i].Name(), ".") {
+				continue
+			}
+
 			file := File{
-				Name:   fileInfos[i].Name(),
-				Path:   path.Join(remoteDir, fileInfos[i].Name()),
-				IsDir:  fileInfos[i].IsDir(),
-				Mode:   fileInfos[i].Mode().String(),
-				IsLink: fileInfos[i].Mode()&os.ModeSymlink == os.ModeSymlink,
+				Name:    fileInfos[i].Name(),
+				Path:    path.Join(remoteDir, fileInfos[i].Name()),
+				IsDir:   fileInfos[i].IsDir(),
+				Mode:    fileInfos[i].Mode().String(),
+				IsLink:  fileInfos[i].Mode()&os.ModeSymlink == os.ModeSymlink,
+				ModTime: utils.NewJsonTime(fileInfos[i].ModTime()),
+				Size:    fileInfos[i].Size(),
 			}
 
 			files = append(files, file)
@@ -412,11 +427,13 @@ func SessionLsEndpoint(c echo.Context) error {
 		var files = make([]File, 0)
 		for i := range fileInfos {
 			file := File{
-				Name:   fileInfos[i].Name(),
-				Path:   path.Join(remoteDir, fileInfos[i].Name()),
-				IsDir:  fileInfos[i].IsDir(),
-				Mode:   fileInfos[i].Mode().String(),
-				IsLink: fileInfos[i].Mode()&os.ModeSymlink == os.ModeSymlink,
+				Name:    fileInfos[i].Name(),
+				Path:    path.Join(remoteDir, fileInfos[i].Name()),
+				IsDir:   fileInfos[i].IsDir(),
+				Mode:    fileInfos[i].Mode().String(),
+				IsLink:  fileInfos[i].Mode()&os.ModeSymlink == os.ModeSymlink,
+				ModTime: utils.NewJsonTime(fileInfos[i].ModTime()),
+				Size:    fileInfos[i].Size(),
 			}
 
 			files = append(files, file)
@@ -539,10 +556,10 @@ func SessionRecordingEndpoint(c echo.Context) error {
 	}
 
 	var recording string
-	if session.Protocol == "rdp" || session.Protocol == "vnc" {
-		recording = session.Recording + "/recording"
-	} else {
+	if session.Mode == model.Naive {
 		recording = session.Recording
+	} else {
+		recording = session.Recording + "/recording"
 	}
 
 	logrus.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))

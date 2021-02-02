@@ -210,3 +210,15 @@ export function exitFull() {
         }
     }
 }
+
+export function renderSize(value) {
+    if (null == value || value === '' || value === 0) {
+        return "0 Bytes";
+    }
+    const unitArr = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    let srcSize = parseFloat(value);
+    let index = Math.floor(Math.log(srcSize) / Math.log(1024));
+    let size = srcSize / Math.pow(1024, index);
+    size = size.toFixed(2);
+    return size + unitArr[index];
+}

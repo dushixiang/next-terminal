@@ -13,6 +13,11 @@ const (
 	Disconnected = "disconnected"
 )
 
+const (
+	Guacd = "guacd"
+	Naive = "naive"
+)
+
 type Session struct {
 	ID               string         `gorm:"primary_key" json:"id"`
 	Protocol         string         `json:"protocol"`
@@ -34,6 +39,7 @@ type Session struct {
 	Message          string         `json:"message"`
 	ConnectedTime    utils.JsonTime `json:"connectedTime"`
 	DisconnectedTime utils.JsonTime `json:"disconnectedTime"`
+	Mode             string         `json:"mode"`
 }
 
 func (r *Session) TableName() string {
@@ -60,6 +66,7 @@ type SessionVo struct {
 	CreatorName      string         `json:"creatorName"`
 	Code             int            `json:"code"`
 	Message          string         `json:"message"`
+	Mode             string         `json:"mode"`
 }
 
 func FindPageSession(pageIndex, pageSize int, status, userId, clientIp, assetId, protocol string) (results []SessionVo, total int64, err error) {
@@ -69,7 +76,7 @@ func FindPageSession(pageIndex, pageSize int, status, userId, clientIp, assetId,
 
 	params = append(params, status)
 
-	itemSql := "SELECT s.id, s.protocol,s.recording, s.connection_id, s.asset_id, s.creator, s.client_ip, s.width, s.height, s.ip, s.port, s.username, s.status, s.connected_time, s.disconnected_time,s.code, s.message, a.name AS asset_name, u.nickname AS creator_name FROM sessions s LEFT JOIN assets a ON s.asset_id = a.id LEFT JOIN users u ON s.creator = u.id WHERE s.STATUS = ? "
+	itemSql := "SELECT s.id,s.mode, s.protocol,s.recording, s.connection_id, s.asset_id, s.creator, s.client_ip, s.width, s.height, s.ip, s.port, s.username, s.status, s.connected_time, s.disconnected_time,s.code, s.message, a.name AS asset_name, u.nickname AS creator_name FROM sessions s LEFT JOIN assets a ON s.asset_id = a.id LEFT JOIN users u ON s.creator = u.id WHERE s.STATUS = ? "
 	countSql := "select count(*) from sessions as s where s.status = ? "
 
 	if len(userId) > 0 {

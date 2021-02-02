@@ -13,7 +13,7 @@ const STATE_CONNECTED = 3;
 const STATE_DISCONNECTING = 4;
 const STATE_DISCONNECTED = 5;
 
-class Access extends Component {
+class Monitor extends Component {
 
     formRef = React.createRef()
 
@@ -103,76 +103,6 @@ class Access extends Component {
         }
     };
 
-    onError = (status) => {
-
-        console.log('通道异常。', status);
-
-        switch (status.code) {
-            case 256:
-                this.showMessage('未支持的访问');
-                break;
-            case 512:
-                this.showMessage('远程服务异常');
-                break;
-            case 513:
-                this.showMessage('服务器忙碌');
-                break;
-            case 514:
-                this.showMessage('服务器连接超时');
-                break;
-            case 515:
-                this.showMessage('远程服务异常');
-                break;
-            case 516:
-                this.showMessage('资源未找到');
-                break;
-            case 517:
-                this.showMessage('资源冲突');
-                break;
-            case 518:
-                this.showMessage('资源已关闭');
-                break;
-            case 519:
-                this.showMessage('远程服务未找到');
-                break;
-            case 520:
-                this.showMessage('远程服务不可用');
-                break;
-            case 521:
-                this.showMessage('会话冲突');
-                break;
-            case 522:
-                this.showMessage('会话连接超时');
-                break;
-            case 523:
-                this.showMessage('会话已关闭');
-                break;
-            case 768:
-                this.showMessage('网络不可达');
-                break;
-            case 769:
-                this.showMessage('服务器密码验证失败');
-                break;
-            case 771:
-                this.showMessage('客户端被禁止');
-                break;
-            case 776:
-                this.showMessage('客户端连接超时');
-                break;
-            case 781:
-                this.showMessage('客户端异常');
-                break;
-            case 783:
-                this.showMessage('错误的请求类型');
-                break;
-            case 797:
-                this.showMessage('客户端连接数量过多');
-                break;
-            default:
-                this.showMessage('未知错误。');
-        }
-    };
-
     showMessage(message) {
         Modal.error({
             title: '提示',
@@ -189,7 +119,6 @@ class Access extends Component {
 
         // 处理客户端的状态变化事件
         client.onstatechange = this.onClientStateChange;
-        client.onerror = this.onError;
         const display = document.getElementById("display");
 
         // Add client to display div
@@ -245,4 +174,4 @@ class Access extends Component {
     }
 }
 
-export default Access;
+export default Monitor;
