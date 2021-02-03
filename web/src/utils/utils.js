@@ -220,5 +220,5 @@ export function renderSize(value) {
     let index = Math.floor(Math.log(srcSize) / Math.log(1024));
     let size = srcSize / Math.pow(1024, index);
     size = size.toFixed(2);
-    return size + unitArr[index];
+    return size + ' ' + unitArr[index];
 }

@@ -438,14 +438,6 @@ class Asset extends Component {
                 );
             }
         }, {
-            title: '网络',
-            dataIndex: 'ip',
-            key: 'ip',
-            render: (text, record) => {
-
-                return record['ip'] + ':' + record['port'];
-            }
-        }, {
             title: '连接协议',
             dataIndex: 'protocol',
             key: 'protocol',

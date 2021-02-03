@@ -111,7 +111,6 @@ func SetupRoutes() *echo.Echo {
 		sessions.GET("/:id/download", SessionDownloadEndpoint)
 		sessions.GET("/:id/ls", SessionLsEndpoint)
 		sessions.POST("/:id/mkdir", SessionMkDirEndpoint)
-		sessions.DELETE("/:id/rmdir", SessionRmDirEndpoint)
 		sessions.DELETE("/:id/rm", SessionRmEndpoint)
 		sessions.DELETE("/:id", SessionDeleteEndpoint)
 		sessions.GET("/:id/recording", SessionRecordingEndpoint)

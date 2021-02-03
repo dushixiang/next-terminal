@@ -1,21 +1,22 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, message, Modal, Row, Space, Table, Tooltip} from "antd";
+import {Button, Card, Col, Form, Input, message, Modal, Row, Space, Table, Tooltip} from "antd";
 import {
     CloudDownloadOutlined,
     CloudUploadOutlined,
     DeleteOutlined,
-    FileExcelTwoTone,
-    FileImageTwoTone,
-    FileMarkdownTwoTone,
-    FilePdfTwoTone,
-    FileTextTwoTone,
-    FileTwoTone,
-    FileWordTwoTone,
-    FileZipTwoTone,
+    ExclamationCircleOutlined,
+    FileExcelOutlined,
+    FileImageOutlined,
+    FileMarkdownOutlined,
+    FileOutlined,
+    FilePdfOutlined,
+    FileTextOutlined,
+    FileWordOutlined,
+    FileZipOutlined,
     FolderAddOutlined,
     FolderTwoTone,
-    LinkOutlined,
     ReloadOutlined,
+    ThunderboltTwoTone,
     UploadOutlined
 } from "@ant-design/icons";
 import qs from "qs";
@@ -29,6 +30,7 @@ const formItemLayout = {
     labelCol: {span: 6},
     wrapperCol: {span: 14},
 };
+const {confirm} = Modal;
 
 class FileSystem extends Component {
 
@@ -40,7 +42,10 @@ class FileSystem extends Component {
         files: [],
         loading: false,
         selectedRowKeys: [],
-        selectedRow: {}
+        selectedRow: {},
+        dropdown: {
+            visible: false
+        },
     }
 
     componentDidMount() {
@@ -76,12 +81,6 @@ class FileSystem extends Component {
         })
     }
 
-    mkdir = () => {
-        this.setState({
-            confirmVisible: true
-        })
-    }
-
     upload = () => {
         this.setState({
             uploadVisible: true
@@ -93,28 +92,39 @@ class FileSystem extends Component {
     }
 
     rmdir = async () => {
-        if (!this.state.selectedRow.key) {
-            message.warning('请选择一个文件或目录');
-            return;
+        let selectedRowKeys = this.state.selectedRowKeys;
+        if (selectedRowKeys === undefined || selectedRowKeys.length === 0) {
+            message.warning('请至少选择一个文件或目录');
         }
-        let result;
-        if (this.state.selectedRow.isLeaf) {
-            result = await request.delete(`/sessions/${this.state.sessionId}/rm?file=${this.state.selectedRow.key}`);
+
+        let title = '';
+        if (selectedRowKeys.length === 1) {
+            let file = selectedRowKeys[0].substring(selectedRowKeys[0].lastIndexOf('/') + 1, selectedRowKeys[0].length);
+            title = <p>您确认要删除"{file}"吗？</p>;
         } else {
-            result = await request.delete(`/sessions/${this.state.sessionId}/rmdir?dir=${this.state.selectedRow.key}`);
+            title = `您确认要删除所选的${selectedRowKeys.length}项目吗？`;
         }
-        if (result.code !== 1) {
-            message.error(result.message);
-        } else {
-            message.success('删除成功');
-            let path = this.state.selectedRow.key;
-            let parentPath = path.substring(0, path.lastIndexOf('/'));
-            let items = await this.getTreeNodes(parentPath);
-            this.setState({
-                treeData: this.updateTreeData(this.state.treeData, parentPath, items),
-                selectedRow: {}
-            });
-        }
+        confirm({
+            title: title,
+            icon: <ExclamationCircleOutlined/>,
+            content: '所选项目将立即被删除。',
+            onOk: async () => {
+                for (let i = 0; i < selectedRowKeys.length; i++) {
+                    let rowKey = selectedRowKeys[i];
+                    if (rowKey === '..') {
+                        continue;
+                    }
+                    let result = await request.delete(`/sessions/${this.state.sessionId}/rm?key=${rowKey}`);
+                    if (result['code'] !== 1) {
+                        message.error(result['message']);
+                    }
+                }
+                await this.loadFiles(this.state.currentDirectory);
+            },
+            onCancel() {
+
+            },
+        });
     }
 
     refresh = async () => {
@@ -169,6 +179,34 @@ class FileSystem extends Component {
         }
     }
 
+    getNodeTreeRightClickMenu = () => {
+        const {pageX, pageY, visible} = {...this.state.dropdown};
+        if (visible) {
+            console.log(pageX, pageY)
+            const tmpStyle = {
+                left: `${pageX}px`,
+                top: `${pageY}px`,
+            };
+
+            let disableDownload = true;
+            if (this.state.selectedRowKeys.length === 1
+                && !this.state.selectedRow['isDir']
+                && !this.state.selectedRow['isLink']) {
+                disableDownload = false;
+            }
+
+            return (
+                <ul className="popup" style={tmpStyle}>
+                    <li><Button type={'text'} size={'small'} icon={<CloudDownloadOutlined/>} onClick={this.download}
+                                disabled={disableDownload}>下载</Button></li>
+                    <li><Button type={'text'} size={'small'} icon={<DeleteOutlined/>} onClick={this.rmdir}>删除</Button>
+                    </li>
+                </ul>
+            );
+        }
+        return undefined;
+    };
+
     render() {
 
         const columns = [
@@ -182,17 +220,17 @@ class FileSystem extends Component {
                         icon = <FolderTwoTone/>;
                     } else {
                         if (item['isLink']) {
-                            icon = <LinkOutlined/>;
+                            icon = <ThunderboltTwoTone/>;
                         } else {
                             const fileExtension = item['name'].split('.').pop().toLowerCase();
                             switch (fileExtension) {
                                 case "doc":
                                 case "docx":
-                                    icon = <FileWordTwoTone/>;
+                                    icon = <FileWordOutlined/>;
                                     break;
                                 case "xls":
                                 case "xlsx":
-                                    icon = <FileExcelTwoTone/>;
+                                    icon = <FileExcelOutlined/>;
                                     break;
                                 case "bmp":
                                 case "jpg":
@@ -207,24 +245,25 @@ class FileSystem extends Component {
                                 case "psd":
                                 case "ai":
                                 case "webp":
-                                    icon = <FileImageTwoTone/>;
+                                    icon = <FileImageOutlined/>;
                                     break;
                                 case "md":
-                                    icon = <FileMarkdownTwoTone/>;
+                                    icon = <FileMarkdownOutlined/>;
                                     break;
                                 case "pdf":
-                                    icon = <FilePdfTwoTone/>;
+                                    icon = <FilePdfOutlined/>;
                                     break;
                                 case "txt":
-                                    icon = <FileTextTwoTone/>;
+                                    icon = <FileTextOutlined/>;
                                     break;
                                 case "zip":
                                 case "gz":
                                 case "tar":
-                                    icon = <FileZipTwoTone/>;
+                                case "tgz":
+                                    icon = <FileZipOutlined/>;
                                     break;
                                 default:
-                                    icon = <FileTwoTone/>;
+                                    icon = <FileOutlined/>;
                                     break;
                             }
                         }
@@ -293,53 +332,70 @@ class FileSystem extends Component {
         ];
 
         const title = (
-            <Row>
-                <Space>
-                    远程文件管理
-                    &nbsp;
-                    &nbsp;
-                    <Tooltip title="创建文件夹">
-                        <Button type="primary" size="small" icon={<FolderAddOutlined/>}
-                                onClick={this.mkdir} ghost/>
-                    </Tooltip>
+            <Row justify="space-around" align="middle" gutter={24}>
+                <Col span={16} key={1}>
+                    {this.state.currentDirectory}
+                </Col>
+                <Col span={8} key={2} style={{textAlign: 'right'}}>
+                    <Space>
+                        <Tooltip title="创建文件夹">
+                            <Button type="primary" size="small" icon={<FolderAddOutlined/>}
+                                    onClick={() => {
+                                        this.setState({
+                                            mkdirVisible: true
+                                        })
+                                    }} ghost/>
+                        </Tooltip>
 
-                    <Tooltip title="上传">
-                        <Button type="primary" size="small" icon={<CloudUploadOutlined/>}
-                                onClick={this.upload} ghost/>
-                    </Tooltip>
+                        <Tooltip title="上传">
+                            <Button type="primary" size="small" icon={<CloudUploadOutlined/>}
+                                    onClick={() => {
+                                        this.setState({
+                                            uploadVisible: true
+                                        })
+                                    }} ghost/>
+                        </Tooltip>
 
-                    <Tooltip title="下载">
-                        <Button type="primary" size="small" icon={<CloudDownloadOutlined/>}
-                                disabled={isEmpty(this.state.selectedRow['key']) || this.state.selectedRow['isDir'] || this.state.selectedRow['isLink']}
-                                onClick={this.download} ghost/>
-                    </Tooltip>
-
-                    <Tooltip title="删除文件">
-                        <Button type="dashed" size="small" icon={<DeleteOutlined/>} disabled={isEmpty(this.state.selectedRow['key'])} onClick={this.rmdir}
-                                danger/>
-                    </Tooltip>
-
-                    <Tooltip title="刷新">
-                        <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh}
-                                ghost/>
-                    </Tooltip>
-                </Space>
+                        <Tooltip title="刷新">
+                            <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh}
+                                    ghost/>
+                        </Tooltip>
+                    </Space>
+                </Col>
             </Row>
         );
+
+        const {loading, selectedRowKeys} = this.state;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: (selectedRowKeys) => {
+                selectedRowKeys = selectedRowKeys.filter(rowKey => rowKey !== '..');
+                this.setState({selectedRowKeys});
+            },
+        };
+        const hasSelected = selectedRowKeys.length > 0;
+
 
         return (
             <div>
                 <Card title={title} bordered={true} size="small">
+
                     <Table columns={columns}
+                           rowSelection={rowSelection}
                            dataSource={this.state.files}
                            size={'small'}
                            pagination={false}
                            loading={this.state.loading}
+
                            onRow={record => {
                                return {
                                    onClick: event => {
+                                       if (record['key'] === '..') {
+                                           return;
+                                       }
                                        this.setState({
-                                           selectedRow: record
+                                           selectedRow: record,
+                                           selectedRowKeys: [record['key']]
                                        });
                                    }, // 点击行
                                    onDoubleClick: event => {
@@ -358,12 +414,44 @@ class FileSystem extends Component {
                                        }
                                    },
                                    onContextMenu: event => {
+                                       event.preventDefault();
+                                       if (record['key'] === '..') {
+                                           return;
+                                       }
 
+                                       let selectedRowKeys = this.state.selectedRowKeys;
+                                       if (selectedRowKeys.length === 0) {
+                                           selectedRowKeys = [record['key']]
+                                       }
+                                       this.setState({
+                                           selectedRow: record,
+                                           selectedRowKeys: selectedRowKeys,
+                                           dropdown: {
+                                               visible: true,
+                                               pageX: event.pageX,
+                                               pageY: event.pageY,
+                                           }
+                                       });
+
+                                       if (!this.state.dropdown.visible) {
+                                           const that = this;
+                                           document.addEventListener(`click`, function onClickOutside() {
+                                               that.setState({dropdown: {visible: false}});
+                                               document.removeEventListener(`click`, onClickOutside);
+
+                                               document.querySelector('.ant-drawer-body').style.height = 'unset';
+                                               document.querySelector('.ant-drawer-body').style['overflow-y'] = 'auto';
+                                           });
+
+                                           document.querySelector('.ant-drawer-body').style.height = '100vh';
+                                           document.querySelector('.ant-drawer-body').style['overflow-y'] = 'hidden';
+                                       }
                                    },
                                    onMouseEnter: event => {
 
                                    }, // 鼠标移入行
                                    onMouseLeave: event => {
+
                                    },
                                };
                            }}
@@ -378,17 +466,19 @@ class FileSystem extends Component {
                     title="上传文件"
                     visible={this.state.uploadVisible}
                     onOk={() => {
-
+                        this.setState({
+                            uploadVisible: false
+                        })
                     }}
                     confirmLoading={this.state.uploadLoading}
-                    onCancel={()=>{
+                    onCancel={() => {
                         this.setState({
                             uploadVisible: false
                         })
                     }}
                 >
                     <Upload
-                        action={server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.selectedRow.key}>
+                        action={server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.currentDirectory}>
                         <Button icon={<UploadOutlined/>}>上传文件</Button>
                     </Upload>
                 </Modal>
@@ -396,12 +486,12 @@ class FileSystem extends Component {
 
                 <Modal
                     title="创建文件夹"
-                    visible={this.state.confirmVisible}
+                    visible={this.state.mkdirVisible}
                     onOk={() => {
-                        this.formRef.current
+                        this.mkdirFormRef.current
                             .validateFields()
                             .then(values => {
-                                this.formRef.current.resetFields();
+                                this.mkdirFormRef.current.resetFields();
                                 this.handleOk(values);
                             })
                             .catch(info => {
@@ -409,21 +499,21 @@ class FileSystem extends Component {
                             });
                     }}
                     confirmLoading={this.state.confirmLoading}
-                    onCancel={()=>{
+                    onCancel={() => {
                         this.setState({
-                            confirmVisible: false
+                            mkdirVisible: false
                         })
                     }}
                 >
-                    <Form ref={this.formRef} {...formItemLayout}>
+                    <Form ref={this.mkdirFormRef}>
 
-                        <Form.Item label="文件夹名称" name='dir' rules={[{required: true, message: '请输入文件夹名称'}]}>
+                        <Form.Item name='dir' rules={[{required: true, message: '请输入文件夹名称'}]}>
                             <Input autoComplete="off" placeholder="请输入文件夹名称"/>
                         </Form.Item>
                     </Form>
                 </Modal>
 
-
+                {this.getNodeTreeRightClickMenu()}
             </div>
         );
     }
