@@ -1,21 +1,15 @@
 import React, {Component} from 'react';
 import Guacamole from 'guacamole-common-js';
-import {Affix, Button, Col, Drawer, Dropdown, Form, Input, Menu, message, Modal, Row, Space, Tooltip} from 'antd'
+import {Affix, Button, Col, Drawer, Dropdown, Form, Input, Menu, message, Modal, Row} from 'antd'
 import qs from "qs";
 import request from "../../common/request";
 import {wsServer} from "../../common/constants";
 import {
     AppstoreTwoTone,
-    CloudDownloadOutlined,
-    CloudUploadOutlined,
     CopyTwoTone,
-    DeleteOutlined,
     DesktopOutlined,
     ExclamationCircleOutlined,
-    ExpandOutlined,
-    FolderAddOutlined,
-    LoadingOutlined,
-    ReloadOutlined
+    ExpandOutlined
 } from '@ant-design/icons';
 import {exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
 import './Access.css'
@@ -48,9 +42,6 @@ class Access extends Component {
         uploadHeaders: {},
         keyboard: {},
         protocol: '',
-        treeData: [],
-
-        confirmVisible: false,
         confirmLoading: false,
         uploadVisible: false,
         uploadLoading: false,
@@ -315,7 +306,7 @@ class Access extends Component {
     };
 
     onKeyDown = (keysym) => {
-        if (true === this.state.clipboardVisible || true === this.state.confirmVisible) {
+        if (this.state.clipboardVisible || this.state.fileSystemVisible) {
             return true;
         }
         this.state.client.sendKeyEvent(1, keysym);
@@ -598,10 +589,10 @@ class Access extends Component {
                 <Drawer
                     title={'会话详情'}
                     placement="right"
-                    width={window.innerWidth * 0.5}
+                    width={window.innerWidth * 0.8}
                     closable={true}
-                    maskClosable={false}
-                    onClose={()=>{
+                    // maskClosable={false}
+                    onClose={() => {
                         this.setState({
                             fileSystemVisible: false
                         });

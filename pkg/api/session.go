@@ -476,63 +476,47 @@ func SessionMkDirEndpoint(c echo.Context) error {
 	return nil
 }
 
-func SessionRmDirEndpoint(c echo.Context) error {
-	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
-	if err != nil {
-		return err
-	}
-	remoteDir := c.QueryParam("dir")
-	if "ssh" == session.Protocol {
-		tun, ok := global.Store.Get(sessionId)
-		if !ok {
-			return errors.New("获取sftp客户端失败")
-		}
-		fileInfos, err := tun.Subject.SftpClient.ReadDir(remoteDir)
-		if err != nil {
-			return err
-		}
-
-		for i := range fileInfos {
-			if err := tun.Subject.SftpClient.Remove(path.Join(remoteDir, fileInfos[i].Name())); err != nil {
-				return err
-			}
-		}
-
-		if err := tun.Subject.SftpClient.RemoveDirectory(remoteDir); err != nil {
-			return err
-		}
-		return Success(c, nil)
-	} else if "rdp" == session.Protocol {
-		drivePath, err := model.GetDrivePath()
-		if err != nil {
-			return err
-		}
-
-		if err := os.RemoveAll(path.Join(drivePath, remoteDir)); err != nil {
-			return err
-		}
-		return Success(c, nil)
-	}
-
-	return nil
-}
-
 func SessionRmEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
 	session, err := model.FindSessionById(sessionId)
 	if err != nil {
 		return err
 	}
-	remoteFile := c.QueryParam("file")
+	key := c.QueryParam("key")
 	if "ssh" == session.Protocol {
 		tun, ok := global.Store.Get(sessionId)
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
-		if err := tun.Subject.SftpClient.Remove(remoteFile); err != nil {
+
+		sftpClient := tun.Subject.SftpClient
+
+		stat, err := sftpClient.Stat(key)
+		if err != nil {
 			return err
 		}
+
+		if stat.IsDir() {
+			fileInfos, err := tun.Subject.SftpClient.ReadDir(key)
+			if err != nil {
+				return err
+			}
+
+			for i := range fileInfos {
+				if err := tun.Subject.SftpClient.Remove(path.Join(key, fileInfos[i].Name())); err != nil {
+					return err
+				}
+			}
+
+			if err := tun.Subject.SftpClient.RemoveDirectory(key); err != nil {
+				return err
+			}
+		} else {
+			if err := tun.Subject.SftpClient.Remove(key); err != nil {
+				return err
+			}
+		}
+
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
 		drivePath, err := model.GetDrivePath()
@@ -540,11 +524,13 @@ func SessionRmEndpoint(c echo.Context) error {
 			return err
 		}
 
-		if err := os.Remove(path.Join(drivePath, remoteFile)); err != nil {
+		if err := os.RemoveAll(path.Join(drivePath, key)); err != nil {
 			return err
 		}
+
 		return Success(c, nil)
 	}
+
 	return nil
 }
 
