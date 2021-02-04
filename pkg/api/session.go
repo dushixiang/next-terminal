@@ -442,7 +442,7 @@ func SessionLsEndpoint(c echo.Context) error {
 		return Success(c, files)
 	}
 
-	return err
+	return errors.New("当前协议不支持此操作")
 }
 
 func SessionMkDirEndpoint(c echo.Context) error {
@@ -473,7 +473,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 		return Success(c, nil)
 	}
 
-	return nil
+	return errors.New("当前协议不支持此操作")
 }
 
 func SessionRmEndpoint(c echo.Context) error {
@@ -497,22 +497,22 @@ func SessionRmEndpoint(c echo.Context) error {
 		}
 
 		if stat.IsDir() {
-			fileInfos, err := tun.Subject.SftpClient.ReadDir(key)
+			fileInfos, err := sftpClient.ReadDir(key)
 			if err != nil {
 				return err
 			}
 
 			for i := range fileInfos {
-				if err := tun.Subject.SftpClient.Remove(path.Join(key, fileInfos[i].Name())); err != nil {
+				if err := sftpClient.Remove(path.Join(key, fileInfos[i].Name())); err != nil {
 					return err
 				}
 			}
 
-			if err := tun.Subject.SftpClient.RemoveDirectory(key); err != nil {
+			if err := sftpClient.RemoveDirectory(key); err != nil {
 				return err
 			}
 		} else {
-			if err := tun.Subject.SftpClient.Remove(key); err != nil {
+			if err := sftpClient.Remove(key); err != nil {
 				return err
 			}
 		}
@@ -531,7 +531,43 @@ func SessionRmEndpoint(c echo.Context) error {
 		return Success(c, nil)
 	}
 
-	return nil
+	return errors.New("当前协议不支持此操作")
+}
+
+func SessionRenameEndpoint(c echo.Context) error {
+	sessionId := c.Param("id")
+	session, err := model.FindSessionById(sessionId)
+	if err != nil {
+		return err
+	}
+	oldName := c.QueryParam("oldName")
+	newName := c.QueryParam("newName")
+	if "ssh" == session.Protocol {
+		tun, ok := global.Store.Get(sessionId)
+		if !ok {
+			return errors.New("获取sftp客户端失败")
+		}
+
+		sftpClient := tun.Subject.SftpClient
+
+		if err := sftpClient.Rename(oldName, newName); err != nil {
+			return err
+		}
+
+		return Success(c, nil)
+	} else if "rdp" == session.Protocol {
+		drivePath, err := model.GetDrivePath()
+		if err != nil {
+			return err
+		}
+
+		if err := os.Rename(path.Join(drivePath, oldName), path.Join(drivePath, newName)); err != nil {
+			return err
+		}
+
+		return Success(c, nil)
+	}
+	return errors.New("当前协议不支持此操作")
 }
 
 func SessionRecordingEndpoint(c echo.Context) error {
@@ -550,15 +586,4 @@ func SessionRecordingEndpoint(c echo.Context) error {
 
 	logrus.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
 	return c.File(recording)
-}
-
-func SessionGetStatusEndpoint(c echo.Context) error {
-	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
-	if err != nil {
-		return err
-	}
-	return Success(c, H{
-		"status": session.Status,
-	})
 }

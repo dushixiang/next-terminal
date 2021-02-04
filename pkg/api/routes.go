@@ -107,14 +107,14 @@ func SetupRoutes() *echo.Echo {
 		sessions.POST("/:id/connect", SessionConnectEndpoint)
 		sessions.POST("/:id/disconnect", Admin(SessionDisconnectEndpoint))
 		sessions.POST("/:id/resize", SessionResizeEndpoint)
-		sessions.POST("/:id/upload", SessionUploadEndpoint)
-		sessions.GET("/:id/download", SessionDownloadEndpoint)
 		sessions.GET("/:id/ls", SessionLsEndpoint)
+		sessions.GET("/:id/download", SessionDownloadEndpoint)
+		sessions.POST("/:id/upload", SessionUploadEndpoint)
 		sessions.POST("/:id/mkdir", SessionMkDirEndpoint)
-		sessions.DELETE("/:id/rm", SessionRmEndpoint)
+		sessions.POST("/:id/rm", SessionRmEndpoint)
+		sessions.POST("/:id/rename", SessionRenameEndpoint)
 		sessions.DELETE("/:id", SessionDeleteEndpoint)
 		sessions.GET("/:id/recording", SessionRecordingEndpoint)
-		sessions.GET("/:id/status", SessionGetStatusEndpoint)
 	}
 
 	resourceSharers := e.Group("/resource-sharers")

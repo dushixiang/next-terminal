@@ -222,3 +222,7 @@ export function renderSize(value) {
     size = size.toFixed(2);
     return size + ' ' + unitArr[index];
 }
+
+export function getFileName(fullFileName){
+    return fullFileName.substring(fullFileName.lastIndexOf('/') + 1, fullFileName.length);
+}
