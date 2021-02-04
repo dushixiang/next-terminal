@@ -106,11 +106,11 @@ class Access extends Component {
         })
         if (this.state.protocol === 'ssh') {
             if (data.data && data.data.length > 0) {
-                message.info('您输入的内容已复制到远程服务器上，使用右键将自动粘贴。');
+                // message.info('您输入的内容已复制到远程服务器上，使用右键将自动粘贴。');
             }
         } else {
             if (data.data && data.data.length > 0) {
-                message.info('您输入的内容已复制到远程服务器上');
+                // message.info('您输入的内容已复制到远程服务器上');
             }
         }
 
@@ -282,9 +282,13 @@ class Access extends Component {
             // Set clipboard contents once stream is finished
             reader.onend = async () => {
 
-                message.info('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
+                // message.info('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
                 this.setState({
                     clipboardText: data
+                }, () => {
+                    // 选中粘贴板文本框中的内容
+
+                    // 调用API粘贴进
                 });
 
                 if (navigator.clipboard) {
@@ -306,9 +310,9 @@ class Access extends Component {
     };
 
     onKeyDown = (keysym) => {
-        if (this.state.clipboardVisible || this.state.fileSystemVisible) {
-            return true;
-        }
+        // if (this.state.clipboardVisible || this.state.fileSystemVisible) {
+        //     return true;
+        // }
         this.state.client.sendKeyEvent(1, keysym);
         if (keysym === 65288) {
             return false;
@@ -416,8 +420,11 @@ class Access extends Component {
             }
         };
 
+        const sink = new Guacamole.InputSink();
+        display.appendChild(sink.getElement());
+
         // Keyboard
-        const keyboard = new Guacamole.Keyboard(document);
+        const keyboard = new Guacamole.Keyboard(sink.getElement());
 
         keyboard.onkeydown = this.onKeyDown;
         keyboard.onkeyup = this.onKeyUp;

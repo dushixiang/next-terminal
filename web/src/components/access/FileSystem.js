@@ -4,6 +4,7 @@ import {
     CloudDownloadOutlined,
     CloudUploadOutlined,
     DeleteOutlined,
+    EditOutlined,
     ExclamationCircleOutlined,
     FileExcelOutlined,
     FileImageOutlined,
@@ -23,18 +24,15 @@ import qs from "qs";
 import request from "../../common/request";
 import {server} from "../../common/constants";
 import Upload from "antd/es/upload";
-import {download, getToken, isEmpty, renderSize} from "../../utils/utils";
+import {download, getFileName, getToken, isEmpty, renderSize} from "../../utils/utils";
 import './FileSystem.css'
 
-const formItemLayout = {
-    labelCol: {span: 6},
-    wrapperCol: {span: 14},
-};
 const {confirm} = Modal;
 
 class FileSystem extends Component {
 
     mkdirFormRef = React.createRef();
+    renameFormRef = React.createRef();
 
     state = {
         sessionId: undefined,
@@ -57,36 +55,6 @@ class FileSystem extends Component {
         });
     }
 
-
-    handleOk = async (values) => {
-        let params = {
-            'dir': this.state.selectedRow.key + '/' + values['dir']
-        }
-        let paramStr = qs.stringify(params);
-
-        this.setState({
-            confirmLoading: true
-        })
-        let result = await request.post(`/sessions/${this.state.sessionId}/mkdir?${paramStr}`);
-        if (result.code === 1) {
-            message.success('创建成功');
-            this.loadFiles(this.state.currentDirectory);
-        } else {
-            message.error(result.message);
-        }
-
-        this.setState({
-            confirmLoading: false,
-            confirmVisible: false
-        })
-    }
-
-    upload = () => {
-        this.setState({
-            uploadVisible: true
-        })
-    }
-
     download = () => {
         download(`${server}/sessions/${this.state.sessionId}/download?file=${this.state.selectedRow.key}`);
     }
@@ -97,9 +65,9 @@ class FileSystem extends Component {
             message.warning('请至少选择一个文件或目录');
         }
 
-        let title = '';
+        let title;
         if (selectedRowKeys.length === 1) {
-            let file = selectedRowKeys[0].substring(selectedRowKeys[0].lastIndexOf('/') + 1, selectedRowKeys[0].length);
+            let file = getFileName(selectedRowKeys[0]);
             title = <p>您确认要删除"{file}"吗？</p>;
         } else {
             title = `您确认要删除所选的${selectedRowKeys.length}项目吗？`;
@@ -114,7 +82,7 @@ class FileSystem extends Component {
                     if (rowKey === '..') {
                         continue;
                     }
-                    let result = await request.delete(`/sessions/${this.state.sessionId}/rm?key=${rowKey}`);
+                    let result = await request.post(`/sessions/${this.state.sessionId}/rm?key=${rowKey}`);
                     if (result['code'] !== 1) {
                         message.error(result['message']);
                     }
@@ -158,7 +126,8 @@ class FileSystem extends Component {
             this.setState({
                 files: items,
                 currentDirectory: key,
-                selectedRow: {}
+                selectedRow: {},
+                selectedRowKeys: []
             })
         } finally {
             this.setState({
@@ -182,7 +151,6 @@ class FileSystem extends Component {
     getNodeTreeRightClickMenu = () => {
         const {pageX, pageY, visible} = {...this.state.dropdown};
         if (visible) {
-            console.log(pageX, pageY)
             const tmpStyle = {
                 left: `${pageX}px`,
                 top: `${pageY}px`,
@@ -195,10 +163,24 @@ class FileSystem extends Component {
                 disableDownload = false;
             }
 
+            let disableRename = true;
+            if (this.state.selectedRowKeys.length === 1) {
+                disableRename = false;
+            }
+
             return (
                 <ul className="popup" style={tmpStyle}>
                     <li><Button type={'text'} size={'small'} icon={<CloudDownloadOutlined/>} onClick={this.download}
                                 disabled={disableDownload}>下载</Button></li>
+
+                    <li><Button type={'text'} size={'small'} icon={<EditOutlined/>} disabled={disableRename}
+                                onClick={() => {
+                                    this.setState({
+                                        renameVisible: true
+                                    })
+                                }}
+                    >重命名</Button></li>
+
                     <li><Button type={'text'} size={'small'} icon={<DeleteOutlined/>} onClick={this.rmdir}>删除</Button>
                     </li>
                 </ul>
@@ -365,7 +347,7 @@ class FileSystem extends Component {
             </Row>
         );
 
-        const {loading, selectedRowKeys} = this.state;
+        const {selectedRowKeys} = this.state;
         const rowSelection = {
             selectedRowKeys,
             onChange: (selectedRowKeys) => {
@@ -465,10 +447,12 @@ class FileSystem extends Component {
                 <Modal
                     title="上传文件"
                     visible={this.state.uploadVisible}
+                    centered={true}
                     onOk={() => {
                         this.setState({
                             uploadVisible: false
                         })
+                        this.loadFiles(this.state.currentDirectory);
                     }}
                     confirmLoading={this.state.uploadLoading}
                     onCancel={() => {
@@ -484,34 +468,135 @@ class FileSystem extends Component {
                 </Modal>
 
 
-                <Modal
-                    title="创建文件夹"
-                    visible={this.state.mkdirVisible}
-                    onOk={() => {
-                        this.mkdirFormRef.current
-                            .validateFields()
-                            .then(values => {
-                                this.mkdirFormRef.current.resetFields();
-                                this.handleOk(values);
-                            })
-                            .catch(info => {
+                {
+                    this.state.mkdirVisible ?
+                        <Modal
+                            title="创建文件夹"
+                            visible={this.state.mkdirVisible}
+                            centered={true}
+                            onOk={() => {
+                                this.mkdirFormRef.current
+                                    .validateFields()
+                                    .then(async values => {
+                                        this.mkdirFormRef.current.resetFields();
+                                        let params = {
+                                            'dir': this.state.currentDirectory + '/' + values['dir']
+                                        }
+                                        let paramStr = qs.stringify(params);
 
-                            });
-                    }}
-                    confirmLoading={this.state.confirmLoading}
-                    onCancel={() => {
-                        this.setState({
-                            mkdirVisible: false
-                        })
-                    }}
-                >
-                    <Form ref={this.mkdirFormRef}>
+                                        this.setState({
+                                            confirmLoading: true
+                                        })
+                                        let result = await request.post(`/sessions/${this.state.sessionId}/mkdir?${paramStr}`);
+                                        if (result.code === 1) {
+                                            message.success('创建成功');
+                                            this.loadFiles(this.state.currentDirectory);
+                                        } else {
+                                            message.error(result.message);
+                                        }
 
-                        <Form.Item name='dir' rules={[{required: true, message: '请输入文件夹名称'}]}>
-                            <Input autoComplete="off" placeholder="请输入文件夹名称"/>
-                        </Form.Item>
-                    </Form>
-                </Modal>
+                                        this.setState({
+                                            confirmLoading: false,
+                                            mkdirVisible: false
+                                        })
+                                    })
+                                    .catch(info => {
+
+                                    });
+                            }}
+                            confirmLoading={this.state.confirmLoading}
+                            onCancel={() => {
+                                this.setState({
+                                    mkdirVisible: false
+                                })
+                            }}
+                        >
+                            <Form ref={this.mkdirFormRef}>
+
+                                <Form.Item name='dir' rules={[{required: true, message: '请输入文件夹名称'}]}>
+                                    <Input autoComplete="off" placeholder="请输入文件夹名称"/>
+                                </Form.Item>
+                            </Form>
+                        </Modal> : undefined
+                }
+
+                {
+                    this.state.renameVisible ?
+                        <Modal
+                            title="重命名"
+                            visible={this.state.renameVisible}
+                            centered={true}
+                            onOk={() => {
+                                this.renameFormRef.current
+                                    .validateFields()
+                                    .then(async values => {
+                                        this.renameFormRef.current.resetFields();
+
+                                        try {
+                                            let currentDirectory = this.state.currentDirectory;
+                                            if (!currentDirectory.endsWith("/")) {
+                                                currentDirectory += '/';
+                                            }
+                                            let params = {
+                                                'oldName': this.state.selectedRowKeys[0],
+                                                'newName': currentDirectory + values['newName'],
+                                            }
+
+                                            if (params['oldName'] === params['newName']) {
+                                                message.success('重命名成功');
+                                                return;
+                                            }
+
+                                            let paramStr = qs.stringify(params);
+
+                                            this.setState({
+                                                confirmLoading: true
+                                            })
+                                            let result = await request.post(`/sessions/${this.state.sessionId}/rename?${paramStr}`);
+                                            if (result['code'] === 1) {
+                                                message.success('重命名成功');
+                                                let files = this.state.files;
+                                                for (let i = 0; i < files.length; i++) {
+                                                    if (files['key'] === params['oldName']) {
+                                                        files[i].path = params['newName'];
+                                                        files[i].key = params['newName'];
+                                                        files[i].name = getFileName(params['newName']);
+                                                        break;
+                                                    }
+                                                }
+                                                this.setState({
+                                                    files: files
+                                                })
+                                            } else {
+                                                message.error(result.message);
+                                            }
+                                        } finally {
+                                            this.setState({
+                                                confirmLoading: false,
+                                                renameVisible: false
+                                            })
+                                        }
+                                    })
+                                    .catch(info => {
+
+                                    });
+                            }}
+                            confirmLoading={this.state.confirmLoading}
+                            onCancel={() => {
+                                this.setState({
+                                    renameVisible: false
+                                })
+                            }}
+                        >
+                            <Form ref={this.renameFormRef}
+                                  initialValues={{newName: getFileName(this.state.selectedRowKeys[0])}}>
+                                <Form.Item name='newName' rules={[{required: true, message: '请输入新的名称'}]}>
+                                    <Input autoComplete="off" placeholder="新的名称"/>
+                                </Form.Item>
+                            </Form>
+                        </Modal> : undefined
+                }
+
 
                 {this.getNodeTreeRightClickMenu()}
             </div>
