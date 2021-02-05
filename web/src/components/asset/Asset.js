@@ -323,12 +323,12 @@ class Asset extends Component {
         if (result.code === 1) {
             if (result.data === true) {
                 message.success({content: '检测完成，您访问的资产在线，即将打开窗口进行访问。', key: id, duration: 3});
-                window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
-                // if (protocol === 'ssh') {
-                //     window.open(`#/access-naive?assetId=${id}&assetName=${name}`);
-                // } else {
-                //     window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
-                // }
+                // window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
+                if (protocol === 'ssh') {
+                    window.open(`#/term?assetId=${id}&assetName=${name}`);
+                } else {
+                    window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
+                }
             } else {
                 message.warn('您访问的资产未在线，请确认网络状态。', 10);
             }

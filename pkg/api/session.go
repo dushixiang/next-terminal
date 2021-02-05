@@ -4,14 +4,12 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"next-terminal/pkg/global"
-	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
 	"os"
@@ -100,7 +98,7 @@ func SessionDisconnectEndpoint(c echo.Context) error {
 
 	split := strings.Split(sessionIds, ",")
 	for i := range split {
-		CloseSessionById(split[i], ForcedDisconnect, "forced disconnect")
+		CloseSessionById(split[i], ForcedDisconnect, "管理员强制关闭了此会话")
 	}
 	return Success(c, nil)
 }
@@ -112,16 +110,13 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	defer mutex.Unlock()
 	observable, _ := global.Store.Get(sessionId)
 	if observable != nil {
-		logrus.Debugf("会话%v创建者退出", observable.Subject.Tunnel.UUID)
-		observable.Subject.Close()
+		logrus.Debugf("会话%v创建者退出", sessionId)
+		observable.Subject.Close(code, reason)
 
 		for i := 0; i < len(observable.Observers); i++ {
-			observable.Observers[i].Close()
-			CloseWebSocket(observable.Observers[i].WebSocket, code, reason)
-			logrus.Debugf("强制踢出会话%v的观察者", observable.Observers[i].Tunnel.UUID)
+			observable.Observers[i].Close(code, reason)
+			logrus.Debugf("强制踢出会话%v的观察者", sessionId)
 		}
-
-		CloseWebSocket(observable.Subject.WebSocket, code, reason)
 	}
 	global.Store.Del(sessionId)
 
@@ -148,17 +143,6 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	session.Message = reason
 
 	_ = model.UpdateSessionById(&session, sessionId)
-}
-
-func CloseWebSocket(ws *websocket.Conn, c int, t string) {
-	if ws == nil {
-		return
-	}
-	err := guacd.NewInstruction("error", "", strconv.Itoa(c))
-	_ = ws.WriteMessage(websocket.TextMessage, []byte(err.String()))
-	disconnect := guacd.NewInstruction("disconnect")
-	_ = ws.WriteMessage(websocket.TextMessage, []byte(disconnect.String()))
-	//defer ws.Close()
 }
 
 func SessionResizeEndpoint(c echo.Context) error {
@@ -274,11 +258,11 @@ func SessionUploadEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		dstFile, err := tun.Subject.SftpClient.Create(remoteFile)
-		defer dstFile.Close()
+		dstFile, err := tun.Subject.NextTerminal.SftpClient.Create(remoteFile)
 		if err != nil {
 			return err
 		}
+		defer dstFile.Close()
 
 		buf := make([]byte, 1024)
 		for {
@@ -327,7 +311,7 @@ func SessionDownloadEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		dstFile, err := tun.Subject.SftpClient.Open(remoteFile)
+		dstFile, err := tun.Subject.NextTerminal.SftpClient.Open(remoteFile)
 		if err != nil {
 			return err
 		}
@@ -378,16 +362,16 @@ func SessionLsEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		if tun.Subject.SftpClient == nil {
+		if tun.Subject.NextTerminal.SftpClient == nil {
 			sftpClient, err := CreateSftpClient(session)
 			if err != nil {
 				logrus.Errorf("创建sftp客户端失败：%v", err.Error())
 				return err
 			}
-			tun.Subject.SftpClient = sftpClient
+			tun.Subject.NextTerminal.SftpClient = sftpClient
 		}
 
-		fileInfos, err := tun.Subject.SftpClient.ReadDir(remoteDir)
+		fileInfos, err := tun.Subject.NextTerminal.SftpClient.ReadDir(remoteDir)
 		if err != nil {
 			return err
 		}
@@ -457,7 +441,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 		if !ok {
 			return errors.New("获取sftp客户端失败")
 		}
-		if err := tun.Subject.SftpClient.Mkdir(remoteDir); err != nil {
+		if err := tun.Subject.NextTerminal.SftpClient.Mkdir(remoteDir); err != nil {
 			return err
 		}
 		return Success(c, nil)
@@ -489,7 +473,7 @@ func SessionRmEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		sftpClient := tun.Subject.SftpClient
+		sftpClient := tun.Subject.NextTerminal.SftpClient
 
 		stat, err := sftpClient.Stat(key)
 		if err != nil {
@@ -548,7 +532,7 @@ func SessionRenameEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		sftpClient := tun.Subject.SftpClient
+		sftpClient := tun.Subject.NextTerminal.SftpClient
 
 		if err := sftpClient.Rename(oldName, newName); err != nil {
 			return err

@@ -46,11 +46,11 @@ func TunEndpoint(c echo.Context) error {
 	if len(connectionId) > 0 {
 		session, err = model.FindSessionByConnectionId(connectionId)
 		if err != nil {
-			CloseWebSocket(ws, NotFoundSession, "会话不存在")
+			logrus.Warnf("会话不存在")
 			return err
 		}
 		if session.Status != model.Connected {
-			CloseWebSocket(ws, NotFoundSession, "会话未在线")
+			logrus.Warnf("会话未在线")
 			return errors.New("会话未在线")
 		}
 		configuration.ConnectionID = connectionId

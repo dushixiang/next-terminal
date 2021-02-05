@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"next-terminal/pkg/global"
+	"next-terminal/pkg/log"
 	"next-terminal/pkg/model"
 
 	"github.com/labstack/echo/v4"
@@ -15,6 +16,7 @@ func SetupRoutes() *echo.Echo {
 
 	e := echo.New()
 	e.HideBanner = true
+	e.Logger = log.GetEchoLogger()
 
 	e.File("/", "web/build/index.html")
 	e.File("/logo.svg", "web/build/logo.svg")
