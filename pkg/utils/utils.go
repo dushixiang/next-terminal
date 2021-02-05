@@ -10,6 +10,7 @@ import (
 	"image/png"
 	"net"
 	"os"
+	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
@@ -121,6 +122,10 @@ func IsDir(path string) bool {
 // 判断所给路径是否为文件
 func IsFile(path string) bool {
 	return !IsDir(path)
+}
+
+func GetParentDirectory(directory string) string {
+	return filepath.Dir(directory)
 }
 
 // 去除重复元素

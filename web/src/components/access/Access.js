@@ -240,7 +240,7 @@ class Access extends Component {
                 this.showMessage('创建隧道失败');
                 break;
             case 802:
-                this.showMessage('管理员强制断开了此会话');
+                this.showMessage('管理员强制关闭了此会话');
                 break;
             default:
                 this.showMessage('未知错误。');

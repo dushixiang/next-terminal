@@ -10,7 +10,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
@@ -23,7 +22,7 @@ import (
 	"time"
 )
 
-const Version = "v0.1.1"
+const Version = "v0.2.0"
 
 func main() {
 	log.Fatal(Run())
@@ -71,7 +70,7 @@ func Run() error {
 			global.Config.Mysql.Database,
 		)
 		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
+			//Logger: logger.Default.LogMode(logger.Info),
 		})
 	} else {
 		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{})

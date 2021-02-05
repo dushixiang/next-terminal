@@ -2,30 +2,37 @@ package global
 
 import (
 	"github.com/gorilla/websocket"
-	"github.com/pkg/sftp"
-	"golang.org/x/crypto/ssh"
 	"next-terminal/pkg/guacd"
+	"next-terminal/pkg/term"
+	"strconv"
 	"sync"
 )
 
 type Tun struct {
-	Protocol   string
-	Tunnel     *guacd.Tunnel
-	SshClient  *ssh.Client
-	SftpClient *sftp.Client
-	WebSocket  *websocket.Conn
+	Protocol     string
+	WebSocket    *websocket.Conn
+	Tunnel       *guacd.Tunnel
+	NextTerminal *term.NextTerminal
 }
 
-func (r *Tun) Close() {
-	if r.Protocol == "rdp" || r.Protocol == "vnc" {
+func (r *Tun) Close(code int, reason string) {
+	if r.Tunnel != nil {
 		_ = r.Tunnel.Close()
-	} else {
-		if r.SshClient != nil {
-			_ = r.SshClient.Close()
-		}
+	}
+	if r.NextTerminal != nil {
+		_ = r.NextTerminal.Close()
+	}
 
-		if r.SftpClient != nil {
-			_ = r.SftpClient.Close()
+	ws := r.WebSocket
+	if ws != nil {
+		if r.Protocol == "rdp" || r.Protocol == "vnc" {
+			err := guacd.NewInstruction("error", reason, strconv.Itoa(code))
+			_ = ws.WriteMessage(websocket.TextMessage, []byte(err.String()))
+			disconnect := guacd.NewInstruction("disconnect")
+			_ = ws.WriteMessage(websocket.TextMessage, []byte(disconnect.String()))
+		} else {
+			msg := `{"type":"closed","content":"` + reason + `"}`
+			_ = ws.WriteMessage(websocket.TextMessage, []byte(msg))
 		}
 	}
 }

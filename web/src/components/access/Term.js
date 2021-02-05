@@ -9,7 +9,7 @@ import "./Access.css"
 import request from "../../common/request";
 import {message} from "antd";
 
-class AccessNaive extends Component {
+class Term extends Component {
 
     state = {
         width: window.innerWidth,
@@ -30,17 +30,9 @@ class AccessNaive extends Component {
             return;
         }
 
-        let params = {
-            'width': this.state.width,
-            'height': this.state.height,
-            'sessionId': sessionId
-        };
-
-        let paramStr = qs.stringify(params);
-
         let term = new Terminal({
             fontFamily: 'monaco, Consolas, "Lucida Console", monospace',
-            fontSize: 14,
+            fontSize: 15,
             // theme: {
             //     background: '#1b1b1b',
             //     lineHeight: 17
@@ -81,20 +73,22 @@ class AccessNaive extends Component {
         });
 
         let token = getToken();
+        let params = {
+            'cols': term.cols,
+            'rows': term.rows,
+            'sessionId': sessionId,
+            'X-Auth-Token': token
+        };
 
-        let webSocket = new WebSocket(wsServer + '/ssh?X-Auth-Token=' + token + '&' + paramStr);
+        let paramStr = qs.stringify(params);
+
+        let webSocket = new WebSocket(wsServer + '/ssh?' + paramStr);
 
         let pingInterval;
         webSocket.onopen = (e => {
             pingInterval = setInterval(() => {
                 webSocket.send(JSON.stringify({type: 'ping'}))
             }, 5000);
-
-            let terminalSize = {
-                cols: term.cols,
-                rows: term.rows
-            }
-            webSocket.send(JSON.stringify({type: 'resize', content: JSON.stringify(terminalSize)}));
         });
 
         webSocket.onerror = (e) => {
@@ -111,8 +105,8 @@ class AccessNaive extends Component {
             let msg = JSON.parse(e.data);
             switch (msg['type']) {
                 case 'connected':
+                    // term.write(msg['content'])
                     term.clear();
-                    this.onWindowResize();
                     this.updateSessionStatus(sessionId);
                     break;
                 case 'data':
@@ -202,4 +196,4 @@ class AccessNaive extends Component {
     }
 }
 
-export default AccessNaive;
+export default Term;

@@ -40,7 +40,7 @@ import {isEmpty, NT_PACKAGE} from "./utils/utils";
 import {isAdmin} from "./service/permission";
 import UserGroup from "./components/user/UserGroup";
 import LoginLog from "./components/session/LoginLog";
-import AccessNaive from "./components/access/AccessNaive";
+import Term from "./components/access/Term";
 
 const {Footer, Sider} = Layout;
 
@@ -114,7 +114,7 @@ class App extends Component {
 
             <Switch>
                 <Route path="/access" component={Access}/>
-                <Route path="/access-naive" component={AccessNaive}/>
+                <Route path="/term" component={Term}/>
                 <Route path="/login"><Login updateUser={this.updateUser}/></Route>
 
                 <Route path="/">
