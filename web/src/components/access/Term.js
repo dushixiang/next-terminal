@@ -105,7 +105,6 @@ class Term extends Component {
             let msg = JSON.parse(e.data);
             switch (msg['type']) {
                 case 'connected':
-                    // term.write(msg['content'])
                     term.clear();
                     this.updateSessionStatus(sessionId);
                     break;
