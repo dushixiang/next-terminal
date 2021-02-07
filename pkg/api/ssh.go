@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/sftp"
@@ -155,12 +154,8 @@ func SSHEndpoint(c echo.Context) (err error) {
 	_ = WriteMessage(ws, msg)
 
 	quitChan := make(chan bool)
-	recordingChan := make(chan string, 1024)
 
-	go ReadMessage(nextTerminal, recordingChan, quitChan, ws)
-
-	go Recoding(nextTerminal, recordingChan, quitChan)
-	go Monitor(sessionId, recordingChan, quitChan)
+	go ReadMessage(nextTerminal, quitChan, ws)
 
 	for {
 		_, message, err := ws.ReadMessage()
@@ -207,7 +202,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	return err
 }
 
-func ReadMessage(nextTerminal *term.NextTerminal, stdoutChan chan string, quitChan chan bool, ws *websocket.Conn) {
+func ReadMessage(nextTerminal *term.NextTerminal, quitChan chan bool, ws *websocket.Conn) {
 
 	var quit bool
 	for {
@@ -227,8 +222,6 @@ func ReadMessage(nextTerminal *term.NextTerminal, stdoutChan chan string, quitCh
 			}
 			if n > 0 {
 				s := string(p)
-				// 发送一份数据到队列中
-				stdoutChan <- s
 				msg := Message{
 					Type:    Data,
 					Content: s,
@@ -236,52 +229,6 @@ func ReadMessage(nextTerminal *term.NextTerminal, stdoutChan chan string, quitCh
 				_ = WriteMessage(ws, msg)
 			}
 			time.Sleep(time.Duration(10) * time.Millisecond)
-		}
-	}
-}
-
-func Recoding(nextTerminal *term.NextTerminal, recordingChan chan string, quitChan chan bool) {
-	var quit bool
-	var s string
-	for {
-		select {
-		case quit = <-quitChan:
-			if quit {
-				fmt.Println("退出录屏")
-				return
-			}
-		case s = <-recordingChan:
-			_ = nextTerminal.Recorder.WriteData(s)
-		default:
-
-		}
-	}
-}
-
-func Monitor(sessionId string, recordingChan chan string, quitChan chan bool) {
-	var quit bool
-	var s string
-	for {
-		select {
-		case quit = <-quitChan:
-			if quit {
-				fmt.Println("退出监控")
-				return
-			}
-		case s = <-recordingChan:
-			msg := Message{
-				Type:    Data,
-				Content: s,
-			}
-
-			observable, ok := global.Store.Get(sessionId)
-			if ok {
-				for i := 0; i < len(observable.Observers); i++ {
-					_ = WriteMessage(observable.Observers[i].WebSocket, msg)
-				}
-			}
-		default:
-
 		}
 	}
 }

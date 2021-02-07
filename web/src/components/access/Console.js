@@ -4,8 +4,10 @@ import {Terminal} from "xterm";
 import qs from "qs";
 import {wsServer} from "../../common/constants";
 import "./Console.css"
-import {getToken} from "../../utils/utils";
+import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit'
+import request from "../../common/request";
+import {message} from "antd";
 
 class Console extends Component {
 
@@ -18,45 +20,33 @@ class Console extends Component {
         fitAddon: undefined
     };
 
-    componentDidMount() {
+    componentDidMount = async () => {
 
         let command = this.props.command;
         let assetId = this.props.assetId;
         let width = this.props.width;
         let height = this.props.height;
-
-        let params = {
-            'width': width,
-            'height': height,
-            'assetId': assetId
-        };
-
-        let paramStr = qs.stringify(params);
-
-        const ua = navigator.userAgent.toLowerCase();
-        let lineHeight = 1;
-        if (ua.includes('windows')) {
-            lineHeight = 1.1;
+        let sessionId = await this.createSession(assetId);
+        if (isEmpty(sessionId)) {
+            return;
         }
 
         let term = new Terminal({
             fontFamily: 'monaco, Consolas, "Lucida Console", monospace',
             fontSize: 14,
-            lineHeight: lineHeight,
             theme: {
                 background: '#1b1b1b'
             },
             rightClickSelectsWord: true,
         });
 
-        let fitAddon = new FitAddon();
-        term.loadAddon(fitAddon);
         term.open(this.refs.terminal);
+        const fitAddon = new FitAddon();
+        term.loadAddon(fitAddon);
+        fitAddon.fit();
+        term.focus();
 
         term.writeln('Trying to connect to the server ...');
-        term.onResize(e => {
-
-        });
 
         term.onData(data => {
             let webSocket = this.state.webSocket;
@@ -66,8 +56,16 @@ class Console extends Component {
         });
 
         let token = getToken();
+        let params = {
+            'cols': term.cols,
+            'rows': term.rows,
+            'sessionId': sessionId,
+            'X-Auth-Token': token
+        };
 
-        let webSocket = new WebSocket(wsServer + '/ssh?X-Auth-Token=' + token + '&' + paramStr);
+        let paramStr = qs.stringify(params);
+
+        let webSocket = new WebSocket(wsServer + '/ssh?' + paramStr);
 
         this.props.appendWebsocket({'id': assetId, 'ws': webSocket});
 
@@ -86,6 +84,10 @@ class Console extends Component {
         webSocket.onmessage = (e) => {
             let msg = JSON.parse(e.data);
             switch (msg['type']) {
+                case 'connected':
+                    term.clear();
+                    this.updateSessionStatus(sessionId);
+                    break;
                 case 'data':
                     term.write(msg['content']);
                     break;
@@ -126,6 +128,22 @@ class Console extends Component {
         let webSocket = this.state.webSocket;
         if (webSocket) {
             webSocket.close()
+        }
+    }
+
+    async createSession(assetsId) {
+        let result = await request.post(`/sessions?assetId=${assetsId}&mode=naive`);
+        if (result['code'] !== 1) {
+            this.showMessage(result['message']);
+            return null;
+        }
+        return result['data']['id'];
+    }
+
+    updateSessionStatus = async (sessionId) => {
+        let result = await request.post(`/sessions/${sessionId}/connect`);
+        if (result['code'] !== 1) {
+            message.error(result['message']);
         }
     }
 

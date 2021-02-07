@@ -75,7 +75,14 @@ func (ret *NextTerminal) Write(p []byte) (int, error) {
 }
 
 func (ret *NextTerminal) Read() ([]byte, int, error) {
-	return ret.NextWriter.Read()
+	bytes, n, err := ret.NextWriter.Read()
+	if err != nil {
+		return nil, 0, err
+	}
+	if ret.Recorder != nil && n > 0 {
+		_ = ret.Recorder.WriteData(string(bytes))
+	}
+	return bytes, n, nil
 }
 
 func (ret *NextTerminal) Close() error {

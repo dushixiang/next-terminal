@@ -108,8 +108,8 @@ func CreateRecording(recordingPath string, h int, w int) (*Recorder, error) {
 	header := &Header{
 		Title:     "",
 		Version:   2,
-		Height:    h,
-		Width:     w,
+		Height:    42,
+		Width:     150,
 		Env:       Env{Shell: "/bin/bash", Term: "xterm-256color"},
 		Timestamp: int(time.Now().Unix()),
 	}
