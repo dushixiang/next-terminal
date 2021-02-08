@@ -120,11 +120,11 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                 </Form.Item>
 
                 <Form.Item label="资产名称" name='name' rules={[{required: true, message: "请输入资产名称"}]}>
-                    <Input placeholder="请输入资产名称"/>
+                    <Input placeholder="资产名称"/>
                 </Form.Item>
 
-                <Form.Item label="IP" name='ip' rules={[{required: true, message: '请输入资产IP'}]}>
-                    <Input placeholder="请输入资产IP"/>
+                <Form.Item label="主机" name='ip' rules={[{required: true, message: '请输入资产的主机名称或者IP地址'}]}>
+                    <Input placeholder="资产的主机名称或者IP地址"/>
                 </Form.Item>
 
                 <Form.Item label="接入协议" name='protocol' rules={[{required: true, message: '请选择接入协议'}]}>
@@ -136,7 +136,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     </Radio.Group>
                 </Form.Item>
 
-                <Form.Item label="端口" name='port' rules={[{required: true, message: '请输入资产端口'}]}>
+                <Form.Item label="端口号" name='port' rules={[{required: true, message: '请输入资产端口'}]}>
                     <InputNumber min={1} max={65535}/>
                 </Form.Item>
 
