@@ -24,6 +24,7 @@ const UserGroupModal = ({
             visible={visible}
             maskClosable={false}
             destroyOnClose={true}
+            centered={true}
             onOk={() => {
                 form
                     .validateFields()

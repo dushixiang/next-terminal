@@ -97,6 +97,10 @@ func AssetUpdateEndpoint(c echo.Context) error {
 		item.Tags = "-"
 	}
 
+	if item.Description == "" {
+		item.Description = "-"
+	}
+
 	model.UpdateAssetById(&item, id)
 
 	return Success(c, nil)

@@ -98,6 +98,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
             title={title}
             visible={visible}
             maskClosable={false}
+            centered={true}
             onOk={() => {
                 form
                     .validateFields()
@@ -137,7 +138,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                 </Form.Item>
 
                 <Form.Item label="端口号" name='port' rules={[{required: true, message: '请输入资产端口'}]}>
-                    <InputNumber min={1} max={65535}/>
+                    <InputNumber min={1} max={65535} placeholder='TCP端口'/>
                 </Form.Item>
 
                 <Form.Item label="账户类型" name='accountType' rules={[{required: true, message: '请选择接账户类型'}]}>
@@ -198,7 +199,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                 }
 
                 <Form.Item label="标签" name='tags'>
-                    <Select mode="tags" placeholder="请选择标签">
+                    <Select mode="tags" placeholder="标签可以更加方便的检索资产">
                         {tags.map(tag => {
                             if (tag === '-') {
                                 return undefined;
@@ -206,6 +207,10 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                             return (<Option key={tag}>{tag}</Option>)
                         })}
                     </Select>
+                </Form.Item>
+
+                <Form.Item label="备注" name='description'>
+                    <TextArea rows={4} placeholder='关于资产的一些信息您可以写在这里'/>
                 </Form.Item>
             </Form>
         </Modal>

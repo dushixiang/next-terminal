@@ -475,7 +475,7 @@ class OnlineSession extends Component {
                             <Modal
                                 className='monitor'
                                 title={this.state.sessionTitle}
-                                centered
+                                centered={true}
                                 maskClosable={false}
                                 visible={this.state.accessVisible}
                                 footer={null}
