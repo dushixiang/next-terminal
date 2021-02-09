@@ -124,6 +124,15 @@ func TunEndpoint(c echo.Context) error {
 
 		configuration.SetParameter("hostname", session.IP)
 		configuration.SetParameter("port", strconv.Itoa(session.Port))
+
+		// 加载资产配置的属性，优先级比全局配置的高，因此最后加载，覆盖掉全局配置
+		attributes, _ := model.FindAssetAttributeByAssetId(session.AssetId)
+		if len(attributes) > 0 {
+			for i := range attributes {
+				attribute := attributes[i]
+				configuration.SetParameter(attribute.Name, attribute.Value)
+			}
+		}
 	}
 	for name := range configuration.Parameters {
 		// 替换数据库空格字符串占位符为真正的空格

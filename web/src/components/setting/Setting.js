@@ -314,6 +314,26 @@ class Setting extends Component {
 
                                 <Form.Item
                                     {...formItemLayout}
+                                    name="color-scheme"
+                                    label="配色方案"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '配色方案',
+                                        },
+                                    ]}
+                                    initialValue="gray-black"
+                                >
+                                    <Select style={{width: 120}} onChange={null}>
+                                        <Option value="gray-black">黑底灰字</Option>
+                                        <Option value="green-black">黑底绿字</Option>
+                                        <Option value="white-black">黑底白字</Option>
+                                        <Option value="black-white">白底黑字</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    {...formItemLayout}
                                     name="font-name"
                                     label="字体名称"
                                     rules={[
@@ -338,26 +358,6 @@ class Setting extends Component {
                                     ]}
                                 >
                                     <Input type='number' placeholder="请输入字体大小"/>
-                                </Form.Item>
-
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="color-scheme"
-                                    label="颜色主题"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: '颜色主题',
-                                        },
-                                    ]}
-                                    initialValue="gray-black"
-                                >
-                                    <Select style={{width: 120}} onChange={null}>
-                                        <Option value="gray-black">黑底灰字</Option>
-                                        <Option value="green-black">黑底绿字</Option>
-                                        <Option value="white-black">黑底白字</Option>
-                                        <Option value="black-white">白底黑字</Option>
-                                    </Select>
                                 </Form.Item>
 
                                 <Form.Item {...formTailLayout}>

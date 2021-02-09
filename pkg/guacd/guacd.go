@@ -15,9 +15,11 @@ const (
 	RecordingPath       = "recording-path"
 	CreateRecordingPath = "create-recording-path"
 
-	FontName    = "font-name"
-	FontSize    = "font-size"
-	ColorScheme = "color-scheme"
+	FontName     = "font-name"
+	FontSize     = "font-size"
+	ColorScheme  = "color-scheme"
+	Backspace    = "backspace"
+	TerminalType = "terminal-type"
 
 	EnableDrive              = "enable-drive"
 	DriveName                = "drive-name"
@@ -31,6 +33,17 @@ const (
 	DisableBitmapCaching     = "disable-bitmap-caching"
 	DisableOffscreenCaching  = "disable-offscreen-caching"
 	DisableGlyphCaching      = "disable-glyph-caching"
+
+	ColorDepth  = "color-depth"
+	Cursor      = "cursor"
+	SwapRedBlue = "swap-red-blue"
+	DestHost    = "dest-host"
+	DestPort    = "dest-port"
+
+	UsernameRegex     = "username-regex"
+	PasswordRegex     = "password-regex"
+	LoginSuccessRegex = "login-success-regex"
+	LoginFailureRegex = "login-failure-regex"
 )
 
 const Delimiter = ';'

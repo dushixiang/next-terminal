@@ -122,6 +122,9 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.Asset{}); err != nil {
 		return err
 	}
+	if err := global.DB.AutoMigrate(&model.AssetAttribute{}); err != nil {
+		return err
+	}
 	if err := global.DB.AutoMigrate(&model.Session{}); err != nil {
 		return err
 	}

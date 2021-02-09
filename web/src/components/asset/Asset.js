@@ -40,6 +40,10 @@ import {
 import {PROTOCOL_COLORS} from "../../common/constants";
 import Logout from "../user/Logout";
 import {hasPermission, isAdmin} from "../../service/permission";
+import AssetSSHAttributeModal from "./AssetSSHAttributeModal";
+import AssetRDPAttributeModal from "./AssetRDPAttributeModal";
+import AssetVNCAttributeModal from "./AssetVNCAttributeModal";
+import AssetTelnetAttributeModal from "./AssetTelnetAttributeModal";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -85,6 +89,8 @@ class Asset extends Component {
         users: [],
         selected: {},
         selectedSharers: [],
+        attrVisible: false,
+        attributes: {}
     };
 
     async componentDidMount() {
@@ -222,6 +228,34 @@ class Asset extends Component {
         }
         result.data['id'] = undefined;
         await this.showModal('复制资产', result.data);
+    }
+
+    async attr(record) {
+        let result = await request.get(`/assets/${record['id']}/attributes`);
+        if (result.code !== 1) {
+            message.error(result.message, 10);
+            return;
+        }
+
+        // eslint-disable-next-line no-extend-native
+        String.prototype.bool = function () {
+            return (/^true$/i).test(this);
+        };
+
+        let attributes = result['data'];
+        for (const key in attributes) {
+            if (!attributes.hasOwnProperty(key)) {
+                continue;
+            }
+            if (key === 'swap-red-blue') {
+                attributes[key] = attributes[key].bool();
+            }
+        }
+        this.setState({
+            selected: record,
+            attrVisible: true,
+            attributes: attributes
+        });
     }
 
     async showModal(title, asset = {}) {
@@ -413,6 +447,38 @@ class Asset extends Component {
         })
     }
 
+    handleUpdateAttr = async (formData) => {
+        // 弹窗 form 传来的数据
+        this.setState({
+            modalConfirmLoading: true
+        });
+
+        try {
+            let selected = this.state.selected;
+            let result = await request.put(`/assets/${selected['id']}/attributes?protocol=${selected['protocol']}`, formData);
+            if (result['code'] !== 1) {
+                message.error(result['message'], 10);
+            } else {
+                message.success('操作成功');
+                this.setState({
+                    attrVisible: false
+                })
+            }
+        } finally {
+            this.setState({
+                modalConfirmLoading: false
+            });
+        }
+    }
+
+    handleCancelUpdateAttr = () => {
+        this.setState({
+            attrVisible: false,
+            selected: {},
+            attributes: {}
+        });
+    }
+
     render() {
 
         const columns = [{
@@ -484,8 +550,14 @@ class Asset extends Component {
                                         onClick={() => this.copy(record.id)}>复制</Button>
                             </Menu.Item>
 
+                            <Menu.Item key="3">
+                                <Button type="text" size='small'
+                                        disabled={!hasPermission(record['owner'])}
+                                        onClick={() => this.attr(record)}>属性</Button>
+                            </Menu.Item>
+
                             {isAdmin() ?
-                                <Menu.Item key="3">
+                                <Menu.Item key="4">
                                     <Button type="text" size='small'
                                             disabled={!hasPermission(record['owner'])}
                                             onClick={() => {
@@ -507,7 +579,7 @@ class Asset extends Component {
                             }
 
 
-                            <Menu.Item key="4">
+                            <Menu.Item key="5">
                                 <Button type="text" size='small'
                                         disabled={!hasPermission(record['owner'])}
                                         onClick={async () => {
@@ -516,7 +588,7 @@ class Asset extends Component {
                             </Menu.Item>
 
                             <Menu.Divider/>
-                            <Menu.Item key="5">
+                            <Menu.Item key="6">
                                 <Button type="text" size='small' danger
                                         disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
@@ -692,7 +764,6 @@ class Asset extends Component {
                     {
                         this.state.modalVisible ?
                             <AssetModal
-                                modalFormRef={this.modalFormRef}
                                 visible={this.state.modalVisible}
                                 title={this.state.modalTitle}
                                 handleOk={this.handleOk}
@@ -823,6 +894,49 @@ class Asset extends Component {
                             </Modal> : undefined
                     }
 
+                    {
+                        this.state.attrVisible && this.state.selected['protocol'] === 'ssh' ?
+                            <AssetSSHAttributeModal
+                                handleOk={this.handleUpdateAttr}
+                                handleCancel={this.handleCancelUpdateAttr}
+                                confirmLoading={this.state.modalConfirmLoading}
+                                attributes={this.state.attributes}
+                            />
+                            : null
+                    }
+
+                    {
+                        this.state.attrVisible && this.state.selected['protocol'] === 'rdp' ?
+                            <AssetRDPAttributeModal
+                                handleOk={this.handleUpdateAttr}
+                                handleCancel={this.handleCancelUpdateAttr}
+                                confirmLoading={this.state.modalConfirmLoading}
+                                attributes={this.state.attributes}
+                            />
+                            : null
+                    }
+
+                    {
+                        this.state.attrVisible && this.state.selected['protocol'] === 'vnc' ?
+                            <AssetVNCAttributeModal
+                                handleOk={this.handleUpdateAttr}
+                                handleCancel={this.handleCancelUpdateAttr}
+                                confirmLoading={this.state.modalConfirmLoading}
+                                attributes={this.state.attributes}
+                            />
+                            : null
+                    }
+
+                    {
+                        this.state.attrVisible && this.state.selected['protocol'] === 'telnet' ?
+                            <AssetTelnetAttributeModal
+                                handleOk={this.handleUpdateAttr}
+                                handleCancel={this.handleCancelUpdateAttr}
+                                confirmLoading={this.state.modalConfirmLoading}
+                                attributes={this.state.attributes}
+                            />
+                            : null
+                    }
                 </Content>
             </>
         );
