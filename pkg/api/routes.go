@@ -74,6 +74,8 @@ func SetupRoutes() *echo.Echo {
 		assets.GET("/paging", AssetPagingEndpoint)
 		assets.POST("/:id/tcping", AssetTcpingEndpoint)
 		assets.PUT("/:id", AssetUpdateEndpoint)
+		assets.GET("/:id/attributes", AssetGetAttributeEndpoint)
+		assets.PUT("/:id/attributes", AssetUpdateAttributeEndpoint)
 		assets.DELETE("/:id", AssetDeleteEndpoint)
 		assets.GET("/:id", AssetGetEndpoint)
 		assets.POST("/:id/change-owner", Admin(AssetChangeOwnerEndpoint))
