@@ -479,10 +479,9 @@ class OfflineSession extends Component {
                             <Modal
                                 className='monitor'
                                 title="会话回放"
-                                centered
+                                centered={true}
                                 visible={this.state.playbackVisible}
                                 onCancel={this.hidePlayback}
-
                                 width={window.innerWidth * 0.8}
                                 footer={null}
                                 destroyOnClose

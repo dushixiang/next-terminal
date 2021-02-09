@@ -621,6 +621,7 @@ class Access extends Component {
                             title="剪贴板"
                             maskClosable={false}
                             visible={this.state.clipboardVisible}
+                            centered={true}
                             onOk={() => {
                                 this.clipboardFormRef.current
                                     .validateFields()

@@ -15,6 +15,7 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
             title={title}
             visible={visible}
             maskClosable={false}
+            centered={true}
             onOk={() => {
                 form
                     .validateFields()
