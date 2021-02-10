@@ -1,8 +1,10 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 	"next-terminal/pkg/model"
 )
 
@@ -19,11 +21,23 @@ func PropertyUpdateEndpoint(c echo.Context) error {
 
 	for key := range item {
 		value := fmt.Sprintf("%v", item[key])
+		if value == "" {
+			value = "-"
+		}
+
 		property := model.Property{
 			Name:  key,
 			Value: value,
 		}
-		model.UpdatePropertyByName(&property, key)
+
+		_, err := model.FindPropertyByName(key)
+		if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+			if err := model.CreateNewProperty(&property); err != nil {
+				return err
+			}
+		} else {
+			model.UpdatePropertyByName(&property, key)
+		}
 	}
 	return Success(c, nil)
 }

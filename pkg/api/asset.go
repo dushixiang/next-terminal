@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
@@ -68,10 +69,17 @@ func AssetUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	var item model.Asset
-	if err := c.Bind(&item); err != nil {
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
 		return err
 	}
+
+	data, _ := json.Marshal(m)
+	var item model.Asset
+	if err := json.Unmarshal(data, &item); err != nil {
+		return err
+	}
+
 	switch item.AccountType {
 	case "credential":
 		item.Username = "-"
@@ -102,6 +110,9 @@ func AssetUpdateEndpoint(c echo.Context) error {
 	}
 
 	model.UpdateAssetById(&item, id)
+	if err := model.UpdateAssetAttributes(id, item.Protocol, m); err != nil {
+		return err
+	}
 
 	return Success(c, nil)
 }
@@ -151,8 +162,16 @@ func AssetGetEndpoint(c echo.Context) (err error) {
 	if item, err = model.FindAssetById(id); err != nil {
 		return err
 	}
+	attributeMap, err := model.FindAssetAttrMapByAssetId(id)
+	if err != nil {
+		return err
+	}
+	itemMap := utils.StructToMap(item)
+	for key := range attributeMap {
+		itemMap[key] = attributeMap[key]
+	}
 
-	return Success(c, item)
+	return Success(c, itemMap)
 }
 
 func AssetTcpingEndpoint(c echo.Context) (err error) {
