@@ -1,9 +1,10 @@
 import React, {Component} from 'react';
-import {Button, Form, Input, Layout, PageHeader, Select, Switch, Tabs, Typography} from "antd";
+import {Button, Form, Input, Layout, PageHeader, Select, Switch, Tabs, Tooltip, Typography} from "antd";
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import {message} from "antd/es";
 import Logout from "../user/Logout";
+import {ExclamationCircleOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
 const {Option} = Select;
@@ -37,9 +38,11 @@ class Setting extends Component {
         properties: {}
     }
 
-    settingFormRef1 = React.createRef();
-    settingFormRef2 = React.createRef();
-    settingFormRef3 = React.createRef();
+    rdpSettingFormRef = React.createRef();
+    sshSettingFormRef = React.createRef();
+    vncSettingFormRef = React.createRef();
+    telnetSettingFormRef = React.createRef();
+    otherSettingFormRef = React.createRef();
 
     componentDidMount() {
         this.getProperties();
@@ -66,28 +69,36 @@ class Setting extends Component {
             let properties = result['data'];
 
             for (let key in properties) {
-                if(!properties.hasOwnProperty(key)){
+                if (!properties.hasOwnProperty(key)) {
                     continue;
                 }
-                if(key.startsWith('enable') || key.startsWith("disable")){
+                if (key.startsWith('enable') || key.startsWith("disable" || key === 'swap-red-blue')) {
                     properties[key] = properties[key].bool();
                 }
             }
-            console.log(properties)
+
             this.setState({
                 properties: properties
             })
 
-            if (this.settingFormRef1.current) {
-                this.settingFormRef1.current.setFieldsValue(properties)
+            if (this.rdpSettingFormRef.current) {
+                this.rdpSettingFormRef.current.setFieldsValue(properties)
             }
 
-            if (this.settingFormRef2.current) {
-                this.settingFormRef2.current.setFieldsValue(properties)
+            if (this.sshSettingFormRef.current) {
+                this.sshSettingFormRef.current.setFieldsValue(properties)
             }
 
-            if (this.settingFormRef3.current) {
-                this.settingFormRef3.current.setFieldsValue(properties)
+            if (this.vncSettingFormRef.current) {
+                this.vncSettingFormRef.current.setFieldsValue(properties)
+            }
+
+            if (this.telnetSettingFormRef.current) {
+                this.telnetSettingFormRef.current.setFieldsValue(properties)
+            }
+
+            if (this.otherSettingFormRef.current) {
+                this.otherSettingFormRef.current.setFieldsValue(properties)
             }
         } else {
             message.error(result['message']);
@@ -119,8 +130,8 @@ class Setting extends Component {
 
                     <Tabs tabPosition={'left'} onChange={this.handleOnTabChange} tabBarStyle={{width: 150}}>
 
-                        <TabPane tab="RDP配置" key="1">
-                            <Form ref={this.settingFormRef1} name="password" onFinish={this.changeProperties}
+                        <TabPane tab="RDP配置" key="rdp">
+                            <Form ref={this.rdpSettingFormRef} name="rdp" onFinish={this.changeProperties}
                                   layout="vertical">
 
                                 <Title level={3}>RDP配置(远程桌面)</Title>
@@ -306,8 +317,8 @@ class Setting extends Component {
                                 </Form.Item>
                             </Form>
                         </TabPane>
-                        <TabPane tab="SSH配置" key="2">
-                            <Form ref={this.settingFormRef2} name="password" onFinish={this.changeProperties}
+                        <TabPane tab="SSH配置" key="ssh">
+                            <Form ref={this.sshSettingFormRef} name="ssh" onFinish={this.changeProperties}
                                   layout="vertical">
 
                                 <Title level={3}>SSH配置</Title>
@@ -360,6 +371,36 @@ class Setting extends Component {
                                     <Input type='number' placeholder="请输入字体大小"/>
                                 </Form.Item>
 
+                                <Form.Item
+                                    name="backspace"
+                                    label="退格键映射"
+                                    {...formItemLayout}
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">默认</Option>
+                                        <Option value="127">删除键(Ctrl-?)</Option>
+                                        <Option value="8">退格键(Ctrl-H)</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="terminal-type"
+                                    label="终端类型"
+                                    {...formItemLayout}
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">默认</Option>
+                                        <Option value="ansi">ansi</Option>
+                                        <Option value="linux">linux</Option>
+                                        <Option value="vt100">vt100</Option>
+                                        <Option value="vt220">vt220</Option>
+                                        <Option value="xterm">xterm</Option>
+                                        <Option value="xterm-256color">xterm-256color</Option>
+                                    </Select>
+                                </Form.Item>
+
                                 <Form.Item {...formTailLayout}>
                                     <Button type="primary" htmlType="submit">
                                         更新
@@ -367,9 +408,166 @@ class Setting extends Component {
                                 </Form.Item>
                             </Form>
                         </TabPane>
-                        <TabPane tab="其他配置" key="3">
+                        <TabPane tab="VNC配置" key="vnc">
+                            <Form ref={this.vncSettingFormRef} name="vnc" onFinish={this.changeProperties}
+                                  layout="vertical">
+
+                                <Title level={3}>VNC配置</Title>
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="color-depth"
+                                    label="色彩深度"
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">默认</Option>
+                                        <Option value="16">低色（16位）</Option>
+                                        <Option value="24">真彩（24位）</Option>
+                                        <Option value="32">真彩（32位）</Option>
+                                        <Option value="8">256色</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="cursor"
+                                    label="光标"
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">默认</Option>
+                                        <Option value="local">本地</Option>
+                                        <Option value="remote">远程</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="swap-red-blue"
+                                    label="交换红蓝成分"
+                                    valuePropName="checked"
+                                >
+                                    <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
+                                </Form.Item>
+
+                                <Form.Item label={<Tooltip
+                                    title="连接到VNC代理（例如UltraVNC Repeater）时要请求的目标主机。">目标主机&nbsp;
+                                    <ExclamationCircleOutlined/></Tooltip>}
+                                           {...formItemLayout}
+                                           name='dest-host'>
+                                    <Input placeholder="目标主机"/>
+                                </Form.Item>
+                                <Form.Item label={<Tooltip
+                                    title="连接到VNC代理（例如UltraVNC Repeater）时要请求的目标端口。">目标端口&nbsp;
+                                    <ExclamationCircleOutlined/></Tooltip>}
+                                           {...formItemLayout}
+                                           name='dest-port'>
+                                    <Input type='number' min={1} max={65535}
+                                           placeholder='目标端口'/>
+                                </Form.Item>
+
+                                <Form.Item {...formTailLayout}>
+                                    <Button type="primary" htmlType="submit">
+                                        更新
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </TabPane>
+                        <TabPane tab="TELNET配置" key="telnet">
+                            <Form ref={this.telnetSettingFormRef} name="telnet" onFinish={this.changeProperties}
+                                  layout="vertical">
+
+                                <Title level={3}>TELNET配置</Title>
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="color-scheme"
+                                    label="配色方案"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '配色方案',
+                                        },
+                                    ]}
+                                    initialValue="gray-black"
+                                >
+                                    <Select style={{width: 120}} onChange={null}>
+                                        <Option value="gray-black">黑底灰字</Option>
+                                        <Option value="green-black">黑底绿字</Option>
+                                        <Option value="white-black">黑底白字</Option>
+                                        <Option value="black-white">白底黑字</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="font-name"
+                                    label="字体名称"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '字体名称',
+                                        },
+                                    ]}
+                                >
+                                    <Input type='text' placeholder="请输入字体名称"/>
+                                </Form.Item>
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="font-size"
+                                    label="字体大小"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '字体大小',
+                                        },
+                                    ]}
+                                >
+                                    <Input type='number' placeholder="请输入字体大小"/>
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="backspace"
+                                    label="退格键映射"
+                                    {...formItemLayout}
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">默认</Option>
+                                        <Option value="127">删除键(Ctrl-?)</Option>
+                                        <Option value="8">退格键(Ctrl-H)</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="terminal-type"
+                                    label="终端类型"
+                                    {...formItemLayout}
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">默认</Option>
+                                        <Option value="ansi">ansi</Option>
+                                        <Option value="linux">linux</Option>
+                                        <Option value="vt100">vt100</Option>
+                                        <Option value="vt220">vt220</Option>
+                                        <Option value="xterm">xterm</Option>
+                                        <Option value="xterm-256color">xterm-256color</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item {...formTailLayout}>
+                                    <Button type="primary" htmlType="submit">
+                                        更新
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </TabPane>
+                        <TabPane tab="其他配置" key="other">
                             <Title level={3}>Guacd 服务配置</Title>
-                            <Form ref={this.settingFormRef3} name="password" onFinish={this.changeProperties}
+                            <Form ref={this.otherSettingFormRef} name="password" onFinish={this.changeProperties}
                                   layout="vertical">
                                 <Form.Item
                                     {...formItemLayout}
@@ -449,8 +647,6 @@ class Setting extends Component {
                             </Form>
                         </TabPane>
                     </Tabs>
-
-
                 </Content>
             </>
         );
