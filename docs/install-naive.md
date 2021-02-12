@@ -151,6 +151,9 @@ sqlite:
   file: 'next-terminal.db'
 server:
   addr: 0.0.0.0:8088
+# 当设置下面两个参数时会自动开启https模式
+#  cert: /root/next-terminal/cert.pem
+#  key: /root/next-terminal/key.pem
 ```
 
 启动
