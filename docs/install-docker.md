@@ -48,10 +48,51 @@ docker run -d \
   --restart always dushixiang/next-terminal:latest
 ```
 
+或者使用docker-compose构建
+
+示例:
+
+1. 在root目录下创建文件夹 `next-terminal`
+2. 在`/root/next-terminal`文件夹下创建`docker-compose.yml`文件
+   
+    ```yaml
+    version: '3.3'
+    services:
+      mysql:
+        image: mysql:8.0
+        environment:
+          MYSQL_DATABASE: next-terminal
+          MYSQL_USER: next-terminal
+          MYSQL_PASSWORD: next-terminal
+          MYSQL_ROOT_PASSWORD: next-terminal
+        ports:
+          - "3306:3306"
+      next-terminal:
+        image: "dushixiang/next-terminal:latest"
+        environment:
+          DB: "mysql"
+          MYSQL_HOSTNAME: "mysql"
+          MYSQL_PORT: 3306
+          MYSQL_USERNAME: "next-terminal"
+          MYSQL_PASSWORD: "next-terminal"
+          MYSQL_DATABASE: "next-terminal"
+        ports:
+          - "8088:8088"
+        volumes:
+          - /root/next-terminal/drive:/usr/local/next-terminal/drive
+          - /root/next-terminal/recording:/usr/local/next-terminal/recording
+        depends_on:
+          - mysql
+    ```
+
+3. 在`/root/next-terminal`文件夹下执行命令`docker-compose up`
+
+
 ### 注意事项 ⚠️
 
 1. docker连接宿主机器上的`mysql`时连接地址不是`127.0.0.1`，请使用`ipconfig`或`ifconfig`确认宿主机器的IP。
 2. 使用其他容器内部的`mysql`时请使用`--link <some-mysql-name>`，环境变量参数为`-e MYSQL_HOSTNAME=<some-mysql-name>`
+3. 使用独立数据库的需要手动创建数据库，使用docker-compose不需要。
 
 ## 环境变量
 
