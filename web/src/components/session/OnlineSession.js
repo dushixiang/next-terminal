@@ -280,7 +280,7 @@ class OnlineSession extends Component {
 
                     return (
                         <div>
-                            <Button type="link" size='small' onClick={() => {
+                            <Button type="link" size='small' disabled={record['mode'] === 'naive'} onClick={() => {
                                 this.showMonitor(record)
                             }}>监控</Button>
                             <Button type="link" size='small' onClick={async () => {
