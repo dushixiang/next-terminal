@@ -1,23 +1,10 @@
 import React, {useState} from 'react';
-import {
-    Col,
-    Collapse,
-    Form,
-    Input,
-    InputNumber,
-    Modal,
-    Radio,
-    Row,
-    Select,
-    Switch,
-    Tooltip,
-    Typography
-} from "antd/lib/index";
+import {Col, Collapse, Form, Input, InputNumber, Modal, Radio, Row, Select, Tooltip, Typography} from "antd/lib/index";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 
 const {TextArea} = Input;
 const {Option} = Select;
-const {Text, Title} = Typography;
+const {Text} = Typography;
 const {Panel} = Collapse;
 
 // 子级页面
@@ -38,10 +25,7 @@ const formLayout = {
     labelCol: {span: 6},
     wrapperCol: {span: 18},
 };
-const RDPFormItemLayout = {
-    labelCol: {span: 12},
-    wrapperCol: {span: 12},
-};
+
 const TELENETFormItemLayout = {
     labelCol: {span: 8},
     wrapperCol: {span: 16},

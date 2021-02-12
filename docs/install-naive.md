@@ -22,9 +22,9 @@ sudo apt-get install libcairo2-dev libjpeg62-turbo-dev libpng-dev libtool-bin li
 
 下载&解压&configure
 ```shell
-wget https://mirror.bit.edu.cn/apache/guacamole/1.2.0/source/guacamole-server-1.2.0.tar.gz
-tar -xzf guacamole-server-1.2.0.tar.gz
-cd guacamole-server-1.2.0
+wget https://mirror.bit.edu.cn/apache/guacamole/1.3.0/source/guacamole-server-1.3.0.tar.gz
+tar -xzf guacamole-server-1.3.0.tar.gz
+cd guacamole-server-1.3.0
 ./configure --with-init-dir=/etc/init.d
 ```
 
@@ -32,7 +32,7 @@ cd guacamole-server-1.2.0
 
 ```shell
 ------------------------------------------------
-guacamole-server version 1.2.0
+guacamole-server version 1.3.0
 ------------------------------------------------
 
    Library status:

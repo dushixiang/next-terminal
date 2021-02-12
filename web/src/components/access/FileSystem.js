@@ -355,8 +355,6 @@ class FileSystem extends Component {
                 this.setState({selectedRowKeys});
             },
         };
-        const hasSelected = selectedRowKeys.length > 0;
-
 
         return (
             <div>
