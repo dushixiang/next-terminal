@@ -10,6 +10,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
@@ -73,7 +74,9 @@ func Run() error {
 			//Logger: logger.Default.LogMode(logger.Info),
 		})
 	} else {
-		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{})
+		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{
+			Logger: logger.Default.LogMode(logger.Info),
+		})
 	}
 
 	if err != nil {
@@ -206,5 +209,10 @@ func Run() error {
 	go handle.RunTicker()
 	go handle.RunDataFix()
 
-	return e.Start(global.Config.Server.Addr)
+	if global.Config.Server.Cert != "" && global.Config.Server.Key != "" {
+		return e.StartTLS(global.Config.Server.Addr, global.Config.Server.Cert, global.Config.Server.Key)
+	} else {
+		return e.Start(global.Config.Server.Addr)
+	}
+
 }

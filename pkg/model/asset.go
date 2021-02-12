@@ -111,8 +111,13 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 	if len(tags) > 0 {
 		tagArr := strings.Split(tags, ",")
 		for i := range tagArr {
-			db = db.Where("find_in_set(?, assets.tags)", tagArr[i])
-			dbCounter = dbCounter.Where("find_in_set(?, assets.tags)", tagArr[i])
+			if global.Config.DB == "sqlite" {
+				db = db.Where("(',' || assets.tags || ',') LIKE ?", "%,"+tagArr[i]+",%")
+				dbCounter = dbCounter.Where("(',' || assets.tags || ',') LIKE ?", "%,"+tagArr[i]+",%")
+			} else {
+				db = db.Where("find_in_set(?, assets.tags)", tagArr[i])
+				dbCounter = dbCounter.Where("find_in_set(?, assets.tags)", tagArr[i])
+			}
 		}
 	}
 

@@ -67,7 +67,8 @@ class Asset extends Component {
         queryParams: {
             pageIndex: 1,
             pageSize: 10,
-            protocol: ''
+            protocol: '',
+            tags: ''
         },
         loading: false,
         modalVisible: false,
@@ -75,6 +76,7 @@ class Asset extends Component {
         modalConfirmLoading: false,
         credentials: [],
         tags: [],
+        selectedTags: [],
         model: {},
         selectedRowKeys: [],
         delBtnLoading: false,
@@ -171,6 +173,9 @@ class Asset extends Component {
     };
 
     handleTagsChange = tags => {
+        this.setState({
+            selectedTags: tags
+        })
         let query = {
             ...this.state.queryParams,
             'pageIndex': 1,
@@ -604,6 +609,7 @@ class Asset extends Component {
 
                                     <Select mode="multiple"
                                             allowClear
+                                            value={this.state.selectedTags}
                                             placeholder="资产标签" onChange={this.handleTagsChange}
                                             style={{minWidth: 150}}>
                                         {this.state.tags.map(tag => {
@@ -628,7 +634,10 @@ class Asset extends Component {
 
                                         <Button icon={<UndoOutlined/>} onClick={() => {
                                             this.inputRefOfName.current.setValue('');
-                                            this.loadTableData({pageIndex: 1, pageSize: 10, protocol: ''})
+                                            this.setState({
+                                                selectedTags: []
+                                            })
+                                            this.loadTableData({pageIndex: 1, pageSize: 10, protocol: '', tags: ''})
                                         }}>
 
                                         </Button>
