@@ -155,8 +155,8 @@ func UpdateAssetActiveById(active bool, id string) {
 	global.DB.Exec(sql, active, id)
 }
 
-func DeleteAssetById(id string) {
-	global.DB.Where("id = ?", id).Delete(&Asset{})
+func DeleteAssetById(id string) error {
+	return global.DB.Where("id = ?", id).Delete(&Asset{}).Error
 }
 
 func CountAsset() (total int64, err error) {

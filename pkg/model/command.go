@@ -77,6 +77,6 @@ func UpdateCommandById(o *Command, id string) {
 	global.DB.Updates(o)
 }
 
-func DeleteCommandById(id string) {
-	global.DB.Where("id = ?", id).Delete(&Command{})
+func DeleteCommandById(id string) error {
+	return global.DB.Where("id = ?", id).Delete(&Command{}).Error
 }

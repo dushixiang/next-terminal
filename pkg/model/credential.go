@@ -95,8 +95,8 @@ func UpdateCredentialById(o *Credential, id string) {
 	global.DB.Updates(o)
 }
 
-func DeleteCredentialById(id string) {
-	global.DB.Where("id = ?", id).Delete(&Credential{})
+func DeleteCredentialById(id string) error {
+	return global.DB.Where("id = ?", id).Delete(&Credential{}).Error
 }
 
 func CountCredential() (total int64, err error) {
