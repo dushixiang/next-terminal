@@ -4,9 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/sftp"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/crypto/ssh"
 	"net/http"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
@@ -97,6 +95,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 
 	tun := global.Tun{
 		Protocol:  session.Protocol,
+		Mode:      session.Mode,
 		WebSocket: ws,
 	}
 
@@ -242,18 +241,6 @@ func WriteMessage(ws *websocket.Conn, msg Message) error {
 	return err
 }
 
-func CreateSshClientBySession(session model.Session) (sshClient *ssh.Client, err error) {
-
-	var (
-		username   = session.Username
-		password   = session.Password
-		privateKey = session.PrivateKey
-		passphrase = session.Passphrase
-	)
-
-	return term.NewSshClient(session.IP, session.Port, username, password, privateKey, passphrase)
-}
-
 func WriteByteMessage(ws *websocket.Conn, p []byte) {
 	err := ws.WriteMessage(websocket.TextMessage, p)
 	if err != nil {
@@ -261,11 +248,14 @@ func WriteByteMessage(ws *websocket.Conn, p []byte) {
 	}
 }
 
-func CreateSftpClient(session model.Session) (sftpClient *sftp.Client, err error) {
-	sshClient, err := CreateSshClientBySession(session)
-	if err != nil {
-		return nil, err
-	}
-
-	return sftp.NewClient(sshClient)
+func CreateNextTerminalBySession(session model.Session) (*term.NextTerminal, error) {
+	var (
+		username   = session.Username
+		password   = session.Password
+		privateKey = session.PrivateKey
+		passphrase = session.Passphrase
+		ip         = session.IP
+		port       = session.Port
+	)
+	return term.NewNextTerminal(ip, port, username, password, privateKey, passphrase, 10, 10, "")
 }

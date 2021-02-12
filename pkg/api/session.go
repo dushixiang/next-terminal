@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/labstack/echo/v4"
+	"github.com/pkg/sftp"
 	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
@@ -362,8 +363,16 @@ func SessionLsEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
+		if tun.Subject.NextTerminal == nil {
+			nextTerminal, err := CreateNextTerminalBySession(session)
+			if err != nil {
+				return err
+			}
+			tun.Subject.NextTerminal = nextTerminal
+		}
+
 		if tun.Subject.NextTerminal.SftpClient == nil {
-			sftpClient, err := CreateSftpClient(session)
+			sftpClient, err := sftp.NewClient(tun.Subject.NextTerminal.SshClient)
 			if err != nil {
 				logrus.Errorf("创建sftp客户端失败：%v", err.Error())
 				return err
