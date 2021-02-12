@@ -149,7 +149,13 @@ func AssetDeleteEndpoint(c echo.Context) error {
 		if err := PreCheckAssetPermission(c, split[i]); err != nil {
 			return err
 		}
-		model.DeleteAssetById(split[i])
+		if err := model.DeleteAssetById(split[i]); err != nil {
+			return err
+		}
+		// 删除资产与用户的关系
+		if err := model.DeleteResourceSharerByResourceId(split[i]); err != nil {
+			return err
+		}
 	}
 
 	return Success(c, nil)

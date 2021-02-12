@@ -102,6 +102,10 @@ func DeleteByUserIdAndResourceTypeAndResourceIdIn(userGroupId, userId, resourceT
 	return db.Delete(&ResourceSharer{}).Error
 }
 
+func DeleteResourceSharerByResourceId(resourceId string) error {
+	return global.DB.Where("resource_id = ?", resourceId).Delete(&ResourceSharer{}).Error
+}
+
 func AddSharerResources(userGroupId, userId, resourceType string, resourceIds []string) error {
 	return global.DB.Transaction(func(tx *gorm.DB) (err error) {
 

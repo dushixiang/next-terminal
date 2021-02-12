@@ -68,7 +68,13 @@ func CommandDeleteEndpoint(c echo.Context) error {
 		if err := PreCheckCommandPermission(c, split[i]); err != nil {
 			return err
 		}
-		model.DeleteCommandById(split[i])
+		if err := model.DeleteCommandById(split[i]); err != nil {
+			return err
+		}
+		// 删除资产与用户的关系
+		if err := model.DeleteResourceSharerByResourceId(split[i]); err != nil {
+			return err
+		}
 	}
 	return Success(c, nil)
 }
