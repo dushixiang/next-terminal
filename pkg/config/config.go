@@ -28,6 +28,8 @@ type Sqlite struct {
 
 type Server struct {
 	Addr string
+	Cert string
+	Key  string
 }
 
 func SetupConfig() (*Config, error) {
@@ -49,6 +51,8 @@ func SetupConfig() (*Config, error) {
 	pflag.String("mysql.database", "next_terminal", "mysql database")
 
 	pflag.String("server.addr", "", "server listen addr")
+	pflag.String("server.cert", "", "tls cert file")
+	pflag.String("server.key", "", "tls key file")
 
 	pflag.Parse()
 	_ = viper.BindPFlags(pflag.CommandLine)
@@ -68,6 +72,8 @@ func SetupConfig() (*Config, error) {
 		},
 		Server: &Server{
 			Addr: viper.GetString("server.addr"),
+			Cert: viper.GetString("server.cert"),
+			Key:  viper.GetString("server.key"),
 		},
 	}
 

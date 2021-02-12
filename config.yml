@@ -1,4 +1,4 @@
-db: mysql
+db: sqlite
 mysql:
   hostname: 172.16.101.32
   port: 3306

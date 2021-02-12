@@ -87,7 +87,8 @@ func FindUserGroupById(id string) (o UserGroup, err error) {
 }
 
 func FindUserGroupIdsByUserId(userId string) (o []string, err error) {
-	err = global.DB.Table("user_groups").Select("user_groups.id").Joins("right join user_group_members on user_groups.id = user_group_members.user_group_id").Where("user_group_members.user_id = ?", userId).Find(&o).Error
+	// 先查询用户所在的用户
+	err = global.DB.Table("user_group_members").Select("user_group_id").Where("user_id = ?", userId).Find(&o).Error
 	return
 }
 
