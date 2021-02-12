@@ -47,7 +47,8 @@ class Access extends Component {
         uploadLoading: false,
         startTime: new Date(),
         fullScreen: false,
-        fullScreenBtnText: '进入全屏'
+        fullScreenBtnText: '进入全屏',
+        sink: undefined
     };
 
     async componentDidMount() {
@@ -434,6 +435,7 @@ class Access extends Component {
             containerWidth: width,
             containerHeight: height,
             keyboard: keyboard,
+            sink: sink
         });
     }
 
@@ -622,6 +624,9 @@ class Access extends Component {
                     closable={true}
                     // maskClosable={false}
                     onClose={() => {
+                        if (this.state.sink) {
+                            this.state.sink.focus();
+                        }
                         this.setState({
                             fileSystemVisible: false
                         });
@@ -666,6 +671,9 @@ class Access extends Component {
                             }}
                             confirmLoading={this.state.confirmLoading}
                             onCancel={() => {
+                                if (this.state.sink) {
+                                    this.state.sink.focus();
+                                }
                                 this.setState({
                                     clipboardVisible: false
                                 })
