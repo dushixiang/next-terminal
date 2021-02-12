@@ -10,6 +10,7 @@ import (
 
 type Tun struct {
 	Protocol     string
+	Mode         string
 	WebSocket    *websocket.Conn
 	Tunnel       *guacd.Tunnel
 	NextTerminal *term.NextTerminal
@@ -25,7 +26,7 @@ func (r *Tun) Close(code int, reason string) {
 
 	ws := r.WebSocket
 	if ws != nil {
-		if r.Protocol == "rdp" || r.Protocol == "vnc" {
+		if r.Mode == "guacd" {
 			err := guacd.NewInstruction("error", reason, strconv.Itoa(code))
 			_ = ws.WriteMessage(websocket.TextMessage, []byte(err.String()))
 			disconnect := guacd.NewInstruction("disconnect")

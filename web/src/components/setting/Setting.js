@@ -41,7 +41,6 @@ class Setting extends Component {
     rdpSettingFormRef = React.createRef();
     sshSettingFormRef = React.createRef();
     vncSettingFormRef = React.createRef();
-    telnetSettingFormRef = React.createRef();
     otherSettingFormRef = React.createRef();
 
     componentDidMount() {
@@ -72,6 +71,9 @@ class Setting extends Component {
                 if (!properties.hasOwnProperty(key)) {
                     continue;
                 }
+                if (properties[key] === '-') {
+                    properties[key] = '';
+                }
                 if (key.startsWith('enable') || key.startsWith("disable" || key === 'swap-red-blue')) {
                     properties[key] = properties[key].bool();
                 }
@@ -91,10 +93,6 @@ class Setting extends Component {
 
             if (this.vncSettingFormRef.current) {
                 this.vncSettingFormRef.current.setFieldsValue(properties)
-            }
-
-            if (this.telnetSettingFormRef.current) {
-                this.telnetSettingFormRef.current.setFieldsValue(properties)
             }
 
             if (this.otherSettingFormRef.current) {
@@ -317,11 +315,11 @@ class Setting extends Component {
                                 </Form.Item>
                             </Form>
                         </TabPane>
-                        <TabPane tab="SSH配置" key="ssh">
+                        <TabPane tab="SSH/TELNET配置" key="ssh">
                             <Form ref={this.sshSettingFormRef} name="ssh" onFinish={this.changeProperties}
                                   layout="vertical">
 
-                                <Title level={3}>SSH配置</Title>
+                                <Title level={3}>SSH/TELNET配置</Title>
 
                                 <Form.Item
                                     {...formItemLayout}
@@ -465,97 +463,6 @@ class Setting extends Component {
                                            name='dest-port'>
                                     <Input type='number' min={1} max={65535}
                                            placeholder='目标端口'/>
-                                </Form.Item>
-
-                                <Form.Item {...formTailLayout}>
-                                    <Button type="primary" htmlType="submit">
-                                        更新
-                                    </Button>
-                                </Form.Item>
-                            </Form>
-                        </TabPane>
-                        <TabPane tab="TELNET配置" key="telnet">
-                            <Form ref={this.telnetSettingFormRef} name="telnet" onFinish={this.changeProperties}
-                                  layout="vertical">
-
-                                <Title level={3}>TELNET配置</Title>
-
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="color-scheme"
-                                    label="配色方案"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: '配色方案',
-                                        },
-                                    ]}
-                                    initialValue="gray-black"
-                                >
-                                    <Select style={{width: 120}} onChange={null}>
-                                        <Option value="gray-black">黑底灰字</Option>
-                                        <Option value="green-black">黑底绿字</Option>
-                                        <Option value="white-black">黑底白字</Option>
-                                        <Option value="black-white">白底黑字</Option>
-                                    </Select>
-                                </Form.Item>
-
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="font-name"
-                                    label="字体名称"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: '字体名称',
-                                        },
-                                    ]}
-                                >
-                                    <Input type='text' placeholder="请输入字体名称"/>
-                                </Form.Item>
-
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="font-size"
-                                    label="字体大小"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: '字体大小',
-                                        },
-                                    ]}
-                                >
-                                    <Input type='number' placeholder="请输入字体大小"/>
-                                </Form.Item>
-
-                                <Form.Item
-                                    name="backspace"
-                                    label="退格键映射"
-                                    {...formItemLayout}
-                                    initialValue=""
-                                >
-                                    <Select onChange={null}>
-                                        <Option value="">默认</Option>
-                                        <Option value="127">删除键(Ctrl-?)</Option>
-                                        <Option value="8">退格键(Ctrl-H)</Option>
-                                    </Select>
-                                </Form.Item>
-
-                                <Form.Item
-                                    name="terminal-type"
-                                    label="终端类型"
-                                    {...formItemLayout}
-                                    initialValue=""
-                                >
-                                    <Select onChange={null}>
-                                        <Option value="">默认</Option>
-                                        <Option value="ansi">ansi</Option>
-                                        <Option value="linux">linux</Option>
-                                        <Option value="vt100">vt100</Option>
-                                        <Option value="vt220">vt220</Option>
-                                        <Option value="xterm">xterm</Option>
-                                        <Option value="xterm-256color">xterm-256color</Option>
-                                    </Select>
                                 </Form.Item>
 
                                 <Form.Item {...formTailLayout}>

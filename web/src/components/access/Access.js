@@ -575,23 +575,45 @@ class Access extends Component {
                     </Affix>
                 </Draggable>
 
-                <Draggable>
-                    <Affix style={{position: 'absolute', top: 100, right: 100}}>
-                        <Button icon={<AppstoreTwoTone/>} onClick={() => {
-                            this.setState({
-                                fileSystemVisible: true,
-                            });
-                        }}/>
-                    </Affix>
-                </Draggable>
+                {
+                    this.state.protocol === 'rdp' ?
+                        <>
+                            <Draggable>
+                                <Affix style={{position: 'absolute', top: 100, right: 100}}>
+                                    <Button icon={<AppstoreTwoTone/>} onClick={() => {
+                                        this.setState({
+                                            fileSystemVisible: true,
+                                        });
+                                    }}/>
+                                </Affix>
+                            </Draggable>
 
-                <Draggable>
-                    <Affix style={{position: 'absolute', top: 100, right: 150}}>
-                        <Dropdown overlay={menu} trigger={['click']} placement="bottomLeft">
-                            <Button icon={<DesktopOutlined/>}/>
-                        </Dropdown>
-                    </Affix>
-                </Draggable>
+                            <Draggable>
+                                <Affix style={{position: 'absolute', top: 100, right: 150}}>
+                                    <Dropdown overlay={menu} trigger={['click']} placement="bottomLeft">
+                                        <Button icon={<DesktopOutlined/>}/>
+                                    </Dropdown>
+                                </Affix>
+                            </Draggable>
+                        </> : undefined
+                }
+
+                {
+                    this.state.protocol === 'ssh' ?
+                        <>
+                            <Draggable>
+                                <Affix style={{position: 'absolute', top: 100, right: 100}}>
+                                    <Button icon={<AppstoreTwoTone/>} onClick={() => {
+                                        this.setState({
+                                            fileSystemVisible: true,
+                                        });
+                                    }}/>
+                                </Affix>
+                            </Draggable>
+
+                        </> : undefined
+                }
+
 
                 <Drawer
                     title={'会话详情'}

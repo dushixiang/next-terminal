@@ -92,6 +92,8 @@ func FindAssetAttrMapByAssetId(assetId string) (map[string]interface{}, error) {
 		parameterNames = RDPParameterNames
 	case "vnc":
 		parameterNames = VNCParameterNames
+	case "telnet":
+		parameterNames = TelnetParameterNames
 	}
 	propertiesMap := FindAllPropertiesMap()
 	var attributeMap = make(map[string]interface{})

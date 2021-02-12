@@ -154,8 +154,9 @@ func TunEndpoint(c echo.Context) error {
 
 	tun := global.Tun{
 		Protocol:  session.Protocol,
-		Tunnel:    tunnel,
+		Mode:      session.Mode,
 		WebSocket: ws,
+		Tunnel:    tunnel,
 	}
 
 	if len(session.ConnectionId) == 0 {
