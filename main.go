@@ -10,7 +10,6 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
@@ -75,7 +74,7 @@ func Run() error {
 		})
 	} else {
 		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{
-			Logger: logger.Default.LogMode(logger.Info),
+			//Logger: logger.Default.LogMode(logger.Info),
 		})
 	}
 
