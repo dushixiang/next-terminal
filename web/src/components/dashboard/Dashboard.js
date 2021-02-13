@@ -7,6 +7,7 @@ import './Dashboard.css'
 import {Link} from "react-router-dom";
 import {Area} from '@ant-design/charts';
 import Logout from "../user/Logout";
+import {isAdmin} from "../../service/permission";
 
 
 const routes = [
@@ -97,7 +98,7 @@ class Dashboard extends Component {
                     <Row gutter={16}>
                         <Col span={6}>
                             <Card bordered={true}>
-                                <Link to={'/user'}>
+                                <Link to={'/user'} disabled={!isAdmin()}>
                                     <Statistic title="在线用户" value={this.state.counter['user']}
                                                prefix={<UserOutlined/>}/>
                                 </Link>
@@ -122,7 +123,7 @@ class Dashboard extends Component {
                         </Col>
                         <Col span={6}>
                             <Card bordered={true}>
-                                <Link to={'/online-session'}>
+                                <Link to={'/online-session'} disabled={!isAdmin()}>
                                     <Statistic title="在线会话" value={this.state.counter['onlineSession']}
                                                prefix={<LinkOutlined/>}/>
                                 </Link>
