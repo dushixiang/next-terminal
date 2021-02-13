@@ -164,6 +164,24 @@ func CountAsset() (total int64, err error) {
 	return
 }
 
+func CountAssetByUserId(userId string) (total int64, err error) {
+	db := global.DB.Joins("left join resource_sharers on assets.id = resource_sharers.resource_id")
+
+	db = db.Where("assets.owner = ? or resource_sharers.user_id = ?", userId, userId)
+
+	// 查询用户所在用户组列表
+	userGroupIds, err := FindUserGroupIdsByUserId(userId)
+	if err != nil {
+		return 0, err
+	}
+
+	if userGroupIds != nil && len(userGroupIds) > 0 {
+		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
+	}
+	err = db.Find(&Asset{}).Count(&total).Error
+	return
+}
+
 func FindAssetTags() (o []string, err error) {
 	var assets []Asset
 	err = global.DB.Not("tags = ?", "").Find(&assets).Error

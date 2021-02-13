@@ -103,3 +103,21 @@ func CountCredential() (total int64, err error) {
 	err = global.DB.Find(&Credential{}).Count(&total).Error
 	return
 }
+
+func CountCredentialByUserId(userId string) (total int64, err error) {
+	db := global.DB.Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id")
+
+	db = db.Where("credentials.owner = ? or resource_sharers.user_id = ?", userId, userId)
+
+	// 查询用户所在用户组列表
+	userGroupIds, err := FindUserGroupIdsByUserId(userId)
+	if err != nil {
+		return 0, err
+	}
+
+	if userGroupIds != nil && len(userGroupIds) > 0 {
+		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
+	}
+	err = db.Find(&Credential{}).Count(&total).Error
+	return
+}

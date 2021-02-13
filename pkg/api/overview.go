@@ -13,11 +13,25 @@ type Counter struct {
 }
 
 func OverviewCounterEndPoint(c echo.Context) error {
-	countUser, _ := model.CountUser()
-	countOnlineSession, _ := model.CountOnlineSession()
-	credential, _ := model.CountCredential()
-	asset, _ := model.CountAsset()
+	account, _ := GetCurrentAccount(c)
 
+	var (
+		countUser          int64
+		countOnlineSession int64
+		credential         int64
+		asset              int64
+	)
+	if model.TypeUser == account.Type {
+		countUser, _ = model.CountUser()
+		countOnlineSession, _ = model.CountOnlineSession()
+		credential, _ = model.CountCredentialByUserId(account.ID)
+		asset, _ = model.CountAssetByUserId(account.ID)
+	} else {
+		countUser, _ = model.CountUser()
+		countOnlineSession, _ = model.CountOnlineSession()
+		credential, _ = model.CountCredential()
+		asset, _ = model.CountAsset()
+	}
 	counter := Counter{
 		User:          countUser,
 		OnlineSession: countOnlineSession,
