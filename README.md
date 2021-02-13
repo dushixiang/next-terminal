@@ -63,6 +63,19 @@ ssh
 
 ![批量执行命令](./screenshot/command.png)
 
+## 捐赠
+
+如果您觉得 next-terminal 对你有帮助，欢迎给予我们一定的捐助来维持项目的长期发展。
+
+### 微信扫码捐赠
+
+<img src="screenshot/paywx.png" width="300"  height="auto"/>
+
+### 支付宝扫码捐赠
+
+<img src="screenshot/payali.png" width="300"  height="auto"/>
+
+
 ## 联系方式
 
 - 邮箱 helloworld1024@foxmail.com
