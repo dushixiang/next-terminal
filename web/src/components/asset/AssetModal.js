@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {Col, Collapse, Form, Input, InputNumber, Modal, Radio, Row, Select, Tooltip, Typography} from "antd/lib/index";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {isEmpty} from "../../utils/utils";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -41,6 +42,8 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
     let [accountType, setAccountType] = useState(model.accountType);
     let [protocol, setProtocol] = useState(model.protocol);
+    let [sshMode, setSshMode] = useState(model['ssh-mode']);
+    console.log(sshMode)
 
     let initAccountTypes = []
     if (model.protocol) {
@@ -233,7 +236,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Collapse defaultActiveKey={['remote-app', '认证', '显示设置', '控制终端行为', 'VNC中继']} ghost>
+                        <Collapse defaultActiveKey={['remote-app', '认证', '显示设置', '控制终端行为', 'VNC中继', '模式设置']} ghost>
                             {
                                 protocol === 'rdp' ?
                                     <>
@@ -275,64 +278,88 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                             {
                                 protocol === 'ssh' ?
                                     <>
-                                        <Panel header={<Text strong>显示设置</Text>} key="显示设置">
+                                        <Panel header={<Text strong>模式设置</Text>} key="模式设置">
                                             <Form.Item
-                                                name="color-scheme"
-                                                label="配色方案"
+                                                name="ssh-mode"
+                                                label={<Tooltip
+                                                    title="guacd对部分SSH密钥支持不完善，当密钥类型为ED25519时请选择原生模式。">连接模式&nbsp;
+                                                    <ExclamationCircleOutlined/></Tooltip>}
                                                 initialValue=""
                                             >
-                                                <Select onChange={null}>
+                                                <Select onChange={(value) => {
+                                                    setSshMode(value)
+                                                }}>
                                                     <Option value="">默认</Option>
-                                                    <Option value="gray-black">黑底灰字</Option>
-                                                    <Option value="green-black">黑底绿字</Option>
-                                                    <Option value="white-black">黑底白字</Option>
-                                                    <Option value="black-white">白底黑字</Option>
-                                                </Select>
-                                            </Form.Item>
-
-                                            <Form.Item
-                                                name="font-name"
-                                                label="字体名称"
-                                            >
-                                                <Input type='text' placeholder="为空时使用系统默认字体"/>
-                                            </Form.Item>
-
-                                            <Form.Item
-                                                name="font-size"
-                                                label="字体大小"
-                                            >
-                                                <Input type='number' placeholder="为空时使用系统默认字体大小" min={8} max={96}/>
-                                            </Form.Item>
-                                        </Panel>
-                                        <Panel header={<Text strong>控制终端行为</Text>} key="控制终端行为">
-                                            <Form.Item
-                                                name="backspace"
-                                                label="退格键映射"
-                                                initialValue=""
-                                            >
-                                                <Select onChange={null}>
-                                                    <Option value="">默认</Option>
-                                                    <Option value="127">删除键(Ctrl-?)</Option>
-                                                    <Option value="8">退格键(Ctrl-H)</Option>
-                                                </Select>
-                                            </Form.Item>
-
-                                            <Form.Item
-                                                name="terminal-type"
-                                                label="终端类型"
-                                                initialValue=""
-                                            >
-                                                <Select onChange={null}>
-                                                    <Option value="">默认</Option>
-                                                    <Option value="ansi">ansi</Option>
-                                                    <Option value="linux">linux</Option>
-                                                    <Option value="vt100">vt100</Option>
-                                                    <Option value="vt220">vt220</Option>
-                                                    <Option value="xterm">xterm</Option>
-                                                    <Option value="xterm-256color">xterm-256color</Option>
+                                                    <Option value="guacd">guacd</Option>
+                                                    <Option value="naive">原生</Option>
                                                 </Select>
                                             </Form.Item>
                                         </Panel>
+                                        {
+                                            isEmpty(sshMode) || sshMode === 'guacd' ?
+                                                <>
+                                                    <Panel header={<Text strong>显示设置</Text>} key="显示设置">
+                                                        <Form.Item
+                                                            name="color-scheme"
+                                                            label="配色方案"
+                                                            initialValue=""
+                                                        >
+                                                            <Select onChange={null}>
+                                                                <Option value="">默认</Option>
+                                                                <Option value="gray-black">黑底灰字</Option>
+                                                                <Option value="green-black">黑底绿字</Option>
+                                                                <Option value="white-black">黑底白字</Option>
+                                                                <Option value="black-white">白底黑字</Option>
+                                                            </Select>
+                                                        </Form.Item>
+
+                                                        <Form.Item
+                                                            name="font-name"
+                                                            label="字体名称"
+                                                        >
+                                                            <Input type='text' placeholder="为空时使用系统默认字体"/>
+                                                        </Form.Item>
+
+                                                        <Form.Item
+                                                            name="font-size"
+                                                            label="字体大小"
+                                                        >
+                                                            <Input type='number' placeholder="为空时使用系统默认字体大小" min={8}
+                                                                   max={96}/>
+                                                        </Form.Item>
+                                                    </Panel>
+                                                    <Panel header={<Text strong>控制终端行为</Text>} key="控制终端行为">
+                                                        <Form.Item
+                                                            name="backspace"
+                                                            label="退格键映射"
+                                                            initialValue=""
+                                                        >
+                                                            <Select onChange={null}>
+                                                                <Option value="">默认</Option>
+                                                                <Option value="127">删除键(Ctrl-?)</Option>
+                                                                <Option value="8">退格键(Ctrl-H)</Option>
+                                                            </Select>
+                                                        </Form.Item>
+
+                                                        <Form.Item
+                                                            name="terminal-type"
+                                                            label="终端类型"
+                                                            initialValue=""
+                                                        >
+                                                            <Select onChange={null}>
+                                                                <Option value="">默认</Option>
+                                                                <Option value="ansi">ansi</Option>
+                                                                <Option value="linux">linux</Option>
+                                                                <Option value="vt100">vt100</Option>
+                                                                <Option value="vt220">vt220</Option>
+                                                                <Option value="xterm">xterm</Option>
+                                                                <Option value="xterm-256color">xterm-256color</Option>
+                                                            </Select>
+                                                        </Form.Item>
+                                                    </Panel>
+                                                </> : undefined
+                                        }
+
                                     </> : undefined
                             }
 

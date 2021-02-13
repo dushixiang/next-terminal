@@ -5,6 +5,10 @@ import (
 	"next-terminal/pkg/guacd"
 )
 
+const (
+	SshMode = "ssh-mode"
+)
+
 type Property struct {
 	Name  string `gorm:"primary_key" json:"name"`
 	Value string `json:"value"`

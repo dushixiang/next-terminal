@@ -7,7 +7,10 @@ import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
 import "./Access.css"
 import request from "../../common/request";
-import {message} from "antd";
+import {Affix, Button, Col, Drawer, message, Row} from "antd";
+import {AppstoreTwoTone} from "@ant-design/icons";
+import Draggable from "react-draggable";
+import FileSystem from "./FileSystem";
 
 class Term extends Component {
 
@@ -16,7 +19,8 @@ class Term extends Component {
         height: window.innerHeight,
         term: undefined,
         webSocket: undefined,
-        fitAddon: undefined
+        fitAddon: undefined,
+        sessionId: undefined
     };
 
     componentDidMount = async () => {
@@ -123,7 +127,8 @@ class Term extends Component {
         this.setState({
             term: term,
             webSocket: webSocket,
-            fitAddon: fitAddon
+            fitAddon: fitAddon,
+            sessionId: sessionId
         });
 
         window.addEventListener('resize', this.onWindowResize);
@@ -190,6 +195,39 @@ class Term extends Component {
                     overflowX: 'hidden',
                     overflowY: 'hidden',
                 }}/>
+
+                <Draggable>
+                    <Affix style={{position: 'absolute', top: 50, right: 50, zIndex: 9999}}>
+                        <Button icon={<AppstoreTwoTone/>} onClick={() => {
+                            this.setState({
+                                fileSystemVisible: true,
+                            });
+                        }}/>
+                    </Affix>
+                </Draggable>
+
+                <Drawer
+                    style={{zIndex: 10000}}
+                    title={'会话详情'}
+                    placement="right"
+                    width={window.innerWidth * 0.8}
+                    closable={true}
+                    // maskClosable={false}
+                    onClose={() => {
+                        this.setState({
+                            fileSystemVisible: false
+                        });
+                    }}
+                    visible={this.state.fileSystemVisible}
+                >
+
+
+                    <Row style={{marginTop: 10}}>
+                        <Col span={24}>
+                            <FileSystem sessionId={this.state.sessionId}/>
+                        </Col>
+                    </Row>
+                </Drawer>
             </div>
         );
     }

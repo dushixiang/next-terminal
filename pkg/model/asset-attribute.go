@@ -20,7 +20,7 @@ func (r *AssetAttribute) TableName() string {
 	return "asset_attributes"
 }
 
-var SSHParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType}
+var SSHParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, SshMode}
 var RDPParameterNames = []string{guacd.EnableWallpaper, guacd.EnableTheming, guacd.EnableFontSmoothing, guacd.EnableFullWindowDrag, guacd.EnableDesktopComposition, guacd.EnableMenuAnimations, guacd.DisableBitmapCaching, guacd.DisableOffscreenCaching, guacd.DisableGlyphCaching}
 var VNCParameterNames = []string{guacd.ColorDepth, guacd.Cursor, guacd.SwapRedBlue, guacd.DestHost, guacd.DestPort}
 var TelnetParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, guacd.UsernameRegex, guacd.PasswordRegex, guacd.LoginSuccessRegex, guacd.LoginFailureRegex}
