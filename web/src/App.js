@@ -23,8 +23,6 @@ import {
     IdcardOutlined,
     LinkOutlined,
     LoginOutlined,
-    MenuFoldOutlined,
-    MenuUnfoldOutlined,
     SettingOutlined,
     SolutionOutlined,
     TeamOutlined,
@@ -55,10 +53,11 @@ class App extends Component {
         user: {
             'nickname': '未定义'
         },
-        package: NT_PACKAGE()
+        package: NT_PACKAGE(),
+        triggerMenu: true
     };
 
-    toggle = () => {
+    onCollapse = () => {
         this.setState({
             collapsed: !this.state.collapsed,
         });
@@ -78,10 +77,11 @@ class App extends Component {
 
         let result = await request.get('/info');
         if (result['code'] === 1) {
-            this.setState({
-                user: result['data']
-            })
             sessionStorage.setItem('user', JSON.stringify(result['data']));
+            this.setState({
+                user: result['data'],
+                triggerMenu: true
+            })
         } else {
             message.error(result['message']);
         }
@@ -120,7 +120,7 @@ class App extends Component {
                 <Route path="/">
                     <Layout className="layout" style={{minHeight: '100vh'}}>
 
-                        <Sider trigger={null} collapsible collapsed={this.state.collapsed} style={{width: 256}}>
+                        <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
                             <div className="logo">
                                 <img src='logo.svg' alt='logo'/>
                                 {
@@ -175,7 +175,7 @@ class App extends Component {
                                 </SubMenu>
 
                                 {
-                                    isAdmin() ?
+                                    this.state.triggerMenu && isAdmin() ?
                                         <>
                                             <SubMenu key='audit' title='操作审计' icon={<AuditOutlined/>}>
                                                 <Menu.Item key="online-session" icon={<LinkOutlined/>}>
@@ -221,7 +221,7 @@ class App extends Component {
                                 </Menu.Item>
 
                                 {
-                                    isAdmin() ?
+                                    this.state.triggerMenu && isAdmin() ?
                                         <>
                                             <Menu.Item key="setting" icon={<SettingOutlined/>}>
                                                 <Link to={'/setting'}>
@@ -231,13 +231,6 @@ class App extends Component {
                                         </> : undefined
                                 }
                             </Menu>
-
-                            <div>
-                                {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                                    className: 'trigger',
-                                    onClick: this.toggle,
-                                })}
-                            </div>
                         </Sider>
 
                         <Layout className="site-layout">
