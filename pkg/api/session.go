@@ -267,11 +267,15 @@ func SessionUploadEndpoint(c echo.Context) error {
 
 		buf := make([]byte, 1024)
 		for {
-			n, _ := src.Read(buf)
-			if n == 0 {
-				break
+			n, err := src.Read(buf)
+			if err != nil {
+				if err != io.EOF {
+					logrus.Warnf("文件上传错误 %v", err)
+				} else {
+					break
+				}
 			}
-			_, _ = dstFile.Write(buf)
+			_, _ = dstFile.Write(buf[:n])
 		}
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
