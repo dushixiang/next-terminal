@@ -201,6 +201,9 @@ func TunEndpoint(c echo.Context) error {
 				}
 				break
 			}
+			if len(instruction) == 0 {
+				continue
+			}
 			err = ws.WriteMessage(websocket.TextMessage, instruction)
 			if err != nil {
 				if connectionId == "" {

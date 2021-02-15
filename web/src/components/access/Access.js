@@ -151,6 +151,8 @@ class Access extends Component {
                 this.onWindowResize(null);
                 message.destroy();
                 message.success('连接成功');
+                console.log('requestAudioStream')
+                this.requestAudioStream();
                 // 向后台发送请求，更新会话的状态
                 this.updateSessionStatus(this.state.sessionId).then(_ => {
                 })
@@ -267,6 +269,7 @@ class Access extends Component {
     }
 
     clientClipboardReceived = (stream, mimetype) => {
+        console.log('clientClipboardReceived', mimetype)
         let reader;
 
         // If the received data is text, read it as a simple string
@@ -525,6 +528,24 @@ class Access extends Component {
         for (let j = 0; j < keys.length; j++) {
             this.state.client.sendKeyEvent(0, keys[j]);
         }
+    }
+
+    requestAudioStream = () => {
+        let client = this.state.client;
+        // Create new audio stream, associating it with an AudioRecorder
+        const stream = client.createAudioStream('audio/L16;rate=44100,channels=2');
+        const recorder = Guacamole.AudioRecorder.getInstance(stream, 'audio/L16;rate=44100,channels=2');
+
+        // If creation of the AudioRecorder failed, simply end the stream
+        if (!recorder)
+            stream.sendEnd();
+
+            // Otherwise, ensure that another audio stream is created after this
+        // audio stream is closed
+        else
+            recorder.onclose = () => {
+                console.log('audio closed')
+            };
     }
 
     render() {
