@@ -11,8 +11,14 @@ import (
 )
 
 func AssetCreateEndpoint(c echo.Context) error {
+	m := echo.Map{}
+	if err := c.Bind(&m); err != nil {
+		return err
+	}
+
+	data, _ := json.Marshal(m)
 	var item model.Asset
-	if err := c.Bind(&item); err != nil {
+	if err := json.Unmarshal(data, &item); err != nil {
 		return err
 	}
 
@@ -22,6 +28,10 @@ func AssetCreateEndpoint(c echo.Context) error {
 	item.Created = utils.NowJsonTime()
 
 	if err := model.CreateNewAsset(&item); err != nil {
+		return err
+	}
+
+	if err := model.UpdateAssetAttributes(item.ID, item.Protocol, m); err != nil {
 		return err
 	}
 
