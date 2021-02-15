@@ -153,13 +153,13 @@ func NewTunnel(address string, config Configuration) (ret *Tunnel, err error) {
 	if err := ret.WriteInstructionAndFlush(NewInstruction("size", width, height, dpi)); err != nil {
 		return nil, err
 	}
-	if err := ret.WriteInstructionAndFlush(NewInstruction("audio")); err != nil {
+	if err := ret.WriteInstructionAndFlush(NewInstruction("audio", "audio/L8", "audio/L16")); err != nil {
 		return nil, err
 	}
 	if err := ret.WriteInstructionAndFlush(NewInstruction("video")); err != nil {
 		return nil, err
 	}
-	if err := ret.WriteInstructionAndFlush(NewInstruction("image")); err != nil {
+	if err := ret.WriteInstructionAndFlush(NewInstruction("image", "image/jpeg", "image/png", "image/webp")); err != nil {
 		return nil, err
 	}
 	if err := ret.WriteInstructionAndFlush(NewInstruction("timezone", "Asia/Shanghai")); err != nil {
@@ -209,7 +209,7 @@ func (opt *Tunnel) WriteInstruction(instruction Instruction) error {
 }
 
 func (opt *Tunnel) WriteAndFlush(p []byte) (int, error) {
-	//fmt.Printf("-> %v \n", string(p))
+	//fmt.Printf("-> %v\n", string(p))
 	nn, err := opt.rw.Write(p)
 	if err != nil {
 		return nn, err
@@ -246,7 +246,14 @@ func (opt *Tunnel) ReadInstruction() (instruction Instruction, err error) {
 func (opt *Tunnel) Read() (p []byte, err error) {
 	p, err = opt.rw.ReadBytes(Delimiter)
 	//fmt.Printf("<- %v \n", string(p))
-	return
+	s := string(p)
+	if s == "rate=44100,channels=2;" {
+		return make([]byte, 0), nil
+	}
+	if s == "5.audio,1.1,31.audio/L16;" {
+		s += "rate=44100,channels=2;"
+	}
+	return []byte(s), err
 }
 
 func (opt *Tunnel) expect(opcode string) (instruction Instruction, err error) {

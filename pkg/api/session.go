@@ -111,7 +111,7 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	defer mutex.Unlock()
 	observable, _ := global.Store.Get(sessionId)
 	if observable != nil {
-		logrus.Debugf("会话%v创建者退出", sessionId)
+		logrus.Debugf("会话%v创建者退出，原因：%v", sessionId, reason)
 		observable.Subject.Close(code, reason)
 
 		for i := 0; i < len(observable.Observers); i++ {
