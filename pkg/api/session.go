@@ -309,7 +309,8 @@ func SessionDownloadEndpoint(c echo.Context) error {
 	}
 	//remoteDir := c.Query("dir")
 	remoteFile := c.QueryParam("file")
-
+	// 获取带后缀的文件名称
+	filenameWithSuffix := path.Base(remoteFile)
 	if "ssh" == session.Protocol {
 		tun, ok := global.Store.Get(sessionId)
 		if !ok {
@@ -322,8 +323,6 @@ func SessionDownloadEndpoint(c echo.Context) error {
 		}
 
 		defer dstFile.Close()
-		// 获取带后缀的文件名称
-		filenameWithSuffix := path.Base(remoteFile)
 		c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filenameWithSuffix))
 
 		var buff bytes.Buffer
@@ -338,7 +337,7 @@ func SessionDownloadEndpoint(c echo.Context) error {
 			return err
 		}
 
-		return c.File(path.Join(drivePath, remoteFile))
+		return c.Attachment(path.Join(drivePath, remoteFile), filenameWithSuffix)
 	}
 
 	return err
