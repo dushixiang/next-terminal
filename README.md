@@ -21,7 +21,7 @@ Next Terminal基于 [Apache Guacamole](https://guacamole.apache.org/) 开发，�
 - 双因素认证 感谢 [naiba](https://github.com/naiba) 贡献
 - 资产标签
 - 资产授权
-- 用户分组
+- 多用户&用户分组
 
 ## 在线体验
 
@@ -39,42 +39,13 @@ test/test
 
 ## 相关截图
 
-资源占用截图
-
-![资源占用截图](./screenshot/docker_stats.png)
-
-资产管理
-
-![资产](./screenshot/assets.png)
-
-rdp
-
-![rdp](./screenshot/rdp.png)
-
-vnc
-
-![vnc](./screenshot/vnc.png)
-
-ssh
-
-![ssh](./screenshot/ssh.png)
-
-批量执行命令
-
-![批量执行命令](./screenshot/command.png)
+[截图](docs/screenshot.md)
 
 ## 捐赠
 
 如果您觉得 next-terminal 对你有帮助，欢迎给予我们一定的捐助来维持项目的长期发展。
 
-### 微信扫码捐赠
-
-<img src="screenshot/paywx.png" width="300"  height="auto"/>
-
-### 支付宝扫码捐赠
-
-<img src="screenshot/payali.png" width="300"  height="auto"/>
-
+![捐赠](./screenshot/donate.png)
 
 ## 联系方式
 
