@@ -34,6 +34,10 @@ const (
 	DisableOffscreenCaching  = "disable-offscreen-caching"
 	DisableGlyphCaching      = "disable-glyph-caching"
 
+	RemoteApp     = "remote-app"
+	RemoteAppDir  = "remote-app-dir"
+	RemoteAppArgs = "remote-app-args"
+
 	ColorDepth  = "color-depth"
 	Cursor      = "cursor"
 	SwapRedBlue = "swap-red-blue"
