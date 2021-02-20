@@ -1,5 +1,5 @@
 import axios from 'axios'
-import {server} from "./constants";
+import {server} from "./env";
 import {message} from 'antd';
 import {getHeaders} from "../utils/utils";
 

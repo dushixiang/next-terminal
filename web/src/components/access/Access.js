@@ -3,7 +3,7 @@ import Guacamole from 'guacamole-common-js';
 import {Affix, Button, Col, Drawer, Dropdown, Form, Input, Menu, message, Modal, Row} from 'antd'
 import qs from "qs";
 import request from "../../common/request";
-import {wsServer} from "../../common/constants";
+import {wsServer} from "../../common/env";
 import {
     AppstoreTwoTone,
     CopyTwoTone,

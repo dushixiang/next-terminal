@@ -22,12 +22,12 @@ func OverviewCounterEndPoint(c echo.Context) error {
 		asset              int64
 	)
 	if model.TypeUser == account.Type {
-		countUser, _ = model.CountUser()
+		countUser, _ = model.CountOnlineUser()
 		countOnlineSession, _ = model.CountOnlineSession()
 		credential, _ = model.CountCredentialByUserId(account.ID)
 		asset, _ = model.CountAssetByUserId(account.ID)
 	} else {
-		countUser, _ = model.CountUser()
+		countUser, _ = model.CountOnlineUser()
 		countOnlineSession, _ = model.CountOnlineSession()
 		credential, _ = model.CountCredential()
 		asset, _ = model.CountAsset()

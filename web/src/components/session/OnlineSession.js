@@ -19,12 +19,13 @@ import {
 } from "antd";
 import qs from "qs";
 import request from "../../common/request";
-import {differTime, formatDate, itemRender} from "../../utils/utils";
+import {differTime, itemRender} from "../../utils/utils";
 import {message} from "antd/es";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import {DisconnectOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 import Monitor from "../access/Monitor";
 import Logout from "../user/Logout";
+import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
@@ -242,28 +243,27 @@ class OnlineSession extends Component {
             dataIndex: 'assetName',
             key: 'assetName'
         }, {
-            title: '远程连接',
-            dataIndex: 'access',
-            key: 'access',
-            render: (text, record) => {
-
-                return `${record.username}@${record.ip}:${record.port}`;
-            }
-        }, {
             title: '连接协议',
             dataIndex: 'protocol',
             key: 'protocol',
             render: (text, record) => {
-
-                return (<Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>);
+                const title = `${record.username}@${record.ip}:${record.port}`;
+                return (
+                    <Tooltip title={title}>
+                        <Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>
+                    </Tooltip>
+                )
             }
         }, {
             title: '接入时间',
             dataIndex: 'connectedTime',
             key: 'connectedTime',
             render: (text, record) => {
-
-                return formatDate(text, 'yyyy-MM-dd hh:mm:ss');
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
             }
         }, {
             title: '接入时长',

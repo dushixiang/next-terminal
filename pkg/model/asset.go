@@ -63,8 +63,8 @@ func FindAssetByConditions(protocol string, account User) (o []Asset, err error)
 	return
 }
 
-func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account User, owner, sharer, userGroupId string) (o []AssetVo, total int64, err error) {
-	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
+func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account User, owner, sharer, userGroupId, ip string) (o []AssetVo, total int64, err error) {
+	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created,assets.tags, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 
 	if TypeUser == account.Type {
@@ -101,6 +101,11 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 	if len(name) > 0 {
 		db = db.Where("assets.name like ?", "%"+name+"%")
 		dbCounter = dbCounter.Where("assets.name like ?", "%"+name+"%")
+	}
+
+	if len(ip) > 0 {
+		db = db.Where("assets.ip like ?", "%"+ip+"%")
+		dbCounter = dbCounter.Where("assets.ip like ?", "%"+ip+"%")
 	}
 
 	if len(protocol) > 0 {

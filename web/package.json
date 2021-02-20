@@ -6,6 +6,7 @@
     "@ant-design/icons": "^4.3.0",
     "antd": "^4.8.4",
     "axios": "^0.21.1",
+    "dayjs": "^1.10.4",
     "guacamole-common-js": "^1.2.0",
     "qs": "^6.9.4",
     "react": "^16.14.0",

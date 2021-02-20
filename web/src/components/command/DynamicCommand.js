@@ -36,6 +36,7 @@ import {
 import {compare, itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
 import {hasPermission, isAdmin} from "../../service/permission";
+import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
@@ -403,7 +404,14 @@ class DynamicCommand extends Component {
         }, {
             title: '创建日期',
             dataIndex: 'created',
-            key: 'created'
+            key: 'created',
+            render: (text, record) => {
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
+            }
         }, {
             title: '操作',
             key: 'action',
