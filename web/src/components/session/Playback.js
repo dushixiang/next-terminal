@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Guacamole from "guacamole-common-js";
-import server from "../../common/env";
+import {server} from "../../common/env";
 import {Button, Col, Row, Slider, Typography} from "antd";
 import {PauseCircleOutlined, PlayCircleOutlined} from '@ant-design/icons';
 import {Tooltip} from "antd/lib/index";
