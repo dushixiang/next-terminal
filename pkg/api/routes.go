@@ -19,6 +19,10 @@ func SetupRoutes() *echo.Echo {
 	e.Logger = log.GetEchoLogger()
 
 	e.File("/", "web/build/index.html")
+	e.File("/asciinema.html", "web/build/asciinema.html")
+	e.File("/asciinema-player.js", "web/build/asciinema-player.js")
+	e.File("/asciinema-player.css", "web/build/asciinema-player.css")
+	e.File("/", "web/build/index.html")
 	e.File("/logo.svg", "web/build/logo.svg")
 	e.File("/favicon.ico", "web/build/favicon.ico")
 	e.Static("/static", "web/build/static")
