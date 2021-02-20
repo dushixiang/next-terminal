@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import "xterm/css/xterm.css"
 import {Terminal} from "xterm";
 import qs from "qs";
-import {wsServer} from "../../common/constants";
+import {wsServer} from "../../common/env";
 import "./Console.css"
 import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit'

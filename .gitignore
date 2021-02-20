@@ -4,3 +4,4 @@ web/build
 *.db
 .DS_Store
 .eslintcache
+.env

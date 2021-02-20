@@ -35,6 +35,7 @@ import {
 import {itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
 import {hasPermission, isAdmin} from "../../service/permission";
+import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -375,6 +376,13 @@ class Credential extends Component {
             title: '创建时间',
             dataIndex: 'created',
             key: 'created',
+            render: (text, record) => {
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
+            }
         },
             {
                 title: '操作',

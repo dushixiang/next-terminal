@@ -27,7 +27,7 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
-	urls := []string{"download", "recording", "login", "static", "favicon", "logo"}
+	urls := []string{"download", "recording", "login", "static", "favicon", "logo", "asciinema"}
 
 	return func(c echo.Context) error {
 		// 路由拦截 - 登录身份、资源权限判断等

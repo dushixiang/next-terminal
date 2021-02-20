@@ -9,6 +9,7 @@ import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, U
 import Logout from "./Logout";
 import UserGroupModal from "./UserGroupModal";
 import UserShareAsset from "./UserShareAsset";
+import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -285,7 +286,14 @@ class UserGroup extends Component {
         }, {
             title: '创建日期',
             dataIndex: 'created',
-            key: 'created'
+            key: 'created',
+            render: (text, record) => {
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
+            }
         },
             {
                 title: '操作',

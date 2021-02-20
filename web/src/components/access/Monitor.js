@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import Guacamole from 'guacamole-common-js';
 import {Modal, Result, Spin} from 'antd'
 import qs from "qs";
-import {wsServer} from "../../common/constants";
+import {wsServer} from "../../common/env";
 import {getToken} from "../../utils/utils";
 import './Access.css'
 

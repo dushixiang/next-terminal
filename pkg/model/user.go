@@ -107,7 +107,7 @@ func DeleteUserById(id string) {
 	global.DB.Where("user_id = ?", id).Delete(&ResourceSharer{})
 }
 
-func CountUser() (total int64, err error) {
-	err = global.DB.Find(&User{}).Count(&total).Error
+func CountOnlineUser() (total int64, err error) {
+	err = global.DB.Where("online = ?", true).Find(&User{}).Count(&total).Error
 	return
 }

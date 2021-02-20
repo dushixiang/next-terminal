@@ -6,6 +6,12 @@ import * as serviceWorker from './serviceWorker';
 import zhCN from 'antd/es/locale-provider/zh_CN';
 import {ConfigProvider} from 'antd';
 import {HashRouter as Router} from "react-router-dom";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import 'dayjs/locale/zh-cn'
+
+dayjs.extend(relativeTime);
+dayjs.locale('zh-cn');
 
 ReactDOM.render(
     <ConfigProvider locale={zhCN}>

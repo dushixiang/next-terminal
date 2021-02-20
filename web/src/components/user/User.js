@@ -36,6 +36,7 @@ import {
 import Logout from "./Logout";
 import UserShareAsset from "./UserShareAsset";
 import {hasPermission} from "../../service/permission";
+import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -342,7 +343,14 @@ class User extends Component {
         }, {
             title: '创建日期',
             dataIndex: 'created',
-            key: 'created'
+            key: 'created',
+            render: (text, record) => {
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
+            }
         },
             {
                 title: '操作',

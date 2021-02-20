@@ -22,7 +22,7 @@ import {
 } from "@ant-design/icons";
 import qs from "qs";
 import request from "../../common/request";
-import {server} from "../../common/constants";
+import {server} from "../../common/env";
 import Upload from "antd/es/upload";
 import {download, getFileName, getToken, isEmpty, renderSize} from "../../utils/utils";
 import './FileSystem.css'
@@ -107,7 +107,7 @@ class FileSystem extends Component {
             if (isEmpty(key)) {
                 key = '/';
             }
-            let result = await request.get(`${server}/sessions/${this.state.sessionId}/ls?dir=${key}`);
+            let result = await request.get(`/sessions/${this.state.sessionId}/ls?dir=${key}`);
             if (result['code'] !== 1) {
                 message.error(result['message']);
                 return;
