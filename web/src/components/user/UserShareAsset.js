@@ -25,6 +25,8 @@ import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import {PROTOCOL_COLORS} from "../../common/constants";
 import UserShareSelectedAsset from "./UserShareSelectedAsset";
+import {isEmpty} from "../../utils/utils";
+import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -34,6 +36,7 @@ const {Title, Text} = Typography;
 class UserShareAsset extends Component {
 
     inputRefOfName = React.createRef();
+    inputRefOfIp = React.createRef();
     changeOwnerFormRef = React.createRef();
 
     state = {
@@ -132,6 +135,17 @@ class UserShareAsset extends Component {
         this.loadTableData(query);
     };
 
+    handleSearchByIp = ip => {
+        let query = {
+            ...this.state.queryParams,
+            'pageIndex': 1,
+            'pageSize': this.state.queryParams.pageSize,
+            'ip': ip,
+        }
+
+        this.loadTableData(query);
+    };
+
     handleTagsChange = tags => {
         let query = {
             ...this.state.queryParams,
@@ -178,30 +192,52 @@ class UserShareAsset extends Component {
                 );
             }
         }, {
-            title: '网络',
-            dataIndex: 'ip',
-            key: 'ip',
-            render: (text, record) => {
-
-                return record['ip'] + ':' + record['port'];
-            }
-        }, {
             title: '连接协议',
             dataIndex: 'protocol',
             key: 'protocol',
             render: (text, record) => {
-
-                return (<Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>);
+                const title = `${record['ip'] + ':' + record['port']}`
+                return (
+                    <Tooltip title={title}>
+                        <Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>
+                    </Tooltip>
+                )
+            }
+        }, {
+            title: '标签',
+            dataIndex: 'tags',
+            key: 'tags',
+            render: tags => {
+                if (!isEmpty(tags)) {
+                    let tagDocuments = []
+                    let tagArr = tags.split(',');
+                    for (let i = 0; i < tagArr.length; i++) {
+                        if (tags[i] === '-') {
+                            continue;
+                        }
+                        tagDocuments.push(<Tag>{tagArr[i]}</Tag>)
+                    }
+                    return tagDocuments;
+                }
             }
         }, {
             title: '状态',
             dataIndex: 'active',
             key: 'active',
             render: text => {
+
                 if (text) {
-                    return (<Badge status="processing" text="运行中"/>);
+                    return (
+                        <Tooltip title='运行中'>
+                            <Badge status="processing"/>
+                        </Tooltip>
+                    )
                 } else {
-                    return (<Badge status="error" text="不可用"/>);
+                    return (
+                        <Tooltip title='不可用'>
+                            <Badge status="error"/>
+                        </Tooltip>
+                    )
                 }
             }
         }, {
@@ -211,8 +247,15 @@ class UserShareAsset extends Component {
         }, {
             title: '创建日期',
             dataIndex: 'created',
-            key: 'created'
-        }
+            key: 'created',
+            render: (text, record) => {
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
+            }
+        },
         ];
 
         const selectedRowKeys = this.state.selectedRowKeys;
@@ -229,10 +272,10 @@ class UserShareAsset extends Component {
                 <Content key='page-content' className="site-layout-background">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={8} key={1}>
+                            <Col span={4} key={1}>
                                 <Title level={3}>授权资产列表</Title>
                             </Col>
-                            <Col span={16} key={2} style={{textAlign: 'right'}}>
+                            <Col span={20} key={2} style={{textAlign: 'right'}}>
                                 <Space>
 
                                     <Search
@@ -240,6 +283,15 @@ class UserShareAsset extends Component {
                                         placeholder="资产名称"
                                         allowClear
                                         onSearch={this.handleSearchByName}
+                                        style={{width: 200}}
+                                    />
+
+                                    <Search
+                                        ref={this.inputRefOfIp}
+                                        placeholder="资产IP"
+                                        allowClear
+                                        onSearch={this.handleSearchByIp}
+                                        style={{width: 200}}
                                     />
 
                                     <Select mode="multiple"
@@ -268,6 +320,7 @@ class UserShareAsset extends Component {
 
                                         <Button icon={<UndoOutlined/>} onClick={() => {
                                             this.inputRefOfName.current.setValue('');
+                                            this.inputRefOfIp.current.setValue('');
                                             this.loadTableData({
                                                 ...this.state.queryParams,
                                                 pageIndex: 1,
