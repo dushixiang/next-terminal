@@ -22,7 +22,7 @@ import (
 	"time"
 )
 
-const Version = "v0.2.5"
+const Version = "v0.2.6"
 
 func main() {
 	log.Fatal(Run())
