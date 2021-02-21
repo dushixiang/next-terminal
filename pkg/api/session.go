@@ -230,7 +230,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	return Success(c, session)
+	return Success(c, echo.Map{"id": session.ID})
 }
 
 func SessionUploadEndpoint(c echo.Context) error {
