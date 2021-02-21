@@ -151,19 +151,39 @@ func AddSharerResources(userGroupId, userId, resourceType string, resourceIds []
 }
 
 func FindAssetIdsByUserId(userId string) (assetIds []string, err error) {
+	// 查询当前用户创建的资产
+	var ownerAssetIds, sharerAssetIds []string
+	asset := Asset{}
+	err = global.DB.Table(asset.TableName()).Select("id").Where("owner = ?", userId).Find(&ownerAssetIds).Error
+	if err != nil {
+		return nil, err
+	}
+
+	// 查询其他用户授权给该用户的资产
 	groupIds, err := FindUserGroupIdsByUserId(userId)
 	if err != nil {
 		return nil, err
 	}
 
-	db := global.DB
-	db = db.Table("resource_sharers").Select("resource_id").Where("user_id = ?", userId)
+	db := global.DB.Table("resource_sharers").Select("resource_id").Where("user_id = ?", userId)
 	if groupIds != nil && len(groupIds) > 0 {
 		db = db.Or("user_group_id in ?", groupIds)
 	}
-	err = db.Find(&assetIds).Error
-	if assetIds == nil {
-		assetIds = make([]string, 0)
+	err = db.Find(&sharerAssetIds).Error
+	if err != nil {
+		return nil, err
 	}
+
+	// 合并查询到的资产ID
+	assetIds = make([]string, 0)
+
+	if ownerAssetIds != nil {
+		assetIds = append(assetIds, ownerAssetIds...)
+	}
+
+	if sharerAssetIds != nil {
+		assetIds = append(assetIds, sharerAssetIds...)
+	}
+
 	return
 }

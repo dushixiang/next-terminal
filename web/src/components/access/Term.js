@@ -7,8 +7,8 @@ import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
 import "./Access.css"
 import request from "../../common/request";
-import {Affix, Button, Col, Drawer, message, Row} from "antd";
-import {AppstoreTwoTone} from "@ant-design/icons";
+import {Affix, Button, Col, Drawer, message, Modal, Row} from "antd";
+import {AppstoreTwoTone, ExclamationCircleOutlined} from "@ant-design/icons";
 import Draggable from "react-draggable";
 import FileSystem from "./FileSystem";
 
@@ -139,6 +139,24 @@ class Term extends Component {
         if (webSocket) {
             webSocket.close()
         }
+    }
+
+    showMessage(msg) {
+        message.destroy();
+        Modal.confirm({
+            title: '提示',
+            icon: <ExclamationCircleOutlined/>,
+            content: msg,
+            centered: true,
+            okText: '重新连接',
+            cancelText: '关闭页面',
+            onOk() {
+                window.location.reload();
+            },
+            onCancel() {
+                window.close();
+            },
+        });
     }
 
     async createSession(assetsId) {
