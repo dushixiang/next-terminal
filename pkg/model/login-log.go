@@ -89,7 +89,7 @@ func Logout(token string) {
 		return
 	}
 
-	global.DB.Table("login_logs").Where("token = ?", token).Update("logout_time", utils.NowJsonTime())
+	global.DB.Table("login_logs").Where("id = ?", token).Update("logout_time", utils.NowJsonTime())
 
 	loginLogs, err := FindAliveLoginLogsByUserId(loginLog.UserId)
 	if err != nil {
