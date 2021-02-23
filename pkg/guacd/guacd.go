@@ -254,6 +254,9 @@ func (opt *Tunnel) Read() (p []byte, err error) {
 	if s == "rate=44100,channels=2;" {
 		return make([]byte, 0), nil
 	}
+	if s == "rate=22050,channels=2;" {
+		return make([]byte, 0), nil
+	}
 	if s == "5.audio,1.1,31.audio/L16;" {
 		s += "rate=44100,channels=2;"
 	}

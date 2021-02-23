@@ -3,6 +3,7 @@ package handle
 import (
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
+	"log"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -22,7 +23,7 @@ func RunTicker() {
 			now := time.Now()
 			for i := range sessions {
 				if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
-					model.DeleteSessionById(sessions[i].ID)
+					_ = model.DeleteSessionById(sessions[i].ID)
 					s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
 					logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
 				}
@@ -39,6 +40,40 @@ func RunTicker() {
 			}
 		}
 	})
+
+	_, err := c.AddFunc("0 0 0 * * ?", func() {
+		// 定时任务 每日凌晨检查超过时长限制的会话
+		property, err := model.FindPropertyByName("session-saved-limit")
+		if err != nil {
+			return
+		}
+		if property.Value == "" || property.Value == "-" {
+			return
+		}
+		limit, err := strconv.Atoi(property.Value)
+		if err != nil {
+			return
+		}
+		sessions, err := model.FindOutTimeSessions(limit)
+		if err != nil {
+			return
+		}
+
+		if sessions != nil && len(sessions) > 0 {
+			var sessionIds []string
+			for i := range sessions {
+				sessionIds = append(sessionIds, sessions[i].ID)
+			}
+			err := model.DeleteSessionByIds(sessionIds)
+			if err != nil {
+				logrus.Errorf("删除离线会话失败 %v", err)
+			}
+		}
+	})
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	c.Start()
 }

@@ -41,7 +41,8 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		token := GetToken(c)
-		authorization, found := global.Cache.Get(token)
+		cacheKey := strings.Join([]string{Token, token}, ":")
+		authorization, found := global.Cache.Get(cacheKey)
 		if !found {
 			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
 		}

@@ -45,15 +45,16 @@ test/test
 
 如果您觉得 next-terminal 对你有帮助，欢迎给予我们一定的捐助来维持项目的长期发展。
 
-![捐赠](./screenshot/donate.png)
+<figure class="half">
+<img src="./screenshot/donate_wx.png" alt="微信"/>
+<img src="./screenshot/donate_zfb.png" alt="支付宝"/>
+</figure>
 
 ## 联系方式
 
 - 邮箱 helloworld1024@foxmail.com
 
 - QQ群 938145268
-
-  <img src="screenshot/qq.png" width="300"  height="auto"/>
 
 - Telegram
 

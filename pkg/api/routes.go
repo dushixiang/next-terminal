@@ -156,6 +156,14 @@ func Fail(c echo.Context, code int, message string) error {
 	})
 }
 
+func FailWithData(c echo.Context, code int, message string, data interface{}) error {
+	return c.JSON(200, H{
+		"code":    code,
+		"message": message,
+		"data":    data,
+	})
+}
+
 func Success(c echo.Context, data interface{}) error {
 	return c.JSON(200, H{
 		"code":    1,

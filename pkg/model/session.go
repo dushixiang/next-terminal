@@ -3,6 +3,8 @@ package model
 import (
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
+	"os"
+	"path"
 	"time"
 )
 
@@ -126,6 +128,12 @@ func FindSessionByStatusIn(statuses []string) (o []Session, err error) {
 	return
 }
 
+func FindOutTimeSessions(dayLimit int) (o []Session, err error) {
+	limitTime := time.Now().Add(time.Duration(-dayLimit*24) * time.Hour)
+	err = global.DB.Where("status = ? and connected_time < ?", Disconnected, limitTime).Find(&o).Error
+	return
+}
+
 func CreateNewSession(o *Session) (err error) {
 	err = global.DB.Create(o).Error
 	return
@@ -154,8 +162,24 @@ func UpdateSessionWindowSizeById(width, height int, id string) error {
 	return UpdateSessionById(&session, id)
 }
 
-func DeleteSessionById(id string) {
-	global.DB.Where("id = ?", id).Delete(&Session{})
+func DeleteSessionById(id string) error {
+	return global.DB.Where("id = ?", id).Delete(&Session{}).Error
+}
+
+func DeleteSessionByIds(sessionIds []string) error {
+	drivePath, err := GetRecordingPath()
+	if err != nil {
+		return err
+	}
+	for i := range sessionIds {
+		if err := os.RemoveAll(path.Join(drivePath, sessionIds[i])); err != nil {
+			return err
+		}
+		if err := DeleteSessionById(sessionIds[i]); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func DeleteSessionByStatus(status string) {
