@@ -158,12 +158,10 @@ class Access extends Component {
                 })
                 break;
             case STATE_DISCONNECTING:
-                message.destroy();
-                message.loading('正在关闭连接...', 0);
+
                 break;
             case STATE_DISCONNECTED:
-                message.destroy();
-                message.error('连接关闭');
+
                 break;
             default:
                 break;

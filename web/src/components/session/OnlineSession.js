@@ -192,7 +192,7 @@ class OnlineSession extends Component {
             delBtnLoading: true
         })
         try {
-            let result = await request.post('/sessions/' + this.state.selectedRowKeys.join(',') + '/discontent');
+            let result = await request.post('/sessions/' + this.state.selectedRowKeys.join(',') + '/disconnect');
             if (result.code === 1) {
                 message.success('操作成功', 3);
                 this.setState({
