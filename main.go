@@ -168,7 +168,7 @@ func Run() error {
 	global.Cache = cache.New(5*time.Minute, 10*time.Minute)
 	global.Cache.OnEvicted(func(key string, value interface{}) {
 		if strings.HasPrefix(key, api.Token) {
-			token := strings.Split(key, ":")[0]
+			token := strings.Split(key, ":")[1]
 			logrus.Debugf("用户Token「%v」过期", token)
 			model.Logout(token)
 		}

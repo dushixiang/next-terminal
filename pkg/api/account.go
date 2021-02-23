@@ -165,7 +165,8 @@ func loginWithTotpEndpoint(c echo.Context) error {
 
 func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
-	global.Cache.Delete(token)
+	cacheKey := strings.Join([]string{Token, token}, ":")
+	global.Cache.Delete(cacheKey)
 	model.Logout(token)
 	return Success(c, nil)
 }
