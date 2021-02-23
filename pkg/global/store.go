@@ -27,7 +27,7 @@ func (r *Tun) Close(code int, reason string) {
 	ws := r.WebSocket
 	if ws != nil {
 		if r.Mode == "guacd" {
-			err := guacd.NewInstruction("error", reason, strconv.Itoa(code))
+			err := guacd.NewInstruction("error", "", strconv.Itoa(code))
 			_ = ws.WriteMessage(websocket.TextMessage, []byte(err.String()))
 			disconnect := guacd.NewInstruction("disconnect")
 			_ = ws.WriteMessage(websocket.TextMessage, []byte(disconnect.String()))
