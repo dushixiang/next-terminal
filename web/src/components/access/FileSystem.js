@@ -37,6 +37,7 @@ class FileSystem extends Component {
     state = {
         sessionId: undefined,
         currentDirectory: '/',
+        currentDirectoryInput: '/',
         files: [],
         loading: false,
         selectedRowKeys: [],
@@ -126,6 +127,7 @@ class FileSystem extends Component {
             this.setState({
                 files: items,
                 currentDirectory: key,
+                currentDirectoryInput: key,
                 selectedRow: {},
                 selectedRowKeys: []
             })
@@ -188,6 +190,16 @@ class FileSystem extends Component {
         }
         return undefined;
     };
+
+    handleCurrentDirectoryInputChange = (event) => {
+        this.setState({
+            currentDirectoryInput: event.target.value
+        })
+    }
+
+    handleCurrentDirectoryInputPressEnter = (event) => {
+        this.loadFiles(event.target.value);
+    }
 
     render() {
 
@@ -315,10 +327,11 @@ class FileSystem extends Component {
 
         const title = (
             <Row justify="space-around" align="middle" gutter={24}>
-                <Col span={16} key={1}>
-                    {this.state.currentDirectory}
+                <Col span={20} key={1}>
+                    <Input value={this.state.currentDirectoryInput} onChange={this.handleCurrentDirectoryInputChange}
+                           onPressEnter={this.handleCurrentDirectoryInputPressEnter}/>
                 </Col>
-                <Col span={8} key={2} style={{textAlign: 'right'}}>
+                <Col span={4} key={2} style={{textAlign: 'right'}}>
                     <Space>
                         <Tooltip title="创建文件夹">
                             <Button type="primary" size="small" icon={<FolderAddOutlined/>}
@@ -383,7 +396,6 @@ class FileSystem extends Component {
                                            if (record['path'] === '..') {
                                                // 获取当前目录的上级目录
                                                let currentDirectory = this.state.currentDirectory;
-                                               console.log(currentDirectory)
                                                let parentDirectory = currentDirectory.substring(0, currentDirectory.lastIndexOf('/'));
                                                this.loadFiles(parentDirectory);
                                            } else {

@@ -19,6 +19,7 @@ import (
 	"next-terminal/pkg/utils"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -166,8 +167,11 @@ func Run() error {
 	// 配置缓存器
 	global.Cache = cache.New(5*time.Minute, 10*time.Minute)
 	global.Cache.OnEvicted(func(key string, value interface{}) {
-		logrus.Debugf("用户Token「%v」过期", key)
-		model.Logout(key)
+		if strings.HasPrefix(key, api.Token) {
+			token := strings.Split(key, ":")[0]
+			logrus.Debugf("用户Token「%v」过期", token)
+			model.Logout(token)
+		}
 	})
 	global.Store = global.NewStore()
 
@@ -191,11 +195,13 @@ func Run() error {
 			User:     user,
 		}
 
+		cacheKey := strings.Join([]string{api.Token, token}, ":")
+
 		if authorization.Remember {
 			// 记住登录有效期两周
-			global.Cache.Set(token, authorization, api.RememberEffectiveTime)
+			global.Cache.Set(cacheKey, authorization, api.RememberEffectiveTime)
 		} else {
-			global.Cache.Set(token, authorization, api.NotRememberEffectiveTime)
+			global.Cache.Set(cacheKey, authorization, api.NotRememberEffectiveTime)
 		}
 		logrus.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
 	}

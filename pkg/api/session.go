@@ -66,15 +66,9 @@ func SessionPagingEndpoint(c echo.Context) error {
 func SessionDeleteEndpoint(c echo.Context) error {
 	sessionIds := c.Param("id")
 	split := strings.Split(sessionIds, ",")
-	for i := range split {
-		drivePath, err := model.GetRecordingPath()
-		if err != nil {
-			continue
-		}
-		if err := os.RemoveAll(path.Join(drivePath, split[i])); err != nil {
-			return err
-		}
-		model.DeleteSessionById(split[i])
+	err := model.DeleteSessionByIds(split)
+	if err != nil {
+		return err
 	}
 
 	return Success(c, nil)
@@ -132,7 +126,7 @@ func CloseSessionById(sessionId string, code int, reason string) {
 
 	if s.Status == model.Connecting {
 		// 会话还未建立成功，无需保留数据
-		model.DeleteSessionById(sessionId)
+		_ = model.DeleteSessionById(sessionId)
 		return
 	}
 

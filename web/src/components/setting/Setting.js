@@ -546,6 +546,21 @@ class Setting extends Component {
                                         </> : null
                                 }
 
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="session-saved-limit"
+                                    label="会话录屏保存时长"
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">永久</Option>
+                                        <Option value="30">30天</Option>
+                                        <Option value="60">60天</Option>
+                                        <Option value="180">180天</Option>
+                                        <Option value="360">360天</Option>
+                                    </Select>
+                                </Form.Item>
+
                                 <Form.Item {...formTailLayout}>
                                     <Button type="primary" htmlType="submit">
                                         更新
