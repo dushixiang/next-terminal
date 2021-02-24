@@ -135,7 +135,7 @@ tar -xvf next-terminal.tgz
 cd next-terminal
 ```
 
-修改配置文件`config.yml`
+在当前目录下创建或修改配置文件`config.yml`
 ```shell
 db: sqlite
 # 当db为sqlite时mysql的配置无效

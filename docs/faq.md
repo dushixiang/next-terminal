@@ -50,3 +50,12 @@ docker rm <container-id> -f
 详情可参考 https://issues.apache.org/jira/browse/GUACAMOLE-1191
 
 </details>
+
+<details>
+    <summary>ssh协议类型的资产连接模式有什么区别？</summary>
+
+1. 默认：默认使用guacd模式
+2. 原生：使用golang+xterm.js方式实现的webssh，传输协议是文本，操作响应更快。但目前尚未实现实时监控。
+3. guacd：Apache Guacamole包装了一层的ssh协议，支持实时监控，录屏播放更加统一。但某些密钥不支持。
+
+</details>

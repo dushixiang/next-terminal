@@ -45,10 +45,9 @@ test/test
 
 如果您觉得 next-terminal 对你有帮助，欢迎给予我们一定的捐助来维持项目的长期发展。
 
-<figure class="half">
-<img src="./screenshot/donate_wx.png" alt="微信"/>
-<img src="./screenshot/donate_zfb.png" alt="支付宝"/>
-</figure>
+
+![截图](screenshot/donate_wx.png)
+![截图](screenshot/donate_zfb.png)
 
 ## 联系方式
 
