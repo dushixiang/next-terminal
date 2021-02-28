@@ -21,6 +21,7 @@ type User struct {
 	Enabled    bool           `json:"enabled"`
 	Created    utils.JsonTime `json:"created"`
 	Type       string         `json:"type"`
+	Mail       string         `json:"mail"`
 }
 
 type UserVo struct {

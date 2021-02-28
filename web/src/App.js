@@ -16,10 +16,10 @@ import {
     AuditOutlined,
     BlockOutlined,
     CloudServerOutlined,
-    CodeOutlined,
+    CodeOutlined, ControlOutlined,
     DashboardOutlined,
     DesktopOutlined,
-    DisconnectOutlined,
+    DisconnectOutlined, GoldOutlined,
     IdcardOutlined,
     LinkOutlined,
     LoginOutlined,
@@ -39,6 +39,7 @@ import {isAdmin} from "./service/permission";
 import UserGroup from "./components/user/UserGroup";
 import LoginLog from "./components/session/LoginLog";
 import Term from "./components/access/Term";
+import Job from "./components/job/Job";
 
 const {Footer, Sider} = Layout;
 
@@ -161,23 +162,10 @@ class App extends Component {
                                     </Menu.Item>
                                 </SubMenu>
 
-                                <SubMenu key='command-manage' title='指令管理' icon={<CodeOutlined/>}>
-                                    <Menu.Item key="dynamic-command" icon={<BlockOutlined/>}>
-                                        <Link to={'/dynamic-command'}>
-                                            动态指令
-                                        </Link>
-                                    </Menu.Item>
-                                    {/*<Menu.Item key="silent-command" icon={<DeploymentUnitOutlined/>}>
-                                                <Link to={'/silent-command'}>
-                                                    静默指令
-                                                </Link>
-                                            </Menu.Item>*/}
-                                </SubMenu>
-
                                 {
                                     this.state.triggerMenu && isAdmin() ?
                                         <>
-                                            <SubMenu key='audit' title='操作审计' icon={<AuditOutlined/>}>
+                                            <SubMenu key='audit' title='会话审计' icon={<AuditOutlined/>}>
                                                 <Menu.Item key="online-session" icon={<LinkOutlined/>}>
                                                     <Link to={'/online-session'}>
                                                         在线会话
@@ -193,6 +181,28 @@ class App extends Component {
                                                 <Menu.Item key="login-log" icon={<LoginOutlined/>}>
                                                     <Link to={'/login-log'}>
                                                         登录日志
+                                                    </Link>
+                                                </Menu.Item>
+
+                                            </SubMenu>
+
+                                            <SubMenu key='ops' title='系统运维' icon={<ControlOutlined />}>
+
+                                                <Menu.Item key="dynamic-command" icon={<CodeOutlined/>}>
+                                                    <Link to={'/dynamic-command'}>
+                                                        动态指令
+                                                    </Link>
+                                                </Menu.Item>
+
+                                                {/*<Menu.Item key="silent-command" icon={<DeploymentUnitOutlined/>}>
+                                                <Link to={'/silent-command'}>
+                                                    静默指令
+                                                </Link>
+                                            </Menu.Item>*/}
+
+                                                <Menu.Item key="job" icon={<BlockOutlined />}>
+                                                    <Link to={'/job'}>
+                                                        定时任务
                                                     </Link>
                                                 </Menu.Item>
                                             </SubMenu>
@@ -251,6 +261,7 @@ class App extends Component {
                             <Route path="/login-log" component={LoginLog}/>
                             <Route path="/info" component={Info}/>
                             <Route path="/setting" component={Setting}/>
+                            <Route path="/job" component={Job}/>
 
                             <Footer style={{textAlign: 'center'}}>
                                 Next Terminal ©2021 dushixiang Version:{this.state.package['version']}

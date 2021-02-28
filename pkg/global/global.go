@@ -2,6 +2,7 @@ package global
 
 import (
 	"github.com/patrickmn/go-cache"
+	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"
 	"next-terminal/pkg/config"
 )
@@ -13,3 +14,5 @@ var Cache *cache.Cache
 var Config *config.Config
 
 var Store *TunStore
+
+var Cron *cron.Cron

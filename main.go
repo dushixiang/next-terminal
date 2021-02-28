@@ -6,6 +6,7 @@ import (
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/labstack/gommon/log"
 	"github.com/patrickmn/go-cache"
+	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
@@ -155,6 +156,9 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.Num{}); err != nil {
 		return err
 	}
+	if err := global.DB.AutoMigrate(&model.Job{}); err != nil {
+		return err
+	}
 
 	if len(model.FindAllTemp()) == 0 {
 		for i := 0; i <= 30; i++ {
@@ -174,6 +178,45 @@ func Run() error {
 		}
 	})
 	global.Store = global.NewStore()
+	global.Cron = cron.New(cron.WithSeconds()) //精确到秒
+
+	jobs, err := model.FindJobByFunc(model.FuncCheckAssetStatusJob)
+	if err != nil {
+		return err
+	}
+	if jobs == nil || len(jobs) == 0 {
+		job := model.Job{
+			ID:      utils.UUID(),
+			Name:    "资产状态检测",
+			Func:    model.FuncCheckAssetStatusJob,
+			Cron:    "0 0 0/1 * * ?",
+			Status:  model.JobStatusRunning,
+			Created: utils.NowJsonTime(),
+			Updated: utils.NowJsonTime(),
+		}
+		if err := model.CreateNewJob(&job); err != nil {
+			return err
+		}
+	}
+
+	jobs, err = model.FindJobByFunc(model.FuncDelTimeoutSessionJob)
+	if err != nil {
+		return err
+	}
+	if jobs == nil || len(jobs) == 0 {
+		job := model.Job{
+			ID:      utils.UUID(),
+			Name:    "超时会话检测",
+			Func:    model.FuncDelTimeoutSessionJob,
+			Cron:    "0 0 0 * * ?",
+			Status:  model.JobStatusRunning,
+			Created: utils.NowJsonTime(),
+			Updated: utils.NowJsonTime(),
+		}
+		if err := model.CreateNewJob(&job); err != nil {
+			return err
+		}
+	}
 
 	loginLogs, err := model.FindAliveLoginLogs()
 	if err != nil {

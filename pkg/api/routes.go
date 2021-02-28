@@ -144,6 +144,16 @@ func SetupRoutes() *echo.Echo {
 	e.GET("/overview/counter", OverviewCounterEndPoint)
 	e.GET("/overview/sessions", OverviewSessionPoint)
 
+	jobs := e.Group("/jobs", Admin)
+	{
+		jobs.POST("", JobCreateEndpoint)
+		jobs.GET("/paging", JobPagingEndpoint)
+		jobs.PUT("/:id", JobUpdateEndpoint)
+		jobs.POST("/:id/change-status", JobChangeStatusEndpoint)
+		jobs.DELETE("/:id", JobDeleteEndpoint)
+		jobs.GET("/:id", JobGetEndpoint)
+	}
+
 	return e
 }
 
