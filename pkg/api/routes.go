@@ -150,8 +150,11 @@ func SetupRoutes() *echo.Echo {
 		jobs.GET("/paging", JobPagingEndpoint)
 		jobs.PUT("/:id", JobUpdateEndpoint)
 		jobs.POST("/:id/change-status", JobChangeStatusEndpoint)
+		jobs.POST("/:id/exec", JobExecEndpoint)
 		jobs.DELETE("/:id", JobDeleteEndpoint)
 		jobs.GET("/:id", JobGetEndpoint)
+		jobs.GET("/:id/logs", JobGetLogsEndpoint)
+		jobs.DELETE("/:id/logs", JobDeleteLogsEndpoint)
 	}
 
 	return e

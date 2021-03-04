@@ -162,6 +162,14 @@ class App extends Component {
                                     </Menu.Item>
                                 </SubMenu>
 
+                                <SubMenu key='command-manage' title='指令管理' icon={<CodeOutlined/>}>
+                                    <Menu.Item key="dynamic-command" icon={<BlockOutlined/>}>
+                                        <Link to={'/dynamic-command'}>
+                                            动态指令
+                                        </Link>
+                                    </Menu.Item>
+                                </SubMenu>
+
                                 {
                                     this.state.triggerMenu && isAdmin() ?
                                         <>
@@ -177,6 +185,9 @@ class App extends Component {
                                                         历史会话
                                                     </Link>
                                                 </Menu.Item>
+                                            </SubMenu>
+
+                                            <SubMenu key='ops' title='系统运维' icon={<ControlOutlined />}>
 
                                                 <Menu.Item key="login-log" icon={<LoginOutlined/>}>
                                                     <Link to={'/login-log'}>
@@ -184,25 +195,9 @@ class App extends Component {
                                                     </Link>
                                                 </Menu.Item>
 
-                                            </SubMenu>
-
-                                            <SubMenu key='ops' title='系统运维' icon={<ControlOutlined />}>
-
-                                                <Menu.Item key="dynamic-command" icon={<CodeOutlined/>}>
-                                                    <Link to={'/dynamic-command'}>
-                                                        动态指令
-                                                    </Link>
-                                                </Menu.Item>
-
-                                                {/*<Menu.Item key="silent-command" icon={<DeploymentUnitOutlined/>}>
-                                                <Link to={'/silent-command'}>
-                                                    静默指令
-                                                </Link>
-                                            </Menu.Item>*/}
-
                                                 <Menu.Item key="job" icon={<BlockOutlined />}>
                                                     <Link to={'/job'}>
-                                                        定时任务
+                                                        计划任务
                                                     </Link>
                                                 </Menu.Item>
                                             </SubMenu>

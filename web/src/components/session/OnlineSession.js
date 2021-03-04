@@ -473,7 +473,7 @@ class OnlineSession extends Component {
                     {
                         this.state.accessVisible ?
                             <Modal
-                                className='monitor'
+                                className='modal-no-padding'
                                 title={this.state.sessionTitle}
                                 centered={true}
                                 maskClosable={false}
