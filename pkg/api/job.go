@@ -60,6 +60,14 @@ func JobChangeStatusEndpoint(c echo.Context) error {
 	return Success(c, "")
 }
 
+func JobExecEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	if err := model.ExecJobById(id); err != nil {
+		return err
+	}
+	return Success(c, "")
+}
+
 func JobDeleteEndpoint(c echo.Context) error {
 	ids := c.Param("id")
 
@@ -83,4 +91,23 @@ func JobGetEndpoint(c echo.Context) error {
 	}
 
 	return Success(c, item)
+}
+
+func JobGetLogsEndpoint(c echo.Context) error {
+	id := c.Param("id")
+
+	items, err := model.FindJobLogs(id)
+	if err != nil {
+		return err
+	}
+
+	return Success(c, items)
+}
+
+func JobDeleteLogsEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	if err := model.DeleteJobLogByJobId(id); err != nil {
+		return err
+	}
+	return Success(c, "")
 }

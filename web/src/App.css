@@ -90,6 +90,6 @@
     border-radius: 5%;
 }
 
-.monitor .ant-modal-body{
+.modal-no-padding .ant-modal-body{
     padding: 0;
 }

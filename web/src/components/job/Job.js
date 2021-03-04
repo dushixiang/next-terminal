@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 
 import {
     Button,
-    Checkbox,
     Col,
     Divider,
     Dropdown,
@@ -13,7 +12,10 @@ import {
     PageHeader,
     Row,
     Space,
+    Switch,
     Table,
+    Tag,
+    Timeline,
     Tooltip,
     Typography
 } from "antd";
@@ -30,14 +32,14 @@ import {
 } from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
 import Logout from "../user/Logout";
-import {hasPermission} from "../../service/permission";
 import dayjs from "dayjs";
+import JobModal from "./JobModal";
+import './Job.css'
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
-const CheckboxGroup = Checkbox.Group;
 const routes = [
     {
         path: '',
@@ -45,7 +47,7 @@ const routes = [
     },
     {
         path: 'job',
-        breadcrumbName: '定时任务',
+        breadcrumbName: '计划任务',
     }
 ];
 
@@ -64,7 +66,9 @@ class Job extends Component {
         modalVisible: false,
         modalTitle: '',
         modalConfirmLoading: false,
-        selectedRowKeys: []
+        selectedRow: undefined,
+        selectedRowKeys: [],
+        logs: []
     };
 
     componentDidMount() {
@@ -256,9 +260,33 @@ class Job extends Component {
                 );
             }
         }, {
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status, record) => {
+                return <Switch checkedChildren="开启" unCheckedChildren="关闭" checked={status === 'running'}
+                               onChange={async (checked) => {
+                                   let jobStatus = checked ? 'running' : 'not-running';
+                                   let result = await request.post(`/jobs/${record['id']}/change-status?status=${jobStatus}`);
+                                   if (result['code'] === 1) {
+                                       message.success('操作成功');
+                                       await this.loadTableData();
+                                   } else {
+                                       message.error(result['message']);
+                                   }
+                               }}
+                />
+            }
+        }, {
             title: '任务类型',
             dataIndex: 'func',
-            key: 'func'
+            key: 'func',
+            render: (func, record) => {
+                switch (func) {
+                    case "check-asset-status-job":
+                        return <Tag color="green">资产状态检测</Tag>
+                }
+            }
         }, {
             title: 'cron表达式',
             dataIndex: 'cron',
@@ -275,7 +303,7 @@ class Job extends Component {
                 )
             }
         }, {
-            title: '更新日期',
+            title: '最后执行日期',
             dataIndex: 'updated',
             key: 'updated',
             render: (text, record) => {
@@ -288,20 +316,38 @@ class Job extends Component {
         }, {
             title: '操作',
             key: 'action',
-            render: (text, record) => {
+            render: (text, record, index) => {
 
                 const menu = (
                     <Menu>
                         <Menu.Item key="0">
                             <Button type="text" size='small'
-                                    disabled={!hasPermission(record['owner'])}
-                                    onClick={() => this.showModal('更新指令', record)}>编辑</Button>
+                                    onClick={() => this.showModal('更新计划任务', record)}>编辑</Button>
+                        </Menu.Item>
+
+                        <Menu.Item key="2">
+                            <Button type="text" size='small'
+                                    onClick={async () => {
+                                        this.setState({
+                                            logVisible: true,
+                                            logPending: '正在加载...'
+                                        })
+
+                                        let result = await request.get(`/jobs/${record['id']}/logs`);
+                                        if (result['code'] === 1) {
+                                            this.setState({
+                                                logPending: false,
+                                                logs: result['data'],
+                                                selectedRow: record
+                                            })
+                                        }
+
+                                    }}>日志</Button>
                         </Menu.Item>
 
                         <Menu.Divider/>
                         <Menu.Item key="3">
                             <Button type="text" size='small' danger
-                                    disabled={!hasPermission(record['owner'])}
                                     onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
                         </Menu.Item>
                     </Menu>
@@ -309,9 +355,26 @@ class Job extends Component {
 
                 return (
                     <div>
-                        <Button type="link" size='small' onClick={async () => {
+                        <Button type="link" size='small' loading={this.state.items[index]['execLoading']}
+                                onClick={async () => {
+                                    let items = this.state.items;
+                                    items[index]['execLoading'] = true;
+                                    this.setState({
+                                        items: items
+                                    });
 
-                        }}>执行</Button>
+                                    let result = await request.post(`/jobs/${record['id']}/exec`);
+                                    if (result['code'] === 1) {
+                                        message.success('执行成功');
+                                        await this.loadTableData();
+                                    } else {
+                                        message.error(result['message']);
+                                        items[index]['execLoading'] = false;
+                                        this.setState({
+                                            items: items
+                                        });
+                                    }
+                                }}>执行</Button>
 
                         <Dropdown overlay={menu}>
                             <Button type="link" size='small'>
@@ -441,6 +504,65 @@ class Job extends Component {
                         loading={this.state.loading}
                     />
 
+                    {
+                        this.state.modalVisible ?
+                            <JobModal
+                                visible={this.state.modalVisible}
+                                title={this.state.modalTitle}
+                                handleOk={this.handleOk}
+                                handleCancel={this.handleCancelModal}
+                                confirmLoading={this.state.modalConfirmLoading}
+                                model={this.state.model}
+                            >
+                            </JobModal> : undefined
+                    }
+
+                    {
+                        this.state.logVisible ?
+                            <Modal
+                                className='modal-no-padding'
+                                width={window.innerWidth * 0.8}
+                                title={'日志'}
+                                visible={true}
+                                maskClosable={false}
+                                centered={true}
+                                onOk={async () => {
+                                    let result = await request.delete(`/jobs/${this.state.selectedRow['id']}/logs`);
+                                    if (result['code'] === 1) {
+                                        this.setState({
+                                            logVisible: false,
+                                            selectedRow: undefined
+                                        })
+                                        message.success('日志清空成功');
+                                    } else {
+                                        message.error(result['message'], 10);
+                                    }
+                                }}
+                                onCancel={() => {
+                                    this.setState({
+                                        logVisible: false,
+                                        selectedRow: undefined
+                                    })
+                                }}
+                                okText='清空'
+                                okType={'danger'}
+                                cancelText='取消'
+                            >
+                                <Timeline pending={this.state.logPending} mode={'left'}>
+                                    <pre className='cron-log'>
+                                        {
+                                            this.state.logs.map(item => {
+
+                                                return <><Divider
+                                                    orientation="left"
+                                                    style={{color: 'white'}}>{item['timestamp']}</Divider>{item['message']}</>;
+                                            })
+                                        }
+                                    </pre>
+
+                                </Timeline>
+                            </Modal> : undefined
+                    }
                 </Content>
             </>
         );

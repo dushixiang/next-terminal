@@ -1,0 +1,12 @@
+.cron-log {
+    overflow: auto;
+    border: 0 none;
+    line-height: 23px;
+    padding: 15px;
+    margin: 0;
+    white-space: pre-wrap;
+    height: 500px;
+    background-color: rgb(51, 51, 51);
+    color: #f1f1f1;
+    border-radius: 0;
+}

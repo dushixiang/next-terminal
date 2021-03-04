@@ -2,11 +2,11 @@ package model
 
 import (
 	"errors"
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
-	"strconv"
 	"time"
 )
 
@@ -14,20 +14,19 @@ const (
 	JobStatusRunning    = "running"
 	JobStatusNotRunning = "not-running"
 
-	FuncCheckAssetStatusJob  = "check-asset-status-job"
-	FuncDelUnUsedSessionJob  = "del-unused-session-job"
-	FuncDelTimeoutSessionJob = "del-timeout-session-job"
+	FuncCheckAssetStatusJob = "check-asset-status-job"
 )
 
 type Job struct {
-	ID      string         `gorm:"primary_key" json:"id"`
-	JobId   int            `json:"jobId"`
-	Name    string         `json:"name"`
-	Func    string         `json:"func"`
-	Cron    string         `json:"cron"`
-	Status  string         `json:"status"`
-	Created utils.JsonTime `json:"created"`
-	Updated utils.JsonTime `json:"updated"`
+	ID        string         `gorm:"primary_key" json:"id"`
+	CronJobId int            `json:"cronJobId"`
+	Name      string         `json:"name"`
+	Func      string         `json:"func"`
+	Cron      string         `json:"cron"`
+	Status    string         `json:"status"`
+	Metadata  string         `json:"metadata"`
+	Created   utils.JsonTime `json:"created"`
+	Updated   utils.JsonTime `json:"updated"`
 }
 
 func (r *Job) TableName() string {
@@ -78,7 +77,7 @@ func CreateNewJob(o *Job) (err error) {
 		if err != nil {
 			return err
 		}
-		o.JobId = int(jobId)
+		o.CronJobId = int(jobId)
 	}
 
 	return global.DB.Create(o).Error
@@ -93,7 +92,7 @@ func UpdateJobById(o *Job, id string) (err error) {
 }
 
 func UpdateJonUpdatedById(id string) (err error) {
-	err = global.DB.Where("id = ?", id).Update("updated = ?", utils.NowJsonTime()).Error
+	err = global.DB.Updates(Job{ID: id, Updated: utils.NowJsonTime()}).Error
 	return
 }
 
@@ -103,7 +102,7 @@ func ChangeJobStatusById(id, status string) (err error) {
 	if err != nil {
 		return err
 	}
-	if status == JobStatusNotRunning {
+	if status == JobStatusRunning {
 		j, err := getJob(job.ID, job.Func)
 		if err != nil {
 			return err
@@ -112,16 +111,29 @@ func ChangeJobStatusById(id, status string) (err error) {
 		if err != nil {
 			return err
 		}
-		job.JobId = int(entryID)
-		return global.DB.Where("id = ?", id).Update("status = ?", JobStatusRunning).Error
+		job.CronJobId = int(entryID)
+		return global.DB.Updates(Job{ID: id, Status: JobStatusRunning}).Error
 	} else {
-		global.Cron.Remove(cron.EntryID(job.JobId))
-		return global.DB.Where("id = ?", id).Update("status = ?", JobStatusNotRunning).Error
+		global.Cron.Remove(cron.EntryID(job.CronJobId))
+		return global.DB.Updates(Job{ID: id, Status: JobStatusNotRunning}).Error
 	}
 }
 
+func ExecJobById(id string) (err error) {
+	job, err := FindJobById(id)
+	if err != nil {
+		return err
+	}
+	j, err := getJob(id, job.Func)
+	if err != nil {
+		return err
+	}
+	j.Run()
+	return nil
+}
+
 func FindJobById(id string) (o Job, err error) {
-	err = global.DB.Where("id = ?").First(&o).Error
+	err = global.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
@@ -131,21 +143,17 @@ func DeleteJobById(id string) error {
 		return err
 	}
 	if job.Status == JobStatusRunning {
-		if err := ChangeJobStatusById(JobStatusNotRunning, id); err != nil {
+		if err := ChangeJobStatusById(id, JobStatusNotRunning); err != nil {
 			return err
 		}
 	}
-	return global.DB.Where("id = ?").Delete(Job{}).Error
+	return global.DB.Where("id = ?", id).Delete(Job{}).Error
 }
 
 func getJob(id, function string) (job cron.Job, err error) {
 	switch function {
 	case FuncCheckAssetStatusJob:
 		job = CheckAssetStatusJob{ID: id}
-	case FuncDelUnUsedSessionJob:
-		job = DelUnUsedSessionJob{ID: id}
-	case FuncDelTimeoutSessionJob:
-		job = DelTimeoutSessionJob{ID: id}
 	default:
 		return nil, errors.New("未识别的任务")
 	}
@@ -159,71 +167,38 @@ type CheckAssetStatusJob struct {
 func (r CheckAssetStatusJob) Run() {
 	assets, _ := FindAllAsset()
 	if assets != nil && len(assets) > 0 {
+
+		msgChan := make(chan string)
 		for i := range assets {
 			asset := assets[i]
-			active := utils.Tcping(asset.IP, asset.Port)
-			UpdateAssetActiveById(active, asset.ID)
-			logrus.Infof("资产「%v」ID「%v」存活状态检测完成，存活「%v」。", asset.Name, asset.ID, active)
+			go func() {
+				t1 := time.Now()
+				active := utils.Tcping(asset.IP, asset.Port)
+				elapsed := time.Since(t1)
+				msg := fmt.Sprintf("资产「%v」存活状态检测完成，存活「%v」，耗时「%v」", asset.Name, active, elapsed)
+
+				UpdateAssetActiveById(active, asset.ID)
+				logrus.Infof(msg)
+				msgChan <- msg
+			}()
 		}
-	}
-	if r.ID != "" {
-		_ = UpdateJonUpdatedById(r.ID)
-	}
-}
 
-type DelUnUsedSessionJob struct {
-	ID string
-}
-
-func (r DelUnUsedSessionJob) Run() {
-	sessions, _ := FindSessionByStatusIn([]string{NoConnect, Connecting})
-	if sessions != nil && len(sessions) > 0 {
-		now := time.Now()
-		for i := range sessions {
-			if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
-				_ = DeleteSessionById(sessions[i].ID)
-				s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
-				logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
+		if r.ID != "" {
+			var message = ""
+			for i := 0; i < len(assets); i++ {
+				message += <-msgChan + "\n"
 			}
+
+			_ = UpdateJonUpdatedById(r.ID)
+			jobLog := JobLog{
+				ID:        utils.UUID(),
+				JobId:     r.ID,
+				Timestamp: utils.NowJsonTime(),
+				Message:   message,
+			}
+
+			_ = CreateNewJobLog(&jobLog)
 		}
 	}
-	if r.ID != "" {
-		_ = UpdateJonUpdatedById(r.ID)
-	}
-}
 
-type DelTimeoutSessionJob struct {
-	ID string
-}
-
-func (r DelTimeoutSessionJob) Run() {
-	property, err := FindPropertyByName("session-saved-limit")
-	if err != nil {
-		return
-	}
-	if property.Value == "" || property.Value == "-" {
-		return
-	}
-	limit, err := strconv.Atoi(property.Value)
-	if err != nil {
-		return
-	}
-	sessions, err := FindOutTimeSessions(limit)
-	if err != nil {
-		return
-	}
-
-	if sessions != nil && len(sessions) > 0 {
-		var sessionIds []string
-		for i := range sessions {
-			sessionIds = append(sessionIds, sessions[i].ID)
-		}
-		err := DeleteSessionByIds(sessionIds)
-		if err != nil {
-			logrus.Errorf("删除离线会话失败 %v", err)
-		}
-	}
-	if r.ID != "" {
-		_ = UpdateJonUpdatedById(r.ID)
-	}
 }

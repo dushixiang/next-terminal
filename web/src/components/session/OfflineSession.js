@@ -477,7 +477,7 @@ class OfflineSession extends Component {
                     {
                         this.state.playbackVisible ?
                             <Modal
-                                className='monitor'
+                                className='modal-no-padding'
                                 title="会话回放"
                                 centered={true}
                                 visible={this.state.playbackVisible}

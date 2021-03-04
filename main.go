@@ -159,6 +159,9 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.Job{}); err != nil {
 		return err
 	}
+	if err := global.DB.AutoMigrate(&model.JobLog{}); err != nil {
+		return err
+	}
 
 	if len(model.FindAllTemp()) == 0 {
 		for i := 0; i <= 30; i++ {
@@ -197,24 +200,14 @@ func Run() error {
 		if err := model.CreateNewJob(&job); err != nil {
 			return err
 		}
-	}
-
-	jobs, err = model.FindJobByFunc(model.FuncDelTimeoutSessionJob)
-	if err != nil {
-		return err
-	}
-	if jobs == nil || len(jobs) == 0 {
-		job := model.Job{
-			ID:      utils.UUID(),
-			Name:    "超时会话检测",
-			Func:    model.FuncDelTimeoutSessionJob,
-			Cron:    "0 0 0 * * ?",
-			Status:  model.JobStatusRunning,
-			Created: utils.NowJsonTime(),
-			Updated: utils.NowJsonTime(),
-		}
-		if err := model.CreateNewJob(&job); err != nil {
-			return err
+	} else {
+		for i := range jobs {
+			if jobs[i].Status == model.JobStatusRunning {
+				err := model.ChangeJobStatusById(jobs[i].ID, model.JobStatusRunning)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 
