@@ -63,7 +63,6 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     }
     let [accountTypes, setAccountTypes] = useState(initAccountTypes);
     let [useSSL, setUseSSL] = useState(model['use-ssl']);
-    let [ignoreCert, setIgnoreCert] = useState(model['ignore-cert']);
 
     for (let key in model) {
         if (model.hasOwnProperty(key)) {
