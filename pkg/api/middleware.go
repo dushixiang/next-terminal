@@ -30,8 +30,8 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 	startWithUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
 
-	download := regexp.MustCompile(`/sessions/\w{8}(-\w{4}){3}-\w{12}/download`)
-	recording := regexp.MustCompile(`/sessions/\w{8}(-\w{4}){3}-\w{12}/recording`)
+	download := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/download`)
+	recording := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/recording`)
 
 	return func(c echo.Context) error {
 
