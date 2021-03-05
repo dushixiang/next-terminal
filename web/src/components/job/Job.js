@@ -257,6 +257,16 @@ class Job extends Component {
         }
     }
 
+    handleTableChange = (pagination, filters, sorter) => {
+        let query = {
+            ...this.state.queryParams,
+            'order': sorter.order,
+            'field': sorter.field
+        }
+
+        this.loadTableData(query);
+    }
+
     render() {
 
         const columns = [{
@@ -280,7 +290,8 @@ class Job extends Component {
                         {short}
                     </Tooltip>
                 );
-            }
+            },
+            sorter: true,
         }, {
             title: '状态',
             dataIndex: 'status',
@@ -325,7 +336,8 @@ class Job extends Component {
                         {dayjs(text).fromNow()}
                     </Tooltip>
                 )
-            }
+            },
+            sorter: true,
         }, {
             title: '最后执行日期',
             dataIndex: 'updated',
@@ -339,7 +351,8 @@ class Job extends Component {
                         {dayjs(text).fromNow()}
                     </Tooltip>
                 )
-            }
+            },
+            sorter: true,
         }, {
             title: '操作',
             key: 'action',
@@ -529,6 +542,7 @@ class Job extends Component {
                             showTotal: total => `总计 ${total} 条`
                         }}
                         loading={this.state.loading}
+                        onChange={this.handleTableChange}
                     />
 
                     {

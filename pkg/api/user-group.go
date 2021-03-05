@@ -39,7 +39,10 @@ func UserGroupPagingEndpoint(c echo.Context) error {
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	name := c.QueryParam("name")
 
-	items, total, err := model.FindPageUserGroup(pageIndex, pageSize, name)
+	order := c.QueryParam("order")
+	field := c.QueryParam("field")
+
+	items, total, err := model.FindPageUserGroup(pageIndex, pageSize, name, order, field)
 	if err != nil {
 		return err
 	}

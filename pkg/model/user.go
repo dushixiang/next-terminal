@@ -50,7 +50,7 @@ func FindAllUser() (o []User) {
 	return
 }
 
-func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []UserVo, total int64, err error) {
+func FindPageUser(pageIndex, pageSize int, username, nickname, order, field string) (o []UserVo, total int64, err error) {
 	db := global.DB.Table("users").Select("users.id,users.username,users.nickname,users.online,users.enabled,users.created,users.type, count(resource_sharers.user_id) as sharer_asset_count").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
 	dbCounter := global.DB.Table("users")
 	if len(username) > 0 {
@@ -68,7 +68,21 @@ func FindPageUser(pageIndex, pageSize int, username, nickname string) (o []UserV
 		return nil, 0, err
 	}
 
-	err = db.Order("users.created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
+	if order == "ascend" {
+		order = "asc"
+	} else {
+		order = "desc"
+	}
+
+	if field == "username" {
+		field = "username"
+	} else if field == "nickname" {
+		field = "nickname"
+	} else {
+		field = "created"
+	}
+
+	err = db.Order("users." + field + " " + order).Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
 	if o == nil {
 		o = make([]UserVo, 0)
 	}

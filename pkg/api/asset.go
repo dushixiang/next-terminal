@@ -55,8 +55,11 @@ func AssetPagingEndpoint(c echo.Context) error {
 	userGroupId := c.QueryParam("userGroupId")
 	ip := c.QueryParam("ip")
 
+	order := c.QueryParam("order")
+	field := c.QueryParam("field")
+
 	account, _ := GetCurrentAccount(c)
-	items, total, err := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip)
+	items, total, err := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
 	if err != nil {
 		return err
 	}

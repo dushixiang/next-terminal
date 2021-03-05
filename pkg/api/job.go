@@ -29,7 +29,10 @@ func JobPagingEndpoint(c echo.Context) error {
 	name := c.QueryParam("name")
 	status := c.QueryParam("status")
 
-	items, total, err := model.FindPageJob(pageIndex, pageSize, name, status)
+	order := c.QueryParam("order")
+	field := c.QueryParam("field")
+
+	items, total, err := model.FindPageJob(pageIndex, pageSize, name, status, order, field)
 	if err != nil {
 		return err
 	}

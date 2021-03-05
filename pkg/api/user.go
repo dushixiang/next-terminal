@@ -37,7 +37,10 @@ func UserPagingEndpoint(c echo.Context) error {
 	username := c.QueryParam("username")
 	nickname := c.QueryParam("nickname")
 
-	items, total, err := model.FindPageUser(pageIndex, pageSize, username, nickname)
+	order := c.QueryParam("order")
+	field := c.QueryParam("field")
+
+	items, total, err := model.FindPageUser(pageIndex, pageSize, username, nickname, order, field)
 	if err != nil {
 		return err
 	}

@@ -281,6 +281,16 @@ class User extends Component {
         })
     }
 
+    handleTableChange = (pagination, filters, sorter) => {
+        let query = {
+            ...this.state.queryParams,
+            'order': sorter.order,
+            'field': sorter.field
+        }
+
+        this.loadTableData(query);
+    }
+
     render() {
 
         const columns = [{
@@ -294,10 +304,12 @@ class User extends Component {
             title: '登录账号',
             dataIndex: 'username',
             key: 'username',
+            sorter: true,
         }, {
             title: '用户昵称',
             dataIndex: 'nickname',
             key: 'nickname',
+            sorter: true,
         }, {
             title: '用户类型',
             dataIndex: 'type',
@@ -350,7 +362,8 @@ class User extends Component {
                         {dayjs(text).fromNow()}
                     </Tooltip>
                 )
-            }
+            },
+            sorter: true,
         },
             {
                 title: '操作',
@@ -578,6 +591,7 @@ class User extends Component {
                                showTotal: total => `总计 ${total} 条`
                            }}
                            loading={this.state.loading}
+                           onChange={this.handleTableChange}
                     />
 
                     {/* 为了屏蔽ant modal 关闭后数据仍然遗留的问题*/}
