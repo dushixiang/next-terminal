@@ -27,7 +27,10 @@ import (
 const Version = "v0.3.0"
 
 func main() {
-	log.Fatal(Run())
+	err := Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func Run() error {
@@ -83,6 +86,24 @@ func Run() error {
 	if err != nil {
 		logrus.Errorf("连接数据库异常：%v", err.Error())
 		return err
+	}
+
+	if global.Config.ResetPassword != "" {
+		user, err := model.FindUserByUsername(global.Config.ResetPassword)
+		if err != nil {
+			return err
+		}
+		password := "next-terminal"
+		passwd, err := utils.Encoder.Encode([]byte(password))
+		if err != nil {
+			return err
+		}
+		u := &model.User{
+			Password: string(passwd),
+		}
+		model.UpdateUserById(u, user.ID)
+		logrus.Debugf("用户「%v」密码初始化为: %v", user.Username, password)
+		return nil
 	}
 
 	if err := global.DB.AutoMigrate(&model.User{}); err != nil {
