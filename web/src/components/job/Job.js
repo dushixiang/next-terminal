@@ -319,7 +319,9 @@ class Job extends Component {
                     case "check-asset-status-job":
                         return <Tag color="green">资产状态检测</Tag>;
                     case "shell-job":
-                        return <Tag color="volcano">Shell脚本</Tag>
+                        return <Tag color="volcano">Shell脚本</Tag>;
+                    default:
+                        return '';
                 }
             }
         }, {

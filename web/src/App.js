@@ -16,10 +16,11 @@ import {
     AuditOutlined,
     BlockOutlined,
     CloudServerOutlined,
-    CodeOutlined, ControlOutlined,
+    CodeOutlined,
+    ControlOutlined,
     DashboardOutlined,
     DesktopOutlined,
-    DisconnectOutlined, GoldOutlined,
+    DisconnectOutlined,
     IdcardOutlined,
     LinkOutlined,
     LoginOutlined,
@@ -187,7 +188,7 @@ class App extends Component {
                                                 </Menu.Item>
                                             </SubMenu>
 
-                                            <SubMenu key='ops' title='系统运维' icon={<ControlOutlined />}>
+                                            <SubMenu key='ops' title='系统运维' icon={<ControlOutlined/>}>
 
                                                 <Menu.Item key="login-log" icon={<LoginOutlined/>}>
                                                     <Link to={'/login-log'}>
@@ -195,7 +196,7 @@ class App extends Component {
                                                     </Link>
                                                 </Menu.Item>
 
-                                                <Menu.Item key="job" icon={<BlockOutlined />}>
+                                                <Menu.Item key="job" icon={<BlockOutlined/>}>
                                                     <Link to={'/job'}>
                                                         计划任务
                                                     </Link>
