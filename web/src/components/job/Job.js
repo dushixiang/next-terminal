@@ -12,10 +12,10 @@ import {
     PageHeader,
     Row,
     Space,
+    Spin,
     Switch,
     Table,
     Tag,
-    Timeline,
     Tooltip,
     Typography
 } from "antd";
@@ -68,6 +68,7 @@ class Job extends Component {
         modalConfirmLoading: false,
         selectedRow: undefined,
         selectedRowKeys: [],
+        logPending: false,
         logs: []
     };
 
@@ -159,11 +160,19 @@ class Job extends Component {
         });
     };
 
-    showModal(title, assets = null) {
+    showModal(title, obj = null) {
+        if (obj['func'] === 'shell-job') {
+            obj['shell'] = JSON.parse(obj['metadata'])['shell'];
+        }
+
+        if (obj['mode'] === 'custom') {
+            obj['resourceIds'] = obj['resourceIds'].split(',');
+        }
+
         this.setState({
             modalTitle: title,
             modalVisible: true,
-            model: assets
+            model: obj
         });
     };
 
@@ -179,6 +188,19 @@ class Job extends Component {
         this.setState({
             modalConfirmLoading: true
         });
+
+        console.log(formData)
+        if (formData['func'] === 'shell-job') {
+            console.log(formData['shell'], JSON.stringify({'shell': formData['shell']}))
+
+            formData['metadata'] = JSON.stringify({'shell': formData['shell']});
+            formData['shell'] = undefined;
+        }
+
+        if (formData['mode'] === 'custom') {
+            let resourceIds = formData['resourceIds'];
+            formData['resourceIds'] = resourceIds.join(',');
+        }
 
         if (formData.id) {
             // 向后台提交数据
@@ -284,7 +306,9 @@ class Job extends Component {
             render: (func, record) => {
                 switch (func) {
                     case "check-asset-status-job":
-                        return <Tag color="green">资产状态检测</Tag>
+                        return <Tag color="green">资产状态检测</Tag>;
+                    case "shell-job":
+                        return <Tag color="volcano">Shell脚本</Tag>
                 }
             }
         }, {
@@ -307,6 +331,9 @@ class Job extends Component {
             dataIndex: 'updated',
             key: 'updated',
             render: (text, record) => {
+                if (text === '0001-01-01 00:00:00') {
+                    return '';
+                }
                 return (
                     <Tooltip title={text}>
                         {dayjs(text).fromNow()}
@@ -330,7 +357,7 @@ class Job extends Component {
                                     onClick={async () => {
                                         this.setState({
                                             logVisible: true,
-                                            logPending: '正在加载...'
+                                            logPending: true
                                         })
 
                                         let result = await request.get(`/jobs/${record['id']}/logs`);
@@ -401,7 +428,7 @@ class Job extends Component {
             <>
                 <PageHeader
                     className="site-page-header-ghost-wrapper page-herder"
-                    title="定时任务"
+                    title="计划任务"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
@@ -409,7 +436,7 @@ class Job extends Component {
                     extra={[
                         <Logout key='logout'/>
                     ]}
-                    subTitle="定时任务"
+                    subTitle="计划任务"
                 >
                 </PageHeader>
 
@@ -444,7 +471,7 @@ class Job extends Component {
 
                                     <Tooltip title="新增">
                                         <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增任务', {})}>
+                                                onClick={() => this.showModal('新增计划任务', {})}>
 
                                         </Button>
                                     </Tooltip>
@@ -548,7 +575,7 @@ class Job extends Component {
                                 okType={'danger'}
                                 cancelText='取消'
                             >
-                                <Timeline pending={this.state.logPending} mode={'left'}>
+                                <Spin tip='加载中...' spinning={this.state.logPending}>
                                     <pre className='cron-log'>
                                         {
                                             this.state.logs.map(item => {
@@ -559,8 +586,7 @@ class Job extends Component {
                                             })
                                         }
                                     </pre>
-
-                                </Timeline>
+                                </Spin>
                             </Modal> : undefined
                     }
                 </Content>

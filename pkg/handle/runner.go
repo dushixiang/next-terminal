@@ -2,7 +2,6 @@ package handle
 
 import (
 	"github.com/sirupsen/logrus"
-	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -14,50 +13,55 @@ import (
 func RunTicker() {
 
 	// 每隔一小时删除一次未使用的会话信息
-	_, _ = global.Cron.AddFunc("0 0 0/1 * * ?", func() {
-		sessions, _ := model.FindSessionByStatusIn([]string{model.NoConnect, model.Connecting})
-		if sessions != nil && len(sessions) > 0 {
-			now := time.Now()
-			for i := range sessions {
-				if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
-					_ = model.DeleteSessionById(sessions[i].ID)
-					s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
-					logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
+	unUsedSessionTicker := time.NewTicker(time.Minute * 60)
+	go func() {
+		for range unUsedSessionTicker.C {
+			sessions, _ := model.FindSessionByStatusIn([]string{model.NoConnect, model.Connecting})
+			if sessions != nil && len(sessions) > 0 {
+				now := time.Now()
+				for i := range sessions {
+					if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
+						_ = model.DeleteSessionById(sessions[i].ID)
+						s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
+						logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
+					}
 				}
 			}
 		}
-	})
+	}()
+
 	// 每日凌晨删除超过时长限制的会话
-	_, _ = global.Cron.AddFunc("0 0 0 * * ?", func() {
-		property, err := model.FindPropertyByName("session-saved-limit")
-		if err != nil {
-			return
-		}
-		if property.Value == "" || property.Value == "-" {
-			return
-		}
-		limit, err := strconv.Atoi(property.Value)
-		if err != nil {
-			return
-		}
-		sessions, err := model.FindOutTimeSessions(limit)
-		if err != nil {
-			return
-		}
-
-		if sessions != nil && len(sessions) > 0 {
-			var sessionIds []string
-			for i := range sessions {
-				sessionIds = append(sessionIds, sessions[i].ID)
-			}
-			err := model.DeleteSessionByIds(sessionIds)
+	timeoutSessionTicker := time.NewTicker(time.Hour * 24)
+	go func() {
+		for range timeoutSessionTicker.C {
+			property, err := model.FindPropertyByName("session-saved-limit")
 			if err != nil {
-				logrus.Errorf("删除离线会话失败 %v", err)
+				return
+			}
+			if property.Value == "" || property.Value == "-" {
+				return
+			}
+			limit, err := strconv.Atoi(property.Value)
+			if err != nil {
+				return
+			}
+			sessions, err := model.FindOutTimeSessions(limit)
+			if err != nil {
+				return
+			}
+
+			if sessions != nil && len(sessions) > 0 {
+				var sessionIds []string
+				for i := range sessions {
+					sessionIds = append(sessionIds, sessions[i].ID)
+				}
+				err := model.DeleteSessionByIds(sessionIds)
+				if err != nil {
+					logrus.Errorf("删除离线会话失败 %v", err)
+				}
 			}
 		}
-	})
-
-	global.Cron.Start()
+	}()
 }
 
 func RunDataFix() {

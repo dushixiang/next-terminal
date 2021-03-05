@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
+	"next-terminal/pkg/utils"
 	"strconv"
 	"strings"
 )
@@ -12,6 +13,9 @@ func JobCreateEndpoint(c echo.Context) error {
 	if err := c.Bind(&item); err != nil {
 		return err
 	}
+
+	item.ID = utils.UUID()
+	item.Created = utils.NowJsonTime()
 
 	if err := model.CreateNewJob(&item); err != nil {
 		return err

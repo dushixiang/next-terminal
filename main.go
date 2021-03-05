@@ -24,7 +24,7 @@ import (
 	"time"
 )
 
-const Version = "v0.2.7"
+const Version = "v0.3.0"
 
 func main() {
 	log.Fatal(Run())
@@ -182,6 +182,7 @@ func Run() error {
 	})
 	global.Store = global.NewStore()
 	global.Cron = cron.New(cron.WithSeconds()) //精确到秒
+	global.Cron.Start()
 
 	jobs, err := model.FindJobByFunc(model.FuncCheckAssetStatusJob)
 	if err != nil {
@@ -193,6 +194,7 @@ func Run() error {
 			Name:    "资产状态检测",
 			Func:    model.FuncCheckAssetStatusJob,
 			Cron:    "0 0 0/1 * * ?",
+			Mode:    model.JobModeAll,
 			Status:  model.JobStatusRunning,
 			Created: utils.NowJsonTime(),
 			Updated: utils.NowJsonTime(),
@@ -200,6 +202,7 @@ func Run() error {
 		if err := model.CreateNewJob(&job); err != nil {
 			return err
 		}
+		logrus.Debugf("创建计划任务「%v」cron「%v」", job.Name, job.Cron)
 	} else {
 		for i := range jobs {
 			if jobs[i].Status == model.JobStatusRunning {
@@ -207,6 +210,7 @@ func Run() error {
 				if err != nil {
 					return err
 				}
+				logrus.Debugf("启动计划任务「%v」cron「%v」", jobs[i].Name, jobs[i].Cron)
 			}
 		}
 	}

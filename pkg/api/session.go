@@ -46,10 +46,8 @@ func SessionPagingEndpoint(c echo.Context) error {
 			}
 
 			if utils.FileExists(recording) {
-				logrus.Debugf("检测到录屏文件[%v]存在", recording)
 				items[i].Recording = "1"
 			} else {
-				logrus.Warnf("检测到录屏文件[%v]不存在", recording)
 				items[i].Recording = "0"
 			}
 		} else {
