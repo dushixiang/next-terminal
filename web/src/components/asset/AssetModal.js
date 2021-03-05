@@ -1,5 +1,18 @@
 import React, {useState} from 'react';
-import {Col, Collapse, Form, Input, InputNumber, Modal, Radio, Row, Select, Tooltip, Typography} from "antd/lib/index";
+import {
+    Col,
+    Collapse,
+    Form,
+    Input,
+    InputNumber,
+    Modal,
+    Radio,
+    Row,
+    Select,
+    Switch,
+    Tooltip,
+    Typography
+} from "antd/lib/index";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 import {isEmpty} from "../../utils/utils";
 
@@ -43,13 +56,14 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     let [accountType, setAccountType] = useState(model.accountType);
     let [protocol, setProtocol] = useState(model.protocol);
     let [sshMode, setSshMode] = useState(model['ssh-mode']);
-    console.log(sshMode)
 
     let initAccountTypes = []
     if (model.protocol) {
         initAccountTypes = protocolMapping[model.protocol];
     }
     let [accountTypes, setAccountTypes] = useState(initAccountTypes);
+    let [useSSL, setUseSSL] = useState(model['use-ssl']);
+    let [ignoreCert, setIgnoreCert] = useState(model['ignore-cert']);
 
     for (let key in model) {
         if (model.hasOwnProperty(key)) {
@@ -95,6 +109,9 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                 });
                 handleAccountTypeChange('custom');
                 break;
+            case 'kubernetes':
+                port = 6443;
+                break
             default:
                 port = 65535;
         }
@@ -135,7 +152,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
             <Form form={form} {...formLayout} initialValues={model}>
                 <Row>
-                    <Col span={12}>
+                    <Col span={13}>
                         <Form.Item name='id' noStyle>
                             <Input hidden={true}/>
                         </Form.Item>
@@ -150,10 +167,11 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
                         <Form.Item label="接入协议" name='protocol' rules={[{required: true, message: '请选择接入协议'}]}>
                             <Radio.Group onChange={handleProtocolChange}>
-                                <Radio value="rdp">rdp</Radio>
-                                <Radio value="ssh">ssh</Radio>
-                                <Radio value="vnc">vnc</Radio>
-                                <Radio value="telnet">telnet</Radio>
+                                <Radio value="rdp">RDP</Radio>
+                                <Radio value="ssh">SSH</Radio>
+                                <Radio value="vnc">VNC</Radio>
+                                <Radio value="telnet">Telnet</Radio>
+                                <Radio value="kubernetes">Kubernetes</Radio>
                             </Radio.Group>
                         </Form.Item>
 
@@ -161,63 +179,93 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                             <InputNumber min={1} max={65535} placeholder='TCP端口'/>
                         </Form.Item>
 
-                        <Form.Item label="账户类型" name='accountType' rules={[{required: true, message: '请选择接账户类型'}]}>
-                            <Select onChange={handleAccountTypeChange}>
-                                {accountTypes.map(item => {
-                                    return (<Option key={item.value} value={item.value}>{item.text}</Option>)
-                                })}
-                            </Select>
-                        </Form.Item>
-
                         {
-                            accountType === 'credential' ?
-                                <Form.Item label="授权凭证" name='credentialId'
-                                           rules={[{required: true, message: '请选择授权凭证'}]}>
-                                    <Select onChange={() => null}>
-                                        {credentials.map(item => {
-                                            return (
-                                                <Option key={item.id} value={item.id}>
-                                                    <Tooltip placement="topLeft" title={item.name}>
-                                                        {item.name}
-                                                    </Tooltip>
-                                                </Option>
-                                            );
+                            protocol === 'kubernetes' ? <>
+                                <Form.Item
+                                    name="namespace"
+                                    label="命名空间"
+                                >
+                                    <Input type='text' placeholder="为空时默认使用default命名空间"/>
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="pod"
+                                    label="pod"
+                                    rules={[{required: true, message: '请输入Pod名称'}]}
+                                >
+                                    <Input type='text' placeholder="Kubernetes Pod的名称，其中包含与之相连的容器。"/>
+                                </Form.Item>
+
+                                <Form.Item
+                                    name="container"
+                                    label="容器"
+                                >
+                                    <Input type='text' placeholder="为空时默认使用第一个容器"/>
+                                </Form.Item>
+                            </> : <>
+                                <Form.Item label="账户类型" name='accountType'
+                                           rules={[{required: true, message: '请选择接账户类型'}]}>
+                                    <Select onChange={handleAccountTypeChange}>
+                                        {accountTypes.map(item => {
+                                            return (<Option key={item.value} value={item.value}>{item.text}</Option>)
                                         })}
                                     </Select>
                                 </Form.Item>
-                                : null
-                        }
 
-                        {
-                            accountType === 'custom' ?
-                                <>
-                                    <Form.Item label="授权账户" name='username' noStyle={!(accountType === 'custom')}>
-                                        <Input placeholder="输入授权账户"/>
-                                    </Form.Item>
 
-                                    <Form.Item label="授权密码" name='password' noStyle={!(accountType === 'custom')}>
-                                        <Input.Password placeholder="输入授权密码"/>
-                                    </Form.Item>
-                                </>
-                                : null
-                        }
+                                {
+                                    accountType === 'credential' ?
+                                        <Form.Item label="授权凭证" name='credentialId'
+                                                   rules={[{required: true, message: '请选择授权凭证'}]}>
+                                            <Select onChange={() => null}>
+                                                {credentials.map(item => {
+                                                    return (
+                                                        <Option key={item.id} value={item.id}>
+                                                            <Tooltip placement="topLeft" title={item.name}>
+                                                                {item.name}
+                                                            </Tooltip>
+                                                        </Option>
+                                                    );
+                                                })}
+                                            </Select>
+                                        </Form.Item>
+                                        : null
+                                }
 
-                        {
-                            accountType === 'private-key' ?
-                                <>
-                                    <Form.Item label="授权账户" name='username'>
-                                        <Input placeholder="输入授权账户"/>
-                                    </Form.Item>
+                                {
+                                    accountType === 'custom' ?
+                                        <>
+                                            <Form.Item label="授权账户" name='username'
+                                                       noStyle={!(accountType === 'custom')}>
+                                                <Input placeholder="输入授权账户"/>
+                                            </Form.Item>
 
-                                    <Form.Item label="私钥" name='privateKey'
-                                               rules={[{required: true, message: '请输入私钥'}]}>
-                                        <TextArea rows={4}/>
-                                    </Form.Item>
-                                    <Form.Item label="私钥密码" name='passphrase'>
-                                        <TextArea rows={1}/>
-                                    </Form.Item>
-                                </>
-                                : null
+                                            <Form.Item label="授权密码" name='password'
+                                                       noStyle={!(accountType === 'custom')}>
+                                                <Input.Password placeholder="输入授权密码"/>
+                                            </Form.Item>
+                                        </>
+                                        : null
+                                }
+
+                                {
+                                    accountType === 'private-key' ?
+                                        <>
+                                            <Form.Item label="授权账户" name='username'>
+                                                <Input placeholder="输入授权账户"/>
+                                            </Form.Item>
+
+                                            <Form.Item label="私钥" name='privateKey'
+                                                       rules={[{required: true, message: '请输入私钥'}]}>
+                                                <TextArea rows={4}/>
+                                            </Form.Item>
+                                            <Form.Item label="私钥密码" name='passphrase'>
+                                                <TextArea rows={1}/>
+                                            </Form.Item>
+                                        </>
+                                        : null
+                                }
+                            </>
                         }
 
                         <Form.Item label="标签" name='tags'>
@@ -235,8 +283,8 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                             <TextArea rows={4} placeholder='关于资产的一些信息您可以写在这里'/>
                         </Form.Item>
                     </Col>
-                    <Col span={12}>
-                        <Collapse defaultActiveKey={['remote-app', '认证', '显示设置', '控制终端行为', 'VNC中继', '模式设置']} ghost>
+                    <Col span={11}>
+                        <Collapse defaultActiveKey={['remote-app', '认证', 'VNC中继', '模式设置']} ghost>
                             {
                                 protocol === 'rdp' ?
                                     <>
@@ -443,6 +491,121 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                             >
                                                 <Input type='text' placeholder=""/>
                                             </Form.Item>
+                                        </Panel>
+                                        <Panel header={<Text strong>显示设置</Text>} key="显示设置">
+                                            <Form.Item
+                                                name="color-scheme"
+                                                label="配色方案"
+                                                initialValue=""
+                                            >
+                                                <Select onChange={null}>
+                                                    <Option value="">默认</Option>
+                                                    <Option value="gray-black">黑底灰字</Option>
+                                                    <Option value="green-black">黑底绿字</Option>
+                                                    <Option value="white-black">黑底白字</Option>
+                                                    <Option value="black-white">白底黑字</Option>
+                                                </Select>
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                name="font-name"
+                                                label="字体名称"
+                                            >
+                                                <Input type='text' placeholder="为空时使用系统默认字体"/>
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                name="font-size"
+                                                label="字体大小"
+                                            >
+                                                <Input type='number' placeholder="为空时使用系统默认字体大小" min={8} max={96}/>
+                                            </Form.Item>
+                                        </Panel>
+                                        <Panel header={<Text strong>控制终端行为</Text>} key="控制终端行为">
+                                            <Form.Item
+                                                name="backspace"
+                                                label="退格键映射"
+                                                initialValue=""
+                                            >
+                                                <Select onChange={null}>
+                                                    <Option value="">默认</Option>
+                                                    <Option value="127">删除键(Ctrl-?)</Option>
+                                                    <Option value="8">退格键(Ctrl-H)</Option>
+                                                </Select>
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                name="terminal-type"
+                                                label="终端类型"
+                                                initialValue=""
+                                            >
+                                                <Select onChange={null}>
+                                                    <Option value="">默认</Option>
+                                                    <Option value="ansi">ansi</Option>
+                                                    <Option value="linux">linux</Option>
+                                                    <Option value="vt100">vt100</Option>
+                                                    <Option value="vt220">vt220</Option>
+                                                    <Option value="xterm">xterm</Option>
+                                                    <Option value="xterm-256color">xterm-256color</Option>
+                                                </Select>
+                                            </Form.Item>
+                                        </Panel>
+                                    </> : undefined
+                            }
+
+                            {
+                                protocol === 'kubernetes' ?
+                                    <>
+                                        <Panel header={<Text strong>认证</Text>} key="认证">
+                                            <Form.Item
+                                                name="use-ssl"
+                                                label="使用SSL"
+                                                valuePropName="checked"
+                                            >
+                                                <Switch checkedChildren="是" unCheckedChildren="否"
+                                                        onChange={(checked, event) => {
+                                                            setUseSSL(checked);
+                                                        }}/>
+                                            </Form.Item>
+
+                                            {
+                                                useSSL ?
+                                                    <>
+                                                        <Form.Item
+                                                            name="client-cert"
+                                                            label="client-cert"
+                                                        >
+                                                            <Input type='text' placeholder=""/>
+                                                        </Form.Item>
+
+                                                        <Form.Item
+                                                            name="client-key"
+                                                            label="client-key"
+                                                        >
+                                                            <Input type='text' placeholder=""/>
+                                                        </Form.Item>
+
+                                                        <Form.Item
+                                                            name="ca-cert"
+                                                            label="ca-cert"
+                                                        >
+                                                            <Input type='text' placeholder=""/>
+                                                        </Form.Item>
+                                                    </> : undefined
+                                            }
+
+
+                                            <Form.Item
+                                                name="ignore-cert"
+                                                label="忽略证书"
+                                                valuePropName="checked"
+                                            >
+                                                <Switch checkedChildren="是" unCheckedChildren="否"
+                                                        onChange={(checked, event) => {
+
+                                                        }}/>
+                                            </Form.Item>
+
                                         </Panel>
                                         <Panel header={<Text strong>显示设置</Text>} key="显示设置">
                                             <Form.Item

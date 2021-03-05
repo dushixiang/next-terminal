@@ -48,6 +48,15 @@ const (
 	PasswordRegex     = "password-regex"
 	LoginSuccessRegex = "login-success-regex"
 	LoginFailureRegex = "login-failure-regex"
+
+	Namespace  = "namespace"
+	Pod        = "pod"
+	Container  = "container"
+	UesSSL     = "use-ssl"
+	ClientCert = "client-cert"
+	ClientKey  = "client-key"
+	CaCert     = "ca-cert"
+	IgnoreCert = "ignore-cert"
 )
 
 const Delimiter = ';'
