@@ -335,7 +335,9 @@ class Access extends Component {
                 fullScreenBtnText: '退出全屏'
             })
         }
-
+        if (this.state.sink) {
+            this.state.sink.focus();
+        }
     }
 
     async createSession(assetsId) {
