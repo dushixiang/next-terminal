@@ -48,6 +48,21 @@ func FindAllAsset() (o []Asset, err error) {
 	return
 }
 
+func FindAssetByIds(assetIds []string) (o []Asset, err error) {
+	err = global.DB.Where("id in ?", assetIds).Find(&o).Error
+	return
+}
+
+func FindAssetByProtocol(protocol string) (o []Asset, err error) {
+	err = global.DB.Where("protocol = ?", protocol).Find(&o).Error
+	return
+}
+
+func FindAssetByProtocolAndIds(protocol string, assetIds []string) (o []Asset, err error) {
+	err = global.DB.Where("protocol = ? and id in ?", protocol, assetIds).Find(&o).Error
+	return
+}
+
 func FindAssetByConditions(protocol string, account User) (o []Asset, err error) {
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 

@@ -490,7 +490,7 @@ class Asset extends Component {
                         if (tags[i] === '-') {
                             continue;
                         }
-                        tagDocuments.push(<Tag>{tagArr[i]}</Tag>)
+                        tagDocuments.push(<Tag key={tagArr[i]}>{tagArr[i]}</Tag>)
                     }
                     return tagDocuments;
                 }

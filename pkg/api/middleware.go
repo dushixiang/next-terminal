@@ -27,7 +27,7 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
-	urls := []string{"download", "recording", "login", "static", "favicon", "logo", "asciinema"}
+	urls := []string{"/download", "/recording", "/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
 
 	return func(c echo.Context) error {
 		// 路由拦截 - 登录身份、资源权限判断等
@@ -35,7 +35,7 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			if c.Request().RequestURI == "/" || strings.HasPrefix(c.Request().RequestURI, "/#") {
 				return next(c)
 			}
-			if strings.Contains(c.Request().RequestURI, urls[i]) {
+			if strings.HasPrefix(c.Request().RequestURI, urls[i]) {
 				return next(c)
 			}
 		}
