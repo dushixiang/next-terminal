@@ -42,7 +42,7 @@ func (r *Job) TableName() string {
 	return "jobs"
 }
 
-func FindPageJob(pageIndex, pageSize int, name, status string) (o []Job, total int64, err error) {
+func FindPageJob(pageIndex, pageSize int, name, status, order, field string) (o []Job, total int64, err error) {
 	job := Job{}
 	db := global.DB.Table(job.TableName())
 	dbCounter := global.DB.Table(job.TableName())
@@ -62,7 +62,21 @@ func FindPageJob(pageIndex, pageSize int, name, status string) (o []Job, total i
 		return nil, 0, err
 	}
 
-	err = db.Order("created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
+	if order == "ascend" {
+		order = "asc"
+	} else {
+		order = "desc"
+	}
+
+	if field == "name" {
+		field = "name"
+	} else if field == "created" {
+		field = "created"
+	} else {
+		field = "updated"
+	}
+
+	err = db.Order(field + " " + order).Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
 	if o == nil {
 		o = make([]Job, 0)
 	}

@@ -357,6 +357,16 @@ class DynamicCommand extends Component {
         })
     }
 
+    handleTableChange = (pagination, filters, sorter) => {
+        let query = {
+            ...this.state.queryParams,
+            'order': sorter.order,
+            'field': sorter.field
+        }
+
+        this.loadTableData(query);
+    }
+
     render() {
 
         const columns = [{
@@ -380,7 +390,8 @@ class DynamicCommand extends Component {
                         {short}
                     </Tooltip>
                 );
-            }
+            },
+            sorter: true,
         }, {
             title: '指令内容',
             dataIndex: 'content',
@@ -411,7 +422,8 @@ class DynamicCommand extends Component {
                         {dayjs(text).fromNow()}
                     </Tooltip>
                 )
-            }
+            },
+            sorter: true,
         }, {
             title: '操作',
             key: 'action',
@@ -632,6 +644,7 @@ class DynamicCommand extends Component {
                             showTotal: total => `总计 ${total} 条`
                         }}
                         loading={this.state.loading}
+                        onChange={this.handleTableChange}
                     />
 
                     {

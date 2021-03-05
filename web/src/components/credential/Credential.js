@@ -324,6 +324,16 @@ class Credential extends Component {
         })
     }
 
+    handleTableChange = (pagination, filters, sorter) => {
+        let query = {
+            ...this.state.queryParams,
+            'order': sorter.order,
+            'field': sorter.field
+        }
+
+        this.loadTableData(query);
+    }
+
     render() {
 
         const columns = [{
@@ -347,7 +357,8 @@ class Credential extends Component {
                         {short}
                     </Tooltip>
                 );
-            }
+            },
+            sorter: true,
         }, {
             title: '凭证类型',
             dataIndex: 'type',
@@ -382,7 +393,8 @@ class Credential extends Component {
                         {dayjs(text).fromNow()}
                     </Tooltip>
                 )
-            }
+            },
+            sorter: true,
         },
             {
                 title: '操作',
@@ -574,6 +586,7 @@ class Credential extends Component {
                             showTotal: total => `总计 ${total} 条`
                         }}
                         loading={this.state.loading}
+                        onChange={this.handleTableChange}
                     />
 
                     {

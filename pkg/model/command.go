@@ -27,7 +27,7 @@ func (r *Command) TableName() string {
 	return "commands"
 }
 
-func FindPageCommand(pageIndex, pageSize int, name, content string, account User) (o []CommandVo, total int64, err error) {
+func FindPageCommand(pageIndex, pageSize int, name, content, order, field string, account User) (o []CommandVo, total int64, err error) {
 
 	db := global.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
 	dbCounter := global.DB.Table("commands").Select("DISTINCT commands.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
@@ -53,7 +53,19 @@ func FindPageCommand(pageIndex, pageSize int, name, content string, account User
 		return nil, 0, err
 	}
 
-	err = db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
+	if order == "ascend" {
+		order = "asc"
+	} else {
+		order = "desc"
+	}
+
+	if field == "name" {
+		field = "name"
+	} else {
+		field = "created"
+	}
+
+	err = db.Order("commands." + field + " " + order).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
 	if o == nil {
 		o = make([]CommandVo, 0)
 	}

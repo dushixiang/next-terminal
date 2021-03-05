@@ -23,7 +23,7 @@ func (r *UserGroup) TableName() string {
 	return "user_groups"
 }
 
-func FindPageUserGroup(pageIndex, pageSize int, name string) (o []UserGroupVo, total int64, err error) {
+func FindPageUserGroup(pageIndex, pageSize int, name, order, field string) (o []UserGroupVo, total int64, err error) {
 	db := global.DB.Table("user_groups").Select("user_groups.id, user_groups.name, user_groups.created, count(resource_sharers.user_group_id) as asset_count").Joins("left join resource_sharers on user_groups.id = resource_sharers.user_group_id and resource_sharers.resource_type = 'asset'").Group("user_groups.id")
 	dbCounter := global.DB.Table("user_groups")
 	if len(name) > 0 {
@@ -35,7 +35,20 @@ func FindPageUserGroup(pageIndex, pageSize int, name string) (o []UserGroupVo, t
 	if err != nil {
 		return nil, 0, err
 	}
-	err = db.Order("user_groups.created desc").Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
+
+	if order == "ascend" {
+		order = "asc"
+	} else {
+		order = "desc"
+	}
+
+	if field == "name" {
+		field = "name"
+	} else {
+		field = "created"
+	}
+
+	err = db.Order("user_groups." + field + " " + order).Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
 	if o == nil {
 		o = make([]UserGroupVo, 0)
 	}
