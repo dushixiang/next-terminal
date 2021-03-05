@@ -270,6 +270,12 @@ class Asset extends Component {
             asset['tags'] = [];
         }
 
+        asset['use-ssl'] = asset['use-ssl'] === 'true';
+
+        asset['ignore-cert'] = asset['ignore-cert'] === 'true';
+
+        console.log(asset)
+
         this.setState({
             modalTitle: title,
             modalVisible: true,

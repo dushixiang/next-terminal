@@ -24,6 +24,7 @@ var SSHParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorSche
 var RDPParameterNames = []string{guacd.RemoteApp, guacd.RemoteAppDir, guacd.RemoteAppArgs}
 var VNCParameterNames = []string{guacd.ColorDepth, guacd.Cursor, guacd.SwapRedBlue, guacd.DestHost, guacd.DestPort}
 var TelnetParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, guacd.UsernameRegex, guacd.PasswordRegex, guacd.LoginSuccessRegex, guacd.LoginFailureRegex}
+var KubernetesParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, guacd.Namespace, guacd.Pod, guacd.Container, guacd.UesSSL, guacd.ClientCert, guacd.ClientKey, guacd.CaCert, guacd.IgnoreCert}
 
 func UpdateAssetAttributes(assetId, protocol string, m echo.Map) error {
 	var data []AssetAttribute
@@ -37,6 +38,9 @@ func UpdateAssetAttributes(assetId, protocol string, m echo.Map) error {
 		parameterNames = VNCParameterNames
 	case "telnet":
 		parameterNames = TelnetParameterNames
+	case "kubernetes":
+		parameterNames = KubernetesParameterNames
+
 	}
 
 	for i := range parameterNames {
@@ -94,6 +98,8 @@ func FindAssetAttrMapByAssetId(assetId string) (map[string]interface{}, error) {
 		parameterNames = VNCParameterNames
 	case "telnet":
 		parameterNames = TelnetParameterNames
+	case "kubernetes":
+		parameterNames = KubernetesParameterNames
 	}
 	propertiesMap := FindAllPropertiesMap()
 	var attributeMap = make(map[string]interface{})

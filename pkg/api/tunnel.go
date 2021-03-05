@@ -111,6 +111,8 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.FontSize, propertyMap[guacd.FontSize])
 			configuration.SetParameter(guacd.FontName, propertyMap[guacd.FontName])
 			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
+			configuration.SetParameter(guacd.Backspace, propertyMap[guacd.Backspace])
+			configuration.SetParameter(guacd.TerminalType, propertyMap[guacd.TerminalType])
 			break
 		case "vnc":
 			configuration.SetParameter("username", session.Username)
@@ -119,7 +121,20 @@ func TunEndpoint(c echo.Context) error {
 		case "telnet":
 			configuration.SetParameter("username", session.Username)
 			configuration.SetParameter("password", session.Password)
+
+			configuration.SetParameter(guacd.FontSize, propertyMap[guacd.FontSize])
+			configuration.SetParameter(guacd.FontName, propertyMap[guacd.FontName])
+			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
+			configuration.SetParameter(guacd.Backspace, propertyMap[guacd.Backspace])
+			configuration.SetParameter(guacd.TerminalType, propertyMap[guacd.TerminalType])
 			break
+		case "kubernetes":
+
+			configuration.SetParameter(guacd.FontSize, propertyMap[guacd.FontSize])
+			configuration.SetParameter(guacd.FontName, propertyMap[guacd.FontName])
+			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
+			configuration.SetParameter(guacd.Backspace, propertyMap[guacd.Backspace])
+			configuration.SetParameter(guacd.TerminalType, propertyMap[guacd.TerminalType])
 		}
 
 		configuration.SetParameter("hostname", session.IP)
