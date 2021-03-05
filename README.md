@@ -22,6 +22,7 @@ Next Terminal基于 [Apache Guacamole](https://guacamole.apache.org/) 开发，�
 - 资产标签
 - 资产授权
 - 多用户&用户分组
+- 计划任务
 
 ## 在线体验
 
