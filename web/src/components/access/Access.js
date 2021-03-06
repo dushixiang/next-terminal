@@ -377,10 +377,10 @@ class Access extends Component {
 
         let width = window.innerWidth;
         let height = window.innerHeight;
-        let dpi = Math.floor(window.devicePixelRatio * 96);
-        // if (protocol === 'ssh' || protocol === 'telnet') {
-        //     dpi = dpi * 2;
-        // }
+        let dpi = 96;
+        if (protocol === 'ssh' || protocol === 'telnet') {
+            dpi = dpi * 2;
+        }
 
         let token = getToken();
 
