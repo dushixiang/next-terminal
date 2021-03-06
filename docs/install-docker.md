@@ -1,15 +1,10 @@
 # docker安装
 
+默认使用`docker hub`源，与Github的docker镜像仓库`ghcr.io`同步。
+
 ### 使用`sqlite`存储数据
 
-```shell
-docker run -d \
-  -p 8088:8088 \
-  --name next-terminal \
-  --restart always ghcr.io/dushixiang/next-terminal:latest
-```
-
-或者从Docker Hub拉取
+最简安装
 
 ```shell
 docker run -d \
@@ -18,22 +13,23 @@ docker run -d \
   --restart always dushixiang/next-terminal:latest
 ```
 
-### 使用`mysql`存储数据
+将`sqlite`数据库文件及存储的录屏文件映射到宿主机器
 
 ```shell
+mkdir -p "/opt/next-terminal/drive"
+mkdir -p "/opt/next-terminal/recording"
+touch /opt/next-terminal/next-terminal.db
+
 docker run -d \
   -p 8088:8088 \
-  -e DB=mysql \
-  -e MYSQL_HOSTNAME=172.1.0.1 \
-  -e MYSQL_PORT=3306 \
-  -e MYSQL_USERNAME=root \
-  -e MYSQL_PASSWORD=mysql \
-  -e MYSQL_DATABASE=next_terminal \
+  -v /opt/next-terminal/drive:/usr/local/next-terminal/drive \
+  -v /opt/next-terminal/recording:/usr/local/next-terminal/recording \
+  -v /opt/next-terminal/next-terminal.db:/usr/local/next-terminal/next-terminal.db \
   --name next-terminal \
-  --restart always ghcr.io/dushixiang/next-terminal:latest
+  --restart always dushixiang/next-terminal:latest
 ```
 
-或者从Docker Hub拉取
+### 使用`mysql`存储数据
 
 ```shell
 docker run -d \
