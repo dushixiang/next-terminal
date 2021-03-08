@@ -28,6 +28,8 @@ type UserVo struct {
 	ID               string         `json:"id"`
 	Username         string         `json:"username"`
 	Nickname         string         `json:"nickname"`
+	TOTPSecret       string         `json:"totpSecret"`
+	Mail             string         `json:"mail"`
 	Online           bool           `json:"online"`
 	Enabled          bool           `json:"enabled"`
 	Created          utils.JsonTime `json:"created"`
@@ -50,8 +52,8 @@ func FindAllUser() (o []User) {
 	return
 }
 
-func FindPageUser(pageIndex, pageSize int, username, nickname, order, field string) (o []UserVo, total int64, err error) {
-	db := global.DB.Table("users").Select("users.id,users.username,users.nickname,users.online,users.enabled,users.created,users.type, count(resource_sharers.user_id) as sharer_asset_count").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
+func FindPageUser(pageIndex, pageSize int, username, nickname, mail, order, field string) (o []UserVo, total int64, err error) {
+	db := global.DB.Table("users").Select("users.id,users.username,users.nickname,users.mail,users.online,users.enabled,users.created,users.type, count(resource_sharers.user_id) as sharer_asset_count, users.totp_secret").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
 	dbCounter := global.DB.Table("users")
 	if len(username) > 0 {
 		db = db.Where("users.username like ?", "%"+username+"%")
@@ -61,6 +63,11 @@ func FindPageUser(pageIndex, pageSize int, username, nickname, order, field stri
 	if len(nickname) > 0 {
 		db = db.Where("users.nickname like ?", "%"+nickname+"%")
 		dbCounter = dbCounter.Where("nickname like ?", "%"+nickname+"%")
+	}
+
+	if len(mail) > 0 {
+		db = db.Where("users.mail like ?", "%"+mail+"%")
+		dbCounter = dbCounter.Where("mail like ?", "%"+mail+"%")
 	}
 
 	err = dbCounter.Count(&total).Error
@@ -85,6 +92,14 @@ func FindPageUser(pageIndex, pageSize int, username, nickname, order, field stri
 	err = db.Order("users." + field + " " + order).Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
 	if o == nil {
 		o = make([]UserVo, 0)
+	}
+
+	for i := 0; i < len(o); i++ {
+		if o[i].TOTPSecret == "" || o[i].TOTPSecret == "-" {
+			o[i].TOTPSecret = "0"
+		} else {
+			o[i].TOTPSecret = "1"
+		}
 	}
 	return
 }

@@ -52,6 +52,10 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
                     </Radio.Group>
                 </Form.Item>
 
+                <Form.Item label="邮箱账号" name="mail" rules={[{required: false, type: "email", message: '请输入正确的邮箱账号',},]}>
+                    <Input type='email' placeholder="请输入邮箱账号"/>
+                </Form.Item>
+
                 {
                     title.indexOf('新增') > -1 ?
                         (<Form.Item label="登录密码" name='password' rules={[{required: true, message: '请输入登录密码'}]}>

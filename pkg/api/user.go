@@ -14,10 +14,11 @@ func UserCreateEndpoint(c echo.Context) error {
 	if err := c.Bind(&item); err != nil {
 		return err
 	}
+	password := item.Password
 
 	var pass []byte
 	var err error
-	if pass, err = utils.Encoder.Encode([]byte(item.Password)); err != nil {
+	if pass, err = utils.Encoder.Encode([]byte(password)); err != nil {
 		return err
 	}
 	item.Password = string(pass)
@@ -28,6 +29,10 @@ func UserCreateEndpoint(c echo.Context) error {
 	if err := model.CreateNewUser(&item); err != nil {
 		return err
 	}
+
+	if item.Mail != "" {
+		go model.SendMail(item.Mail, "[Next Terminal] 注册通知", "你好，"+item.Nickname+"。管理员为你注册了账号："+item.Username+" 密码："+password)
+	}
 	return Success(c, item)
 }
 
@@ -36,11 +41,12 @@ func UserPagingEndpoint(c echo.Context) error {
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	username := c.QueryParam("username")
 	nickname := c.QueryParam("nickname")
+	mail := c.QueryParam("mail")
 
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := model.FindPageUser(pageIndex, pageSize, username, nickname, order, field)
+	items, total, err := model.FindPageUser(pageIndex, pageSize, username, nickname, mail, order, field)
 	if err != nil {
 		return err
 	}
@@ -109,6 +115,11 @@ func UserChangePasswordEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	password := c.QueryParam("password")
 
+	user, err := model.FindUserById(id)
+	if err != nil {
+		return err
+	}
+
 	passwd, err := utils.Encoder.Encode([]byte(password))
 	if err != nil {
 		return err
@@ -117,6 +128,11 @@ func UserChangePasswordEndpoint(c echo.Context) error {
 		Password: string(passwd),
 	}
 	model.UpdateUserById(u, id)
+
+	if user.Mail != "" {
+		go model.SendMail(user.Mail, "[Next Terminal] 密码修改通知", "你好，"+user.Nickname+"。管理员已将你的密码修改为："+password)
+	}
+
 	return Success(c, "")
 }
 
