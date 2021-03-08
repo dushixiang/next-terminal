@@ -1,12 +1,19 @@
 package model
 
 import (
+	"github.com/jordan-wright/email"
+	"github.com/sirupsen/logrus"
+	"net/smtp"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 )
 
 const (
-	SshMode = "ssh-mode"
+	SshMode      = "ssh-mode"
+	MailHost     = "mail-host"
+	MailPort     = "mail-port"
+	MailUsername = "mail-username"
+	MailPassword = "mail-password"
 )
 
 type Property struct {
@@ -63,4 +70,27 @@ func GetRecordingPath() (string, error) {
 		return "", err
 	}
 	return property.Value, nil
+}
+
+func SendMail(to, subject, text string) {
+	propertiesMap := FindAllPropertiesMap()
+	host := propertiesMap[MailHost]
+	port := propertiesMap[MailPort]
+	username := propertiesMap[MailUsername]
+	password := propertiesMap[MailPassword]
+
+	if host == "" || port == "" || username == "" || password == "" {
+		logrus.Debugf("邮箱信息不完整，跳过发送邮件。")
+		return
+	}
+
+	e := email.NewEmail()
+	e.From = "Next Terminal <" + username + ">"
+	e.To = []string{to}
+	e.Subject = subject
+	e.Text = []byte(text)
+	err := e.Send(host+":"+port, smtp.PlainAuth("", username, password, host))
+	if err != nil {
+		logrus.Errorf("邮件发送失败: %v", err.Error())
+	}
 }

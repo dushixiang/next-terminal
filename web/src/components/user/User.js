@@ -25,9 +25,10 @@ import UserModal from "./UserModal";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {
+    CheckCircleOutlined,
     DeleteOutlined,
     DownOutlined,
-    ExclamationCircleOutlined,
+    ExclamationCircleOutlined, InsuranceOutlined,
     LockOutlined,
     PlusOutlined,
     SyncOutlined,
@@ -58,6 +59,7 @@ class User extends Component {
 
     inputRefOfNickname = React.createRef();
     inputRefOfUsername = React.createRef();
+    inputRefOfMail = React.createRef();
     changePasswordFormRef = React.createRef()
 
     state = {
@@ -234,6 +236,17 @@ class User extends Component {
         this.loadTableData(query);
     };
 
+    handleSearchByMail = mail => {
+        let query = {
+            ...this.state.queryParams,
+            'pageIndex': 1,
+            'pageSize': this.state.queryParams.pageSize,
+            'mail': mail,
+        }
+
+        this.loadTableData(query);
+    };
+
     batchDelete = async () => {
         this.setState({
             delBtnLoading: true
@@ -327,7 +340,22 @@ class User extends Component {
                 } else {
                     return text;
                 }
+            }
+        }, {
+            title: '邮箱',
+            dataIndex: 'mail',
+            key: 'mail',
+        }, {
+            title: '二次认证',
+            dataIndex: 'totpSecret',
+            key: 'totpSecret',
+            render: (text, record) => {
 
+                if (text === '1') {
+                    return <Tag icon={<InsuranceOutlined />} color="success">开启</Tag>;
+                }else {
+                    return <Tag icon={<ExclamationCircleOutlined />} color="warning">关闭</Tag>;
+                }
             }
         }, {
             title: '在线状态',
@@ -394,6 +422,7 @@ class User extends Component {
                                                     let result = await request.post(`/users/${record['id']}/reset-totp`);
                                                     if (result['code'] === 1) {
                                                         message.success('操作成功', 3);
+                                                        this.loadTableData();
                                                     } else {
                                                         message.error(result['message'], 10);
                                                     }
@@ -414,7 +443,14 @@ class User extends Component {
                     return (
                         <div>
                             <Button type="link" size='small'
-                                    onClick={() => this.showModal('更新用户', record)}>编辑</Button>
+                                    onClick={async () => {
+                                        let result = await request.get(`/users/${record['id']}`);
+                                        if (result['code'] !== 1) {
+                                            message.error(result['message']);
+                                            return;
+                                        }
+                                        this.showModal('更新用户', result['data']);
+                                    }}>编辑</Button>
                             <Dropdown overlay={menu}>
                                 <Button type="link" size='small'>
                                     更多 <DownOutlined/>
@@ -474,11 +510,19 @@ class User extends Component {
                                         onSearch={this.handleSearchByUsername}
                                     />
 
+                                    <Search
+                                        ref={this.inputRefOfMail}
+                                        placeholder="邮箱"
+                                        allowClear
+                                        onSearch={this.handleSearchByMail}
+                                    />
+
                                     <Tooltip title='重置查询'>
 
                                         <Button icon={<UndoOutlined/>} onClick={() => {
                                             this.inputRefOfUsername.current.setValue('');
                                             this.inputRefOfNickname.current.setValue('');
+                                            this.inputRefOfMail.current.setValue('');
                                             this.loadTableData({pageIndex: 1, pageSize: 10})
                                         }}>
 

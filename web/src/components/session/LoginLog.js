@@ -318,6 +318,7 @@ class LoginLog extends Component {
                                         onSearch={this.handleSearchByNickname}
                                         onChange={this.handleChangeByUserId}
                                         filterOption={false}
+                                        allowClear
                                     >
                                         {userOptions}
                                     </Select>
