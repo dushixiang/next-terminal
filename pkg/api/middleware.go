@@ -55,7 +55,7 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		token := GetToken(c)
-		cacheKey := strings.Join([]string{Token, token}, ":")
+		cacheKey := BuildCacheKeyByToken(token)
 		authorization, found := global.Cache.Get(cacheKey)
 		if !found {
 			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
@@ -63,9 +63,9 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 		if authorization.(Authorization).Remember {
 			// 记住登录有效期两周
-			global.Cache.Set(token, authorization, time.Hour*time.Duration(24*14))
+			global.Cache.Set(cacheKey, authorization, time.Hour*time.Duration(24*14))
 		} else {
-			global.Cache.Set(token, authorization, time.Hour*time.Duration(2))
+			global.Cache.Set(cacheKey, authorization, time.Hour*time.Duration(2))
 		}
 
 		return next(c)

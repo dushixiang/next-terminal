@@ -140,6 +140,9 @@ func CredentialDeleteEndpoint(c echo.Context) error {
 
 func CredentialGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
+	if err := PreCheckCredentialPermission(c, id); err != nil {
+		return err
+	}
 
 	item, err := model.FindCredentialById(id)
 	if err != nil {

@@ -11,6 +11,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
@@ -24,7 +25,7 @@ import (
 	"time"
 )
 
-const Version = "v0.3.2"
+const Version = "v0.3.3"
 
 func main() {
 	err := Run()
@@ -65,6 +66,13 @@ func Run() error {
 		return err
 	}
 
+	var logMode logger.Interface
+	if global.Config.Debug {
+		logMode = logger.Default.LogMode(logger.Info)
+	} else {
+		logMode = logger.Default.LogMode(logger.Silent)
+	}
+
 	fmt.Printf("当前数据库模式为：%v\n", global.Config.DB)
 	if global.Config.DB == "mysql" {
 		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
@@ -75,11 +83,11 @@ func Run() error {
 			global.Config.Mysql.Database,
 		)
 		global.DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
-			//Logger: logger.Default.LogMode(logger.Info),
+			Logger: logMode,
 		})
 	} else {
 		global.DB, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{
-			//Logger: logger.Default.LogMode(logger.Info),
+			Logger: logMode,
 		})
 	}
 
@@ -196,9 +204,12 @@ func Run() error {
 	global.Cache = cache.New(5*time.Minute, 10*time.Minute)
 	global.Cache.OnEvicted(func(key string, value interface{}) {
 		if strings.HasPrefix(key, api.Token) {
-			token := strings.Split(key, ":")[1]
+			token := api.GetTokenFormCacheKey(key)
 			logrus.Debugf("用户Token「%v」过期", token)
-			model.Logout(token)
+			err := model.Logout(token)
+			if err != nil {
+				logrus.Errorf("退出登录失败 %v", err)
+			}
 		}
 	})
 	global.Store = global.NewStore()
@@ -256,7 +267,7 @@ func Run() error {
 			User:     user,
 		}
 
-		cacheKey := strings.Join([]string{api.Token, token}, ":")
+		cacheKey := api.BuildCacheKeyByToken(token)
 
 		if authorization.Remember {
 			// 记住登录有效期两周
@@ -265,6 +276,23 @@ func Run() error {
 			global.Cache.Set(cacheKey, authorization, api.NotRememberEffectiveTime)
 		}
 		logrus.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
+	}
+
+	// 修正用户登录状态
+	onlineUsers, err := model.FindOnlineUsers()
+	if err != nil {
+		return err
+	}
+	for i := range onlineUsers {
+		logs, err := model.FindAliveLoginLogsByUserId(onlineUsers[i].ID)
+		if err != nil {
+			return err
+		}
+		if len(logs) == 0 {
+			if err := model.UpdateUserOnline(false, onlineUsers[i].ID); err != nil {
+				return err
+			}
+		}
 	}
 
 	e := api.SetupRoutes()

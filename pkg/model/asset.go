@@ -9,8 +9,8 @@ import (
 type Asset struct {
 	ID           string         `gorm:"primary_key " json:"id"`
 	Name         string         `json:"name"`
-	IP           string         `json:"ip"`
 	Protocol     string         `json:"protocol"`
+	IP           string         `json:"ip"`
 	Port         int            `json:"port"`
 	AccountType  string         `json:"accountType"`
 	Username     string         `json:"username"`
