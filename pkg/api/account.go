@@ -182,6 +182,9 @@ func LogoutEndpoint(c echo.Context) error {
 }
 
 func ConfirmTOTPEndpoint(c echo.Context) error {
+	if global.Config.Demo {
+		return Fail(c, 0, "演示模式禁止修改密码")
+	}
 	account, _ := GetCurrentAccount(c)
 
 	var confirmTOTP ConfirmTOTP
@@ -239,6 +242,9 @@ func ResetTOTPEndpoint(c echo.Context) error {
 }
 
 func ChangePasswordEndpoint(c echo.Context) error {
+	if global.Config.Demo {
+		return Fail(c, 0, "演示模式禁止修改密码")
+	}
 	account, _ := GetCurrentAccount(c)
 
 	var changePassword ChangePassword
