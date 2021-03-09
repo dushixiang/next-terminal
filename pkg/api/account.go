@@ -183,7 +183,7 @@ func LogoutEndpoint(c echo.Context) error {
 
 func ConfirmTOTPEndpoint(c echo.Context) error {
 	if global.Config.Demo {
-		return Fail(c, 0, "演示模式禁止修改密码")
+		return Fail(c, 0, "演示模式禁止开启两步验证")
 	}
 	account, _ := GetCurrentAccount(c)
 
