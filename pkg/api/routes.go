@@ -71,10 +71,11 @@ func SetupRoutes() *echo.Echo {
 		//userGroups.DELETE("/:id/members/:memberId", UserGroupDelMembersEndpoint)
 	}
 
-	assets := e.Group("/assets", Auth)
+	assets := e.Group("/assets")
 	{
 		assets.GET("", AssetAllEndpoint)
 		assets.POST("", AssetCreateEndpoint)
+		assets.POST("/import", Admin(AssetImportEndpoint))
 		assets.GET("/paging", AssetPagingEndpoint)
 		assets.POST("/:id/tcping", AssetTcpingEndpoint)
 		assets.PUT("/:id", AssetUpdateEndpoint)
@@ -110,7 +111,7 @@ func SetupRoutes() *echo.Echo {
 	sessions := e.Group("/sessions")
 	{
 		sessions.POST("", SessionCreateEndpoint)
-		sessions.GET("/paging", SessionPagingEndpoint)
+		sessions.GET("/paging", Admin(SessionPagingEndpoint))
 		sessions.POST("/:id/connect", SessionConnectEndpoint)
 		sessions.POST("/:id/disconnect", Admin(SessionDisconnectEndpoint))
 		sessions.POST("/:id/resize", SessionResizeEndpoint)
@@ -138,7 +139,7 @@ func SetupRoutes() *echo.Echo {
 		loginLogs.DELETE("/:id", LoginLogDeleteEndpoint)
 	}
 
-	e.GET("/properties", PropertyGetEndpoint)
+	e.GET("/properties", Admin(PropertyGetEndpoint))
 	e.PUT("/properties", Admin(PropertyUpdateEndpoint))
 
 	e.GET("/overview/counter", OverviewCounterEndPoint)
@@ -202,7 +203,8 @@ func GetToken(c echo.Context) string {
 
 func GetCurrentAccount(c echo.Context) (model.User, bool) {
 	token := GetToken(c)
-	get, b := global.Cache.Get(token)
+	cacheKey := BuildCacheKeyByToken(token)
+	get, b := global.Cache.Get(cacheKey)
 	if b {
 		return get.(Authorization).User, true
 	}

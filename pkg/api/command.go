@@ -84,6 +84,11 @@ func CommandDeleteEndpoint(c echo.Context) error {
 
 func CommandGetEndpoint(c echo.Context) (err error) {
 	id := c.Param("id")
+
+	if err := PreCheckCommandPermission(c, id); err != nil {
+		return err
+	}
+
 	var item model.Command
 	if item, err = model.FindCommandById(id); err != nil {
 		return err

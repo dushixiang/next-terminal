@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	Debug         bool
 	DB            string
 	Server        *Server
 	Mysql         *Mysql
@@ -78,6 +79,7 @@ func SetupConfig() (*Config, error) {
 			Key:  viper.GetString("server.key"),
 		},
 		ResetPassword: viper.GetString("reset-password"),
+		Debug:         viper.GetBool("debug"),
 	}
 
 	return config, nil

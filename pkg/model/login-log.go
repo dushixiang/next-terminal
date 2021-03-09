@@ -81,7 +81,7 @@ func FindLoginLogById(id string) (o LoginLog, err error) {
 	return
 }
 
-func Logout(token string) {
+func Logout(token string) (err error) {
 
 	loginLog, err := FindLoginLogById(token)
 	if err != nil {
@@ -89,7 +89,10 @@ func Logout(token string) {
 		return
 	}
 
-	global.DB.Table("login_logs").Where("id = ?", token).Update("logout_time", utils.NowJsonTime())
+	err = global.DB.Updates(&LoginLog{LogoutTime: utils.NowJsonTime(), ID: token}).Error
+	if err != nil {
+		return err
+	}
 
 	loginLogs, err := FindAliveLoginLogsByUserId(loginLog.UserId)
 	if err != nil {
@@ -97,6 +100,7 @@ func Logout(token string) {
 	}
 
 	if len(loginLogs) == 0 {
-		UpdateUserById(&User{Online: false}, loginLog.UserId)
+		err = UpdateUserOnline(false, loginLog.UserId)
 	}
+	return
 }

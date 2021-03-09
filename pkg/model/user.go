@@ -129,6 +129,17 @@ func UpdateUserById(o *User, id string) {
 	global.DB.Updates(o)
 }
 
+func UpdateUserOnline(online bool, id string) (err error) {
+	sql := "update users set online = ? where id = ?"
+	err = global.DB.Exec(sql, online, id).Error
+	return
+}
+
+func FindOnlineUsers() (o []User, err error) {
+	err = global.DB.Where("online = ?", true).Find(&o).Error
+	return
+}
+
 func DeleteUserById(id string) {
 	global.DB.Where("id = ?", id).Delete(&User{})
 	// 删除用户组中的用户关系
