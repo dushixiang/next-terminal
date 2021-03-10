@@ -32,14 +32,40 @@
     background-color: #FFF;
 }
 
-.global-header {
-    position: relative;
-    display: flex;
-    align-items: center;
+.layout-header {
     height: 48px;
+    align-items: center;
     padding: 0 16px 0 0;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+}
+
+.layout-header-right {
+    align-items: center;
+    padding: 0 12px;
+    cursor: pointer;
+    transition: all .3s;
+    line-height: 48px;
+    height: 48px;
+}
+
+.layout-header-right-item {
+    margin: 0 6px;
+    display: inline;
+    height: 48px;
+}
+
+.layout-header-right-item:hover {
+    background-color: #eeeeee;
+}
+
+.nickname {
+    line-height: 48px;
+    height: 48px;
+    width: 125px;
+    text-align: left;
+    padding: 0 5px;
+    float: right;
 }
 
 .page-herder {
@@ -77,7 +103,7 @@
     color: white;
 }
 
-.user-in-menu>.nickname {
+.user-in-menu > .nickname {
     margin-top: 20px;
     margin-right: auto;
     margin-left: auto;
@@ -90,6 +116,6 @@
     border-radius: 5%;
 }
 
-.modal-no-padding .ant-modal-body{
+.modal-no-padding .ant-modal-body {
     padding: 0;
 }

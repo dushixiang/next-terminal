@@ -33,7 +33,7 @@ import {
     UndoOutlined
 } from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import {hasPermission, isAdmin} from "../../service/permission";
 import dayjs from "dayjs";
 
@@ -484,15 +484,13 @@ class Credential extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="授权凭证"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="访问资产的账户、密钥等"
                 >
                 </PageHeader>

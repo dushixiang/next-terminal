@@ -25,16 +25,16 @@ import UserModal from "./UserModal";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {
-    CheckCircleOutlined,
     DeleteOutlined,
     DownOutlined,
-    ExclamationCircleOutlined, InsuranceOutlined,
+    ExclamationCircleOutlined,
+    InsuranceOutlined,
     LockOutlined,
     PlusOutlined,
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import Logout from "./Logout";
+import LayoutHeader from "./LayoutHeader";
 import UserShareAsset from "./UserShareAsset";
 import {hasPermission} from "../../service/permission";
 import dayjs from "dayjs";
@@ -352,9 +352,9 @@ class User extends Component {
             render: (text, record) => {
 
                 if (text === '1') {
-                    return <Tag icon={<InsuranceOutlined />} color="success">开启</Tag>;
-                }else {
-                    return <Tag icon={<ExclamationCircleOutlined />} color="warning">关闭</Tag>;
+                    return <Tag icon={<InsuranceOutlined/>} color="success">开启</Tag>;
+                } else {
+                    return <Tag icon={<ExclamationCircleOutlined/>} color="warning">关闭</Tag>;
                 }
             }
         }, {
@@ -474,15 +474,13 @@ class User extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="用户管理"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="平台用户管理"
                 >
                 </PageHeader>

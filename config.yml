@@ -1,4 +1,5 @@
 debug: true
+demo: false
 db: mysql
 mysql:
   hostname: 172.16.101.32
