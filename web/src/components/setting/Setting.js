@@ -3,7 +3,6 @@ import {Button, Form, Input, Layout, PageHeader, Select, Switch, Tabs, Tooltip, 
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import {message} from "antd/es";
-import LayoutHeader from "../user/LayoutHeader";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
@@ -41,7 +40,7 @@ class Setting extends Component {
     rdpSettingFormRef = React.createRef();
     sshSettingFormRef = React.createRef();
     vncSettingFormRef = React.createRef();
-    otherSettingFormRef = React.createRef();
+    guacdSettingFormRef = React.createRef();
     mailSettingFormRef = React.createRef();
 
     componentDidMount() {
@@ -96,8 +95,8 @@ class Setting extends Component {
                 this.vncSettingFormRef.current.setFieldsValue(properties)
             }
 
-            if (this.otherSettingFormRef.current) {
-                this.otherSettingFormRef.current.setFieldsValue(properties)
+            if (this.guacdSettingFormRef.current) {
+                this.guacdSettingFormRef.current.setFieldsValue(properties)
             }
 
             if (this.mailSettingFormRef.current) {
@@ -475,9 +474,9 @@ class Setting extends Component {
                                 </Form.Item>
                             </Form>
                         </TabPane>
-                        <TabPane tab="其他配置" key="other">
+                        <TabPane tab="Guacd服务配置" key="other">
                             <Title level={3}>Guacd 服务配置</Title>
-                            <Form ref={this.otherSettingFormRef} name="password" onFinish={this.changeProperties}
+                            <Form ref={this.guacdSettingFormRef} name="password" onFinish={this.changeProperties}
                                   layout="vertical">
                                 <Form.Item
                                     {...formItemLayout}
@@ -572,7 +571,7 @@ class Setting extends Component {
                             </Form>
                         </TabPane>
                         <TabPane tab="邮箱配置" key="mail">
-                            <Title level={3}>Guacd 服务配置</Title>
+                            <Title level={3}>邮箱配置</Title>
                             <Form ref={this.mailSettingFormRef} name="password" onFinish={this.changeProperties}
                                   layout="vertical">
 
