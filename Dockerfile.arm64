@@ -1,0 +1,50 @@
+FROM golang:alpine as builder
+
+ENV GO111MODULE=on
+ENV GUACD_VERSION=1.3.0
+ENV GOPROXY=https://goproxy.cn,direct
+
+WORKDIR /app
+
+COPY . .
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+RUN apk add gcc g++
+RUN go env && CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -a -ldflags '-linkmode external -extldflags "-static"' -o next-terminal main.go
+
+FROM arm64v8/debian:rc-buggy-20210208
+
+ARG PREFIX_DIR=/usr/local/guacamole
+WORKDIR $PREFIX_DIR
+
+ARG BUILD_DEPENDENCIES="              \
+        libcairo2-dev  \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libtool-bin \
+        libossp-uuid-dev \
+        freerdp2-dev \
+        libpango1.0-dev \
+        libssh2-1-dev \
+        libtelnet-dev \
+        libvncserver-dev \
+        libwebsockets-dev \
+        libpulse-dev \
+        libssl-dev \
+        libvorbis-dev \
+        libwebp-dev\
+        make"
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get install $BUILD_DEPENDENCIES && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# Install guacamole-server
+RUN curl -SLO "http://apache.org/dyn/closer.cgi?action=download&filename=guacamole/${GUACD_VERSION}/source/guacamole-server-${GUACD_VERSION}.tar.gz" &&\
+  tar -xzf guacamole-server-${GUACD_VERSION}.tar.gz &&\
+  cd guacamole-server-${GUACD_VERSION} &&\
+  ./configure --prefix="$PREFIX_DIR" --disable-guaclog &&\
+  make && make install && ldconfig\
+  rm -rf ${PREFIX_DIR}/guacamole-server-${GUACD_VERSION}.tar.gz ${PREFIX_DIR}/guacamole-server-${GUACD_VERSION} &&\
