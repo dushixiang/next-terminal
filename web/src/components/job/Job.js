@@ -31,7 +31,7 @@ import {
     UndoOutlined
 } from '@ant-design/icons';
 import {itemRender} from "../../utils/utils";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import dayjs from "dayjs";
 import JobModal from "./JobModal";
 import './Job.css'
@@ -442,15 +442,13 @@ class Job extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="计划任务"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="计划任务"
                 >
                 </PageHeader>

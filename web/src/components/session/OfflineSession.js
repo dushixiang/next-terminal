@@ -23,7 +23,7 @@ import Playback from "./Playback";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 import {PROTOCOL_COLORS} from "../../common/constants";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
@@ -342,15 +342,13 @@ class OfflineSession extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="离线会话"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="离线会话管理"
                 >
                 </PageHeader>

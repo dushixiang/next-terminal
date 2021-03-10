@@ -34,7 +34,7 @@ import {
     UndoOutlined
 } from '@ant-design/icons';
 import {compare, itemRender} from "../../utils/utils";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import {hasPermission, isAdmin} from "../../service/permission";
 import dayjs from "dayjs";
 
@@ -535,15 +535,13 @@ class DynamicCommand extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="动态指令"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="批量动态指令执行"
                 >
                 </PageHeader>

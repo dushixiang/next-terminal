@@ -40,7 +40,7 @@ import {
     UploadOutlined
 } from '@ant-design/icons';
 import {PROTOCOL_COLORS} from "../../common/constants";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import {hasPermission, isAdmin} from "../../service/permission";
 import Upload from "antd/es/upload";
 import axios from "axios";
@@ -55,6 +55,9 @@ const routes = [
     {
         path: '',
         breadcrumbName: '首页',
+    },
+    {
+        breadcrumbName: '资源管理',
     },
     {
         path: 'assets',
@@ -658,15 +661,13 @@ class Asset extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="资产管理"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="资产"
                 >
                 </PageHeader>

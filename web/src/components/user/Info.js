@@ -3,7 +3,7 @@ import {Button, Card, Form, Image, Input, Layout, Modal, PageHeader, Result, Spa
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import {message} from "antd/es";
-import Logout from "./Logout";
+import LayoutHeader from "./LayoutHeader";
 import {ExclamationCircleOutlined, ReloadOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
@@ -123,15 +123,13 @@ class Info extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="个人中心"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="个人中心"
                 />
 

@@ -21,7 +21,7 @@ import request from "../../common/request";
 import {formatDate, isEmpty, itemRender} from "../../utils/utils";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
@@ -281,15 +281,13 @@ class LoginLog extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="登录日志"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="只有登录成功的才会保存日志"
                 >
                 </PageHeader>

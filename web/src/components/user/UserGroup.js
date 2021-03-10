@@ -6,7 +6,7 @@ import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
-import Logout from "./Logout";
+import LayoutHeader from "./LayoutHeader";
 import UserGroupModal from "./UserGroupModal";
 import UserShareAsset from "./UserShareAsset";
 import dayjs from "dayjs";
@@ -336,15 +336,13 @@ class UserGroup extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="用户组管理"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="平台用户管理"
                 >
                 </PageHeader>

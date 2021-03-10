@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {Card, Input, List, PageHeader, Spin} from "antd";
 import Console from "../access/Console";
 import {itemRender} from "../../utils/utils";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import './Command.css'
 import request from "../../common/request";
 import {message} from "antd/es";
@@ -73,15 +73,13 @@ class BatchCommand extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="批量执行命令"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="动态指令"
                 >
                 </PageHeader>

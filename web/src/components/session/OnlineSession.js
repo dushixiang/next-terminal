@@ -24,7 +24,7 @@ import {message} from "antd/es";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import {DisconnectOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 import Monitor from "../access/Monitor";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
@@ -336,15 +336,13 @@ class OnlineSession extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="在线会话"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="查询实时在线会话"
                 >
                 </PageHeader>

@@ -41,6 +41,8 @@ import UserGroup from "./components/user/UserGroup";
 import LoginLog from "./components/session/LoginLog";
 import Term from "./components/access/Term";
 import Job from "./components/job/Job";
+import {Header} from "antd/es/layout/layout";
+import LayoutHeader from "./components/user/LayoutHeader";
 
 const {Footer, Sider} = Layout;
 
@@ -240,10 +242,10 @@ class App extends Component {
                         </Sider>
 
                         <Layout className="site-layout">
-                            {/*<Header className="site-layout-background"
-                                        style={{padding: 0, height: 48, lineHeight: 48}}>
-
-                                </Header>*/}
+                            <Header className="site-layout-background"
+                                    style={{padding: 0, height: 48, zIndex: 20}}>
+                                <LayoutHeader key='layout-right-header'/>
+                            </Header>
 
                             <Route path="/" exact component={Dashboard}/>
                             <Route path="/user" component={User}/>

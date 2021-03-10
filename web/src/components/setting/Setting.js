@@ -3,7 +3,7 @@ import {Button, Form, Input, Layout, PageHeader, Select, Switch, Tabs, Tooltip, 
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import {message} from "antd/es";
-import Logout from "../user/Logout";
+import LayoutHeader from "../user/LayoutHeader";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
@@ -116,15 +116,13 @@ class Setting extends Component {
         return (
             <>
                 <PageHeader
-                    className="site-page-header-ghost-wrapper page-herder"
+                    className="site-page-header-ghost-wrapper"
                     title="系统设置"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
-                    extra={[
-                        <Logout key='logout'/>
-                    ]}
+
                     subTitle="系统设置"
                 >
                 </PageHeader>
