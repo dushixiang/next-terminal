@@ -1,6 +1,7 @@
 package model
 
 import (
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 	"strings"
@@ -66,7 +67,7 @@ func FindAssetByProtocolAndIds(protocol string, assetIds []string) (o []Asset, e
 func FindAssetByConditions(protocol string, account User) (o []Asset, err error) {
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 
-	if TypeUser == account.Type {
+	if constant.TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("assets.owner = ? or resource_sharers.user_id = ?", owner, owner)
 	}
@@ -82,7 +83,7 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 	db := global.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created,assets.tags, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 	dbCounter := global.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 
-	if TypeUser == account.Type {
+	if constant.TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("assets.owner = ? or resource_sharers.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("assets.owner = ? or resource_sharers.user_id = ?", owner, owner)

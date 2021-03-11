@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/log"
 	"next-terminal/pkg/model"
@@ -34,6 +35,7 @@ func SetupRoutes() *echo.Echo {
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 	e.Use(ErrorHandler)
+	e.Use(TcpWall)
 	e.Use(Auth)
 
 	e.POST("/login", LoginEndpoint)
@@ -121,7 +123,7 @@ func SetupRoutes() *echo.Echo {
 		sessions.POST("/:id/mkdir", SessionMkDirEndpoint)
 		sessions.POST("/:id/rm", SessionRmEndpoint)
 		sessions.POST("/:id/rename", SessionRenameEndpoint)
-		sessions.DELETE("/:id", SessionDeleteEndpoint)
+		sessions.DELETE("/:id", Admin(SessionDeleteEndpoint))
 		sessions.GET("/:id/recording", SessionRecordingEndpoint)
 	}
 
@@ -156,6 +158,15 @@ func SetupRoutes() *echo.Echo {
 		jobs.GET("/:id", JobGetEndpoint)
 		jobs.GET("/:id/logs", JobGetLogsEndpoint)
 		jobs.DELETE("/:id/logs", JobDeleteLogsEndpoint)
+	}
+
+	securities := e.Group("/securities", Admin)
+	{
+		securities.POST("", SecurityCreateEndpoint)
+		securities.GET("/paging", SecurityPagingEndpoint)
+		securities.PUT("/:id", SecurityUpdateEndpoint)
+		securities.DELETE("/:id", SecurityDeleteEndpoint)
+		securities.GET("/:id", SecurityGetEndpoint)
 	}
 
 	return e
@@ -218,7 +229,7 @@ func HasPermission(c echo.Context, owner string) bool {
 		return false
 	}
 	// 检测是否为管理人员
-	if model.TypeAdmin == account.Type {
+	if constant.TypeAdmin == account.Type {
 		return true
 	}
 	// 检测是否为所有者

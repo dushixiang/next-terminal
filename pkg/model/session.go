@@ -1,23 +1,12 @@
 package model
 
 import (
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 	"os"
 	"path"
 	"time"
-)
-
-const (
-	NoConnect    = "no_connect"
-	Connecting   = "connecting"
-	Connected    = "connected"
-	Disconnected = "disconnected"
-)
-
-const (
-	Guacd = "guacd"
-	Naive = "naive"
 )
 
 type Session struct {
@@ -130,7 +119,7 @@ func FindSessionByStatusIn(statuses []string) (o []Session, err error) {
 
 func FindOutTimeSessions(dayLimit int) (o []Session, err error) {
 	limitTime := time.Now().Add(time.Duration(-dayLimit*24) * time.Hour)
-	err = global.DB.Where("status = ? and connected_time < ?", Disconnected, limitTime).Find(&o).Error
+	err = global.DB.Where("status = ? and connected_time < ?", constant.Disconnected, limitTime).Find(&o).Error
 	return
 }
 
@@ -187,7 +176,7 @@ func DeleteSessionByStatus(status string) {
 }
 
 func CountOnlineSession() (total int64, err error) {
-	err = global.DB.Where("status = ?", Connected).Find(&Session{}).Count(&total).Error
+	err = global.DB.Where("status = ?", constant.Connected).Find(&Session{}).Count(&total).Error
 	return
 }
 

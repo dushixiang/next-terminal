@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 	"net/http"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
@@ -62,7 +63,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	}
 
 	user, _ := GetCurrentAccount(c)
-	if model.TypeUser == user.Type {
+	if constant.TypeUser == user.Type {
 		// 检测是否有访问权限
 		assetIds, err := model.FindAssetIdsByUserId(user.ID)
 		if err != nil {
@@ -137,7 +138,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 		ConnectionId: sessionId,
 		Width:        cols,
 		Height:       rows,
-		Status:       model.Connecting,
+		Status:       constant.Connecting,
 		Recording:    recording,
 	}
 	// 创建新会话

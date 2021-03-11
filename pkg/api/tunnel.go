@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
@@ -49,7 +50,7 @@ func TunEndpoint(c echo.Context) error {
 			logrus.Warnf("会话不存在")
 			return err
 		}
-		if session.Status != model.Connected {
+		if session.Status != constant.Connected {
 			logrus.Warnf("会话未在线")
 			return errors.New("会话未在线")
 		}
@@ -188,7 +189,7 @@ func TunEndpoint(c echo.Context) error {
 			ConnectionId: tunnel.UUID,
 			Width:        intWidth,
 			Height:       intHeight,
-			Status:       model.Connecting,
+			Status:       constant.Connecting,
 			Recording:    configuration.GetParameter(guacd.RecordingPath),
 		}
 		// 创建新会话

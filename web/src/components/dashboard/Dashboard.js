@@ -6,7 +6,7 @@ import request from "../../common/request";
 import './Dashboard.css'
 import {Link} from "react-router-dom";
 import {Area} from '@ant-design/charts';
-import LayoutHeader from "../user/LayoutHeader";
+
 import {isAdmin} from "../../service/permission";
 
 
@@ -87,9 +87,7 @@ class Dashboard extends Component {
                         itemRender: itemRender
                     }}
                     subTitle="仪表盘"
-                    extra={[
-
-                    ]}
+                    extra={[]}
                 >
                 </PageHeader>
 

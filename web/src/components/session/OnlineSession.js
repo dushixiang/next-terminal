@@ -24,7 +24,7 @@ import {message} from "antd/es";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import {DisconnectOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 import Monitor from "../access/Monitor";
-import LayoutHeader from "../user/LayoutHeader";
+
 import dayjs from "dayjs";
 
 const confirm = Modal.confirm;

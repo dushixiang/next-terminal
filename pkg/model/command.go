@@ -1,6 +1,7 @@
 package model
 
 import (
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
 )
@@ -32,7 +33,7 @@ func FindPageCommand(pageIndex, pageSize int, name, content, order, field string
 	db := global.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
 	dbCounter := global.DB.Table("commands").Select("DISTINCT commands.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
 
-	if TypeUser == account.Type {
+	if constant.TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("commands.owner = ? or resource_sharers.user_id = ?", owner, owner)
 		dbCounter = dbCounter.Where("commands.owner = ? or resource_sharers.user_id = ?", owner, owner)

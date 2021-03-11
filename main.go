@@ -15,6 +15,7 @@ import (
 	"io"
 	"next-terminal/pkg/api"
 	"next-terminal/pkg/config"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/handle"
 	"next-terminal/pkg/model"
@@ -132,7 +133,7 @@ func Run() error {
 			Username: "admin",
 			Password: string(pass),
 			Nickname: "超级管理员",
-			Type:     model.TypeAdmin,
+			Type:     constant.TypeAdmin,
 			Created:  utils.NowJsonTime(),
 		}
 		if err := model.CreateNewUser(&user); err != nil {
@@ -144,7 +145,7 @@ func Run() error {
 			// 修正默认用户类型为管理员
 			if users[i].Type == "" {
 				user := model.User{
-					Type: model.TypeAdmin,
+					Type: constant.TypeAdmin,
 				}
 				model.UpdateUserById(&user, users[i].ID)
 				logrus.Infof("自动修正用户「%v」ID「%v」类型为管理员", users[i].Nickname, users[i].ID)
@@ -191,6 +192,12 @@ func Run() error {
 	if err := global.DB.AutoMigrate(&model.JobLog{}); err != nil {
 		return err
 	}
+	if err := global.DB.AutoMigrate(&model.AccessSecurity{}); err != nil {
+		return err
+	}
+	if err := api.ReloadAccessSecurity(); err != nil {
+		return err
+	}
 
 	if len(model.FindAllTemp()) == 0 {
 		for i := 0; i <= 30; i++ {
@@ -216,7 +223,7 @@ func Run() error {
 	global.Cron = cron.New(cron.WithSeconds()) //精确到秒
 	global.Cron.Start()
 
-	jobs, err := model.FindJobByFunc(model.FuncCheckAssetStatusJob)
+	jobs, err := model.FindJobByFunc(constant.FuncCheckAssetStatusJob)
 	if err != nil {
 		return err
 	}
@@ -224,10 +231,10 @@ func Run() error {
 		job := model.Job{
 			ID:      utils.UUID(),
 			Name:    "资产状态检测",
-			Func:    model.FuncCheckAssetStatusJob,
+			Func:    constant.FuncCheckAssetStatusJob,
 			Cron:    "0 0 0/1 * * ?",
-			Mode:    model.JobModeAll,
-			Status:  model.JobStatusRunning,
+			Mode:    constant.JobModeAll,
+			Status:  constant.JobStatusRunning,
 			Created: utils.NowJsonTime(),
 			Updated: utils.NowJsonTime(),
 		}
@@ -237,8 +244,8 @@ func Run() error {
 		logrus.Debugf("创建计划任务「%v」cron「%v」", job.Name, job.Cron)
 	} else {
 		for i := range jobs {
-			if jobs[i].Status == model.JobStatusRunning {
-				err := model.ChangeJobStatusById(jobs[i].ID, model.JobStatusRunning)
+			if jobs[i].Status == constant.JobStatusRunning {
+				err := model.ChangeJobStatusById(jobs[i].ID, constant.JobStatusRunning)
 				if err != nil {
 					return err
 				}

@@ -287,6 +287,14 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                             {
                                 protocol === 'rdp' ?
                                     <>
+                                        <Panel header={<Text strong>认证</Text>} key="认证">
+                                            <Form.Item
+                                                name="domain"
+                                                label='域'
+                                            >
+                                                <Input type='text' placeholder="身份验证时使用的域"/>
+                                            </Form.Item>
+                                        </Panel>
                                         <Panel header={<Text strong>Remote App</Text>} key="remote-app">
                                             <Form.Item
                                                 name="remote-app"

@@ -23,7 +23,7 @@ import Playback from "./Playback";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 import {PROTOCOL_COLORS} from "../../common/constants";
-import LayoutHeader from "../user/LayoutHeader";
+
 import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
@@ -290,6 +290,30 @@ class OfflineSession extends Component {
                             <Button type="link" size='small'
                                     disabled={disabled}
                                     onClick={() => this.showPlayback(record)}>回放</Button>
+                            <Button type="link" size='small'
+                                    onClick={() => {
+                                        confirm({
+                                            title: '您确定要禁止该IP访问本系统吗?',
+                                            content: '',
+                                            okText: '确定',
+                                            okType: 'danger',
+                                            cancelText: '取消',
+                                            onOk: async () => {
+                                                // 向后台提交数据
+                                                let formData = {
+                                                    ip: record['clientIp'],
+                                                    rule: 'reject',
+                                                    priority: 99,
+                                                }
+                                                const result = await request.post('/securities', formData);
+                                                if (result.code === 1) {
+                                                    message.success('禁用成功');
+                                                } else {
+                                                    message.error('禁用失败 :( ' + result.message, 10);
+                                                }
+                                            }
+                                        });
+                                    }}>禁用IP</Button>
                             <Button type="link" size='small' onClick={() => {
                                 confirm({
                                     title: '您确定要删除此会话吗?',
@@ -496,7 +520,7 @@ class OfflineSession extends Component {
                                                 overflow: 'visible'
                                             }}
                                             onLoad={() => {
-                                                // const obj = ReactDOM.findDOMNode(this);
+                                                // constant obj = ReactDOM.findDOMNode(this);
                                                 // this.setState({
                                                 //     "iFrameHeight": obj.contentWindow.document.body.scrollHeight + 'px'
                                                 // });

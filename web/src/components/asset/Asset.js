@@ -40,7 +40,7 @@ import {
     UploadOutlined
 } from '@ant-design/icons';
 import {PROTOCOL_COLORS} from "../../common/constants";
-import LayoutHeader from "../user/LayoutHeader";
+
 import {hasPermission, isAdmin} from "../../service/permission";
 import Upload from "antd/es/upload";
 import axios from "axios";
@@ -880,28 +880,44 @@ class Asset extends Component {
                                        disabled: this.state.fileList.length === 0
                                    }}
                             >
-                                <Upload
-                                    maxCount={1}
-                                    onRemove={file => {
-                                        this.setState(state => {
-                                            const index = state.fileList.indexOf(file);
-                                            const newFileList = state.fileList.slice();
-                                            newFileList.splice(index, 1);
-                                            return {
-                                                fileList: newFileList,
-                                            };
-                                        });
-                                    }}
-                                    beforeUpload={(file) => {
-                                        this.setState(state => ({
-                                            fileList: [file],
-                                        }));
-                                        return false;
-                                    }}
-                                    fileList={this.state.fileList}
-                                >
-                                    <Button icon={<UploadOutlined/>}>选择csv文件</Button>
-                                </Upload>
+                                <Space>
+                                    <Upload
+                                        maxCount={1}
+                                        onRemove={file => {
+                                            this.setState(state => {
+                                                const index = state.fileList.indexOf(file);
+                                                const newFileList = state.fileList.slice();
+                                                newFileList.splice(index, 1);
+                                                return {
+                                                    fileList: newFileList,
+                                                };
+                                            });
+                                        }}
+                                        beforeUpload={(file) => {
+                                            this.setState(state => ({
+                                                fileList: [file],
+                                            }));
+                                            return false;
+                                        }}
+                                        fileList={this.state.fileList}
+                                    >
+                                        <Button icon={<UploadOutlined/>}>选择csv文件</Button>
+                                    </Upload>
+
+                                    <Button type="primary" onClick={() => {
+
+                                        let csvString= 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description';
+                                        //前置的"\uFEFF"为“零宽不换行空格”，可处理中文乱码问题
+                                        const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
+                                        let a = document.createElement('a');
+                                        a.download = 'sample.csv';
+                                        a.href = URL.createObjectURL(blob);
+                                        a.click();
+                                    }}>
+                                        下载样本文件
+                                    </Button>
+                                </Space>
+
                             </Modal>
                             : undefined
                     }
