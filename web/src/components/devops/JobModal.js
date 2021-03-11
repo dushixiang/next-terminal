@@ -47,7 +47,6 @@ const JobModal = ({title, visible, handleOk, handleCancel, confirmLoading, model
             title={title}
             visible={visible}
             maskClosable={false}
-            centered={true}
             onOk={() => {
                 form
                     .validateFields()
