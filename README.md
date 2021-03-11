@@ -36,6 +36,8 @@ test/test
 
 ## 快速安装
 
+> 本项目未进行严格的安全性测试，不建议部署安装在公网环境。
+
 - [使用docker安装](docs/install-docker.md)
 - [原生安装](docs/install-naive.md)
 - [FAQ](docs/faq.md)
