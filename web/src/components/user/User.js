@@ -34,7 +34,6 @@ import {
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import LayoutHeader from "./LayoutHeader";
 import UserShareAsset from "./UserShareAsset";
 import {hasPermission} from "../../service/permission";
 import dayjs from "dayjs";
