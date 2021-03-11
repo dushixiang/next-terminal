@@ -2,6 +2,8 @@
 
 默认使用`docker hub`源，与Github的docker镜像仓库`ghcr.io`同步。
 
+国内用户可以使用阿里云镜像仓库 `registry.cn-qingdao.aliyuncs.com/dushixiang/next-terminal`。
+
 ### 使用`sqlite`存储数据
 
 最简安装
