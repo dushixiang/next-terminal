@@ -502,7 +502,7 @@ class OfflineSession extends Component {
                             <Modal
                                 className='modal-no-padding'
                                 title={`会话回放 来源IP：${this.state.selectedRow['clientIp']} 用户昵称：${this.state.selectedRow['creatorName']} 资产名称：${this.state.selectedRow['assetName']} 网络：${this.state.selectedRow['username']}@${this.state.selectedRow['ip']}:${this.state.selectedRow['port']}`}
-                                centered={true}
+
                                 visible={this.state.playbackVisible}
                                 onCancel={this.hidePlayback}
                                 width={window.innerWidth * 0.8}

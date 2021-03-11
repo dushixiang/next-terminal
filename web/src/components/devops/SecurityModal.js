@@ -1,5 +1,6 @@
 import React from 'react';
-import {Form, Input, InputNumber, Modal, Radio} from "antd/lib/index";
+import {Form, Input, InputNumber, Modal, Radio, Tooltip} from "antd/lib/index";
+import {ExclamationCircleOutlined} from "@ant-design/icons";
 
 const formItemLayout = {
     labelCol: {span: 6},
@@ -19,7 +20,6 @@ const SecurityModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
             title={title}
             visible={visible}
             maskClosable={false}
-            centered={true}
             onOk={() => {
                 form
                     .validateFields()
@@ -54,7 +54,9 @@ const SecurityModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
                     </Radio.Group>
                 </Form.Item>
 
-                <Form.Item label="优先级" name='priority' rules={[{required: true, message: '请输入优先级'}]}>
+                <Form.Item label={<Tooltip
+                    title="数字越小代表优先级越高。">优先级&nbsp;
+                    <ExclamationCircleOutlined/></Tooltip>} name='priority' rules={[{required: true, message: '请输入优先级'}]}>
                     <InputNumber min={0} max={100}/>
                 </Form.Item>
 

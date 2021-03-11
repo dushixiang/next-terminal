@@ -457,7 +457,7 @@ class FileSystem extends Component {
                 <Modal
                     title="上传文件"
                     visible={this.state.uploadVisible}
-                    centered={true}
+
                     onOk={() => {
                         this.setState({
                             uploadVisible: false
@@ -483,7 +483,7 @@ class FileSystem extends Component {
                         <Modal
                             title="创建文件夹"
                             visible={this.state.mkdirVisible}
-                            centered={true}
+
                             onOk={() => {
                                 this.mkdirFormRef.current
                                     .validateFields()
@@ -535,7 +535,7 @@ class FileSystem extends Component {
                         <Modal
                             title="重命名"
                             visible={this.state.renameVisible}
-                            centered={true}
+
                             onOk={() => {
                                 this.renameFormRef.current
                                     .validateFields()
