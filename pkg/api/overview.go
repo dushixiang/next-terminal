@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/labstack/echo/v4"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/model"
 )
 
@@ -21,7 +22,7 @@ func OverviewCounterEndPoint(c echo.Context) error {
 		credential         int64
 		asset              int64
 	)
-	if model.TypeUser == account.Type {
+	if constant.TypeUser == account.Type {
 		countUser, _ = model.CountOnlineUser()
 		countOnlineSession, _ = model.CountOnlineSession()
 		credential, _ = model.CountCredentialByUserId(account.ID)

@@ -3,7 +3,6 @@ import {Button, Card, Form, Image, Input, Layout, Modal, PageHeader, Result, Spa
 import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import {message} from "antd/es";
-import LayoutHeader from "./LayoutHeader";
 import {ExclamationCircleOutlined, ReloadOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;

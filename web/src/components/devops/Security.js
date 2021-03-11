@@ -1,32 +1,44 @@
 import React, {Component} from 'react';
-import {itemRender} from '../../utils/utils'
 
-import {Button, Col, Divider, Input, Layout, Modal, PageHeader, Row, Space, Table, Tooltip, Typography,} from "antd";
+import {
+    Button,
+    Col,
+    Divider,
+    Input,
+    Layout,
+    Modal,
+    PageHeader,
+    Row,
+    Space,
+    Table,
+    Tag,
+    Tooltip,
+    Typography
+} from "antd";
 import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
-import UserGroupModal from "./UserGroupModal";
-import UserShareAsset from "./UserShareAsset";
-import dayjs from "dayjs";
+import {itemRender} from "../../utils/utils";
+import './Job.css'
+import SecurityModal from "./SecurityModal";
 
 const confirm = Modal.confirm;
-const {Search} = Input;
-const {Title, Text} = Typography;
 const {Content} = Layout;
-
+const {Title, Text} = Typography;
+const {Search} = Input;
 const routes = [
     {
         path: '',
         breadcrumbName: '首页',
     },
     {
-        path: 'user',
-        breadcrumbName: '用户组',
+        path: 'security',
+        breadcrumbName: '访问安全',
     }
 ];
 
-class UserGroup extends Component {
+class Security extends Component {
 
     inputRefOfName = React.createRef();
 
@@ -41,10 +53,8 @@ class UserGroup extends Component {
         modalVisible: false,
         modalTitle: '',
         modalConfirmLoading: false,
-        model: undefined,
+        selectedRow: undefined,
         selectedRowKeys: [],
-        delBtnLoading: false,
-        users: [],
     };
 
     componentDidMount() {
@@ -52,13 +62,14 @@ class UserGroup extends Component {
     }
 
     async delete(id) {
-        let result = await request.delete('/user-groups/' + id);
+        const result = await request.delete('/securities/' + id);
         if (result.code === 1) {
-            message.success('操作成功', 3);
-            await this.loadTableData(this.state.queryParams);
+            message.success('删除成功');
+            this.loadTableData(this.state.queryParams);
         } else {
             message.error('删除失败 :( ' + result.message, 10);
         }
+
     }
 
     async loadTableData(queryParams) {
@@ -68,6 +79,7 @@ class UserGroup extends Component {
 
         queryParams = queryParams || this.state.queryParams;
 
+        // queryParams
         let paramsStr = qs.stringify(queryParams);
 
         let data = {
@@ -76,11 +88,11 @@ class UserGroup extends Component {
         };
 
         try {
-            let result = await request.get('/user-groups/paging?' + paramsStr);
+            let result = await request.get('/securities/paging?' + paramsStr);
             if (result.code === 1) {
                 data = result.data;
             } else {
-                message.error(result.message, 10);
+                message.error(result.message);
             }
         } catch (e) {
 
@@ -95,10 +107,9 @@ class UserGroup extends Component {
                 loading: false
             });
         }
-
     }
 
-    handleChangPage = (pageIndex, pageSize) => {
+    handleChangPage = async (pageIndex, pageSize) => {
         let queryParams = this.state.queryParams;
         queryParams.pageIndex = pageIndex;
         queryParams.pageSize = pageSize;
@@ -107,14 +118,23 @@ class UserGroup extends Component {
             queryParams: queryParams
         });
 
-        this.loadTableData(queryParams).then(r => {
-        })
+        await this.loadTableData(queryParams)
+    };
+
+    handleSearchByName = name => {
+        let query = {
+            ...this.state.queryParams,
+            'pageIndex': 1,
+            'pageSize': this.state.queryParams.pageSize,
+            'name': name,
+        }
+        this.loadTableData(query);
     };
 
     showDeleteConfirm(id, content) {
         let self = this;
         confirm({
-            title: '您确定要删除此用户组吗?',
+            title: '您确定要删除此任务吗?',
             content: content,
             okText: '确定',
             okType: 'danger',
@@ -125,45 +145,19 @@ class UserGroup extends Component {
         });
     };
 
-    showModal = async (title, id, index) => {
+    showModal(title, obj = null) {
 
-        let items = this.state.items;
-
-        let model = {}
-        if (id) {
-            items[index].updateBtnLoading = true;
-            this.setState({
-                items: items
-            });
-
-            let result = await request.get('/user-groups/' + id);
-            if (result['code'] !== 1) {
-                message.error(result['message']);
-                items[index].updateBtnLoading = false;
-                this.setState({
-                    items: items
-                });
-                return;
-            }
-
-            items[index].updateBtnLoading = false;
-            model = result['data']
-        }
-
-        await this.handleSearchByNickname('');
-        console.log(model)
         this.setState({
-            model: model,
+            modalTitle: title,
             modalVisible: true,
-            modalTitle: title
+            model: obj
         });
     };
 
     handleCancelModal = e => {
         this.setState({
-            modalVisible: false,
             modalTitle: '',
-            model: undefined
+            modalVisible: false
         });
     };
 
@@ -175,29 +169,29 @@ class UserGroup extends Component {
 
         if (formData.id) {
             // 向后台提交数据
-            const result = await request.put('/user-groups/' + formData.id, formData);
+            const result = await request.put('/securities/' + formData.id, formData);
             if (result.code === 1) {
-                message.success('操作成功', 3);
+                message.success('更新成功');
 
                 this.setState({
                     modalVisible: false
                 });
-                await this.loadTableData(this.state.queryParams);
+                this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error('更新失败 :( ' + result.message, 10);
             }
         } else {
             // 向后台提交数据
-            const result = await request.post('/user-groups', formData);
+            const result = await request.post('/securities', formData);
             if (result.code === 1) {
-                message.success('操作成功', 3);
+                message.success('新增成功');
 
                 this.setState({
                     modalVisible: false
                 });
-                await this.loadTableData(this.state.queryParams);
+                this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error('新增失败 :( ' + result.message, 10);
             }
         }
 
@@ -206,23 +200,12 @@ class UserGroup extends Component {
         });
     };
 
-    handleSearchByName = name => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'name': name,
-        }
-
-        this.loadTableData(query);
-    };
-
     batchDelete = async () => {
         this.setState({
             delBtnLoading: true
         })
         try {
-            let result = await request.delete('/user-groups/' + this.state.selectedRowKeys.join(','));
+            let result = await request.delete('/securities/' + this.state.selectedRowKeys.join(','));
             if (result.code === 1) {
                 message.success('操作成功', 3);
                 this.setState({
@@ -237,25 +220,6 @@ class UserGroup extends Component {
                 delBtnLoading: false
             })
         }
-    }
-
-    handleSearchByNickname = async nickname => {
-        const result = await request.get(`/users/paging?pageIndex=1&pageSize=1000&nickname=${nickname}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-
-        this.setState({
-            users: result.data.items
-        })
-    }
-
-    handleAssetCancel = () => {
-        this.loadTableData()
-        this.setState({
-            assetVisible: false
-        })
     }
 
     handleTableChange = (pagination, filters, sorter) => {
@@ -278,49 +242,47 @@ class UserGroup extends Component {
                 return index + 1;
             }
         }, {
-            title: '名称',
-            dataIndex: 'name',
+            title: 'IP',
+            dataIndex: 'ip',
+            key: 'ip',
             sorter: true,
         }, {
-            title: '授权资产',
-            dataIndex: 'assetCount',
-            key: 'assetCount',
-            render: (text, record, index) => {
-                return <Button type='link' onClick={async () => {
-                    this.setState({
-                        assetVisible: true,
-                        userGroupId: record['id']
-                    })
-                }}>{text}</Button>
+            title: '规则',
+            dataIndex: 'rule',
+            key: 'rule',
+            render: (rule) => {
+                if (rule === 'allow') {
+                    return <Tag color={'green'}>允许</Tag>
+                } else {
+                    return <Tag color={'red'}>禁止</Tag>
+                }
             }
         }, {
-            title: '创建日期',
-            dataIndex: 'created',
-            key: 'created',
-            render: (text, record) => {
+            title: '优先级',
+            dataIndex: 'priority',
+            key: 'priority',
+            sorter: true,
+        }, {
+            title: '来源',
+            dataIndex: 'source',
+            key: 'source',
+        }, {
+            title: '操作',
+            key: 'action',
+            render: (text, record, index) => {
+
                 return (
-                    <Tooltip title={text}>
-                        {dayjs(text).fromNow()}
-                    </Tooltip>
+                    <div>
+                        <Button type="link" size='small' loading={this.state.items[index]['execLoading']}
+                                onClick={() => this.showModal('更新计划任务', record)}>编辑</Button>
+
+                        <Button type="text" size='small' danger
+                                onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+
+                    </div>
                 )
             },
-            sorter: true,
-        },
-            {
-                title: '操作',
-                key: 'action',
-                render: (text, record, index) => {
-                    return (
-                        <div>
-                            <Button type="link" size='small'
-                                    loading={this.state.items[index].updateBtnLoading}
-                                    onClick={() => this.showModal('更新用户组', record['id'], index)}>编辑</Button>
-                            <Button type="link" size='small'
-                                    onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
-                        </div>
-                    )
-                },
-            }
+        }
         ];
 
         const selectedRowKeys = this.state.selectedRowKeys;
@@ -336,37 +298,38 @@ class UserGroup extends Component {
             <>
                 <PageHeader
                     className="site-page-header-ghost-wrapper"
-                    title="用户组管理"
+                    title="访问安全"
                     breadcrumb={{
                         routes: routes,
                         itemRender: itemRender
                     }}
 
-                    subTitle="平台用户管理"
+                    subTitle="IP访问规则限制"
                 >
                 </PageHeader>
 
                 <Content className="site-layout-background page-content">
+
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={8} key={1}>
-                                <Title level={3}>用户组列表</Title>
+                            <Col span={12} key={1}>
+                                <Title level={3}>IP访问规则列表</Title>
                             </Col>
-                            <Col span={16} key={2} style={{textAlign: 'right'}}>
+                            <Col span={12} key={2} style={{textAlign: 'right'}}>
                                 <Space>
-
                                     <Search
                                         ref={this.inputRefOfName}
-                                        placeholder="名称"
+                                        placeholder="IP"
                                         allowClear
                                         onSearch={this.handleSearchByName}
                                     />
+
 
                                     <Tooltip title='重置查询'>
 
                                         <Button icon={<UndoOutlined/>} onClick={() => {
                                             this.inputRefOfName.current.setValue('');
-                                            this.loadTableData({pageIndex: 1, pageSize: 10})
+                                            this.loadTableData({pageIndex: 1, pageSize: 10, name: '', content: ''})
                                         }}>
 
                                         </Button>
@@ -376,10 +339,11 @@ class UserGroup extends Component {
 
                                     <Tooltip title="新增">
                                         <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增用户组')}>
+                                                onClick={() => this.showModal('新增安全访问规则', {})}>
 
                                         </Button>
                                     </Tooltip>
+
 
                                     <Tooltip title="刷新列表">
                                         <Button icon={<SyncOutlined/>} onClick={() => {
@@ -388,6 +352,7 @@ class UserGroup extends Component {
 
                                         </Button>
                                     </Tooltip>
+
 
                                     <Tooltip title="批量删除">
                                         <Button type="primary" danger disabled={!hasSelected} icon={<DeleteOutlined/>}
@@ -417,61 +382,40 @@ class UserGroup extends Component {
                         </Row>
                     </div>
 
-                    <Table rowSelection={rowSelection}
-                           dataSource={this.state.items}
-                           columns={columns}
-                           position={'both'}
-                           pagination={{
-                               showSizeChanger: true,
-                               current: this.state.queryParams.pageIndex,
-                               pageSize: this.state.queryParams.pageSize,
-                               onChange: this.handleChangPage,
-                               onShowSizeChange: this.handleChangPage,
-                               total: this.state.total,
-                               showTotal: total => `总计 ${total} 条`
-                           }}
-                           loading={this.state.loading}
-                           onChange={this.handleTableChange}
+                    <Table
+                        rowSelection={rowSelection}
+                        dataSource={this.state.items}
+                        columns={columns}
+                        position={'both'}
+                        pagination={{
+                            showSizeChanger: true,
+                            current: this.state.queryParams.pageIndex,
+                            pageSize: this.state.queryParams.pageSize,
+                            onChange: this.handleChangPage,
+                            onShowSizeChange: this.handleChangPage,
+                            total: this.state.total,
+                            showTotal: total => `总计 ${total} 条`
+                        }}
+                        loading={this.state.loading}
+                        onChange={this.handleTableChange}
                     />
 
-                    {/* 为了屏蔽ant modal 关闭后数据仍然遗留的问题*/}
-                    {this.state.modalVisible ?
-                        <UserGroupModal
-                            visible={this.state.modalVisible}
-                            title={this.state.modalTitle}
-                            handleOk={this.handleOk}
-                            handleCancel={this.handleCancelModal}
-                            confirmLoading={this.state.modalConfirmLoading}
-                            model={this.state.model}
-                            users={this.state.users}
-                        >
-                        </UserGroupModal> : undefined
+                    {
+                        this.state.modalVisible ?
+                            <SecurityModal
+                                visible={this.state.modalVisible}
+                                title={this.state.modalTitle}
+                                handleOk={this.handleOk}
+                                handleCancel={this.handleCancelModal}
+                                confirmLoading={this.state.modalConfirmLoading}
+                                model={this.state.model}
+                            >
+                            </SecurityModal> : undefined
                     }
-
-                    <Modal
-                        width={window.innerWidth * 0.8}
-                        title='已授权资产'
-                        visible={this.state.assetVisible}
-                        maskClosable={false}
-                        centered={true}
-                        destroyOnClose={true}
-                        onOk={() => {
-
-                        }}
-                        onCancel={this.handleAssetCancel}
-                        okText='确定'
-                        cancelText='取消'
-                        footer={null}
-                    >
-                        <UserShareAsset
-                            userGroupId={this.state.userGroupId}
-                        />
-                    </Modal>
-
                 </Content>
             </>
         );
     }
 }
 
-export default UserGroup;
+export default Security;

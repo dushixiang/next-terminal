@@ -2,6 +2,7 @@ package handle
 
 import (
 	"github.com/sirupsen/logrus"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
@@ -16,7 +17,7 @@ func RunTicker() {
 	unUsedSessionTicker := time.NewTicker(time.Minute * 60)
 	go func() {
 		for range unUsedSessionTicker.C {
-			sessions, _ := model.FindSessionByStatusIn([]string{model.NoConnect, model.Connecting})
+			sessions, _ := model.FindSessionByStatusIn([]string{constant.NoConnect, constant.Connecting})
 			if sessions != nil && len(sessions) > 0 {
 				now := time.Now()
 				for i := range sessions {
@@ -65,14 +66,14 @@ func RunTicker() {
 }
 
 func RunDataFix() {
-	sessions, _ := model.FindSessionByStatus(model.Connected)
+	sessions, _ := model.FindSessionByStatus(constant.Connected)
 	if sessions == nil {
 		return
 	}
 
 	for i := range sessions {
 		session := model.Session{
-			Status:           model.Disconnected,
+			Status:           constant.Disconnected,
 			DisconnectedTime: utils.NowJsonTime(),
 		}
 

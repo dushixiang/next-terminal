@@ -2,10 +2,6 @@ package model
 
 import "next-terminal/pkg/global"
 
-const (
-	FontSize = "font-size"
-)
-
 type UserAttribute struct {
 	Id     string `gorm:"index" json:"id"`
 	UserId string `gorm:"index" json:"userId"`

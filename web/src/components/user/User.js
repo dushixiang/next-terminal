@@ -549,7 +549,7 @@ class User extends Component {
                                     {/*            icon={<IssuesCloseOutlined/>}*/}
                                     {/*            loading={this.state.delBtnLoading}*/}
                                     {/*            onClick={() => {*/}
-                                    {/*                const content = <div>*/}
+                                    {/*                constant content = <div>*/}
                                     {/*                    您确定要启用选中的<Text style={{color: '#1890FF'}}*/}
                                     {/*                                   strong>{this.state.selectedRowKeys.length}</Text>条记录吗？*/}
                                     {/*                </div>;*/}
@@ -572,7 +572,7 @@ class User extends Component {
                                     {/*    <Button type="default" danger disabled={!hasSelected} icon={<StopOutlined/>}*/}
                                     {/*            loading={this.state.delBtnLoading}*/}
                                     {/*            onClick={() => {*/}
-                                    {/*                const content = <div>*/}
+                                    {/*                constant content = <div>*/}
                                     {/*                    您确定要禁用选中的<Text style={{color: '#1890FF'}}*/}
                                     {/*                                   strong>{this.state.selectedRowKeys.length}</Text>条记录吗？*/}
                                     {/*                </div>;*/}

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/labstack/echo/v4"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
 	"strconv"
@@ -85,7 +86,7 @@ func AssetImportEndpoint(c echo.Context) error {
 				Protocol:    record[1],
 				IP:          record[2],
 				Port:        port,
-				AccountType: model.Custom,
+				AccountType: constant.Custom,
 				Username:    record[4],
 				Password:    record[5],
 				PrivateKey:  record[6],

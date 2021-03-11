@@ -182,3 +182,30 @@ func StructToMap(obj interface{}) map[string]interface{} {
 	}
 	return data
 }
+
+func IpToInt(ip string) int64 {
+	if len(ip) == 0 {
+		return 0
+	}
+	bits := strings.Split(ip, ".")
+	if len(bits) < 4 {
+		return 0
+	}
+	b0 := StringToInt(bits[0])
+	b1 := StringToInt(bits[1])
+	b2 := StringToInt(bits[2])
+	b3 := StringToInt(bits[3])
+
+	var sum int64
+	sum += int64(b0) << 24
+	sum += int64(b1) << 16
+	sum += int64(b2) << 8
+	sum += int64(b3)
+
+	return sum
+}
+
+func StringToInt(in string) (out int) {
+	out, _ = strconv.Atoi(in)
+	return
+}

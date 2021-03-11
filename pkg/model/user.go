@@ -6,11 +6,6 @@ import (
 	"reflect"
 )
 
-const (
-	TypeUser  = "user"
-	TypeAdmin = "admin"
-)
-
 type User struct {
 	ID         string         `gorm:"primary_key" json:"id"`
 	Username   string         `gorm:"index" json:"username"`

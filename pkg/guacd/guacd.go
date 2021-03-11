@@ -34,6 +34,7 @@ const (
 	DisableOffscreenCaching  = "disable-offscreen-caching"
 	DisableGlyphCaching      = "disable-glyph-caching"
 
+	Domain        = "domain"
 	RemoteApp     = "remote-app"
 	RemoteAppDir  = "remote-app-dir"
 	RemoteAppArgs = "remote-app-args"

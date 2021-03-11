@@ -16,3 +16,10 @@ var Config *config.Config
 var Store *TunStore
 
 var Cron *cron.Cron
+
+type Security struct {
+	Rule string
+	IP   string
+}
+
+var Securities []*Security

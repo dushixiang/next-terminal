@@ -6,22 +6,12 @@ import (
 	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/term"
 	"next-terminal/pkg/utils"
 	"strings"
 	"time"
-)
-
-const (
-	JobStatusRunning    = "running"
-	JobStatusNotRunning = "not-running"
-
-	FuncCheckAssetStatusJob = "check-asset-status-job"
-	FuncShellJob            = "shell-job"
-
-	JobModeAll    = "all"
-	JobModeCustom = "custom"
 )
 
 type Job struct {
@@ -91,7 +81,7 @@ func FindJobByFunc(function string) (o []Job, err error) {
 
 func CreateNewJob(o *Job) (err error) {
 
-	if o.Status == JobStatusRunning {
+	if o.Status == constant.JobStatusRunning {
 		j, err := getJob(o)
 		if err != nil {
 			return err
@@ -107,11 +97,12 @@ func CreateNewJob(o *Job) (err error) {
 }
 
 func UpdateJobById(o *Job, id string) (err error) {
-	if o.Status == JobStatusRunning {
+	if o.Status == constant.JobStatusRunning {
 		return errors.New("请先停止定时任务后再修改")
 	}
 
-	return global.DB.Where("id = ?", id).Updates(o).Error
+	o.ID = id
+	return global.DB.Updates(o).Error
 }
 
 func UpdateJonUpdatedById(id string) (err error) {
@@ -125,7 +116,7 @@ func ChangeJobStatusById(id, status string) (err error) {
 	if err != nil {
 		return err
 	}
-	if status == JobStatusRunning {
+	if status == constant.JobStatusRunning {
 		j, err := getJob(&job)
 		if err != nil {
 			return err
@@ -136,11 +127,11 @@ func ChangeJobStatusById(id, status string) (err error) {
 		}
 		logrus.Debugf("开启计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(global.Cron.Entries()))
 
-		return global.DB.Updates(Job{ID: id, Status: JobStatusRunning, CronJobId: int(entryID)}).Error
+		return global.DB.Updates(Job{ID: id, Status: constant.JobStatusRunning, CronJobId: int(entryID)}).Error
 	} else {
 		global.Cron.Remove(cron.EntryID(job.CronJobId))
 		logrus.Debugf("关闭计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(global.Cron.Entries()))
-		return global.DB.Updates(Job{ID: id, Status: JobStatusNotRunning}).Error
+		return global.DB.Updates(Job{ID: id, Status: constant.JobStatusNotRunning}).Error
 	}
 }
 
@@ -167,8 +158,8 @@ func DeleteJobById(id string) error {
 	if err != nil {
 		return err
 	}
-	if job.Status == JobStatusRunning {
-		if err := ChangeJobStatusById(id, JobStatusNotRunning); err != nil {
+	if job.Status == constant.JobStatusRunning {
+		if err := ChangeJobStatusById(id, constant.JobStatusNotRunning); err != nil {
 			return err
 		}
 	}
@@ -177,9 +168,9 @@ func DeleteJobById(id string) error {
 
 func getJob(j *Job) (job cron.Job, err error) {
 	switch j.Func {
-	case FuncCheckAssetStatusJob:
+	case constant.FuncCheckAssetStatusJob:
 		job = CheckAssetStatusJob{ID: j.ID, Mode: j.Mode, ResourceIds: j.ResourceIds, Metadata: j.Metadata}
-	case FuncShellJob:
+	case constant.FuncShellJob:
 		job = ShellJob{ID: j.ID, Mode: j.Mode, ResourceIds: j.ResourceIds, Metadata: j.Metadata}
 	default:
 		return nil, errors.New("未识别的任务")
@@ -200,7 +191,7 @@ func (r CheckAssetStatusJob) Run() {
 	}
 
 	var assets []Asset
-	if r.Mode == JobModeAll {
+	if r.Mode == constant.JobModeAll {
 		assets, _ = FindAllAsset()
 	} else {
 		assets, _ = FindAssetByIds(strings.Split(r.ResourceIds, ","))
@@ -258,7 +249,7 @@ func (r ShellJob) Run() {
 	}
 
 	var assets []Asset
-	if r.Mode == JobModeAll {
+	if r.Mode == constant.JobModeAll {
 		assets, _ = FindAssetByProtocol("ssh")
 	} else {
 		assets, _ = FindAssetByProtocolAndIds("ssh", strings.Split(r.ResourceIds, ","))
@@ -299,7 +290,7 @@ func (r ShellJob) Run() {
 				return
 			}
 
-			if credential.Type == Custom {
+			if credential.Type == constant.Custom {
 				username = credential.Username
 				password = credential.Password
 			} else {
