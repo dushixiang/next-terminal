@@ -31,7 +31,7 @@ class LayoutHeader extends Component {
                 </Menu.Item>
 
                 <Menu.Item>
-                    <a target='_blank' href='https://github.com/dushixiang/next-terminal'>
+                    <a target='_blank' rel="noreferrer"  href='https://github.com/dushixiang/next-terminal'>
                         <GithubOutlined/>
                         点个Star
                     </a>
@@ -65,7 +65,7 @@ class LayoutHeader extends Component {
 
                         <div className={'layout-header-right-item'}>
                             <Tooltip placement="bottom" title={'使用帮助'}>
-                                <a target='_blank' href='https://github.com/dushixiang/next-terminal/blob/master/docs/faq.md'>
+                                <a target='_blank' rel="noreferrer"  href='https://github.com/dushixiang/next-terminal/blob/master/docs/faq.md'>
                                     <QuestionCircleOutlined/>
                                 </a>
                             </Tooltip>
