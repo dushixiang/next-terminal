@@ -271,6 +271,12 @@ func SessionUploadEndpoint(c echo.Context) error {
 		}
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
+
+		if strings.Contains(remoteFile, "../") {
+			logrus.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
+			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+		}
+
 		drivePath, err := model.GetDrivePath()
 		if err != nil {
 			return err
@@ -324,11 +330,14 @@ func SessionDownloadEndpoint(c echo.Context) error {
 
 		return c.Stream(http.StatusOK, echo.MIMEOctetStream, bytes.NewReader(buff.Bytes()))
 	} else if "rdp" == session.Protocol {
+		if strings.Contains(remoteFile, "../") {
+			logrus.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
+			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+		}
 		drivePath, err := model.GetDrivePath()
 		if err != nil {
 			return err
 		}
-
 		return c.Attachment(path.Join(drivePath, remoteFile), filenameWithSuffix)
 	}
 
@@ -403,6 +412,10 @@ func SessionLsEndpoint(c echo.Context) error {
 
 		return Success(c, files)
 	} else if "rdp" == session.Protocol {
+		if strings.Contains(remoteDir, "../") {
+			logrus.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
+			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+		}
 		drivePath, err := model.GetDrivePath()
 		if err != nil {
 			return err
@@ -450,6 +463,10 @@ func SessionMkDirEndpoint(c echo.Context) error {
 		}
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
+		if strings.Contains(remoteDir, "../") {
+			logrus.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
+			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+		}
 		drivePath, err := model.GetDrivePath()
 		if err != nil {
 			return err
@@ -507,6 +524,10 @@ func SessionRmEndpoint(c echo.Context) error {
 
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
+		if strings.Contains(key, "../") {
+			logrus.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
+			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+		}
 		drivePath, err := model.GetDrivePath()
 		if err != nil {
 			return err
@@ -544,6 +565,10 @@ func SessionRenameEndpoint(c echo.Context) error {
 
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
+		if strings.Contains(oldName, "../") {
+			logrus.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
+			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+		}
 		drivePath, err := model.GetDrivePath()
 		if err != nil {
 			return err

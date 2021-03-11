@@ -177,7 +177,10 @@ func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
 	cacheKey := BuildCacheKeyByToken(token)
 	global.Cache.Delete(cacheKey)
-	model.Logout(token)
+	err := model.Logout(token)
+	if err != nil {
+		return err
+	}
 	return Success(c, nil)
 }
 
