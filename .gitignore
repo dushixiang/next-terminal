@@ -1,3 +1,6 @@
+.idea
+.vscode
+
 yarn.lock
 web/build
 *.log
