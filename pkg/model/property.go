@@ -1,12 +1,14 @@
 package model
 
 import (
-	"github.com/jordan-wright/email"
-	"github.com/sirupsen/logrus"
 	"net/smtp"
+
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
+
+	"github.com/jordan-wright/email"
+	"github.com/sirupsen/logrus"
 )
 
 type Property struct {

@@ -2,15 +2,17 @@ package api
 
 import (
 	"errors"
-	"github.com/gorilla/websocket"
-	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
+	"path"
+	"strconv"
+
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
-	"path"
-	"strconv"
+
+	"github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -98,7 +100,6 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.DisableBitmapCaching, propertyMap[guacd.DisableBitmapCaching])
 			configuration.SetParameter(guacd.DisableOffscreenCaching, propertyMap[guacd.DisableOffscreenCaching])
 			configuration.SetParameter(guacd.DisableGlyphCaching, propertyMap[guacd.DisableGlyphCaching])
-			break
 		case "ssh":
 			if len(session.PrivateKey) > 0 && session.PrivateKey != "-" {
 				configuration.SetParameter("username", session.Username)
@@ -114,11 +115,9 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
 			configuration.SetParameter(guacd.Backspace, propertyMap[guacd.Backspace])
 			configuration.SetParameter(guacd.TerminalType, propertyMap[guacd.TerminalType])
-			break
 		case "vnc":
 			configuration.SetParameter("username", session.Username)
 			configuration.SetParameter("password", session.Password)
-			break
 		case "telnet":
 			configuration.SetParameter("username", session.Username)
 			configuration.SetParameter("password", session.Password)
@@ -128,7 +127,6 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
 			configuration.SetParameter(guacd.Backspace, propertyMap[guacd.Backspace])
 			configuration.SetParameter(guacd.TerminalType, propertyMap[guacd.TerminalType])
-			break
 		case "kubernetes":
 
 			configuration.SetParameter(guacd.FontSize, propertyMap[guacd.FontSize])
@@ -136,6 +134,9 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.ColorScheme, propertyMap[guacd.ColorScheme])
 			configuration.SetParameter(guacd.Backspace, propertyMap[guacd.Backspace])
 			configuration.SetParameter(guacd.TerminalType, propertyMap[guacd.TerminalType])
+		default:
+			logrus.WithField("configuration.Protocol", configuration.Protocol).Error("UnSupport Protocol")
+			return Fail(c, 400, "不支持的协议")
 		}
 
 		configuration.SetParameter("hostname", session.IP)
@@ -209,7 +210,7 @@ func TunEndpoint(c echo.Context) error {
 	}
 
 	go func() {
-		for true {
+		for {
 			instruction, err := tunnel.Read()
 			if err != nil {
 				if connectionId == "" {
@@ -230,7 +231,7 @@ func TunEndpoint(c echo.Context) error {
 		}
 	}()
 
-	for true {
+	for {
 		_, message, err := ws.ReadMessage()
 		if err != nil {
 			if connectionId == "" {

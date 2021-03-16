@@ -1,0 +1,26 @@
+linters-settings:
+  goimports:
+    local-prefixes: uqingtech.com
+
+linters:
+  disable-all: true
+  enable:
+    - deadcode
+    - errcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+
+run:
+  skip-dirs:
+    - api/
+    - module/
+  skip-files:
+    - test_ssh.go

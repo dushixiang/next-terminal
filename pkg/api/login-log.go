@@ -1,11 +1,14 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/model"
 	"strconv"
 	"strings"
+
+	"next-terminal/pkg/global"
+	"next-terminal/pkg/model"
+
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 func LoginLogPagingEndpoint(c echo.Context) error {
@@ -32,7 +35,9 @@ func LoginLogDeleteEndpoint(c echo.Context) error {
 	for i := range split {
 		token := split[i]
 		global.Cache.Delete(token)
-		model.Logout(token)
+		if err := model.Logout(token); err != nil {
+			logrus.WithError(err).Error("Cache Delete Failed")
+		}
 	}
 	if err := model.DeleteLoginLogByIdIn(split); err != nil {
 		return err

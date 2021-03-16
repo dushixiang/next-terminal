@@ -123,7 +123,7 @@ func CountCredentialByUserId(userId string) (total int64, err error) {
 		return 0, err
 	}
 
-	if userGroupIds != nil && len(userGroupIds) > 0 {
+	if userGroupIds != nil {
 		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
 	}
 	err = db.Find(&Credential{}).Count(&total).Error

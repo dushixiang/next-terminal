@@ -1,10 +1,11 @@
 package global
 
 import (
+	"next-terminal/pkg/config"
+
 	"github.com/patrickmn/go-cache"
 	"github.com/robfig/cron/v3"
 	"gorm.io/gorm"
-	"next-terminal/pkg/config"
 )
 
 var DB *gorm.DB

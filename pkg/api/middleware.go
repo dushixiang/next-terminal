@@ -2,14 +2,16 @@ package api
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
 	"net"
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/utils"
 	"regexp"
 	"strings"
 	"time"
+
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
+	"next-terminal/pkg/utils"
+
+	"github.com/labstack/echo/v4"
 )
 
 func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
