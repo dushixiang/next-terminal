@@ -1,9 +1,10 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 type Counter struct {

@@ -1,12 +1,14 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
+	"strconv"
+	"strings"
+
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
-	"strconv"
-	"strings"
+
+	"github.com/labstack/echo/v4"
 )
 
 func SecurityCreateEndpoint(c echo.Context) error {
@@ -33,7 +35,7 @@ func ReloadAccessSecurity() error {
 	if err != nil {
 		return err
 	}
-	if rules != nil && len(rules) > 0 {
+	if rules != nil {
 		var securities []*global.Security
 		for i := 0; i < len(rules); i++ {
 			rule := global.Security{

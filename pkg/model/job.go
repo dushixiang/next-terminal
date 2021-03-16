@@ -4,14 +4,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/robfig/cron/v3"
-	"github.com/sirupsen/logrus"
+	"strings"
+	"time"
+
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/term"
 	"next-terminal/pkg/utils"
-	"strings"
-	"time"
+
+	"github.com/robfig/cron/v3"
+	"github.com/sirupsen/logrus"
 )
 
 type Job struct {
@@ -197,7 +199,7 @@ func (r CheckAssetStatusJob) Run() {
 		assets, _ = FindAssetByIds(strings.Split(r.ResourceIds, ","))
 	}
 
-	if assets == nil || len(assets) == 0 {
+	if assets == nil {
 		return
 	}
 
@@ -255,7 +257,7 @@ func (r ShellJob) Run() {
 		assets, _ = FindAssetByProtocolAndIds("ssh", strings.Split(r.ResourceIds, ","))
 	}
 
-	if assets == nil || len(assets) == 0 {
+	if assets == nil {
 		return
 	}
 

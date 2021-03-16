@@ -1,8 +1,9 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
 	"next-terminal/pkg/model"
+
+	"github.com/labstack/echo/v4"
 )
 
 type RU struct {
