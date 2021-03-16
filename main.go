@@ -229,7 +229,7 @@ func Run() error {
 	if err != nil {
 		return err
 	}
-	if jobs == nil {
+	if len(jobs) == 0 {
 		job := model.Job{
 			ID:      utils.UUID(),
 			Name:    "资产状态检测",
