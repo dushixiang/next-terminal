@@ -1,11 +1,13 @@
 package global
 
 import (
-	"github.com/gorilla/websocket"
-	"next-terminal/pkg/guacd"
-	"next-terminal/pkg/term"
 	"strconv"
 	"sync"
+
+	"next-terminal/pkg/guacd"
+	"next-terminal/pkg/term"
+
+	"github.com/gorilla/websocket"
 )
 
 type Tun struct {

@@ -1,12 +1,13 @@
 package model
 
 import (
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/utils"
 	"os"
 	"path"
 	"time"
+
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
+	"next-terminal/pkg/utils"
 )
 
 type Session struct {
