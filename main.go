@@ -3,6 +3,20 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
+	"strconv"
+	"strings"
+	"time"
+
+	"next-terminal/pkg/api"
+	"next-terminal/pkg/config"
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
+	"next-terminal/pkg/handle"
+	"next-terminal/pkg/model"
+	"next-terminal/pkg/utils"
+
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/labstack/gommon/log"
 	"github.com/patrickmn/go-cache"
@@ -12,18 +26,6 @@ import (
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
-	"io"
-	"next-terminal/pkg/api"
-	"next-terminal/pkg/config"
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/handle"
-	"next-terminal/pkg/model"
-	"next-terminal/pkg/utils"
-	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
 const Version = "v0.3.3"
@@ -227,7 +229,7 @@ func Run() error {
 	if err != nil {
 		return err
 	}
-	if jobs == nil || len(jobs) == 0 {
+	if jobs == nil {
 		job := model.Job{
 			ID:      utils.UUID(),
 			Name:    "资产状态检测",

@@ -2,19 +2,21 @@ package api
 
 import (
 	"encoding/json"
-	"github.com/gorilla/websocket"
-	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 	"net/http"
+	"path"
+	"strconv"
+	"time"
+
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/term"
 	"next-terminal/pkg/utils"
-	"path"
-	"strconv"
-	"time"
+
+	"github.com/gorilla/websocket"
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 var UpGrader = websocket.Upgrader{

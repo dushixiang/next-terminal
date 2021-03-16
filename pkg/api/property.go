@@ -3,9 +3,11 @@ package api
 import (
 	"errors"
 	"fmt"
+
+	"next-terminal/pkg/model"
+
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
-	"next-terminal/pkg/model"
 )
 
 func PropertyGetEndpoint(c echo.Context) error {

@@ -1,12 +1,13 @@
 package api
 
 import (
+	"strings"
+	"time"
+
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/totp"
 	"next-terminal/pkg/utils"
-	"strings"
-	"time"
 
 	"github.com/labstack/echo/v4"
 )

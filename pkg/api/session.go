@@ -4,21 +4,23 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"github.com/pkg/sftp"
-	"github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/model"
-	"next-terminal/pkg/utils"
 	"os"
 	"path"
 	"strconv"
 	"strings"
 	"sync"
+
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
+	"next-terminal/pkg/model"
+	"next-terminal/pkg/utils"
+
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/sftp"
+	"github.com/sirupsen/logrus"
 )
 
 func SessionPagingEndpoint(c echo.Context) error {

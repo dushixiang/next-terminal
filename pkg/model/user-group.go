@@ -1,9 +1,10 @@
 package model
 
 import (
-	"gorm.io/gorm"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
+
+	"gorm.io/gorm"
 )
 
 type UserGroup struct {

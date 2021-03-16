@@ -1,9 +1,10 @@
 package term
 
 import (
+	"io"
+
 	"github.com/pkg/sftp"
 	"golang.org/x/crypto/ssh"
-	"io"
 )
 
 type NextTerminal struct {
