@@ -95,7 +95,7 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 			return nil, 0, err
 		}
 
-		if userGroupIds != nil {
+		if len(userGroupIds) > 0 {
 			db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
 			dbCounter = dbCounter.Or("resource_sharers.user_group_id in ?", userGroupIds)
 		}
@@ -210,7 +210,7 @@ func CountAssetByUserId(userId string) (total int64, err error) {
 		return 0, err
 	}
 
-	if userGroupIds != nil {
+	if len(userGroupIds) > 0 {
 		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
 	}
 	err = db.Find(&Asset{}).Count(&total).Error
