@@ -175,7 +175,7 @@ func FindAssetIdsByUserId(userId string) (assetIds []string, err error) {
 	}
 
 	db := global.DB.Table("resource_sharers").Select("resource_id").Where("user_id = ?", userId)
-	if groupIds != nil {
+	if len(groupIds) > 0 {
 		db = db.Or("user_group_id in ?", groupIds)
 	}
 	err = db.Find(&sharerAssetIds).Error
