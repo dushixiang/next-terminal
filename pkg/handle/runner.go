@@ -20,7 +20,7 @@ func RunTicker() {
 	go func() {
 		for range unUsedSessionTicker.C {
 			sessions, _ := model.FindSessionByStatusIn([]string{constant.NoConnect, constant.Connecting})
-			if sessions != nil {
+			if len(sessions) > 0 {
 				now := time.Now()
 				for i := range sessions {
 					if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
@@ -53,7 +53,7 @@ func RunTicker() {
 				return
 			}
 
-			if sessions != nil {
+			if len(sessions) > 0 {
 				var sessionIds []string
 				for i := range sessions {
 					sessionIds = append(sessionIds, sessions[i].ID)

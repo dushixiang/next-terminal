@@ -199,7 +199,7 @@ func (r CheckAssetStatusJob) Run() {
 		assets, _ = FindAssetByIds(strings.Split(r.ResourceIds, ","))
 	}
 
-	if assets == nil {
+	if len(assets) == 0 {
 		return
 	}
 
@@ -257,7 +257,7 @@ func (r ShellJob) Run() {
 		assets, _ = FindAssetByProtocolAndIds("ssh", strings.Split(r.ResourceIds, ","))
 	}
 
-	if assets == nil {
+	if len(assets) == 0 {
 		return
 	}
 

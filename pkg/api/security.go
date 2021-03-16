@@ -35,7 +35,7 @@ func ReloadAccessSecurity() error {
 	if err != nil {
 		return err
 	}
-	if rules != nil {
+	if len(rules) > 0 {
 		var securities []*global.Security
 		for i := 0; i < len(rules); i++ {
 			rule := global.Security{
