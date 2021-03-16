@@ -2,11 +2,13 @@ package api
 
 import (
 	"errors"
-	"github.com/labstack/echo/v4"
-	"next-terminal/pkg/model"
-	"next-terminal/pkg/utils"
 	"strconv"
 	"strings"
+
+	"next-terminal/pkg/model"
+	"next-terminal/pkg/utils"
+
+	"github.com/labstack/echo/v4"
 )
 
 func CommandCreateEndpoint(c echo.Context) error {

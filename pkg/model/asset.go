@@ -1,10 +1,11 @@
 package model
 
 import (
+	"strings"
+
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
-	"strings"
 )
 
 type Asset struct {
@@ -94,7 +95,7 @@ func FindPageAsset(pageIndex, pageSize int, name, protocol, tags string, account
 			return nil, 0, err
 		}
 
-		if userGroupIds != nil && len(userGroupIds) > 0 {
+		if userGroupIds != nil {
 			db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
 			dbCounter = dbCounter.Or("resource_sharers.user_group_id in ?", userGroupIds)
 		}
@@ -209,7 +210,7 @@ func CountAssetByUserId(userId string) (total int64, err error) {
 		return 0, err
 	}
 
-	if userGroupIds != nil && len(userGroupIds) > 0 {
+	if userGroupIds != nil {
 		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
 	}
 	err = db.Find(&Asset{}).Count(&total).Error

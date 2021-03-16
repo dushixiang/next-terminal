@@ -1,9 +1,10 @@
 package model
 
 import (
+	"reflect"
+
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
-	"reflect"
 )
 
 type User struct {

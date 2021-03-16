@@ -2,8 +2,9 @@ package term
 
 import (
 	"fmt"
-	"golang.org/x/crypto/ssh"
 	"time"
+
+	"golang.org/x/crypto/ssh"
 )
 
 func NewSshClient(ip string, port int, username, password, privateKey, passphrase string) (*ssh.Client, error) {

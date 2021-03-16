@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -103,10 +104,7 @@ func ImageToBase64Encode(img image.Image) (string, error) {
 func FileExists(path string) bool {
 	_, err := os.Stat(path) //os.Stat获取文件信息
 	if err != nil {
-		if os.IsExist(err) {
-			return true
-		}
-		return false
+		return os.IsExist(err)
 	}
 	return true
 }
@@ -208,4 +206,10 @@ func IpToInt(ip string) int64 {
 func StringToInt(in string) (out int) {
 	out, _ = strconv.Atoi(in)
 	return
+}
+
+func Check(f func() error) {
+	if err := f(); err != nil {
+		logrus.Error("Received error:", err)
+	}
 }

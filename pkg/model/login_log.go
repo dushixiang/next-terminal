@@ -1,9 +1,10 @@
 package model
 
 import (
-	"github.com/sirupsen/logrus"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
+
+	"github.com/sirupsen/logrus"
 )
 
 type LoginLog struct {
