@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/ssh"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -29,7 +30,7 @@ func main() {
 
 	client, err := ssh.Dial("tcp", "172.16.101.32:22", sshConfig)
 	if err != nil {
-		fmt.Println(err)
+		logrus.Error(err)
 	}
 	defer client.Close()
 
@@ -68,7 +69,7 @@ func (t *SSHTerminal) updateTerminalSize() {
 					continue
 				}
 
-				t.Session.WindowChange(currTermHeight, currTermWidth)
+				err = t.Session.WindowChange(currTermHeight, currTermWidth)
 				if err != nil {
 					fmt.Printf("Unable to send window-change reqest: %s.", err)
 					continue
@@ -86,9 +87,9 @@ func (t *SSHTerminal) interactiveSession() error {
 
 	defer func() {
 		if t.exitMsg == "" {
-			fmt.Fprintln(os.Stdout, "the connection was closed on the remote side on ", time.Now().Format(time.RFC822))
+			logrus.Info(os.Stdout, "the connection was closed on the remote side on ", time.Now().Format(time.RFC822))
 		} else {
-			fmt.Fprintln(os.Stdout, t.exitMsg)
+			logrus.Info(os.Stdout, t.exitMsg)
 		}
 	}()
 

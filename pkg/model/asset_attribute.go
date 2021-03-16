@@ -2,12 +2,14 @@ package model
 
 import (
 	"fmt"
-	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
+
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/utils"
+
+	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type AssetAttribute struct {

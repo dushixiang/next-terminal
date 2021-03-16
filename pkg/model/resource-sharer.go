@@ -1,10 +1,12 @@
 package model
 
 import (
-	"github.com/labstack/echo/v4"
-	"gorm.io/gorm"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/utils"
+
+	"github.com/labstack/echo/v4"
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 type ResourceSharer struct {
@@ -117,15 +119,22 @@ func AddSharerResources(userGroupId, userId, resourceType string, resourceIds []
 			switch resourceType {
 			case "asset":
 				resource := Asset{}
-				err = tx.Where("id = ?", resourceId).First(&resource).Error
+				if err = tx.Where("id = ?", resourceId).First(&resource).Error; err != nil {
+					return errors.Wrap(err, "find asset  fail")
+				}
 				owner = resource.Owner
 			case "command":
 				resource := Command{}
-				err = tx.Where("id = ?", resourceId).First(&resource).Error
+				if err = tx.Where("id = ?", resourceId).First(&resource).Error; err != nil {
+					return errors.Wrap(err, "find command  fail")
+				}
 				owner = resource.Owner
 			case "credential":
 				resource := Credential{}
-				err = tx.Where("id = ?", resourceId).First(&resource).Error
+				if err = tx.Where("id = ?", resourceId).First(&resource).Error; err != nil {
+					return errors.Wrap(err, "find credential  fail")
+
+				}
 				owner = resource.Owner
 			}
 
@@ -166,7 +175,7 @@ func FindAssetIdsByUserId(userId string) (assetIds []string, err error) {
 	}
 
 	db := global.DB.Table("resource_sharers").Select("resource_id").Where("user_id = ?", userId)
-	if groupIds != nil && len(groupIds) > 0 {
+	if groupIds != nil {
 		db = db.Or("user_group_id in ?", groupIds)
 	}
 	err = db.Find(&sharerAssetIds).Error

@@ -1,14 +1,16 @@
 package handle
 
 import (
-	"github.com/sirupsen/logrus"
+	"os"
+	"strconv"
+	"time"
+
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
-	"os"
-	"strconv"
-	"time"
+
+	"github.com/sirupsen/logrus"
 )
 
 func RunTicker() {
@@ -18,7 +20,7 @@ func RunTicker() {
 	go func() {
 		for range unUsedSessionTicker.C {
 			sessions, _ := model.FindSessionByStatusIn([]string{constant.NoConnect, constant.Connecting})
-			if sessions != nil && len(sessions) > 0 {
+			if sessions != nil {
 				now := time.Now()
 				for i := range sessions {
 					if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
@@ -51,7 +53,7 @@ func RunTicker() {
 				return
 			}
 
-			if sessions != nil && len(sessions) > 0 {
+			if sessions != nil {
 				var sessionIds []string
 				for i := range sessions {
 					sessionIds = append(sessionIds, sessions[i].ID)

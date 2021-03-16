@@ -1,12 +1,14 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
+	"strconv"
+	"strings"
+
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
-	"strconv"
-	"strings"
+
+	"github.com/labstack/echo/v4"
 )
 
 type UserGroup struct {

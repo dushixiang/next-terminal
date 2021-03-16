@@ -1,12 +1,15 @@
 package api
 
 import (
-	"github.com/labstack/echo/v4"
+	"strconv"
+	"strings"
+
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/model"
 	"next-terminal/pkg/utils"
-	"strconv"
-	"strings"
+
+	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 )
 
 func UserCreateEndpoint(c echo.Context) error {
@@ -87,12 +90,15 @@ func UserDeleteEndpoint(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		if loginLogs != nil && len(loginLogs) > 0 {
-			for j := range loginLogs {
-				global.Cache.Delete(loginLogs[j].ID)
-				model.Logout(loginLogs[j].ID)
+
+		for j := range loginLogs {
+			global.Cache.Delete(loginLogs[j].ID)
+			if err := model.Logout(loginLogs[j].ID); err != nil {
+				logrus.WithError(err).WithField("id:", loginLogs[j].ID).Error("Cache Deleted Error")
+				return Fail(c, 500, "强制下线错误")
 			}
 		}
+
 		// 删除用户
 		model.DeleteUserById(userId)
 	}

@@ -10,6 +10,7 @@ require (
 	github.com/labstack/echo/v4 v4.1.17
 	github.com/labstack/gommon v0.3.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.12.0
 	github.com/pquerna/otp v1.3.0
 	github.com/robfig/cron/v3 v3.0.1
