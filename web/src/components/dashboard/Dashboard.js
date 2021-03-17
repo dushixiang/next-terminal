@@ -9,18 +9,6 @@ import {Area} from '@ant-design/charts';
 
 import {isAdmin} from "../../service/permission";
 
-
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'dashboard',
-        breadcrumbName: '仪表盘',
-    }
-];
-
 class Dashboard extends Component {
 
     state = {
@@ -79,17 +67,6 @@ class Dashboard extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="dashboard"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-                    subTitle="仪表盘"
-                    extra={[]}
-                >
-                </PageHeader>
 
                 <div className="page-card">
 

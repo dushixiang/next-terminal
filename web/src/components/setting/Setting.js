@@ -10,17 +10,6 @@ const {Option} = Select;
 const {TabPane} = Tabs;
 const {Title} = Typography;
 
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'setting',
-        breadcrumbName: '系统设置',
-    }
-];
-
 const formItemLayout = {
     labelCol: {span: 12},
     wrapperCol: {span: 12},
@@ -114,18 +103,6 @@ class Setting extends Component {
     render() {
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="系统设置"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="系统设置"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
 
                     <Tabs tabPosition={'left'} onChange={this.handleOnTabChange} tabBarStyle={{width: 150}}>

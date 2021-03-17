@@ -43,16 +43,6 @@ const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
 const CheckboxGroup = Checkbox.Group;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'command',
-        breadcrumbName: '动态指令',
-    }
-];
 
 class DynamicCommand extends Component {
 
@@ -534,18 +524,6 @@ class DynamicCommand extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="动态指令"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="批量动态指令执行"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
 
                     <div style={{marginBottom: 20}}>

@@ -33,7 +33,7 @@
 }
 
 .layout-header {
-    height: 48px;
+    height: 60px;
     align-items: center;
     padding: 0 16px 0 0;
     background: #fff;
@@ -45,23 +45,19 @@
     padding: 0 12px;
     cursor: pointer;
     transition: all .3s;
-    line-height: 48px;
-    height: 48px;
+    line-height: 60px;
+    height: 60px;
 }
 
 .layout-header-right-item {
     margin: 0 6px;
     display: inline;
-    height: 48px;
-}
-
-.layout-header-right-item:hover {
-    background-color: #eeeeee;
+    height: 60px;
 }
 
 .nickname {
-    line-height: 48px;
-    height: 48px;
+    line-height: 60px;
+    height: 60px;
     width: 125px;
     text-align: left;
     padding: 0 5px;
