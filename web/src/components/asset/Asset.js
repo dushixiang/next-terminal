@@ -51,19 +51,6 @@ const confirm = Modal.confirm;
 const {Search} = Input;
 const {Content} = Layout;
 const {Title, Text} = Typography;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        breadcrumbName: '资源管理',
-    },
-    {
-        path: 'assets',
-        breadcrumbName: '资产管理',
-    }
-];
 
 class Asset extends Component {
 
@@ -660,18 +647,6 @@ class Asset extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="资产管理"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="资产"
-                >
-                </PageHeader>
-
                 <Content key='page-content' className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>

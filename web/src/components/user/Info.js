@@ -8,17 +8,6 @@ import {ExclamationCircleOutlined, ReloadOutlined} from "@ant-design/icons";
 const {Content} = Layout;
 const {Meta} = Card;
 
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'info',
-        breadcrumbName: '个人中心',
-    }
-];
-
 const formItemLayout = {
     labelCol: {span: 3},
     wrapperCol: {span: 6},
@@ -121,17 +110,6 @@ class Info extends Component {
     render() {
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="个人中心"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="个人中心"
-                />
-
                 <Content className="site-layout-background page-content">
                     <h1>修改密码</h1>
                     <Form ref={this.passwordFormRef} name="password" onFinish={this.changePassword}>

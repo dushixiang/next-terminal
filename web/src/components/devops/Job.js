@@ -40,16 +40,6 @@ const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'job',
-        breadcrumbName: '计划任务',
-    }
-];
 
 class Job extends Component {
 
@@ -441,18 +431,6 @@ class Job extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="计划任务"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="计划任务"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
 
                     <div style={{marginBottom: 20}}>

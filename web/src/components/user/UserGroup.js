@@ -15,17 +15,6 @@ const {Search} = Input;
 const {Title, Text} = Typography;
 const {Content} = Layout;
 
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'user',
-        breadcrumbName: '用户组',
-    }
-];
-
 class UserGroup extends Component {
 
     inputRefOfName = React.createRef();
@@ -334,18 +323,6 @@ class UserGroup extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="用户组管理"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="平台用户管理"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
