@@ -27,16 +27,6 @@ const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'security',
-        breadcrumbName: '访问安全',
-    }
-];
 
 class Security extends Component {
 
@@ -296,18 +286,6 @@ class Security extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="访问安全"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="IP访问规则限制"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
 
                     <div style={{marginBottom: 20}}>

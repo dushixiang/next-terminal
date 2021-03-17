@@ -30,16 +30,6 @@ const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Search} = Input;
 const {Title, Text} = Typography;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'offlineSession',
-        breadcrumbName: '离线会话',
-    }
-];
 
 class OfflineSession extends Component {
 
@@ -365,18 +355,6 @@ class OfflineSession extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="离线会话"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="离线会话管理"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
