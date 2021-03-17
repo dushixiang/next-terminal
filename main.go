@@ -45,7 +45,7 @@ func Run() error {
 
 	writer1 := &bytes.Buffer{}
 	writer2 := os.Stdout
-	writer3, err := os.OpenFile("next-terminal.log", os.O_WRONLY|os.O_CREATE, 0755)
+	writer3, err := os.OpenFile("log/next-terminal.log", os.O_WRONLY|os.O_CREATE, 0755)
 	if err != nil {
 		log.Fatalf("create file log.txt failed: %v", err)
 	}
