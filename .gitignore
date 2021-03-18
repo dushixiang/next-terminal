@@ -22,6 +22,8 @@ web/build
 
 
 # playground
-playground/next-terminal
+playground/data
+playground/drive
+playground/recording
 
 /log
