@@ -1,97 +1,30 @@
-package handle
+package service
 
 import (
-	"os"
-	"strconv"
-	"time"
-
-	"next-terminal/server/constant"
 	"next-terminal/server/guacd"
 	"next-terminal/server/model"
+	"next-terminal/server/repository"
 	"next-terminal/server/utils"
-
-	"github.com/sirupsen/logrus"
+	"os"
 )
 
-func RunTicker() {
-
-	// 每隔一小时删除一次未使用的会话信息
-	unUsedSessionTicker := time.NewTicker(time.Minute * 60)
-	go func() {
-		for range unUsedSessionTicker.C {
-			sessions, _ := model.FindSessionByStatusIn([]string{constant.NoConnect, constant.Connecting})
-			if len(sessions) > 0 {
-				now := time.Now()
-				for i := range sessions {
-					if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
-						_ = model.DeleteSessionById(sessions[i].ID)
-						s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
-						logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
-					}
-				}
-			}
-		}
-	}()
-
-	// 每日凌晨删除超过时长限制的会话
-	timeoutSessionTicker := time.NewTicker(time.Hour * 24)
-	go func() {
-		for range timeoutSessionTicker.C {
-			property, err := model.FindPropertyByName("session-saved-limit")
-			if err != nil {
-				return
-			}
-			if property.Value == "" || property.Value == "-" {
-				return
-			}
-			limit, err := strconv.Atoi(property.Value)
-			if err != nil {
-				return
-			}
-			sessions, err := model.FindOutTimeSessions(limit)
-			if err != nil {
-				return
-			}
-
-			if len(sessions) > 0 {
-				var sessionIds []string
-				for i := range sessions {
-					sessionIds = append(sessionIds, sessions[i].ID)
-				}
-				err := model.DeleteSessionByIds(sessionIds)
-				if err != nil {
-					logrus.Errorf("删除离线会话失败 %v", err)
-				}
-			}
-		}
-	}()
+type PropertyService struct {
+	propertyRepository *repository.PropertyRepository
 }
 
-func RunDataFix() {
-	sessions, _ := model.FindSessionByStatus(constant.Connected)
-	if sessions == nil {
-		return
-	}
-
-	for i := range sessions {
-		session := model.Session{
-			Status:           constant.Disconnected,
-			DisconnectedTime: utils.NowJsonTime(),
-		}
-
-		_ = model.UpdateSessionById(&session, sessions[i].ID)
-	}
+func NewPropertyService(propertyRepository *repository.PropertyRepository) *PropertyService {
+	return &PropertyService{propertyRepository: propertyRepository}
 }
 
-func InitProperties() error {
-	propertyMap := model.FindAllPropertiesMap()
+func (r PropertyService) InitProperties() error {
+	propertyMap := r.propertyRepository.FindAllMap()
 
 	if len(propertyMap[guacd.Host]) == 0 {
 		property := model.Property{
 			Name:  guacd.Host,
 			Value: "127.0.0.1",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -101,7 +34,7 @@ func InitProperties() error {
 			Name:  guacd.Port,
 			Value: "4822",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -111,7 +44,7 @@ func InitProperties() error {
 			Name:  guacd.EnableRecording,
 			Value: "true",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -127,7 +60,7 @@ func InitProperties() error {
 				return err
 			}
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -137,7 +70,7 @@ func InitProperties() error {
 			Name:  guacd.CreateRecordingPath,
 			Value: "true",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -147,7 +80,7 @@ func InitProperties() error {
 			Name:  guacd.DriveName,
 			Value: "File-System",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -165,7 +98,7 @@ func InitProperties() error {
 				return err
 			}
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -175,7 +108,7 @@ func InitProperties() error {
 			Name:  guacd.FontName,
 			Value: "menlo",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -185,7 +118,7 @@ func InitProperties() error {
 			Name:  guacd.FontSize,
 			Value: "12",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -195,7 +128,7 @@ func InitProperties() error {
 			Name:  guacd.ColorScheme,
 			Value: "gray-black",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -205,7 +138,7 @@ func InitProperties() error {
 			Name:  guacd.EnableDrive,
 			Value: "true",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -215,7 +148,7 @@ func InitProperties() error {
 			Name:  guacd.EnableWallpaper,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -225,7 +158,7 @@ func InitProperties() error {
 			Name:  guacd.EnableTheming,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -235,7 +168,7 @@ func InitProperties() error {
 			Name:  guacd.EnableFontSmoothing,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -245,7 +178,7 @@ func InitProperties() error {
 			Name:  guacd.EnableFullWindowDrag,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -255,7 +188,7 @@ func InitProperties() error {
 			Name:  guacd.EnableDesktopComposition,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -265,7 +198,7 @@ func InitProperties() error {
 			Name:  guacd.EnableMenuAnimations,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -275,7 +208,7 @@ func InitProperties() error {
 			Name:  guacd.DisableBitmapCaching,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -285,7 +218,7 @@ func InitProperties() error {
 			Name:  guacd.DisableOffscreenCaching,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
@@ -295,7 +228,7 @@ func InitProperties() error {
 			Name:  guacd.DisableGlyphCaching,
 			Value: "false",
 		}
-		if err := model.CreateNewProperty(&property); err != nil {
+		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
 		}
 	}
