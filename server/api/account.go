@@ -111,7 +111,7 @@ func LoginSuccess(c echo.Context, loginAccount LoginAccount, user model.User) (t
 		Remember:        authorization.Remember,
 	}
 
-	if model.CreateNewLoginLog(&loginLog) != nil {
+	if loginLogRepository.Create(&loginLog) != nil {
 		return "", err
 	}
 
@@ -179,7 +179,7 @@ func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
 	cacheKey := BuildCacheKeyByToken(token)
 	global.Cache.Delete(cacheKey)
-	err := model.Logout(token)
+	err := userService.Logout(token)
 	if err != nil {
 		return err
 	}

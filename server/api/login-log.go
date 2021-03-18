@@ -4,11 +4,9 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/server/global"
-	"next-terminal/server/model"
-
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
+	"next-terminal/server/global"
 )
 
 func LoginLogPagingEndpoint(c echo.Context) error {
@@ -17,7 +15,7 @@ func LoginLogPagingEndpoint(c echo.Context) error {
 	userId := c.QueryParam("userId")
 	clientIp := c.QueryParam("clientIp")
 
-	items, total, err := model.FindPageLoginLog(pageIndex, pageSize, userId, clientIp)
+	items, total, err := loginLogRepository.Find(pageIndex, pageSize, userId, clientIp)
 
 	if err != nil {
 		return err
@@ -35,11 +33,11 @@ func LoginLogDeleteEndpoint(c echo.Context) error {
 	for i := range split {
 		token := split[i]
 		global.Cache.Delete(token)
-		if err := model.Logout(token); err != nil {
+		if err := userService.Logout(token); err != nil {
 			logrus.WithError(err).Error("Cache Delete Failed")
 		}
 	}
-	if err := model.DeleteLoginLogByIdIn(split); err != nil {
+	if err := loginLogRepository.DeleteByIdIn(split); err != nil {
 		return err
 	}
 

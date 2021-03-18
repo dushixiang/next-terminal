@@ -20,7 +20,7 @@ func SecurityCreateEndpoint(c echo.Context) error {
 	item.ID = utils.UUID()
 	item.Source = "管理员添加"
 
-	if err := model.CreateNewSecurity(&item); err != nil {
+	if err := accessSecurityRepository.Create(&item); err != nil {
 		return err
 	}
 	// 更新内存中的安全规则
@@ -31,7 +31,7 @@ func SecurityCreateEndpoint(c echo.Context) error {
 }
 
 func ReloadAccessSecurity() error {
-	rules, err := model.FindAllAccessSecurities()
+	rules, err := accessSecurityRepository.FindAllAccessSecurities()
 	if err != nil {
 		return err
 	}
@@ -58,7 +58,7 @@ func SecurityPagingEndpoint(c echo.Context) error {
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := model.FindPageSecurity(pageIndex, pageSize, ip, rule, order, field)
+	items, total, err := accessSecurityRepository.Find(pageIndex, pageSize, ip, rule, order, field)
 	if err != nil {
 		return err
 	}
@@ -77,7 +77,7 @@ func SecurityUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	if err := model.UpdateSecurityById(&item, id); err != nil {
+	if err := accessSecurityRepository.UpdateById(&item, id); err != nil {
 		return err
 	}
 	// 更新内存中的安全规则
@@ -93,7 +93,7 @@ func SecurityDeleteEndpoint(c echo.Context) error {
 	split := strings.Split(ids, ",")
 	for i := range split {
 		jobId := split[i]
-		if err := model.DeleteSecurityById(jobId); err != nil {
+		if err := accessSecurityRepository.DeleteById(jobId); err != nil {
 			return err
 		}
 	}
@@ -107,7 +107,7 @@ func SecurityDeleteEndpoint(c echo.Context) error {
 func SecurityGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	item, err := model.FindSecurityById(id)
+	item, err := accessSecurityRepository.FindById(id)
 	if err != nil {
 		return err
 	}
