@@ -18,28 +18,28 @@ services:
       next-terminal:
         ipv4_address: 172.77.77.2
 
-  next-terminal:
-    container_name: next-terminal
-    image: "dushixiang/next-terminal:latest"
-    environment:
-      DB: "mysql"
-      MYSQL_HOSTNAME: "mysql"
-      MYSQL_PORT: 3306
-      MYSQL_USERNAME: "next-terminal"
-      MYSQL_PASSWORD: "next-terminal"
-      MYSQL_DATABASE: "next-terminal"
-    ports:
-      - "8088:8088"
-    volumes:
-      - ./drive:/usr/local/next-terminal/drive
-      - ./recording:/usr/local/next-terminal/recording
-    depends_on:
-      - mysql
-    networks:
-      next-terminal:
-        ipv4_address: 172.77.77.3
-    restart:
-      always
+#  next-terminal:
+#    container_name: next-terminal
+#    image: "dushixiang/next-terminal:latest"
+#    environment:
+#      DB: "mysql"
+#      MYSQL_HOSTNAME: "mysql"
+#      MYSQL_PORT: 3306
+#      MYSQL_USERNAME: "next-terminal"
+#      MYSQL_PASSWORD: "next-terminal"
+#      MYSQL_DATABASE: "next-terminal"
+#    ports:
+#      - "8088:8088"
+#    volumes:
+#      - ./drive:/usr/local/next-terminal/drive
+#      - ./recording:/usr/local/next-terminal/recording
+#    depends_on:
+#      - mysql
+#    networks:
+#      next-terminal:
+#        ipv4_address: 172.77.77.3
+#    restart:
+#      always
 
 networks:
   next-terminal:
