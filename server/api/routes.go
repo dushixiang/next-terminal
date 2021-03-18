@@ -1,12 +1,19 @@
 package api
 
 import (
+	"github.com/patrickmn/go-cache"
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 	"net/http"
-	"next-terminal/server/constant"
 	"next-terminal/server/global"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
+	"next-terminal/server/service"
+	"next-terminal/server/utils"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -15,11 +22,32 @@ import (
 const Token = "X-Auth-Token"
 
 var (
-	userRepository repository.UserRepository
+	userRepository           *repository.UserRepository
+	userGroupRepository      *repository.UserGroupRepository
+	resourceSharerRepository *repository.ResourceSharerRepository
+	assetRepository          *repository.AssetRepository
+	credentialRepository     *repository.CredentialRepository
+	propertyRepository       *repository.PropertyRepository
+	commandRepository        *repository.CommandRepository
+	sessionRepository        *repository.SessionRepository
+	numRepository            *repository.NumRepository
+	accessSecurityRepository *repository.AccessSecurityRepository
+	jobRepository            *repository.JobRepository
+	jobLogRepository         *repository.JobLogRepository
+	loginLogRepository       *repository.LoginLogRepository
+
+	jobService      *service.JobService
+	propertyService *service.PropertyService
+	userService     *service.UserService
+	sessionService  *service.SessionService
 )
 
-func SetupRoutes(ur repository.UserRepository) *echo.Echo {
-	userRepository = ur
+func SetupRoutes(db *gorm.DB) *echo.Echo {
+
+	InitRepository(db)
+	InitService()
+
+	InitDBData()
 
 	e := echo.New()
 	e.HideBanner = true
@@ -178,69 +206,88 @@ func SetupRoutes(ur repository.UserRepository) *echo.Echo {
 	return e
 }
 
-type H map[string]interface{}
+func InitRepository(db *gorm.DB) {
+	userRepository = repository.NewUserRepository(db)
+	userGroupRepository = repository.NewUserGroupRepository(db)
+	resourceSharerRepository = repository.NewResourceSharerRepository(db)
+	assetRepository = repository.NewAssetRepository(db)
+	credentialRepository = repository.NewCredentialRepository(db)
+	propertyRepository = repository.NewPropertyRepository(db)
+	commandRepository = repository.NewCommandRepository(db)
+	sessionRepository = repository.NewSessionRepository(db)
+	numRepository = repository.NewNumRepository(db)
+	accessSecurityRepository = repository.NewAccessSecurityRepository(db)
+	jobRepository = repository.NewJobRepository(db)
+	jobLogRepository = repository.NewJobLogRepository(db)
+	loginLogRepository = repository.NewLoginLogRepository(db)
+}
 
-func Fail(c echo.Context, code int, message string) error {
-	return c.JSON(200, H{
-		"code":    code,
-		"message": message,
+func InitService() {
+	jobService = service.NewJobService(jobRepository, jobLogRepository, assetRepository, credentialRepository)
+	propertyService = service.NewPropertyService(propertyRepository)
+	userService = service.NewUserService(userRepository)
+	sessionService = service.NewSessionService(sessionRepository)
+}
+
+func InitDBData() (err error) {
+	if err := propertyService.InitProperties(); err != nil {
+		return err
+	}
+	if err := userService.InitUser(); err != nil {
+		return err
+	}
+	if err := userService.FixedOnlineState(); err != nil {
+		return err
+	}
+	if err := jobService.InitJob(); err != nil {
+		return err
+	}
+
+	sessionService.Fix()
+	nums, _ := numRepository.FindAll()
+	if nums == nil || len(nums) == 0 {
+		for i := 0; i <= 30; i++ {
+			if err := numRepository.Create(&model.Num{I: strconv.Itoa(i)}); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func ResetPassword() error {
+	user, err := userRepository.FindByUsername(global.Config.ResetPassword)
+	if err != nil {
+		return err
+	}
+	password := "next-terminal"
+	passwd, err := utils.Encoder.Encode([]byte(password))
+	if err != nil {
+		return err
+	}
+	u := &model.User{
+		Password: string(passwd),
+		ID:       user.ID,
+	}
+	if err := userRepository.Update(u); err != nil {
+		return err
+	}
+	logrus.Debugf("用户「%v」密码初始化为: %v", user.Username, password)
+	return nil
+}
+
+func SetupCache() *cache.Cache {
+	// 配置缓存器
+	mCache := cache.New(5*time.Minute, 10*time.Minute)
+	mCache.OnEvicted(func(key string, value interface{}) {
+		if strings.HasPrefix(key, Token) {
+			token := GetTokenFormCacheKey(key)
+			logrus.Debugf("用户Token「%v」过期", token)
+			err := userService.Logout(token)
+			if err != nil {
+				logrus.Errorf("退出登录失败 %v", err)
+			}
+		}
 	})
-}
-
-func FailWithData(c echo.Context, code int, message string, data interface{}) error {
-	return c.JSON(200, H{
-		"code":    code,
-		"message": message,
-		"data":    data,
-	})
-}
-
-func Success(c echo.Context, data interface{}) error {
-	return c.JSON(200, H{
-		"code":    1,
-		"message": "success",
-		"data":    data,
-	})
-}
-
-func NotFound(c echo.Context, message string) error {
-	return c.JSON(200, H{
-		"code":    -1,
-		"message": message,
-	})
-}
-
-func GetToken(c echo.Context) string {
-	token := c.Request().Header.Get(Token)
-	if len(token) > 0 {
-		return token
-	}
-	return c.QueryParam(Token)
-}
-
-func GetCurrentAccount(c echo.Context) (model.User, bool) {
-	token := GetToken(c)
-	cacheKey := BuildCacheKeyByToken(token)
-	get, b := global.Cache.Get(cacheKey)
-	if b {
-		return get.(Authorization).User, true
-	}
-	return model.User{}, false
-}
-
-func HasPermission(c echo.Context, owner string) bool {
-	// 检测是否登录
-	account, found := GetCurrentAccount(c)
-	if !found {
-		return false
-	}
-	// 检测是否为管理人员
-	if constant.TypeAdmin == account.Type {
-		return true
-	}
-	// 检测是否为所有者
-	if owner == account.ID {
-		return true
-	}
-	return false
+	return mCache
 }

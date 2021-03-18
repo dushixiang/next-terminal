@@ -32,18 +32,18 @@ func AssetCreateEndpoint(c echo.Context) error {
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
-	if err := model.CreateNewAsset(&item); err != nil {
+	if err := assetRepository.Create(&item); err != nil {
 		return err
 	}
 
-	if err := model.UpdateAssetAttributes(item.ID, item.Protocol, m); err != nil {
+	if err := assetRepository.UpdateAttributes(item.ID, item.Protocol, m); err != nil {
 		return err
 	}
 
 	// 创建后自动检测资产是否存活
 	go func() {
 		active := utils.Tcping(item.IP, item.Port)
-		model.UpdateAssetActiveById(active, item.ID)
+		assetRepository.UpdateActiveById(active, item.ID)
 	}()
 
 	return Success(c, item)
@@ -98,7 +98,7 @@ func AssetImportEndpoint(c echo.Context) error {
 				Owner:       account.ID,
 			}
 
-			err := model.CreateNewAsset(&asset)
+			err := assetRepository.Create(&asset)
 			if err != nil {
 				errorCount++
 				m[strconv.Itoa(i)] = err.Error()
@@ -107,7 +107,7 @@ func AssetImportEndpoint(c echo.Context) error {
 				// 创建后自动检测资产是否存活
 				go func() {
 					active := utils.Tcping(asset.IP, asset.Port)
-					model.UpdateAssetActiveById(active, asset.ID)
+					assetRepository.UpdateActiveById(active, asset.ID)
 				}()
 			}
 		}
@@ -135,7 +135,7 @@ func AssetPagingEndpoint(c echo.Context) error {
 	field := c.QueryParam("field")
 
 	account, _ := GetCurrentAccount(c)
-	items, total, err := model.FindPageAsset(pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
+	items, total, err := assetRepository.Find(pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
 	if err != nil {
 		return err
 	}
@@ -149,7 +149,7 @@ func AssetPagingEndpoint(c echo.Context) error {
 func AssetAllEndpoint(c echo.Context) error {
 	protocol := c.QueryParam("protocol")
 	account, _ := GetCurrentAccount(c)
-	items, _ := model.FindAssetByConditions(protocol, account)
+	items, _ := assetRepository.FindByProtocolAndUser(protocol, account)
 	return Success(c, items)
 }
 
@@ -199,8 +199,10 @@ func AssetUpdateEndpoint(c echo.Context) error {
 		item.Description = "-"
 	}
 
-	model.UpdateAssetById(&item, id)
-	if err := model.UpdateAssetAttributes(id, item.Protocol, m); err != nil {
+	if err := assetRepository.UpdateById(&item, id); err != nil {
+		return err
+	}
+	if err := assetRepository.UpdateAttributes(id, item.Protocol, m); err != nil {
 		return err
 	}
 
@@ -214,7 +216,7 @@ func AssetGetAttributeEndpoint(c echo.Context) error {
 		return err
 	}
 
-	attributeMap, err := model.FindAssetAttrMapByAssetId(assetId)
+	attributeMap, err := assetRepository.FindAssetAttrMapByAssetId(assetId)
 	if err != nil {
 		return err
 	}
@@ -229,7 +231,7 @@ func AssetUpdateAttributeEndpoint(c echo.Context) error {
 
 	assetId := c.Param("id")
 	protocol := c.QueryParam("protocol")
-	err := model.UpdateAssetAttributes(assetId, protocol, m)
+	err := assetRepository.UpdateAttributes(assetId, protocol, m)
 	if err != nil {
 		return err
 	}
@@ -243,11 +245,11 @@ func AssetDeleteEndpoint(c echo.Context) error {
 		if err := PreCheckAssetPermission(c, split[i]); err != nil {
 			return err
 		}
-		if err := model.DeleteAssetById(split[i]); err != nil {
+		if err := assetRepository.DeleteById(split[i]); err != nil {
 			return err
 		}
 		// 删除资产与用户的关系
-		if err := model.DeleteResourceSharerByResourceId(split[i]); err != nil {
+		if err := resourceSharerRepository.DeleteResourceSharerByResourceId(split[i]); err != nil {
 			return err
 		}
 	}
@@ -262,10 +264,10 @@ func AssetGetEndpoint(c echo.Context) (err error) {
 	}
 
 	var item model.Asset
-	if item, err = model.FindAssetById(id); err != nil {
+	if item, err = assetRepository.FindById(id); err != nil {
 		return err
 	}
-	attributeMap, err := model.FindAssetAttrMapByAssetId(id)
+	attributeMap, err := assetRepository.FindAssetAttrMapByAssetId(id)
 	if err != nil {
 		return err
 	}
@@ -281,19 +283,21 @@ func AssetTcpingEndpoint(c echo.Context) (err error) {
 	id := c.Param("id")
 
 	var item model.Asset
-	if item, err = model.FindAssetById(id); err != nil {
+	if item, err = assetRepository.FindById(id); err != nil {
 		return err
 	}
 
 	active := utils.Tcping(item.IP, item.Port)
 
-	model.UpdateAssetActiveById(active, item.ID)
+	if err := assetRepository.UpdateActiveById(active, item.ID); err != nil {
+		return err
+	}
 	return Success(c, active)
 }
 
 func AssetTagsEndpoint(c echo.Context) (err error) {
 	var items []string
-	if items, err = model.FindAssetTags(); err != nil {
+	if items, err = assetRepository.FindTags(); err != nil {
 		return err
 	}
 	return Success(c, items)
@@ -307,12 +311,14 @@ func AssetChangeOwnerEndpoint(c echo.Context) (err error) {
 	}
 
 	owner := c.QueryParam("owner")
-	model.UpdateAssetById(&model.Asset{Owner: owner}, id)
+	if err := assetRepository.UpdateById(&model.Asset{Owner: owner}, id); err != nil {
+		return err
+	}
 	return Success(c, "")
 }
 
 func PreCheckAssetPermission(c echo.Context, id string) error {
-	item, err := model.FindAssetById(id)
+	item, err := assetRepository.FindById(id)
 	if err != nil {
 		return err
 	}

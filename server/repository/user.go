@@ -9,6 +9,11 @@ type UserRepository struct {
 	DB *gorm.DB
 }
 
+func NewUserRepository(db *gorm.DB) *UserRepository {
+	userRepository = &UserRepository{DB: db}
+	return userRepository
+}
+
 func (r UserRepository) FindAll() (o []model.User) {
 	if r.DB.Find(&o).Error != nil {
 		return nil
