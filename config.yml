@@ -2,10 +2,10 @@ debug: true
 demo: false
 db: mysql
 mysql:
-  hostname: 172.16.101.32
+  hostname: localhost
   port: 3306
-  username: root
-  password: mysql
+  username: next-terminal
+  password: next-terminal
   database: next-terminal
 sqlite:
   file: 'next-terminal.db'
