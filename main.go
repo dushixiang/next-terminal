@@ -3,15 +3,17 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"os"
+
+	"next-terminal/server/api"
+	"next-terminal/server/config"
+	"next-terminal/server/global"
+
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/labstack/gommon/log"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	"io"
-	"next-terminal/server/api"
-	"next-terminal/server/config"
-	"next-terminal/server/global"
-	"os"
 )
 
 const Version = "v0.3.4"
