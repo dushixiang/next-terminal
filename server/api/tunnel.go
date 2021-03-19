@@ -42,12 +42,12 @@ func TunEndpoint(c echo.Context) error {
 
 	configuration := guacd.NewConfiguration()
 
-	propertyMap := model.FindAllPropertiesMap()
+	propertyMap := propertyRepository.FindAllMap()
 
 	var session model.Session
 
 	if len(connectionId) > 0 {
-		session, err = model.FindSessionByConnectionId(connectionId)
+		session, err = sessionRepository.FindByConnectionId(connectionId)
 		if err != nil {
 			logrus.Warnf("会话不存在")
 			return err
@@ -65,7 +65,7 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("width", width)
 		configuration.SetParameter("height", height)
 		configuration.SetParameter("dpi", dpi)
-		session, err = model.FindSessionById(sessionId)
+		session, err = sessionRepository.FindById(sessionId)
 		if err != nil {
 			CloseSessionById(sessionId, NotFoundSession, "会话不存在")
 			return err
@@ -143,7 +143,7 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("port", strconv.Itoa(session.Port))
 
 		// 加载资产配置的属性，优先级比全局配置的高，因此最后加载，覆盖掉全局配置
-		attributes, _ := model.FindAssetAttributeByAssetId(session.AssetId)
+		attributes, _ := assetRepository.FindAttrById(session.AssetId)
 		if len(attributes) > 0 {
 			for i := range attributes {
 				attribute := attributes[i]
@@ -195,7 +195,7 @@ func TunEndpoint(c echo.Context) error {
 		}
 		// 创建新会话
 		logrus.Debugf("创建新会话 %v", sess.ConnectionId)
-		if err := model.UpdateSessionById(&sess, sessionId); err != nil {
+		if err := sessionRepository.UpdateById(&sess, sessionId); err != nil {
 			return err
 		}
 	} else {

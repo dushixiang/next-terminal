@@ -14,7 +14,7 @@ import (
 
 func CredentialAllEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
-	items, _ := model.FindAllCredential(account)
+	items, _ := credentialRepository.FindByUser(account)
 	return Success(c, items)
 }
 func CredentialCreateEndpoint(c echo.Context) error {
@@ -53,7 +53,7 @@ func CredentialCreateEndpoint(c echo.Context) error {
 		return Fail(c, -1, "类型错误")
 	}
 
-	if err := model.CreateNewCredential(&item); err != nil {
+	if err := credentialRepository.Create(&item); err != nil {
 		return err
 	}
 
@@ -69,7 +69,7 @@ func CredentialPagingEndpoint(c echo.Context) error {
 	field := c.QueryParam("field")
 
 	account, _ := GetCurrentAccount(c)
-	items, total, err := model.FindPageCredential(pageIndex, pageSize, name, order, field, account)
+	items, total, err := credentialRepository.Find(pageIndex, pageSize, name, order, field, account)
 	if err != nil {
 		return err
 	}
@@ -117,7 +117,9 @@ func CredentialUpdateEndpoint(c echo.Context) error {
 		return Fail(c, -1, "类型错误")
 	}
 
-	model.UpdateCredentialById(&item, id)
+	if err := credentialRepository.UpdateById(&item, id); err != nil {
+		return err
+	}
 
 	return Success(c, nil)
 }
@@ -129,11 +131,11 @@ func CredentialDeleteEndpoint(c echo.Context) error {
 		if err := PreCheckCredentialPermission(c, split[i]); err != nil {
 			return err
 		}
-		if err := model.DeleteCredentialById(split[i]); err != nil {
+		if err := credentialRepository.DeleteById(split[i]); err != nil {
 			return err
 		}
 		// 删除资产与用户的关系
-		if err := model.DeleteResourceSharerByResourceId(split[i]); err != nil {
+		if err := resourceSharerRepository.DeleteResourceSharerByResourceId(split[i]); err != nil {
 			return err
 		}
 	}
@@ -147,7 +149,7 @@ func CredentialGetEndpoint(c echo.Context) error {
 		return err
 	}
 
-	item, err := model.FindCredentialById(id)
+	item, err := credentialRepository.FindById(id)
 	if err != nil {
 		return err
 	}
@@ -167,12 +169,14 @@ func CredentialChangeOwnerEndpoint(c echo.Context) error {
 	}
 
 	owner := c.QueryParam("owner")
-	model.UpdateCredentialById(&model.Credential{Owner: owner}, id)
+	if err := credentialRepository.UpdateById(&model.Credential{Owner: owner}, id); err != nil {
+		return err
+	}
 	return Success(c, "")
 }
 
 func PreCheckCredentialPermission(c echo.Context, id string) error {
-	item, err := model.FindCredentialById(id)
+	item, err := credentialRepository.FindById(id)
 	if err != nil {
 		return err
 	}

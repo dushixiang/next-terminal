@@ -15,7 +15,7 @@ func NewCredentialRepository(db *gorm.DB) *CredentialRepository {
 	return credentialRepository
 }
 
-func (r CredentialRepository) FindAllByUser(account model.User) (o []model.CredentialSimpleVo, err error) {
+func (r CredentialRepository) FindByUser(account model.User) (o []model.CredentialSimpleVo, err error) {
 	db := r.DB.Table("credentials").Select("DISTINCT credentials.id,credentials.name").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id")
 	if account.Type == constant.TypeUser {
 		db = db.Where("credentials.owner = ? or resource_sharers.user_id = ?", account.ID, account.ID)

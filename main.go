@@ -7,7 +7,6 @@ import (
 	"github.com/labstack/gommon/log"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"io"
 	"next-terminal/server/api"
 	"next-terminal/server/config"
@@ -15,11 +14,7 @@ import (
 	"os"
 )
 
-const Version = "v0.3.3"
-
-var (
-	db *gorm.DB
-)
+const Version = "v0.3.4"
 
 func main() {
 	err := Run()
@@ -56,26 +51,19 @@ func Run() error {
 	logrus.SetOutput(io.MultiWriter(writer1, writer2, writer3))
 
 	global.Config = config.SetupConfig()
-	db = config.SetupDB()
-
-	//if global.Config.ResetPassword != "" {
-	//	return ResetPassword()
-	//}
-
-	if err := api.ReloadAccessSecurity(); err != nil {
-		return err
-	}
 
 	global.Store = global.NewStore()
 	global.Cron = cron.New(cron.WithSeconds()) //精确到秒
 	global.Cron.Start()
 
+	db := api.SetupDB()
 	e := api.SetupRoutes(db)
 	global.Cache = api.SetupCache()
+	if global.Config.ResetPassword != "" {
+		return api.ResetPassword()
+	}
 
 	api.SetupTicker()
-
-	go handle.RunDataFix()
 
 	if global.Config.Server.Cert != "" && global.Config.Server.Key != "" {
 		return e.StartTLS(global.Config.Server.Addr, global.Config.Server.Cert, global.Config.Server.Key)

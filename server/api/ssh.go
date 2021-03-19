@@ -54,7 +54,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	cols, _ := strconv.Atoi(c.QueryParam("cols"))
 	rows, _ := strconv.Atoi(c.QueryParam("rows"))
 
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		msg := Message{
 			Type:    Closed,
@@ -67,7 +67,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	user, _ := GetCurrentAccount(c)
 	if constant.TypeUser == user.Type {
 		// 检测是否有访问权限
-		assetIds, err := model.FindAssetIdsByUserId(user.ID)
+		assetIds, err := resourceSharerRepository.FindAssetIdsByUserId(user.ID)
 		if err != nil {
 			return err
 		}
@@ -91,7 +91,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	)
 
 	recording := ""
-	propertyMap := model.FindAllPropertiesMap()
+	propertyMap := propertyRepository.FindAllMap()
 	if propertyMap[guacd.EnableRecording] == "true" {
 		recording = path.Join(propertyMap[guacd.RecordingPath], sessionId, "recording.cast")
 	}
@@ -145,7 +145,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	}
 	// 创建新会话
 	logrus.Debugf("创建新会话 %v", sess.ConnectionId)
-	if err := model.UpdateSessionById(&sess, sessionId); err != nil {
+	if err := sessionRepository.UpdateById(&sess, sessionId); err != nil {
 		return err
 	}
 

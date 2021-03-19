@@ -32,7 +32,7 @@ func SessionPagingEndpoint(c echo.Context) error {
 	assetId := c.QueryParam("assetId")
 	protocol := c.QueryParam("protocol")
 
-	items, total, err := model.FindPageSession(pageIndex, pageSize, status, userId, clientIp, assetId, protocol)
+	items, total, err := sessionRepository.Find(pageIndex, pageSize, status, userId, clientIp, assetId, protocol)
 
 	if err != nil {
 		return err
@@ -67,7 +67,7 @@ func SessionPagingEndpoint(c echo.Context) error {
 func SessionDeleteEndpoint(c echo.Context) error {
 	sessionIds := c.Param("id")
 	split := strings.Split(sessionIds, ",")
-	err := model.DeleteSessionByIds(split)
+	err := sessionRepository.DeleteByIds(split)
 	if err != nil {
 		return err
 	}
@@ -83,7 +83,7 @@ func SessionConnectEndpoint(c echo.Context) error {
 	session.Status = constant.Connected
 	session.ConnectedTime = utils.NowJsonTime()
 
-	if err := model.UpdateSessionById(&session, sessionId); err != nil {
+	if err := sessionRepository.UpdateById(&session, sessionId); err != nil {
 		return err
 	}
 	return Success(c, nil)
@@ -116,7 +116,7 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	}
 	global.Store.Del(sessionId)
 
-	s, err := model.FindSessionById(sessionId)
+	s, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return
 	}
@@ -127,7 +127,7 @@ func CloseSessionById(sessionId string, code int, reason string) {
 
 	if s.Status == constant.Connecting {
 		// 会话还未建立成功，无需保留数据
-		_ = model.DeleteSessionById(sessionId)
+		_ = sessionRepository.DeleteById(sessionId)
 		return
 	}
 
@@ -138,7 +138,7 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	session.Code = code
 	session.Message = reason
 
-	_ = model.UpdateSessionById(&session, sessionId)
+	_ = sessionRepository.UpdateById(&session, sessionId)
 }
 
 func SessionResizeEndpoint(c echo.Context) error {
@@ -154,7 +154,7 @@ func SessionResizeEndpoint(c echo.Context) error {
 
 	intHeight, _ := strconv.Atoi(height)
 
-	if err := model.UpdateSessionWindowSizeById(intWidth, intHeight, sessionId); err != nil {
+	if err := sessionRepository.UpdateWindowSizeById(intWidth, intHeight, sessionId); err != nil {
 		return err
 	}
 	return Success(c, "")
@@ -174,7 +174,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 
 	if constant.TypeUser == user.Type {
 		// 检测是否有访问权限
-		assetIds, err := model.FindAssetIdsByUserId(user.ID)
+		assetIds, err := resourceSharerRepository.FindAssetIdsByUserId(user.ID)
 		if err != nil {
 			return err
 		}
@@ -184,7 +184,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 		}
 	}
 
-	asset, err := model.FindAssetById(assetId)
+	asset, err := assetRepository.FindById(assetId)
 	if err != nil {
 		return err
 	}
@@ -206,7 +206,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 	}
 
 	if asset.AccountType == "credential" {
-		credential, err := model.FindCredentialById(asset.CredentialId)
+		credential, err := credentialRepository.FindById(asset.CredentialId)
 		if err != nil {
 			return err
 		}
@@ -221,7 +221,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 		}
 	}
 
-	if err := model.CreateNewSession(session); err != nil {
+	if err := sessionRepository.Create(session); err != nil {
 		return err
 	}
 
@@ -230,7 +230,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 
 func SessionUploadEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return err
 	}
@@ -280,7 +280,7 @@ func SessionUploadEndpoint(c echo.Context) error {
 			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
 		}
 
-		drivePath, err := model.GetDrivePath()
+		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
 			return err
 		}
@@ -304,7 +304,7 @@ func SessionUploadEndpoint(c echo.Context) error {
 
 func SessionDownloadEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return err
 	}
@@ -337,7 +337,7 @@ func SessionDownloadEndpoint(c echo.Context) error {
 			SafetyRuleTrigger(c)
 			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
 		}
-		drivePath, err := model.GetDrivePath()
+		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
 			return err
 		}
@@ -359,7 +359,7 @@ type File struct {
 
 func SessionLsEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return err
 	}
@@ -419,7 +419,7 @@ func SessionLsEndpoint(c echo.Context) error {
 			SafetyRuleTrigger(c)
 			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
 		}
-		drivePath, err := model.GetDrivePath()
+		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
 			return err
 		}
@@ -458,12 +458,12 @@ func SafetyRuleTrigger(c echo.Context) {
 		Rule:   constant.AccessRuleReject,
 	}
 
-	_ = model.CreateNewSecurity(&security)
+	_ = accessSecurityRepository.Create(&security)
 }
 
 func SessionMkDirEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return err
 	}
@@ -482,7 +482,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 			SafetyRuleTrigger(c)
 			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
 		}
-		drivePath, err := model.GetDrivePath()
+		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
 			return err
 		}
@@ -498,7 +498,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 
 func SessionRmEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return err
 	}
@@ -543,7 +543,7 @@ func SessionRmEndpoint(c echo.Context) error {
 			SafetyRuleTrigger(c)
 			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
 		}
-		drivePath, err := model.GetDrivePath()
+		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
 			return err
 		}
@@ -560,7 +560,7 @@ func SessionRmEndpoint(c echo.Context) error {
 
 func SessionRenameEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return err
 	}
@@ -584,7 +584,7 @@ func SessionRenameEndpoint(c echo.Context) error {
 			SafetyRuleTrigger(c)
 			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
 		}
-		drivePath, err := model.GetDrivePath()
+		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
 			return err
 		}
@@ -600,7 +600,7 @@ func SessionRenameEndpoint(c echo.Context) error {
 
 func SessionRecordingEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := model.FindSessionById(sessionId)
+	session, err := sessionRepository.FindById(sessionId)
 	if err != nil {
 		return err
 	}

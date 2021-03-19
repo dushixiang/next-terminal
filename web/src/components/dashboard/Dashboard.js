@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {Card, Col, PageHeader, Radio, Row, Statistic} from "antd";
+import {Card, Col, Radio, Row, Statistic} from "antd";
 import {DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
-import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import './Dashboard.css'
 import {Link} from "react-router-dom";

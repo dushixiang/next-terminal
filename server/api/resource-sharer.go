@@ -1,8 +1,6 @@
 package api
 
 import (
-	"next-terminal/server/model"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -21,7 +19,7 @@ type UR struct {
 
 func RSGetSharersEndPoint(c echo.Context) error {
 	resourceId := c.QueryParam("resourceId")
-	userIds, err := model.FindUserIdsByResourceId(resourceId)
+	userIds, err := resourceSharerRepository.FindUserIdsByResourceId(resourceId)
 	if err != nil {
 		return err
 	}
@@ -34,7 +32,7 @@ func RSOverwriteSharersEndPoint(c echo.Context) error {
 		return err
 	}
 
-	if err := model.OverwriteUserIdsByResourceId(ur.ResourceId, ur.ResourceType, ur.UserIds); err != nil {
+	if err := resourceSharerRepository.OverwriteUserIdsByResourceId(ur.ResourceId, ur.ResourceType, ur.UserIds); err != nil {
 		return err
 	}
 
@@ -47,7 +45,7 @@ func ResourceRemoveByUserIdAssignEndPoint(c echo.Context) error {
 		return err
 	}
 
-	if err := model.DeleteByUserIdAndResourceTypeAndResourceIdIn(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := resourceSharerRepository.DeleteByUserIdAndResourceTypeAndResourceIdIn(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 
@@ -60,7 +58,7 @@ func ResourceAddByUserIdAssignEndPoint(c echo.Context) error {
 		return err
 	}
 
-	if err := model.AddSharerResources(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := resourceSharerRepository.AddSharerResources(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 
