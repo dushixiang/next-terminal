@@ -4,12 +4,12 @@ import (
 	"strconv"
 	"strings"
 
+	"next-terminal/pkg/log"
 	"next-terminal/server/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 )
 
 func UserCreateEndpoint(c echo.Context) error {
@@ -97,7 +97,7 @@ func UserDeleteEndpoint(c echo.Context) error {
 		for j := range loginLogs {
 			global.Cache.Delete(loginLogs[j].ID)
 			if err := userService.Logout(loginLogs[j].ID); err != nil {
-				logrus.WithError(err).WithField("id:", loginLogs[j].ID).Error("Cache Deleted Error")
+				log.WithError(err).WithField("id:", loginLogs[j].ID).Error("Cache Deleted Error")
 				return Fail(c, 500, "强制下线错误")
 			}
 		}
@@ -173,7 +173,7 @@ func ReloadToken() error {
 		token := loginLog.ID
 		user, err := userRepository.FindById(loginLog.UserId)
 		if err != nil {
-			logrus.Debugf("用户「%v」获取失败，忽略", loginLog.UserId)
+			log.Debugf("用户「%v」获取失败，忽略", loginLog.UserId)
 			continue
 		}
 
@@ -191,7 +191,7 @@ func ReloadToken() error {
 		} else {
 			global.Cache.Set(cacheKey, authorization, NotRememberEffectiveTime)
 		}
-		logrus.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
+		log.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
 	}
 	return nil
 }

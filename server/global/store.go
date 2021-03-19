@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"sync"
 
-	"next-terminal/server/guacd"
+	"next-terminal/pkg/guacd"
 	"next-terminal/server/term"
 
 	"github.com/gorilla/websocket"
