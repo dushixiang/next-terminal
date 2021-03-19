@@ -5,14 +5,14 @@ import (
 	"path"
 	"strconv"
 
+	"next-terminal/pkg/guacd"
+	"next-terminal/pkg/log"
 	"next-terminal/server/constant"
 	"next-terminal/server/global"
-	"next-terminal/server/guacd"
 	"next-terminal/server/model"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -27,7 +27,7 @@ func TunEndpoint(c echo.Context) error {
 
 	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
-		logrus.Errorf("升级为WebSocket协议失败：%v", err.Error())
+		log.Errorf("升级为WebSocket协议失败：%v", err.Error())
 		return err
 	}
 
@@ -49,11 +49,11 @@ func TunEndpoint(c echo.Context) error {
 	if len(connectionId) > 0 {
 		session, err = sessionRepository.FindByConnectionId(connectionId)
 		if err != nil {
-			logrus.Warnf("会话不存在")
+			log.Warnf("会话不存在")
 			return err
 		}
 		if session.Status != constant.Connected {
-			logrus.Warnf("会话未在线")
+			log.Warnf("会话未在线")
 			return errors.New("会话未在线")
 		}
 		configuration.ConnectionID = connectionId
@@ -135,7 +135,7 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter(guacd.Backspace, propertyMap[guacd.Backspace])
 			configuration.SetParameter(guacd.TerminalType, propertyMap[guacd.TerminalType])
 		default:
-			logrus.WithField("configuration.Protocol", configuration.Protocol).Error("UnSupport Protocol")
+			log.WithField("configuration.Protocol", configuration.Protocol).Error("UnSupport Protocol")
 			return Fail(c, 400, "不支持的协议")
 		}
 
@@ -165,7 +165,7 @@ func TunEndpoint(c echo.Context) error {
 		if connectionId == "" {
 			CloseSessionById(sessionId, NewTunnelError, err.Error())
 		}
-		logrus.Printf("建立连接失败: %v", err.Error())
+		log.Printf("建立连接失败: %v", err.Error())
 		return err
 	}
 
@@ -194,7 +194,7 @@ func TunEndpoint(c echo.Context) error {
 			Recording:    configuration.GetParameter(guacd.RecordingPath),
 		}
 		// 创建新会话
-		logrus.Debugf("创建新会话 %v", sess.ConnectionId)
+		log.Debugf("创建新会话 %v", sess.ConnectionId)
 		if err := sessionRepository.UpdateById(&sess, sessionId); err != nil {
 			return err
 		}
@@ -205,7 +205,7 @@ func TunEndpoint(c echo.Context) error {
 			observers := append(observable.Observers, tun)
 			observable.Observers = observers
 			global.Store.Set(sessionId, observable)
-			logrus.Debugf("加入会话%v,当前观察者数量为：%v", session.ConnectionId, len(observers))
+			log.Debugf("加入会话%v,当前观察者数量为：%v", session.ConnectionId, len(observers))
 		}
 	}
 

@@ -3,7 +3,7 @@ package service
 import (
 	"os"
 
-	"next-terminal/server/guacd"
+	"next-terminal/pkg/guacd"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"

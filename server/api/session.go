@@ -13,6 +13,7 @@ import (
 	"strings"
 	"sync"
 
+	"next-terminal/pkg/log"
 	"next-terminal/server/constant"
 	"next-terminal/server/global"
 	"next-terminal/server/model"
@@ -20,7 +21,6 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/sftp"
-	"github.com/sirupsen/logrus"
 )
 
 func SessionPagingEndpoint(c echo.Context) error {
@@ -106,12 +106,12 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	defer mutex.Unlock()
 	observable, _ := global.Store.Get(sessionId)
 	if observable != nil {
-		logrus.Debugf("会话%v创建者退出，原因：%v", sessionId, reason)
+		log.Debugf("会话%v创建者退出，原因：%v", sessionId, reason)
 		observable.Subject.Close(code, reason)
 
 		for i := 0; i < len(observable.Observers); i++ {
 			observable.Observers[i].Close(code, reason)
-			logrus.Debugf("强制踢出会话%v的观察者", sessionId)
+			log.Debugf("强制踢出会话%v的观察者", sessionId)
 		}
 	}
 	global.Store.Del(sessionId)
@@ -265,7 +265,7 @@ func SessionUploadEndpoint(c echo.Context) error {
 			n, err := src.Read(buf)
 			if err != nil {
 				if err != io.EOF {
-					logrus.Warnf("文件上传错误 %v", err)
+					log.Warnf("文件上传错误 %v", err)
 				} else {
 					break
 				}
@@ -381,7 +381,7 @@ func SessionLsEndpoint(c echo.Context) error {
 		if tun.Subject.NextTerminal.SftpClient == nil {
 			sftpClient, err := sftp.NewClient(tun.Subject.NextTerminal.SshClient)
 			if err != nil {
-				logrus.Errorf("创建sftp客户端失败：%v", err.Error())
+				log.Errorf("创建sftp客户端失败：%v", err.Error())
 				return err
 			}
 			tun.Subject.NextTerminal.SftpClient = sftpClient
@@ -450,7 +450,7 @@ func SessionLsEndpoint(c echo.Context) error {
 }
 
 func SafetyRuleTrigger(c echo.Context) {
-	logrus.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
+	log.Warnf("IP %v 尝试进行攻击，请ban掉此IP", c.RealIP())
 	security := model.AccessSecurity{
 		ID:     utils.UUID(),
 		Source: "安全规则触发",
@@ -612,6 +612,6 @@ func SessionRecordingEndpoint(c echo.Context) error {
 		recording = session.Recording + "/recording"
 	}
 
-	logrus.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
+	log.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
 	return c.File(recording)
 }

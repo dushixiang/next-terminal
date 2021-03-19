@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"next-terminal/server/guacd"
+	"next-terminal/pkg/guacd"
 	"next-terminal/server/model"
 
 	"gorm.io/gorm"
