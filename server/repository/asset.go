@@ -169,7 +169,7 @@ func (r AssetRepository) DeleteById(id string) error {
 	return r.DB.Where("id = ?", id).Delete(&model.Asset{}).Error
 }
 
-func (r AssetRepository) CountAsset() (total int64, err error) {
+func (r AssetRepository) Count() (total int64, err error) {
 	err = r.DB.Find(&model.Asset{}).Count(&total).Error
 	return
 }

@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
-import {itemRender} from '../../utils/utils'
 
-import {Button, Col, Divider, Input, Layout, Modal, PageHeader, Row, Space, Table, Tooltip, Typography,} from "antd";
+import {Button, Col, Divider, Input, Layout, Modal, Row, Space, Table, Tooltip, Typography,} from "antd";
 import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";

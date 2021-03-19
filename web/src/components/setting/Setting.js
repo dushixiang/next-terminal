@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Form, Input, Layout, PageHeader, Select, Switch, Tabs, Tooltip, Typography} from "antd";
-import {itemRender} from '../../utils/utils'
+import {Button, Form, Input, Layout, Select, Switch, Tabs, Tooltip, Typography} from "antd";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {ExclamationCircleOutlined} from "@ant-design/icons";

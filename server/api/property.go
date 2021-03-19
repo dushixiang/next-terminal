@@ -11,7 +11,7 @@ import (
 )
 
 func PropertyGetEndpoint(c echo.Context) error {
-	properties := model.FindAllPropertiesMap()
+	properties := propertyRepository.FindAllMap()
 	return Success(c, properties)
 }
 
@@ -32,13 +32,15 @@ func PropertyUpdateEndpoint(c echo.Context) error {
 			Value: value,
 		}
 
-		_, err := model.FindPropertyByName(key)
+		_, err := propertyRepository.FindByName(key)
 		if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
-			if err := model.CreateNewProperty(&property); err != nil {
+			if err := propertyRepository.Create(&property); err != nil {
 				return err
 			}
 		} else {
-			model.UpdatePropertyByName(&property, key)
+			if err := propertyRepository.UpdateByName(&property, key); err != nil {
+				return err
+			}
 		}
 	}
 	return Success(c, nil)

@@ -22,7 +22,7 @@ func CommandCreateEndpoint(c echo.Context) error {
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
-	if err := model.CreateNewCommand(&item); err != nil {
+	if err := commandRepository.Create(&item); err != nil {
 		return err
 	}
 
@@ -39,7 +39,7 @@ func CommandPagingEndpoint(c echo.Context) error {
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := model.FindPageCommand(pageIndex, pageSize, name, content, order, field, account)
+	items, total, err := commandRepository.Find(pageIndex, pageSize, name, content, order, field, account)
 	if err != nil {
 		return err
 	}
@@ -61,7 +61,9 @@ func CommandUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	model.UpdateCommandById(&item, id)
+	if err := commandRepository.UpdateById(&item, id); err != nil {
+		return err
+	}
 
 	return Success(c, nil)
 }
@@ -73,11 +75,11 @@ func CommandDeleteEndpoint(c echo.Context) error {
 		if err := PreCheckCommandPermission(c, split[i]); err != nil {
 			return err
 		}
-		if err := model.DeleteCommandById(split[i]); err != nil {
+		if err := commandRepository.DeleteById(split[i]); err != nil {
 			return err
 		}
 		// 删除资产与用户的关系
-		if err := model.DeleteResourceSharerByResourceId(split[i]); err != nil {
+		if err := resourceSharerRepository.DeleteResourceSharerByResourceId(split[i]); err != nil {
 			return err
 		}
 	}
@@ -92,7 +94,7 @@ func CommandGetEndpoint(c echo.Context) (err error) {
 	}
 
 	var item model.Command
-	if item, err = model.FindCommandById(id); err != nil {
+	if item, err = commandRepository.FindById(id); err != nil {
 		return err
 	}
 	return Success(c, item)
@@ -106,12 +108,14 @@ func CommandChangeOwnerEndpoint(c echo.Context) (err error) {
 	}
 
 	owner := c.QueryParam("owner")
-	model.UpdateCommandById(&model.Command{Owner: owner}, id)
+	if err := commandRepository.UpdateById(&model.Command{Owner: owner}, id); err != nil {
+		return err
+	}
 	return Success(c, "")
 }
 
 func PreCheckCommandPermission(c echo.Context, id string) error {
-	item, err := model.FindCommandById(id)
+	item, err := commandRepository.FindById(id)
 	if err != nil {
 		return err
 	}

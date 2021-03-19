@@ -3,7 +3,6 @@ package repository
 import (
 	"gorm.io/gorm"
 	"next-terminal/server/constant"
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 )
 
@@ -68,13 +67,13 @@ func (r CommandRepository) Create(o *model.Command) (err error) {
 }
 
 func (r CommandRepository) FindById(id string) (o model.Command, err error) {
-	err = global.DB.Where("id = ?", id).First(&o).Error
+	err = r.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
-func (r CommandRepository) UpdateById(o *model.Command, id string) {
+func (r CommandRepository) UpdateById(o *model.Command, id string) error {
 	o.ID = id
-	global.DB.Updates(o)
+	return r.DB.Updates(o).Error
 }
 
 func (r CommandRepository) DeleteById(id string) error {

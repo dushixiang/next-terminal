@@ -4,7 +4,6 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -29,7 +28,7 @@ func UserGroupCreateEndpoint(c echo.Context) error {
 		Name:    item.Name,
 	}
 
-	if err := model.CreateNewUserGroup(&userGroup, item.Members); err != nil {
+	if err := userGroupRepository.Create(&userGroup, item.Members); err != nil {
 		return err
 	}
 
@@ -44,7 +43,7 @@ func UserGroupPagingEndpoint(c echo.Context) error {
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := model.FindPageUserGroup(pageIndex, pageSize, name, order, field)
+	items, total, err := userGroupRepository.Find(pageIndex, pageSize, name, order, field)
 	if err != nil {
 		return err
 	}
@@ -66,7 +65,7 @@ func UserGroupUpdateEndpoint(c echo.Context) error {
 		Name: item.Name,
 	}
 
-	if err := model.UpdateUserGroupById(&userGroup, item.Members, id); err != nil {
+	if err := userGroupRepository.Update(&userGroup, item.Members, id); err != nil {
 		return err
 	}
 
@@ -78,7 +77,9 @@ func UserGroupDeleteEndpoint(c echo.Context) error {
 	split := strings.Split(ids, ",")
 	for i := range split {
 		userId := split[i]
-		model.DeleteUserGroupById(userId)
+		if err := userGroupRepository.DeleteById(userId); err != nil {
+			return err
+		}
 	}
 
 	return Success(c, nil)
@@ -87,12 +88,12 @@ func UserGroupDeleteEndpoint(c echo.Context) error {
 func UserGroupGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	item, err := model.FindUserGroupById(id)
+	item, err := userGroupRepository.FindById(id)
 	if err != nil {
 		return err
 	}
 
-	members, err := model.FindUserGroupMembersByUserGroupId(id)
+	members, err := userGroupRepository.FindMembersById(id)
 	if err != nil {
 		return err
 	}
@@ -104,33 +105,4 @@ func UserGroupGetEndpoint(c echo.Context) error {
 	}
 
 	return Success(c, userGroup)
-}
-
-func UserGroupAddMembersEndpoint(c echo.Context) error {
-	id := c.Param("id")
-
-	var items []string
-	if err := c.Bind(&items); err != nil {
-		return err
-	}
-
-	if err := model.AddUserGroupMembers(global.DB, items, id); err != nil {
-		return err
-	}
-	return Success(c, "")
-}
-
-func UserGroupDelMembersEndpoint(c echo.Context) (err error) {
-	id := c.Param("id")
-	memberIdsStr := c.Param("memberId")
-	memberIds := strings.Split(memberIdsStr, ",")
-	for i := range memberIds {
-		memberId := memberIds[i]
-		err = global.DB.Where("user_group_id = ? and user_id = ?", id, memberId).Delete(&model.UserGroupMember{}).Error
-		if err != nil {
-			return err
-		}
-	}
-
-	return Success(c, "")
 }

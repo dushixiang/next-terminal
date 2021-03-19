@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/sirupsen/logrus"
-	"next-terminal/server/api"
 	"next-terminal/server/constant"
 	"next-terminal/server/global"
 	"next-terminal/server/model"
@@ -28,7 +27,7 @@ func NewJobService(jobRepository *repository.JobRepository, jobLogRepository *re
 	return &JobService{jobRepository: jobRepository, jobLogRepository: jobLogRepository, assetRepository: assetRepository, credentialRepository: credentialRepository}
 }
 
-func (r JobService) ChangeJobStatusById(id, status string) error {
+func (r JobService) ChangeStatusById(id, status string) error {
 	job, err := r.jobRepository.FindById(id)
 	if err != nil {
 		return err
@@ -259,7 +258,7 @@ func (r JobService) ExecJobById(id string) (err error) {
 
 func (r JobService) InitJob() error {
 	jobs, _ := r.jobRepository.FindByFunc(constant.FuncCheckAssetStatusJob)
-	if jobs == nil || len(jobs) == 0 {
+	if jobs == nil {
 		job := model.Job{
 			ID:      utils.UUID(),
 			Name:    "资产状态检测",
@@ -277,7 +276,7 @@ func (r JobService) InitJob() error {
 	} else {
 		for i := range jobs {
 			if jobs[i].Status == constant.JobStatusRunning {
-				err := r.ChangeJobStatusById(jobs[i].ID, constant.JobStatusRunning)
+				err := r.ChangeStatusById(jobs[i].ID, constant.JobStatusRunning)
 				if err != nil {
 					return err
 				}
@@ -288,37 +287,32 @@ func (r JobService) InitJob() error {
 	return nil
 }
 
-// TODO 可能存在循环引用
-func (r UserService) ReloadToken() error {
-	loginLogs, err := r.loginLogRepository.FindAliveLoginLogs()
+func (r JobService) Create(o *model.Job) (err error) {
+
+	if o.Status == constant.JobStatusRunning {
+		j, err := getJob(o, &r)
+		if err != nil {
+			return err
+		}
+		jobId, err := global.Cron.AddJob(o.Cron, j)
+		if err != nil {
+			return err
+		}
+		o.CronJobId = int(jobId)
+	}
+
+	return r.jobRepository.Create(o)
+}
+
+func (r JobService) DeleteJobById(id string) error {
+	job, err := r.jobRepository.FindById(id)
 	if err != nil {
 		return err
 	}
-
-	for i := range loginLogs {
-		loginLog := loginLogs[i]
-		token := loginLog.ID
-		user, err := r.userRepository.FindById(loginLog.UserId)
-		if err != nil {
-			logrus.Debugf("用户「%v」获取失败，忽略", loginLog.UserId)
-			continue
+	if job.Status == constant.JobStatusRunning {
+		if err := r.ChangeStatusById(id, constant.JobStatusNotRunning); err != nil {
+			return err
 		}
-
-		authorization := api.Authorization{
-			Token:    token,
-			Remember: loginLog.Remember,
-			User:     user,
-		}
-
-		cacheKey := api.BuildCacheKeyByToken(token)
-
-		if authorization.Remember {
-			// 记住登录有效期两周
-			global.Cache.Set(cacheKey, authorization, api.RememberEffectiveTime)
-		} else {
-			global.Cache.Set(cacheKey, authorization, api.NotRememberEffectiveTime)
-		}
-		logrus.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
 	}
-	return nil
+	return r.jobRepository.DeleteJobById(id)
 }
