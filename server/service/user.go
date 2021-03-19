@@ -13,8 +13,8 @@ type UserService struct {
 	loginLogRepository *repository.LoginLogRepository
 }
 
-func NewUserService(userRepository *repository.UserRepository) *UserService {
-	return &UserService{userRepository: userRepository}
+func NewUserService(userRepository *repository.UserRepository, loginLogRepository *repository.LoginLogRepository) *UserService {
+	return &UserService{userRepository: userRepository, loginLogRepository: loginLogRepository}
 }
 
 func (r UserService) InitUser() (err error) {

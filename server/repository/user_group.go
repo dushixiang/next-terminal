@@ -2,7 +2,6 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 )
@@ -56,7 +55,7 @@ func (r UserGroupRepository) Find(pageIndex, pageSize int, name, order, field st
 }
 
 func (r UserGroupRepository) FindById(id string) (o model.UserGroup, err error) {
-	err = global.DB.Where("id = ?", id).First(&o).Error
+	err = r.DB.Where("id = ?", id).First(&o).Error
 	return
 }
 
@@ -66,7 +65,7 @@ func (r UserGroupRepository) FindUserGroupIdsByUserId(userId string) (o []string
 	return
 }
 
-func (r UserGroupRepository) FindUserGroupMembersByUserGroupId(userGroupId string) (o []string, err error) {
+func (r UserGroupRepository) FindMembersById(userGroupId string) (o []string, err error) {
 	err = r.DB.Table("user_group_members").Select("user_id").Where("user_group_id = ?", userGroupId).Find(&o).Error
 	return
 }
@@ -112,9 +111,12 @@ func (r UserGroupRepository) Update(o *model.UserGroup, members []string, id str
 	})
 }
 
-func (r UserGroupRepository) DeleteById(id string) {
-	r.DB.Where("id = ?", id).Delete(&model.UserGroup{})
-	r.DB.Where("user_group_id = ?", id).Delete(&model.UserGroupMember{})
+func (r UserGroupRepository) DeleteById(id string) (err error) {
+	err = r.DB.Where("id = ?", id).Delete(&model.UserGroup{}).Error
+	if err != nil {
+		return err
+	}
+	return r.DB.Where("user_group_id = ?", id).Delete(&model.UserGroupMember{}).Error
 }
 
 func AddUserGroupMembers(tx *gorm.DB, userIds []string, userGroupId string) error {

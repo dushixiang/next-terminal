@@ -2,7 +2,6 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 )
@@ -64,19 +63,6 @@ func (r JobRepository) FindByFunc(function string) (o []model.Job, err error) {
 }
 
 func (r JobRepository) Create(o *model.Job) (err error) {
-	//
-	//if o.Status == constant.JobStatusRunning {
-	//	j, err := getJob(o)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	jobId, err := global.Cron.AddJob(o.Cron, j)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	o.CronJobId = int(jobId)
-	//}
-
 	return r.DB.Create(o).Error
 }
 
@@ -104,5 +90,5 @@ func (r JobRepository) DeleteJobById(id string) error {
 	//		return err
 	//	}
 	//}
-	return global.DB.Where("id = ?", id).Delete(model.Job{}).Error
+	return r.DB.Where("id = ?", id).Delete(model.Job{}).Error
 }

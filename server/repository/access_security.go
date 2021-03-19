@@ -2,7 +2,6 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 )
 
@@ -63,19 +62,19 @@ func (r AccessSecurityRepository) Find(pageIndex, pageSize int, ip, rule, order,
 }
 
 func (r AccessSecurityRepository) Create(o *model.AccessSecurity) error {
-	return global.DB.Create(o).Error
+	return r.DB.Create(o).Error
 }
 
 func (r AccessSecurityRepository) UpdateById(o *model.AccessSecurity, id string) error {
 	o.ID = id
-	return global.DB.Updates(o).Error
+	return r.DB.Updates(o).Error
 }
 
 func (r AccessSecurityRepository) DeleteById(id string) error {
-	return global.DB.Where("id = ?", id).Delete(model.AccessSecurity{}).Error
+	return r.DB.Where("id = ?", id).Delete(model.AccessSecurity{}).Error
 }
 
 func (r AccessSecurityRepository) FindById(id string) (o *model.AccessSecurity, err error) {
-	err = global.DB.Where("id = ?", id).First(&o).Error
+	err = r.DB.Where("id = ?", id).First(&o).Error
 	return
 }

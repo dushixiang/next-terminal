@@ -34,7 +34,7 @@ func UserCreateEndpoint(c echo.Context) error {
 	}
 
 	if item.Mail != "" {
-		go model.SendMail(item.Mail, "[Next Terminal] 注册通知", "你好，"+item.Nickname+"。管理员为你注册了账号："+item.Username+" 密码："+password)
+		go mailService.SendMail(item.Mail, "[Next Terminal] 注册通知", "你好，"+item.Nickname+"。管理员为你注册了账号："+item.Username+" 密码："+password)
 	}
 	return Success(c, item)
 }
@@ -89,14 +89,14 @@ func UserDeleteEndpoint(c echo.Context) error {
 			return Fail(c, -1, "不允许删除自身账户")
 		}
 		// 将用户强制下线
-		loginLogs, err := model.FindAliveLoginLogsByUserId(userId)
+		loginLogs, err := loginLogRepository.FindAliveLoginLogsByUserId(userId)
 		if err != nil {
 			return err
 		}
 
 		for j := range loginLogs {
 			global.Cache.Delete(loginLogs[j].ID)
-			if err := model.Logout(loginLogs[j].ID); err != nil {
+			if err := userService.Logout(loginLogs[j].ID); err != nil {
 				logrus.WithError(err).WithField("id:", loginLogs[j].ID).Error("Cache Deleted Error")
 				return Fail(c, 500, "强制下线错误")
 			}
@@ -144,7 +144,7 @@ func UserChangePasswordEndpoint(c echo.Context) error {
 	}
 
 	if user.Mail != "" {
-		go model.SendMail(user.Mail, "[Next Terminal] 密码修改通知", "你好，"+user.Nickname+"。管理员已将你的密码修改为："+password)
+		go mailService.SendMail(user.Mail, "[Next Terminal] 密码修改通知", "你好，"+user.Nickname+"。管理员已将你的密码修改为："+password)
 	}
 
 	return Success(c, "")
@@ -160,4 +160,38 @@ func UserResetTotpEndpoint(c echo.Context) error {
 		return err
 	}
 	return Success(c, "")
+}
+
+func ReloadToken() error {
+	loginLogs, err := loginLogRepository.FindAliveLoginLogs()
+	if err != nil {
+		return err
+	}
+
+	for i := range loginLogs {
+		loginLog := loginLogs[i]
+		token := loginLog.ID
+		user, err := userRepository.FindById(loginLog.UserId)
+		if err != nil {
+			logrus.Debugf("用户「%v」获取失败，忽略", loginLog.UserId)
+			continue
+		}
+
+		authorization := Authorization{
+			Token:    token,
+			Remember: loginLog.Remember,
+			User:     user,
+		}
+
+		cacheKey := BuildCacheKeyByToken(token)
+
+		if authorization.Remember {
+			// 记住登录有效期两周
+			global.Cache.Set(cacheKey, authorization, RememberEffectiveTime)
+		} else {
+			global.Cache.Set(cacheKey, authorization, NotRememberEffectiveTime)
+		}
+		logrus.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
+	}
+	return nil
 }

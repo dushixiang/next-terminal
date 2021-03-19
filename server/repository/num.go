@@ -2,7 +2,6 @@ package repository
 
 import (
 	"gorm.io/gorm"
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 )
 
@@ -21,6 +20,6 @@ func (r NumRepository) FindAll() (o []model.Num, err error) {
 }
 
 func (r NumRepository) Create(o *model.Num) (err error) {
-	err = global.DB.Create(o).Error
+	err = r.DB.Create(o).Error
 	return
 }

@@ -2,7 +2,7 @@ package api
 
 import (
 	"next-terminal/server/constant"
-	"next-terminal/server/model"
+	"next-terminal/server/repository"
 
 	"github.com/labstack/echo/v4"
 )
@@ -25,14 +25,14 @@ func OverviewCounterEndPoint(c echo.Context) error {
 	)
 	if constant.TypeUser == account.Type {
 		countUser, _ = userRepository.CountOnlineUser()
-		countOnlineSession, _ = model.CountOnlineSession()
-		credential, _ = model.CountCredentialByUserId(account.ID)
-		asset, _ = model.CountAssetByUserId(account.ID)
+		countOnlineSession, _ = sessionRepository.CountOnlineSession()
+		credential, _ = credentialRepository.CountByUserId(account.ID)
+		asset, _ = assetRepository.CountByUserId(account.ID)
 	} else {
 		countUser, _ = userRepository.CountOnlineUser()
-		countOnlineSession, _ = model.CountOnlineSession()
-		credential, _ = model.CountCredential()
-		asset, _ = model.CountAsset()
+		countOnlineSession, _ = sessionRepository.CountOnlineSession()
+		credential, _ = credentialRepository.Count()
+		asset, _ = assetRepository.Count()
 	}
 	counter := Counter{
 		User:          countUser,
@@ -46,11 +46,11 @@ func OverviewCounterEndPoint(c echo.Context) error {
 
 func OverviewSessionPoint(c echo.Context) (err error) {
 	d := c.QueryParam("d")
-	var results []model.D
+	var results []repository.D
 	if d == "m" {
-		results, err = model.CountSessionByDay(30)
+		results, err = sessionRepository.CountSessionByDay(30)
 	} else {
-		results, err = model.CountSessionByDay(7)
+		results, err = sessionRepository.CountSessionByDay(7)
 	}
 	if err != nil {
 		return err
