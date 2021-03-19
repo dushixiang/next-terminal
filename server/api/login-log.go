@@ -4,9 +4,10 @@ import (
 	"strconv"
 	"strings"
 
+	"next-terminal/server/global"
+
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
-	"next-terminal/server/global"
 )
 
 func LoginLogPagingEndpoint(c echo.Context) error {
