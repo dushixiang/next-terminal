@@ -1,11 +1,13 @@
 package service
 
 import (
-	"github.com/jordan-wright/email"
-	"github.com/sirupsen/logrus"
 	"net/smtp"
+
 	"next-terminal/server/constant"
 	"next-terminal/server/repository"
+
+	"github.com/jordan-wright/email"
+	"github.com/sirupsen/logrus"
 )
 
 type MailService struct {

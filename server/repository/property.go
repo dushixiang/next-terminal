@@ -1,9 +1,10 @@
 package repository
 
 import (
-	"gorm.io/gorm"
 	"next-terminal/server/guacd"
 	"next-terminal/server/model"
+
+	"gorm.io/gorm"
 )
 
 type PropertyRepository struct {

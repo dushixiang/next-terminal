@@ -1,11 +1,12 @@
 package service
 
 import (
+	"os"
+
 	"next-terminal/server/guacd"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
-	"os"
 )
 
 type PropertyService struct {

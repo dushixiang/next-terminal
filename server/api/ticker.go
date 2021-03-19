@@ -1,10 +1,12 @@
 package api
 
 import (
-	"github.com/sirupsen/logrus"
-	"next-terminal/server/constant"
 	"strconv"
 	"time"
+
+	"next-terminal/server/constant"
+
+	"github.com/sirupsen/logrus"
 )
 
 func SetupTicker() {

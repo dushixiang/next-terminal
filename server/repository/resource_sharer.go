@@ -1,11 +1,12 @@
 package repository
 
 import (
+	"next-terminal/server/model"
+	"next-terminal/server/utils"
+
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
-	"next-terminal/server/model"
-	"next-terminal/server/utils"
 )
 
 type ResourceSharerRepository struct {
