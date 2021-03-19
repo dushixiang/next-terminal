@@ -1,12 +1,14 @@
 package repository
 
 import (
-	"gorm.io/gorm"
-	"next-terminal/server/constant"
-	"next-terminal/server/model"
 	"os"
 	"path"
 	"time"
+
+	"next-terminal/server/constant"
+	"next-terminal/server/model"
+
+	"gorm.io/gorm"
 )
 
 type SessionRepository struct {

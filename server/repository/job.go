@@ -1,9 +1,10 @@
 package repository
 
 import (
-	"gorm.io/gorm"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
+
+	"gorm.io/gorm"
 )
 
 type JobRepository struct {

@@ -1,9 +1,10 @@
 package repository
 
 import (
-	"gorm.io/gorm"
 	"next-terminal/server/constant"
 	"next-terminal/server/model"
+
+	"gorm.io/gorm"
 )
 
 type CredentialRepository struct {

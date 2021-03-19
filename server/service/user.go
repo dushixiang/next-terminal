@@ -1,11 +1,12 @@
 package service
 
 import (
-	"github.com/sirupsen/logrus"
 	"next-terminal/server/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
+
+	"github.com/sirupsen/logrus"
 )
 
 type UserService struct {

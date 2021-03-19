@@ -4,16 +4,18 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/robfig/cron/v3"
-	"github.com/sirupsen/logrus"
+	"strings"
+	"time"
+
 	"next-terminal/server/constant"
 	"next-terminal/server/global"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/term"
 	"next-terminal/server/utils"
-	"strings"
-	"time"
+
+	"github.com/robfig/cron/v3"
+	"github.com/sirupsen/logrus"
 )
 
 type JobService struct {
