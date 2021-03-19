@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
+	"next-terminal/pkg/log"
 	"next-terminal/server/global"
-	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
@@ -17,7 +17,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/patrickmn/go-cache"
-	"github.com/sirupsen/logrus"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -54,13 +53,13 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 	InitService()
 
 	if err := InitDBData(); err != nil {
-		logrus.WithError(err).Error("初始化数据异常")
+		log.WithError(err).Error("初始化数据异常")
 	}
 
 	e := echo.New()
 	e.HideBanner = true
-	e.Logger = log.GetEchoLogger()
-
+	//e.Logger = log.GetEchoLogger()
+	e.Use(log.Hook())
 	e.File("/", "web/build/index.html")
 	e.File("/asciinema.html", "web/build/asciinema.html")
 	e.File("/asciinema-player.js", "web/build/asciinema-player.js")
@@ -284,7 +283,7 @@ func ResetPassword() error {
 	if err := userRepository.Update(u); err != nil {
 		return err
 	}
-	logrus.Debugf("用户「%v」密码初始化为: %v", user.Username, password)
+	log.Debugf("用户「%v」密码初始化为: %v", user.Username, password)
 	return nil
 }
 
@@ -294,10 +293,10 @@ func SetupCache() *cache.Cache {
 	mCache.OnEvicted(func(key string, value interface{}) {
 		if strings.HasPrefix(key, Token) {
 			token := GetTokenFormCacheKey(key)
-			logrus.Debugf("用户Token「%v」过期", token)
+			log.Debugf("用户Token「%v」过期", token)
 			err := userService.Logout(token)
 			if err != nil {
-				logrus.Errorf("退出登录失败 %v", err)
+				log.Errorf("退出登录失败 %v", err)
 			}
 		}
 	})
@@ -334,13 +333,13 @@ func SetupDB() *gorm.DB {
 	}
 
 	if err != nil {
-		logrus.WithError(err).Panic("连接数据库异常")
+		log.WithError(err).Panic("连接数据库异常")
 	}
 
 	if err := db.AutoMigrate(&model.User{}, &model.Asset{}, &model.AssetAttribute{}, &model.Session{}, &model.Command{},
 		&model.Credential{}, &model.Property{}, &model.ResourceSharer{}, &model.UserGroup{}, &model.UserGroupMember{},
 		&model.LoginLog{}, &model.Num{}, &model.Job{}, &model.JobLog{}, &model.AccessSecurity{}); err != nil {
-		logrus.WithError(err).Panic("初始化数据库表结构异常")
+		log.WithError(err).Panic("初始化数据库表结构异常")
 	}
 	return db
 }

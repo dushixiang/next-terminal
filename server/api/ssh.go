@@ -7,16 +7,16 @@ import (
 	"strconv"
 	"time"
 
+	"next-terminal/pkg/guacd"
+	"next-terminal/pkg/log"
 	"next-terminal/server/constant"
 	"next-terminal/server/global"
-	"next-terminal/server/guacd"
 	"next-terminal/server/model"
 	"next-terminal/server/term"
 	"next-terminal/server/utils"
 
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 )
 
 var UpGrader = websocket.Upgrader{
@@ -46,7 +46,7 @@ type WindowSize struct {
 func SSHEndpoint(c echo.Context) (err error) {
 	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
-		logrus.Errorf("升级为WebSocket协议失败：%v", err.Error())
+		log.Errorf("升级为WebSocket协议失败：%v", err.Error())
 		return err
 	}
 
@@ -109,7 +109,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 			observers := append(observable.Observers, tun)
 			observable.Observers = observers
 			global.Store.Set(sessionId, observable)
-			logrus.Debugf("加入会话%v,当前观察者数量为：%v", session.ConnectionId, len(observers))
+			log.Debugf("加入会话%v,当前观察者数量为：%v", session.ConnectionId, len(observers))
 		}
 
 		return err
@@ -118,7 +118,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	nextTerminal, err := term.NewNextTerminal(ip, port, username, password, privateKey, passphrase, rows, cols, recording)
 
 	if err != nil {
-		logrus.Errorf("创建SSH客户端失败：%v", err.Error())
+		log.Errorf("创建SSH客户端失败：%v", err.Error())
 		msg := Message{
 			Type:    Closed,
 			Content: err.Error(),
@@ -144,7 +144,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 		Recording:    recording,
 	}
 	// 创建新会话
-	logrus.Debugf("创建新会话 %v", sess.ConnectionId)
+	log.Debugf("创建新会话 %v", sess.ConnectionId)
 	if err := sessionRepository.UpdateById(&sess, sessionId); err != nil {
 		return err
 	}
@@ -172,7 +172,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 		var msg Message
 		err = json.Unmarshal(message, &msg)
 		if err != nil {
-			logrus.Warnf("解析Json失败: %v, 原始字符串：%v", err, string(message))
+			log.Warnf("解析Json失败: %v, 原始字符串：%v", err, string(message))
 			continue
 		}
 
@@ -181,17 +181,17 @@ func SSHEndpoint(c echo.Context) (err error) {
 			var winSize WindowSize
 			err = json.Unmarshal([]byte(msg.Content), &winSize)
 			if err != nil {
-				logrus.Warnf("解析SSH会话窗口大小失败: %v", err)
+				log.Warnf("解析SSH会话窗口大小失败: %v", err)
 				continue
 			}
 			if err := nextTerminal.WindowChange(winSize.Rows, winSize.Cols); err != nil {
-				logrus.Warnf("更改SSH会话窗口大小失败: %v", err)
+				log.Warnf("更改SSH会话窗口大小失败: %v", err)
 				continue
 			}
 		case Data:
 			_, err = nextTerminal.Write([]byte(msg.Content))
 			if err != nil {
-				logrus.Debugf("SSH会话写入失败: %v", err)
+				log.Debugf("SSH会话写入失败: %v", err)
 				msg := Message{
 					Type:    Closed,
 					Content: "the remote connection is closed.",
@@ -247,7 +247,7 @@ func WriteMessage(ws *websocket.Conn, msg Message) error {
 func WriteByteMessage(ws *websocket.Conn, p []byte) {
 	err := ws.WriteMessage(websocket.TextMessage, p)
 	if err != nil {
-		logrus.Debugf("write: %v", err)
+		log.Debugf("write: %v", err)
 	}
 }
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"next-terminal/pkg/log"
 	"next-terminal/server/constant"
 	"next-terminal/server/global"
 	"next-terminal/server/model"
@@ -15,7 +16,6 @@ import (
 	"next-terminal/server/utils"
 
 	"github.com/robfig/cron/v3"
-	"github.com/sirupsen/logrus"
 )
 
 type JobService struct {
@@ -43,14 +43,14 @@ func (r JobService) ChangeStatusById(id, status string) error {
 		if err != nil {
 			return err
 		}
-		logrus.Debugf("开启计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(global.Cron.Entries()))
+		log.Debugf("开启计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(global.Cron.Entries()))
 
 		jobForUpdate := model.Job{ID: id, Status: constant.JobStatusRunning, CronJobId: int(entryID)}
 
 		return r.jobRepository.UpdateById(&jobForUpdate)
 	} else {
 		global.Cron.Remove(cron.EntryID(job.CronJobId))
-		logrus.Debugf("关闭计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(global.Cron.Entries()))
+		log.Debugf("关闭计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(global.Cron.Entries()))
 		jobForUpdate := model.Job{ID: id, Status: constant.JobStatusNotRunning}
 		return r.jobRepository.UpdateById(&jobForUpdate)
 	}
@@ -102,7 +102,7 @@ func (r CheckAssetStatusJob) Run() {
 			msg := fmt.Sprintf("资产「%v」存活状态检测完成，存活「%v」，耗时「%v」", asset.Name, active, elapsed)
 
 			_ = r.jobService.assetRepository.UpdateActiveById(active, asset.ID)
-			logrus.Infof(msg)
+			log.Infof(msg)
 			msgChan <- msg
 		}()
 	}
@@ -154,7 +154,7 @@ func (r ShellJob) Run() {
 	var metadataShell MetadataShell
 	err := json.Unmarshal([]byte(r.Metadata), &metadataShell)
 	if err != nil {
-		logrus.Errorf("JSON数据解析失败 %v", err)
+		log.Errorf("JSON数据解析失败 %v", err)
 		return
 	}
 
@@ -200,10 +200,10 @@ func (r ShellJob) Run() {
 			var msg string
 			if err != nil {
 				msg = fmt.Sprintf("资产「%v」Shell执行失败，返回值「%v」，耗时「%v」", asset.Name, err.Error(), elapsed)
-				logrus.Infof(msg)
+				log.Infof(msg)
 			} else {
 				msg = fmt.Sprintf("资产「%v」Shell执行成功，返回值「%v」，耗时「%v」", asset.Name, result, elapsed)
-				logrus.Infof(msg)
+				log.Infof(msg)
 			}
 
 			msgChan <- msg
@@ -274,7 +274,7 @@ func (r JobService) InitJob() error {
 		if err := r.jobRepository.Create(&job); err != nil {
 			return err
 		}
-		logrus.Debugf("创建计划任务「%v」cron「%v」", job.Name, job.Cron)
+		log.Debugf("创建计划任务「%v」cron「%v」", job.Name, job.Cron)
 	} else {
 		for i := range jobs {
 			if jobs[i].Status == constant.JobStatusRunning {
@@ -282,7 +282,7 @@ func (r JobService) InitJob() error {
 				if err != nil {
 					return err
 				}
-				logrus.Debugf("启动计划任务「%v」cron「%v」", jobs[i].Name, jobs[i].Cron)
+				log.Debugf("启动计划任务「%v」cron「%v」", jobs[i].Name, jobs[i].Cron)
 			}
 		}
 	}
