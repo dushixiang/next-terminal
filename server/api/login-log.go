@@ -4,10 +4,10 @@ import (
 	"strconv"
 	"strings"
 
+	"next-terminal/pkg/log"
 	"next-terminal/server/global"
 
 	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
 )
 
 func LoginLogPagingEndpoint(c echo.Context) error {
@@ -35,7 +35,7 @@ func LoginLogDeleteEndpoint(c echo.Context) error {
 		token := split[i]
 		global.Cache.Delete(token)
 		if err := userService.Logout(token); err != nil {
-			logrus.WithError(err).Error("Cache Delete Failed")
+			log.WithError(err).Error("Cache Delete Failed")
 		}
 	}
 	if err := loginLogRepository.DeleteByIdIn(split); err != nil {

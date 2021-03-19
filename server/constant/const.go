@@ -1,6 +1,6 @@
 package constant
 
-import "next-terminal/server/guacd"
+import "next-terminal/pkg/guacd"
 
 const (
 	AccessRuleAllow  = "allow"  // 允许访问

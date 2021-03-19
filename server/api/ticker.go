@@ -4,9 +4,8 @@ import (
 	"strconv"
 	"time"
 
+	"next-terminal/pkg/log"
 	"next-terminal/server/constant"
-
-	"github.com/sirupsen/logrus"
 )
 
 func SetupTicker() {
@@ -22,7 +21,7 @@ func SetupTicker() {
 					if now.Sub(sessions[i].ConnectedTime.Time) > time.Hour*1 {
 						_ = sessionRepository.DeleteById(sessions[i].ID)
 						s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
-						logrus.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
+						log.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
 					}
 				}
 			}
@@ -56,7 +55,7 @@ func SetupTicker() {
 				}
 				err := sessionRepository.DeleteByIds(sessionIds)
 				if err != nil {
-					logrus.Errorf("删除离线会话失败 %v", err)
+					log.Errorf("删除离线会话失败 %v", err)
 				}
 			}
 		}
