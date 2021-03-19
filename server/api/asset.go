@@ -43,7 +43,7 @@ func AssetCreateEndpoint(c echo.Context) error {
 	// 创建后自动检测资产是否存活
 	go func() {
 		active := utils.Tcping(item.IP, item.Port)
-		assetRepository.UpdateActiveById(active, item.ID)
+		_ = assetRepository.UpdateActiveById(active, item.ID)
 	}()
 
 	return Success(c, item)
@@ -107,7 +107,7 @@ func AssetImportEndpoint(c echo.Context) error {
 				// 创建后自动检测资产是否存活
 				go func() {
 					active := utils.Tcping(asset.IP, asset.Port)
-					assetRepository.UpdateActiveById(active, asset.ID)
+					_ = assetRepository.UpdateActiveById(active, asset.ID)
 				}()
 			}
 		}
