@@ -1,27 +1,12 @@
 import React, {Component} from 'react';
-import {Card, Input, List, PageHeader, Spin} from "antd";
+import {Card, Input, List, Spin} from "antd";
 import Console from "../access/Console";
-import {itemRender} from "../../utils/utils";
 
 import './Command.css'
 import request from "../../common/request";
 import {message} from "antd/es";
 
 const {Search} = Input;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: '/dynamic-command',
-        breadcrumbName: '动态指令',
-    },
-    {
-        path: '/batch-command',
-        breadcrumbName: '批量执行命令',
-    }
-];
 
 class BatchCommand extends Component {
 
@@ -72,18 +57,6 @@ class BatchCommand extends Component {
     render() {
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="批量执行命令"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="动态指令"
-                >
-                </PageHeader>
-
                 <Spin spinning={this.state.loading} tip='正在获取指令内容...'>
                     <div className="page-search">
                         <Search ref={this.commandRef} placeholder="请输入指令" onSearch={value => {
