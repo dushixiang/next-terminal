@@ -93,7 +93,7 @@ func (r *ResourceSharerRepository) DeleteByUserIdAndResourceTypeAndResourceIdIn(
 		db = db.Where("resource_type = ?", resourceType)
 	}
 
-	if resourceIds != nil {
+	if resourceIds != nil && len(resourceIds) > 0 {
 		db = db.Where("resource_id in ?", resourceIds)
 	}
 
