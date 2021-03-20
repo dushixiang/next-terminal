@@ -69,3 +69,7 @@ func NewStore() *TunStore {
 	store := TunStore{sync.Map{}}
 	return &store
 }
+
+func init() {
+	Store = NewStore()
+}
