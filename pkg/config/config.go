@@ -8,6 +8,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var GlobalCfg *Config
+
 type Config struct {
 	Debug         bool
 	Demo          bool
@@ -84,6 +86,10 @@ func SetupConfig() *Config {
 		Debug:         viper.GetBool("debug"),
 		Demo:          viper.GetBool("demo"),
 	}
-
+	GlobalCfg = config
 	return config
+}
+
+func init() {
+	GlobalCfg = SetupConfig()
 }

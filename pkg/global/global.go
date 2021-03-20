@@ -21,3 +21,8 @@ type Security struct {
 }
 
 var Securities []*Security
+
+func init() {
+	Cron = cron.New(cron.WithSeconds())
+	Cron.Start()
+}
