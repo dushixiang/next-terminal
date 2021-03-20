@@ -82,13 +82,17 @@ func UUID() string {
 }
 
 func Tcping(ip string, port int) bool {
-	var conn net.Conn
-	var err error
-
-	if conn, err = net.DialTimeout("tcp", ip+":"+strconv.Itoa(port), 2*time.Second); err != nil {
+	var (
+		conn net.Conn
+		err  error
+	)
+	strPort := strconv.Itoa(port)
+	if conn, err = net.DialTimeout("tcp", fmt.Sprintf("[%s]:%s", ip, strPort), 2*time.Second); err != nil {
 		return false
 	}
-	defer conn.Close()
+	defer func() {
+		conn.Close()
+	}()
 	return true
 }
 
