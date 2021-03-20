@@ -10,7 +10,6 @@ import (
 	"next-terminal/server/repository"
 
 	"github.com/labstack/gommon/log"
-	"github.com/robfig/cron/v3"
 )
 
 const Version = "v0.3.4"
@@ -34,9 +33,6 @@ func Run() error {
 
 	// 为了兼容之前调用global包的代码 后期预期会改为调用pgk/config
 	global.Config = config.GlobalCfg
-
-	global.Cron = cron.New(cron.WithSeconds()) //精确到秒
-	global.Cron.Start()
 
 	db := api.SetupDB()
 	e := api.SetupRoutes(db)
