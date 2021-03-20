@@ -7,11 +7,11 @@ import (
 	"strings"
 	"time"
 
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/log"
-	"next-terminal/server/global"
+	"next-terminal/pkg/service"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
-	"next-terminal/server/service"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"

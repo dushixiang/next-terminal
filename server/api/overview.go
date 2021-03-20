@@ -1,7 +1,7 @@
 package api
 
 import (
-	"next-terminal/server/constant"
+	"next-terminal/pkg/constant"
 	"next-terminal/server/repository"
 
 	"github.com/labstack/echo/v4"

@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/server/global"
+	"next-terminal/pkg/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 

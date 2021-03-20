@@ -1,8 +1,8 @@
 package api
 
 import (
-	"next-terminal/server/constant"
-	"next-terminal/server/global"
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/server/model"
 
 	"github.com/labstack/echo/v4"

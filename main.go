@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 
+	"next-terminal/pkg/config"
+	"next-terminal/pkg/global"
+	"next-terminal/pkg/task"
 	"next-terminal/server/api"
-	"next-terminal/server/config"
-	"next-terminal/server/global"
+	"next-terminal/server/repository"
 
 	"github.com/labstack/gommon/log"
 	"github.com/robfig/cron/v3"
@@ -42,8 +44,10 @@ func Run() error {
 	if global.Config.ResetPassword != "" {
 		return api.ResetPassword()
 	}
-
-	api.SetupTicker()
+	sessionRepo := repository.NewSessionRepository(db)
+	propertyREpo := repository.NewPropertyRepository(db)
+	ticker := task.NewTicker(sessionRepo, propertyREpo)
+	ticker.SetupTicker()
 
 	if global.Config.Server.Cert != "" && global.Config.Server.Key != "" {
 		return e.StartTLS(global.Config.Server.Addr, global.Config.Server.Cert, global.Config.Server.Key)
