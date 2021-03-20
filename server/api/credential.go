@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/server/constant"
+	"next-terminal/pkg/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 

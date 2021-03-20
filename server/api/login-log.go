@@ -4,8 +4,8 @@ import (
 	"strconv"
 	"strings"
 
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/log"
-	"next-terminal/server/global"
 
 	"github.com/labstack/echo/v4"
 )

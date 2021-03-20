@@ -7,12 +7,12 @@ import (
 	"strings"
 	"time"
 
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/log"
-	"next-terminal/server/constant"
-	"next-terminal/server/global"
+	"next-terminal/pkg/term"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
-	"next-terminal/server/term"
 	"next-terminal/server/utils"
 
 	"github.com/robfig/cron/v3"

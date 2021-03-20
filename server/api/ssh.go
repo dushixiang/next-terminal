@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"time"
 
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/log"
-	"next-terminal/server/constant"
-	"next-terminal/server/global"
+	"next-terminal/pkg/term"
 	"next-terminal/server/model"
-	"next-terminal/server/term"
 	"next-terminal/server/utils"
 
 	"github.com/gorilla/websocket"
