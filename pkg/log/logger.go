@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"time"
 
-	"next-terminal/pkg/global"
+	"next-terminal/pkg/config"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
@@ -201,12 +201,11 @@ func NewLogger() Logrus {
 	logger.SetOutput(io.MultiWriter(os.Stdout, src))
 
 	//设置日志级别
-	if global.Config.Debug {
+	if config.GlobalCfg.Debug {
 		logger.SetLevel(logrus.DebugLevel)
 	} else {
 		logger.SetLevel(logrus.InfoLevel)
 	}
-
 	//设置日志格式
 	logger.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",

@@ -32,9 +32,9 @@ func Run() error {
 \____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
         \/     \/      \/                     \/            \/        \/     \/      ` + Version + "\n\n")
 
-	global.Config = config.SetupConfig()
+	// 为了兼容之前调用global包的代码 后期预期会改为调用pgk/config
+	global.Config = config.GlobalCfg
 
-	global.Store = global.NewStore()
 	global.Cron = cron.New(cron.WithSeconds()) //精确到秒
 	global.Cron.Start()
 
