@@ -1,7 +1,7 @@
 package service
 
 import (
-	"next-terminal/server/constant"
+	"next-terminal/pkg/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"

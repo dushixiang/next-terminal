@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
-	"next-terminal/server/global"
+	"next-terminal/pkg/global"
+	"next-terminal/pkg/totp"
 	"next-terminal/server/model"
-	"next-terminal/server/totp"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
@@ -39,6 +39,11 @@ type Authorization struct {
 	Remember bool
 	User     model.User
 }
+
+//
+//type UserServer struct {
+//	repository.UserRepository
+//}
 
 func LoginEndpoint(c echo.Context) error {
 	var loginAccount LoginAccount

@@ -13,9 +13,9 @@ import (
 	"strings"
 	"sync"
 
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/log"
-	"next-terminal/server/constant"
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 

@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"next-terminal/pkg/guacd"
-	"next-terminal/server/term"
+	"next-terminal/pkg/term"
 
 	"github.com/gorilla/websocket"
 )

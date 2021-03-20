@@ -1,7 +1,7 @@
 package global
 
 import (
-	"next-terminal/server/config"
+	"next-terminal/pkg/config"
 
 	"github.com/patrickmn/go-cache"
 	"github.com/robfig/cron/v3"

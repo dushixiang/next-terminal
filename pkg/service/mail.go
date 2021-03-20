@@ -3,8 +3,8 @@ package service
 import (
 	"net/smtp"
 
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/log"
-	"next-terminal/server/constant"
 	"next-terminal/server/repository"
 
 	"github.com/jordan-wright/email"

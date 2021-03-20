@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"next-terminal/server/constant"
-	"next-terminal/server/global"
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
