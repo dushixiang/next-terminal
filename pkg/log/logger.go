@@ -3,11 +3,12 @@ package log
 import (
 	"fmt"
 	"io"
-	"next-terminal/server/global"
 	"os"
 	"path"
 	"strconv"
 	"time"
+
+	"next-terminal/pkg/global"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
