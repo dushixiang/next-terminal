@@ -3,6 +3,7 @@ package log
 import (
 	"fmt"
 	"io"
+	"next-terminal/server/global"
 	"os"
 	"path"
 	"strconv"
@@ -199,7 +200,12 @@ func NewLogger() Logrus {
 	logger.SetOutput(io.MultiWriter(os.Stdout, src))
 
 	//设置日志级别
-	logger.SetLevel(logrus.DebugLevel)
+	if global.Config.Debug {
+		logger.SetLevel(logrus.DebugLevel)
+	} else {
+		logger.SetLevel(logrus.InfoLevel)
+	}
+
 	//设置日志格式
 	logger.SetFormatter(&logrus.TextFormatter{
 		TimestampFormat: "2006-01-02 15:04:05",
