@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"next-terminal/server/constant"
+	"next-terminal/pkg/constant"
 	"next-terminal/server/model"
 
 	"gorm.io/gorm"

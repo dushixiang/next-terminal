@@ -5,10 +5,10 @@ import (
 	"path"
 	"strconv"
 
+	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/guacd"
 	"next-terminal/pkg/log"
-	"next-terminal/server/constant"
-	"next-terminal/server/global"
 	"next-terminal/server/model"
 
 	"github.com/gorilla/websocket"
