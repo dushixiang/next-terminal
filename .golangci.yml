@@ -1,6 +1,6 @@
 linters-settings:
   goimports:
-    local-prefixes: uqingtech.com
+    local-prefixes: next-terminal
 
 linters:
   disable-all: true
@@ -19,8 +19,5 @@ linters:
     - varcheck
 
 run:
-  skip-dirs:
-    - api/
-    - module/
   skip-files:
     - test_ssh.go
