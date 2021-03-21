@@ -56,7 +56,7 @@ func (r *ResourceSharerRepository) OverwriteUserIdsByResourceId(resourceId, reso
 		}
 	}
 
-	db.Where("resource_id = ?", resourceId).Delete(&ResourceSharerRepository{})
+	db.Where("resource_id = ?", resourceId).Delete(&model.ResourceSharer{})
 
 	for i := range userIds {
 		userId := userIds[i]
@@ -97,11 +97,11 @@ func (r *ResourceSharerRepository) DeleteByUserIdAndResourceTypeAndResourceIdIn(
 		db = db.Where("resource_id in ?", resourceIds)
 	}
 
-	return db.Delete(&ResourceSharerRepository{}).Error
+	return db.Delete(&model.ResourceSharer{}).Error
 }
 
 func (r *ResourceSharerRepository) DeleteResourceSharerByResourceId(resourceId string) error {
-	return r.DB.Where("resource_id = ?", resourceId).Delete(&ResourceSharerRepository{}).Error
+	return r.DB.Where("resource_id = ?", resourceId).Delete(&model.ResourceSharer{}).Error
 }
 
 func (r *ResourceSharerRepository) AddSharerResources(userGroupId, userId, resourceType string, resourceIds []string) error {
