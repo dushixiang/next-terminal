@@ -22,7 +22,7 @@ func (r UserRepository) FindAll() (o []model.User) {
 	return
 }
 
-func (r UserRepository) Find(pageIndex, pageSize int, username, nickname, mail, order, field string) (o []model.UserVo, total int64, err error) {
+func (r UserRepository) Find(pageIndex, pageSize int, username, nickname, mail, order, field string) (o []model.UserForPage, total int64, err error) {
 	db := r.DB.Table("users").Select("users.id,users.username,users.nickname,users.mail,users.online,users.enabled,users.created,users.type, count(resource_sharers.user_id) as sharer_asset_count, users.totp_secret").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
 	dbCounter := r.DB.Table("users")
 	if len(username) > 0 {
@@ -61,7 +61,7 @@ func (r UserRepository) Find(pageIndex, pageSize int, username, nickname, mail, 
 
 	err = db.Order("users." + field + " " + order).Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
 	if o == nil {
-		o = make([]model.UserVo, 0)
+		o = make([]model.UserForPage, 0)
 	}
 
 	for i := 0; i < len(o); i++ {

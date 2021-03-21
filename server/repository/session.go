@@ -20,7 +20,7 @@ func NewSessionRepository(db *gorm.DB) *SessionRepository {
 	return sessionRepository
 }
 
-func (r SessionRepository) Find(pageIndex, pageSize int, status, userId, clientIp, assetId, protocol string) (results []model.SessionVo, total int64, err error) {
+func (r SessionRepository) Find(pageIndex, pageSize int, status, userId, clientIp, assetId, protocol string) (results []model.SessionForPage, total int64, err error) {
 
 	db := r.DB
 	var params []interface{}
@@ -62,7 +62,7 @@ func (r SessionRepository) Find(pageIndex, pageSize int, status, userId, clientI
 	err = db.Raw(itemSql, params...).Scan(&results).Error
 
 	if results == nil {
-		results = make([]model.SessionVo, 0)
+		results = make([]model.SessionForPage, 0)
 	}
 	return
 }

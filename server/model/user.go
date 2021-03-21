@@ -17,7 +17,7 @@ type User struct {
 	Mail       string         `json:"mail"`
 }
 
-type UserVo struct {
+type UserForPage struct {
 	ID               string         `json:"id"`
 	Username         string         `json:"username"`
 	Nickname         string         `json:"nickname"`

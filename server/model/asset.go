@@ -23,7 +23,7 @@ type Asset struct {
 	Owner        string         `gorm:"index" json:"owner"`
 }
 
-type AssetVo struct {
+type AssetForPage struct {
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`
 	IP          string         `json:"ip"`
