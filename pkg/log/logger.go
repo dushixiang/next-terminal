@@ -208,6 +208,7 @@ func NewLogger() Logrus {
 
 	//实例化
 	logger := logrus.New()
+	//设置输出
 	logger.SetOutput(io.MultiWriter(&lumberjack.Logger{
 		Filename:   fileName,
 		MaxSize:    100, // megabytes
@@ -215,8 +216,6 @@ func NewLogger() Logrus {
 		MaxAge:     7,    //days
 		Compress:   true, // disabled by default
 	}, os.Stdout))
-	//设置输出
-	//logger.SetOutput()
 	logger.SetReportCaller(true)
 	//设置日志级别
 	if config.GlobalCfg.Debug {
