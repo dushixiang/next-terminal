@@ -83,15 +83,22 @@ func UUID() string {
 
 func Tcping(ip string, port int) bool {
 	var (
-		conn net.Conn
-		err  error
+		conn    net.Conn
+		err     error
+		address string
 	)
 	strPort := strconv.Itoa(port)
-	if conn, err = net.DialTimeout("tcp", fmt.Sprintf("[%s]:%s", ip, strPort), 2*time.Second); err != nil {
+	if strings.HasPrefix(ip, "[") && strings.HasSuffix(ip, "]") {
+		// 如果用户有填写中括号就不再拼接
+		address = fmt.Sprintf("%s:%s", ip, strPort)
+	} else {
+		address = fmt.Sprintf("[%s]:%s", ip, strPort)
+	}
+	if conn, err = net.DialTimeout("tcp", address, 2*time.Second); err != nil {
 		return false
 	}
 	defer func() {
-		conn.Close()
+		_ = conn.Close()
 	}()
 	return true
 }
