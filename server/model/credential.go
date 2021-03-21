@@ -20,7 +20,7 @@ func (r *Credential) TableName() string {
 	return "credentials"
 }
 
-type CredentialVo struct {
+type CredentialForPage struct {
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`
 	Type        string         `json:"type"`

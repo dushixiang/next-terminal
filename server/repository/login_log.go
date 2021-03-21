@@ -15,7 +15,7 @@ func NewLoginLogRepository(db *gorm.DB) *LoginLogRepository {
 	return loginLogRepository
 }
 
-func (r LoginLogRepository) Find(pageIndex, pageSize int, userId, clientIp string) (o []model.LoginLogVo, total int64, err error) {
+func (r LoginLogRepository) Find(pageIndex, pageSize int, userId, clientIp string) (o []model.LoginLogForPage, total int64, err error) {
 
 	db := r.DB.Table("login_logs").Select("login_logs.id,login_logs.user_id,login_logs.client_ip,login_logs.client_user_agent,login_logs.login_time, login_logs.logout_time, users.nickname as user_name").Joins("left join users on login_logs.user_id = users.id")
 	dbCounter := r.DB.Table("login_logs").Select("DISTINCT login_logs.id")
@@ -37,7 +37,7 @@ func (r LoginLogRepository) Find(pageIndex, pageSize int, userId, clientIp strin
 
 	err = db.Order("login_logs.login_time desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
 	if o == nil {
-		o = make([]model.LoginLogVo, 0)
+		o = make([]model.LoginLogForPage, 0)
 	}
 	return
 }

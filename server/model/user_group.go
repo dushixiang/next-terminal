@@ -5,10 +5,16 @@ import (
 )
 
 type UserGroup struct {
-	ID         string         `gorm:"primary_key" json:"id"`
+	ID      string         `gorm:"primary_key" json:"id"`
+	Name    string         `json:"name"`
+	Created utils.JsonTime `json:"created"`
+}
+
+type UserGroupForPage struct {
+	ID         string         `json:"id"`
 	Name       string         `json:"name"`
 	Created    utils.JsonTime `json:"created"`
-	AssetCount int64          `gorm:"-" json:"assetCount"`
+	AssetCount int64          `json:"assetCount"`
 }
 
 func (r *UserGroup) TableName() string {
