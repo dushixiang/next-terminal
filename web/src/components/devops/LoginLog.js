@@ -8,7 +8,6 @@ import {
     Layout,
     Modal,
     notification,
-    PageHeader,
     Row,
     Select,
     Space,
@@ -18,7 +17,7 @@ import {
 } from "antd";
 import qs from "qs";
 import request from "../../common/request";
-import {formatDate, isEmpty, itemRender} from "../../utils/utils";
+import {formatDate, isEmpty} from "../../utils/utils";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 
@@ -27,16 +26,6 @@ const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Search} = Input;
 const {Title, Text} = Typography;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'loginLog',
-        breadcrumbName: '登录日志',
-    }
-];
 
 class LoginLog extends Component {
 
@@ -280,18 +269,6 @@ class LoginLog extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="登录日志"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="只有登录成功的才会保存日志"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import {Divider, Layout, Menu} from "antd";
+import {Col, Divider, Dropdown, Layout, Menu, Popconfirm, Row, Tooltip} from "antd";
 import {Link, Route, Switch} from "react-router-dom";
 import Dashboard from "./components/dashboard/Dashboard";
 import Asset from "./components/asset/Asset";
@@ -21,15 +21,21 @@ import {
     DashboardOutlined,
     DesktopOutlined,
     DisconnectOutlined,
+    DownOutlined,
+    GithubOutlined,
     IdcardOutlined,
     LinkOutlined,
     LoginOutlined,
+    LogoutOutlined,
+    QuestionCircleOutlined,
     SafetyCertificateOutlined,
     SettingOutlined,
     SolutionOutlined,
     TeamOutlined,
     UserOutlined,
-    UserSwitchOutlined
+    UserSwitchOutlined,
+    MenuUnfoldOutlined,
+    MenuFoldOutlined,
 } from '@ant-design/icons';
 import Info from "./components/user/Info";
 import request from "./common/request";
@@ -37,18 +43,18 @@ import {message} from "antd/es";
 import Setting from "./components/setting/Setting";
 import BatchCommand from "./components/command/BatchCommand";
 import {isEmpty, NT_PACKAGE} from "./utils/utils";
-import {isAdmin} from "./service/permission";
+import {getCurrentUser, isAdmin} from "./service/permission";
 import UserGroup from "./components/user/UserGroup";
 import LoginLog from "./components/devops/LoginLog";
 import Term from "./components/access/Term";
 import Job from "./components/devops/Job";
 import {Header} from "antd/es/layout/layout";
-import LayoutHeader from "./components/user/LayoutHeader";
 import Security from "./components/devops/Security";
 
 const {Footer, Sider} = Layout;
 
 const {SubMenu} = Menu;
+const headerHeight = 60;
 
 class App extends Component {
 
@@ -113,8 +119,54 @@ class App extends Component {
         sessionStorage.setItem('openKeys', JSON.stringify(openKeys));
     }
 
+    confirm = async (e) => {
+        let result = await request.post('/logout');
+        if (result['code'] !== 1) {
+            message.error(result['message']);
+        } else {
+            message.success('退出登录成功，即将跳转至登录页面。');
+            window.location.reload();
+        }
+    }
+
     render() {
 
+        const menu = (
+            <Menu>
+
+                <Menu.Item>
+                    <Link to={'/info'}>
+                        <SolutionOutlined/>
+                        个人中心
+                    </Link>
+                </Menu.Item>
+
+                <Menu.Item>
+                    <a target='_blank' rel="noreferrer" href='https://github.com/dushixiang/next-terminal'>
+                        <GithubOutlined/>
+                        点个Star
+                    </a>
+                </Menu.Item>
+
+                <Menu.Divider/>
+
+                <Menu.Item>
+
+                    <Popconfirm
+                        key='login-btn-pop'
+                        title="您确定要退出登录吗?"
+                        onConfirm={this.confirm}
+                        okText="确定"
+                        cancelText="取消"
+                        placement="left"
+                    >
+                        <LogoutOutlined/>
+                        退出登录
+                    </Popconfirm>
+                </Menu.Item>
+
+            </Menu>
+        );
 
         return (
 
@@ -126,7 +178,7 @@ class App extends Component {
                 <Route path="/">
                     <Layout className="layout" style={{minHeight: '100vh'}}>
 
-                        <Sider collapsible collapsed={this.state.collapsed} onCollapse={this.onCollapse}>
+                        <Sider collapsible collapsed={this.state.collapsed} trigger={null}>
                             <div className="logo">
                                 <img src='logo.svg' alt='logo'/>
                                 {
@@ -251,8 +303,38 @@ class App extends Component {
 
                         <Layout className="site-layout">
                             <Header className="site-layout-background"
-                                    style={{padding: 0, height: 48, zIndex: 20}}>
-                                <LayoutHeader key='layout-right-header'/>
+                                    style={{padding: 0, height: headerHeight, zIndex: 20}}>
+                                <div className='layout-header'>
+                                    <Row justify="space-around" align="middle" gutter={24} style={{height: headerHeight}}>
+                                        <Col span={4} key={1} style={{height: headerHeight}}>
+                                            {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                                                className: 'trigger',
+                                                onClick: this.onCollapse,
+                                            })}
+                                        </Col>
+                                        <Col span={20} key={2} style={{textAlign: 'right'}}
+                                             className={'layout-header-right'}>
+
+                                            <div className={'layout-header-right-item'}>
+                                                <Tooltip placement="bottom" title={'使用帮助'}>
+                                                    <a target='_blank' rel="noreferrer"
+                                                       href='https://github.com/dushixiang/next-terminal/blob/master/docs/faq.md'>
+                                                        <QuestionCircleOutlined/>
+                                                    </a>
+                                                </Tooltip>
+
+                                            </div>
+
+
+                                            <Dropdown overlay={menu}>
+                                                <div className='nickname layout-header-right-item'>
+                                                    {getCurrentUser()['nickname']} &nbsp;<DownOutlined/>
+                                                </div>
+                                            </Dropdown>
+                                        </Col>
+                                    </Row>
+
+                                </div>
                             </Header>
 
                             <Route path="/" exact component={Dashboard}/>

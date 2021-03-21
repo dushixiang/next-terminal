@@ -1,25 +1,10 @@
 import React, {Component} from 'react';
 
-import {
-    Button,
-    Col,
-    Divider,
-    Input,
-    Layout,
-    Modal,
-    PageHeader,
-    Row,
-    Space,
-    Table,
-    Tag,
-    Tooltip,
-    Typography
-} from "antd";
+import {Button, Col, Divider, Input, Layout, Modal, Row, Space, Table, Tag, Tooltip, Typography} from "antd";
 import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
-import {itemRender} from "../../utils/utils";
 import './Job.css'
 import SecurityModal from "./SecurityModal";
 
@@ -27,16 +12,6 @@ const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'security',
-        breadcrumbName: '访问安全',
-    }
-];
 
 class Security extends Component {
 
@@ -296,18 +271,6 @@ class Security extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="访问安全"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="IP访问规则限制"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
 
                     <div style={{marginBottom: 20}}>

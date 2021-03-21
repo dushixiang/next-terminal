@@ -10,7 +10,6 @@ import {
     Layout,
     Menu,
     Modal,
-    PageHeader,
     Row,
     Select,
     Space,
@@ -32,7 +31,6 @@ import {
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import {itemRender} from "../../utils/utils";
 
 import {hasPermission, isAdmin} from "../../service/permission";
 import dayjs from "dayjs";
@@ -41,16 +39,6 @@ const confirm = Modal.confirm;
 const {Search} = Input;
 const {Title, Text} = Typography;
 const {Content} = Layout;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'credentials',
-        breadcrumbName: '授权凭证',
-    }
-];
 
 class Credential extends Component {
 
@@ -483,18 +471,6 @@ class Credential extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="授权凭证"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="访问资产的账户、密钥等"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
 
                     <div style={{marginBottom: 20}}>

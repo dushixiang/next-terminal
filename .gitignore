@@ -5,3 +5,25 @@ web/build
 .DS_Store
 .eslintcache
 .env
+
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# ignore ide config
+.idea
+.vscode
+
+# vim
+*.swp
+
+
+# playground
+playground/data
+playground/drive
+playground/recording
+
+/log

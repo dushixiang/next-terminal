@@ -13,7 +13,6 @@ import {
     Menu,
     Modal,
     notification,
-    PageHeader,
     Row,
     Select,
     Space,
@@ -27,7 +26,7 @@ import qs from "qs";
 import AssetModal from "./AssetModal";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {getHeaders, isEmpty, itemRender} from "../../utils/utils";
+import {getHeaders, isEmpty} from "../../utils/utils";
 import dayjs from 'dayjs';
 import {
     DeleteOutlined,
@@ -51,19 +50,6 @@ const confirm = Modal.confirm;
 const {Search} = Input;
 const {Content} = Layout;
 const {Title, Text} = Typography;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        breadcrumbName: '资源管理',
-    },
-    {
-        path: 'assets',
-        breadcrumbName: '资产管理',
-    }
-];
 
 class Asset extends Component {
 
@@ -660,18 +646,6 @@ class Asset extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="资产管理"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="资产"
-                >
-                </PageHeader>
-
                 <Content key='page-content' className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
@@ -906,7 +880,7 @@ class Asset extends Component {
 
                                     <Button type="primary" onClick={() => {
 
-                                        let csvString= 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description';
+                                        let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description';
                                         //前置的"\uFEFF"为“零宽不换行空格”，可处理中文乱码问题
                                         const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
                                         let a = document.createElement('a');

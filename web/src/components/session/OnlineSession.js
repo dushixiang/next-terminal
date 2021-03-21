@@ -8,7 +8,6 @@ import {
     Layout,
     Modal,
     notification,
-    PageHeader,
     Row,
     Select,
     Space,
@@ -19,7 +18,7 @@ import {
 } from "antd";
 import qs from "qs";
 import request from "../../common/request";
-import {differTime, itemRender} from "../../utils/utils";
+import {differTime} from "../../utils/utils";
 import {message} from "antd/es";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import {DisconnectOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
@@ -31,16 +30,6 @@ const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Search} = Input;
 const {Title, Text} = Typography;
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'onlineSession',
-        breadcrumbName: '在线会话',
-    }
-];
 
 class OnlineSession extends Component {
 
@@ -335,18 +324,6 @@ class OnlineSession extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="在线会话"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="查询实时在线会话"
-                >
-                </PageHeader>
-
                 <Content className="site-layout-background page-content">
 
                     <div style={{marginBottom: 20}}>
