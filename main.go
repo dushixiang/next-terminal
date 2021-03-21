@@ -34,9 +34,10 @@ func Run() error {
 	// 为了兼容之前调用global包的代码 后期预期会改为调用pgk/config
 	global.Config = config.GlobalCfg
 
+	global.Cache = api.SetupCache()
 	db := api.SetupDB()
 	e := api.SetupRoutes(db)
-	global.Cache = api.SetupCache()
+
 	if global.Config.ResetPassword != "" {
 		return api.ResetPassword()
 	}

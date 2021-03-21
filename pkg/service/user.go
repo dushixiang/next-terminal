@@ -58,20 +58,22 @@ func (r UserService) InitUser() (err error) {
 	return nil
 }
 
-func (r UserService) FixedOnlineState() error {
+func (r UserService) FixedUserOnlineState() error {
 	// 修正用户登录状态
 	onlineUsers, err := r.userRepository.FindOnlineUsers()
 	if err != nil {
 		return err
 	}
-	for i := range onlineUsers {
-		logs, err := r.loginLogRepository.FindAliveLoginLogsByUserId(onlineUsers[i].ID)
-		if err != nil {
-			return err
-		}
-		if len(logs) == 0 {
-			if err := r.userRepository.UpdateOnline(onlineUsers[i].ID, false); err != nil {
+	if len(onlineUsers) > 0 {
+		for i := range onlineUsers {
+			logs, err := r.loginLogRepository.FindAliveLoginLogsByUserId(onlineUsers[i].ID)
+			if err != nil {
 				return err
+			}
+			if len(logs) == 0 {
+				if err := r.userRepository.UpdateOnline(onlineUsers[i].ID, false); err != nil {
+					return err
+				}
 			}
 		}
 	}

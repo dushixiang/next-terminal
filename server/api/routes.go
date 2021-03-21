@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -45,6 +44,7 @@ var (
 	userService     *service.UserService
 	sessionService  *service.SessionService
 	mailService     *service.MailService
+	numService      *service.NumService
 )
 
 func SetupRoutes(db *gorm.DB) *echo.Echo {
@@ -54,6 +54,10 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 
 	if err := InitDBData(); err != nil {
 		log.WithError(err).Error("初始化数据异常")
+	}
+
+	if err := ReloadData(); err != nil {
+		return nil
 	}
 
 	e := echo.New()
@@ -213,6 +217,17 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 	return e
 }
 
+func ReloadData() error {
+	if err := ReloadAccessSecurity(); err != nil {
+		return err
+	}
+
+	if err := ReloadToken(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func InitRepository(db *gorm.DB) {
 	userRepository = repository.NewUserRepository(db)
 	userGroupRepository = repository.NewUserGroupRepository(db)
@@ -235,33 +250,27 @@ func InitService() {
 	userService = service.NewUserService(userRepository, loginLogRepository)
 	sessionService = service.NewSessionService(sessionRepository)
 	mailService = service.NewMailService(propertyRepository)
+	numService = service.NewNumService(numRepository)
 }
 
 func InitDBData() (err error) {
 	if err := propertyService.InitProperties(); err != nil {
 		return err
 	}
-	if err := userService.InitUser(); err != nil {
+	if err := numService.InitNums(); err != nil {
 		return err
 	}
-	if err := userService.FixedOnlineState(); err != nil {
+	if err := userService.InitUser(); err != nil {
 		return err
 	}
 	if err := jobService.InitJob(); err != nil {
 		return err
 	}
-
-	sessionService.Fix()
-	if err := ReloadAccessSecurity(); err != nil {
+	if err := userService.FixedUserOnlineState(); err != nil {
 		return err
 	}
-	nums, _ := numRepository.FindAll()
-	if nums == nil {
-		for i := 0; i <= 30; i++ {
-			if err := numRepository.Create(&model.Num{I: strconv.Itoa(i)}); err != nil {
-				return err
-			}
-		}
+	if err := sessionService.FixSessionState(); err != nil {
+		return err
 	}
 	return nil
 }
