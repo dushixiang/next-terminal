@@ -1,11 +1,14 @@
 package config
 
 import (
-	"github.com/spf13/pflag"
 	"strings"
+
+	"github.com/spf13/pflag"
 
 	"github.com/spf13/viper"
 )
+
+var GlobalCfg *Config
 
 type Config struct {
 	Debug         bool
@@ -35,7 +38,7 @@ type Server struct {
 	Key  string
 }
 
-func SetupConfig() (*Config, error) {
+func SetupConfig() *Config {
 
 	viper.SetConfigName("config")
 	viper.SetConfigType("yml")
@@ -83,6 +86,10 @@ func SetupConfig() (*Config, error) {
 		Debug:         viper.GetBool("debug"),
 		Demo:          viper.GetBool("demo"),
 	}
+	GlobalCfg = config
+	return config
+}
 
-	return config, nil
+func init() {
+	GlobalCfg = SetupConfig()
 }

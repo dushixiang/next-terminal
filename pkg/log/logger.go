@@ -1,155 +1,235 @@
 package log
 
 import (
+	"fmt"
 	"io"
+	"os"
+	"path"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
+	"next-terminal/pkg/config"
+
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-// Logrus : implement Logger
+type Formatter struct{}
+
+func (s *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
+	timestamp := time.Now().Local().Format("2006-01-02 15:04:05")
+	var file string
+	var l int
+	if entry.HasCaller() {
+		file = filepath.Base(entry.Caller.Function)
+		l = entry.Caller.Line
+	}
+
+	msg := fmt.Sprintf("%s %s [%s:%d]%s\n", timestamp, strings.ToUpper(entry.Level.String()), file, l, entry.Message)
+	return []byte(msg), nil
+}
+
+var stdOut = NewLogger()
+
+// Trace logs a message at level Trace on the standard logger.
+func Trace(args ...interface{}) {
+	stdOut.Trace(args...)
+}
+
+// Debug logs a message at level Debug on the standard logger.
+func Debug(args ...interface{}) {
+	stdOut.Debug(args...)
+}
+
+// Print logs a message at level Info on the standard logger.
+func Print(args ...interface{}) {
+	stdOut.Print(args...)
+}
+
+// Info logs a message at level Info on the standard logger.
+func Info(args ...interface{}) {
+	stdOut.Info(args...)
+}
+
+// Warn logs a message at level Warn on the standard logger.
+func Warn(args ...interface{}) {
+	stdOut.Warn(args...)
+}
+
+// Warning logs a message at level Warn on the standard logger.
+func Warning(args ...interface{}) {
+	stdOut.Warning(args...)
+}
+
+// Error logs a message at level Error on the standard logger.
+func Error(args ...interface{}) {
+	stdOut.Error(args...)
+}
+
+// Panic logs a message at level Panic on the standard logger.
+func Panic(args ...interface{}) {
+	stdOut.Panic(args...)
+}
+
+// Fatal logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
+func Fatal(args ...interface{}) {
+	stdOut.Fatal(args...)
+}
+
+// Tracef logs a message at level Trace on the standard logger.
+func Tracef(format string, args ...interface{}) {
+	stdOut.Tracef(format, args...)
+}
+
+// Debugf logs a message at level Debug on the standard logger.
+func Debugf(format string, args ...interface{}) {
+	stdOut.Debugf(format, args...)
+}
+
+// Printf logs a message at level Info on the standard logger.
+func Printf(format string, args ...interface{}) {
+	stdOut.Printf(format, args...)
+}
+
+// Infof logs a message at level Info on the standard logger.
+func Infof(format string, args ...interface{}) {
+	stdOut.Infof(format, args...)
+}
+
+// Warnf logs a message at level Warn on the standard logger.
+func Warnf(format string, args ...interface{}) {
+	stdOut.Warnf(format, args...)
+}
+
+// Warningf logs a message at level Warn on the standard logger.
+func Warningf(format string, args ...interface{}) {
+	stdOut.Warningf(format, args...)
+}
+
+// Errorf logs a message at level Error on the standard logger.
+func Errorf(format string, args ...interface{}) {
+	stdOut.Errorf(format, args...)
+}
+
+// Panicf logs a message at level Panic on the standard logger.
+func Panicf(format string, args ...interface{}) {
+	stdOut.Panicf(format, args...)
+}
+
+// Fatalf logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
+func Fatalf(format string, args ...interface{}) {
+	stdOut.Fatalf(format, args...)
+}
+
+// Traceln logs a message at level Trace on the standard logger.
+func Traceln(args ...interface{}) {
+	stdOut.Traceln(args...)
+}
+
+// Debugln logs a message at level Debug on the standard logger.
+func Debugln(args ...interface{}) {
+	stdOut.Debugln(args...)
+}
+
+// Println logs a message at level Info on the standard logger.
+func Println(args ...interface{}) {
+	stdOut.Println(args...)
+}
+
+// Infoln logs a message at level Info on the standard logger.
+func Infoln(args ...interface{}) {
+	stdOut.Infoln(args...)
+}
+
+// Warnln logs a message at level Warn on the standard logger.
+func Warnln(args ...interface{}) {
+	stdOut.Warnln(args...)
+}
+
+// Warningln logs a message at level Warn on the standard logger.
+func Warningln(args ...interface{}) {
+	stdOut.Warningln(args...)
+}
+
+// Errorln logs a message at level Error on the standard logger.
+func Errorln(args ...interface{}) {
+	stdOut.Errorln(args...)
+}
+
+// Panicln logs a message at level Panic on the standard logger.
+func Panicln(args ...interface{}) {
+	stdOut.Panicln(args...)
+}
+
+// Fatalln logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
+func Fatalln(args ...interface{}) {
+	stdOut.Fatalln(args...)
+}
+
+// WithError creates an entry from the standard logger and adds an error to it, using the value defined in ErrorKey as key.
+func WithError(err error) *logrus.Entry {
+	return stdOut.WithField(logrus.ErrorKey, err)
+}
+
+// WithField creates an entry from the standard logger and adds a field to
+// it. If you want multiple fields, use `WithFields`.
+//
+// Note that it doesn't log until you call Debug, Print, Info, Warn, Fatal
+// or Panic on the Entry it returns.
+func WithField(key string, value interface{}) *logrus.Entry {
+	return stdOut.WithField(key, value)
+}
+
+// Logrus : implement log
 type Logrus struct {
 	*logrus.Logger
 }
 
-// Logger ...
-var Logger = logrus.New()
-
-// GetEchoLogger for e.Logger
-func GetEchoLogger() Logrus {
-	return Logrus{Logger}
-}
-
-// Level returns logger level
-func (l Logrus) Level() log.Lvl {
-	switch l.Logger.Level {
-	case logrus.DebugLevel:
-		return log.DEBUG
-	case logrus.WarnLevel:
-		return log.WARN
-	case logrus.ErrorLevel:
-		return log.ERROR
-	case logrus.InfoLevel:
-		return log.INFO
-	default:
-		l.Panic("Invalid level")
+// GetEchoLogger for e.l
+func NewLogger() Logrus {
+	logFilePath := ""
+	if dir, err := os.Getwd(); err == nil {
+		logFilePath = dir + "/logs/"
+	}
+	if err := os.MkdirAll(logFilePath, 0755); err != nil {
+		fmt.Println(err.Error())
+	}
+	logFileName := "next-terminal.log"
+	//日志文件
+	fileName := path.Join(logFilePath, logFileName)
+	if _, err := os.Stat(fileName); err != nil {
+		if _, err := os.Create(fileName); err != nil {
+			fmt.Println(err.Error())
+		}
 	}
 
-	return log.OFF
-}
-
-// SetHeader is a stub to satisfy interface
-// It's controlled by Logger
-func (l Logrus) SetHeader(_ string) {}
-
-// SetPrefix It's controlled by Logger
-func (l Logrus) SetPrefix(s string) {}
-
-// Prefix It's controlled by Logger
-func (l Logrus) Prefix() string {
-	return ""
-}
-
-// SetLevel set level to logger from given log.Lvl
-func (l Logrus) SetLevel(lvl log.Lvl) {
-	switch lvl {
-	case log.DEBUG:
-		Logger.SetLevel(logrus.DebugLevel)
-	case log.WARN:
-		Logger.SetLevel(logrus.WarnLevel)
-	case log.ERROR:
-		Logger.SetLevel(logrus.ErrorLevel)
-	case log.INFO:
-		Logger.SetLevel(logrus.InfoLevel)
-	default:
-		l.Panic("Invalid level")
+	//实例化
+	logger := logrus.New()
+	//设置输出
+	logger.SetOutput(io.MultiWriter(&lumberjack.Logger{
+		Filename:   fileName,
+		MaxSize:    100, // megabytes
+		MaxBackups: 3,
+		MaxAge:     7,    //days
+		Compress:   true, // disabled by default
+	}, os.Stdout))
+	logger.SetReportCaller(true)
+	//设置日志级别
+	if config.GlobalCfg.Debug {
+		logger.SetLevel(logrus.DebugLevel)
+	} else {
+		logger.SetLevel(logrus.InfoLevel)
 	}
-}
-
-// Output logger output func
-func (l Logrus) Output() io.Writer {
-	return l.Out
-}
-
-// SetOutput change output, default os.Stdout
-func (l Logrus) SetOutput(w io.Writer) {
-	Logger.SetOutput(w)
-}
-
-// Printj print json log
-func (l Logrus) Printj(j log.JSON) {
-	Logger.WithFields(logrus.Fields(j)).Print()
-}
-
-// Debugj debug json log
-func (l Logrus) Debugj(j log.JSON) {
-	Logger.WithFields(logrus.Fields(j)).Debug()
-}
-
-// Infoj info json log
-func (l Logrus) Infoj(j log.JSON) {
-	Logger.WithFields(logrus.Fields(j)).Info()
-}
-
-// Warnj warning json log
-func (l Logrus) Warnj(j log.JSON) {
-	Logger.WithFields(logrus.Fields(j)).Warn()
-}
-
-// Errorj error json log
-func (l Logrus) Errorj(j log.JSON) {
-	Logger.WithFields(logrus.Fields(j)).Error()
-}
-
-// Fatalj fatal json log
-func (l Logrus) Fatalj(j log.JSON) {
-	Logger.WithFields(logrus.Fields(j)).Fatal()
-}
-
-// Panicj panic json log
-func (l Logrus) Panicj(j log.JSON) {
-	Logger.WithFields(logrus.Fields(j)).Panic()
-}
-
-// Print string log
-func (l Logrus) Print(i ...interface{}) {
-	Logger.Print(i[0].(string))
-}
-
-// Debug string log
-func (l Logrus) Debug(i ...interface{}) {
-	Logger.Debug(i[0].(string))
-}
-
-// Info string log
-func (l Logrus) Info(i ...interface{}) {
-	Logger.Info(i[0].(string))
-}
-
-// Warn string log
-func (l Logrus) Warn(i ...interface{}) {
-	Logger.Warn(i[0].(string))
-}
-
-// Error string log
-func (l Logrus) Error(i ...interface{}) {
-	Logger.Error(i[0].(string))
-}
-
-// Fatal string log
-func (l Logrus) Fatal(i ...interface{}) {
-	Logger.Fatal(i[0].(string))
-}
-
-// Panic string log
-func (l Logrus) Panic(i ...interface{}) {
-	Logger.Panic(i[0].(string))
+	//设置日志格式
+	logger.SetFormatter(new(Formatter))
+	return Logrus{Logger: logger}
 }
 
 func logrusMiddlewareHandler(c echo.Context, next echo.HandlerFunc) error {
+	l := NewLogger()
 	req := c.Request()
 	res := c.Response()
 	start := time.Now()
@@ -158,25 +238,18 @@ func logrusMiddlewareHandler(c echo.Context, next echo.HandlerFunc) error {
 	}
 	stop := time.Now()
 
-	p := req.URL.Path
-
-	bytesIn := req.Header.Get(echo.HeaderContentLength)
-
-	Logger.WithFields(map[string]interface{}{
-		"time_rfc3339":  time.Now().Format(time.RFC3339),
-		"remote_ip":     c.RealIP(),
-		"host":          req.Host,
-		"uri":           req.RequestURI,
-		"method":        req.Method,
-		"path":          p,
-		"referer":       req.Referer(),
-		"user_agent":    req.UserAgent(),
-		"status":        res.Status,
-		"latency":       strconv.FormatInt(stop.Sub(start).Nanoseconds()/1000, 10),
-		"latency_human": stop.Sub(start).String(),
-		"bytes_in":      bytesIn,
-		"bytes_out":     strconv.FormatInt(res.Size, 10),
-	}).Info("Handled request")
+	l.Debugf("%s %s %s %s %s %3d %s %13v %s %s",
+		c.RealIP(),
+		req.Host,
+		req.Method,
+		req.RequestURI,
+		req.URL.Path,
+		res.Status,
+		strconv.FormatInt(res.Size, 10),
+		stop.Sub(start).String(),
+		req.Referer(),
+		req.UserAgent(),
+	)
 
 	return nil
 }

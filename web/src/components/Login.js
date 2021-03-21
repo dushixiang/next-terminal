@@ -10,7 +10,8 @@ const {Title} = Typography;
 
 class LoginForm extends Component {
 
-    formRef = React.createRef()
+    formRef = React.createRef();
+    totpInputRef = React.createRef();
 
     state = {
         inLogin: false,
@@ -44,6 +45,8 @@ class LoginForm extends Component {
                     loginAccount: params,
                     totpModalVisible: true
                 })
+
+                this.totpInputRef.current.focus();
                 return;
             }
             if (result.code !== 1) {
@@ -74,8 +77,9 @@ class LoginForm extends Component {
         try {
             let result = await request.post('/loginWithTotp', loginAccount);
 
-            if (result.code !== 1) {
-                throw new Error(result.message);
+            if (result['code'] !== 1) {
+                message.error(result['message']);
+                return;
             }
 
             // 跳转登录
@@ -128,13 +132,14 @@ class LoginForm extends Component {
 
                 <Modal title="双因素认证" visible={this.state.totpModalVisible} confirmLoading={this.state.confirmLoading}
                        maskClosable={false}
-
+                       centered={true}
+                       okButtonProps={{form:'totp-form', key: 'submit', htmlType: 'submit'}}
                        onOk={() => {
                            this.formRef.current
                                .validateFields()
                                .then(values => {
-                                   this.formRef.current.resetFields();
                                    this.handleOk(values);
+                                   // this.formRef.current.resetFields();
                                })
                                .catch(info => {
 
@@ -142,10 +147,10 @@ class LoginForm extends Component {
                        }}
                        onCancel={this.handleCancel}>
 
-                    <Form ref={this.formRef}>
+                    <Form id='totp-form' ref={this.formRef}>
 
                         <Form.Item name='totp' rules={[{required: true, message: '请输入双因素认证APP中显示的授权码'}]}>
-                            <Input prefix={<OneToOneOutlined/>} placeholder="请输入双因素认证APP中显示的授权码"/>
+                            <Input ref={this.totpInputRef} prefix={<OneToOneOutlined/>} placeholder="请输入双因素认证APP中显示的授权码"/>
                         </Form.Item>
                     </Form>
                 </Modal>

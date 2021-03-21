@@ -1,23 +1,11 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Image, Input, Layout, Modal, PageHeader, Result, Space} from "antd";
-import {itemRender} from '../../utils/utils'
+import {Button, Card, Form, Image, Input, Layout, Modal, Result, Space} from "antd";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {ExclamationCircleOutlined, ReloadOutlined} from "@ant-design/icons";
 
 const {Content} = Layout;
 const {Meta} = Card;
-
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'info',
-        breadcrumbName: '个人中心',
-    }
-];
 
 const formItemLayout = {
     labelCol: {span: 3},
@@ -121,17 +109,6 @@ class Info extends Component {
     render() {
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="个人中心"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-
-                    subTitle="个人中心"
-                />
-
                 <Content className="site-layout-background page-content">
                     <h1>修改密码</h1>
                     <Form ref={this.passwordFormRef} name="password" onFinish={this.changePassword}>
