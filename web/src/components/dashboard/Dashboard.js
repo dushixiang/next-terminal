@@ -1,25 +1,12 @@
 import React, {Component} from 'react';
-import {Card, Col, PageHeader, Radio, Row, Statistic} from "antd";
+import {Card, Col, Radio, Row, Statistic} from "antd";
 import {DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
-import {itemRender} from '../../utils/utils'
 import request from "../../common/request";
 import './Dashboard.css'
 import {Link} from "react-router-dom";
 import {Area} from '@ant-design/charts';
 
 import {isAdmin} from "../../service/permission";
-
-
-const routes = [
-    {
-        path: '',
-        breadcrumbName: '首页',
-    },
-    {
-        path: 'dashboard',
-        breadcrumbName: '仪表盘',
-    }
-];
 
 class Dashboard extends Component {
 
@@ -79,17 +66,6 @@ class Dashboard extends Component {
 
         return (
             <>
-                <PageHeader
-                    className="site-page-header-ghost-wrapper"
-                    title="dashboard"
-                    breadcrumb={{
-                        routes: routes,
-                        itemRender: itemRender
-                    }}
-                    subTitle="仪表盘"
-                    extra={[]}
-                >
-                </PageHeader>
 
                 <div className="page-card">
 

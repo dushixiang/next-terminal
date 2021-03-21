@@ -2,9 +2,10 @@ package term
 
 import (
 	"encoding/json"
-	"next-terminal/pkg/utils"
 	"os"
 	"time"
+
+	"next-terminal/server/utils"
 )
 
 type Env struct {

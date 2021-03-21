@@ -1,0 +1,23 @@
+linters-settings:
+  goimports:
+    local-prefixes: next-terminal
+
+linters:
+  disable-all: true
+  enable:
+    - deadcode
+    - errcheck
+    - gofmt
+    - goimports
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+
+run:
+  skip-files:
+    - test_ssh.go

@@ -1,11 +1,13 @@
 package global
 
 import (
-	"github.com/gorilla/websocket"
-	"next-terminal/pkg/guacd"
-	"next-terminal/pkg/term"
 	"strconv"
 	"sync"
+
+	"next-terminal/pkg/guacd"
+	"next-terminal/pkg/term"
+
+	"github.com/gorilla/websocket"
 )
 
 type Tun struct {
@@ -66,4 +68,8 @@ func (s *TunStore) Get(k string) (item *Observable, ok bool) {
 func NewStore() *TunStore {
 	store := TunStore{sync.Map{}}
 	return &store
+}
+
+func init() {
+	Store = NewStore()
 }
