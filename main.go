@@ -42,8 +42,8 @@ func Run() error {
 		return api.ResetPassword()
 	}
 	sessionRepo := repository.NewSessionRepository(db)
-	propertyREpo := repository.NewPropertyRepository(db)
-	ticker := task.NewTicker(sessionRepo, propertyREpo)
+	propertyRepo := repository.NewPropertyRepository(db)
+	ticker := task.NewTicker(sessionRepo, propertyRepo)
 	ticker.SetupTicker()
 
 	if global.Config.Server.Cert != "" && global.Config.Server.Key != "" {
