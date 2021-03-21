@@ -93,7 +93,7 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 
 	e.GET("/tunnel", TunEndpoint)
 	e.GET("/ssh", SSHEndpoint)
-
+	e.GET("/monitor/:id", MonitorEndpoint)
 	e.POST("/logout", LogoutEndpoint)
 	e.POST("/change-password", ChangePasswordEndpoint)
 	e.GET("/reload-totp", ReloadTOTPEndpoint)

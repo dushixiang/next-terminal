@@ -4,6 +4,16 @@ import (
 	"next-terminal/server/utils"
 )
 
+type AssetProto string
+
+const (
+	SSH    AssetProto = "ssh"
+	RDP    AssetProto = "rdp"
+	VNC    AssetProto = "vnc"
+	Telnet AssetProto = "telnet"
+	K8s    AssetProto = "kubernetes"
+)
+
 type Asset struct {
 	ID           string         `gorm:"primary_key " json:"id"`
 	Name         string         `json:"name"`
