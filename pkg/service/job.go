@@ -260,7 +260,7 @@ func (r JobService) ExecJobById(id string) (err error) {
 
 func (r JobService) InitJob() error {
 	jobs, _ := r.jobRepository.FindByFunc(constant.FuncCheckAssetStatusJob)
-	if jobs == nil {
+	if len(jobs) == 0 {
 		job := model.Job{
 			ID:      utils.UUID(),
 			Name:    "资产状态检测",
