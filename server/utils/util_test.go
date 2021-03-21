@@ -22,7 +22,14 @@ func TestTcping(t *testing.T) {
 
 	ip6res := utils.Tcping(localhost6, 9999)
 	assert.Equal(t, true, ip6res)
+
+	ip4resWithBracket := utils.Tcping("["+localhost4+"]", 9999)
+	assert.Equal(t, true, ip4resWithBracket)
+
+	ip6resWithBracket := utils.Tcping("["+localhost6+"]", 9999)
+	assert.Equal(t, true, ip6resWithBracket)
+
 	defer func() {
-		conn.Close()
+		_ = conn.Close()
 	}()
 }
