@@ -15,18 +15,21 @@ func NewSessionService(sessionRepository *repository.SessionRepository) *Session
 	return &SessionService{sessionRepository: sessionRepository}
 }
 
-func (r SessionService) Fix() {
-	sessions, _ := r.sessionRepository.FindByStatus(constant.Connected)
-	if sessions == nil {
-		return
+func (r SessionService) FixSessionState() error {
+	sessions, err := r.sessionRepository.FindByStatus(constant.Connected)
+	if err != nil {
+		return err
 	}
 
-	for i := range sessions {
-		session := model.Session{
-			Status:           constant.Disconnected,
-			DisconnectedTime: utils.NowJsonTime(),
+	if len(sessions) > 0 {
+		for i := range sessions {
+			session := model.Session{
+				Status:           constant.Disconnected,
+				DisconnectedTime: utils.NowJsonTime(),
+			}
+
+			_ = r.sessionRepository.UpdateById(&session, sessions[i].ID)
 		}
-
-		_ = r.sessionRepository.UpdateById(&session, sessions[i].ID)
 	}
+	return nil
 }
