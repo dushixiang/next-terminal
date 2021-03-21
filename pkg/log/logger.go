@@ -5,14 +5,32 @@ import (
 	"io"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"next-terminal/pkg/config"
 
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
+
+type Formatter struct{}
+
+func (s *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
+	timestamp := time.Now().Local().Format("2006-01-02 15:04:05")
+	var file string
+	var l int
+	if entry.HasCaller() {
+		file = filepath.Base(entry.Caller.Function)
+		l = entry.Caller.Line
+	}
+
+	msg := fmt.Sprintf("%s %s [%s:%d]%s\n", timestamp, strings.ToUpper(entry.Level.String()), file, l, entry.Message)
+	return []byte(msg), nil
+}
 
 var stdOut = NewLogger()
 
@@ -179,7 +197,6 @@ func NewLogger() Logrus {
 	if err := os.MkdirAll(logFilePath, 0755); err != nil {
 		fmt.Println(err.Error())
 	}
-	// TODO 滚动日志
 	logFileName := "next-terminal.log"
 	//日志文件
 	fileName := path.Join(logFilePath, logFileName)
@@ -188,18 +205,18 @@ func NewLogger() Logrus {
 			fmt.Println(err.Error())
 		}
 	}
-	//写入文件
-	src, err := os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY, os.ModeAppend)
-	if err != nil {
-		fmt.Println("err", err)
-	}
 
 	//实例化
 	logger := logrus.New()
-
 	//设置输出
-	logger.SetOutput(io.MultiWriter(os.Stdout, src))
-
+	logger.SetOutput(io.MultiWriter(&lumberjack.Logger{
+		Filename:   fileName,
+		MaxSize:    100, // megabytes
+		MaxBackups: 3,
+		MaxAge:     7,    //days
+		Compress:   true, // disabled by default
+	}, os.Stdout))
+	logger.SetReportCaller(true)
 	//设置日志级别
 	if config.GlobalCfg.Debug {
 		logger.SetLevel(logrus.DebugLevel)
@@ -207,9 +224,7 @@ func NewLogger() Logrus {
 		logger.SetLevel(logrus.InfoLevel)
 	}
 	//设置日志格式
-	logger.SetFormatter(&logrus.TextFormatter{
-		TimestampFormat: "2006-01-02 15:04:05",
-	})
+	logger.SetFormatter(new(Formatter))
 	return Logrus{Logger: logger}
 }
 
@@ -223,25 +238,18 @@ func logrusMiddlewareHandler(c echo.Context, next echo.HandlerFunc) error {
 	}
 	stop := time.Now()
 
-	p := req.URL.Path
-
-	bytesIn := req.Header.Get(echo.HeaderContentLength)
-
-	l.WithFields(map[string]interface{}{
-		"time_rfc3339":  time.Now().Format(time.RFC3339),
-		"remote_ip":     c.RealIP(),
-		"host":          req.Host,
-		"uri":           req.RequestURI,
-		"method":        req.Method,
-		"path":          p,
-		"referer":       req.Referer(),
-		"user_agent":    req.UserAgent(),
-		"status":        res.Status,
-		"latency":       strconv.FormatInt(stop.Sub(start).Nanoseconds()/1000, 10),
-		"latency_human": stop.Sub(start).String(),
-		"bytes_in":      bytesIn,
-		"bytes_out":     strconv.FormatInt(res.Size, 10),
-	}).Debug("Handled request")
+	l.Debugf("%s %s %s %s %s %3d %s %13v %s %s",
+		c.RealIP(),
+		req.Host,
+		req.Method,
+		req.RequestURI,
+		req.URL.Path,
+		res.Status,
+		strconv.FormatInt(res.Size, 10),
+		stop.Sub(start).String(),
+		req.Referer(),
+		req.UserAgent(),
+	)
 
 	return nil
 }
