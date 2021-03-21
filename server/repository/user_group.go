@@ -23,7 +23,7 @@ func (r UserGroupRepository) FindAll() (o []model.UserGroup) {
 	return
 }
 
-func (r UserGroupRepository) Find(pageIndex, pageSize int, name, order, field string) (o []model.UserGroup, total int64, err error) {
+func (r UserGroupRepository) Find(pageIndex, pageSize int, name, order, field string) (o []model.UserGroupForPage, total int64, err error) {
 	db := r.DB.Table("user_groups").Select("user_groups.id, user_groups.name, user_groups.created, count(resource_sharers.user_group_id) as asset_count").Joins("left join resource_sharers on user_groups.id = resource_sharers.user_group_id and resource_sharers.resource_type = 'asset'").Group("user_groups.id")
 	dbCounter := r.DB.Table("user_groups")
 	if len(name) > 0 {
@@ -50,7 +50,7 @@ func (r UserGroupRepository) Find(pageIndex, pageSize int, name, order, field st
 
 	err = db.Order("user_groups." + field + " " + order).Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
 	if o == nil {
-		o = make([]model.UserGroup, 0)
+		o = make([]model.UserGroupForPage, 0)
 	}
 	return
 }

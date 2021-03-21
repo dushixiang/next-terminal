@@ -12,7 +12,7 @@ type Command struct {
 	Owner   string         `gorm:"index" json:"owner"`
 }
 
-type CommandVo struct {
+type CommandForPage struct {
 	ID          string         `gorm:"primary_key" json:"id"`
 	Name        string         `json:"name"`
 	Content     string         `json:"content"`

@@ -32,7 +32,7 @@ func (r *Session) TableName() string {
 	return "sessions"
 }
 
-type SessionVo struct {
+type SessionForPage struct {
 	ID               string         `json:"id"`
 	Protocol         string         `json:"protocol"`
 	IP               string         `json:"ip"`

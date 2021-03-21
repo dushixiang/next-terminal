@@ -14,7 +14,7 @@ type LoginLog struct {
 	Remember        bool           `json:"remember"`
 }
 
-type LoginLogVo struct {
+type LoginLogForPage struct {
 	ID              string         `json:"id"`
 	UserId          string         `json:"userId"`
 	UserName        string         `json:"userName"`
