@@ -27,6 +27,8 @@ const (
 	NetWorkCMD = "/sbin/ifconfig eth0 |grep bytes; sleep 1s; /sbin/ifconfig eth0 | grep bytes"
 )
 
+var statisticsError = errors.New("Get base monitor error")
+
 type MonitorInfo struct {
 	BaseInfo BaseInfo     `json:"base_info"`
 	Docker   []DockerInfo `json:"docker"`
@@ -34,10 +36,10 @@ type MonitorInfo struct {
 }
 
 type NewWork struct {
-	RxTotal          int64 `json:"rx_total"`
-	TxTotal          int64 `json:"tx_total"`
-	RxSpeedPreSecond int64 `json:"rx_speed_pre_second"`
-	TxSpeedPreSecond int64 `json:"tx_speed_pre_second"`
+	RxTotal          string `json:"rx_total"`
+	TxTotal          string `json:"tx_total"`
+	RxSpeedPreSecond int64  `json:"rx_speed_pre_second"`
+	TxSpeedPreSecond int64  `json:"tx_speed_pre_second"`
 }
 
 type BaseInfo struct {
@@ -64,8 +66,64 @@ type DockerInfo struct {
 	MemUsageLimit string `json:"mem_usage_limit"`
 }
 
-// TODO NETWork
 func GetNetWorkInfo(client *ssh.Client) (ret NewWork, err error) {
+	session, err := client.NewSession()
+	if err != nil {
+		err = errors.Wrap(err, "NewSession")
+		return
+	}
+	stdOut, _ := session.StdoutPipe()
+	err = session.Run(NetWorkCMD)
+	if err != nil {
+		err = errors.Wrap(err, "exec cmd error")
+		return
+	}
+	res, err := ioutil.ReadAll(stdOut)
+	if err != nil {
+		err = errors.Wrap(err, "red stdout error")
+		return
+	}
+	resStr := strings.Split(string(res), "\n")
+	if len(resStr) != 5 {
+		return
+	}
+	resStr = resStr[:4]
+	rxReg := regexp.MustCompile(`RX\s+packets\s+\d+\s+bytes\s+(\d+)\s+\((.*?)\)`)
+	txReg := regexp.MustCompile(`TX\s+packets\s+\d+\s+bytes\s+(\d+)\s+\((.*?)\)`)
+	var firstTx, firstRx, secondRx, secondTx int64
+	var totalRx, totalTx string
+	for i, line := range resStr {
+		switch i {
+		case 0:
+			firstRx, _, err = utils.ParseNetReg(line, rxReg, 3, 1)
+			if err != nil {
+				return
+			}
+		case 1:
+			firstTx, _, err = utils.ParseNetReg(line, txReg, 3, 1)
+			if err != nil {
+				return
+			}
+		case 2:
+			secondRx, totalRx, err = utils.ParseNetReg(line, rxReg, 3, 1)
+			if err != nil {
+				return
+			}
+
+		case 3:
+			secondTx, totalTx, err = utils.ParseNetReg(line, txReg, 3, 1)
+
+			if err != nil {
+				return
+			}
+		}
+
+	}
+
+	ret.TxSpeedPreSecond = secondTx - firstTx
+	ret.RxSpeedPreSecond = secondRx - firstRx
+	ret.RxTotal = totalRx
+	ret.TxTotal = totalTx
 	return
 }
 
@@ -131,21 +189,25 @@ func getBaseInfo(client *ssh.Client) (ret BaseInfo, err error) {
 		return
 	}
 	upReg := regexp.MustCompile(`up\s(\d+\s\w+),`)
-	userReg := regexp.MustCompile(`\s+(\d+)\suser,\s+load`)
+	userReg := regexp.MustCompile(`\s+(\d+)\suser`)
 	memUsReg := regexp.MustCompile(`KiB\s+Mem\s+:\s+(\d+)\stotal,\s+(\d+)\sfree,\s+(\d+)\sused,\s+(\d+)\sbuff`)
 	cpuReg := regexp.MustCompile(`Cpu\(s\):\s+(\d+.\d+)\sus,\s+(\d+.\d+)\ssy,.*?,.*?,\s+(\d+.\d+).*?,.*?,.*?,\s+(\d+.\d+)\s+st`)
-
 	for i, line := range data[:4] {
 		if i == 0 {
 			up := upReg.FindStringSubmatch(line)
 			if len(up) != 2 {
-				continue
+				err = statisticsError
+				return
 			}
 			ret.Uptime = up[1]
-			user := userReg.FindStringSubmatch(line)
-			userCount, err := strconv.Atoi(user[1])
+			userRes := userReg.FindStringSubmatch(line)
+			if len(userRes) != 2 {
+				err = statisticsError
+				return
+			}
+			userCount, err := strconv.Atoi(userRes[1])
 			if err != nil {
-				continue
+				return ret, statisticsError
 			}
 			ret.OnlineUser = userCount
 		}
@@ -158,7 +220,7 @@ func getBaseInfo(client *ssh.Client) (ret BaseInfo, err error) {
 			for i, item := range cpuRes[1:] {
 				cInt, err := strconv.ParseFloat(item, 64)
 				if err != nil {
-					continue
+					return ret, statisticsError
 				}
 				switch i {
 				case 0:
@@ -177,7 +239,7 @@ func getBaseInfo(client *ssh.Client) (ret BaseInfo, err error) {
 			if len(memUseArray) != 5 {
 				continue
 			}
-			for i, item := range memUseArray {
+			for i, item := range memUseArray[1:] {
 				intC, err := strconv.Atoi(item)
 				if err != nil {
 					continue
@@ -243,20 +305,29 @@ func MonitorEndpoint(c echo.Context) (err error) {
 			dockerInfo, err := GetDockerInfo(terminal)
 			if err != nil {
 				log.Error(errors.New("format error"))
-				return WriteMessage(ws, NewMessage(Closed, "Get status error"))
+				return WriteMessage(ws, NewMessage(Closed, "Get docker status error"))
 			}
 			returnData.Docker = dockerInfo
 			base, err := getBaseInfo(terminal)
 			if err != nil {
 				log.Error(err, "getBaseInfo error")
-				return WriteMessage(ws, NewMessage(Closed, "Get status error"))
+				return WriteMessage(ws, NewMessage(Closed, "Get base status error"))
 			}
 			returnData.BaseInfo = base
+
+			netInfo, err := GetNetWorkInfo(terminal)
+			if err != nil {
+				log.Error(err, "Get network error")
+				return WriteMessage(ws, NewMessage(Closed, "get monitor error"))
+			}
+			returnData.NetWork = netInfo
+
 			data, err := json.Marshal(returnData)
 			if err != nil {
-				log.Error(errors.New("Marshal error"))
-				return WriteMessage(ws, NewMessage(Closed, "monitor error"))
+				log.Error(errors.Wrap(err, "Marshal error"))
+				return WriteMessage(ws, NewMessage(Closed, "get monitor error"))
 			}
+
 			WriteByteMessage(ws, data)
 		}
 	}

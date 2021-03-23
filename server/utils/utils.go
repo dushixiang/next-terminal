@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 	"database/sql/driver"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"image"
 	"image/png"
@@ -16,6 +17,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -24,6 +26,7 @@ import (
 	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/gofrs/uuid"
+	errors2 "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -229,6 +232,19 @@ func Check(f func() error) {
 	if err := f(); err != nil {
 		logrus.Error("Received error:", err)
 	}
+}
+
+func ParseNetReg(line string, reg *regexp.Regexp, shouldLen, index int) (int64, string, error) {
+	rx1 := reg.FindStringSubmatch(line)
+	if len(rx1) != shouldLen {
+		return 0, "", errors.New("find string length error")
+	}
+	i64, err := strconv.ParseInt(rx1[index], 10, 64)
+	total := rx1[2]
+	if err != nil {
+		return 0, "", errors2.Wrap(err, "ParseInt error")
+	}
+	return i64, total, nil
 }
 
 func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
