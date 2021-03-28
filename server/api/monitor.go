@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"next-terminal/pkg/log"
 	"next-terminal/pkg/term"
@@ -327,8 +328,8 @@ func MonitorEndpoint(c echo.Context) (err error) {
 				log.Error(errors.Wrap(err, "Marshal error"))
 				return WriteMessage(ws, NewMessage(Closed, "get monitor error"))
 			}
-
 			WriteByteMessage(ws, data)
+			time.After(1 * time.Second)
 		}
 	}
 	return

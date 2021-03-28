@@ -6,6 +6,7 @@ import {Link, Route, Switch} from "react-router-dom";
 import Dashboard from "./components/dashboard/Dashboard";
 import Asset from "./components/asset/Asset";
 import Access from "./components/access/Access";
+import StatusMonitor from "./components/monitor/Monitor";
 import User from "./components/user/User";
 import OnlineSession from "./components/session/OnlineSession";
 import OfflineSession from "./components/session/OfflineSession";
@@ -351,6 +352,7 @@ class App extends Component {
                             <Route path="/setting" component={Setting}/>
                             <Route path="/job" component={Job}/>
                             <Route path="/access-security" component={Security}/>
+                            <Route path="/monitor/:id" component={StatusMonitor}/>
 
                             <Footer style={{textAlign: 'center'}}>
                                 Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
