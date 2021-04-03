@@ -299,3 +299,15 @@ func Pbkdf2(password string) ([]byte, error) {
 	dk := pbkdf2.Key([]byte(password), salt, 1, 32, sha256.New)
 	return dk, nil
 }
+
+func DeCryptPassword(cryptPassword string, key []byte) (string, error) {
+	origData, err := base64.StdEncoding.DecodeString(cryptPassword)
+	if err != nil {
+		return "", err
+	}
+	decryptedCBC, err := AesDecryptCBC(origData, key)
+	if err != nil {
+		return "", err
+	}
+	return string(decryptedCBC), nil
+}

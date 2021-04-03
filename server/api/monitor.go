@@ -3,12 +3,14 @@ package api
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 
+	"next-terminal/pkg/global"
 	"next-terminal/pkg/log"
 	"next-terminal/pkg/term"
 	"next-terminal/server/model"
@@ -26,6 +28,7 @@ const (
 	TopCMD = "top -n 1 -b -s"
 
 	NetWorkCMD = "/sbin/ifconfig eth0 |grep bytes; sleep 1s; /sbin/ifconfig eth0 | grep bytes"
+	//GetCpuCore = `cat /proc/cpuinfo| grep \"cpu cores\"| uniq \n`
 )
 
 var statisticsError = errors.New("Get base monitor error")
@@ -34,6 +37,7 @@ type MonitorInfo struct {
 	BaseInfo BaseInfo     `json:"base_info"`
 	Docker   []DockerInfo `json:"docker"`
 	NetWork  NewWork      `json:"net_work"`
+	Datetime time.Time    `json:"datetime"`
 }
 
 type NewWork struct {
@@ -133,13 +137,27 @@ func GetDockerInfo(client *ssh.Client) (ret []DockerInfo, err error) {
 	if err != nil {
 		return nil, err
 	}
-	stdOut, _ := session.StdoutPipe()
-	err = session.Run(DockerCMD)
+	stdIn, err := session.StdinPipe()
+	if err != nil {
+		return
+	}
+	var outBf, errBf bytes.Buffer
+	session.Stdout = &outBf
+	session.Stderr = &errBf
+	if err = session.Shell(); err != nil {
+		return
+	}
+	_, err = stdIn.Write([]byte("whereis docker\n"))
+	if err != nil {
+		return
+	}
+	fmt.Print(outBf.String())
+	_, err = stdIn.Write([]byte(DockerCMD + "\n"))
 	if err != nil {
 		return nil, err
 	}
-	res, _ := ioutil.ReadAll(stdOut)
-	for _, line := range strings.Split(string(res), "\n")[1:] {
+	//res, _ := ioutil.ReadAll(outBf)
+	for _, line := range strings.Split(outBf.String(), "\n")[1:] {
 		if line == "" {
 			continue
 		}
@@ -234,6 +252,8 @@ func getBaseInfo(client *ssh.Client) (ret BaseInfo, err error) {
 					ret.Steal = cInt
 				}
 			}
+			ret.TotalUse = ret.SysUse + ret.UserUse
+
 		}
 		if i == 3 {
 			memUseArray := memUsReg.FindStringSubmatch(line)
@@ -285,7 +305,12 @@ func MonitorEndpoint(c echo.Context) (err error) {
 	var returnData MonitorInfo
 	switch model.AssetProto(asset.Protocol) {
 	case model.SSH:
-		terminal, err := term.NewSshClient(asset.IP, asset.Port, asset.Username, asset.Password,
+		password, err := utils.DeCryptPassword(asset.Password, global.Config.EncryptionPassword)
+		if err != nil {
+			return errors.Wrap(err, "Decrypt error")
+		}
+
+		terminal, err := term.NewSshClient(asset.IP, asset.Port, asset.Username, password,
 			asset.PrivateKey, asset.Passphrase)
 		if err != nil {
 			log.Error(err)
@@ -297,6 +322,7 @@ func MonitorEndpoint(c echo.Context) (err error) {
 			if err != nil {
 				break
 			}
+			returnData.Datetime = time.Now()
 			if msgt != websocket.TextMessage {
 				break
 			}
