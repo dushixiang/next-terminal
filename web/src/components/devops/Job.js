@@ -542,7 +542,7 @@ class Job extends Component {
                                 title={'日志'}
                                 visible={true}
                                 maskClosable={false}
-                                centered={true}
+
                                 onOk={async () => {
                                     let result = await request.delete(`/jobs/${this.state.selectedRow['id']}/logs`);
                                     if (result['code'] === 1) {

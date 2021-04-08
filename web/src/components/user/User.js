@@ -628,7 +628,6 @@ class User extends Component {
                         width={window.innerWidth * 0.8}
                         title='已授权资产'
                         visible={this.state.assetVisible}
-                        centered={true}
                         maskClosable={false}
                         destroyOnClose={true}
                         onOk={() => {
@@ -649,7 +648,6 @@ class User extends Component {
                             <Modal title="修改密码" visible={this.state.changePasswordVisible}
                                    confirmLoading={this.state.changePasswordConfirmLoading}
                                    maskClosable={false}
-                                   centered={true}
                                    onOk={() => {
                                        this.changePasswordFormRef.current
                                            .validateFields()

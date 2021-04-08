@@ -429,7 +429,6 @@ class UserGroup extends Component {
                         title='已授权资产'
                         visible={this.state.assetVisible}
                         maskClosable={false}
-                        centered={true}
                         destroyOnClose={true}
                         onOk={() => {
 

@@ -640,7 +640,7 @@ class DynamicCommand extends Component {
                     <Modal
                         title="选择资产"
                         visible={this.state.assetsVisible}
-                        centered={true}
+
                         onOk={this.executeCommand}
                         onCancel={() => {
                             this.setState({
@@ -668,7 +668,7 @@ class DynamicCommand extends Component {
                     </Text>}
                            visible={this.state.changeOwnerModalVisible}
                            confirmLoading={this.state.changeOwnerConfirmLoading}
-                           centered={true}
+
                            onOk={() => {
                                this.setState({
                                    changeOwnerConfirmLoading: true
@@ -729,7 +729,7 @@ class DynamicCommand extends Component {
                                 style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的授权人
                             </Text>}
                                    visible={this.state.changeSharerModalVisible}
-                                   centered={true}
+
                                    confirmLoading={this.state.changeSharerConfirmLoading}
                                    onOk={async () => {
                                        this.setState({

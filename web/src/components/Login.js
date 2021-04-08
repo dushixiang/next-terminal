@@ -132,7 +132,7 @@ class LoginForm extends Component {
 
                 <Modal title="双因素认证" visible={this.state.totpModalVisible} confirmLoading={this.state.confirmLoading}
                        maskClosable={false}
-                       centered={true}
+
                        okButtonProps={{form:'totp-form', key: 'submit', htmlType: 'submit'}}
                        onOk={() => {
                            this.formRef.current

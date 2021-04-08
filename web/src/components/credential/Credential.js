@@ -582,7 +582,7 @@ class Credential extends Component {
                     </Text>}
                            visible={this.state.changeOwnerModalVisible}
                            confirmLoading={this.state.changeOwnerConfirmLoading}
-                           centered={true}
+
                            onOk={() => {
                                this.setState({
                                    changeOwnerConfirmLoading: true
@@ -641,7 +641,7 @@ class Credential extends Component {
                             </Text>}
                                    visible={this.state.changeSharerModalVisible}
                                    confirmLoading={this.state.changeSharerConfirmLoading}
-                                   centered={true}
+
                                    onOk={async () => {
                                        this.setState({
                                            changeSharerConfirmLoading: true
