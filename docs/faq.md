@@ -39,7 +39,7 @@ docker pull dushixiang/next-terminal:latest
 ```shell
 docker rm <container-id> -f
 ```
-再重新执行一次 [docker方式安装命令](install-naive.md)
+再重新执行一次 [docker方式安装命令](install-docker.md)
 
 </details>
 

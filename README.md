@@ -18,7 +18,7 @@ Next Terminal基于 [Apache Guacamole](https://guacamole.apache.org/) 开发，�
 - 批量执行命令
 - 在线会话管理（监控、强制断开）
 - 离线会话管理（查看录屏）
-- 双因素认证 感谢 [naiba](https://github.com/naiba) 贡献
+- 双因素认证
 - 资产标签
 - 资产授权
 - 多用户&用户分组

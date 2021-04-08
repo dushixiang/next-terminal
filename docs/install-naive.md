@@ -119,10 +119,7 @@ mkfontdir
 fc-cache
 ```
 ### 安装 Next Terminal
-建立next-terminal目录
-```shell
-mkdir ~/next-terminal && cd ~/next-terminal
-```
+> 示例步骤安装在 `/usr/local/next-terminal`，你可以自由选择安装目录。
 
 下载
 ```shell
@@ -131,11 +128,10 @@ wget https://github.com/dushixiang/next-terminal/releases/latest/download/next-t
 
 解压
 ```shell
-tar -xvf next-terminal.tgz
-cd next-terminal
+tar -zxvf next-terminal.tgz -C /usr/local/
 ```
 
-在当前目录下创建或修改配置文件`config.yml`
+在`/usr/local/next-terminal`或`/etc/next-terminal`下创建或修改配置文件`config.yml`
 ```shell
 db: sqlite
 # 当db为sqlite时mysql的配置无效
@@ -159,4 +155,29 @@ server:
 启动
 ```shell
 ./next-terminal
+```
+
+使用systemd方式启动
+
+在 `/etc/systemd/system/` 目录创建文件并写入以下内容
+```shell
+[Unit]
+Description=next-terminal service
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/usr/local/next-terminal
+ExecStart=/usr/local/next-terminal/next-terminal
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+重载系统服务&&设置开机启动&&启动服务
+```shell
+systemctl daemon-reload
+systemctl enable next-terminal
+systemctl start next-terminal
 ```
