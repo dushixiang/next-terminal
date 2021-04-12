@@ -157,9 +157,9 @@ server:
 ./next-terminal
 ```
 
-使用systemd方式启动
+使用系统服务方式启动
 
-在 `/etc/systemd/system/` 目录创建文件并写入以下内容
+在 `/etc/systemd/system/` 目录创建 `next-terminal.service` 文件并写入以下内容
 ```shell
 [Unit]
 Description=next-terminal service
@@ -175,9 +175,10 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-重载系统服务&&设置开机启动&&启动服务
+重载系统服务&&设置开机启动&&启动服务&&查看状态
 ```shell
 systemctl daemon-reload
 systemctl enable next-terminal
 systemctl start next-terminal
+systemctl staus next-terminal
 ```
