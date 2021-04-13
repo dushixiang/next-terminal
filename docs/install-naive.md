@@ -180,5 +180,5 @@ WantedBy=multi-user.target
 systemctl daemon-reload
 systemctl enable next-terminal
 systemctl start next-terminal
-systemctl staus next-terminal
+systemctl status next-terminal
 ```
