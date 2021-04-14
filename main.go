@@ -39,7 +39,10 @@ func Run() error {
 	e := api.SetupRoutes(db)
 
 	if global.Config.ResetPassword != "" {
-		return api.ResetPassword()
+		return api.ResetPassword(global.Config.ResetPassword)
+	}
+	if global.Config.ResetTotp != "" {
+		return api.ResetTotp(global.Config.ResetTotp)
 	}
 	sessionRepo := repository.NewSessionRepository(db)
 	propertyRepo := repository.NewPropertyRepository(db)

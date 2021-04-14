@@ -275,8 +275,8 @@ func InitDBData() (err error) {
 	return nil
 }
 
-func ResetPassword() error {
-	user, err := userRepository.FindByUsername(global.Config.ResetPassword)
+func ResetPassword(username string) error {
+	user, err := userRepository.FindByUsername(username)
 	if err != nil {
 		return err
 	}
@@ -293,6 +293,22 @@ func ResetPassword() error {
 		return err
 	}
 	log.Debugf("用户「%v」密码初始化为: %v", user.Username, password)
+	return nil
+}
+
+func ResetTotp(username string) error {
+	user, err := userRepository.FindByUsername(username)
+	if err != nil {
+		return err
+	}
+	u := &model.User{
+		TOTPSecret: "-",
+		ID:         user.ID,
+	}
+	if err := userRepository.Update(u); err != nil {
+		return err
+	}
+	log.Debugf("用户「%v」已重置TOTP", user.Username)
 	return nil
 }
 

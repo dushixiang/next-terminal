@@ -18,6 +18,7 @@ type Config struct {
 	Mysql         *Mysql
 	Sqlite        *Sqlite
 	ResetPassword string
+	ResetTotp     string
 }
 
 type Mysql struct {
@@ -83,6 +84,7 @@ func SetupConfig() *Config {
 			Key:  viper.GetString("server.key"),
 		},
 		ResetPassword: viper.GetString("reset-password"),
+		ResetTotp:     viper.GetString("reset-totp"),
 		Debug:         viper.GetBool("debug"),
 		Demo:          viper.GetBool("demo"),
 	}
