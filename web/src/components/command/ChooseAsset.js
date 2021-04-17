@@ -26,10 +26,9 @@ import {PROTOCOL_COLORS} from "../../common/constants";
 import {isEmpty} from "../../utils/utils";
 import dayjs from "dayjs";
 
-const confirm = Modal.confirm;
 const {Search} = Input;
 const {Content} = Layout;
-const {Title, Text} = Typography;
+const {Title} = Typography;
 
 class ChooseAsset extends Component {
 

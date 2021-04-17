@@ -41,7 +41,6 @@ const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
-const CheckboxGroup = Checkbox.Group;
 
 class DynamicCommand extends Component {
 
