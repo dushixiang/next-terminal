@@ -5,6 +5,8 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
+	"crypto/rand"
+	"crypto/sha256"
 	"database/sql/driver"
 	"encoding/base64"
 	"fmt"
@@ -18,6 +20,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -239,6 +243,7 @@ func PKCS5UnPadding(origData []byte) []byte {
 	return origData[:(length - unPadding)]
 }
 
+// AesEncryptCBC /*
 func AesEncryptCBC(origData, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -265,4 +270,16 @@ func AesDecryptCBC(encrypted, key []byte) ([]byte, error) {
 	blockMode.CryptBlocks(origData, encrypted)
 	origData = PKCS5UnPadding(origData)
 	return origData, nil
+}
+
+func Pbkdf2(password string) ([]byte, error) {
+	//生成随机盐
+	salt := make([]byte, 32)
+	_, err := rand.Read(salt)
+	if err != nil {
+		return nil, err
+	}
+	//生成密文
+	dk := pbkdf2.Key([]byte(password), salt, 1, 32, sha256.New)
+	return dk, nil
 }

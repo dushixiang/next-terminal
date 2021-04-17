@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strings"
 
@@ -145,7 +146,36 @@ func (r AssetRepository) Find(pageIndex, pageSize int, name, protocol, tags stri
 	return
 }
 
+func (r AssetRepository) Encrypt(item *model.Asset, password []byte) error {
+	if item.Password != "" && item.Password != "-" {
+		encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Password), password)
+		if err != nil {
+			return err
+		}
+		item.Password = base64.StdEncoding.EncodeToString(encryptedCBC)
+	}
+	if item.PrivateKey != "" && item.PrivateKey != "-" {
+		encryptedCBC, err := utils.AesEncryptCBC([]byte(item.PrivateKey), password)
+		if err != nil {
+			return err
+		}
+		item.PrivateKey = base64.StdEncoding.EncodeToString(encryptedCBC)
+	}
+	if item.Passphrase != "" && item.Passphrase != "-" {
+		encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Passphrase), password)
+		if err != nil {
+			return err
+		}
+		item.Passphrase = base64.StdEncoding.EncodeToString(encryptedCBC)
+	}
+	item.Encrypted = true
+	return nil
+}
+
 func (r AssetRepository) Create(o *model.Asset) (err error) {
+	if err := r.Encrypt(o, global.Config.EncryptionPassword); err != nil {
+		return err
+	}
 	if err = r.DB.Create(o).Error; err != nil {
 		return err
 	}
@@ -157,14 +187,65 @@ func (r AssetRepository) FindById(id string) (o model.Asset, err error) {
 	return
 }
 
+func (r AssetRepository) Decrypt(item *model.Asset, password []byte) error {
+	if item.Encrypted {
+		if item.Password != "" && item.Password != "-" {
+			origData, err := base64.StdEncoding.DecodeString(item.Password)
+			if err != nil {
+				return err
+			}
+			decryptedCBC, err := utils.AesDecryptCBC(origData, password)
+			if err != nil {
+				return err
+			}
+			item.Password = string(decryptedCBC)
+		}
+		if item.PrivateKey != "" && item.PrivateKey != "-" {
+			origData, err := base64.StdEncoding.DecodeString(item.PrivateKey)
+			if err != nil {
+				return err
+			}
+			decryptedCBC, err := utils.AesDecryptCBC(origData, password)
+			if err != nil {
+				return err
+			}
+			item.PrivateKey = string(decryptedCBC)
+		}
+		if item.Passphrase != "" && item.Passphrase != "-" {
+			origData, err := base64.StdEncoding.DecodeString(item.Passphrase)
+			if err != nil {
+				return err
+			}
+			decryptedCBC, err := utils.AesDecryptCBC(origData, password)
+			if err != nil {
+				return err
+			}
+			item.Passphrase = string(decryptedCBC)
+		}
+	}
+	return nil
+}
+
+func (r AssetRepository) FindByIdAndDecrypt(id string) (o model.Asset, err error) {
+	err = r.DB.Where("id = ?", id).First(&o).Error
+	if err == nil {
+		err = r.Decrypt(&o, global.Config.EncryptionPassword)
+	}
+	return
+}
+
 func (r AssetRepository) UpdateById(o *model.Asset, id string) error {
-	o.ID = id
 	return r.DB.Updates(o).Error
 }
 
 func (r AssetRepository) UpdateActiveById(active bool, id string) error {
 	sql := "update assets set active = ? where id = ?"
 	return r.DB.Exec(sql, active, id).Error
+}
+
+func (r AssetRepository) EncryptedById(encrypted bool, password, privateKey, passphrase, id string) error {
+	sql := "update assets set encrypted = ?, password = ?,private_key = ?, passphrase = ?  where id = ?"
+	return r.DB.Exec(sql, encrypted, password, privateKey, passphrase, id).Error
 }
 
 func (r AssetRepository) DeleteById(id string) error {

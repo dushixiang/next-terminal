@@ -11,14 +11,17 @@ import (
 var GlobalCfg *Config
 
 type Config struct {
-	Debug         bool
-	Demo          bool
-	DB            string
-	Server        *Server
-	Mysql         *Mysql
-	Sqlite        *Sqlite
-	ResetPassword string
-	ResetTotp     string
+	Debug              bool
+	Demo               bool
+	DB                 string
+	Server             *Server
+	Mysql              *Mysql
+	Sqlite             *Sqlite
+	ResetPassword      string
+	ResetTotp          string
+	EncryptionKey      string
+	EncryptionPassword []byte
+	NewEncryptionKey   string
 }
 
 type Mysql struct {
@@ -83,10 +86,12 @@ func SetupConfig() *Config {
 			Cert: viper.GetString("server.cert"),
 			Key:  viper.GetString("server.key"),
 		},
-		ResetPassword: viper.GetString("reset-password"),
-		ResetTotp:     viper.GetString("reset-totp"),
-		Debug:         viper.GetBool("debug"),
-		Demo:          viper.GetBool("demo"),
+		ResetPassword:    viper.GetString("reset-password"),
+		ResetTotp:        viper.GetString("reset-totp"),
+		Debug:            viper.GetBool("debug"),
+		Demo:             viper.GetBool("demo"),
+		EncryptionKey:    viper.GetString("encryption-key"),
+		NewEncryptionKey: viper.GetString("new-encryption-key"),
 	}
 	GlobalCfg = config
 	return config

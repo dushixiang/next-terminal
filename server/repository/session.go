@@ -1,12 +1,15 @@
 package repository
 
 import (
+	"encoding/base64"
 	"os"
 	"path"
 	"time"
 
 	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/server/model"
+	"next-terminal/server/utils"
 
 	"gorm.io/gorm"
 )
@@ -93,6 +96,51 @@ func (r SessionRepository) FindById(id string) (o model.Session, err error) {
 	return
 }
 
+func (r SessionRepository) FindByIdAndDecrypt(id string) (o model.Session, err error) {
+	err = r.DB.Where("id = ?", id).First(&o).Error
+	if err == nil {
+		err = r.Decrypt(&o)
+	}
+	return
+}
+
+func (r SessionRepository) Decrypt(item *model.Session) error {
+	if item.Password != "" && item.Password != "-" {
+		origData, err := base64.StdEncoding.DecodeString(item.Password)
+		if err != nil {
+			return err
+		}
+		decryptedCBC, err := utils.AesDecryptCBC(origData, global.Config.EncryptionPassword)
+		if err != nil {
+			return err
+		}
+		item.Password = string(decryptedCBC)
+	}
+	if item.PrivateKey != "" && item.PrivateKey != "-" {
+		origData, err := base64.StdEncoding.DecodeString(item.PrivateKey)
+		if err != nil {
+			return err
+		}
+		decryptedCBC, err := utils.AesDecryptCBC(origData, global.Config.EncryptionPassword)
+		if err != nil {
+			return err
+		}
+		item.PrivateKey = string(decryptedCBC)
+	}
+	if item.Passphrase != "" && item.Passphrase != "-" {
+		origData, err := base64.StdEncoding.DecodeString(item.Passphrase)
+		if err != nil {
+			return err
+		}
+		decryptedCBC, err := utils.AesDecryptCBC(origData, global.Config.EncryptionPassword)
+		if err != nil {
+			return err
+		}
+		item.Passphrase = string(decryptedCBC)
+	}
+	return nil
+}
+
 func (r SessionRepository) FindByConnectionId(connectionId string) (o model.Session, err error) {
 	err = r.DB.Where("connection_id = ?", connectionId).First(&o).Error
 	return
@@ -166,4 +214,9 @@ func (r SessionRepository) CountSessionByDay(day int) (results []D, err error) {
 	}
 
 	return
+}
+
+func (r SessionRepository) EmptyPassword() error {
+	sql := "update sessions set password = '-',private_key = '-', passphrase = '-' where 1=1"
+	return r.DB.Exec(sql).Error
 }

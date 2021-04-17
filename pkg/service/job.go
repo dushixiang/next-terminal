@@ -160,7 +160,7 @@ func (r ShellJob) Run() {
 
 	msgChan := make(chan string)
 	for i := range assets {
-		asset, err := r.jobService.assetRepository.FindById(assets[i].ID)
+		asset, err := r.jobService.assetRepository.FindByIdAndDecrypt(assets[i].ID)
 		if err != nil {
 			msgChan <- fmt.Sprintf("资产「%v」Shell执行失败，查询数据异常「%v」", assets[i].Name, err.Error())
 			return
@@ -176,7 +176,7 @@ func (r ShellJob) Run() {
 		)
 
 		if asset.AccountType == "credential" {
-			credential, err := r.jobService.credentialRepository.FindById(asset.CredentialId)
+			credential, err := r.jobService.credentialRepository.FindByIdAndDecrypt(asset.CredentialId)
 			if err != nil {
 				msgChan <- fmt.Sprintf("资产「%v」Shell执行失败，查询授权凭证数据异常「%v」", assets[i].Name, err.Error())
 				return

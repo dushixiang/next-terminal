@@ -54,7 +54,7 @@ func SSHEndpoint(c echo.Context) (err error) {
 	cols, _ := strconv.Atoi(c.QueryParam("cols"))
 	rows, _ := strconv.Atoi(c.QueryParam("rows"))
 
-	session, err := sessionRepository.FindById(sessionId)
+	session, err := sessionRepository.FindByIdAndDecrypt(sessionId)
 	if err != nil {
 		msg := Message{
 			Type:    Closed,
