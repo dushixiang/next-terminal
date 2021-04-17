@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import {
     Alert,
     Button,
-    Checkbox,
     Col,
     Divider,
     Dropdown,
