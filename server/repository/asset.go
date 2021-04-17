@@ -243,11 +243,6 @@ func (r AssetRepository) UpdateActiveById(active bool, id string) error {
 	return r.DB.Exec(sql, active, id).Error
 }
 
-func (r AssetRepository) EncryptedById(encrypted bool, password, privateKey, passphrase, id string) error {
-	sql := "update assets set encrypted = ?, password = ?,private_key = ?, passphrase = ?  where id = ?"
-	return r.DB.Exec(sql, encrypted, password, privateKey, passphrase, id).Error
-}
-
 func (r AssetRepository) DeleteById(id string) error {
 	return r.DB.Where("id = ?", id).Delete(&model.Asset{}).Error
 }

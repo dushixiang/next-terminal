@@ -1,11 +1,8 @@
 package service
 
 import (
-	"encoding/base64"
-
 	"next-terminal/pkg/global"
 	"next-terminal/server/repository"
-	"next-terminal/server/utils"
 )
 
 type AssetService struct {
@@ -26,31 +23,10 @@ func (r AssetService) Encrypt() error {
 		if item.Encrypted {
 			continue
 		}
-		if item.Password != "" && item.Password != "-" {
-			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Password), global.Config.EncryptionPassword)
-			if err != nil {
-				return err
-			}
-			item.Password = base64.StdEncoding.EncodeToString(encryptedCBC)
+		if err := r.assetRepository.Encrypt(&item, global.Config.EncryptionPassword); err != nil {
+			return err
 		}
-
-		if item.PrivateKey != "" && item.PrivateKey != "-" {
-			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.PrivateKey), global.Config.EncryptionPassword)
-			if err != nil {
-				return err
-			}
-			item.PrivateKey = base64.StdEncoding.EncodeToString(encryptedCBC)
-		}
-
-		if item.Passphrase != "" && item.Passphrase != "-" {
-			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Passphrase), global.Config.EncryptionPassword)
-			if err != nil {
-				return err
-			}
-			item.Passphrase = base64.StdEncoding.EncodeToString(encryptedCBC)
-		}
-		err = r.assetRepository.EncryptedById(true, item.Password, item.PrivateKey, item.Passphrase, item.ID)
-		if err != nil {
+		if err := r.assetRepository.UpdateById(&item, item.ID); err != nil {
 			return err
 		}
 	}

@@ -41,13 +41,14 @@ var (
 	jobLogRepository         *repository.JobLogRepository
 	loginLogRepository       *repository.LoginLogRepository
 
-	jobService      *service.JobService
-	propertyService *service.PropertyService
-	userService     *service.UserService
-	sessionService  *service.SessionService
-	mailService     *service.MailService
-	numService      *service.NumService
-	assetService    *service.AssetService
+	jobService        *service.JobService
+	propertyService   *service.PropertyService
+	userService       *service.UserService
+	sessionService    *service.SessionService
+	mailService       *service.MailService
+	numService        *service.NumService
+	assetService      *service.AssetService
+	credentialService *service.CredentialService
 )
 
 func SetupRoutes(db *gorm.DB) *echo.Echo {
@@ -256,6 +257,7 @@ func InitService() {
 	mailService = service.NewMailService(propertyRepository)
 	numService = service.NewNumService(numRepository)
 	assetService = service.NewAssetService(assetRepository)
+	credentialService = service.NewCredentialService(credentialRepository)
 }
 
 func InitDBData() (err error) {
@@ -278,6 +280,9 @@ func InitDBData() (err error) {
 		return err
 	}
 	if err := sessionService.EmptyPassword(); err != nil {
+		return err
+	}
+	if err := credentialService.Encrypt(); err != nil {
 		return err
 	}
 	if err := assetService.Encrypt(); err != nil {

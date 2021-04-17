@@ -192,8 +192,3 @@ func (r CredentialRepository) FindAll() (o []model.Credential, err error) {
 	err = r.DB.Find(&o).Error
 	return
 }
-
-func (r CredentialRepository) EncryptedById(encrypted bool, password, privateKey, passphrase, id string) error {
-	sql := "update assets set encrypted = ?, password = ?,private_key = ?, passphrase = ?  where id = ?"
-	return r.DB.Exec(sql, encrypted, password, privateKey, passphrase, id).Error
-}
