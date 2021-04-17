@@ -21,6 +21,7 @@ type Asset struct {
 	Created      utils.JsonTime `json:"created"`
 	Tags         string         `json:"tags"`
 	Owner        string         `gorm:"index" json:"owner"`
+	Encrypted    bool           `json:"encrypted"`
 }
 
 type AssetForPage struct {

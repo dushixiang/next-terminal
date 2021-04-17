@@ -21,6 +21,7 @@ const DynamicCommandModal = ({title, visible, handleOk, handleCancel, confirmLoa
             title={title}
             visible={visible}
             maskClosable={false}
+
             onOk={() => {
                 form
                     .validateFields()

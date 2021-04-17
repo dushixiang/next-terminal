@@ -2,7 +2,11 @@ package utils
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/md5"
+	"crypto/rand"
+	"crypto/sha256"
 	"database/sql/driver"
 	"encoding/base64"
 	"fmt"
@@ -16,6 +20,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"golang.org/x/crypto/pbkdf2"
 
 	"github.com/gofrs/uuid"
 	"github.com/sirupsen/logrus"
@@ -223,4 +229,57 @@ func Check(f func() error) {
 	if err := f(); err != nil {
 		logrus.Error("Received error:", err)
 	}
+}
+
+func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
+	padding := blockSize - len(ciphertext)%blockSize
+	padText := bytes.Repeat([]byte{byte(padding)}, padding)
+	return append(ciphertext, padText...)
+}
+
+func PKCS5UnPadding(origData []byte) []byte {
+	length := len(origData)
+	unPadding := int(origData[length-1])
+	return origData[:(length - unPadding)]
+}
+
+// AesEncryptCBC /*
+func AesEncryptCBC(origData, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	blockSize := block.BlockSize()
+	origData = PKCS5Padding(origData, blockSize)
+	blockMode := cipher.NewCBCEncrypter(block, key[:blockSize])
+	encrypted := make([]byte, len(origData))
+	blockMode.CryptBlocks(encrypted, origData)
+	return encrypted, nil
+}
+
+func AesDecryptCBC(encrypted, key []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	blockSize := block.BlockSize()
+	blockMode := cipher.NewCBCDecrypter(block, key[:blockSize])
+	origData := make([]byte, len(encrypted))
+	blockMode.CryptBlocks(origData, encrypted)
+	origData = PKCS5UnPadding(origData)
+	return origData, nil
+}
+
+func Pbkdf2(password string) ([]byte, error) {
+	//生成随机盐
+	salt := make([]byte, 32)
+	_, err := rand.Read(salt)
+	if err != nil {
+		return nil, err
+	}
+	//生成密文
+	dk := pbkdf2.Key([]byte(password), salt, 1, 32, sha256.New)
+	return dk, nil
 }

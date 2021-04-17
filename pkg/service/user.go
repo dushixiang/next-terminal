@@ -58,7 +58,7 @@ func (r UserService) InitUser() (err error) {
 	return nil
 }
 
-func (r UserService) FixedUserOnlineState() error {
+func (r UserService) FixUserOnlineState() error {
 	// 修正用户登录状态
 	onlineUsers, err := r.userRepository.FindOnlineUsers()
 	if err != nil {

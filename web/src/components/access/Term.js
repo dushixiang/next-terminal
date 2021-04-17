@@ -20,7 +20,8 @@ class Term extends Component {
         term: undefined,
         webSocket: undefined,
         fitAddon: undefined,
-        sessionId: undefined
+        sessionId: undefined,
+        enterBtnIndex: 1001
     };
 
     componentDidMount = async () => {
@@ -215,17 +216,17 @@ class Term extends Component {
                 }}/>
 
                 <Draggable>
-                    <Affix style={{position: 'absolute', top: 50, right: 50, zIndex: 9999}}>
+                    <Affix style={{position: 'absolute', top: 50, right: 50, zIndex: this.state.enterBtnIndex}}>
                         <Button icon={<AppstoreTwoTone/>} onClick={() => {
                             this.setState({
                                 fileSystemVisible: true,
+                                enterBtnIndex: 999, // xterm.js 输入框的zIndex是1000，在弹出文件管理页面后要隐藏此按钮
                             });
                         }}/>
                     </Affix>
                 </Draggable>
 
                 <Drawer
-                    style={{zIndex: 10000}}
                     title={'会话详情'}
                     placement="right"
                     width={window.innerWidth * 0.8}
@@ -233,7 +234,8 @@ class Term extends Component {
                     // maskClosable={false}
                     onClose={() => {
                         this.setState({
-                            fileSystemVisible: false
+                            fileSystemVisible: false,
+                            enterBtnIndex: 1001, // xterm.js 输入框的zIndex是1000，在隐藏文件管理页面后要显示此按钮
                         });
                     }}
                     visible={this.state.fileSystemVisible}
