@@ -65,7 +65,7 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("width", width)
 		configuration.SetParameter("height", height)
 		configuration.SetParameter("dpi", dpi)
-		session, err = sessionRepository.FindById(sessionId)
+		session, err = sessionRepository.FindByIdAndDecrypt(sessionId)
 		if err != nil {
 			CloseSessionById(sessionId, NotFoundSession, "会话不存在")
 			return err

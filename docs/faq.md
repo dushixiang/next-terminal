@@ -18,7 +18,8 @@ location / {
 <details>
     <summary>访问realvnc提示验证失败？</summary>
 
-把加密类型修改为 Prefer On
+1. 把密码类型修改为VNC
+2. 把加密类型修改为 Prefer On
 
 </details>
 
@@ -39,7 +40,7 @@ docker pull dushixiang/next-terminal:latest
 ```shell
 docker rm <container-id> -f
 ```
-再重新执行一次 [docker方式安装命令](install-naive.md)
+再重新执行一次 [docker方式安装命令](install-docker.md)
 
 </details>
 
@@ -86,5 +87,62 @@ Mar  5 20:00:16.923 [DEBU] 用户「admin」密码初始化为: next-terminal
 
 ```
 
+</details>
+
+<details>
+    <summary>TOTP客户端丢了怎么办？</summary>
+首先需要进入程序所在目录，使用docker安装的程序目录为：/usr/local/next-terminal
+
+执行命令
+
+```shell
+./next-terminal --reset-totp admin
+```
+
+其中 admin 为用户登录账号，成功之后会输出
+
+``` shell
+
+ _______                   __    ___________                  .__              .__   
+ \      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |  
+ /   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |  
+/    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
+\____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
+        \/     \/      \/                     \/            \/        \/     \/      v0.4.0
+
+当前数据库模式为：mysql
+Mar  5 20:00:16.923 [DEBU] 用户「admin」已重置TOTP
+
+```
+
+</details>
+
+<details>
+    <summary>想要修改数据库敏感信息加密的key怎么办？</summary>
+首先需要进入程序所在目录，使用docker安装的程序目录为：/usr/local/next-terminal
+
+执行命令
+
+```shell
+./next-terminal --encryption-key 旧的加密key new-encryption-key 新的的加密key
+```
+
+成功之后会输出
+
+``` shell
+
+ _______                   __    ___________                  .__              .__   
+ \      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |  
+ /   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |  
+/    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
+\____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
+        \/     \/      \/                     \/            \/        \/     \/      v0.4.0
+
+当前数据库模式为：mysql
+Mar  5 20:00:16.923 [DEBU] encryption key has being changed.
+
+```
+
+最后重新启动程序，并且把加密key修改为新的。
 </details>
 

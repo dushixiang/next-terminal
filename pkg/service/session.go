@@ -33,3 +33,7 @@ func (r SessionService) FixSessionState() error {
 	}
 	return nil
 }
+
+func (r SessionService) EmptyPassword() error {
+	return r.sessionRepository.EmptyPassword()
+}

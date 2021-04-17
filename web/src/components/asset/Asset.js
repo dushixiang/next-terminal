@@ -355,10 +355,10 @@ class Asset extends Component {
                     window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
                 }
             } else {
-                message.warn('您访问的资产未在线，请确认网络状态。', 10);
+                message.warn({content: '您访问的资产未在线，请确认网络状态。', key: id, duration: 10});
             }
         } else {
-            message.error('操作失败 :( ' + result.message, 10);
+            message.error({content: result.message, key: id, duration: 10});
         }
 
     }

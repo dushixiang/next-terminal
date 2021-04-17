@@ -1,8 +1,10 @@
 package api
 
 import (
+	"crypto/md5"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -39,12 +41,14 @@ var (
 	jobLogRepository         *repository.JobLogRepository
 	loginLogRepository       *repository.LoginLogRepository
 
-	jobService      *service.JobService
-	propertyService *service.PropertyService
-	userService     *service.UserService
-	sessionService  *service.SessionService
-	mailService     *service.MailService
-	numService      *service.NumService
+	jobService        *service.JobService
+	propertyService   *service.PropertyService
+	userService       *service.UserService
+	sessionService    *service.SessionService
+	mailService       *service.MailService
+	numService        *service.NumService
+	assetService      *service.AssetService
+	credentialService *service.CredentialService
 )
 
 func SetupRoutes(db *gorm.DB) *echo.Echo {
@@ -54,6 +58,7 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 
 	if err := InitDBData(); err != nil {
 		log.WithError(err).Error("初始化数据异常")
+		os.Exit(0)
 	}
 
 	if err := ReloadData(); err != nil {
@@ -251,6 +256,8 @@ func InitService() {
 	sessionService = service.NewSessionService(sessionRepository)
 	mailService = service.NewMailService(propertyRepository)
 	numService = service.NewNumService(numRepository)
+	assetService = service.NewAssetService(assetRepository)
+	credentialService = service.NewCredentialService(credentialRepository)
 }
 
 func InitDBData() (err error) {
@@ -266,17 +273,26 @@ func InitDBData() (err error) {
 	if err := jobService.InitJob(); err != nil {
 		return err
 	}
-	if err := userService.FixedUserOnlineState(); err != nil {
+	if err := userService.FixUserOnlineState(); err != nil {
 		return err
 	}
 	if err := sessionService.FixSessionState(); err != nil {
 		return err
 	}
+	if err := sessionService.EmptyPassword(); err != nil {
+		return err
+	}
+	if err := credentialService.Encrypt(); err != nil {
+		return err
+	}
+	if err := assetService.Encrypt(); err != nil {
+		return err
+	}
 	return nil
 }
 
-func ResetPassword() error {
-	user, err := userRepository.FindByUsername(global.Config.ResetPassword)
+func ResetPassword(username string) error {
+	user, err := userRepository.FindByUsername(username)
 	if err != nil {
 		return err
 	}
@@ -293,6 +309,63 @@ func ResetPassword() error {
 		return err
 	}
 	log.Debugf("用户「%v」密码初始化为: %v", user.Username, password)
+	return nil
+}
+
+func ResetTotp(username string) error {
+	user, err := userRepository.FindByUsername(username)
+	if err != nil {
+		return err
+	}
+	u := &model.User{
+		TOTPSecret: "-",
+		ID:         user.ID,
+	}
+	if err := userRepository.Update(u); err != nil {
+		return err
+	}
+	log.Debugf("用户「%v」已重置TOTP", user.Username)
+	return nil
+}
+
+func ChangeEncryptionKey(oldEncryptionKey, newEncryptionKey string) error {
+
+	oldPassword := []byte(fmt.Sprintf("%x", md5.Sum([]byte(oldEncryptionKey))))
+	newPassword := []byte(fmt.Sprintf("%x", md5.Sum([]byte(newEncryptionKey))))
+
+	credentials, err := credentialRepository.FindAll()
+	if err != nil {
+		return err
+	}
+	for i := range credentials {
+		credential := credentials[i]
+		if err := credentialRepository.Decrypt(&credential, oldPassword); err != nil {
+			return err
+		}
+		if err := credentialRepository.Encrypt(&credential, newPassword); err != nil {
+			return err
+		}
+		if err := credentialRepository.UpdateById(&credential, credential.ID); err != nil {
+			return err
+		}
+	}
+	assets, err := assetRepository.FindAll()
+	if err != nil {
+		return err
+	}
+	for i := range assets {
+		asset := assets[i]
+		if err := assetRepository.Decrypt(&asset, oldPassword); err != nil {
+			return err
+		}
+		if err := assetRepository.Encrypt(&asset, newPassword); err != nil {
+			return err
+		}
+		if err := assetRepository.UpdateById(&asset, asset.ID); err != nil {
+			return err
+		}
+	}
+	log.Infof("encryption key has being changed.")
 	return nil
 }
 

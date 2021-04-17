@@ -47,6 +47,7 @@ const CredentialModal = ({title, visible, handleOk, handleCancel, confirmLoading
             title={title}
             visible={visible}
             maskClosable={false}
+
             onOk={() => {
                 form
                     .validateFields()
