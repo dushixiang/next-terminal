@@ -137,6 +137,9 @@ func CloseSessionById(sessionId string, code int, reason string) {
 	session.DisconnectedTime = utils.NowJsonTime()
 	session.Code = code
 	session.Message = reason
+	session.Password = "-"
+	session.PrivateKey = "-"
+	session.Passphrase = "-"
 
 	_ = sessionRepository.UpdateById(&session, sessionId)
 }
@@ -359,7 +362,7 @@ type File struct {
 
 func SessionLsEndpoint(c echo.Context) error {
 	sessionId := c.Param("id")
-	session, err := sessionRepository.FindById(sessionId)
+	session, err := sessionRepository.FindByIdAndDecrypt(sessionId)
 	if err != nil {
 		return err
 	}

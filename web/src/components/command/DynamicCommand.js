@@ -3,7 +3,6 @@ import React, {Component} from 'react';
 import {
     Alert,
     Button,
-    Checkbox,
     Col,
     Divider,
     Dropdown,
@@ -32,16 +31,15 @@ import {
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import {compare} from "../../utils/utils";
 
 import {hasPermission, isAdmin} from "../../service/permission";
 import dayjs from "dayjs";
+import ChooseAsset from "./ChooseAsset";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
-const CheckboxGroup = Checkbox.Group;
 
 class DynamicCommand extends Component {
 
@@ -191,6 +189,12 @@ class DynamicCommand extends Component {
         });
     };
 
+    setCheckedAssets = (checkedAssets) => {
+        this.setState({
+            checkedAssets: checkedAssets
+        })
+    }
+
     executeCommand = e => {
         let checkedAssets = this.state.checkedAssets;
         if (checkedAssets.length === 0) {
@@ -198,18 +202,10 @@ class DynamicCommand extends Component {
             return;
         }
 
-        let assets = this.state.assets;
         let cAssets = checkedAssets.map(item => {
-            let name = '';
-            for (let i = 0; i < assets.length; i++) {
-                if (assets[i]['id'] === item) {
-                    name = assets[i]['name'];
-                    break;
-                }
-            }
             return {
-                id: item,
-                name: name
+                id: item['id'],
+                name: item['name']
             }
         });
 
@@ -474,17 +470,6 @@ class DynamicCommand extends Component {
                                 assetsVisible: true,
                                 commandId: record['id']
                             });
-
-                            let result = await request.get('/assets?protocol=ssh');
-                            if (result.code === 1) {
-                                let assets = result.data;
-                                assets.sort(compare('name'));
-                                this.setState({
-                                    assets: assets
-                                });
-                            } else {
-                                message.error(result.message);
-                            }
                         }}>执行</Button>
 
                         <Dropdown overlay={menu}>
@@ -640,7 +625,8 @@ class DynamicCommand extends Component {
                     <Modal
                         title="选择资产"
                         visible={this.state.assetsVisible}
-
+                        width={window.innerWidth * 0.8}
+                        centered={true}
                         onOk={this.executeCommand}
                         onCancel={() => {
                             this.setState({
@@ -648,19 +634,11 @@ class DynamicCommand extends Component {
                             });
                         }}
                     >
-                        <Checkbox indeterminate={this.state.indeterminate} onChange={this.onCheckAllChange}
-                                  checked={this.state.checkAllChecked}>
-                            全选
-                        </Checkbox>
-                        <Divider/>
+                        <ChooseAsset
+                            setCheckedAssets={this.setCheckedAssets}
+                        >
 
-                        <CheckboxGroup options={this.state.assets.map((item) => {
-                            return {
-                                label: item.name,
-                                value: item.id,
-                                key: item.id,
-                            }
-                        })} value={this.state.checkedAssets} onChange={this.onChange}/>
+                        </ChooseAsset>
                     </Modal>
 
 

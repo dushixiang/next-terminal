@@ -104,6 +104,7 @@ docker run -d \
 | MYSQL_PASSWORD  |  `mysql`数据库密码 |
 | MYSQL_DATABASE  |  `mysql`数据库名称 |
 | SERVER_ADDR  |  服务器监听地址，默认`0.0.0.0:8088` |
+| ENCRYPTION_KEY  |  授权凭证和资产的密码，密钥等敏感信息加密的key，默认`next-terminal` |
 
 ## 其他
 

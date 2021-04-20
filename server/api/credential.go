@@ -1,11 +1,13 @@
 package api
 
 import (
+	"encoding/base64"
 	"errors"
 	"strconv"
 	"strings"
 
 	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -32,27 +34,28 @@ func CredentialCreateEndpoint(c echo.Context) error {
 	case constant.Custom:
 		item.PrivateKey = "-"
 		item.Passphrase = "-"
-		if len(item.Username) == 0 {
+		if item.Username == "" {
 			item.Username = "-"
 		}
-		if len(item.Password) == 0 {
+		if item.Password == "" {
 			item.Password = "-"
 		}
 	case constant.PrivateKey:
 		item.Password = "-"
-		if len(item.Username) == 0 {
+		if item.Username == "" {
 			item.Username = "-"
 		}
-		if len(item.PrivateKey) == 0 {
+		if item.PrivateKey == "" {
 			item.PrivateKey = "-"
 		}
-		if len(item.Passphrase) == 0 {
+		if item.Passphrase == "" {
 			item.Passphrase = "-"
 		}
 	default:
 		return Fail(c, -1, "类型错误")
 	}
 
+	item.Encrypted = true
 	if err := credentialRepository.Create(&item); err != nil {
 		return err
 	}
@@ -96,26 +99,48 @@ func CredentialUpdateEndpoint(c echo.Context) error {
 	case constant.Custom:
 		item.PrivateKey = "-"
 		item.Passphrase = "-"
-		if len(item.Username) == 0 {
+		if item.Username == "" {
 			item.Username = "-"
 		}
-		if len(item.Password) == 0 {
+		if item.Password == "" {
 			item.Password = "-"
+		}
+		if item.Password != "-" {
+			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Password), global.Config.EncryptionPassword)
+			if err != nil {
+				return err
+			}
+			item.Password = base64.StdEncoding.EncodeToString(encryptedCBC)
 		}
 	case constant.PrivateKey:
 		item.Password = "-"
-		if len(item.Username) == 0 {
+		if item.Username == "" {
 			item.Username = "-"
 		}
-		if len(item.PrivateKey) == 0 {
+		if item.PrivateKey == "" {
 			item.PrivateKey = "-"
 		}
-		if len(item.Passphrase) == 0 {
+		if item.PrivateKey != "-" {
+			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.PrivateKey), global.Config.EncryptionPassword)
+			if err != nil {
+				return err
+			}
+			item.PrivateKey = base64.StdEncoding.EncodeToString(encryptedCBC)
+		}
+		if item.Passphrase == "" {
 			item.Passphrase = "-"
+		}
+		if item.Passphrase != "-" {
+			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Passphrase), global.Config.EncryptionPassword)
+			if err != nil {
+				return err
+			}
+			item.Passphrase = base64.StdEncoding.EncodeToString(encryptedCBC)
 		}
 	default:
 		return Fail(c, -1, "类型错误")
 	}
+	item.Encrypted = true
 
 	if err := credentialRepository.UpdateById(&item, id); err != nil {
 		return err
@@ -149,7 +174,7 @@ func CredentialGetEndpoint(c echo.Context) error {
 		return err
 	}
 
-	item, err := credentialRepository.FindById(id)
+	item, err := credentialRepository.FindByIdAndDecrypt(id)
 	if err != nil {
 		return err
 	}

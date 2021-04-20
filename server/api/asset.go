@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -199,6 +200,9 @@ func AssetUpdateEndpoint(c echo.Context) error {
 		item.Description = "-"
 	}
 
+	if err := assetRepository.Encrypt(&item, global.Config.EncryptionPassword); err != nil {
+		return err
+	}
 	if err := assetRepository.UpdateById(&item, id); err != nil {
 		return err
 	}
@@ -264,7 +268,7 @@ func AssetGetEndpoint(c echo.Context) (err error) {
 	}
 
 	var item model.Asset
-	if item, err = assetRepository.FindById(id); err != nil {
+	if item, err = assetRepository.FindByIdAndDecrypt(id); err != nil {
 		return err
 	}
 	attributeMap, err := assetRepository.FindAssetAttrMapByAssetId(id)
@@ -289,9 +293,12 @@ func AssetTcpingEndpoint(c echo.Context) (err error) {
 
 	active := utils.Tcping(item.IP, item.Port)
 
-	if err := assetRepository.UpdateActiveById(active, item.ID); err != nil {
-		return err
+	if item.Active != active {
+		if err := assetRepository.UpdateActiveById(active, item.ID); err != nil {
+			return err
+		}
 	}
+
 	return Success(c, active)
 }
 

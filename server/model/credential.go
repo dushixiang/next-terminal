@@ -14,6 +14,7 @@ type Credential struct {
 	Passphrase string         `json:"passphrase"`
 	Created    utils.JsonTime `json:"created"`
 	Owner      string         `gorm:"index" json:"owner"`
+	Encrypted  bool           `json:"encrypted"`
 }
 
 func (r *Credential) TableName() string {

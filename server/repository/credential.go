@@ -1,8 +1,12 @@
 package repository
 
 import (
+	"encoding/base64"
+
 	"next-terminal/pkg/constant"
+	"next-terminal/pkg/global"
 	"next-terminal/server/model"
+	"next-terminal/server/utils"
 
 	"gorm.io/gorm"
 )
@@ -65,6 +69,9 @@ func (r CredentialRepository) Find(pageIndex, pageSize int, name, order, field s
 }
 
 func (r CredentialRepository) Create(o *model.Credential) (err error) {
+	if err := r.Encrypt(o, global.Config.EncryptionPassword); err != nil {
+		return err
+	}
 	if err = r.DB.Create(o).Error; err != nil {
 		return err
 	}
@@ -73,6 +80,79 @@ func (r CredentialRepository) Create(o *model.Credential) (err error) {
 
 func (r CredentialRepository) FindById(id string) (o model.Credential, err error) {
 	err = r.DB.Where("id = ?", id).First(&o).Error
+	return
+}
+
+func (r CredentialRepository) Encrypt(item *model.Credential, password []byte) error {
+	if item.Password != "-" {
+		encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Password), password)
+		if err != nil {
+			return err
+		}
+		item.Password = base64.StdEncoding.EncodeToString(encryptedCBC)
+	}
+	if item.PrivateKey != "-" {
+		encryptedCBC, err := utils.AesEncryptCBC([]byte(item.PrivateKey), password)
+		if err != nil {
+			return err
+		}
+		item.PrivateKey = base64.StdEncoding.EncodeToString(encryptedCBC)
+	}
+	if item.Passphrase != "-" {
+		encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Passphrase), password)
+		if err != nil {
+			return err
+		}
+		item.Passphrase = base64.StdEncoding.EncodeToString(encryptedCBC)
+	}
+	item.Encrypted = true
+	return nil
+}
+
+func (r CredentialRepository) Decrypt(item *model.Credential, password []byte) error {
+	if item.Encrypted {
+		if item.Password != "" && item.Password != "-" {
+			origData, err := base64.StdEncoding.DecodeString(item.Password)
+			if err != nil {
+				return err
+			}
+			decryptedCBC, err := utils.AesDecryptCBC(origData, password)
+			if err != nil {
+				return err
+			}
+			item.Password = string(decryptedCBC)
+		}
+		if item.PrivateKey != "" && item.PrivateKey != "-" {
+			origData, err := base64.StdEncoding.DecodeString(item.PrivateKey)
+			if err != nil {
+				return err
+			}
+			decryptedCBC, err := utils.AesDecryptCBC(origData, password)
+			if err != nil {
+				return err
+			}
+			item.PrivateKey = string(decryptedCBC)
+		}
+		if item.Passphrase != "" && item.Passphrase != "-" {
+			origData, err := base64.StdEncoding.DecodeString(item.Passphrase)
+			if err != nil {
+				return err
+			}
+			decryptedCBC, err := utils.AesDecryptCBC(origData, password)
+			if err != nil {
+				return err
+			}
+			item.Passphrase = string(decryptedCBC)
+		}
+	}
+	return nil
+}
+
+func (r CredentialRepository) FindByIdAndDecrypt(id string) (o model.Credential, err error) {
+	err = r.DB.Where("id = ?", id).First(&o).Error
+	if err == nil {
+		err = r.Decrypt(&o, global.Config.EncryptionPassword)
+	}
 	return
 }
 
@@ -105,5 +185,10 @@ func (r CredentialRepository) CountByUserId(userId string) (total int64, err err
 		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
 	}
 	err = db.Find(&model.Credential{}).Count(&total).Error
+	return
+}
+
+func (r CredentialRepository) FindAll() (o []model.Credential, err error) {
+	err = r.DB.Find(&o).Error
 	return
 }

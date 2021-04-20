@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/md5"
 	"fmt"
 
 	"next-terminal/pkg/config"
@@ -12,7 +13,7 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-const Version = "v0.3.4"
+const Version = "v0.4.0"
 
 func main() {
 	err := Run()
@@ -34,13 +35,27 @@ func Run() error {
 	// 为了兼容之前调用global包的代码 后期预期会改为调用pgk/config
 	global.Config = config.GlobalCfg
 
+	if global.Config.EncryptionKey == "" {
+		global.Config.EncryptionKey = "next-terminal"
+	}
+	md5Sum := fmt.Sprintf("%x", md5.Sum([]byte(global.Config.EncryptionKey)))
+	global.Config.EncryptionPassword = []byte(md5Sum)
+
 	global.Cache = api.SetupCache()
 	db := api.SetupDB()
 	e := api.SetupRoutes(db)
 
 	if global.Config.ResetPassword != "" {
-		return api.ResetPassword()
+		return api.ResetPassword(global.Config.ResetPassword)
 	}
+	if global.Config.ResetTotp != "" {
+		return api.ResetTotp(global.Config.ResetTotp)
+	}
+
+	if global.Config.NewEncryptionKey != "" {
+		return api.ChangeEncryptionKey(global.Config.EncryptionKey, global.Config.NewEncryptionKey)
+	}
+
 	sessionRepo := repository.NewSessionRepository(db)
 	propertyRepo := repository.NewPropertyRepository(db)
 	ticker := task.NewTicker(sessionRepo, propertyRepo)
