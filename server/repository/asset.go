@@ -235,6 +235,7 @@ func (r AssetRepository) FindByIdAndDecrypt(id string) (o model.Asset, err error
 }
 
 func (r AssetRepository) UpdateById(o *model.Asset, id string) error {
+	o.ID = id
 	return r.DB.Updates(o).Error
 }
 
