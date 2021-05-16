@@ -67,8 +67,7 @@ class Dashboard extends Component {
         return (
             <>
 
-                <div className="page-card">
-
+                <div style={{margin: 16, marginBottom: 0}}>
                     <Row gutter={16}>
                         <Col span={6}>
                             <Card bordered={true}>
