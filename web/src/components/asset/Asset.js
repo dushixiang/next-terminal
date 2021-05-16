@@ -339,7 +339,7 @@ class Asset extends Component {
         const protocol = record['protocol'];
         const name = record['name'];
         const sshMode = record['sshMode'];
-alert(sshMode)
+
         message.loading({content: '正在检测资产是否在线...', key: id});
         let result = await request.post(`/assets/${id}/tcping`);
         if (result.code === 1) {
