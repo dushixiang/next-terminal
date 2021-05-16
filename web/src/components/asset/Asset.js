@@ -338,19 +338,15 @@ class Asset extends Component {
         const id = record['id'];
         const protocol = record['protocol'];
         const name = record['name'];
-
+        const sshMode = record['sshMode'];
+alert(sshMode)
         message.loading({content: '正在检测资产是否在线...', key: id});
         let result = await request.post(`/assets/${id}/tcping`);
         if (result.code === 1) {
             if (result.data === true) {
                 message.success({content: '检测完成，您访问的资产在线，即将打开窗口进行访问。', key: id, duration: 3});
-                if (protocol === 'ssh') {
-                    result = await request.get(`/assets/${id}/attributes`);
-                    if (result.code === 1 && result['data']['ssh-mode'] === 'naive') {
-                        window.open(`#/term?assetId=${id}&assetName=${name}`);
-                    } else {
-                        window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
-                    }
+                if (protocol === 'ssh' && sshMode === 'naive') {
+                    window.open(`#/term?assetId=${id}&assetName=${name}`);
                 } else {
                     window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
                 }
