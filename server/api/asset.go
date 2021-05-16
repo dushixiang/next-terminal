@@ -213,35 +213,6 @@ func AssetUpdateEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func AssetGetAttributeEndpoint(c echo.Context) error {
-
-	assetId := c.Param("id")
-	if err := PreCheckAssetPermission(c, assetId); err != nil {
-		return err
-	}
-
-	attributeMap, err := assetRepository.FindAssetAttrMapByAssetId(assetId)
-	if err != nil {
-		return err
-	}
-	return Success(c, attributeMap)
-}
-
-func AssetUpdateAttributeEndpoint(c echo.Context) error {
-	m := echo.Map{}
-	if err := c.Bind(&m); err != nil {
-		return err
-	}
-
-	assetId := c.Param("id")
-	protocol := c.QueryParam("protocol")
-	err := assetRepository.UpdateAttributes(assetId, protocol, m)
-	if err != nil {
-		return err
-	}
-	return Success(c, "")
-}
-
 func AssetDeleteEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	split := strings.Split(id, ",")

@@ -142,6 +142,22 @@ func (r AssetRepository) Find(pageIndex, pageSize int, name, protocol, tags stri
 
 	if o == nil {
 		o = make([]model.AssetForPage, 0)
+	} else {
+		for i := 0; i < len(o); i++ {
+			if o[i].Protocol == "ssh" {
+				attributes, err := r.FindAttrById(o[i].ID)
+				if err != nil {
+					continue
+				}
+
+				for j := range attributes {
+					if attributes[j].Name == constant.SshMode {
+						o[i].SshMode = attributes[j].Value
+						break
+					}
+				}
+			}
+		}
 	}
 	return
 }
