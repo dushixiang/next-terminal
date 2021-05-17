@@ -48,17 +48,7 @@ test/test
 
 [截图](docs/screenshot.md)
 
-## 捐赠
-
-如果您觉得 next-terminal 对你有帮助，欢迎给予我们一定的捐助来维持项目的长期发展。
-
-
-![截图](screenshot/donate_wx.png)
-![截图](screenshot/donate_zfb.png)
-
 ## 联系方式
-
-- 邮箱 helloworld1024@foxmail.com
 
 - QQ群 938145268
 
