@@ -64,6 +64,8 @@ func SetupConfig() *Config {
 	pflag.String("server.cert", "", "tls cert file")
 	pflag.String("server.key", "", "tls key file")
 	pflag.String("reset-password", "", "")
+	pflag.String("encryption-key", "", "")
+	pflag.String("new-encryption-key", "", "")
 
 	pflag.Parse()
 	_ = viper.BindPFlags(pflag.CommandLine)
