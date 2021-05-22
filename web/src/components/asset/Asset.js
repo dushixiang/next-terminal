@@ -688,6 +688,7 @@ class Asset extends Component {
                                         <Select.Option value="ssh">ssh</Select.Option>
                                         <Select.Option value="vnc">vnc</Select.Option>
                                         <Select.Option value="telnet">telnet</Select.Option>
+                                        <Select.Option value="kubernetes">kubernetes</Select.Option>
                                     </Select>
 
                                     <Tooltip title='重置查询'>
