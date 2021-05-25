@@ -5,7 +5,6 @@ import request from "../../common/request";
 import './Dashboard.css'
 import {Link} from "react-router-dom";
 import {Area} from '@ant-design/charts';
-
 import {isAdmin} from "../../service/permission";
 
 class Dashboard extends Component {
@@ -50,6 +49,12 @@ class Dashboard extends Component {
         }, () => this.getD())
     }
 
+    handleLinkClick = (e) => {
+        if (!isAdmin()) {
+            e.preventDefault();
+        }
+    }
+
     render() {
 
         const config = {
@@ -71,7 +76,7 @@ class Dashboard extends Component {
                     <Row gutter={16}>
                         <Col span={6}>
                             <Card bordered={true}>
-                                <Link to={'/user'} disabled={!isAdmin()}>
+                                <Link to={'/user'} onClick={this.handleLinkClick}>
                                     <Statistic title="在线用户" value={this.state.counter['user']}
                                                prefix={<UserOutlined/>}/>
                                 </Link>
@@ -96,7 +101,7 @@ class Dashboard extends Component {
                         </Col>
                         <Col span={6}>
                             <Card bordered={true}>
-                                <Link to={'/online-session'} disabled={!isAdmin()}>
+                                <Link to={'/online-session'} onClick={this.handleLinkClick}>
                                     <Statistic title="在线会话" value={this.state.counter['onlineSession']}
                                                prefix={<LinkOutlined/>}/>
                                 </Link>
