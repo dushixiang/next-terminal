@@ -36,6 +36,7 @@ type AssetForPage struct {
 	Owner       string         `json:"owner"`
 	OwnerName   string         `json:"ownerName"`
 	SharerCount int64          `json:"sharerCount"`
+	SshMode     string         `json:"sshMode"`
 }
 
 func (r *Asset) TableName() string {
