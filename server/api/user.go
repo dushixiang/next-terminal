@@ -49,7 +49,8 @@ func UserPagingEndpoint(c echo.Context) error {
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := userRepository.Find(pageIndex, pageSize, username, nickname, mail, order, field)
+	account, _ := GetCurrentAccount(c)
+	items, total, err := userRepository.Find(pageIndex, pageSize, username, nickname, mail, order, field, account)
 	if err != nil {
 		return err
 	}

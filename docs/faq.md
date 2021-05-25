@@ -124,7 +124,7 @@ Mar  5 20:00:16.923 [DEBU] 用户「admin」已重置TOTP
 执行命令
 
 ```shell
-./next-terminal --encryption-key 旧的加密key new-encryption-key 新的的加密key
+./next-terminal --encryption-key 旧的加密key --new-encryption-key 新的的加密key
 ```
 
 成功之后会输出
