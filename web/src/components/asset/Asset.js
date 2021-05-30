@@ -877,7 +877,7 @@ class Asset extends Component {
 
                                     <Button type="primary" onClick={() => {
 
-                                        let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description';
+                                        let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description,tag1|tag2|tag3';
                                         //前置的"\uFEFF"为“零宽不换行空格”，可处理中文乱码问题
                                         const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
                                         let a = document.createElement('a');
