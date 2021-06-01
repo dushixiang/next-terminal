@@ -269,6 +269,13 @@ class UserGroup extends Component {
             title: '名称',
             dataIndex: 'name',
             sorter: true,
+            render: (name, record, index) => {
+                return (
+                    <Button type="link" size='small'
+                            loading={this.state.items[index].updateBtnLoading}
+                            onClick={() => this.showModal('更新用户组', record['id'], index)}>{name}</Button>
+                );
+            }
         }, {
             title: '授权资产',
             dataIndex: 'assetCount',

@@ -335,16 +335,27 @@ class Credential extends Component {
             title: '凭证名称',
             dataIndex: 'name',
             key: 'name',
-            render: (name, record) => {
+            render: (name, record, index) => {
                 let short = name;
                 if (short && short.length > 20) {
                     short = short.substring(0, 20) + " ...";
                 }
-                return (
-                    <Tooltip placement="topLeft" title={name}>
-                        {short}
-                    </Tooltip>
-                );
+                if (hasPermission(record['owner'])) {
+                    return (
+                        <Button type="link" size='small' loading={this.state.items[index].updateBtnLoading}
+                                onClick={() => this.showModal('更新凭证', record.id, index)}>
+                            <Tooltip placement="topLeft" title={name}>
+                                {short}
+                            </Tooltip>
+                        </Button>
+                    );
+                } else {
+                    return (
+                        <Tooltip placement="topLeft" title={name}>
+                            {short}
+                        </Tooltip>
+                    );
+                }
             },
             sorter: true,
         }, {
