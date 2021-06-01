@@ -13,7 +13,7 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
-const Version = "v0.4.1"
+const Version = "v0.5.0"
 
 func main() {
 	err := Run()

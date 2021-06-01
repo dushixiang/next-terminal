@@ -470,11 +470,22 @@ class Asset extends Component {
                 if (short && short.length > 20) {
                     short = short.substring(0, 20) + " ...";
                 }
-                return (
-                    <Tooltip placement="topLeft" title={name}>
-                        {short}
-                    </Tooltip>
-                );
+
+                if (hasPermission(record['owner'])) {
+                    return (
+                        <Button type="link" size='small' onClick={() => this.update(record.id)}>
+                            <Tooltip placement="topLeft" title={name}>
+                                {short}
+                            </Tooltip>
+                        </Button>
+                    );
+                } else {
+                    return (
+                        <Tooltip placement="topLeft" title={name}>
+                            {short}
+                        </Tooltip>
+                    );
+                }
             },
             sorter: true,
         }, {
@@ -688,6 +699,7 @@ class Asset extends Component {
                                         <Select.Option value="ssh">ssh</Select.Option>
                                         <Select.Option value="vnc">vnc</Select.Option>
                                         <Select.Option value="telnet">telnet</Select.Option>
+                                        <Select.Option value="kubernetes">kubernetes</Select.Option>
                                     </Select>
 
                                     <Tooltip title='重置查询'>
@@ -876,7 +888,7 @@ class Asset extends Component {
 
                                     <Button type="primary" onClick={() => {
 
-                                        let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description';
+                                        let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description,tag1|tag2|tag3';
                                         //前置的"\uFEFF"为“零宽不换行空格”，可处理中文乱码问题
                                         const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
                                         let a = document.createElement('a');
