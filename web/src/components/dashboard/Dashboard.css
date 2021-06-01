@@ -2,3 +2,6 @@
     width: 100px;
     text-align: center;
 }
+.disable-link {
+    pointer-events: none;
+}

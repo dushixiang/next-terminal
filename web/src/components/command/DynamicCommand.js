@@ -370,11 +370,21 @@ class DynamicCommand extends Component {
                 if (short && short.length > 20) {
                     short = short.substring(0, 20) + " ...";
                 }
-                return (
-                    <Tooltip placement="topLeft" title={name}>
-                        {short}
-                    </Tooltip>
-                );
+                if (hasPermission(record['owner'])) {
+                    return (
+                        <Button type="link" size='small' onClick={() => this.showModal('更新指令', record)}>
+                            <Tooltip placement="topLeft" title={name}>
+                                {short}
+                            </Tooltip>
+                        </Button>
+                    );
+                } else {
+                    return (
+                        <Tooltip placement="topLeft" title={name}>
+                            {short}
+                        </Tooltip>
+                    );
+                }
             },
             sorter: true,
         }, {

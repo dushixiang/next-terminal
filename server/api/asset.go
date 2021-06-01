@@ -99,6 +99,11 @@ func AssetImportEndpoint(c echo.Context) error {
 				Owner:       account.ID,
 			}
 
+			if len(record) >= 10 {
+				tags := strings.ReplaceAll(record[9], "|", ",")
+				asset.Tags = tags
+			}
+
 			err := assetRepository.Create(&asset)
 			if err != nil {
 				errorCount++
