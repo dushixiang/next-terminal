@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"regexp"
 	"strconv"
@@ -34,10 +33,11 @@ const (
 var statisticsError = errors.New("Get base monitor error")
 
 type MonitorInfo struct {
-	BaseInfo BaseInfo     `json:"base_info"`
-	Docker   []DockerInfo `json:"docker"`
-	NetWork  NewWork      `json:"net_work"`
-	Datetime time.Time    `json:"datetime"`
+	BaseInfo     BaseInfo     `json:"base_info"`
+	Docker       []DockerInfo `json:"docker"`
+	NetWork      NewWork      `json:"net_work"`
+	Datetime     time.Time    `json:"datetime"`
+	HardwareInfo HardwareInfo `json:"hardware_info"`
 }
 
 type NewWork struct {
@@ -47,21 +47,41 @@ type NewWork struct {
 	TxSpeedPreSecond int64  `json:"tx_speed_pre_second"`
 }
 
+type HardwareInfo struct {
+	CPUModel     string       `json:"cpu"`
+	CPUCount     int          `json:"cpu_count"`
+	RootDiskInfo RootDiskInfo `json:"root_disk_info"`
+}
+
+type RootDiskInfo struct {
+	Fs         string `json:"fs"`
+	Total      uint   `json:"total"`
+	Used       uint   `json:"used"`
+	Free       uint   `json:"free"`
+	Percentage string `json:"percentage"`
+	Mount      string `json:"mount"`
+}
+
 type BaseInfo struct {
 	// uptime
 	Uptime     string `json:"uptime"`
 	OnlineUser int    `json:"online_user"`
+
+	// load avg
+	LoadAvg string `json:"load_avg"`
 	// memory
 	Total int64 `json:"total"`
 	Free  int64 `json:"free"`
 	Used  int64 `json:"used"`
 	Cache int64 `json:"cache"`
 	// cpu
-	TotalUse float64 `json:"total_use"`
-	SysUse   float64 `json:"sys_use"`
-	UserUse  float64 `json:"user_use"`
-	IOWait   float64 `json:"io_wait"`
-	Steal    float64 `json:"steal"`
+	TotalUse       float64 `json:"total_use"`
+	SysUse         float64 `json:"sys_use"`
+	UserUse        float64 `json:"user_use"`
+	IOWait         float64 `json:"io_wait"`
+	Steal          float64 `json:"steal"`
+	ReleaseVersion string  `json:"release_version"`
+	HostName       string  `json:"host_name"`
 }
 
 type DockerInfo struct {
@@ -72,23 +92,13 @@ type DockerInfo struct {
 }
 
 func GetNetWorkInfo(client *ssh.Client) (ret NewWork, err error) {
-	session, err := client.NewSession()
-	if err != nil {
-		err = errors.Wrap(err, "NewSession")
-		return
-	}
-	stdOut, _ := session.StdoutPipe()
-	err = session.Run(NetWorkCMD)
-	if err != nil {
-		err = errors.Wrap(err, "exec cmd error")
-		return
-	}
-	res, err := ioutil.ReadAll(stdOut)
+
+	stdout, err := term.ExecCmd(client, NetWorkCMD)
 	if err != nil {
 		err = errors.Wrap(err, "red stdout error")
 		return
 	}
-	resStr := strings.Split(string(res), "\n")
+	resStr := strings.Split(string(stdout), "\n")
 	if len(resStr) != 5 {
 		return
 	}
@@ -117,7 +127,6 @@ func GetNetWorkInfo(client *ssh.Client) (ret NewWork, err error) {
 
 		case 3:
 			secondTx, totalTx, err = utils.ParseNetReg(line, txReg, 3, 1)
-
 			if err != nil {
 				return
 			}
@@ -133,31 +142,19 @@ func GetNetWorkInfo(client *ssh.Client) (ret NewWork, err error) {
 }
 
 func GetDockerInfo(client *ssh.Client) (ret []DockerInfo, err error) {
-	session, err := client.NewSession()
+	whereOut, err := term.ExecCmd(client, "whereis docker")
 	if err != nil {
 		return nil, err
 	}
-	stdIn, err := session.StdinPipe()
-	if err != nil {
+	if string(whereOut) == "docker:" {
+		log.Info("未安装docker skip")
 		return
 	}
-	var outBf, errBf bytes.Buffer
-	session.Stdout = &outBf
-	session.Stderr = &errBf
-	if err = session.Shell(); err != nil {
-		return
-	}
-	_, err = stdIn.Write([]byte("whereis docker\n"))
-	if err != nil {
-		return
-	}
-	fmt.Print(outBf.String())
-	_, err = stdIn.Write([]byte(DockerCMD + "\n"))
+	dockerOut, err := term.ExecCmd(client, DockerCMD+"\n")
 	if err != nil {
 		return nil, err
 	}
-	//res, _ := ioutil.ReadAll(outBf)
-	for _, line := range strings.Split(outBf.String(), "\n")[1:] {
+	for _, line := range strings.Split(string(dockerOut), "\n")[1:] {
 		if line == "" {
 			continue
 		}
@@ -174,9 +171,6 @@ func GetDockerInfo(client *ssh.Client) (ret []DockerInfo, err error) {
 		})
 
 	}
-	defer func() {
-		session.Close()
-	}()
 	return
 }
 
@@ -204,7 +198,7 @@ func getBaseInfo(client *ssh.Client) (ret BaseInfo, err error) {
 		return
 	}
 	data := strings.Split(string(res), "\n")
-	if len(data) < 3 {
+	if len(data) < 5 {
 		return
 	}
 	upReg := regexp.MustCompile(`up\s(\d+\s\w+),`)
@@ -279,7 +273,68 @@ func getBaseInfo(client *ssh.Client) (ret BaseInfo, err error) {
 			}
 		}
 	}
+	if hostRes, err := term.ExecCmd(client, "hostname"); err != nil {
+		return ret, errors.Wrap(err, "get host name failed")
+	} else {
+		ret.HostName = strings.TrimSpace(string(hostRes))
+	}
+	if releaseVersion, err := term.ExecCmd(client, "cat /etc/os-release | grep PRETTY_NAME"); err != nil {
+		return ret, errors.Wrap(err, "get release version failed")
+	} else {
+		regRet, err := utils.RegexpFindSubString(string(releaseVersion), regexp.MustCompile(`PRETTY_NAME="(.*?)"`))
+		if err != nil {
+			return ret, errors.Wrap(err, "get release version failed")
+		}
+		ret.ReleaseVersion = strings.TrimSpace(regRet)
+	}
 	return
+}
+
+func GetHardWareInfo(client *ssh.Client) (ret HardwareInfo, err error) {
+	cpuInfo, err := term.ExecCmd(client, "cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c")
+	if err != nil {
+		return ret, errors.Wrap(err, "get cpu info  cmd failed")
+	}
+	cpuInfoList := regexp.MustCompile(`(\d+)(\s+\w+.*)\n`).FindStringSubmatch(string(cpuInfo))
+	if len(cpuInfoList) != 3 {
+		return ret, errors.New("get cpu info failed ")
+	}
+	ret.CPUModel = cpuInfoList[2]
+	count, _ := strconv.Atoi(cpuInfoList[1])
+	ret.CPUCount = count
+	return
+}
+
+func GetDiskInfo(client *ssh.Client) (ret RootDiskInfo, err error) {
+	diskRes, err := term.ExecCmd(client, "df --block-size 1M --local | grep dev")
+	if err != nil {
+		return
+	}
+	diskRegRes := regexp.MustCompile(`(\/.*?)\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+%)\s+(\/)`).FindStringSubmatch(strings.TrimSpace(string(diskRes)))
+	if len(diskRegRes) != 7 {
+		return ret, errors.New("get root disk failed")
+	}
+	ret.Fs = diskRegRes[1]
+	if total, err := utils.String2int(diskRegRes[2]); err != nil {
+		return ret, errors.Wrap(err, "parse int failed")
+	} else {
+		ret.Total = uint(total)
+	}
+	if used, err := utils.String2int(diskRegRes[3]); err != nil {
+		return ret, errors.Wrap(err, "parse int failed")
+	} else {
+		ret.Used = uint(used)
+	}
+	if free, err := utils.String2int(diskRegRes[4]); err != nil {
+		return ret, errors.Wrap(err, "parse int failed")
+	} else {
+		ret.Free = uint(free)
+	}
+
+	ret.Percentage = diskRegRes[5]
+	ret.Mount = diskRegRes[6]
+	return
+
 }
 
 func MonitorEndpoint(c echo.Context) (err error) {
@@ -334,12 +389,14 @@ func MonitorEndpoint(c echo.Context) (err error) {
 				log.Error(errors.New("format error"))
 				return WriteMessage(ws, NewMessage(Closed, "Get docker status error"))
 			}
+			log.Info("get docker info success")
 			returnData.Docker = dockerInfo
 			base, err := getBaseInfo(terminal)
 			if err != nil {
 				log.Error(err, "getBaseInfo error")
 				return WriteMessage(ws, NewMessage(Closed, "Get base status error"))
 			}
+			log.Info("get base info success")
 			returnData.BaseInfo = base
 
 			netInfo, err := GetNetWorkInfo(terminal)
@@ -347,15 +404,28 @@ func MonitorEndpoint(c echo.Context) (err error) {
 				log.Error(err, "Get network error")
 				return WriteMessage(ws, NewMessage(Closed, "get monitor error"))
 			}
+			log.Info("Get network success")
+
 			returnData.NetWork = netInfo
 
+			hardwareInfo, err := GetHardWareInfo(terminal)
+			if err != nil {
+				log.Error("get hardware info failed")
+				return WriteMessage(ws, NewMessage(Closed, "get hardware failed"))
+			}
+			returnData.HardwareInfo = hardwareInfo
+			diskInfp, err := GetDiskInfo(terminal)
+			if err != nil {
+				log.Error("get disk info failed")
+				return WriteMessage(ws, NewMessage(Closed, "get disk failed"))
+			}
+			returnData.HardwareInfo.RootDiskInfo = diskInfp
 			data, err := json.Marshal(returnData)
 			if err != nil {
 				log.Error(errors.Wrap(err, "Marshal error"))
 				return WriteMessage(ws, NewMessage(Closed, "get monitor error"))
 			}
 			WriteByteMessage(ws, data)
-			time.After(1 * time.Second)
 		}
 	}
 	return

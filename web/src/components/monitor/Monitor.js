@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import './Monitor.css';
-import ReactEcharts from 'echarts-for-react'
 import Layout from "antd/lib/layout/layout";
 import {Col, Descriptions, Row, Table} from "antd"
 import {wsServer} from "../../common/env";
@@ -8,6 +7,8 @@ import {getToken} from "../../utils/utils";
 import {message} from "antd/es";
 import moment from 'moment';
 import qs from "qs";
+import {SwapOutlined} from "@ant-design/icons";
+import {Line, Pie} from '@ant-design/charts';
 
 
 const {Content} = Layout
@@ -22,7 +23,12 @@ class StatusMonitor extends Component {
         totalRx: "",
         totalTx: "",
         memory: {},
-        cpuInfo: []
+        cpuInfo: [],
+        rx: 0,
+        tx: 0,
+        tx_speed: 0,
+        rx_speed: 0,
+        hardware: {root_disk_info: {}}
 
     }
 
@@ -46,7 +52,7 @@ class StatusMonitor extends Component {
         webSocket.onopen = (e => {
             pingInterval = setInterval(() => {
                 webSocket.send("status")
-            }, 1000);
+            }, 3000);
         });
 
         webSocket.onerror = (e) => {
@@ -86,7 +92,7 @@ class StatusMonitor extends Component {
                 "used": baseInfo["used"],
                 "cache": baseInfo["cache"]
             }
-
+            console.log(data)
             this.setState({
                 baseInfo: data["base_info"],
                 cpuInfo: CpuInfo,
@@ -96,7 +102,10 @@ class StatusMonitor extends Component {
                 upTime: data['base_info']['uptime'],
                 onlineUser: data['base_info']["online_user"],
                 totalRx: data['net_work']["rx_total"],
-                totalTx: data['net_work']["tx_total"]
+                totalTx: data['net_work']["tx_total"],
+                rx_speed: data["net_work"]["rx_speed_pre_second"],
+                tx_speed: data["net_work"]["tx_speed_pre_second"],
+                hardware: data["hardware_info"]
             })
         }
     }
@@ -111,19 +120,22 @@ class StatusMonitor extends Component {
 
     parseMemory() {
         let ret = []
-
         let memory = this.state.memory
         Object.keys(memory).forEach(function (key) {
-            ret.push({value: memory[key]/1000, name: key})
+            let data = {value: memory[key] / 1024 | 0, name: key}
+            // switch (key) {
+            //     case "free":
+            //         data["name"] = "空闲"
+            //         break
+            //     case "used":
+            //         data["name"] = "已使用"
+            //         break
+            //     case "cache":
+            //         data["name"] = "缓存"
+            // }
+            ret.push(data)
         })
-        return ret
-    }
-
-    parseCpuTime() {
-        let ret = []
-        this.state.cpuInfo.forEach(function (item) {
-            ret.push(item['datetime'])
-        })
+        console.log(this.state.memory)
         return ret
     }
 
@@ -132,7 +144,6 @@ class StatusMonitor extends Component {
             user: [],
             sys: [],
             total: [],
-
         }
 
         this.state.cpuInfo.forEach(function (item) {
@@ -143,123 +154,41 @@ class StatusMonitor extends Component {
         return ret
     }
 
+    AntCpuInfo() {
+        let ret = []
+        this.state.cpuInfo.forEach(function (data) {
+            ["sys", "user"].forEach(function (item) {
+
+                let single = {
+                    "name": item,
+                    "data": data[item],
+                    "datetime": data['datetime']
+                }
+                if (item === "sys") {
+                    single["name"] = "系统"
+                } else if (item === "user") {
+                    single["name"] = "用户"
+                }
+                ret.push(single)
+            })
+            ret.push({
+                "name": "总体",
+                "data": data["sys"] + data["user"],
+                "datetime": data['datetime']
+            })
+
+        })
+        return ret
+    }
+
     render() {
-        let cpuData = this.parseCpuData()
-        let baseOption = {
-            title: {
-                text: 'CPU使用率'
-            },
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data: ['用户', '系统', '总量']
-            },
-            grid: {
-                left: '3%',
-                right: '4%',
-                bottom: '3%',
-                containLabel: true
-            },
-            toolbox: {
-                feature: {
-                    saveAsImage: {}
-                }
-            },
-            xAxis: {
-                type: 'category',
-                boundaryGap: false,
-                data: this.parseCpuTime()
-            },
-            yAxis: {
-                type: 'value',
-                max: 100
-            },
-            series: [
-                {
-                    name: '用户',
-                    type: 'line',
-                    stack: '用户',
-                    data: cpuData["user"],
-                    smooth: true
-                },
-                {
-                    name: '系统',
-                    type: 'line',
-                    stack: '系统',
-                    data: cpuData["sys"],
-                    smooth: true
-                },
-                {
-                    name: '总量',
-                    type: 'line',
-                    stack: '总量',
-                    data: cpuData["total"],
-                    smooth: true
-                }
+        let txList = this.state.totalTx.split(" ")
+        let rxList = this.state.totalRx.split(" ")
+        if (txList.length > 1 && rxList.length > 1) {
+            this.state.tx = parseInt(txList[0])
+            this.state.rx = parseInt(rxList[0])
+        }
 
-            ]
-        };
-        const memoryOption = {
-            title: {
-                text: '内存使用分布',
-                left: 'center'
-            },
-            tooltip: {
-                trigger: 'item'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-            },
-            series: [
-                {
-                    name: '内存分布',
-                    type: 'pie',
-                    radius: '50%',
-                    data: this.parseMemory(),
-                    emphasis: {
-                        itemStyle: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 1)'
-                        }
-                    }
-                }
-            ]
-        };
-
-        const netWorkOption = {
-            title: {
-                text: '网络流量',
-                left: 'center'
-            },
-            tooltip: {
-                trigger: 'item'
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-            },
-            series: [
-                {
-                    name: "流量分布",
-                    type: 'pie',
-                    radius: '50%',
-                    data: [
-                        {value: this.state.totalTx, name: '发送', itemStyle: {"color": "#087cd2"}},
-                        {value: this.state.totalRx, name: '接收', itemStyle: {"color": "#7ce0a0"}},
-                    ],
-                    emphasis: {
-                        itemStyle: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 1)'
-                        }
-                    }
-                }
-            ]
-        };
 
         const containerColumns = [
             {
@@ -283,59 +212,224 @@ class StatusMonitor extends Component {
                 key: 'mem_usage_limit',
             }
         ];
-        console.log(this.state.totalTx)
-        console.log(this.state.totalRx)
+        var CPUInfo = {
+            height: 300,
+            data: this.AntCpuInfo(),
+            xField: 'datetime',
+            yField: 'data',
+            seriesField: 'name',
+            yAxis: {
+                maxLimit: 100
+            },
+
+            legend: {position: 'top'},
+            smooth: true,
+            animation: {
+                appear: {
+                    animation: 'grow-in-x',
+                    duration: 5000,
+                },
+                update: false
+            },
+        };
+        let memory = this.parseMemory()
+        var MemInfo = {
+            height: 250,
+            appendPadding: 10,
+            data: [
+                {name: "使用", value: memory.length > 1 ? memory[1]["value"] : 0},
+                {name: "空闲", value: memory.length > 1 ? memory[0]["value"] : 0},
+                {name: "缓存", value: memory.length > 1 ? memory[2]["value"] : 0},
+            ],
+            angleField: 'value',
+            colorField: 'name',
+            radius: 1,
+            innerRadius: 0.64,
+            animation: false,
+            label: {
+                type: 'inner',
+                offset: '-50%',
+                content: '{value}',
+                style: {
+                    textAlign: 'center',
+                    fontSize: 14,
+                },
+            },
+            meta: {
+                value: {
+                    alias: '内存',
+                    formatter: v => {
+                        return `${v}M`;
+                    }
+                }
+            },
+            interactions: [{type: 'element-selected'}, {type: 'element-active'}],
+            statistic: {
+                title: false,
+                content: {
+                    style: {
+                        whiteSpace: 'pre-wrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    },
+                    formatter: function formatter() {
+                        return '内存使用';
+                    },
+                },
+            },
+        };
+
+        var NetInfo = {
+            height: 250,
+            appendPadding: 10,
+            data: [
+                {value: this.state.tx, name: '发送'},
+                {value: this.state.rx, name: '接收'},
+            ],
+            meta: {
+                value: {
+                    alias: '流量',
+                    formatter: v => {
+                        return `${v}G`;
+                    }
+                }
+            },
+
+            angleField: 'value',
+            colorField: 'name',
+            radius: 1,
+            innerRadius: 0.64,
+            animation: false,
+            label: {
+                type: 'inner',
+                offset: '-50%',
+                content: '{value}',
+                style: {
+                    textAlign: 'center',
+                    fontSize: 14,
+                },
+            },
+            interactions: [{type: 'element-selected'}, {type: 'element-active'}],
+            statistic: {
+                title: false,
+                content: {
+                    style: {
+                        whiteSpace: 'pre-wrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    },
+                    formatter: function formatter() {
+                        return '网络';
+                    },
+                },
+            },
+        };
+        console.log(this.state.hardware)
+        let use = this.state.hardware["root_disk_info"]["used"] / 1024
+        let free = this.state.hardware["root_disk_info"]["free"] / 1024
+        var DiskInfo = {
+            height: 250,
+            appendPadding: 10,
+            data: [
+                {value: (free | 0), name: '空闲'},
+                {value: (use | 0), name: '已使用'},
+            ],
+
+            meta: {
+                value: {
+                    alias: '内存',
+                    formatter: v => {
+                        return `${v}G`;
+                    }
+                }
+            },
+            maxLimit: this.state.hardware["root_disk_info"],
+            angleField: 'value',
+            colorField: 'name',
+            radius: 1,
+            innerRadius: 0.64,
+            animation: false,
+            label: {
+                type: 'inner',
+                offset: '-50%',
+                content: '{value}',
+                style: {
+                    textAlign: 'center',
+                    fontSize: 14,
+                },
+            },
+            interactions: [{type: 'element-selected'}, {type: 'element-active'}],
+            statistic: {
+                title: false,
+                content: {
+                    style: {
+                        whiteSpace: 'pre-wrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                    },
+                    formatter: function formatter() {
+                        return '磁盘使用';
+                    },
+                },
+            },
+        };
         return (
             <>
-                <Content>
-                    <Row gutter={5} justify="start" style={{padding: 18}}>
+                <Content style={{padding: 30}}>
+                    <Row gutter={5} justify="start">
                         <Col>
                             <Descriptions title="系统信息">
                                 <Descriptions.Item label="开机时长">{this.state.upTime}</Descriptions.Item>
                                 <Descriptions.Item label="在线用户">{this.state.onlineUser}</Descriptions.Item>
-                                <Descriptions.Item label="发送">{this.state.totalTx}</Descriptions.Item>
-                                <Descriptions.Item label="接收">{this.state.totalRx}</Descriptions.Item>
-
+                                <Descriptions.Item label="CPU个数">{this.state.hardware["cpu_count"]}</Descriptions.Item>
+                                <Descriptions.Item label="CPU Model">{this.state.hardware["cpu"]}</Descriptions.Item>
+                                <Descriptions.Item
+                                    label="内存">{this.state.baseInfo == null ? "" : (this.state.baseInfo["total"] / 1024 / 1025).toFixed(1) + "G"}</Descriptions.Item>
+                                <Descriptions.Item
+                                    label="hostname">{this.state.baseInfo == null ? "" : this.state.baseInfo["host_name"]}</Descriptions.Item>
                             </Descriptions>
                         </Col>
 
                     </Row>
-                    <Row justify="left" gutter={18} style={{padding: 18}}>
+                    <Row justify="left" gutter={18} style={{padding: 30}}>
 
-                        <Col span={12}>
-                            <ReactEcharts
-                                style={{height: 300, width: 500, padding: 10}}
-                                notMerge={true}
-                                lazyUpdate={true}
-                                option={memoryOption}/>
-
+                        <Col span={8}>
+                            <Pie {...MemInfo}/>
                         </Col>
-                        <Col span={12}>
-                            <ReactEcharts
-                                style={{height: 300, width: 500, padding: 10}}
-                                notMerge={true}
-                                lazyUpdate={true}
-                                option={netWorkOption}/>
+                        <Col span={8}>
+                            <Pie {...NetInfo}/>
+                            <div style={{height: 10, textAlign: "center"}}>
+                                <SwapOutlined/>
+                                <span>当前网速:上传:{(this.state.tx_speed / 1024).toFixed(1)}Kb/s 下载:{(this.state.rx_speed / 1024).toFixed(1)}Kb/s</span>
+                            </div>
+                        </Col>
+                        <Col span={8}>
+                            <Pie {...DiskInfo}/>
+                            <div style={{height: 10, textAlign: "center"}}>
 
+                                <span>rootFS:{this.state.hardware["root_disk_info"]['fs']}</span>
+
+                                <span>挂载:{this.state.hardware["root_disk_info"]['fs']}</span>
+
+                            </div>
                         </Col>
                     </Row>
-                    <Row justify="center" style={{paddingTop: 10}}>
+                    <Row justify="center" style={{paddingTop: 18}}>
                         <Col span={20}>
                             <div className="Status">
-                                <ReactEcharts
-                                    style={{height: 300, width: 1100, padding: 10}}
-                                    notMerge={true}
-                                    lazyUpdate={true}
-                                    option={baseOption}/>
+                                <Line {...CPUInfo} />
                             </div>
                         </Col>
 
                     </Row>
+                    {
+                        this.state.dockerInfo != null &&
+                        <Table columns={containerColumns}
+                               dataSource={this.state.dockerInfo}
+                               pagination={false}
+                               style={{padding: 30}}/>
+                    }
 
-                    <Table columns={containerColumns}
-                           dataSource={this.state.dockerInfo}
-                           pagination={false}
-                           style={{padding: 18}}/>
                 </Content>
 
             </>

@@ -23,12 +23,11 @@ import (
 	"strings"
 	"time"
 
-	"golang.org/x/crypto/pbkdf2"
-
 	"github.com/gofrs/uuid"
 	errors2 "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/crypto/pbkdf2"
 )
 
 type JsonTime struct {
@@ -310,4 +309,23 @@ func DeCryptPassword(cryptPassword string, key []byte) (string, error) {
 		return "", err
 	}
 	return string(decryptedCBC), nil
+}
+
+func RegexpFindSubString(text string, reg *regexp.Regexp) (ret string, err error) {
+	findErr := errors.New("regexp find failed")
+	res := reg.FindStringSubmatch(text)
+	if len(res) != 2 {
+		return "", findErr
+	}
+	return res[1], nil
+
+}
+
+func String2int(s string) (int, error) {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, err
+	}
+	return i, nil
+
 }

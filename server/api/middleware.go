@@ -115,6 +115,9 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		token := GetToken(c)
+		if token == "" {
+			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+		}
 		cacheKey := BuildCacheKeyByToken(token)
 		authorization, found := global.Cache.Get(cacheKey)
 		if !found {

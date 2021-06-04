@@ -52,3 +52,12 @@ func NewSshClient(ip string, port int, username, password, privateKey, passphras
 
 	return ssh.Dial("tcp", addr, config)
 }
+
+func ExecCmd(ssh *ssh.Client, cmd string) (out []byte, err error) {
+	session, err := ssh.NewSession()
+	if err != nil {
+		return nil, err
+	}
+	defer func() { session.Close() }()
+	return session.CombinedOutput(cmd)
+}
