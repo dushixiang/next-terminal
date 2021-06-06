@@ -92,7 +92,6 @@ class StatusMonitor extends Component {
                 "used": baseInfo["used"],
                 "cache": baseInfo["cache"]
             }
-            console.log(data)
             this.setState({
                 baseInfo: data["base_info"],
                 cpuInfo: CpuInfo,
@@ -135,7 +134,6 @@ class StatusMonitor extends Component {
             // }
             ret.push(data)
         })
-        console.log(this.state.memory)
         return ret
     }
 
@@ -324,7 +322,6 @@ class StatusMonitor extends Component {
                 },
             },
         };
-        console.log(this.state.hardware)
         let use = this.state.hardware["root_disk_info"]["used"] / 1024
         let free = this.state.hardware["root_disk_info"]["free"] / 1024
         var DiskInfo = {
@@ -407,9 +404,10 @@ class StatusMonitor extends Component {
                             <Pie {...DiskInfo}/>
                             <div style={{height: 10, textAlign: "center"}}>
 
-                                <span>rootFS:{this.state.hardware["root_disk_info"]['fs']}</span>
+                                <span>rootFS:{this.state.hardware["root_disk_info"]['fs']} </span>
 
-                                <span>挂载:{this.state.hardware["root_disk_info"]['fs']}</span>
+                                <span>挂载:{this.state.hardware["root_disk_info"]['mount']} </span>
+                                <span>已使用:{this.state.hardware["root_disk_info"]["percentage"]} </span>
 
                             </div>
                         </Col>
