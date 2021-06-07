@@ -43,7 +43,7 @@
   ],
   "homepage": ".",
   "devDependencies": {
-    "@ant-design/charts": "^1.0.13",
+    "@ant-design/charts": "^1.1.9",
     "@antv/g2": "^4.1.13",
     "ant-design-pro": "^2.3.2",
     "echarts-for-react": "^3.0.1",

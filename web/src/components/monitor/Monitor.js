@@ -39,7 +39,7 @@ class StatusMonitor extends Component {
     }
 
     componentDidMount() {
-        const dataLength = 10
+        const dataLength = 20
 
         let param = {
             'X-Auth-Token': getToken()
@@ -71,6 +71,8 @@ class StatusMonitor extends Component {
             let baseInfo = data["base_info"]
             let datetime = new Date(data["datetime"])
             let datetimeStr = moment(datetime).format("YYYY-MM-DD HH:mm:ss")
+            let txList = this.state.totalTx.split(" ")
+            let rxList = this.state.totalRx.split(" ")
             let singleCpuInfo = {
                 "sys": baseInfo['sys_use'],
                 "user": baseInfo["user_use"],
@@ -78,12 +80,12 @@ class StatusMonitor extends Component {
             }
             singleCpuInfo["total"] = singleCpuInfo["sys"] + singleCpuInfo["user"]
 
-            if (this.state.memoryInfo.length < 20) {
+            if (this.state.memoryInfo.length < dataLength) {
                 CpuInfo = this.state.memoryInfo
                 CpuInfo.push(singleCpuInfo)
 
             } else {
-                CpuInfo = this.state.memoryInfo.slice(1, 20)
+                CpuInfo = this.state.memoryInfo.slice(1, dataLength)
                 CpuInfo.push(singleCpuInfo)
                 this.setState({memoryInfo: CpuInfo})
             }
@@ -104,8 +106,15 @@ class StatusMonitor extends Component {
                 totalTx: data['net_work']["tx_total"],
                 rx_speed: data["net_work"]["rx_speed_pre_second"],
                 tx_speed: data["net_work"]["tx_speed_pre_second"],
-                hardware: data["hardware_info"]
+                hardware: data["hardware_info"],
+
             })
+            if (txList.length > 1 && rxList.length > 1){
+                this.setState({
+                    tx:parseInt(txList[0]),
+                    rx:parseInt(rxList[0])
+                })
+            }
         }
     }
 
@@ -122,16 +131,6 @@ class StatusMonitor extends Component {
         let memory = this.state.memory
         Object.keys(memory).forEach(function (key) {
             let data = {value: memory[key] / 1024 | 0, name: key}
-            // switch (key) {
-            //     case "free":
-            //         data["name"] = "空闲"
-            //         break
-            //     case "used":
-            //         data["name"] = "已使用"
-            //         break
-            //     case "cache":
-            //         data["name"] = "缓存"
-            // }
             ret.push(data)
         })
         return ret
@@ -180,12 +179,15 @@ class StatusMonitor extends Component {
     }
 
     render() {
-        let txList = this.state.totalTx.split(" ")
-        let rxList = this.state.totalRx.split(" ")
-        if (txList.length > 1 && rxList.length > 1) {
-            this.state.tx = parseInt(txList[0])
-            this.state.rx = parseInt(rxList[0])
-        }
+
+        // if (txList.length > 1 && rxList.length > 1) {
+        //     // this.state.tx = parseInt(txList[0])
+        //     // this.state.rx = parseInt(rxList[0])
+        //     this.setState({
+        //         tx:parseInt(txList[0]),
+        //         rx: parseInt(rxList[0])
+        //     })
+        // }
 
 
         const containerColumns = [
@@ -378,7 +380,7 @@ class StatusMonitor extends Component {
                             <Descriptions title="系统信息">
                                 <Descriptions.Item label="开机时长">{this.state.upTime}</Descriptions.Item>
                                 <Descriptions.Item label="在线用户">{this.state.onlineUser}</Descriptions.Item>
-                                <Descriptions.Item label="CPU个数">{this.state.hardware["cpu_count"]}</Descriptions.Item>
+                                <Descriptions.Item label="CPU核心数">{this.state.hardware["cpu_count"]}</Descriptions.Item>
                                 <Descriptions.Item label="CPU Model">{this.state.hardware["cpu"]}</Descriptions.Item>
                                 <Descriptions.Item
                                     label="内存">{this.state.baseInfo == null ? "" : (this.state.baseInfo["total"] / 1024 / 1025).toFixed(1) + "G"}</Descriptions.Item>
