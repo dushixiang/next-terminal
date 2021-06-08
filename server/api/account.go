@@ -1,6 +1,7 @@
 package api
 
 import (
+	"net/http"
 	"strings"
 	"time"
 
@@ -122,7 +123,7 @@ func LoginSuccess(c echo.Context, loginAccount LoginAccount, user model.User) (t
 
 	// 修改登录状态
 	err = userRepository.Update(&model.User{Online: true, ID: user.ID})
-
+	c.SetCookie(&http.Cookie{Name: Token, Value: token})
 	return token, err
 }
 

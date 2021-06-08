@@ -9,6 +9,7 @@ import (
 	"crypto/sha256"
 	"database/sql/driver"
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"image"
 	"image/png"
@@ -16,16 +17,17 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
 
-	"golang.org/x/crypto/pbkdf2"
-
 	"github.com/gofrs/uuid"
+	errors2 "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/crypto/pbkdf2"
 )
 
 type JsonTime struct {
@@ -231,6 +233,19 @@ func Check(f func() error) {
 	}
 }
 
+func ParseNetReg(line string, reg *regexp.Regexp, shouldLen, index int) (int64, string, error) {
+	rx1 := reg.FindStringSubmatch(line)
+	if len(rx1) != shouldLen {
+		return 0, "", errors.New("find string length error")
+	}
+	i64, err := strconv.ParseInt(rx1[index], 10, 64)
+	total := rx1[2]
+	if err != nil {
+		return 0, "", errors2.Wrap(err, "ParseInt error")
+	}
+	return i64, total, nil
+}
+
 func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
 	padding := blockSize - len(ciphertext)%blockSize
 	padText := bytes.Repeat([]byte{byte(padding)}, padding)
@@ -282,4 +297,35 @@ func Pbkdf2(password string) ([]byte, error) {
 	//生成密文
 	dk := pbkdf2.Key([]byte(password), salt, 1, 32, sha256.New)
 	return dk, nil
+}
+
+func DeCryptPassword(cryptPassword string, key []byte) (string, error) {
+	origData, err := base64.StdEncoding.DecodeString(cryptPassword)
+	if err != nil {
+		return "", err
+	}
+	decryptedCBC, err := AesDecryptCBC(origData, key)
+	if err != nil {
+		return "", err
+	}
+	return string(decryptedCBC), nil
+}
+
+func RegexpFindSubString(text string, reg *regexp.Regexp) (ret string, err error) {
+	findErr := errors.New("regexp find failed")
+	res := reg.FindStringSubmatch(text)
+	if len(res) != 2 {
+		return "", findErr
+	}
+	return res[1], nil
+
+}
+
+func String2int(s string) (int, error) {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return 0, err
+	}
+	return i, nil
+
 }

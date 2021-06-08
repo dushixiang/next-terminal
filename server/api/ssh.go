@@ -31,11 +31,24 @@ const (
 	Data      = "data"
 	Resize    = "resize"
 	Closed    = "closed"
+	CMD       = "cmd"
 )
 
 type Message struct {
 	Type    string `json:"type"`
 	Content string `json:"content"`
+}
+
+func FailMessage() Message {
+	return Message{Type: Closed}
+}
+
+func ConnectMsg() Message {
+	return Message{Type: Connected}
+}
+
+func NewMessage(typ, content string) Message {
+	return Message{Content: content, Type: typ}
 }
 
 type WindowSize struct {
@@ -164,7 +177,6 @@ func SSHEndpoint(c echo.Context) (err error) {
 		if err != nil {
 			// web socket会话关闭后主动关闭ssh会话
 			CloseSessionById(sessionId, Normal, "正常退出")
-			quitChan <- true
 			quitChan <- true
 			break
 		}
