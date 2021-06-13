@@ -38,30 +38,24 @@
     padding: 0 16px 0 0;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+    position: relative;
+    display: flex;
 }
 
 .layout-header-right {
-    align-items: center;
-    padding: 0 12px;
-    cursor: pointer;
-    transition: all .3s;
-    line-height: 60px;
-    height: 60px;
+    text-align: right;
+    height: 100%;
+    margin: 0 8px;
 }
 
 .layout-header-right-item {
-    margin: 0 6px;
-    display: inline;
-    height: 60px;
-}
-
-.nickname {
-    line-height: 60px;
-    height: 60px;
-    width: 125px;
-    text-align: left;
-    padding: 0 5px;
-    float: right;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    height: 100%;
+    padding: 0 8px;
 }
 
 .page-herder {

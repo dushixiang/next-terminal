@@ -137,15 +137,13 @@ class App extends Component {
 
                 <Menu.Item>
                     <Link to={'/info'}>
-                        <SolutionOutlined/>
-                        个人中心
+                        <SolutionOutlined/> 个人中心
                     </Link>
                 </Menu.Item>
 
                 <Menu.Item>
                     <a target='_blank' rel="noreferrer" href='https://github.com/dushixiang/next-terminal'>
-                        <GithubOutlined/>
-                        点个Star
+                        <GithubOutlined/> 点个Star
                     </a>
                 </Menu.Item>
 
@@ -161,8 +159,7 @@ class App extends Component {
                         cancelText="取消"
                         placement="left"
                     >
-                        <LogoutOutlined/>
-                        退出登录
+                        <LogoutOutlined/> 退出登录
                     </Popconfirm>
                 </Menu.Item>
 
@@ -306,35 +303,31 @@ class App extends Component {
                             <Header className="site-layout-background"
                                     style={{padding: 0, height: headerHeight, zIndex: 20}}>
                                 <div className='layout-header'>
-                                    <Row justify="space-around" align="middle" gutter={24} style={{height: headerHeight}}>
-                                        <Col span={4} key={1} style={{height: headerHeight}}>
-                                            {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                                                className: 'trigger',
-                                                onClick: this.onCollapse,
-                                            })}
-                                        </Col>
-                                        <Col span={20} key={2} style={{textAlign: 'right'}}
-                                             className={'layout-header-right'}>
+                                    <div style={{flex: '1 1 0%'}}>
+                                        {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                                            className: 'trigger',
+                                            onClick: this.onCollapse,
+                                        })}
+                                    </div>
 
-                                            <div className={'layout-header-right-item'}>
-                                                <Tooltip placement="bottom" title={'使用帮助'}>
-                                                    <a target='_blank' rel="noreferrer"
-                                                       href='https://github.com/dushixiang/next-terminal/blob/master/docs/faq.md'>
-                                                        <QuestionCircleOutlined/>
-                                                    </a>
-                                                </Tooltip>
+                                    <div className='layout-header-right'>
+                                        <div className={'layout-header-right-item'}>
+                                            <Tooltip placement="bottom" title={'使用帮助'}>
+                                                <a target='_blank' rel="noreferrer"
+                                                   href='https://github.com/dushixiang/next-terminal/blob/master/docs/faq.md'>
+                                                    <QuestionCircleOutlined/>
+                                                </a>
+                                            </Tooltip>
+                                        </div>
 
-                                            </div>
-
-
+                                        <div className={'layout-header-right-item'}>
                                             <Dropdown overlay={menu}>
                                                 <div className='nickname layout-header-right-item'>
                                                     {getCurrentUser()['nickname']} &nbsp;<DownOutlined/>
                                                 </div>
                                             </Dropdown>
-                                        </Col>
-                                    </Row>
-
+                                        </div>
+                                    </div>
                                 </div>
                             </Header>
 
