@@ -334,31 +334,6 @@ class Asset extends Component {
         });
     };
 
-    access = async (record) => {
-        const id = record['id'];
-        const protocol = record['protocol'];
-        const name = record['name'];
-        const sshMode = record['sshMode'];
-
-        message.loading({content: '正在检测资产是否在线...', key: id});
-        let result = await request.post(`/assets/${id}/tcping`);
-        if (result.code === 1) {
-            if (result.data === true) {
-                message.success({content: '检测完成，您访问的资产在线，即将打开窗口进行访问。', key: id, duration: 3});
-                if (protocol === 'ssh' && sshMode === 'naive') {
-                    window.open(`#/term?assetId=${id}&assetName=${name}`);
-                } else {
-                    window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
-                }
-            } else {
-                message.warn({content: '您访问的资产未在线，请确认网络状态。', key: id, duration: 10});
-            }
-        } else {
-            message.error({content: result.message, key: id, duration: 10});
-        }
-
-    }
-
     monitor = async (record) => {
         const id = record['id'];
         var protocol  = record["protocol"];
@@ -636,10 +611,20 @@ class Asset extends Component {
                         </Menu>
                     );
 
+                    const id = record['id'];
+                    const protocol = record['protocol'];
+                    const name = record['name'];
+                    const sshMode = record['sshMode'];
+                    let url = '';
+                    if (protocol === 'ssh' && sshMode === 'naive') {
+                        url = `#/term?assetId=${id}&assetName=${name}`;
+                    }else {
+                        url = `#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`;
+                    }
+
                     return (
                         <div>
-                            <Button type="link" size='small'
-                                    onClick={() => this.access(record)}>接入</Button>
+                            <Button type="link" size='small' href={url} target='_blank'>接入</Button>
                 
                             <Button type="link" size='small' disabled={record.protocol !== 'ssh'}
                                     onClick={() => this.monitor(record)}>状态监控</Button>
