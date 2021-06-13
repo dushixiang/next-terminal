@@ -572,13 +572,13 @@ class Setting extends Component {
                                     rules={[
                                         {
                                             required: false,
-                                            message: '邮件服务器地址',
+                                            message: '邮件服务器端口',
                                             min: 1,
                                             max: 65535
                                         },
                                     ]}
                                 >
-                                    <Input type='number' placeholder="请输入邮件服务器地址"/>
+                                    <Input type='number' placeholder="请输入邮件服务器端口"/>
                                 </Form.Item>
 
                                 <Form.Item
