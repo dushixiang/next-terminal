@@ -240,9 +240,7 @@ class Term extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-
-
-                    <Row style={{marginTop: 10}}>
+                    <Row>
                         <Col span={24}>
                             <FileSystem sessionId={this.state.sessionId}/>
                         </Col>

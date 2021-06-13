@@ -66,3 +66,24 @@
 .popup li > i {
     margin-right: 8px;
 }
+
+.fs-header {
+    /*align-items: center;*/
+    position: relative;
+    display: flex;
+}
+
+.fs-header-right{
+    text-align: right;
+    height: 100%;
+    margin-left: 10px;
+}
+
+.fs-header-right-item {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    height: 100%;
+}

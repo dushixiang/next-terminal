@@ -15,7 +15,7 @@ import {
     FileWordOutlined,
     FileZipOutlined,
     FolderAddOutlined,
-    FolderTwoTone,
+    FolderTwoTone, MenuFoldOutlined, MenuUnfoldOutlined,
     ReloadOutlined,
     ThunderboltTwoTone,
     UploadOutlined
@@ -326,38 +326,52 @@ class FileSystem extends Component {
         ];
 
         const title = (
-            <Row justify="space-around" align="middle" gutter={24}>
+            <div className='fs-header'>
+                <div style={{flex: '1 1 0%'}}>
+                    <Input value={this.state.currentDirectoryInput} onChange={this.handleCurrentDirectoryInputChange}
+                           onPressEnter={this.handleCurrentDirectoryInputPressEnter}/>
+                </div>
+                <div className='fs-header-right'>
+                    <Space>
+                        <div className='fs-header-right-item'>
+                            <Tooltip title="创建文件夹">
+                                <Button type="primary" size="small" icon={<FolderAddOutlined/>}
+                                        onClick={() => {
+                                            this.setState({
+                                                mkdirVisible: true
+                                            })
+                                        }} ghost/>
+                            </Tooltip>
+                        </div>
+
+                        <div className='fs-header-right-item'>
+                            <Tooltip title="上传">
+                                <Button type="primary" size="small" icon={<CloudUploadOutlined/>}
+                                        onClick={() => {
+                                            this.setState({
+                                                uploadVisible: true
+                                            })
+                                        }} ghost/>
+                            </Tooltip>
+                        </div>
+                        <div className='fs-header-right-item'>
+                            <Tooltip title="刷新">
+                                <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh}
+                                        ghost/>
+                            </Tooltip>
+                        </div>
+                    </Space>
+                </div>
+            </div>
+            /*<Row justify="space-around" align="middle" gutter={24}>
                 <Col span={20} key={1}>
                     <Input value={this.state.currentDirectoryInput} onChange={this.handleCurrentDirectoryInputChange}
                            onPressEnter={this.handleCurrentDirectoryInputPressEnter}/>
                 </Col>
                 <Col span={4} key={2} style={{textAlign: 'right'}}>
-                    <Space>
-                        <Tooltip title="创建文件夹">
-                            <Button type="primary" size="small" icon={<FolderAddOutlined/>}
-                                    onClick={() => {
-                                        this.setState({
-                                            mkdirVisible: true
-                                        })
-                                    }} ghost/>
-                        </Tooltip>
 
-                        <Tooltip title="上传">
-                            <Button type="primary" size="small" icon={<CloudUploadOutlined/>}
-                                    onClick={() => {
-                                        this.setState({
-                                            uploadVisible: true
-                                        })
-                                    }} ghost/>
-                        </Tooltip>
-
-                        <Tooltip title="刷新">
-                            <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh}
-                                    ghost/>
-                        </Tooltip>
-                    </Space>
                 </Col>
-            </Row>
+            </Row>*/
         );
 
         const {selectedRowKeys} = this.state;

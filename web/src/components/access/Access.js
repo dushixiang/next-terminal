@@ -639,7 +639,7 @@ class Access extends Component {
                 >
 
 
-                    <Row style={{marginTop: 10}}>
+                    <Row>
                         <Col span={24}>
                             <FileSystem sessionId={this.state.sessionId}/>
                         </Col>
