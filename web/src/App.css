@@ -35,26 +35,24 @@
 .layout-header {
     height: 60px;
     align-items: center;
-    padding: 0 16px 0 0;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
     position: relative;
     display: flex;
 }
 
+.layout-header-left {
+    flex: 1 1 0;
+}
+
 .layout-header-right {
     text-align: right;
-    height: 100%;
-    margin: 0 8px;
 }
 
 .layout-header-right-item {
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    vertical-align: middle;
-    height: 100%;
     padding: 0 8px;
 }
 

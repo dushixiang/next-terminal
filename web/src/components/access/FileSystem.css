@@ -68,14 +68,17 @@
 }
 
 .fs-header {
-    /*align-items: center;*/
+    align-items: center;
     position: relative;
     display: flex;
 }
 
+.fs-header-left{
+    flex: 1 1 0;
+}
+
 .fs-header-right{
     text-align: right;
-    height: 100%;
     margin-left: 10px;
 }
 

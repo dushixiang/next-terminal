@@ -303,7 +303,7 @@ class App extends Component {
                             <Header className="site-layout-background"
                                     style={{padding: 0, height: headerHeight, zIndex: 20}}>
                                 <div className='layout-header'>
-                                    <div style={{flex: '1 1 0%'}}>
+                                    <div className='layout-header-left'>
                                         {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
                                             className: 'trigger',
                                             onClick: this.onCollapse,

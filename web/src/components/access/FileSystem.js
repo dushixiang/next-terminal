@@ -327,7 +327,7 @@ class FileSystem extends Component {
 
         const title = (
             <div className='fs-header'>
-                <div style={{flex: '1 1 0%'}}>
+                <div className='fs-header-left'>
                     <Input value={this.state.currentDirectoryInput} onChange={this.handleCurrentDirectoryInputChange}
                            onPressEnter={this.handleCurrentDirectoryInputPressEnter}/>
                 </div>
