@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import {Col, Divider, Dropdown, Layout, Menu, Popconfirm, Row, Tooltip} from "antd";
+import {Divider, Dropdown, Layout, Menu, Popconfirm, Tooltip} from "antd";
 import {Link, Route, Switch} from "react-router-dom";
 import Dashboard from "./components/dashboard/Dashboard";
 import Asset from "./components/asset/Asset";

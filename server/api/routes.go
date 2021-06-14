@@ -140,6 +140,7 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 
 	commands := e.Group("/commands")
 	{
+		commands.GET("", CommandAllEndpoint)
 		commands.GET("/paging", CommandPagingEndpoint)
 		commands.POST("", CommandCreateEndpoint)
 		commands.PUT("/:id", CommandUpdateEndpoint)

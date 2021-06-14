@@ -7,8 +7,8 @@ import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
 import "./Access.css"
 import request from "../../common/request";
-import {Affix, Button, Col, Drawer, message, Modal, Row} from "antd";
-import {AppstoreTwoTone, ExclamationCircleOutlined} from "@ant-design/icons";
+import {Affix, Button, Col, Drawer, Dropdown, Menu, message, Modal, Row, Tooltip} from "antd";
+import {CodeOutlined, ExclamationCircleOutlined, FolderOutlined} from "@ant-design/icons";
 import Draggable from "react-draggable";
 import FileSystem from "./FileSystem";
 
@@ -21,7 +21,8 @@ class Term extends Component {
         webSocket: undefined,
         fitAddon: undefined,
         sessionId: undefined,
-        enterBtnIndex: 1001
+        enterBtnIndex: 1001,
+        commands: []
     };
 
     componentDidMount = async () => {
@@ -112,6 +113,7 @@ class Term extends Component {
                 case 'connected':
                     term.clear();
                     this.updateSessionStatus(sessionId);
+                    this.getCommands();
                     break;
                 case 'data':
                     term.write(msg['content']);
@@ -140,6 +142,16 @@ class Term extends Component {
         if (webSocket) {
             webSocket.close()
         }
+    }
+
+    getCommands = async () => {
+        let result = await request.get('/commands');
+        if (result.code !== 1) {
+            message.error(result.message);
+        }
+        this.setState({
+            commands: result['data']
+        })
     }
 
     showMessage(msg) {
@@ -194,7 +206,7 @@ class Term extends Component {
         }, () => {
             if (webSocket && webSocket.readyState === WebSocket.OPEN) {
                 fitAddon.fit();
-                term.focus();
+                this.focus();
                 let terminalSize = {
                     cols: term.cols,
                     rows: term.rows
@@ -204,7 +216,37 @@ class Term extends Component {
         });
     };
 
+    writeCommand = (command) => {
+        let webSocket = this.state.webSocket;
+        if (webSocket !== undefined) {
+            webSocket.send(JSON.stringify({type: 'data', content: command}));
+        }
+        this.focus();
+    }
+
+    focus = () => {
+        let term = this.state.term;
+        if (term) {
+            term.focus();
+        }
+    }
+
     render() {
+
+        const cmdMenuItems = this.state.commands.map(item => {
+            return <Tooltip placement="left" title={item['content']} color='blue' key={'t-' + item['id']}>
+                <Menu.Item onClick={() => {
+                    this.writeCommand(item['content'])
+                }} key={'i-' + item['id']}>{item['name']}</Menu.Item>
+            </Tooltip>;
+        });
+
+        const cmdMenu = (
+            <Menu>
+                {cmdMenuItems}
+            </Menu>
+        );
+
         return (
             <div>
                 <div ref='terminal' id='terminal' style={{
@@ -217,12 +259,20 @@ class Term extends Component {
 
                 <Draggable>
                     <Affix style={{position: 'absolute', top: 50, right: 50, zIndex: this.state.enterBtnIndex}}>
-                        <Button icon={<AppstoreTwoTone/>} onClick={() => {
+                        <Button icon={<FolderOutlined/>} onClick={() => {
                             this.setState({
                                 fileSystemVisible: true,
                                 enterBtnIndex: 999, // xterm.js 输入框的zIndex是1000，在弹出文件管理页面后要隐藏此按钮
                             });
                         }}/>
+                    </Affix>
+                </Draggable>
+
+                <Draggable>
+                    <Affix style={{position: 'absolute', top: 50, right: 100, zIndex: this.state.enterBtnIndex}}>
+                        <Dropdown overlay={cmdMenu} trigger={['click']} placement="bottomLeft">
+                            <Button icon={<CodeOutlined/>}/>
+                        </Dropdown>
                     </Affix>
                 </Draggable>
 
@@ -237,6 +287,7 @@ class Term extends Component {
                             fileSystemVisible: false,
                             enterBtnIndex: 1001, // xterm.js 输入框的zIndex是1000，在隐藏文件管理页面后要显示此按钮
                         });
+                        this.focus();
                     }}
                     visible={this.state.fileSystemVisible}
                 >

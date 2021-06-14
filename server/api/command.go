@@ -29,6 +29,12 @@ func CommandCreateEndpoint(c echo.Context) error {
 	return Success(c, item)
 }
 
+func CommandAllEndpoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+	items, _ := commandRepository.FindByUser(account)
+	return Success(c, items)
+}
+
 func CommandPagingEndpoint(c echo.Context) error {
 	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
