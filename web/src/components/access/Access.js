@@ -528,7 +528,7 @@ class Access extends Component {
 
     render() {
 
-        const menu = (
+        const hotKeyMenu = (
             <Menu>
                 <Menu.Item
                     onClick={() => this.sendCombinationKey(['65507', '65513', '65535'])}>Ctrl+Alt+Delete</Menu.Item>
@@ -594,7 +594,7 @@ class Access extends Component {
 
                             <Draggable>
                                 <Affix style={{position: 'absolute', top: 100, right: 150}}>
-                                    <Dropdown overlay={menu} trigger={['click']} placement="bottomLeft">
+                                    <Dropdown overlay={hotKeyMenu} trigger={['click']} placement="bottomLeft">
                                         <Button icon={<DesktopOutlined/>}
                                                 disabled={this.state.clientState !== STATE_CONNECTED}/>
                                     </Dropdown>
@@ -637,8 +637,6 @@ class Access extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-
-
                     <Row>
                         <Col span={24}>
                             <FileSystem sessionId={this.state.sessionId}/>

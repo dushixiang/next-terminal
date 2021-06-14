@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Card, Col, Form, Input, message, Modal, Row, Space, Table, Tooltip} from "antd";
+import {Button, Card, Form, Input, message, Modal, Row, Space, Table, Tooltip} from "antd";
 import {
     CloudDownloadOutlined,
     CloudUploadOutlined,
@@ -15,9 +15,9 @@ import {
     FileWordOutlined,
     FileZipOutlined,
     FolderAddOutlined,
-    FolderTwoTone, MenuFoldOutlined, MenuUnfoldOutlined,
+    FolderTwoTone,
     ReloadOutlined,
-    ThunderboltTwoTone,
+    LinkOutlined,
     UploadOutlined
 } from "@ant-design/icons";
 import qs from "qs";
@@ -214,7 +214,7 @@ class FileSystem extends Component {
                         icon = <FolderTwoTone/>;
                     } else {
                         if (item['isLink']) {
-                            icon = <ThunderboltTwoTone/>;
+                            icon = <LinkOutlined />;
                         } else {
                             const fileExtension = item['name'].split('.').pop().toLowerCase();
                             switch (fileExtension) {
