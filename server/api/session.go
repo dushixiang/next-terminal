@@ -263,17 +263,8 @@ func SessionUploadEndpoint(c echo.Context) error {
 		}
 		defer dstFile.Close()
 
-		buf := make([]byte, 1024)
-		for {
-			n, err := src.Read(buf)
-			if err != nil {
-				if err != io.EOF {
-					log.Warnf("文件上传错误 %v", err)
-				} else {
-					break
-				}
-			}
-			_, _ = dstFile.Write(buf[:n])
+		if _, err = io.Copy(dstFile, src); err != nil {
+			return err
 		}
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {

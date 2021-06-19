@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, message, Modal, Space, Table, Tooltip} from "antd";
+import {Button, Card, Form, Input, message, Modal, notification, Progress, Space, Table, Tooltip} from "antd";
 import {
+    AlertTwoTone,
     CloudDownloadOutlined,
     CloudUploadOutlined,
     DeleteOutlined,
@@ -16,14 +17,12 @@ import {
     FileZipOutlined,
     FolderAddOutlined,
     FolderTwoTone,
-    ReloadOutlined,
     LinkOutlined,
-    UploadOutlined
+    ReloadOutlined
 } from "@ant-design/icons";
 import qs from "qs";
 import request from "../../common/request";
 import {server} from "../../common/env";
-import Upload from "antd/es/upload";
 import {download, getFileName, getToken, isEmpty, renderSize} from "../../utils/utils";
 import './FileSystem.css'
 
@@ -45,6 +44,7 @@ class FileSystem extends Component {
         dropdown: {
             visible: false
         },
+        uploading: {}
     }
 
     componentDidMount() {
@@ -139,17 +139,6 @@ class FileSystem extends Component {
 
     }
 
-    uploadChange = (info) => {
-        if (info.file.status !== 'uploading') {
-
-        }
-        if (info.file.status === 'done') {
-            message.success(`${info.file.name} 文件上传成功。`, 3);
-        } else if (info.file.status === 'error') {
-            message.error(`${info.file.name} 文件上传失败。`, 10);
-        }
-    }
-
     getNodeTreeRightClickMenu = () => {
         const {pageX, pageY, visible} = {...this.state.dropdown};
         if (visible) {
@@ -201,6 +190,105 @@ class FileSystem extends Component {
         this.loadFiles(event.target.value);
     }
 
+    handleUploadFile = () => {
+        const file = window.document.getElementById('file-upload').files[0];
+        const {name, size} = file;
+        let url = server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.currentDirectory;
+
+        const key = name;
+        const xhr = new XMLHttpRequest();
+        let prevPercent = 0, percent = 0;
+
+        const uploadEnd = (success, message) => {
+            if (success) {
+                notification.success({
+                    key,
+                    icon: <AlertTwoTone/>,
+                    message: `上传"${name}"成功`,
+                    duration: 5,
+                    description: <Progress percent={100}/>,
+                    placement: 'bottomRight'
+                });
+                this.refresh();
+            } else {
+                notification.error({
+                    key,
+                    message: `上传"${name}"失败，${message}`,
+                    duration: 10,
+                    description: <Progress percent={percent} status="exception"/>,
+                    placement: 'bottomRight'
+                });
+            }
+        }
+
+        xhr.upload.addEventListener('progress', (event) => {
+            if (event.lengthComputable) {
+                percent = Math.min(Math.floor(event.loaded * 100 / event.total), 99);
+                if (prevPercent === percent) {
+                    return;
+                }
+                const description = (
+                    <><div>{renderSize(event.loaded)}/{renderSize(size)}</div><Progress percent={0}/></>
+                );
+
+                notification.info({
+                    key,
+                    message: `正在上传"${name}"`,
+                    duration: null,
+                    description: description,
+                    placement: 'bottomRight',
+                    onClose: () => {
+                        xhr.abort();
+                        message.info(`您已取消上传"${name}"`,10);
+                    }
+                });
+                prevPercent = percent;
+            }
+
+        }, false)
+        xhr.onreadystatechange = (data) => {
+            if (xhr.readyState !== 4) {
+                return;
+            }
+            if (xhr.status >= 200 && xhr.status < 300) {
+                const responseText = data.currentTarget.responseText
+                let result;
+                try {
+                    result = JSON.parse(responseText)
+                } catch (e) {
+                    result = {}
+                }
+                if (result.code !== 1) {
+                    uploadEnd(false, result['message']);
+                } else {
+                    uploadEnd(true, result['message']);
+                }
+            } else if (xhr.status >= 400 && xhr.status < 500) {
+                uploadEnd(false, '服务器内部错误');
+            }
+        }
+
+        xhr.onerror = () => {
+            uploadEnd(false, '服务器内部错误');
+        }
+        xhr.open('POST', url, true);
+        let formData = new FormData();
+        formData.append("file", file, name);
+        xhr.send(formData);
+
+        const description = (
+            <><div>{0}/{renderSize(size)}</div><Progress percent={0}/></>
+        );
+
+        notification.info({
+            key,
+            message: `正在上传 ${name} `,
+            duration: null,
+            description: description,
+            placement: 'bottomRight'
+        });
+    }
+
     render() {
 
         const columns = [
@@ -214,7 +302,7 @@ class FileSystem extends Component {
                         icon = <FolderTwoTone/>;
                     } else {
                         if (item['isLink']) {
-                            icon = <LinkOutlined />;
+                            icon = <LinkOutlined/>;
                         } else {
                             const fileExtension = item['name'].split('.').pop().toLowerCase();
                             switch (fileExtension) {
@@ -348,10 +436,10 @@ class FileSystem extends Component {
                             <Tooltip title="上传">
                                 <Button type="primary" size="small" icon={<CloudUploadOutlined/>}
                                         onClick={() => {
-                                            this.setState({
-                                                uploadVisible: true
-                                            })
+                                            window.document.getElementById('file-upload').click();
                                         }} ghost/>
+                                <input type="file" id="file-upload" style={{display: 'none'}}
+                                       onChange={this.handleUploadFile}/>
                             </Tooltip>
                         </div>
                         <div className='fs-header-right-item'>
@@ -363,15 +451,6 @@ class FileSystem extends Component {
                     </Space>
                 </div>
             </div>
-            /*<Row justify="space-around" align="middle" gutter={24}>
-                <Col span={20} key={1}>
-                    <Input value={this.state.currentDirectoryInput} onChange={this.handleCurrentDirectoryInputChange}
-                           onPressEnter={this.handleCurrentDirectoryInputPressEnter}/>
-                </Col>
-                <Col span={4} key={2} style={{textAlign: 'right'}}>
-
-                </Col>
-            </Row>*/
         );
 
         const {selectedRowKeys} = this.state;
@@ -385,7 +464,7 @@ class FileSystem extends Component {
 
         return (
             <div>
-                <Card title={title} bordered={true} size="small">
+                <Card title={title} bordered={true} size="small" style={{minHeight: window.innerHeight - 103}}>
 
                     <Table columns={columns}
                            rowSelection={rowSelection}
@@ -467,30 +546,6 @@ class FileSystem extends Component {
                            }}
                     />
                 </Card>
-
-                <Modal
-                    title="上传文件"
-                    visible={this.state.uploadVisible}
-
-                    onOk={() => {
-                        this.setState({
-                            uploadVisible: false
-                        })
-                        this.loadFiles(this.state.currentDirectory);
-                    }}
-                    confirmLoading={this.state.uploadLoading}
-                    onCancel={() => {
-                        this.setState({
-                            uploadVisible: false
-                        })
-                    }}
-                >
-                    <Upload
-                        action={server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.currentDirectory}>
-                        <Button icon={<UploadOutlined/>}>上传文件</Button>
-                    </Upload>
-                </Modal>
-
 
                 {
                     this.state.mkdirVisible ?
