@@ -23,6 +23,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/crypto/ssh"
+
 	"github.com/gofrs/uuid"
 	errors2 "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -327,5 +329,29 @@ func String2int(s string) (int, error) {
 		return 0, err
 	}
 	return i, nil
+}
 
+func RunCommand(client *ssh.Client, command string) (stdout string, err error) {
+	session, err := client.NewSession()
+	if err != nil {
+		return "", err
+	}
+	defer session.Close()
+
+	var buf bytes.Buffer
+	session.Stdout = &buf
+	err = session.Run(command)
+	if err != nil {
+		return "", err
+	}
+	stdout = string(buf.Bytes())
+	return
+}
+
+func TimeWatcher(name string) {
+	start := time.Now()
+	defer func() {
+		cost := time.Since(start)
+		fmt.Printf("%s: %v\n", name, cost)
+	}()
 }

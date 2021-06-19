@@ -7,12 +7,15 @@ import {getToken, isEmpty} from "../../utils/utils";
 import {FitAddon} from 'xterm-addon-fit';
 import "./Access.css"
 import request from "../../common/request";
-import {Affix, Button, Col, Drawer, Dropdown, Menu, message, Modal, Row, Tooltip} from "antd";
-import {CodeOutlined, ExclamationCircleOutlined, FolderOutlined} from "@ant-design/icons";
+import {Affix, Button, Drawer, Dropdown, Menu, message, Modal, Tooltip} from "antd";
+import {CodeOutlined, ExclamationCircleOutlined, FolderOutlined, LineChartOutlined} from "@ant-design/icons";
 import Draggable from "react-draggable";
 import FileSystem from "./FileSystem";
+import Stats from "./Stats";
 
 class Term extends Component {
+
+    statsRef = undefined;
 
     state = {
         width: window.innerWidth,
@@ -231,6 +234,10 @@ class Term extends Component {
         }
     }
 
+    onRef = (statsRef) => {
+        this.statsRef = statsRef;
+    }
+
     render() {
 
         const cmdMenuItems = this.state.commands.map(item => {
@@ -276,6 +283,20 @@ class Term extends Component {
                     </Affix>
                 </Draggable>
 
+                <Draggable>
+                    <Affix style={{position: 'absolute', top: 100, right: 100, zIndex: this.state.enterBtnIndex}}>
+                        <Button icon={<LineChartOutlined/>} onClick={() => {
+                            this.setState({
+                                statsVisible: true,
+                                enterBtnIndex: 999, // xterm.js 输入框的zIndex是1000，在弹出文件管理页面后要隐藏此按钮
+                            });
+                            if(this.statsRef){
+                                this.statsRef.addInterval();
+                            }
+                        }}/>
+                    </Affix>
+                </Draggable>
+
                 <Drawer
                     title={'会话详情'}
                     placement="right"
@@ -291,11 +312,28 @@ class Term extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-                    <Row>
-                        <Col span={24}>
-                            <FileSystem sessionId={this.state.sessionId}/>
-                        </Col>
-                    </Row>
+                    <FileSystem sessionId={this.state.sessionId}/>
+                </Drawer>
+
+                <Drawer
+                    title={'状态信息'}
+                    placement="right"
+                    width={window.innerWidth * 0.8}
+                    closable={true}
+                    // maskClosable={false}
+                    onClose={() => {
+                        this.setState({
+                            statsVisible: false,
+                            enterBtnIndex: 1001, // xterm.js 输入框的zIndex是1000，在隐藏文件管理页面后要显示此按钮
+                        });
+                        this.focus();
+                        if (this.statsRef) {
+                            this.statsRef.delInterval();
+                        }
+                    }}
+                    visible={this.state.statsVisible}
+                >
+                    <Stats sessionId={this.state.sessionId} onRef={this.onRef}/>
                 </Drawer>
             </div>
         );

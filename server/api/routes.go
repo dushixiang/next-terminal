@@ -93,7 +93,6 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 
 	e.GET("/tunnel", TunEndpoint)
 	e.GET("/ssh", SSHEndpoint)
-	e.GET("/monitor/:id", MonitorEndpoint)
 	e.POST("/logout", LogoutEndpoint)
 	e.POST("/change-password", ChangePasswordEndpoint)
 	e.GET("/reload-totp", ReloadTOTPEndpoint)
@@ -168,6 +167,7 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 		sessions.POST("/:id/disconnect", Admin(SessionDisconnectEndpoint))
 		sessions.POST("/:id/resize", SessionResizeEndpoint)
 		sessions.GET("/:id/ls", SessionLsEndpoint)
+		sessions.GET("/:id/stats", SessionStatsEndpoint)
 		sessions.GET("/:id/download", SessionDownloadEndpoint)
 		sessions.POST("/:id/upload", SessionUploadEndpoint)
 		sessions.POST("/:id/mkdir", SessionMkDirEndpoint)

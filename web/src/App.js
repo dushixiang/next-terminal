@@ -6,7 +6,6 @@ import {Link, Route, Switch} from "react-router-dom";
 import Dashboard from "./components/dashboard/Dashboard";
 import Asset from "./components/asset/Asset";
 import Access from "./components/access/Access";
-import StatusMonitor from "./components/monitor/Monitor";
 import User from "./components/user/User";
 import OnlineSession from "./components/session/OnlineSession";
 import OfflineSession from "./components/session/OfflineSession";
@@ -312,10 +311,19 @@ class App extends Component {
 
                                     <div className='layout-header-right'>
                                         <div className={'layout-header-right-item'}>
+                                            <Tooltip placement="bottom" title={'项目地址'}>
+                                                <a target='_blank' rel="noreferrer"
+                                                   href='https://github.com/dushixiang/next-terminal'>
+                                                    <GithubOutlined style={{color: 'black'}}/>
+                                                </a>
+                                            </Tooltip>
+                                        </div>
+
+                                        <div className={'layout-header-right-item'}>
                                             <Tooltip placement="bottom" title={'使用帮助'}>
                                                 <a target='_blank' rel="noreferrer"
                                                    href='https://github.com/dushixiang/next-terminal/blob/master/docs/faq.md'>
-                                                    <QuestionCircleOutlined/>
+                                                    <QuestionCircleOutlined style={{color: 'black'}}/>
                                                 </a>
                                             </Tooltip>
                                         </div>
@@ -345,7 +353,6 @@ class App extends Component {
                             <Route path="/setting" component={Setting}/>
                             <Route path="/job" component={Job}/>
                             <Route path="/access-security" component={Security}/>
-                            <Route path="/monitor/:id" component={StatusMonitor}/>
 
                             <Footer style={{textAlign: 'center'}}>
                                 Next Terminal ©2021 dushixiang Version:{this.state.package['version']}

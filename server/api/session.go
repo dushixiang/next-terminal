@@ -618,3 +618,35 @@ func SessionRecordingEndpoint(c echo.Context) error {
 	log.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
 	return c.File(recording)
 }
+
+func SessionStatsEndpoint(c echo.Context) error {
+	sessionId := c.Param("id")
+	session, err := sessionRepository.FindByIdAndDecrypt(sessionId)
+	if err != nil {
+		return err
+	}
+
+	if "ssh" != session.Protocol {
+		return Fail(c, -1, "不支持当前协议")
+	}
+
+	tun, ok := global.Store.Get(sessionId)
+	if !ok {
+		return errors.New("获取隧道失败")
+	}
+
+	if tun.Subject.NextTerminal == nil {
+		nextTerminal, err := CreateNextTerminalBySession(session)
+		if err != nil {
+			return err
+		}
+		tun.Subject.NextTerminal = nextTerminal
+	}
+
+	sshClient := tun.Subject.NextTerminal.SshClient
+	stats, err := GetAllStats(sshClient)
+	if err != nil {
+		return err
+	}
+	return Success(c, stats)
+}

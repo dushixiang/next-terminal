@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import Guacamole from 'guacamole-common-js';
-import {Affix, Button, Col, Drawer, Dropdown, Form, Input, Menu, message, Modal, Row, Tooltip} from 'antd'
+import {Affix, Button, Drawer, Dropdown, Form, Input, Menu, message, Modal, Tooltip} from 'antd'
 import qs from "qs";
 import request from "../../common/request";
 import {wsServer} from "../../common/env";
@@ -683,11 +683,7 @@ class Access extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-                    <Row>
-                        <Col span={24}>
-                            <FileSystem sessionId={this.state.sessionId}/>
-                        </Col>
-                    </Row>
+                    <FileSystem sessionId={this.state.sessionId}/>
                 </Drawer>
 
                 {

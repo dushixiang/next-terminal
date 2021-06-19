@@ -334,29 +334,6 @@ class Asset extends Component {
         });
     };
 
-    monitor = async (record) => {
-        const id = record['id'];
-        var protocol  = record["protocol"];
-        const name = record["name"];
-        message.loading({content: '正在检测资产是否在线...', key: id});
-        let result = await request.post(`/assets/${id}/tcping`);
-        if (result.code === 1) {
-            if (result.data === true) {
-                message.success({content: '检测完成，您访问的资产在线，即将打开窗口进行访问。', key: id, duration: 3});
-                if (protocol === 'ssh') {
-                    window.open(`/#/monitor/${id}/?name=${name}`);
-                } else {
-                    message.warn('暂时仅支持监控ssh协议的资产', 10);
-                }
-            } else {
-                message.warn('您访问的资产未在线，请确认网络状态。', 10);
-            }
-        } else {
-            message.error('操作失败 :( ' + result.message, 10);
-        }
-
-    }
-
     batchDelete = async () => {
         this.setState({
             delBtnLoading: true
@@ -625,9 +602,6 @@ class Asset extends Component {
                     return (
                         <div>
                             <Button type="link" size='small' href={url} target='_blank'>接入</Button>
-                
-                            <Button type="link" size='small' disabled={record.protocol !== 'ssh'}
-                                    onClick={() => this.monitor(record)}>状态监控</Button>
                             <Dropdown overlay={menu}>
                                 <Button type="link" size='small'>
                                     更多 <DownOutlined/>
