@@ -9,13 +9,14 @@ import {
     CopyOutlined,
     ExclamationCircleOutlined,
     ExpandOutlined,
-    FolderOutlined,
+    FolderOutlined, LineChartOutlined,
     WindowsOutlined
 } from '@ant-design/icons';
 import {exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
 import './Access.css'
 import Draggable from 'react-draggable';
 import FileSystem from "./FileSystem";
+import Stats from "./Stats";
 
 const {TextArea} = Input;
 
@@ -29,6 +30,7 @@ const STATE_DISCONNECTED = 5;
 class Access extends Component {
 
     clipboardFormRef = React.createRef();
+    statsRef = undefined;
 
     state = {
         sessionId: '',
@@ -552,6 +554,10 @@ class Access extends Component {
         this.focus();
     }
 
+    onRef = (statsRef) => {
+        this.statsRef = statsRef;
+    }
+
     render() {
 
         const hotKeyMenu = (
@@ -665,6 +671,19 @@ class Access extends Component {
                                     </Dropdown>
                                 </Affix>
                             </Draggable>
+
+                            <Draggable>
+                                <Affix style={{position: 'absolute', top: 150, right: 100, zIndex: this.state.enterBtnIndex}}>
+                                    <Button icon={<LineChartOutlined/>} onClick={() => {
+                                        this.setState({
+                                            statsVisible: true,
+                                        });
+                                        if(this.statsRef){
+                                            this.statsRef.addInterval();
+                                        }
+                                    }}/>
+                                </Affix>
+                            </Draggable>
                         </> : undefined
                 }
 
@@ -684,6 +703,25 @@ class Access extends Component {
                     visible={this.state.fileSystemVisible}
                 >
                     <FileSystem sessionId={this.state.sessionId}/>
+                </Drawer>
+
+                <Drawer
+                    title={'状态信息'}
+                    placement="right"
+                    width={window.innerWidth * 0.8}
+                    closable={true}
+                    onClose={() => {
+                        this.setState({
+                            statsVisible: false,
+                        });
+                        this.focus();
+                        if (this.statsRef) {
+                            this.statsRef.delInterval();
+                        }
+                    }}
+                    visible={this.state.statsVisible}
+                >
+                    <Stats sessionId={this.state.sessionId} onRef={this.onRef}/>
                 </Drawer>
 
                 {

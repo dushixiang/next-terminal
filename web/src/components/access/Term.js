@@ -320,7 +320,6 @@ class Term extends Component {
                     placement="right"
                     width={window.innerWidth * 0.8}
                     closable={true}
-                    // maskClosable={false}
                     onClose={() => {
                         this.setState({
                             statsVisible: false,

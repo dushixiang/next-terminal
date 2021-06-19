@@ -343,8 +343,7 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                 <Select onChange={(value) => {
                                                     setSshMode(value)
                                                 }}>
-                                                    <Option value="">默认</Option>
-                                                    <Option value="guacd">guacd</Option>
+                                                    <Option value="">guacd</Option>
                                                     <Option value="naive">原生</Option>
                                                 </Select>
                                             </Form.Item>

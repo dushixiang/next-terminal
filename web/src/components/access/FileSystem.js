@@ -1,7 +1,19 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Input, message, Modal, notification, Progress, Space, Table, Tooltip} from "antd";
 import {
-    AlertTwoTone,
+    Button,
+    Card,
+    Form,
+    Input,
+    message,
+    Modal,
+    notification,
+    Progress,
+    Space,
+    Table,
+    Tooltip,
+    Typography
+} from "antd";
+import {
     CloudDownloadOutlined,
     CloudUploadOutlined,
     DeleteOutlined,
@@ -27,6 +39,7 @@ import {download, getFileName, getToken, isEmpty, renderSize} from "../../utils/
 import './FileSystem.css'
 
 const {confirm} = Modal;
+const {Text} = Typography;
 
 class FileSystem extends Component {
 
@@ -201,21 +214,34 @@ class FileSystem extends Component {
 
         const uploadEnd = (success, message) => {
             if (success) {
+                let description = (
+                    <React.Fragment>
+                        <div>{name}</div>
+                        <div>{renderSize(size)}/{renderSize(size)}</div>
+                        <Progress percent={100}/>
+                    </React.Fragment>
+                );
                 notification.success({
                     key,
-                    icon: <AlertTwoTone/>,
-                    message: `上传"${name}"成功`,
+                    message: `上传成功`,
                     duration: 5,
-                    description: <Progress percent={100}/>,
+                    description: description,
                     placement: 'bottomRight'
                 });
                 this.refresh();
             } else {
+                let description = (
+                    <React.Fragment>
+                        <div>{name}</div>
+                        <div>-/{renderSize(size)}</div>
+                        <Text type="danger">{message}</Text>
+                    </React.Fragment>
+                );
                 notification.error({
                     key,
-                    message: `上传"${name}"失败，${message}`,
+                    message: `上传失败`,
                     duration: 10,
-                    description: <Progress percent={percent} status="exception"/>,
+                    description: description,
                     placement: 'bottomRight'
                 });
             }
@@ -223,23 +249,48 @@ class FileSystem extends Component {
 
         xhr.upload.addEventListener('progress', (event) => {
             if (event.lengthComputable) {
+                let description = (
+                    <React.Fragment>
+                        <div>{name}</div>
+                        <div>{renderSize(event.loaded)}/{renderSize(size)}</div>
+                        <Progress percent={99}/>
+                    </React.Fragment>
+                );
+                if (event.loaded === event.total) {
+                    notification.info({
+                        key,
+                        message: `向目标机器传输中...`,
+                        duration: null,
+                        description: description,
+                        placement: 'bottomRight',
+                        onClose: () => {
+                            xhr.abort();
+                            message.info(`您已取消上传"${name}"`, 10);
+                        }
+                    });
+                    return;
+                }
                 percent = Math.min(Math.floor(event.loaded * 100 / event.total), 99);
                 if (prevPercent === percent) {
                     return;
                 }
-                const description = (
-                    <><div>{renderSize(event.loaded)}/{renderSize(size)}</div><Progress percent={0}/></>
+                description = (
+                    <React.Fragment>
+                        <div>{name}</div>
+                        <div>{renderSize(event.loaded)}/{renderSize(size)}</div>
+                        <Progress percent={percent}/>
+                    </React.Fragment>
                 );
 
                 notification.info({
                     key,
-                    message: `正在上传"${name}"`,
+                    message: `上传中...`,
                     duration: null,
                     description: description,
                     placement: 'bottomRight',
                     onClose: () => {
                         xhr.abort();
-                        message.info(`您已取消上传"${name}"`,10);
+                        message.info(`您已取消上传"${name}"`, 10);
                     }
                 });
                 prevPercent = percent;
@@ -275,18 +326,6 @@ class FileSystem extends Component {
         let formData = new FormData();
         formData.append("file", file, name);
         xhr.send(formData);
-
-        const description = (
-            <><div>{0}/{renderSize(size)}</div><Progress percent={0}/></>
-        );
-
-        notification.info({
-            key,
-            message: `正在上传 ${name} `,
-            duration: null,
-            description: description,
-            placement: 'bottomRight'
-        });
     }
 
     render() {

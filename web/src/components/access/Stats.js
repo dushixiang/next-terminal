@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Descriptions, Progress, Row, Col} from "antd";
+import {Col, Descriptions, Progress, Row} from "antd";
 import request from "../../common/request";
 import {renderSize} from "../../utils/utils";
 import './Stats.css'
@@ -169,20 +169,26 @@ class Stats extends Component {
 
                 <Descriptions title="磁盘" column={4}>
                     {
-                        fileSystems.map(item => {
+                        fileSystems.map((item, index) => {
                             return (
-                                <>
-                                    <Descriptions.Item label="挂载路径">{item['mountPoint']}</Descriptions.Item>
-                                    <Descriptions.Item label="已经使用">{renderSize(item['used'])}</Descriptions.Item>
-                                    <Descriptions.Item label="剩余空间">{renderSize(item['free'])}</Descriptions.Item>
-                                    <Descriptions.Item label="使用占比">
+                                <React.Fragment key={'磁盘' + index}>
+                                    <Descriptions.Item label="挂载路径" key={'挂载路径' + index}>
+                                        {item['mountPoint']}
+                                    </Descriptions.Item>
+                                    <Descriptions.Item label="已经使用" key={'已经使用' + index}>
+                                        {renderSize(item['used'])}
+                                    </Descriptions.Item>
+                                    <Descriptions.Item label="剩余空间" key={'剩余空间' + index}>
+                                        {renderSize(item['free'])}
+                                    </Descriptions.Item>
+                                    <Descriptions.Item label="使用占比" key={'使用占比' + index}>
                                         <div className='description-content'>
                                             <Progress
                                                 percent={(item['used'] * 100 / (item['used'] + item['free'])).toFixed(2)}
                                                 steps={20} size={'small'}/>
                                         </div>
                                     </Descriptions.Item>
-                                </>
+                                </React.Fragment>
                             );
                         })
                     }
@@ -193,26 +199,26 @@ class Stats extends Component {
                         Object.keys(network).map((key, index) => {
                             let prevNetwork = this.state.prevStats.network;
                             let rxOfSeconds = 0, txOfSeconds = 0;
-                            if (prevNetwork[key] !== undefined){
-                                rxOfSeconds = (network[key]['rx'] - prevNetwork[key]['rx'])/5;
+                            if (prevNetwork[key] !== undefined) {
+                                rxOfSeconds = (network[key]['rx'] - prevNetwork[key]['rx']) / 5;
                             }
-                            if (prevNetwork[key] !== undefined){
-                                txOfSeconds = (network[key]['tx'] - prevNetwork[key]['tx'])/5;
+                            if (prevNetwork[key] !== undefined) {
+                                txOfSeconds = (network[key]['tx'] - prevNetwork[key]['tx']) / 5;
                             }
 
                             return (
-                                <>
-                                    <Descriptions.Item label="网卡" key={'网卡' + key}>{key}</Descriptions.Item>
-                                    <Descriptions.Item label="IPv4" key={'IPv4' + key}>
+                                <React.Fragment key={'网络' + index}>
+                                    <Descriptions.Item label="网卡" key={'网卡' + index}>{key}</Descriptions.Item>
+                                    <Descriptions.Item label="IPv4" key={'IPv4' + index}>
                                         {network[key]['ipv4']}
                                     </Descriptions.Item>
-                                    <Descriptions.Item label="接收" key={'接收' + key}>
+                                    <Descriptions.Item label="接收" key={'接收' + index}>
                                         {renderSize(network[key]['rx'])} &nbsp; {renderSize(rxOfSeconds)}/秒
                                     </Descriptions.Item>
-                                    <Descriptions.Item label="发送" key={'发送' + key}>
+                                    <Descriptions.Item label="发送" key={'发送' + index}>
                                         {renderSize(network[key]['tx'])} &nbsp; {renderSize(txOfSeconds)}/秒
                                     </Descriptions.Item>
-                                </>
+                                </React.Fragment>
                             );
                         })
                     }
