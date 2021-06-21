@@ -414,6 +414,8 @@ func SetupDB() *gorm.DB {
 	}
 
 	if err != nil {
+		fmt.Printf(" --- === %+v \n", global.Config.Mysql)
+		
 		log.WithError(err).Panic("连接数据库异常")
 	}
 
