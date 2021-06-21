@@ -304,6 +304,19 @@ class User extends Component {
             dataIndex: 'username',
             key: 'username',
             sorter: true,
+            render: (username, record, index) => {
+                return (
+                    <Button type="link" size='small'
+                            onClick={async () => {
+                                let result = await request.get(`/users/${record['id']}`);
+                                if (result['code'] !== 1) {
+                                    message.error(result['message']);
+                                    return;
+                                }
+                                this.showModal('更新用户', result['data']);
+                            }}>{username}</Button>
+                );
+            }
         }, {
             title: '用户昵称',
             dataIndex: 'nickname',

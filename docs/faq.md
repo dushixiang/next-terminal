@@ -53,6 +53,13 @@ docker rm <container-id> -f
 </details>
 
 <details>
+    <summary>ssh协议中文字体乱码怎么办？</summary>
+
+参考[安装字体](install-naive.md)章节，给系统安装中文字体。
+
+</details>
+
+<details>
     <summary>ssh协议类型的资产连接模式有什么区别？</summary>
 
 1. 默认：默认使用guacd模式
