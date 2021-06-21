@@ -227,7 +227,7 @@ func (r PropertyService) InitProperties() error {
 	if len(propertyMap[guacd.DisableGlyphCaching]) == 0 {
 		property := model.Property{
 			Name:  guacd.DisableGlyphCaching,
-			Value: "false",
+			Value: "true",
 		}
 		if err := r.propertyRepository.Create(&property); err != nil {
 			return err
