@@ -43,7 +43,7 @@ class Setting extends Component {
             message.error(result.message);
         }
     }
-
+    
     getProperties = async () => {
 
         // eslint-disable-next-line no-extend-native
