@@ -15,7 +15,7 @@ import {
 import {exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
 import './Access.css'
 import Draggable from 'react-draggable';
-import FileSystem from "./FileSystem";
+import FileSystem from "../devops/FileSystem";
 import Stats from "./Stats";
 
 const {TextArea} = Input;
@@ -702,7 +702,10 @@ class Access extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-                    <FileSystem sessionId={this.state.sessionId}/>
+                    <FileSystem
+                        storageId={this.state.sessionId}
+                        storageType={'sessions'}
+                        minHeight={window.innerHeight - 103}/>
                 </Drawer>
 
                 <Drawer

@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import StorageFileSystem from "../devops/StorageFileSystem";
+import FileSystem from "../devops/FileSystem";
 import {Col, Descriptions, Layout, Row, Typography,} from "antd";
 import {getCurrentUser} from "../../service/permission";
 import {FireOutlined, HeartOutlined} from "@ant-design/icons";
@@ -54,7 +54,10 @@ class MyFile extends Component {
                             </Col>
                         </Row>
                     </div>
-                    <StorageFileSystem storageId={getCurrentUser()['id']} callback={this.getDefaultStorage} minHeight={window.innerHeight - 203}/>
+                    <FileSystem storageId={getCurrentUser()['id']}
+                                storageType={'storages'}
+                                callback={this.getDefaultStorage}
+                                minHeight={window.innerHeight - 203}/>
                 </Content>
             </div>
         );

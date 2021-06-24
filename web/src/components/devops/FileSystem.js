@@ -7,6 +7,7 @@ import {
     message,
     Modal,
     notification,
+    Popconfirm,
     Progress,
     Space,
     Table,
@@ -14,10 +15,8 @@ import {
     Typography
 } from "antd";
 import {
-    CloudDownloadOutlined,
     CloudUploadOutlined,
     DeleteOutlined,
-    EditOutlined,
     ExclamationCircleOutlined,
     FileExcelOutlined,
     FileImageOutlined,
@@ -38,8 +37,8 @@ import {server} from "../../common/env";
 import {download, getFileName, getToken, isEmpty, renderSize} from "../../utils/utils";
 import './FileSystem.css'
 
-const {confirm} = Modal;
 const {Text} = Typography;
+const confirm = Modal.confirm;
 
 class FileSystem extends Component {
 
@@ -47,70 +46,46 @@ class FileSystem extends Component {
     renameFormRef = React.createRef();
 
     state = {
-        sessionId: undefined,
+        storageType: undefined,
+        storageId: undefined,
         currentDirectory: '/',
         currentDirectoryInput: '/',
         files: [],
         loading: false,
+        currentFileKey: undefined,
         selectedRowKeys: [],
-        selectedRow: {},
-        dropdown: {
-            visible: false
-        },
-        uploading: {}
+        uploading: {},
+        callback: undefined,
+        minHeight: 280
     }
 
     componentDidMount() {
-        let sessionId = this.props.sessionId;
+        if (this.props.onRef) {
+            this.props.onRef(this);
+        }
         this.setState({
-            sessionId: sessionId
+            storageId: this.props.storageId,
+            storageType: this.props.storageType,
+            callback: this.props.callback,
+            minHeight: this.props.minHeight
         }, () => {
             this.loadFiles(this.state.currentDirectory);
         });
     }
 
-    download = () => {
-        download(`${server}/sessions/${this.state.sessionId}/download?file=${this.state.selectedRow.key}`);
-    }
-
-    rmdir = async () => {
-        let selectedRowKeys = this.state.selectedRowKeys;
-        if (selectedRowKeys === undefined || selectedRowKeys.length === 0) {
-            message.warning('请至少选择一个文件或目录');
-        }
-
-        let title;
-        if (selectedRowKeys.length === 1) {
-            let file = getFileName(selectedRowKeys[0]);
-            title = <p>您确认要删除"{file}"吗？</p>;
-        } else {
-            title = `您确认要删除所选的${selectedRowKeys.length}项目吗？`;
-        }
-        confirm({
-            title: title,
-            icon: <ExclamationCircleOutlined/>,
-            content: '所选项目将立即被删除。',
-            onOk: async () => {
-                for (let i = 0; i < selectedRowKeys.length; i++) {
-                    let rowKey = selectedRowKeys[i];
-                    if (rowKey === '..') {
-                        continue;
-                    }
-                    let result = await request.post(`/sessions/${this.state.sessionId}/rm?key=${rowKey}`);
-                    if (result['code'] !== 1) {
-                        message.error(result['message']);
-                    }
-                }
-                await this.loadFiles(this.state.currentDirectory);
-            },
-            onCancel() {
-
-            },
+    reSetStorageId = (storageId) => {
+        this.setState({
+            storageId: storageId
+        }, () => {
+            this.loadFiles('/');
         });
     }
 
     refresh = async () => {
         this.loadFiles(this.state.currentDirectory);
+        if (this.state.callback) {
+            this.state.callback();
+        }
     }
 
     loadFiles = async (key) => {
@@ -121,7 +96,7 @@ class FileSystem extends Component {
             if (isEmpty(key)) {
                 key = '/';
             }
-            let result = await request.get(`/sessions/${this.state.sessionId}/ls?dir=${key}`);
+            let result = await request.get(`/${this.state.storageType}/${this.state.storageId}/ls?dir=${key}`);
             if (result['code'] !== 1) {
                 message.error(result['message']);
                 return;
@@ -140,9 +115,7 @@ class FileSystem extends Component {
             this.setState({
                 files: items,
                 currentDirectory: key,
-                currentDirectoryInput: key,
-                selectedRow: {},
-                selectedRowKeys: []
+                currentDirectoryInput: key
             })
         } finally {
             this.setState({
@@ -151,47 +124,6 @@ class FileSystem extends Component {
         }
 
     }
-
-    getNodeTreeRightClickMenu = () => {
-        const {pageX, pageY, visible} = {...this.state.dropdown};
-        if (visible) {
-            const tmpStyle = {
-                left: `${pageX}px`,
-                top: `${pageY}px`,
-            };
-
-            let disableDownload = true;
-            if (this.state.selectedRowKeys.length === 1
-                && !this.state.selectedRow['isDir']
-                && !this.state.selectedRow['isLink']) {
-                disableDownload = false;
-            }
-
-            let disableRename = true;
-            if (this.state.selectedRowKeys.length === 1) {
-                disableRename = false;
-            }
-
-            return (
-                <ul className="popup" style={tmpStyle}>
-                    <li><Button type={'text'} size={'small'} icon={<CloudDownloadOutlined/>} onClick={this.download}
-                                disabled={disableDownload}>下载</Button></li>
-
-                    <li><Button type={'text'} size={'small'} icon={<EditOutlined/>} disabled={disableRename}
-                                onClick={() => {
-                                    this.setState({
-                                        renameVisible: true
-                                    })
-                                }}
-                    >重命名</Button></li>
-
-                    <li><Button type={'text'} size={'small'} icon={<DeleteOutlined/>} onClick={this.rmdir}>删除</Button>
-                    </li>
-                </ul>
-            );
-        }
-        return undefined;
-    };
 
     handleCurrentDirectoryInputChange = (event) => {
         this.setState({
@@ -205,8 +137,11 @@ class FileSystem extends Component {
 
     handleUploadFile = () => {
         const file = window.document.getElementById('file-upload').files[0];
+        if (!file) {
+            return;
+        }
         const {name, size} = file;
-        let url = server + '/sessions/' + this.state.sessionId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.currentDirectory;
+        let url = `${server}/${this.state.storageType}/${this.state.storageId}/upload?X-Auth-Token=${getToken()}&dir=${this.state.currentDirectory}`
 
         const key = name;
         const xhr = new XMLHttpRequest();
@@ -217,7 +152,7 @@ class FileSystem extends Component {
                 let description = (
                     <React.Fragment>
                         <div>{name}</div>
-                        <div>{renderSize(size)}/{renderSize(size)}</div>
+                        <div>{renderSize(size)} / {renderSize(size)}</div>
                         <Progress percent={100}/>
                     </React.Fragment>
                 );
@@ -233,7 +168,6 @@ class FileSystem extends Component {
                 let description = (
                     <React.Fragment>
                         <div>{name}</div>
-                        <div>-/{renderSize(size)}</div>
                         <Text type="danger">{message}</Text>
                     </React.Fragment>
                 );
@@ -277,7 +211,7 @@ class FileSystem extends Component {
                 description = (
                     <React.Fragment>
                         <div>{name}</div>
-                        <div>{renderSize(event.loaded)}/{renderSize(size)}</div>
+                        <div>{renderSize(event.loaded)} / {renderSize(size)}</div>
                         <Progress percent={percent}/>
                     </React.Fragment>
                 );
@@ -326,6 +260,13 @@ class FileSystem extends Component {
         let formData = new FormData();
         formData.append("file", file, name);
         xhr.send(formData);
+    }
+
+    delete = async (key) => {
+        let result = await request.post(`/${this.state.storageType}/${this.state.storageId}/rm?key=${key}`);
+        if (result['code'] !== 1) {
+            message.error(result['message']);
+        }
     }
 
     render() {
@@ -449,8 +390,56 @@ class FileSystem extends Component {
                 render: (value, item) => {
                     return <span className={'dode'}>{value}</span>;
                 },
+            }, {
+                title: '操作',
+                dataIndex: 'action',
+                key: 'action',
+                width: 200,
+                render: (value, item) => {
+                    if (item['key'] === '..') {
+                        return undefined;
+                    }
+                    let disableDownload = false;
+                    if (item['isDir'] || item['isLink']) {
+                        disableDownload = true;
+                    }
+                    return (
+                        <>
+                            <Button type="link" size='small' disabled={disableDownload} onClick={async () => {
+                                download(`${server}/${this.state.storageType}/${this.state.storageId}/download?file=${item['key']}&X-Auth-Token=${getToken()}`);
+                            }}>下载</Button>
+                            <Button type={'link'} size={'small'} onClick={() => {
+                                this.setState({
+                                    renameVisible: true,
+                                    currentFileKey: item['key']
+                                })
+                            }}>重命名</Button>
+                            <Popconfirm
+                                title="您确认要删除此文件吗?"
+                                onConfirm={async () => {
+                                    await this.delete(item['key']);
+                                    await this.refresh();
+                                }}
+                                okText="是"
+                                cancelText="否"
+                            >
+                                <Button type={'link'} size={'small'} danger>删除</Button>
+                            </Popconfirm>
+                        </>
+                    );
+                },
             }
         ];
+
+
+        const {selectedRowKeys} = this.state;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: (selectedRowKeys) => {
+                this.setState({selectedRowKeys});
+            },
+        };
+        const hasSelected = selectedRowKeys.filter(item => item !== '..').length > 0;
 
         const title = (
             <div className='fs-header'>
@@ -483,8 +472,40 @@ class FileSystem extends Component {
                         </div>
                         <div className='fs-header-right-item'>
                             <Tooltip title="刷新">
-                                <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh}
-                                        ghost/>
+                                <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh} ghost/>
+                            </Tooltip>
+                        </div>
+
+                        <div className='fs-header-right-item'>
+                            <Tooltip title="批量删除">
+                                <Button type="primary" size="small" ghost danger disabled={!hasSelected}
+                                        icon={<DeleteOutlined/>}
+                                        loading={this.state.delBtnLoading}
+                                        onClick={() => {
+                                            let rowKeys = this.state.selectedRowKeys;
+                                            const content = <div>
+                                                您确定要删除选中的<Text style={{color: '#1890FF'}}
+                                                               strong>{rowKeys.filter(item => item !== '..').length}</Text>条记录吗？
+                                            </div>;
+                                            confirm({
+                                                icon: <ExclamationCircleOutlined/>,
+                                                content: content,
+                                                onOk: async () => {
+                                                    for (let i = 0; i < rowKeys.length; i++) {
+                                                        if (rowKeys[i] === '..') {
+                                                            continue;
+                                                        }
+                                                        await this.delete(rowKeys[i]);
+                                                    }
+                                                    this.refresh();
+                                                },
+                                                onCancel() {
+
+                                                },
+                                            });
+                                        }}>
+
+                                </Button>
                             </Tooltip>
                         </div>
                     </Space>
@@ -492,17 +513,9 @@ class FileSystem extends Component {
             </div>
         );
 
-        const {selectedRowKeys} = this.state;
-        const rowSelection = {
-            selectedRowKeys,
-            onChange: (selectedRowKeys) => {
-                this.setState({selectedRowKeys});
-            },
-        };
-
         return (
             <div>
-                <Card title={title} bordered={true} size="small" style={{minHeight: window.innerHeight - 103}}>
+                <Card title={title} bordered={true} size="small" style={{minHeight: this.state.minHeight}}>
 
                     <Table columns={columns}
                            rowSelection={rowSelection}
@@ -513,15 +526,6 @@ class FileSystem extends Component {
 
                            onRow={record => {
                                return {
-                                   onClick: event => {
-                                       if (record['key'] === '..') {
-                                           return;
-                                       }
-                                       this.setState({
-                                           selectedRow: record,
-                                           selectedRowKeys: [record['key']]
-                                       });
-                                   }, // 点击行
                                    onDoubleClick: event => {
                                        if (record['isDir'] || record['isLink']) {
                                            if (record['path'] === '..') {
@@ -536,51 +540,7 @@ class FileSystem extends Component {
 
                                        }
                                    },
-                                   onContextMenu: event => {
-                                       event.preventDefault();
-                                       if (record['key'] === '..') {
-                                           return;
-                                       }
-
-                                       let selectedRowKeys = this.state.selectedRowKeys;
-                                       if (selectedRowKeys.length === 0) {
-                                           selectedRowKeys = [record['key']]
-                                       }
-                                       this.setState({
-                                           selectedRow: record,
-                                           selectedRowKeys: selectedRowKeys,
-                                           dropdown: {
-                                               visible: true,
-                                               pageX: event.pageX,
-                                               pageY: event.pageY,
-                                           }
-                                       });
-
-                                       if (!this.state.dropdown.visible) {
-                                           const that = this;
-                                           document.addEventListener(`click`, function onClickOutside() {
-                                               that.setState({dropdown: {visible: false}});
-                                               document.removeEventListener(`click`, onClickOutside);
-
-                                               document.querySelector('.ant-drawer-body').style.height = 'unset';
-                                               document.querySelector('.ant-drawer-body').style['overflow-y'] = 'auto';
-                                           });
-
-                                           document.querySelector('.ant-drawer-body').style.height = '100vh';
-                                           document.querySelector('.ant-drawer-body').style['overflow-y'] = 'hidden';
-                                       }
-                                   },
-                                   onMouseEnter: event => {
-
-                                   }, // 鼠标移入行
-                                   onMouseLeave: event => {
-
-                                   },
                                };
-                           }}
-
-                           rowClassName={(record) => {
-                               return record['key'] === this.state.selectedRow['key'] ? 'selectedRow' : '';
                            }}
                     />
                 </Card>
@@ -590,7 +550,7 @@ class FileSystem extends Component {
                         <Modal
                             title="创建文件夹"
                             visible={this.state.mkdirVisible}
-
+                            okButtonProps={{form: 'mkdir-form', key: 'submit', htmlType: 'submit'}}
                             onOk={() => {
                                 this.mkdirFormRef.current
                                     .validateFields()
@@ -604,7 +564,7 @@ class FileSystem extends Component {
                                         this.setState({
                                             confirmLoading: true
                                         })
-                                        let result = await request.post(`/sessions/${this.state.sessionId}/mkdir?${paramStr}`);
+                                        let result = await request.post(`/${this.state.storageType}/${this.state.storageId}/mkdir?${paramStr}`);
                                         if (result.code === 1) {
                                             message.success('创建成功');
                                             this.loadFiles(this.state.currentDirectory);
@@ -628,8 +588,7 @@ class FileSystem extends Component {
                                 })
                             }}
                         >
-                            <Form ref={this.mkdirFormRef}>
-
+                            <Form ref={this.mkdirFormRef} id={'mkdir-form'}>
                                 <Form.Item name='dir' rules={[{required: true, message: '请输入文件夹名称'}]}>
                                     <Input autoComplete="off" placeholder="请输入文件夹名称"/>
                                 </Form.Item>
@@ -642,7 +601,7 @@ class FileSystem extends Component {
                         <Modal
                             title="重命名"
                             visible={this.state.renameVisible}
-
+                            okButtonProps={{form: 'rename-form', key: 'submit', htmlType: 'submit'}}
                             onOk={() => {
                                 this.renameFormRef.current
                                     .validateFields()
@@ -655,7 +614,7 @@ class FileSystem extends Component {
                                                 currentDirectory += '/';
                                             }
                                             let params = {
-                                                'oldName': this.state.selectedRowKeys[0],
+                                                'oldName': this.state.currentFileKey,
                                                 'newName': currentDirectory + values['newName'],
                                             }
 
@@ -669,7 +628,7 @@ class FileSystem extends Component {
                                             this.setState({
                                                 confirmLoading: true
                                             })
-                                            let result = await request.post(`/sessions/${this.state.sessionId}/rename?${paramStr}`);
+                                            let result = await request.post(`/${this.state.storageType}/${this.state.storageId}/rename?${paramStr}`);
                                             if (result['code'] === 1) {
                                                 message.success('重命名成功');
                                                 this.refresh();
@@ -694,17 +653,15 @@ class FileSystem extends Component {
                                 })
                             }}
                         >
-                            <Form ref={this.renameFormRef}
-                                  initialValues={{newName: getFileName(this.state.selectedRowKeys[0])}}>
+                            <Form id={'rename-form'}
+                                  ref={this.renameFormRef}
+                                  initialValues={{newName: getFileName(this.state.currentFileKey)}}>
                                 <Form.Item name='newName' rules={[{required: true, message: '请输入新的名称'}]}>
                                     <Input autoComplete="off" placeholder="新的名称"/>
                                 </Form.Item>
                             </Form>
                         </Modal> : undefined
                 }
-
-
-                {this.getNodeTreeRightClickMenu()}
             </div>
         );
     }

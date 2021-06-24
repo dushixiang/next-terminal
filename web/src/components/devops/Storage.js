@@ -32,7 +32,7 @@ import request from "../../common/request";
 import {message} from "antd/es";
 import qs from "qs";
 import {cloneObj, renderSize} from "../../utils/utils";
-import StorageFileSystem from "./StorageFileSystem";
+import FileSystem from "./FileSystem";
 import StorageModal from "./StorageModal";
 
 const {Content} = Layout;
@@ -311,7 +311,11 @@ class Storage extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-                    <StorageFileSystem storageId={this.state.storageId} onRef={this.onRef} minHeight={window.innerHeight - 103}/>
+                    <FileSystem
+                        storageId={this.state.storageId}
+                        storageType={'storages'}
+                        onRef={this.onRef}
+                        minHeight={window.innerHeight - 103}/>
                 </Drawer>
 
                 {

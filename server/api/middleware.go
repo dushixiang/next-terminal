@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net"
-	"regexp"
 	"strings"
 	"time"
 
@@ -90,9 +89,6 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 	startWithUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
 
-	sessionDownload := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/download`)
-	recording := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/recording`)
-
 	return func(c echo.Context) error {
 
 		uri := c.Request().RequestURI
@@ -104,14 +100,6 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			if strings.HasPrefix(uri, startWithUrls[i]) {
 				return next(c)
 			}
-		}
-
-		if sessionDownload.FindString(uri) != "" {
-			return next(c)
-		}
-
-		if recording.FindString(uri) != "" {
-			return next(c)
 		}
 
 		token := GetToken(c)

@@ -10,7 +10,7 @@ import request from "../../common/request";
 import {Affix, Button, Drawer, Dropdown, Menu, message, Modal, Tooltip} from "antd";
 import {CodeOutlined, ExclamationCircleOutlined, FolderOutlined, LineChartOutlined} from "@ant-design/icons";
 import Draggable from "react-draggable";
-import FileSystem from "./FileSystem";
+import FileSystem from "../devops/FileSystem";
 import Stats from "./Stats";
 
 class Term extends Component {
@@ -312,7 +312,10 @@ class Term extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-                    <FileSystem sessionId={this.state.sessionId}/>
+                    <FileSystem
+                        storageId={this.state.sessionId}
+                        storageType={'sessions'}
+                        minHeight={window.innerHeight - 103}/>
                 </Drawer>
 
                 <Drawer
