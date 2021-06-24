@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto/md5"
+	"embed"
 	"fmt"
 
 	"next-terminal/pkg/config"
@@ -14,7 +15,7 @@ import (
 )
 
 const (
-	Version = "v0.5.0"
+	Version = "v1.0.0"
 	banner  = `
  _______                   __    ___________                  .__              .__   
  \      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |  
@@ -25,6 +26,24 @@ const (
 
 `
 )
+
+//go:embed web/build/index.html
+var indexHtml string
+
+//go:embed web/build/asciinema.html
+var asciinemaHtml string
+
+//go:embed web/build/asciinema-player.js
+var asciinemaPlayerJs []byte
+
+//go:embed web/build/asciinema-player.css
+var asciinemaPlayerCss []byte
+
+//go:embed web/build/favicon.ico
+var faviconIco []byte
+
+//go:embed web/build/static
+var static embed.FS
 
 func main() {
 	err := Run()
@@ -48,7 +67,7 @@ func Run() error {
 
 	global.Cache = api.SetupCache()
 	db := api.SetupDB()
-	e := api.SetupRoutes(db)
+	e := api.SetupRoutes(db, indexHtml, asciinemaHtml, asciinemaPlayerJs, asciinemaPlayerCss, faviconIco, static)
 
 	if global.Config.ResetPassword != "" {
 		return api.ResetPassword(global.Config.ResetPassword)

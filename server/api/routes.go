@@ -2,6 +2,7 @@ package api
 
 import (
 	"crypto/md5"
+	"embed"
 	"fmt"
 	"net/http"
 	"os"
@@ -40,6 +41,7 @@ var (
 	jobRepository            *repository.JobRepository
 	jobLogRepository         *repository.JobLogRepository
 	loginLogRepository       *repository.LoginLogRepository
+	storageRepository        *repository.StorageRepository
 
 	jobService        *service.JobService
 	propertyService   *service.PropertyService
@@ -49,9 +51,10 @@ var (
 	numService        *service.NumService
 	assetService      *service.AssetService
 	credentialService *service.CredentialService
+	storageService    *service.StorageService
 )
 
-func SetupRoutes(db *gorm.DB) *echo.Echo {
+func SetupRoutes(db *gorm.DB, indexHtml, asciinemaHtml string, asciinemaPlayerJs, asciinemaPlayerCss, faviconIco []byte, static embed.FS) *echo.Echo {
 
 	InitRepository(db)
 	InitService()
@@ -69,11 +72,41 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 	e.HideBanner = true
 	//e.Logger = log.GetEchoLogger()
 	e.Use(log.Hook())
+	//e.GET("/", func(c echo.Context) error {
+	//	return c.HTML(200, indexHtml)
+	//})
+	//e.GET("/asciinema.html", func(c echo.Context) error {
+	//	return c.HTML(200, asciinemaHtml)
+	//})
+	//e.GET("/asciinema-player.js", func(c echo.Context) error {
+	//	return c.Blob(200, "application/javascript", asciinemaPlayerJs)
+	//})
+	//e.GET("/asciinema-player.css", func(c echo.Context) error {
+	//	return c.Blob(200, "text/css; charset=utf-8", asciinemaPlayerCss)
+	//})
+	//e.GET("/favicon.ico", func(c echo.Context) error {
+	//	return c.Blob(200, "image/vnd.microsoft.icon", faviconIco)
+	//})
+	//e.GET("/static/*", func(c echo.Context) error {
+	//	uri := c.Request().RequestURI
+	//	path := strings.Replace(uri, "/static/", "", 1)
+	//	file, err := static.ReadFile("web/build/static/" + path)
+	//	if err != nil {
+	//		return err
+	//	}
+	//	if strings.HasSuffix(path, "js") {
+	//		return c.Blob(200, "application/javascript", file)
+	//	}
+	//	if strings.HasSuffix(path, "css") {
+	//		return c.Blob(200, "text/css; charset=utf-8", file)
+	//	}
+	//
+	//	return c.Blob(200, "", file)
+	//})
 	e.File("/", "web/build/index.html")
 	e.File("/asciinema.html", "web/build/asciinema.html")
 	e.File("/asciinema-player.js", "web/build/asciinema-player.js")
 	e.File("/asciinema-player.css", "web/build/asciinema-player.css")
-	e.File("/", "web/build/index.html")
 	e.File("/logo.svg", "web/build/logo.svg")
 	e.File("/favicon.ico", "web/build/favicon.ico")
 	e.Static("/static", "web/build/static")
@@ -219,6 +252,21 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 		securities.GET("/:id", SecurityGetEndpoint)
 	}
 
+	storages := e.Group("/storages")
+	{
+		storages.GET("/paging", StoragePagingEndpoint)
+		storages.POST("", StorageCreateEndpoint)
+		storages.DELETE("/:id", StorageDeleteEndpoint)
+		storages.PUT("/:id", StorageUpdateEndpoint)
+		storages.GET("/:id", StorageGetEndpoint)
+		storages.GET("/:id/ls", StorageLsEndpoint)
+		storages.GET("/:id/download", StorageDownloadEndpoint)
+		storages.POST("/:id/upload", StorageUploadEndpoint)
+		storages.POST("/:id/mkdir", StorageMkDirEndpoint)
+		storages.POST("/:id/rm", StorageRmEndpoint)
+		storages.POST("/:id/rename", StorageRenameEndpoint)
+	}
+
 	return e
 }
 
@@ -247,6 +295,7 @@ func InitRepository(db *gorm.DB) {
 	jobRepository = repository.NewJobRepository(db)
 	jobLogRepository = repository.NewJobLogRepository(db)
 	loginLogRepository = repository.NewLoginLogRepository(db)
+	storageRepository = repository.NewStorageRepository(db)
 }
 
 func InitService() {
@@ -258,6 +307,7 @@ func InitService() {
 	numService = service.NewNumService(numRepository)
 	assetService = service.NewAssetService(assetRepository)
 	credentialService = service.NewCredentialService(credentialRepository)
+	storageService = service.NewStorageService(storageRepository, userRepository, propertyRepository)
 }
 
 func InitDBData() (err error) {
@@ -286,6 +336,9 @@ func InitDBData() (err error) {
 		return err
 	}
 	if err := assetService.Encrypt(); err != nil {
+		return err
+	}
+	if err := storageService.InitStorages(); err != nil {
 		return err
 	}
 	return nil
@@ -420,7 +473,7 @@ func SetupDB() *gorm.DB {
 
 	if err := db.AutoMigrate(&model.User{}, &model.Asset{}, &model.AssetAttribute{}, &model.Session{}, &model.Command{},
 		&model.Credential{}, &model.Property{}, &model.ResourceSharer{}, &model.UserGroup{}, &model.UserGroupMember{},
-		&model.LoginLog{}, &model.Num{}, &model.Job{}, &model.JobLog{}, &model.AccessSecurity{}); err != nil {
+		&model.LoginLog{}, &model.Num{}, &model.Job{}, &model.JobLog{}, &model.AccessSecurity{}, &model.Storage{}); err != nil {
 		log.WithError(err).Panic("初始化数据库表结构异常")
 	}
 	return db

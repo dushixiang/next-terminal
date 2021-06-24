@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -16,6 +15,7 @@ import (
 	"next-terminal/pkg/constant"
 	"next-terminal/pkg/global"
 	"next-terminal/pkg/log"
+	"next-terminal/pkg/service"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -270,8 +270,7 @@ func SessionUploadEndpoint(c echo.Context) error {
 	} else if "rdp" == session.Protocol {
 
 		if strings.Contains(remoteFile, "../") {
-			SafetyRuleTrigger(c)
-			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+			return Fail(c, -1, "非法请求 :(")
 		}
 
 		drivePath, err := propertyRepository.GetDrivePath()
@@ -328,8 +327,7 @@ func SessionDownloadEndpoint(c echo.Context) error {
 		return c.Stream(http.StatusOK, echo.MIMEOctetStream, bytes.NewReader(buff.Bytes()))
 	} else if "rdp" == session.Protocol {
 		if strings.Contains(remoteFile, "../") {
-			SafetyRuleTrigger(c)
-			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+			return Fail(c, -1, "非法请求 :(")
 		}
 		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
@@ -339,16 +337,6 @@ func SessionDownloadEndpoint(c echo.Context) error {
 	}
 
 	return err
-}
-
-type File struct {
-	Name    string         `json:"name"`
-	Path    string         `json:"path"`
-	IsDir   bool           `json:"isDir"`
-	Mode    string         `json:"mode"`
-	IsLink  bool           `json:"isLink"`
-	ModTime utils.JsonTime `json:"modTime"`
-	Size    int64          `json:"size"`
 }
 
 func SessionLsEndpoint(c echo.Context) error {
@@ -386,7 +374,7 @@ func SessionLsEndpoint(c echo.Context) error {
 			return err
 		}
 
-		var files = make([]File, 0)
+		var files = make([]service.File, 0)
 		for i := range fileInfos {
 
 			// 忽略因此文件
@@ -394,7 +382,7 @@ func SessionLsEndpoint(c echo.Context) error {
 				continue
 			}
 
-			file := File{
+			file := service.File{
 				Name:    fileInfos[i].Name(),
 				Path:    path.Join(remoteDir, fileInfos[i].Name()),
 				IsDir:   fileInfos[i].IsDir(),
@@ -410,31 +398,15 @@ func SessionLsEndpoint(c echo.Context) error {
 		return Success(c, files)
 	} else if "rdp" == session.Protocol {
 		if strings.Contains(remoteDir, "../") {
-			SafetyRuleTrigger(c)
-			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+			return Fail(c, -1, "非法请求 :(")
 		}
 		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
 			return err
 		}
-		fileInfos, err := ioutil.ReadDir(path.Join(drivePath, remoteDir))
+		files, err := storageService.Ls(drivePath, remoteDir)
 		if err != nil {
 			return err
-		}
-
-		var files = make([]File, 0)
-		for i := range fileInfos {
-			file := File{
-				Name:    fileInfos[i].Name(),
-				Path:    path.Join(remoteDir, fileInfos[i].Name()),
-				IsDir:   fileInfos[i].IsDir(),
-				Mode:    fileInfos[i].Mode().String(),
-				IsLink:  fileInfos[i].Mode()&os.ModeSymlink == os.ModeSymlink,
-				ModTime: utils.NewJsonTime(fileInfos[i].ModTime()),
-				Size:    fileInfos[i].Size(),
-			}
-
-			files = append(files, file)
 		}
 
 		return Success(c, files)
@@ -473,8 +445,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
 		if strings.Contains(remoteDir, "../") {
-			SafetyRuleTrigger(c)
-			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+			return Fail(c, -1, ":) 非法请求")
 		}
 		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
@@ -496,6 +467,7 @@ func SessionRmEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	// 文件夹或者文件
 	key := c.QueryParam("key")
 	if "ssh" == session.Protocol {
 		tun, ok := global.Store.Get(sessionId)
@@ -534,8 +506,7 @@ func SessionRmEndpoint(c echo.Context) error {
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
 		if strings.Contains(key, "../") {
-			SafetyRuleTrigger(c)
-			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+			return Fail(c, -1, ":) 非法请求")
 		}
 		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {
@@ -575,8 +546,10 @@ func SessionRenameEndpoint(c echo.Context) error {
 		return Success(c, nil)
 	} else if "rdp" == session.Protocol {
 		if strings.Contains(oldName, "../") {
-			SafetyRuleTrigger(c)
-			return Fail(c, -1, ":) 您的IP已被记录，请去向管理员自首。")
+			return Fail(c, -1, ":) 非法请求")
+		}
+		if strings.Contains(newName, "../") {
+			return Fail(c, -1, ":) 非法请求")
 		}
 		drivePath, err := propertyRepository.GetDrivePath()
 		if err != nil {

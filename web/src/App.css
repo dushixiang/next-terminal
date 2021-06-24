@@ -78,7 +78,7 @@
 .page-content {
     margin: 16px;
     padding: 24px;
-    min-height: 280px;
+    /*min-height: 280px;*/
 }
 
 .page-card {
@@ -107,4 +107,13 @@
 
 .modal-no-padding .ant-modal-body {
     padding: 0;
+}
+
+.disabled-icon {
+    cursor: not-allowed;
+    color: #ccc;
+}
+
+.disabled-icon:hover {
+    color: #ccc;
 }

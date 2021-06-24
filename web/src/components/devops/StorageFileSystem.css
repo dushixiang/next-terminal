@@ -1,0 +1,92 @@
+.dode {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+}
+
+@-webkit-keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.popup {
+    -webkit-animation-name: fadeIn;
+    animation-name: fadeIn;
+    animation-duration: 0.4s;
+    background-clip: padding-box;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
+    left: 0;
+    list-style-type: none;
+    margin: 0;
+    outline: none;
+    padding: 0;
+    position: fixed;
+    text-align: left;
+    top: 0;
+    overflow: hidden;
+    -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.75);
+}
+
+.popup li {
+    clear: both;
+    /*color: rgba(0, 0, 0, 0.65);*/
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: normal;
+    line-height: 22px;
+    margin: 0;
+    padding: 5px 12px;
+    transition: all .3s;
+    white-space: nowrap;
+    -webkit-transition: all .3s;
+}
+
+.popup li:hover {
+    background-color: #e6f7ff;
+}
+
+.popup li > i {
+    margin-right: 8px;
+}
+
+.fs-header {
+    align-items: center;
+    position: relative;
+    display: flex;
+}
+
+.fs-header-left{
+    flex: 1 1 0;
+}
+
+.fs-header-right{
+    text-align: right;
+    margin-left: 10px;
+}
+
+.fs-header-right-item {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    height: 100%;
+}

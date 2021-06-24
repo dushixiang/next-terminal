@@ -35,7 +35,7 @@ import {
     UserOutlined,
     UserSwitchOutlined,
     MenuUnfoldOutlined,
-    MenuFoldOutlined,
+    MenuFoldOutlined, HddOutlined, FolderOutlined
 } from '@ant-design/icons';
 import Info from "./components/user/Info";
 import request from "./common/request";
@@ -50,6 +50,9 @@ import Term from "./components/access/Term";
 import Job from "./components/devops/Job";
 import {Header} from "antd/es/layout/layout";
 import Security from "./components/devops/Security";
+import StorageFileSystem from "./components/devops/Storage";
+import Storage from "./components/devops/Storage";
+import MyFile from "./components/asset/MyFile";
 
 const {Footer, Sider} = Layout;
 
@@ -139,13 +142,6 @@ class App extends Component {
                         <SolutionOutlined/> 个人中心
                     </Link>
                 </Menu.Item>
-
-                <Menu.Item>
-                    <a target='_blank' rel="noreferrer" href='https://github.com/dushixiang/next-terminal'>
-                        <GithubOutlined/> 点个Star
-                    </a>
-                </Menu.Item>
-
                 <Menu.Divider/>
 
                 <Menu.Item>
@@ -177,7 +173,7 @@ class App extends Component {
 
                         <Sider collapsible collapsed={this.state.collapsed} trigger={null}>
                             <div className="logo">
-                                <img src='logo.svg' alt='logo'/>
+                                <img src='data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjxwYXRoIGQ9Ik0yNzIgMTIyLjI0aDQ4MHYxNTcuMDU2aDk2Vi40NDhoLTk2TDI3MiAwYy01Mi44IDAtOTYgLjQ0OC05NiAuNDQ4djI3OC44NDhoOTZ2LTE1Ny4xMnptNDAzLjY0OCA2MDMuMzkyTDg5NiA1MTIgNjc1LjY0OCAyOTguMzY4IDYwOCAzNjQuNDggNzYwLjEyOCA1MTIgNjA4IDY1OS41Mmw2Ny42NDggNjYuMTEyek00MTYgNjU5LjUyTDI2My44MDggNTEyIDQxNiAzNjQuNDhsLTY3LjcxMi02Ni4xMTJMMTI4IDUxMmwyMjAuMjg4IDIxMy42MzJMNDE2IDY1OS41MnptMzM2IDI0Mi4zMDRIMjcydi0xNTcuMTJoLTk2VjEwMjRoNjcyVjc0NC43MDRoLTk2djE1Ny4xMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=' alt='logo'/>
                                 {
                                     !this.state.collapsed ?
 
@@ -212,6 +208,11 @@ class App extends Component {
                                     <Menu.Item key="credential" icon={<IdcardOutlined/>}>
                                         <Link to={'/credential'}>
                                             授权凭证
+                                        </Link>
+                                    </Menu.Item>
+                                    <Menu.Item key="my-file" icon={<FolderOutlined />}>
+                                        <Link to={'/my-file'}>
+                                            我的文件
                                         </Link>
                                     </Menu.Item>
                                 </SubMenu>
@@ -258,6 +259,11 @@ class App extends Component {
                                                 <Menu.Item key="access-security" icon={<SafetyCertificateOutlined/>}>
                                                     <Link to={'/access-security'}>
                                                         访问安全
+                                                    </Link>
+                                                </Menu.Item>
+                                                <Menu.Item key="storage" icon={<HddOutlined />}>
+                                                    <Link to={'/storage'}>
+                                                        磁盘空间
                                                     </Link>
                                                 </Menu.Item>
                                             </SubMenu>
@@ -353,6 +359,8 @@ class App extends Component {
                             <Route path="/setting" component={Setting}/>
                             <Route path="/job" component={Job}/>
                             <Route path="/access-security" component={Security}/>
+                            <Route path="/my-file" component={MyFile}/>
+                            <Route path="/storage" component={Storage}/>
 
                             <Footer style={{textAlign: 'center'}}>
                                 Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
