@@ -6,7 +6,8 @@ import {
     Input,
     message,
     Modal,
-    notification, Popconfirm,
+    notification,
+    Popconfirm,
     Progress,
     Space,
     Table,
@@ -15,6 +16,8 @@ import {
 } from "antd";
 import {
     CloudUploadOutlined,
+    DeleteOutlined,
+    ExclamationCircleOutlined,
     FileExcelOutlined,
     FileImageOutlined,
     FileMarkdownOutlined,
@@ -35,6 +38,7 @@ import {download, getFileName, getToken, isEmpty, renderSize} from "../../utils/
 import './StorageFileSystem.css'
 
 const {Text} = Typography;
+const confirm = Modal.confirm;
 
 class StorageFileSystem extends Component {
 
@@ -50,7 +54,8 @@ class StorageFileSystem extends Component {
         currentFileKey: undefined,
         selectedRowKeys: [],
         uploading: {},
-        callback: undefined
+        callback: undefined,
+        minHeight: 280
     }
 
     componentDidMount() {
@@ -59,7 +64,8 @@ class StorageFileSystem extends Component {
         }
         this.setState({
             storageId: this.props.storageId,
-            callback: this.props.callback
+            callback: this.props.callback,
+            minHeight: this.props.minHeight
         }, () => {
             this.loadFiles(this.state.currentDirectory);
         });
@@ -75,7 +81,7 @@ class StorageFileSystem extends Component {
 
     refresh = async () => {
         this.loadFiles(this.state.currentDirectory);
-        if(this.state.callback){
+        if (this.state.callback) {
             this.state.callback();
         }
     }
@@ -129,6 +135,9 @@ class StorageFileSystem extends Component {
 
     handleUploadFile = () => {
         const file = window.document.getElementById('file-upload').files[0];
+        if (!file) {
+            return;
+        }
         const {name, size} = file;
         let url = server + '/storages/' + this.state.storageId + '/upload?X-Auth-Token=' + getToken() + '&dir=' + this.state.currentDirectory;
 
@@ -141,7 +150,7 @@ class StorageFileSystem extends Component {
                 let description = (
                     <React.Fragment>
                         <div>{name}</div>
-                        <div>{renderSize(size)}/{renderSize(size)}</div>
+                        <div>{renderSize(size)} / {renderSize(size)}</div>
                         <Progress percent={100}/>
                     </React.Fragment>
                 );
@@ -157,7 +166,6 @@ class StorageFileSystem extends Component {
                 let description = (
                     <React.Fragment>
                         <div>{name}</div>
-                        <div>-/{renderSize(size)}</div>
                         <Text type="danger">{message}</Text>
                     </React.Fragment>
                 );
@@ -201,7 +209,7 @@ class StorageFileSystem extends Component {
                 description = (
                     <React.Fragment>
                         <div>{name}</div>
-                        <div>{renderSize(event.loaded)}/{renderSize(size)}</div>
+                        <div>{renderSize(event.loaded)} / {renderSize(size)}</div>
                         <Progress percent={percent}/>
                     </React.Fragment>
                 );
@@ -250,6 +258,13 @@ class StorageFileSystem extends Component {
         let formData = new FormData();
         formData.append("file", file, name);
         xhr.send(formData);
+    }
+
+    delete = async (key) => {
+        let result = await request.post(`/storages/${this.state.storageId}/rm?key=${key}`);
+        if (result['code'] !== 1) {
+            message.error(result['message']);
+        }
     }
 
     render() {
@@ -379,7 +394,7 @@ class StorageFileSystem extends Component {
                 key: 'action',
                 width: 200,
                 render: (value, item) => {
-                    if(item['key'] === '..'){
+                    if (item['key'] === '..') {
                         return undefined;
                     }
                     let disableDownload = false;
@@ -388,8 +403,8 @@ class StorageFileSystem extends Component {
                     }
                     return (
                         <>
-                            <Button type="link" size='small' disabled={disableDownload} onClick={async ()=>{
-                                download(`${server}/storages/${this.state.storageId}/download?file=${item['key']}&X-Auth-Token=${getToken()}'`);
+                            <Button type="link" size='small' disabled={disableDownload} onClick={async () => {
+                                download(`${server}/storages/${this.state.storageId}/download?file=${item['key']}&X-Auth-Token=${getToken()}`);
                             }}>下载</Button>
                             <Button type={'link'} size={'small'} onClick={() => {
                                 this.setState({
@@ -400,11 +415,7 @@ class StorageFileSystem extends Component {
                             <Popconfirm
                                 title="您确认要删除此文件吗?"
                                 onConfirm={async () => {
-                                    let result = await request.post(`/storages/${this.state.storageId}/rm?key=${item['key']}`);
-                                    if (result['code'] !== 1) {
-                                        message.error(result['message']);
-                                        return;
-                                    }
+                                    this.delete(item['key']);
                                     this.refresh();
                                 }}
                                 okText="是"
@@ -417,6 +428,16 @@ class StorageFileSystem extends Component {
                 },
             }
         ];
+
+
+        const {selectedRowKeys} = this.state;
+        const rowSelection = {
+            selectedRowKeys,
+            onChange: (selectedRowKeys) => {
+                this.setState({selectedRowKeys});
+            },
+        };
+        const hasSelected = selectedRowKeys.filter(item => item !== '..').length > 0;
 
         const title = (
             <div className='fs-header'>
@@ -453,22 +474,47 @@ class StorageFileSystem extends Component {
                                         ghost/>
                             </Tooltip>
                         </div>
+
+                        <div className='fs-header-right-item'>
+                            <Tooltip title="批量删除">
+                                <Button type="primary" size="small" ghost danger disabled={!hasSelected}
+                                        icon={<DeleteOutlined/>}
+                                        loading={this.state.delBtnLoading}
+                                        onClick={() => {
+                                            let rowKeys = this.state.selectedRowKeys;
+                                            const content = <div>
+                                                您确定要删除选中的<Text style={{color: '#1890FF'}}
+                                                               strong>{rowKeys.filter(item => item !== '..').length}</Text>条记录吗？
+                                            </div>;
+                                            confirm({
+                                                icon: <ExclamationCircleOutlined/>,
+                                                content: content,
+                                                onOk: async () => {
+                                                    for (let i = 0; i < rowKeys.length; i++) {
+                                                        if (rowKeys[i] === '..') {
+                                                            continue;
+                                                        }
+                                                        await this.delete(rowKeys[i]);
+                                                    }
+                                                    this.refresh();
+                                                },
+                                                onCancel() {
+
+                                                },
+                                            });
+                                        }}>
+
+                                </Button>
+                            </Tooltip>
+                        </div>
                     </Space>
                 </div>
             </div>
         );
 
-        const {selectedRowKeys} = this.state;
-        const rowSelection = {
-            selectedRowKeys,
-            onChange: (selectedRowKeys) => {
-                this.setState({selectedRowKeys});
-            },
-        };
-
         return (
             <div>
-                <Card title={title} bordered={true} size="small" style={{minHeight: window.innerHeight - 103}}>
+                <Card title={title} bordered={true} size="small" style={{minHeight: this.state.minHeight}}>
 
                     <Table columns={columns}
                            rowSelection={rowSelection}
@@ -503,7 +549,7 @@ class StorageFileSystem extends Component {
                         <Modal
                             title="创建文件夹"
                             visible={this.state.mkdirVisible}
-
+                            okButtonProps={{form: 'mkdir-form', key: 'submit', htmlType: 'submit'}}
                             onOk={() => {
                                 this.mkdirFormRef.current
                                     .validateFields()
@@ -541,8 +587,7 @@ class StorageFileSystem extends Component {
                                 })
                             }}
                         >
-                            <Form ref={this.mkdirFormRef}>
-
+                            <Form ref={this.mkdirFormRef} id={'mkdir-form'}>
                                 <Form.Item name='dir' rules={[{required: true, message: '请输入文件夹名称'}]}>
                                     <Input autoComplete="off" placeholder="请输入文件夹名称"/>
                                 </Form.Item>
@@ -555,7 +600,7 @@ class StorageFileSystem extends Component {
                         <Modal
                             title="重命名"
                             visible={this.state.renameVisible}
-                            okButtonProps={{form:'rename-form', key: 'submit', htmlType: 'submit'}}
+                            okButtonProps={{form: 'rename-form', key: 'submit', htmlType: 'submit'}}
                             onOk={() => {
                                 this.renameFormRef.current
                                     .validateFields()

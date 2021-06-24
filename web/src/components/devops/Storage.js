@@ -311,7 +311,7 @@ class Storage extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-                    <StorageFileSystem storageId={this.state.storageId} onRef={this.onRef}/>
+                    <StorageFileSystem storageId={this.state.storageId} onRef={this.onRef} minHeight={window.innerHeight - 103}/>
                 </Drawer>
 
                 {

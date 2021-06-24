@@ -8,7 +8,7 @@ import request from "../../common/request";
 import {message} from "antd/es";
 
 const {Content} = Layout;
-const {Title, Text} = Typography;
+const {Title} = Typography;
 
 class MyFile extends Component {
 
@@ -39,10 +39,10 @@ class MyFile extends Component {
                 <Content key='page-content' className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={12} key={1}>
+                            <Col span={16} key={1}>
                                 <Title level={3}>我的文件</Title>
                             </Col>
-                            <Col span={12} key={2} style={{textAlign: 'right'}}>
+                            <Col span={8} key={2} style={{textAlign: 'right'}}>
                                 <Descriptions title="" column={2}>
                                     <Descriptions.Item label={<div><FireOutlined/> 大小限制</div>}>
                                         <strong>{storage['limitSize'] < 0 ? '无限制' : renderSize(storage['limitSize'])}</strong>
@@ -54,7 +54,7 @@ class MyFile extends Component {
                             </Col>
                         </Row>
                     </div>
-                    <StorageFileSystem storageId={getCurrentUser()['id']} callback={this.getDefaultStorage}/>
+                    <StorageFileSystem storageId={getCurrentUser()['id']} callback={this.getDefaultStorage} minHeight={window.innerHeight - 203}/>
                 </Content>
             </div>
         );

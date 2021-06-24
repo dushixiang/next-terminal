@@ -91,7 +91,6 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 	startWithUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
 
 	sessionDownload := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/download`)
-	storageDownload := regexp.MustCompile(`^/storages/\w{8}(-\w{4}){3}-\w{12}/download`)
 	recording := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/recording`)
 
 	return func(c echo.Context) error {
@@ -108,10 +107,6 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 		}
 
 		if sessionDownload.FindString(uri) != "" {
-			return next(c)
-		}
-
-		if storageDownload.FindString(uri) != "" {
 			return next(c)
 		}
 
