@@ -9,7 +9,8 @@ import {
     CopyOutlined,
     ExclamationCircleOutlined,
     ExpandOutlined,
-    FolderOutlined, LineChartOutlined,
+    FolderOutlined,
+    LineChartOutlined,
     WindowsOutlined
 } from '@ant-design/icons';
 import {exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
@@ -17,6 +18,7 @@ import './Access.css'
 import Draggable from 'react-draggable';
 import FileSystem from "../devops/FileSystem";
 import Stats from "./Stats";
+import {getCurrentUser} from "../../service/permission";
 
 const {TextArea} = Input;
 
@@ -673,12 +675,17 @@ class Access extends Component {
                             </Draggable>
 
                             <Draggable>
-                                <Affix style={{position: 'absolute', top: 150, right: 100, zIndex: this.state.enterBtnIndex}}>
+                                <Affix style={{
+                                    position: 'absolute',
+                                    top: 150,
+                                    right: 100,
+                                    zIndex: this.state.enterBtnIndex
+                                }}>
                                     <Button icon={<LineChartOutlined/>} onClick={() => {
                                         this.setState({
                                             statsVisible: true,
                                         });
-                                        if(this.statsRef){
+                                        if (this.statsRef) {
                                             this.statsRef.addInterval();
                                         }
                                     }}/>
@@ -689,7 +696,7 @@ class Access extends Component {
 
 
                 <Drawer
-                    title={'会话详情'}
+                    title={'文件管理'}
                     placement="right"
                     width={window.innerWidth * 0.8}
                     closable={true}
@@ -702,10 +709,18 @@ class Access extends Component {
                     }}
                     visible={this.state.fileSystemVisible}
                 >
-                    <FileSystem
-                        storageId={this.state.sessionId}
-                        storageType={'sessions'}
-                        minHeight={window.innerHeight - 103}/>
+                    {
+                        this.state.protocol === 'ssh' ?
+                            <FileSystem
+                                storageId={this.state.sessionId}
+                                storageType={'sessions'}
+                                minHeight={window.innerHeight - 103}/> :
+                            <FileSystem
+                                storageId={getCurrentUser()['id']}
+                                storageType={'storages'}
+                                minHeight={window.innerHeight - 103}/>
+                    }
+
                 </Drawer>
 
                 <Drawer

@@ -88,9 +88,6 @@ func TunEndpoint(c echo.Context) error {
 			configuration.SetParameter("ignore-cert", "true")
 			configuration.SetParameter("create-drive-path", "true")
 			configuration.SetParameter("resize-method", "reconnect")
-			configuration.SetParameter(guacd.EnableDrive, propertyMap[guacd.EnableDrive])
-			configuration.SetParameter(guacd.DriveName, propertyMap[guacd.DriveName])
-			configuration.SetParameter(guacd.DrivePath, propertyMap[guacd.DrivePath])
 			configuration.SetParameter(guacd.EnableWallpaper, propertyMap[guacd.EnableWallpaper])
 			configuration.SetParameter(guacd.EnableTheming, propertyMap[guacd.EnableTheming])
 			configuration.SetParameter(guacd.EnableFontSmoothing, propertyMap[guacd.EnableFontSmoothing])
@@ -143,11 +140,37 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("port", strconv.Itoa(session.Port))
 
 		// 加载资产配置的属性，优先级比全局配置的高，因此最后加载，覆盖掉全局配置
-		attributes, _ := assetRepository.FindAttrById(session.AssetId)
+		attributes, err := assetRepository.FindAssetAttrMapByAssetId(session.AssetId)
+		if err != nil {
+			return err
+		}
 		if len(attributes) > 0 {
-			for i := range attributes {
-				attribute := attributes[i]
-				configuration.SetParameter(attribute.Name, attribute.Value)
+			for key := range attributes {
+				value := attributes[key]
+				if guacd.DrivePath == key {
+					// 忽略该参数
+					continue
+				}
+				if guacd.EnableDrive == key && value == "true" {
+					drivePath := attributes[guacd.DrivePath]
+					var storageId string
+					if drivePath == nil {
+						storageId = session.Creator
+					} else {
+						storageId = drivePath.(string)
+					}
+					if storageId == "" || storageId == "-" {
+						// 默认空间ID和用户ID相同
+						storageId = session.Creator
+					}
+					realPath := path.Join(storageService.GetBaseDrivePath(), storageId)
+					configuration.SetParameter(guacd.EnableDrive, "true")
+					configuration.SetParameter(guacd.DriveName, "Next Terminal Filesystem")
+					configuration.SetParameter(guacd.DrivePath, realPath)
+					log.Debugf("会话 %v:%v 映射目录地址为 %v", session.IP, session.Port, realPath)
+				} else {
+					configuration.SetParameter(key, value.(string))
+				}
 			}
 		}
 	}

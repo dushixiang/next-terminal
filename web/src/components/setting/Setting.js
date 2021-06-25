@@ -114,57 +114,18 @@ class Setting extends Component {
 
                                 <Form.Item
                                     {...formItemLayout}
-                                    name="enable-drive"
-                                    label="启用设备映射"
-                                    valuePropName="checked"
+                                    name="base-drive-path"
+                                    label="磁盘空间基础路径"
                                     rules={[
                                         {
                                             required: true,
+                                            message: '请输入磁盘空间基础路径',
                                         },
                                     ]}
+                                    tooltip={'磁盘空间的基础路径'}
                                 >
-                                    <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked, event) => {
-                                        this.setState({
-                                            properties: {
-                                                ...this.state.properties,
-                                                'enable-drive': checked,
-                                            }
-                                        })
-                                    }}/>
+                                    <Input type='text' placeholder="磁盘空间的基础路径"/>
                                 </Form.Item>
-                                {
-                                    this.state.properties['enable-drive'] === true ?
-                                        <>
-                                            <Form.Item
-                                                {...formItemLayout}
-                                                name="drive-name"
-                                                label="设备名称"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: '请输入设备名称',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input type='text' placeholder="请输入设备名称"/>
-                                            </Form.Item>
-
-                                            <Form.Item
-                                                {...formItemLayout}
-                                                name="drive-path"
-                                                label="设备路径"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: '请输入设备路径',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input type='text' placeholder="请输入设备路径"/>
-                                            </Form.Item>
-                                        </> : null
-                                }
-
                                 <Form.Item
                                     {...formItemLayout}
                                     name="enable-wallpaper"

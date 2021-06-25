@@ -267,29 +267,6 @@ func SessionUploadEndpoint(c echo.Context) error {
 			return err
 		}
 		return Success(c, nil)
-	} else if "rdp" == session.Protocol {
-
-		if strings.Contains(remoteFile, "../") {
-			return Fail(c, -1, "非法请求 :(")
-		}
-
-		drivePath, err := propertyRepository.GetDrivePath()
-		if err != nil {
-			return err
-		}
-
-		// Destination
-		dst, err := os.Create(path.Join(drivePath, remoteFile))
-		if err != nil {
-			return err
-		}
-		defer dst.Close()
-
-		// Copy
-		if _, err = io.Copy(dst, src); err != nil {
-			return err
-		}
-		return Success(c, nil)
 	}
 
 	return err
@@ -325,15 +302,6 @@ func SessionDownloadEndpoint(c echo.Context) error {
 		}
 
 		return c.Stream(http.StatusOK, echo.MIMEOctetStream, bytes.NewReader(buff.Bytes()))
-	} else if "rdp" == session.Protocol {
-		if strings.Contains(remoteFile, "../") {
-			return Fail(c, -1, "非法请求 :(")
-		}
-		drivePath, err := propertyRepository.GetDrivePath()
-		if err != nil {
-			return err
-		}
-		return c.Attachment(path.Join(drivePath, remoteFile), filenameWithSuffix)
 	}
 
 	return err
@@ -396,20 +364,6 @@ func SessionLsEndpoint(c echo.Context) error {
 		}
 
 		return Success(c, files)
-	} else if "rdp" == session.Protocol {
-		if strings.Contains(remoteDir, "../") {
-			return Fail(c, -1, "非法请求 :(")
-		}
-		drivePath, err := propertyRepository.GetDrivePath()
-		if err != nil {
-			return err
-		}
-		files, err := storageService.Ls(drivePath, remoteDir)
-		if err != nil {
-			return err
-		}
-
-		return Success(c, files)
 	}
 
 	return errors.New("当前协议不支持此操作")
@@ -443,21 +397,7 @@ func SessionMkDirEndpoint(c echo.Context) error {
 			return err
 		}
 		return Success(c, nil)
-	} else if "rdp" == session.Protocol {
-		if strings.Contains(remoteDir, "../") {
-			return Fail(c, -1, ":) 非法请求")
-		}
-		drivePath, err := propertyRepository.GetDrivePath()
-		if err != nil {
-			return err
-		}
-
-		if err := os.MkdirAll(path.Join(drivePath, remoteDir), os.ModePerm); err != nil {
-			return err
-		}
-		return Success(c, nil)
 	}
-
 	return errors.New("当前协议不支持此操作")
 }
 
@@ -504,20 +444,6 @@ func SessionRmEndpoint(c echo.Context) error {
 		}
 
 		return Success(c, nil)
-	} else if "rdp" == session.Protocol {
-		if strings.Contains(key, "../") {
-			return Fail(c, -1, ":) 非法请求")
-		}
-		drivePath, err := propertyRepository.GetDrivePath()
-		if err != nil {
-			return err
-		}
-
-		if err := os.RemoveAll(path.Join(drivePath, key)); err != nil {
-			return err
-		}
-
-		return Success(c, nil)
 	}
 
 	return errors.New("当前协议不支持此操作")
@@ -540,23 +466,6 @@ func SessionRenameEndpoint(c echo.Context) error {
 		sftpClient := tun.Subject.NextTerminal.SftpClient
 
 		if err := sftpClient.Rename(oldName, newName); err != nil {
-			return err
-		}
-
-		return Success(c, nil)
-	} else if "rdp" == session.Protocol {
-		if strings.Contains(oldName, "../") {
-			return Fail(c, -1, ":) 非法请求")
-		}
-		if strings.Contains(newName, "../") {
-			return Fail(c, -1, ":) 非法请求")
-		}
-		drivePath, err := propertyRepository.GetDrivePath()
-		if err != nil {
-			return err
-		}
-
-		if err := os.Rename(path.Join(drivePath, oldName), path.Join(drivePath, newName)); err != nil {
 			return err
 		}
 

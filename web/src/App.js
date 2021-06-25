@@ -50,7 +50,6 @@ import Term from "./components/access/Term";
 import Job from "./components/devops/Job";
 import {Header} from "antd/es/layout/layout";
 import Security from "./components/devops/Security";
-import StorageFileSystem from "./components/devops/Storage";
 import Storage from "./components/devops/Storage";
 import MyFile from "./components/asset/MyFile";
 

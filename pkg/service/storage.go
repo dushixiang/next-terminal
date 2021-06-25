@@ -3,11 +3,12 @@ package service
 import (
 	"errors"
 	"io/ioutil"
+	"os"
+	"path"
+
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
-	"os"
-	"path"
 
 	"gorm.io/gorm"
 )
@@ -23,11 +24,7 @@ func NewStorageService(storageRepository *repository.StorageRepository, userRepo
 }
 
 func (r StorageService) InitStorages() error {
-	drivePath, err := r.propertyRepository.GetDrivePath()
-	if err != nil {
-		return err
-	}
-
+	drivePath := r.GetBaseDrivePath()
 	users := r.userRepository.FindAll()
 	for i := range users {
 		userId := users[i].ID
@@ -64,7 +61,7 @@ type File struct {
 	Size    int64          `json:"size"`
 }
 
-func (ret StorageService) Ls(drivePath, remoteDir string) ([]File, error) {
+func (r StorageService) Ls(drivePath, remoteDir string) ([]File, error) {
 	fileInfos, err := ioutil.ReadDir(path.Join(drivePath, remoteDir))
 	if err != nil {
 		return nil, err
@@ -85,4 +82,9 @@ func (ret StorageService) Ls(drivePath, remoteDir string) ([]File, error) {
 		files = append(files, file)
 	}
 	return files, nil
+}
+
+func (r StorageService) GetBaseDrivePath() string {
+	baseDrivePath, _ := r.propertyRepository.GetBaseDrivePath()
+	return baseDrivePath
 }

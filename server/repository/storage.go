@@ -49,6 +49,13 @@ func (r StorageRepository) Find(pageIndex, pageSize int, name, order, field stri
 	return
 }
 
+func (r StorageRepository) FindShares() (o []model.Storage, err error) {
+	m := model.Storage{}
+	db := r.DB.Table(m.TableName()).Where("is_share = 1")
+	err = db.Find(&o).Error
+	return
+}
+
 func (r StorageRepository) DeleteById(id string) error {
 	return r.DB.Where("id = ?", id).Delete(model.Storage{}).Error
 }

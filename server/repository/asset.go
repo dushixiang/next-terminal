@@ -260,8 +260,17 @@ func (r AssetRepository) UpdateActiveById(active bool, id string) error {
 	return r.DB.Exec(sql, active, id).Error
 }
 
-func (r AssetRepository) DeleteById(id string) error {
-	return r.DB.Where("id = ?", id).Delete(&model.Asset{}).Error
+func (r AssetRepository) DeleteById(id string) (err error) {
+	return r.DB.Transaction(func(tx *gorm.DB) error {
+		err = tx.Where("id = ?", id).Delete(&model.Asset{}).Error
+		if err != nil {
+			return err
+		}
+		// 删除资产属性
+		err = tx.Where("asset_id = ?", id).Delete(&model.AssetAttribute{}).Error
+		return err
+	})
+
 }
 
 func (r AssetRepository) Count() (total int64, err error) {

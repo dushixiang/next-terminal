@@ -3,6 +3,7 @@ package service
 import (
 	"os"
 
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/guacd"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
@@ -76,34 +77,6 @@ func (r PropertyService) InitProperties() error {
 		}
 	}
 
-	if len(propertyMap[guacd.DriveName]) == 0 {
-		property := model.Property{
-			Name:  guacd.DriveName,
-			Value: "File-System",
-		}
-		if err := r.propertyRepository.Create(&property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.DrivePath]) == 0 {
-
-		path, _ := os.Getwd()
-
-		property := model.Property{
-			Name:  guacd.DrivePath,
-			Value: path + "/drive/",
-		}
-		if !utils.FileExists(property.Value) {
-			if err := os.Mkdir(property.Value, os.ModePerm); err != nil {
-				return err
-			}
-		}
-		if err := r.propertyRepository.Create(&property); err != nil {
-			return err
-		}
-	}
-
 	if len(propertyMap[guacd.FontName]) == 0 {
 		property := model.Property{
 			Name:  guacd.FontName,
@@ -134,10 +107,16 @@ func (r PropertyService) InitProperties() error {
 		}
 	}
 
-	if len(propertyMap[guacd.EnableDrive]) == 0 {
+	if len(propertyMap[constant.BaseDrivePath]) == 0 {
+		path, _ := os.Getwd()
 		property := model.Property{
-			Name:  guacd.EnableDrive,
-			Value: "true",
+			Name:  constant.BaseDrivePath,
+			Value: path + "/drive/",
+		}
+		if !utils.FileExists(property.Value) {
+			if err := os.Mkdir(property.Value, os.ModePerm); err != nil {
+				return err
+			}
 		}
 		if err := r.propertyRepository.Create(&property); err != nil {
 			return err

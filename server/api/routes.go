@@ -2,7 +2,6 @@ package api
 
 import (
 	"crypto/md5"
-	"embed"
 	"fmt"
 	"net/http"
 	"os"
@@ -54,7 +53,7 @@ var (
 	storageService    *service.StorageService
 )
 
-func SetupRoutes(db *gorm.DB, indexHtml, asciinemaHtml string, asciinemaPlayerJs, asciinemaPlayerCss, faviconIco []byte, static embed.FS) *echo.Echo {
+func SetupRoutes(db *gorm.DB) *echo.Echo {
 
 	InitRepository(db)
 	InitService()
@@ -72,42 +71,9 @@ func SetupRoutes(db *gorm.DB, indexHtml, asciinemaHtml string, asciinemaPlayerJs
 	e.HideBanner = true
 	//e.Logger = log.GetEchoLogger()
 	e.Use(log.Hook())
-	//e.GET("/", func(c echo.Context) error {
-	//	return c.HTML(200, indexHtml)
-	//})
-	//e.GET("/asciinema.html", func(c echo.Context) error {
-	//	return c.HTML(200, asciinemaHtml)
-	//})
-	//e.GET("/asciinema-player.js", func(c echo.Context) error {
-	//	return c.Blob(200, "application/javascript", asciinemaPlayerJs)
-	//})
-	//e.GET("/asciinema-player.css", func(c echo.Context) error {
-	//	return c.Blob(200, "text/css; charset=utf-8", asciinemaPlayerCss)
-	//})
-	//e.GET("/favicon.ico", func(c echo.Context) error {
-	//	return c.Blob(200, "image/vnd.microsoft.icon", faviconIco)
-	//})
-	//e.GET("/static/*", func(c echo.Context) error {
-	//	uri := c.Request().RequestURI
-	//	path := strings.Replace(uri, "/static/", "", 1)
-	//	file, err := static.ReadFile("web/build/static/" + path)
-	//	if err != nil {
-	//		return err
-	//	}
-	//	if strings.HasSuffix(path, "js") {
-	//		return c.Blob(200, "application/javascript", file)
-	//	}
-	//	if strings.HasSuffix(path, "css") {
-	//		return c.Blob(200, "text/css; charset=utf-8", file)
-	//	}
-	//
-	//	return c.Blob(200, "", file)
-	//})
 	e.File("/", "web/build/index.html")
 	e.File("/asciinema.html", "web/build/asciinema.html")
-	e.File("/asciinema-player.js", "web/build/asciinema-player.js")
-	e.File("/asciinema-player.css", "web/build/asciinema-player.css")
-	e.File("/logo.svg", "web/build/logo.svg")
+	e.File("/", "web/build/index.html")
 	e.File("/favicon.ico", "web/build/favicon.ico")
 	e.Static("/static", "web/build/static")
 
@@ -254,10 +220,12 @@ func SetupRoutes(db *gorm.DB, indexHtml, asciinemaHtml string, asciinemaPlayerJs
 
 	storages := e.Group("/storages")
 	{
-		storages.GET("/paging", StoragePagingEndpoint)
-		storages.POST("", StorageCreateEndpoint)
-		storages.DELETE("/:id", StorageDeleteEndpoint)
-		storages.PUT("/:id", StorageUpdateEndpoint)
+		storages.GET("/paging", StoragePagingEndpoint, Admin)
+		storages.POST("", StorageCreateEndpoint, Admin)
+		storages.DELETE("/:id", StorageDeleteEndpoint, Admin)
+		storages.PUT("/:id", StorageUpdateEndpoint, Admin)
+
+		storages.GET("/shares", StorageSharesEndpoint)
 		storages.GET("/:id", StorageGetEndpoint)
 		storages.GET("/:id/ls", StorageLsEndpoint)
 		storages.GET("/:id/download", StorageDownloadEndpoint)

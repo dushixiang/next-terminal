@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"image"
 	"image/png"
+	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -24,6 +25,8 @@ import (
 	"time"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/text/encoding/simplifiedchinese"
+	"golang.org/x/text/transform"
 
 	"github.com/gofrs/uuid"
 	errors2 "github.com/pkg/errors"
@@ -368,4 +371,13 @@ func DirSize(path string) (int64, error) {
 		return err
 	})
 	return size, err
+}
+
+func Utf8ToGbk(s []byte) ([]byte, error) {
+	reader := transform.NewReader(bytes.NewReader(s), simplifiedchinese.GBK.NewEncoder())
+	d, e := ioutil.ReadAll(reader)
+	if e != nil {
+		return nil, e
+	}
+	return d, nil
 }

@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"next-terminal/pkg/constant"
 	"next-terminal/pkg/guacd"
 	"next-terminal/server/model"
 
@@ -47,8 +48,8 @@ func (r PropertyRepository) FindAllMap() map[string]string {
 	return propertyMap
 }
 
-func (r PropertyRepository) GetDrivePath() (string, error) {
-	property, err := r.FindByName(guacd.DrivePath)
+func (r PropertyRepository) GetBaseDrivePath() (string, error) {
+	property, err := r.FindByName(constant.BaseDrivePath)
 	if err != nil {
 		return "", err
 	}

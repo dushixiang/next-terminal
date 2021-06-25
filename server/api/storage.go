@@ -28,10 +28,7 @@ func StoragePagingEndpoint(c echo.Context) error {
 		return err
 	}
 
-	drivePath, err := propertyRepository.GetDrivePath()
-	if err != nil {
-		return err
-	}
+	drivePath := storageService.GetBaseDrivePath()
 
 	for i := range items {
 		item := items[i]
@@ -60,10 +57,7 @@ func StorageCreateEndpoint(c echo.Context) error {
 	item.Created = utils.NowJsonTime()
 	item.Owner = account.ID
 	// 创建对应的目录文件夹
-	drivePath, err := propertyRepository.GetDrivePath()
-	if err != nil {
-		return err
-	}
+	drivePath := storageService.GetBaseDrivePath()
 	if err := os.MkdirAll(path.Join(drivePath, item.ID), os.ModePerm); err != nil {
 		return err
 	}
@@ -80,10 +74,7 @@ func StorageUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	drivePath, err := propertyRepository.GetDrivePath()
-	if err != nil {
-		return err
-	}
+	drivePath := storageService.GetBaseDrivePath()
 	dirSize, err := utils.DirSize(path.Join(drivePath, item.ID))
 	if err != nil {
 		return err
@@ -113,10 +104,7 @@ func StorageGetEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	drivePath, err := propertyRepository.GetDrivePath()
-	if err != nil {
-		return err
-	}
+	drivePath := storageService.GetBaseDrivePath()
 	dirSize, err := utils.DirSize(path.Join(drivePath, id))
 	if err != nil {
 		return err
@@ -126,9 +114,17 @@ func StorageGetEndpoint(c echo.Context) error {
 	return Success(c, structMap)
 }
 
+func StorageSharesEndpoint(c echo.Context) error {
+	storages, err := storageRepository.FindShares()
+	if err != nil {
+		return err
+	}
+	return Success(c, storages)
+}
+
 func StorageDeleteEndpoint(c echo.Context) error {
 	ids := c.Param("id")
-	drivePath := getNetworkDiskPath()
+	drivePath := storageService.GetBaseDrivePath()
 	split := strings.Split(ids, ",")
 	for i := range split {
 		id := split[i]
@@ -172,7 +168,7 @@ func StorageLsEndpoint(c echo.Context) error {
 		return err
 	}
 
-	drivePath := getNetworkDiskPath()
+	drivePath := storageService.GetBaseDrivePath()
 	remoteDir := c.QueryParam("dir")
 	if strings.Contains(remoteDir, "../") {
 		return Fail(c, -1, "非法请求 :(")
@@ -190,7 +186,7 @@ func StorageDownloadEndpoint(c echo.Context) error {
 		return err
 	}
 
-	drivePath := getNetworkDiskPath()
+	drivePath := storageService.GetBaseDrivePath()
 	remoteFile := c.QueryParam("file")
 	if strings.Contains(remoteFile, "../") {
 		return Fail(c, -1, "非法请求 :(")
@@ -205,7 +201,7 @@ func StorageUploadEndpoint(c echo.Context) error {
 	if err := PermissionCheck(c, id); err != nil {
 		return err
 	}
-	drivePath := getNetworkDiskPath()
+	drivePath := storageService.GetBaseDrivePath()
 	file, err := c.FormFile("file")
 	if err != nil {
 		return err
@@ -254,7 +250,7 @@ func StorageMkDirEndpoint(c echo.Context) error {
 	if err := PermissionCheck(c, id); err != nil {
 		return err
 	}
-	drivePath := getNetworkDiskPath()
+	drivePath := storageService.GetBaseDrivePath()
 	remoteDir := c.QueryParam("dir")
 	if strings.Contains(remoteDir, "../") {
 		SafetyRuleTrigger(c)
@@ -271,7 +267,7 @@ func StorageRmEndpoint(c echo.Context) error {
 	if err := PermissionCheck(c, id); err != nil {
 		return err
 	}
-	drivePath := getNetworkDiskPath()
+	drivePath := storageService.GetBaseDrivePath()
 	// 文件夹或者文件
 	key := c.QueryParam("key")
 	if strings.Contains(key, "../") {
@@ -288,7 +284,7 @@ func StorageRenameEndpoint(c echo.Context) error {
 	if err := PermissionCheck(c, id); err != nil {
 		return err
 	}
-	drivePath := getNetworkDiskPath()
+	drivePath := storageService.GetBaseDrivePath()
 	oldName := c.QueryParam("oldName")
 	newName := c.QueryParam("newName")
 	if strings.Contains(oldName, "../") {
@@ -301,8 +297,4 @@ func StorageRenameEndpoint(c echo.Context) error {
 		return err
 	}
 	return Success(c, nil)
-}
-
-func getNetworkDiskPath() string {
-	return "/Users/dushixiang/go/src/next-terminal/drive/"
 }
