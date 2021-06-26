@@ -90,7 +90,7 @@ func UserDeleteEndpoint(c echo.Context) error {
 			return Fail(c, -1, "不允许删除自身账户")
 		}
 		// 将用户强制下线
-		loginLogs, err := loginLogRepository.FindAliveLoginLogsByUserId(userId)
+		loginLogs, err := loginLogRepository.FindAliveLoginLogsByUsername(userId)
 		if err != nil {
 			return err
 		}
@@ -172,9 +172,9 @@ func ReloadToken() error {
 	for i := range loginLogs {
 		loginLog := loginLogs[i]
 		token := loginLog.ID
-		user, err := userRepository.FindById(loginLog.UserId)
+		user, err := userRepository.FindByUsername(loginLog.Username)
 		if err != nil {
-			log.Debugf("用户「%v」获取失败，忽略", loginLog.UserId)
+			log.Debugf("用户「%v」获取失败，忽略", loginLog.Username)
 			continue
 		}
 

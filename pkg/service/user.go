@@ -66,12 +66,12 @@ func (r UserService) FixUserOnlineState() error {
 	}
 	if len(onlineUsers) > 0 {
 		for i := range onlineUsers {
-			logs, err := r.loginLogRepository.FindAliveLoginLogsByUserId(onlineUsers[i].ID)
+			logs, err := r.loginLogRepository.FindAliveLoginLogsByUsername(onlineUsers[i].Username)
 			if err != nil {
 				return err
 			}
 			if len(logs) == 0 {
-				if err := r.userRepository.UpdateOnline(onlineUsers[i].ID, false); err != nil {
+				if err := r.userRepository.UpdateOnlineByUsername(onlineUsers[i].Username, false); err != nil {
 					return err
 				}
 			}
@@ -81,7 +81,6 @@ func (r UserService) FixUserOnlineState() error {
 }
 
 func (r UserService) Logout(token string) (err error) {
-
 	loginLog, err := r.loginLogRepository.FindById(token)
 	if err != nil {
 		log.Warnf("登录日志「%v」获取失败", token)
@@ -94,13 +93,13 @@ func (r UserService) Logout(token string) (err error) {
 		return err
 	}
 
-	loginLogs, err := r.loginLogRepository.FindAliveLoginLogsByUserId(loginLog.UserId)
+	loginLogs, err := r.loginLogRepository.FindAliveLoginLogsByUsername(loginLog.Username)
 	if err != nil {
 		return
 	}
 
 	if len(loginLogs) == 0 {
-		err = r.userRepository.UpdateOnline(loginLog.UserId, false)
+		err = r.userRepository.UpdateOnlineByUsername(loginLog.Username, false)
 	}
 	return
 }

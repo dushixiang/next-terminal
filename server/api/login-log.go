@@ -13,10 +13,11 @@ import (
 func LoginLogPagingEndpoint(c echo.Context) error {
 	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
-	userId := c.QueryParam("userId")
+	username := c.QueryParam("username")
 	clientIp := c.QueryParam("clientIp")
+	state := c.QueryParam("state")
 
-	items, total, err := loginLogRepository.Find(pageIndex, pageSize, userId, clientIp)
+	items, total, err := loginLogRepository.Find(pageIndex, pageSize, username, clientIp, state)
 
 	if err != nil {
 		return err
@@ -44,3 +45,10 @@ func LoginLogDeleteEndpoint(c echo.Context) error {
 
 	return Success(c, nil)
 }
+
+//func LoginLogClearEndpoint(c echo.Context) error {
+//	loginLogs, err := loginLogRepository.FindAliveLoginLogs()
+//	if err != nil {
+//		return err
+//	}
+//}

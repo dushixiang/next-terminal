@@ -188,6 +188,7 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 	{
 		loginLogs.GET("/paging", LoginLogPagingEndpoint)
 		loginLogs.DELETE("/:id", LoginLogDeleteEndpoint)
+		//loginLogs.DELETE("/clear", LoginLogClearEndpoint)
 	}
 
 	e.GET("/properties", Admin(PropertyGetEndpoint))

@@ -15,19 +15,24 @@ func NewLoginLogRepository(db *gorm.DB) *LoginLogRepository {
 	return loginLogRepository
 }
 
-func (r LoginLogRepository) Find(pageIndex, pageSize int, userId, clientIp string) (o []model.LoginLogForPage, total int64, err error) {
+func (r LoginLogRepository) Find(pageIndex, pageSize int, username, clientIp, state string) (o []model.LoginLog, total int64, err error) {
+	m := model.LoginLog{}
+	db := r.DB.Table(m.TableName())
+	dbCounter := r.DB.Table(m.TableName())
 
-	db := r.DB.Table("login_logs").Select("login_logs.id,login_logs.user_id,login_logs.client_ip,login_logs.client_user_agent,login_logs.login_time, login_logs.logout_time, users.nickname as user_name").Joins("left join users on login_logs.user_id = users.id")
-	dbCounter := r.DB.Table("login_logs").Select("DISTINCT login_logs.id")
-
-	if userId != "" {
-		db = db.Where("login_logs.user_id = ?", userId)
-		dbCounter = dbCounter.Where("login_logs.user_id = ?", userId)
+	if username != "" {
+		db = db.Where("username like ?", "%"+username+"%")
+		dbCounter = dbCounter.Where("username like ?", "%"+username+"%")
 	}
 
 	if clientIp != "" {
-		db = db.Where("login_logs.client_ip like ?", "%"+clientIp+"%")
-		dbCounter = dbCounter.Where("login_logs.client_ip like ?", "%"+clientIp+"%")
+		db = db.Where("client_ip like ?", "%"+clientIp+"%")
+		dbCounter = dbCounter.Where("client_ip like ?", "%"+clientIp+"%")
+	}
+
+	if state != "" {
+		db = db.Where("state = ?", state)
+		dbCounter = dbCounter.Where("state = ?", state)
 	}
 
 	err = dbCounter.Count(&total).Error
@@ -35,20 +40,20 @@ func (r LoginLogRepository) Find(pageIndex, pageSize int, userId, clientIp strin
 		return nil, 0, err
 	}
 
-	err = db.Order("login_logs.login_time desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
+	err = db.Order("login_time desc").Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&o).Error
 	if o == nil {
-		o = make([]model.LoginLogForPage, 0)
+		o = make([]model.LoginLog, 0)
 	}
 	return
 }
 
 func (r LoginLogRepository) FindAliveLoginLogs() (o []model.LoginLog, err error) {
-	err = r.DB.Where("logout_time is null").Find(&o).Error
+	err = r.DB.Where("state = '1' and logout_time is null").Find(&o).Error
 	return
 }
 
-func (r LoginLogRepository) FindAliveLoginLogsByUserId(userId string) (o []model.LoginLog, err error) {
-	err = r.DB.Where("logout_time is null and user_id = ?", userId).Find(&o).Error
+func (r LoginLogRepository) FindAliveLoginLogsByUsername(username string) (o []model.LoginLog, err error) {
+	err = r.DB.Where("state = '1' and logout_time is null and username = ?", username).Find(&o).Error
 	return
 }
 

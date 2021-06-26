@@ -41,11 +41,6 @@ type Authorization struct {
 	User     model.User
 }
 
-//
-//type UserServer struct {
-//	repository.UserRepository
-//}
-
 func LoginEndpoint(c echo.Context) error {
 	var loginAccount LoginAccount
 	if err := c.Bind(&loginAccount); err != nil {
@@ -68,12 +63,20 @@ func LoginEndpoint(c echo.Context) error {
 	if err != nil {
 		count++
 		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c, loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
 		count++
 		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c, loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
@@ -85,8 +88,35 @@ func LoginEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
+	// 保存登录日志
+	if err := SaveLoginLog(c, loginAccount.Username, true, loginAccount.Remember, token, ""); err != nil {
+		return err
+	}
 
 	return Success(c, token)
+}
+
+func SaveLoginLog(c echo.Context, username string, success, remember bool, id, reason string) error {
+	loginLog := model.LoginLog{
+		Username:        username,
+		ClientIP:        c.RealIP(),
+		ClientUserAgent: c.Request().UserAgent(),
+		LoginTime:       utils.NowJsonTime(),
+		Reason:          reason,
+		Remember:        remember,
+	}
+	if success {
+		loginLog.State = "1"
+		loginLog.ID = id
+	} else {
+		loginLog.State = "0"
+		loginLog.ID = utils.UUID()
+	}
+
+	if err := loginLogRepository.Create(&loginLog); err != nil {
+		return err
+	}
+	return nil
 }
 
 func LoginSuccess(c echo.Context, loginAccount LoginAccount, user model.User) (token string, err error) {
@@ -105,20 +135,6 @@ func LoginSuccess(c echo.Context, loginAccount LoginAccount, user model.User) (t
 		global.Cache.Set(cacheKey, authorization, RememberEffectiveTime)
 	} else {
 		global.Cache.Set(cacheKey, authorization, NotRememberEffectiveTime)
-	}
-
-	// 保存登录日志
-	loginLog := model.LoginLog{
-		ID:              token,
-		UserId:          user.ID,
-		ClientIP:        c.RealIP(),
-		ClientUserAgent: c.Request().UserAgent(),
-		LoginTime:       utils.NowJsonTime(),
-		Remember:        authorization.Remember,
-	}
-
-	if loginLogRepository.Create(&loginLog) != nil {
-		return "", err
 	}
 
 	// 修改登录状态
@@ -158,23 +174,39 @@ func loginWithTotpEndpoint(c echo.Context) error {
 	if err != nil {
 		count++
 		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c, loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
 		count++
 		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c, loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
 	if !totp.Validate(loginAccount.TOTP, user.TOTPSecret) {
 		count++
 		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c, loginAccount.Username, false, loginAccount.Remember, "", "双因素认证授权码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入双因素认证授权码不正确", count)
 	}
 
 	token, err := LoginSuccess(c, loginAccount, user)
 	if err != nil {
+		return err
+	}
+	// 保存登录日志
+	if err := SaveLoginLog(c, loginAccount.Username, true, loginAccount.Remember, token, ""); err != nil {
 		return err
 	}
 
