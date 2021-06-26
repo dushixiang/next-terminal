@@ -34,6 +34,10 @@ func (r PropertyRepository) UpdateByName(o *model.Property, name string) error {
 	return r.DB.Updates(o).Error
 }
 
+func (r PropertyRepository) DeleteByName(name string) error {
+	return r.DB.Where("name = ?", name).Delete(model.Property{}).Error
+}
+
 func (r PropertyRepository) FindByName(name string) (o model.Property, err error) {
 	err = r.DB.Where("name = ?", name).First(&o).Error
 	return

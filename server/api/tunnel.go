@@ -152,13 +152,7 @@ func TunEndpoint(c echo.Context) error {
 					continue
 				}
 				if guacd.EnableDrive == key && value == "true" {
-					drivePath := attributes[guacd.DrivePath]
-					var storageId string
-					if drivePath == nil {
-						storageId = session.Creator
-					} else {
-						storageId = drivePath.(string)
-					}
+					storageId := attributes[guacd.DrivePath]
 					if storageId == "" || storageId == "-" {
 						// 默认空间ID和用户ID相同
 						storageId = session.Creator
@@ -169,7 +163,7 @@ func TunEndpoint(c echo.Context) error {
 					configuration.SetParameter(guacd.DrivePath, realPath)
 					log.Debugf("会话 %v:%v 映射目录地址为 %v", session.IP, session.Port, realPath)
 				} else {
-					configuration.SetParameter(key, value.(string))
+					configuration.SetParameter(key, value)
 				}
 			}
 		}

@@ -214,3 +214,23 @@ func (r PropertyService) InitProperties() error {
 	}
 	return nil
 }
+
+func (r PropertyService) DeleteDeprecatedProperty() error {
+	propertyMap := r.propertyRepository.FindAllMap()
+	if propertyMap[guacd.EnableDrive] != "" {
+		if err := r.propertyRepository.DeleteByName(guacd.DriveName); err != nil {
+			return err
+		}
+	}
+	if propertyMap[guacd.DrivePath] != "" {
+		if err := r.propertyRepository.DeleteByName(guacd.DrivePath); err != nil {
+			return err
+		}
+	}
+	if propertyMap[guacd.DriveName] != "" {
+		if err := r.propertyRepository.DeleteByName(guacd.DriveName); err != nil {
+			return err
+		}
+	}
+	return nil
+}

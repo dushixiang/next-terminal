@@ -368,7 +368,7 @@ func (r AssetRepository) FindAttrById(assetId string) (o []model.AssetAttribute,
 	return o, err
 }
 
-func (r AssetRepository) FindAssetAttrMapByAssetId(assetId string) (map[string]interface{}, error) {
+func (r AssetRepository) FindAssetAttrMapByAssetId(assetId string) (map[string]string, error) {
 	asset, err := r.FindById(assetId)
 	if err != nil {
 		return nil, err
@@ -392,7 +392,7 @@ func (r AssetRepository) FindAssetAttrMapByAssetId(assetId string) (map[string]i
 		parameterNames = constant.KubernetesParameterNames
 	}
 	propertiesMap := propertyRepository.FindAllMap()
-	var attributeMap = make(map[string]interface{})
+	var attributeMap = make(map[string]string)
 	for name := range propertiesMap {
 		if utils.Contains(parameterNames, name) {
 			attributeMap[name] = propertiesMap[name]

@@ -279,9 +279,13 @@ func InitService() {
 }
 
 func InitDBData() (err error) {
+	if err := propertyService.DeleteDeprecatedProperty(); err != nil {
+		return err
+	}
 	if err := propertyService.InitProperties(); err != nil {
 		return err
 	}
+
 	if err := numService.InitNums(); err != nil {
 		return err
 	}
