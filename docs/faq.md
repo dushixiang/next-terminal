@@ -53,6 +53,14 @@ docker rm <container-id> -f
 </details>
 
 <details>
+    <summary>连接rdp协议的windows一直处于"正在努力连接中..."状态？</summary>
+
+1. 确认guacd是否正确启动。
+2. 确认是否使用了中文的账号或者密码，如果有，请使用英文字符。
+
+</details>
+
+<details>
     <summary>ssh协议中文字体乱码怎么办？</summary>
 
 参考[安装字体](install-naive.md)章节，给系统安装中文字体。
