@@ -267,7 +267,7 @@ class App extends Component {
                                                 </Menu.Item>
                                             </SubMenu>
 
-                                            <SubMenu key='user-group' title='用户管理' icon={<UserSwitchOutlined/>}>
+                                            <SubMenu key='user-manage' title='用户管理' icon={<UserSwitchOutlined/>}>
                                                 <Menu.Item key="user" icon={<UserOutlined/>}>
                                                     <Link to={'/user'}>
                                                         用户管理

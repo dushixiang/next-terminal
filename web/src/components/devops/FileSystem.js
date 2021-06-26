@@ -29,7 +29,8 @@ import {
     FolderAddOutlined,
     FolderTwoTone,
     LinkOutlined,
-    ReloadOutlined
+    ReloadOutlined,
+    UploadOutlined
 } from "@ant-design/icons";
 import qs from "qs";
 import request from "../../common/request";
@@ -135,13 +136,41 @@ class FileSystem extends Component {
         this.loadFiles(event.target.value);
     }
 
-    handleUploadFile = () => {
-        const file = window.document.getElementById('file-upload').files[0];
-        if (!file) {
-            return;
+    handleUploadDir = () => {
+        let files = window.document.getElementById('dir-upload').files;
+        let uploadEndCount = 0;
+        for (let i = 0; i < files.length; i++) {
+            let relativePath = files[i]['webkitRelativePath'];
+            let dir = relativePath.substring(0, relativePath.length - files[i].name.length);
+            this.uploadFile(files[i], this.state.currentDirectory + '/' + dir, () => {
+                uploadEndCount++;
+                if (uploadEndCount === files.length) {
+                    this.refresh();
+                }
+            });
         }
+    }
+
+    handleUploadFile = () => {
+        let files = window.document.getElementById('file-upload').files;
+        let uploadEndCount = 0;
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            if (!file) {
+                return;
+            }
+            this.uploadFile(file, this.state.currentDirectory, () => {
+                uploadEndCount++;
+                if (uploadEndCount === files.length) {
+                    this.refresh();
+                }
+            });
+        }
+    }
+
+    uploadFile = (file, dir, callback) => {
         const {name, size} = file;
-        let url = `${server}/${this.state.storageType}/${this.state.storageId}/upload?X-Auth-Token=${getToken()}&dir=${this.state.currentDirectory}`
+        let url = `${server}/${this.state.storageType}/${this.state.storageId}/upload?X-Auth-Token=${getToken()}&dir=${dir}`
 
         const key = name;
         const xhr = new XMLHttpRequest();
@@ -163,7 +192,9 @@ class FileSystem extends Component {
                     description: description,
                     placement: 'bottomRight'
                 });
-                this.refresh();
+                if (callback) {
+                    callback();
+                }
             } else {
                 let description = (
                     <React.Fragment>
@@ -461,18 +492,31 @@ class FileSystem extends Component {
                         </div>
 
                         <div className='fs-header-right-item'>
-                            <Tooltip title="上传">
+                            <Tooltip title="上传文件">
                                 <Button type="primary" size="small" icon={<CloudUploadOutlined/>}
                                         onClick={() => {
                                             window.document.getElementById('file-upload').click();
                                         }} ghost/>
                                 <input type="file" id="file-upload" style={{display: 'none'}}
-                                       onChange={this.handleUploadFile}/>
+                                       onChange={this.handleUploadFile} multiple/>
                             </Tooltip>
                         </div>
+
+                        <div className='fs-header-right-item'>
+                            <Tooltip title="上传文件夹">
+                                <Button type="primary" size="small" icon={<UploadOutlined/>}
+                                        onClick={() => {
+                                            window.document.getElementById('dir-upload').click();
+                                        }} ghost/>
+                                <input type="file" id="dir-upload" style={{display: 'none'}}
+                                       onChange={this.handleUploadDir} webkitdirectory='' multiple/>
+                            </Tooltip>
+                        </div>
+
                         <div className='fs-header-right-item'>
                             <Tooltip title="刷新">
-                                <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh} ghost/>
+                                <Button type="primary" size="small" icon={<ReloadOutlined/>} onClick={this.refresh}
+                                        ghost/>
                             </Tooltip>
                         </div>
 

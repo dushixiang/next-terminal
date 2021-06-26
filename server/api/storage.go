@@ -227,10 +227,20 @@ func StorageUploadEndpoint(c echo.Context) error {
 	remoteDir := c.QueryParam("dir")
 	remoteFile := path.Join(remoteDir, filename)
 
+	if strings.Contains(remoteDir, "../") {
+		return Fail(c, -1, "非法请求 :(")
+	}
 	if strings.Contains(remoteFile, "../") {
 		return Fail(c, -1, "非法请求 :(")
 	}
 
+	// 判断文件夹不存在时自动创建
+	dir := path.Join(path.Join(drivePath, id), remoteDir)
+	if !utils.FileExists(dir) {
+		if err := os.MkdirAll(dir, os.ModePerm); err != nil {
+			return err
+		}
+	}
 	// Destination
 	dst, err := os.Create(path.Join(path.Join(drivePath, id), remoteFile))
 	if err != nil {
@@ -253,7 +263,6 @@ func StorageMkDirEndpoint(c echo.Context) error {
 	drivePath := storageService.GetBaseDrivePath()
 	remoteDir := c.QueryParam("dir")
 	if strings.Contains(remoteDir, "../") {
-		SafetyRuleTrigger(c)
 		return Fail(c, -1, ":) 非法请求")
 	}
 	if err := os.MkdirAll(path.Join(path.Join(drivePath, id), remoteDir), os.ModePerm); err != nil {

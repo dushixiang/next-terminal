@@ -257,7 +257,15 @@ func SessionUploadEndpoint(c echo.Context) error {
 			return errors.New("获取sftp客户端失败")
 		}
 
-		dstFile, err := tun.Subject.NextTerminal.SftpClient.Create(remoteFile)
+		sftpClient := tun.Subject.NextTerminal.SftpClient
+		// 文件夹不存在时自动创建文件夹
+		if _, err := sftpClient.Stat(remoteDir); os.IsNotExist(err) {
+			if err := sftpClient.MkdirAll(remoteDir); err != nil {
+				return err
+			}
+		}
+
+		dstFile, err := sftpClient.Create(remoteFile)
 		if err != nil {
 			return err
 		}
@@ -345,7 +353,7 @@ func SessionLsEndpoint(c echo.Context) error {
 		var files = make([]service.File, 0)
 		for i := range fileInfos {
 
-			// 忽略因此文件
+			// 忽略隐藏文件
 			if strings.HasPrefix(fileInfos[i].Name(), ".") {
 				continue
 			}
