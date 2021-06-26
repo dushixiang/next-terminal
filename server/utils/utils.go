@@ -347,7 +347,7 @@ func RunCommand(client *ssh.Client, command string) (stdout string, err error) {
 	if err != nil {
 		return "", err
 	}
-	stdout = string(buf.Bytes())
+	stdout = buf.String()
 	return
 }
 
