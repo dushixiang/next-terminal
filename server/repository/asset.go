@@ -298,7 +298,7 @@ func (r AssetRepository) CountByUserId(userId string) (total int64, err error) {
 
 func (r AssetRepository) FindTags() (o []string, err error) {
 	var assets []model.Asset
-	err = r.DB.Not("tags = ?", "").Find(&assets).Error
+	err = r.DB.Not("tags = '' or tags = '-' ").Find(&assets).Error
 	if err != nil {
 		return nil, err
 	}

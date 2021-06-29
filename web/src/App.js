@@ -22,20 +22,22 @@ import {
     DesktopOutlined,
     DisconnectOutlined,
     DownOutlined,
+    FolderOutlined,
     GithubOutlined,
+    HddOutlined,
     IdcardOutlined,
     LinkOutlined,
     LoginOutlined,
     LogoutOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
     QuestionCircleOutlined,
     SafetyCertificateOutlined,
     SettingOutlined,
     SolutionOutlined,
     TeamOutlined,
     UserOutlined,
-    UserSwitchOutlined,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined, HddOutlined, FolderOutlined
+    UserSwitchOutlined
 } from '@ant-design/icons';
 import Info from "./components/user/Info";
 import request from "./common/request";
@@ -52,6 +54,7 @@ import {Header} from "antd/es/layout/layout";
 import Security from "./components/devops/Security";
 import Storage from "./components/devops/Storage";
 import MyFile from "./components/asset/MyFile";
+import Strategy from "./components/user/Strategy";
 
 const {Footer, Sider} = Layout;
 
@@ -172,7 +175,9 @@ class App extends Component {
 
                         <Sider collapsible collapsed={this.state.collapsed} trigger={null}>
                             <div className="logo">
-                                <img src='data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjxwYXRoIGQ9Ik0yNzIgMTIyLjI0aDQ4MHYxNTcuMDU2aDk2Vi40NDhoLTk2TDI3MiAwYy01Mi44IDAtOTYgLjQ0OC05NiAuNDQ4djI3OC44NDhoOTZ2LTE1Ny4xMnptNDAzLjY0OCA2MDMuMzkyTDg5NiA1MTIgNjc1LjY0OCAyOTguMzY4IDYwOCAzNjQuNDggNzYwLjEyOCA1MTIgNjA4IDY1OS41Mmw2Ny42NDggNjYuMTEyek00MTYgNjU5LjUyTDI2My44MDggNTEyIDQxNiAzNjQuNDhsLTY3LjcxMi02Ni4xMTJMMTI4IDUxMmwyMjAuMjg4IDIxMy42MzJMNDE2IDY1OS41MnptMzM2IDI0Mi4zMDRIMjcydi0xNTcuMTJoLTk2VjEwMjRoNjcyVjc0NC43MDRoLTk2djE1Ny4xMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4=' alt='logo'/>
+                                <img
+                                    src='data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjxwYXRoIGQ9Ik0yNzIgMTIyLjI0aDQ4MHYxNTcuMDU2aDk2Vi40NDhoLTk2TDI3MiAwYy01Mi44IDAtOTYgLjQ0OC05NiAuNDQ4djI3OC44NDhoOTZ2LTE1Ny4xMnptNDAzLjY0OCA2MDMuMzkyTDg5NiA1MTIgNjc1LjY0OCAyOTguMzY4IDYwOCAzNjQuNDggNzYwLjEyOCA1MTIgNjA4IDY1OS41Mmw2Ny42NDggNjYuMTEyek00MTYgNjU5LjUyTDI2My44MDggNTEyIDQxNiAzNjQuNDhsLTY3LjcxMi02Ni4xMTJMMTI4IDUxMmwyMjAuMjg4IDIxMy42MzJMNDE2IDY1OS41MnptMzM2IDI0Mi4zMDRIMjcydi0xNTcuMTJoLTk2VjEwMjRoNjcyVjc0NC43MDRoLTk2djE1Ny4xMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4='
+                                    alt='logo'/>
                                 {
                                     !this.state.collapsed ?
 
@@ -209,7 +214,7 @@ class App extends Component {
                                             授权凭证
                                         </Link>
                                     </Menu.Item>
-                                    <Menu.Item key="my-file" icon={<FolderOutlined />}>
+                                    <Menu.Item key="my-file" icon={<FolderOutlined/>}>
                                         <Link to={'/my-file'}>
                                             我的文件
                                         </Link>
@@ -260,7 +265,7 @@ class App extends Component {
                                                         访问安全
                                                     </Link>
                                                 </Menu.Item>
-                                                <Menu.Item key="storage" icon={<HddOutlined />}>
+                                                <Menu.Item key="storage" icon={<HddOutlined/>}>
                                                     <Link to={'/storage'}>
                                                         磁盘空间
                                                     </Link>
@@ -278,6 +283,11 @@ class App extends Component {
                                                         用户组管理
                                                     </Link>
                                                 </Menu.Item>
+                                                {/*<Menu.Item key="strategy" icon={<InsuranceOutlined/>}>*/}
+                                                {/*    <Link to={'/strategy'}>*/}
+                                                {/*        授权策略*/}
+                                                {/*    </Link>*/}
+                                                {/*</Menu.Item>*/}
                                             </SubMenu>
 
                                         </> : undefined
@@ -360,6 +370,7 @@ class App extends Component {
                             <Route path="/access-security" component={Security}/>
                             <Route path="/my-file" component={MyFile}/>
                             <Route path="/storage" component={Storage}/>
+                            <Route path="/strategy" component={Strategy}/>
 
                             <Footer style={{textAlign: 'center'}}>
                                 Next Terminal ©2021 dushixiang Version:{this.state.package['version']}

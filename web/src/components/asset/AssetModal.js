@@ -248,12 +248,12 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                                         <>
                                             <Form.Item label="授权账户" name='username'
                                                        noStyle={!(accountType === 'custom')}>
-                                                <Input placeholder="输入授权账户"/>
+                                                <Input autoComplete="off" placeholder="输入授权账户"/>
                                             </Form.Item>
 
                                             <Form.Item label="授权密码" name='password'
                                                        noStyle={!(accountType === 'custom')}>
-                                                <Input.Password placeholder="输入授权密码"/>
+                                                <Input.Password autoComplete="off" placeholder="输入授权密码"/>
                                             </Form.Item>
                                         </>
                                         : null

@@ -41,6 +41,7 @@ var (
 	jobLogRepository         *repository.JobLogRepository
 	loginLogRepository       *repository.LoginLogRepository
 	storageRepository        *repository.StorageRepository
+	strategyRepository       *repository.StrategyRepository
 
 	jobService        *service.JobService
 	propertyService   *service.PropertyService
@@ -236,6 +237,14 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 		storages.POST("/:id/rename", StorageRenameEndpoint)
 	}
 
+	strategies := e.Group("/strategies", Admin)
+	{
+		strategies.GET("/paging", StrategyPagingEndpoint)
+		strategies.POST("", StrategyCreateEndpoint)
+		strategies.DELETE("/:id", StrategyDeleteEndpoint)
+		strategies.PUT("/:id", StrategyUpdateEndpoint)
+	}
+
 	return e
 }
 
@@ -265,6 +274,7 @@ func InitRepository(db *gorm.DB) {
 	jobLogRepository = repository.NewJobLogRepository(db)
 	loginLogRepository = repository.NewLoginLogRepository(db)
 	storageRepository = repository.NewStorageRepository(db)
+	strategyRepository = repository.NewStrategyRepository(db)
 }
 
 func InitService() {
@@ -446,7 +456,7 @@ func SetupDB() *gorm.DB {
 
 	if err := db.AutoMigrate(&model.User{}, &model.Asset{}, &model.AssetAttribute{}, &model.Session{}, &model.Command{},
 		&model.Credential{}, &model.Property{}, &model.ResourceSharer{}, &model.UserGroup{}, &model.UserGroupMember{},
-		&model.LoginLog{}, &model.Num{}, &model.Job{}, &model.JobLog{}, &model.AccessSecurity{}, &model.Storage{}); err != nil {
+		&model.LoginLog{}, &model.Num{}, &model.Job{}, &model.JobLog{}, &model.AccessSecurity{}, &model.Storage{}, &model.Strategy{}); err != nil {
 		log.WithError(err).Panic("初始化数据库表结构异常")
 	}
 	return db

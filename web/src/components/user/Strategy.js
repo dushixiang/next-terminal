@@ -5,14 +5,17 @@ import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
-import SecurityModal from "./SecurityModal";
+import StrategyModal from "./StrategyModal";
+import {cloneObj} from "../../utils/utils";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
 
-class Security extends Component {
+const keys = ['upload', 'download', 'delete', 'rename'];
+
+class Strategy extends Component {
 
     inputRefOfName = React.createRef();
 
@@ -36,7 +39,7 @@ class Security extends Component {
     }
 
     async delete(id) {
-        const result = await request.delete('/securities/' + id);
+        const result = await request.delete('/strategies/' + id);
         if (result.code === 1) {
             message.success('删除成功');
             this.loadTableData(this.state.queryParams);
@@ -62,7 +65,7 @@ class Security extends Component {
         };
 
         try {
-            let result = await request.get('/securities/paging?' + paramsStr);
+            let result = await request.get('/strategies/paging?' + paramsStr);
             if (result.code === 1) {
                 data = result.data;
             } else {
@@ -119,12 +122,23 @@ class Security extends Component {
         });
     };
 
-    showModal(title, obj = null) {
+    showModal(title, obj = undefined) {
+        let model = obj;
+        if (model) {
+            model = cloneObj(obj);
+            for (let i = 0; i < keys.length; i++) {
+                let key = keys[i];
+                if (!model.hasOwnProperty(key)) {
+                    continue;
+                }
+                model[key] = model[key] === '1';
+            }
+        }
 
         this.setState({
             modalTitle: title,
             modalVisible: true,
-            model: obj
+            model: model
         });
     };
 
@@ -141,9 +155,21 @@ class Security extends Component {
             modalConfirmLoading: true
         });
 
+        for (let i = 0; i < keys.length; i++) {
+            let key = keys[i];
+            if (!formData.hasOwnProperty(key)) {
+                continue;
+            }
+            if (formData[key] === true) {
+                formData[key] = '1';
+            } else {
+                formData[key] = '0';
+            }
+        }
+
         if (formData.id) {
             // 向后台提交数据
-            const result = await request.put('/securities/' + formData.id, formData);
+            const result = await request.put('/strategies/' + formData.id, formData);
             if (result.code === 1) {
                 message.success('更新成功');
 
@@ -156,7 +182,7 @@ class Security extends Component {
             }
         } else {
             // 向后台提交数据
-            const result = await request.post('/securities', formData);
+            const result = await request.post('/strategies', formData);
             if (result.code === 1) {
                 message.success('新增成功');
 
@@ -179,7 +205,7 @@ class Security extends Component {
             delBtnLoading: true
         })
         try {
-            let result = await request.delete('/securities/' + this.state.selectedRowKeys.join(','));
+            let result = await request.delete('/strategies/' + this.state.selectedRowKeys.join(','));
             if (result.code === 1) {
                 message.success('操作成功', 3);
                 this.setState({
@@ -208,6 +234,14 @@ class Security extends Component {
 
     render() {
 
+        const renderStatus = (text) => {
+            if (text === '1') {
+                return <Tag color={'green'}>允许</Tag>
+            } else {
+                return <Tag color={'red'}>禁止</Tag>
+            }
+        }
+
         const columns = [{
             title: '序号',
             dataIndex: 'id',
@@ -216,30 +250,42 @@ class Security extends Component {
                 return index + 1;
             }
         }, {
-            title: 'IP',
-            dataIndex: 'ip',
-            key: 'ip',
+            title: '名称',
+            dataIndex: 'name',
+            key: 'name',
             sorter: true,
         }, {
-            title: '规则',
-            dataIndex: 'rule',
-            key: 'rule',
-            render: (rule) => {
-                if (rule === 'allow') {
-                    return <Tag color={'green'}>允许</Tag>
-                } else {
-                    return <Tag color={'red'}>禁止</Tag>
-                }
+            title: '上传',
+            dataIndex: 'upload',
+            key: 'upload',
+            render: (text) => {
+                return renderStatus(text);
             }
         }, {
-            title: '优先级',
-            dataIndex: 'priority',
-            key: 'priority',
-            sorter: true,
+            title: '下载',
+            dataIndex: 'download',
+            key: 'download',
+            render: (text) => {
+                return renderStatus(text);
+            }
         }, {
-            title: '来源',
-            dataIndex: 'source',
-            key: 'source',
+            title: '删除',
+            dataIndex: 'delete',
+            key: 'delete',
+            render: (text) => {
+                return renderStatus(text);
+            }
+        }, {
+            title: '重命名',
+            dataIndex: 'rename',
+            key: 'rename',
+            render: (text) => {
+                return renderStatus(text);
+            }
+        }, {
+            title: '创建时间',
+            dataIndex: 'created',
+            key: 'created',
         }, {
             title: '操作',
             key: 'action',
@@ -248,7 +294,7 @@ class Security extends Component {
                 return (
                     <div>
                         <Button type="link" size='small' loading={this.state.items[index]['execLoading']}
-                                onClick={() => this.showModal('更新', record)}>编辑</Button>
+                                onClick={() => this.showModal('更新授权策略', record)}>编辑</Button>
 
                         <Button type="text" size='small' danger
                                 onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
@@ -275,17 +321,16 @@ class Security extends Component {
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
                             <Col span={12} key={1}>
-                                <Title level={3}>IP访问规则列表</Title>
+                                <Title level={3}>授权策略</Title>
                             </Col>
                             <Col span={12} key={2} style={{textAlign: 'right'}}>
                                 <Space>
                                     <Search
                                         ref={this.inputRefOfName}
-                                        placeholder="IP"
+                                        placeholder="名称"
                                         allowClear
                                         onSearch={this.handleSearchByName}
                                     />
-
 
                                     <Tooltip title='重置查询'>
 
@@ -301,10 +346,11 @@ class Security extends Component {
 
                                     <Tooltip title="新增">
                                         <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增安全访问规则', {})}>
+                                                onClick={() => this.showModal('新增授权策略')}>
 
                                         </Button>
                                     </Tooltip>
+
 
                                     <Tooltip title="刷新列表">
                                         <Button icon={<SyncOutlined/>} onClick={() => {
@@ -363,7 +409,7 @@ class Security extends Component {
 
                     {
                         this.state.modalVisible ?
-                            <SecurityModal
+                            <StrategyModal
                                 visible={this.state.modalVisible}
                                 title={this.state.modalTitle}
                                 handleOk={this.handleOk}
@@ -371,7 +417,7 @@ class Security extends Component {
                                 confirmLoading={this.state.modalConfirmLoading}
                                 model={this.state.model}
                             >
-                            </SecurityModal> : undefined
+                            </StrategyModal> : undefined
                     }
                 </Content>
             </>
@@ -379,4 +425,4 @@ class Security extends Component {
     }
 }
 
-export default Security;
+export default Strategy;

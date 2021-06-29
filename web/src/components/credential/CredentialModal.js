@@ -99,11 +99,11 @@ const CredentialModal = ({title, visible, handleOk, handleCancel, confirmLoading
                         :
                         <>
                             <Form.Item label="授权账户" name='username'>
-                                <Input placeholder="输入授权账户"/>
+                                <Input autoComplete="off" placeholder="输入授权账户"/>
                             </Form.Item>
 
                             <Form.Item label="授权密码" name='password'>
-                                <Input.Password placeholder="输入授权密码"/>
+                                <Input.Password autoComplete="off" placeholder="输入授权密码"/>
                             </Form.Item>
                         </>
 

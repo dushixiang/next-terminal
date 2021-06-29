@@ -87,7 +87,7 @@ func TcpWall(next echo.HandlerFunc) echo.HandlerFunc {
 
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
-	startWithUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
+	anonymousUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
 
 	return func(c echo.Context) error {
 
@@ -96,8 +96,8 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(c)
 		}
 		// 路由拦截 - 登录身份、资源权限判断等
-		for i := range startWithUrls {
-			if strings.HasPrefix(uri, startWithUrls[i]) {
+		for i := range anonymousUrls {
+			if strings.HasPrefix(uri, anonymousUrls[i]) {
 				return next(c)
 			}
 		}

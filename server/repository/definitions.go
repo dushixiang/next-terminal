@@ -18,4 +18,5 @@ var (
 	jobLogRepository         *JobLogRepository
 	loginLogRepository       *LoginLogRepository
 	storageRepository        *StorageRepository
+	strategyRepository       *StrategyRepository
 )

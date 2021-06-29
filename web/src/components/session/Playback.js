@@ -4,6 +4,7 @@ import {server} from "../../common/env";
 import {Button, Col, Row, Slider, Typography} from "antd";
 import {PauseCircleOutlined, PlayCircleOutlined} from '@ant-design/icons';
 import {Tooltip} from "antd/lib/index";
+import {getToken} from "../../utils/utils";
 
 const {Text} = Typography;
 
@@ -27,14 +28,14 @@ class Playback extends Component {
     }
 
     initPlayer(sessionId) {
-        var RECORDING_URL = `${server}/sessions/${sessionId}/recording`;
+        const RECORDING_URL = `${server}/sessions/${sessionId}/recording?X-Auth-Token=${getToken()}`;
 
-        var display = document.getElementById('display');
+        const display = document.getElementById('display');
 
-        var tunnel = new Guacamole.StaticHTTPTunnel(RECORDING_URL);
-        var recording = new Guacamole.SessionRecording(tunnel);
+        const tunnel = new Guacamole.StaticHTTPTunnel(RECORDING_URL);
+        const recording = new Guacamole.SessionRecording(tunnel);
 
-        var recordingDisplay = recording.getDisplay();
+        const recordingDisplay = recording.getDisplay();
 
         /**
          * Converts the given number to a string, adding leading zeroes as necessary
@@ -50,7 +51,7 @@ class Playback extends Component {
          *     A string representation of the given number, with leading zeroes
          *     added as necessary to reach the specified minimum length.
          */
-        var zeroPad = function zeroPad(num, minLength) {
+        const zeroPad = function zeroPad(num, minLength) {
 
             // Convert provided number to string
             var str = num.toString();
@@ -74,7 +75,7 @@ class Playback extends Component {
          *     A human-readable string representation of the given timestamp, in
          *     MM:SS format.
          */
-        var formatTime = function formatTime(millis) {
+        const formatTime = function formatTime(millis) {
 
             // Calculate total number of whole seconds
             var totalSeconds = Math.floor(millis / 1000);
