@@ -21,3 +21,6 @@ linters:
 run:
   skip-files:
     - test_ssh.go
+  run:
+  skip-dirs:
+    - web/
