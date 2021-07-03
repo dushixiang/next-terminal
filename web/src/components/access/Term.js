@@ -59,16 +59,14 @@ class Term extends Component {
 
         term.onSelectionChange(async () => {
             let selection = term.getSelection();
-            this.setState({
-                selection: selection
-            })
             if (navigator.clipboard) {
                 await navigator.clipboard.writeText(selection);
             }
         });
 
         term.attachCustomKeyEventHandler((e) => {
-            if (e.ctrlKey && e.key === 'c' && this.state.selection) {
+            let selection = term.getSelection();
+            if (e.ctrlKey && e.key === 'c' && selection != "") {
                 return false;
             }
             return !(e.ctrlKey && e.key === 'v');
