@@ -11,7 +11,9 @@ import {
     ExclamationCircleOutlined,
     ExpandOutlined
 } from '@ant-design/icons';
-import {exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
+import { getToken, isEmpty} from "../../utils/utils";
+import FullScreen from "../../utils/screen";
+
 import './Access.css'
 import Draggable from 'react-draggable';
 import FileSystem from "./FileSystem";
@@ -46,8 +48,6 @@ class Access extends Component {
         uploadVisible: false,
         uploadLoading: false,
         startTime: new Date(),
-        fullScreen: false,
-        fullScreenBtnText: '进入全屏',
         sink: undefined
     };
 
@@ -320,21 +320,8 @@ class Access extends Component {
         this.state.client.sendKeyEvent(0, keysym);
     };
 
-    fullScreen = () => {
-        let fs = this.state.fullScreen;
-        if (fs) {
-            exitFull();
-            this.setState({
-                fullScreen: false,
-                fullScreenBtnText: '进入全屏'
-            })
-        } else {
-            requestFullScreen(document.documentElement);
-            this.setState({
-                fullScreen: true,
-                fullScreenBtnText: '退出全屏'
-            })
-        }
+    toggleFullScreen = () => {
+        FullScreen.toggle(); 
         if (this.state.sink) {
             this.state.sink.focus();
         }
@@ -562,7 +549,7 @@ class Access extends Component {
                     <Affix style={{position: 'absolute', top: 50, right: 100}}>
                         <Button icon={<ExpandOutlined/>} disabled={this.state.clientState !== STATE_CONNECTED}
                                 onClick={() => {
-                                    this.fullScreen();
+                                    this.toggleFullScreen();
                                 }}/>
                     </Affix>
                 </Draggable>

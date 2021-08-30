@@ -24,22 +24,8 @@ type Config struct {
 	NewEncryptionKey   string
 }
 
-type Mysql struct {
-	Hostname string
-	Port     int
-	Username string
-	Password string
-	Database string
-}
-
 type Sqlite struct {
 	File string
-}
-
-type Server struct {
-	Addr string
-	Cert string
-	Key  string
 }
 
 func SetupConfig() *Config {

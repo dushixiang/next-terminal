@@ -4,9 +4,9 @@ db: mysql
 mysql:
   hostname: localhost
   port: 3306
-  username: next-terminal
-  password: next-terminal
-  database: next-terminal
+  username: next_terminal
+  password: next_terminal
+  database: next_terminal
 sqlite:
   file: 'next-terminal.db'
 server:

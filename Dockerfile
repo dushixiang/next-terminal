@@ -18,7 +18,8 @@ USER root
 LABEL MAINTAINER="helloworld1024@foxmail.com"
 
 RUN sed -i 's/deb.debian.org/mirrors.ustc.edu.cn/g' /etc/apt/sources.list
-RUN apt-get update && apt-get -y install supervisor
+RUN apt-get update && apt-get -y install supervisor net-tools iputils-ping 
+
 RUN mkdir -p /var/log/supervisor
 COPY --from=builder /app/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 

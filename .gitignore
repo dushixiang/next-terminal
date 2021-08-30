@@ -27,3 +27,6 @@ playground/drive
 playground/recording
 
 /log
+/vendor
+/drive
+/recording
