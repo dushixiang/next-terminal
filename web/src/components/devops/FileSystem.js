@@ -358,12 +358,11 @@ class FileSystem extends Component {
         let result = await request.post(url, formData);
         if (result['code'] !== 1) {
             message.error(result['message']);
-        } else {
-            this.setState({
-                confirmLoading: false
-            })
-            this.hideEditor();
         }
+        this.setState({
+            confirmLoading: false
+        })
+        this.hideEditor();
     }
 
     render() {

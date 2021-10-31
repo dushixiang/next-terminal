@@ -326,8 +326,8 @@ func StorageEditEndpoint(c echo.Context) error {
 	if err := PermissionCheck(c, storageId); err != nil {
 		return err
 	}
-	file := c.Param("file")
-	fileContent := c.Param("fileContent")
+	file := c.FormValue("file")
+	fileContent := c.FormValue("fileContent")
 	return StorageEdit(c, file, fileContent, storageId)
 }
 
