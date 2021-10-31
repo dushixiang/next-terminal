@@ -31,6 +31,7 @@ WORKDIR /usr/local/next-terminal
 RUN touch config.yml
 
 COPY --from=builder /app/next-terminal ./
+COPY --from=builder /app/LICENSE ./
 COPY --from=builder /app/web/build ./web/build
 
 EXPOSE $SERVER_PORT $SSHD_PORT
