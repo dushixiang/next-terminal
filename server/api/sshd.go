@@ -27,7 +27,7 @@ import (
 
 func sessionHandler(sess *ssh.Session) {
 	defer func() {
-		(*sess).Close()
+		_ = (*sess).Close()
 	}()
 
 	username := (*sess).User()
