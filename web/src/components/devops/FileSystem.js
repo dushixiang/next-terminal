@@ -328,7 +328,7 @@ class FileSystem extends Component {
 
     showEditor = async (name, key) => {
         message.loading({key: key, content: 'Loading'})
-        let fileContent = await request.get(`${server}/${this.state.storageType}/${this.state.storageId}/download?file=${window.encodeURIComponent(key)}`);
+        let fileContent = await request.get(`${server}/${this.state.storageType}/${this.state.storageId}/download?file=${window.encodeURIComponent(key)}&t=${new Date().getTime()}`);
         this.setState({
             currentFileKey: key,
             fileName: name,
@@ -508,7 +508,7 @@ class FileSystem extends Component {
                                 编辑
                             </Button>
                             <Button type="link" size='small' disabled={disableDownload} onClick={async () => {
-                                download(`${server}/${this.state.storageType}/${this.state.storageId}/download?file=${window.encodeURIComponent(item['key'])}&X-Auth-Token=${getToken()}`);
+                                download(`${server}/${this.state.storageType}/${this.state.storageId}/download?file=${window.encodeURIComponent(item['key'])}&X-Auth-Token=${getToken()}&t=${new Date().getTime()}`);
                             }}>
                                 下载
                             </Button>
