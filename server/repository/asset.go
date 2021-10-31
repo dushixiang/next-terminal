@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
+	"next-terminal/server/config"
+	"next-terminal/server/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -44,11 +44,21 @@ func (r AssetRepository) FindByProtocolAndIds(protocol string, assetIds []string
 }
 
 func (r AssetRepository) FindByProtocolAndUser(protocol string, account model.User) (o []model.Asset, err error) {
-	db := r.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
+	db := r.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created,assets.tags,assets.description, users.nickname as owner_name").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 
 	if constant.TypeUser == account.Type {
 		owner := account.ID
 		db = db.Where("assets.owner = ? or resource_sharers.user_id = ?", owner, owner)
+
+		// 查询用户所在用户组列表
+		userGroupIds, err := userGroupRepository.FindUserGroupIdsByUserId(account.ID)
+		if err != nil {
+			return nil, err
+		}
+
+		if len(userGroupIds) > 0 {
+			db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
+		}
 	}
 
 	if len(protocol) > 0 {
@@ -59,7 +69,7 @@ func (r AssetRepository) FindByProtocolAndUser(protocol string, account model.Us
 }
 
 func (r AssetRepository) Find(pageIndex, pageSize int, name, protocol, tags string, account model.User, owner, sharer, userGroupId, ip, order, field string) (o []model.AssetForPage, total int64, err error) {
-	db := r.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created,assets.tags, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
+	db := r.DB.Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.owner,assets.created,assets.tags,assets.description, users.nickname as owner_name").Joins("left join users on assets.owner = users.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 	dbCounter := r.DB.Table("assets").Select("DISTINCT assets.id").Joins("left join resource_sharers on assets.id = resource_sharers.resource_id").Group("assets.id")
 
 	if constant.TypeUser == account.Type {
@@ -111,7 +121,7 @@ func (r AssetRepository) Find(pageIndex, pageSize int, name, protocol, tags stri
 	if len(tags) > 0 {
 		tagArr := strings.Split(tags, ",")
 		for i := range tagArr {
-			if global.Config.DB == "sqlite" {
+			if config.GlobalCfg.DB == "sqlite" {
 				db = db.Where("(',' || assets.tags || ',') LIKE ?", "%,"+tagArr[i]+",%")
 				dbCounter = dbCounter.Where("(',' || assets.tags || ',') LIKE ?", "%,"+tagArr[i]+",%")
 			} else {
@@ -189,7 +199,7 @@ func (r AssetRepository) Encrypt(item *model.Asset, password []byte) error {
 }
 
 func (r AssetRepository) Create(o *model.Asset) (err error) {
-	if err := r.Encrypt(o, global.Config.EncryptionPassword); err != nil {
+	if err := r.Encrypt(o, config.GlobalCfg.EncryptionPassword); err != nil {
 		return err
 	}
 	if err = r.DB.Create(o).Error; err != nil {
@@ -245,7 +255,7 @@ func (r AssetRepository) Decrypt(item *model.Asset, password []byte) error {
 func (r AssetRepository) FindByIdAndDecrypt(id string) (o model.Asset, err error) {
 	err = r.DB.Where("id = ?", id).First(&o).Error
 	if err == nil {
-		err = r.Decrypt(&o, global.Config.EncryptionPassword)
+		err = r.Decrypt(&o, config.GlobalCfg.EncryptionPassword)
 	}
 	return
 }
@@ -260,12 +270,26 @@ func (r AssetRepository) UpdateActiveById(active bool, id string) error {
 	return r.DB.Exec(sql, active, id).Error
 }
 
-func (r AssetRepository) DeleteById(id string) error {
-	return r.DB.Where("id = ?", id).Delete(&model.Asset{}).Error
+func (r AssetRepository) DeleteById(id string) (err error) {
+	return r.DB.Transaction(func(tx *gorm.DB) error {
+		err = tx.Where("id = ?", id).Delete(&model.Asset{}).Error
+		if err != nil {
+			return err
+		}
+		// 删除资产属性
+		err = tx.Where("asset_id = ?", id).Delete(&model.AssetAttribute{}).Error
+		return err
+	})
+
 }
 
 func (r AssetRepository) Count() (total int64, err error) {
 	err = r.DB.Find(&model.Asset{}).Count(&total).Error
+	return
+}
+
+func (r AssetRepository) CountByProtocol(protocol string) (total int64, err error) {
+	err = r.DB.Find(&model.Asset{}).Where("protocol = ?", protocol).Count(&total).Error
 	return
 }
 
@@ -287,9 +311,27 @@ func (r AssetRepository) CountByUserId(userId string) (total int64, err error) {
 	return
 }
 
+func (r AssetRepository) CountByUserIdAndProtocol(userId, protocol string) (total int64, err error) {
+	db := r.DB.Joins("left join resource_sharers on assets.id = resource_sharers.resource_id")
+
+	db = db.Where("( assets.owner = ? or resource_sharers.user_id = ? ) and assets.protocol = ?", userId, userId, protocol)
+
+	// 查询用户所在用户组列表
+	userGroupIds, err := userGroupRepository.FindUserGroupIdsByUserId(userId)
+	if err != nil {
+		return 0, err
+	}
+
+	if len(userGroupIds) > 0 {
+		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
+	}
+	err = db.Find(&model.Asset{}).Count(&total).Error
+	return
+}
+
 func (r AssetRepository) FindTags() (o []string, err error) {
 	var assets []model.Asset
-	err = r.DB.Not("tags = ?", "").Find(&assets).Error
+	err = r.DB.Not("tags = '' or tags = '-' ").Find(&assets).Error
 	if err != nil {
 		return nil, err
 	}
@@ -359,7 +401,7 @@ func (r AssetRepository) FindAttrById(assetId string) (o []model.AssetAttribute,
 	return o, err
 }
 
-func (r AssetRepository) FindAssetAttrMapByAssetId(assetId string) (map[string]interface{}, error) {
+func (r AssetRepository) FindAssetAttrMapByAssetId(assetId string) (map[string]string, error) {
 	asset, err := r.FindById(assetId)
 	if err != nil {
 		return nil, err
@@ -383,7 +425,7 @@ func (r AssetRepository) FindAssetAttrMapByAssetId(assetId string) (map[string]i
 		parameterNames = constant.KubernetesParameterNames
 	}
 	propertiesMap := propertyRepository.FindAllMap()
-	var attributeMap = make(map[string]interface{})
+	var attributeMap = make(map[string]string)
 	for name := range propertiesMap {
 		if utils.Contains(parameterNames, name) {
 			attributeMap[name] = propertiesMap[name]

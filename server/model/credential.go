@@ -5,15 +5,15 @@ import (
 )
 
 type Credential struct {
-	ID         string         `gorm:"primary_key" json:"id"`
-	Name       string         `json:"name"`
-	Type       string         `json:"type"`
-	Username   string         `json:"username"`
-	Password   string         `json:"password"`
-	PrivateKey string         `json:"privateKey"`
-	Passphrase string         `json:"passphrase"`
+	ID         string         `gorm:"primary_key,type:varchar(36)" json:"id"`
+	Name       string         `gorm:"type:varchar(500)" json:"name"`
+	Type       string         `gorm:"type:varchar(50)" json:"type"`
+	Username   string         `gorm:"type:varchar(200)" json:"username"`
+	Password   string         `gorm:"type:varchar(500)" json:"password"`
+	PrivateKey string         `gorm:"type:text" json:"privateKey"`
+	Passphrase string         `gorm:"type:varchar(500)" json:"passphrase"`
 	Created    utils.JsonTime `json:"created"`
-	Owner      string         `gorm:"index" json:"owner"`
+	Owner      string         `gorm:"index,type:varchar(36)" json:"owner"`
 	Encrypted  bool           `json:"encrypted"`
 }
 

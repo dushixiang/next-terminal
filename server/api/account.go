@@ -1,12 +1,15 @@
 package api
 
 import (
+	"path"
+	"strconv"
 	"strings"
 	"time"
 
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/totp"
+	"next-terminal/server/config"
+	"next-terminal/server/global/cache"
 	"next-terminal/server/model"
+	"next-terminal/server/totp"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
@@ -40,11 +43,6 @@ type Authorization struct {
 	User     model.User
 }
 
-//
-//type UserServer struct {
-//	repository.UserRepository
-//}
-
 func LoginEndpoint(c echo.Context) error {
 	var loginAccount LoginAccount
 	if err := c.Bind(&loginAccount); err != nil {
@@ -54,25 +52,33 @@ func LoginEndpoint(c echo.Context) error {
 	user, err := userRepository.FindByUsername(loginAccount.Username)
 
 	// 存储登录失败次数信息
-	loginFailCountKey := loginAccount.Username
-	v, ok := global.Cache.Get(loginFailCountKey)
+	loginFailCountKey := c.RealIP() + loginAccount.Username
+	v, ok := cache.GlobalCache.Get(loginFailCountKey)
 	if !ok {
 		v = 1
 	}
 	count := v.(int)
 	if count >= 5 {
-		return Fail(c, -1, "登录失败次数过多，请稍后再试")
+		return Fail(c, -1, "登录失败次数过多，请等待5分钟后再试")
 	}
 
 	if err != nil {
 		count++
-		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		cache.GlobalCache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
 		count++
-		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		cache.GlobalCache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
@@ -80,15 +86,42 @@ func LoginEndpoint(c echo.Context) error {
 		return Fail(c, 0, "")
 	}
 
-	token, err := LoginSuccess(c, loginAccount, user)
+	token, err := LoginSuccess(loginAccount, user)
 	if err != nil {
+		return err
+	}
+	// 保存登录日志
+	if err := SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, true, loginAccount.Remember, token, ""); err != nil {
 		return err
 	}
 
 	return Success(c, token)
 }
 
-func LoginSuccess(c echo.Context, loginAccount LoginAccount, user model.User) (token string, err error) {
+func SaveLoginLog(clientIP, clientUserAgent string, username string, success, remember bool, id, reason string) error {
+	loginLog := model.LoginLog{
+		Username:        username,
+		ClientIP:        clientIP,
+		ClientUserAgent: clientUserAgent,
+		LoginTime:       utils.NowJsonTime(),
+		Reason:          reason,
+		Remember:        remember,
+	}
+	if success {
+		loginLog.State = "1"
+		loginLog.ID = id
+	} else {
+		loginLog.State = "0"
+		loginLog.ID = utils.UUID()
+	}
+
+	if err := loginLogRepository.Create(&loginLog); err != nil {
+		return err
+	}
+	return nil
+}
+
+func LoginSuccess(loginAccount LoginAccount, user model.User) (token string, err error) {
 	token = strings.Join([]string{utils.UUID(), utils.UUID(), utils.UUID(), utils.UUID()}, "")
 
 	authorization := Authorization{
@@ -97,43 +130,18 @@ func LoginSuccess(c echo.Context, loginAccount LoginAccount, user model.User) (t
 		User:     user,
 	}
 
-	cacheKey := BuildCacheKeyByToken(token)
+	cacheKey := userService.BuildCacheKeyByToken(token)
 
 	if authorization.Remember {
 		// 记住登录有效期两周
-		global.Cache.Set(cacheKey, authorization, RememberEffectiveTime)
+		cache.GlobalCache.Set(cacheKey, authorization, RememberEffectiveTime)
 	} else {
-		global.Cache.Set(cacheKey, authorization, NotRememberEffectiveTime)
-	}
-
-	// 保存登录日志
-	loginLog := model.LoginLog{
-		ID:              token,
-		UserId:          user.ID,
-		ClientIP:        c.RealIP(),
-		ClientUserAgent: c.Request().UserAgent(),
-		LoginTime:       utils.NowJsonTime(),
-		Remember:        authorization.Remember,
-	}
-
-	if loginLogRepository.Create(&loginLog) != nil {
-		return "", err
+		cache.GlobalCache.Set(cacheKey, authorization, NotRememberEffectiveTime)
 	}
 
 	// 修改登录状态
 	err = userRepository.Update(&model.User{Online: true, ID: user.ID})
-
 	return token, err
-}
-
-func BuildCacheKeyByToken(token string) string {
-	cacheKey := strings.Join([]string{Token, token}, ":")
-	return cacheKey
-}
-
-func GetTokenFormCacheKey(cacheKey string) string {
-	token := strings.Split(cacheKey, ":")[1]
-	return token
 }
 
 func loginWithTotpEndpoint(c echo.Context) error {
@@ -143,37 +151,53 @@ func loginWithTotpEndpoint(c echo.Context) error {
 	}
 
 	// 存储登录失败次数信息
-	loginFailCountKey := loginAccount.Username
-	v, ok := global.Cache.Get(loginFailCountKey)
+	loginFailCountKey := c.RealIP() + loginAccount.Username
+	v, ok := cache.GlobalCache.Get(loginFailCountKey)
 	if !ok {
 		v = 1
 	}
 	count := v.(int)
 	if count >= 5 {
-		return Fail(c, -1, "登录失败次数过多，请稍后再试")
+		return Fail(c, -1, "登录失败次数过多，请等待5分钟后再试")
 	}
 
 	user, err := userRepository.FindByUsername(loginAccount.Username)
 	if err != nil {
 		count++
-		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		cache.GlobalCache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
 		count++
-		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		cache.GlobalCache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
 	if !totp.Validate(loginAccount.TOTP, user.TOTPSecret) {
 		count++
-		global.Cache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		cache.GlobalCache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
+		// 保存登录日志
+		if err := SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "双因素认证授权码不正确"); err != nil {
+			return err
+		}
 		return FailWithData(c, -1, "您输入双因素认证授权码不正确", count)
 	}
 
-	token, err := LoginSuccess(c, loginAccount, user)
+	token, err := LoginSuccess(loginAccount, user)
 	if err != nil {
+		return err
+	}
+	// 保存登录日志
+	if err := SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, true, loginAccount.Remember, token, ""); err != nil {
 		return err
 	}
 
@@ -182,8 +206,8 @@ func loginWithTotpEndpoint(c echo.Context) error {
 
 func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
-	cacheKey := BuildCacheKeyByToken(token)
-	global.Cache.Delete(cacheKey)
+	cacheKey := userService.BuildCacheKeyByToken(token)
+	cache.GlobalCache.Delete(cacheKey)
 	err := userService.Logout(token)
 	if err != nil {
 		return err
@@ -192,7 +216,7 @@ func LogoutEndpoint(c echo.Context) error {
 }
 
 func ConfirmTOTPEndpoint(c echo.Context) error {
-	if global.Config.Demo {
+	if config.GlobalCfg.Demo {
 		return Fail(c, 0, "演示模式禁止开启两步验证")
 	}
 	account, _ := GetCurrentAccount(c)
@@ -258,7 +282,7 @@ func ResetTOTPEndpoint(c echo.Context) error {
 }
 
 func ChangePasswordEndpoint(c echo.Context) error {
-	if global.Config.Demo {
+	if config.GlobalCfg.Demo {
 		return Fail(c, 0, "演示模式禁止修改密码")
 	}
 	account, _ := GetCurrentAccount(c)
@@ -312,4 +336,49 @@ func InfoEndpoint(c echo.Context) error {
 		EnableTotp: user.TOTPSecret != "" && user.TOTPSecret != "-",
 	}
 	return Success(c, info)
+}
+
+func AccountAssetEndpoint(c echo.Context) error {
+	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	name := c.QueryParam("name")
+	protocol := c.QueryParam("protocol")
+	tags := c.QueryParam("tags")
+	owner := c.QueryParam("owner")
+	sharer := c.QueryParam("sharer")
+	userGroupId := c.QueryParam("userGroupId")
+	ip := c.QueryParam("ip")
+
+	order := c.QueryParam("order")
+	field := c.QueryParam("field")
+	account, _ := GetCurrentAccount(c)
+
+	items, total, err := assetRepository.Find(pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
+	if err != nil {
+		return err
+	}
+
+	return Success(c, H{
+		"total": total,
+		"items": items,
+	})
+}
+
+func AccountStorageEndpoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+	storageId := account.ID
+	storage, err := storageRepository.FindById(storageId)
+	if err != nil {
+		return err
+	}
+	structMap := utils.StructToMap(storage)
+	drivePath := storageService.GetBaseDrivePath()
+	dirSize, err := utils.DirSize(path.Join(drivePath, storageId))
+	if err != nil {
+		structMap["usedSize"] = -1
+	} else {
+		structMap["usedSize"] = dirSize
+	}
+
+	return Success(c, structMap)
 }

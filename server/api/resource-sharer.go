@@ -7,6 +7,7 @@ import (
 type RU struct {
 	UserGroupId  string   `json:"userGroupId"`
 	UserId       string   `json:"userId"`
+	StrategyId   string   `json:"strategyId"`
 	ResourceType string   `json:"resourceType"`
 	ResourceIds  []string `json:"resourceIds"`
 }
@@ -19,24 +20,14 @@ type UR struct {
 
 func RSGetSharersEndPoint(c echo.Context) error {
 	resourceId := c.QueryParam("resourceId")
-	userIds, err := resourceSharerRepository.FindUserIdsByResourceId(resourceId)
+	resourceType := c.QueryParam("resourceType")
+	userId := c.QueryParam("userId")
+	userGroupId := c.QueryParam("userGroupId")
+	userIds, err := resourceSharerRepository.Find(resourceId, resourceType, userId, userGroupId)
 	if err != nil {
 		return err
 	}
 	return Success(c, userIds)
-}
-
-func RSOverwriteSharersEndPoint(c echo.Context) error {
-	var ur UR
-	if err := c.Bind(&ur); err != nil {
-		return err
-	}
-
-	if err := resourceSharerRepository.OverwriteUserIdsByResourceId(ur.ResourceId, ur.ResourceType, ur.UserIds); err != nil {
-		return err
-	}
-
-	return Success(c, "")
 }
 
 func ResourceRemoveByUserIdAssignEndPoint(c echo.Context) error {
@@ -58,7 +49,7 @@ func ResourceAddByUserIdAssignEndPoint(c echo.Context) error {
 		return err
 	}
 
-	if err := resourceSharerRepository.AddSharerResources(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := resourceSharerRepository.AddSharerResources(ru.UserGroupId, ru.UserId, ru.StrategyId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 

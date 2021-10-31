@@ -4,39 +4,41 @@ import (
 	"next-terminal/server/utils"
 )
 
+type AssetProto string
+
 type Asset struct {
-	ID           string         `gorm:"primary_key " json:"id"`
-	Name         string         `json:"name"`
-	Protocol     string         `json:"protocol"`
-	IP           string         `json:"ip"`
-	Port         int            `json:"port"`
-	AccountType  string         `json:"accountType"`
-	Username     string         `json:"username"`
-	Password     string         `json:"password"`
-	CredentialId string         `gorm:"index" json:"credentialId"`
-	PrivateKey   string         `json:"privateKey"`
-	Passphrase   string         `json:"passphrase"`
-	Description  string         `json:"description"`
-	Active       bool           `json:"active"`
-	Created      utils.JsonTime `json:"created"`
-	Tags         string         `json:"tags"`
-	Owner        string         `gorm:"index" json:"owner"`
-	Encrypted    bool           `json:"encrypted"`
+	ID              string         `gorm:"primary_key,type:varchar(36)" json:"id"`
+	Name            string         `gorm:"type:varchar(500)" json:"name"`
+	Protocol        string         `gorm:"type:varchar(20)" json:"protocol"`
+	IP              string         `gorm:"type:varchar(200)" json:"ip"`
+	Port            int            `json:"port"`
+	AccountType     string         `gorm:"type:varchar(20)" json:"accountType"`
+	Username        string         `gorm:"type:varchar(200)" json:"username"`
+	Password        string         `gorm:"type:varchar(500)" json:"password"`
+	CredentialId    string         `gorm:"index,type:varchar(36)" json:"credentialId"`
+	PrivateKey      string         `gorm:"type:text" json:"privateKey"`
+	Passphrase      string         `gorm:"type:varchar(500)" json:"passphrase"`
+	Description     string         `json:"description"`
+	Active          bool           `json:"active"`
+	Created         utils.JsonTime `json:"created"`
+	Tags            string         `json:"tags"`
+	Owner           string         `gorm:"index,type:varchar(36)" json:"owner"`
+	Encrypted       bool           `json:"encrypted"`
+	AccessGatewayId string         `gorm:"type:varchar(36)" json:"accessGatewayId"`
 }
 
 type AssetForPage struct {
-	ID          string         `json:"id"`
-	Name        string         `json:"name"`
-	IP          string         `json:"ip"`
-	Protocol    string         `json:"protocol"`
-	Port        int            `json:"port"`
-	Active      bool           `json:"active"`
-	Created     utils.JsonTime `json:"created"`
-	Tags        string         `json:"tags"`
-	Owner       string         `json:"owner"`
-	OwnerName   string         `json:"ownerName"`
-	SharerCount int64          `json:"sharerCount"`
-	SshMode     string         `json:"sshMode"`
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	IP        string         `json:"ip"`
+	Protocol  string         `json:"protocol"`
+	Port      int            `json:"port"`
+	Active    bool           `json:"active"`
+	Created   utils.JsonTime `json:"created"`
+	Tags      string         `json:"tags"`
+	Owner     string         `json:"owner"`
+	OwnerName string         `json:"ownerName"`
+	SshMode   string         `json:"sshMode"`
 }
 
 func (r *Asset) TableName() string {

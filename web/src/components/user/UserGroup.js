@@ -1,13 +1,13 @@
 import React, {Component} from 'react';
 
-import {Button, Col, Divider, Input, Layout, Modal, Row, Space, Table, Tooltip, Typography,} from "antd";
+import {Button, Col, Divider, Drawer, Input, Layout, Modal, Row, Space, Table, Tooltip, Typography,} from "antd";
 import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import UserGroupModal from "./UserGroupModal";
-import UserShareAsset from "./UserShareAsset";
 import dayjs from "dayjs";
+import UserShareSelectedAsset from "./UserShareSelectedAsset";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -45,7 +45,7 @@ class UserGroup extends Component {
             message.success('操作成功', 3);
             await this.loadTableData(this.state.queryParams);
         } else {
-            message.error('删除失败 :( ' + result.message, 10);
+            message.error(result.message, 10);
         }
     }
 
@@ -172,7 +172,7 @@ class UserGroup extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } else {
             // 向后台提交数据
@@ -185,7 +185,7 @@ class UserGroup extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         }
 
@@ -218,7 +218,7 @@ class UserGroup extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({
@@ -311,6 +311,13 @@ class UserGroup extends Component {
                                     loading={this.state.items[index].updateBtnLoading}
                                     onClick={() => this.showModal('更新用户组', record['id'], index)}>编辑</Button>
                             <Button type="link" size='small'
+                                    onClick={() => {
+                                        this.setState({
+                                            assetVisible: true,
+                                            userGroupId: record['id']
+                                        })
+                                    }}>资产授权</Button>
+                            <Button type="link" size='small' danger
                                     onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
                         </div>
                     )
@@ -431,24 +438,25 @@ class UserGroup extends Component {
                         </UserGroupModal> : undefined
                     }
 
-                    <Modal
-                        width={window.innerWidth * 0.8}
-                        title='已授权资产'
-                        visible={this.state.assetVisible}
-                        maskClosable={false}
+                    <Drawer
+                        title="资产授权"
+                        placement="right"
+                        closable={true}
                         destroyOnClose={true}
-                        onOk={() => {
-
+                        onClose={() => {
+                            this.loadTableData(this.state.queryParams);
+                            this.setState({
+                                assetVisible: false
+                            })
                         }}
-                        onCancel={this.handleAssetCancel}
-                        okText='确定'
-                        cancelText='取消'
-                        footer={null}
+                        visible={this.state.assetVisible}
+                        width={window.innerWidth * 0.8}
                     >
-                        <UserShareAsset
+                        <UserShareSelectedAsset
                             userGroupId={this.state.userGroupId}
-                        />
-                    </Modal>
+                        >
+                        </UserShareSelectedAsset>
+                    </Drawer>
 
                 </Content>
             </>

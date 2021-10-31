@@ -12,6 +12,7 @@ import {
     Select,
     Space,
     Table,
+    Tag,
     Tooltip,
     Typography
 } from "antd";
@@ -47,7 +48,6 @@ class LoginLog extends Component {
 
     componentDidMount() {
         this.loadTableData();
-        this.handleSearchByNickname('');
     }
 
     async loadTableData(queryParams) {
@@ -110,34 +110,22 @@ class LoginLog extends Component {
         this.loadTableData(query);
     }
 
-    handleChangeByProtocol = protocol => {
+    handleSearchByUsername = username => {
         let query = {
             ...this.state.queryParams,
             'pageIndex': 1,
             'pageSize': this.state.queryParams.pageSize,
-            'protocol': protocol,
+            'username': username,
         }
         this.loadTableData(query);
     }
 
-    handleSearchByNickname = async nickname => {
-        const result = await request.get(`/users/paging?pageIndex=1&pageSize=1000&nickname=${nickname}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-
-        this.setState({
-            users: result.data.items
-        })
-    }
-
-    handleChangeByUserId = userId => {
+    handleChangeByState = (state) => {
         let query = {
             ...this.state.queryParams,
             'pageIndex': 1,
             'pageSize': this.state.queryParams.pageSize,
-            'userId': userId,
+            'state': state,
         }
         this.loadTableData(query);
     }
@@ -155,7 +143,7 @@ class LoginLog extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({
@@ -174,13 +162,28 @@ class LoginLog extends Component {
                 return index + 1;
             }
         }, {
-            title: '用户昵称',
-            dataIndex: 'userName',
-            key: 'userName'
+            title: '登录账号',
+            dataIndex: 'username',
+            key: 'username'
         }, {
-            title: '来源IP',
+            title: '登录IP',
             dataIndex: 'clientIp',
             key: 'clientIp'
+        }, {
+            title: '登录状态',
+            dataIndex: 'state',
+            key: 'state',
+            render: text => {
+                if (text === '0') {
+                    return <Tag color="error">失败</Tag>
+                } else {
+                    return <Tag color="success">成功</Tag>
+                }
+            }
+        }, {
+            title: '失败原因',
+            dataIndex: 'reason',
+            key: 'reason'
         }, {
             title: '浏览器',
             dataIndex: 'clientUserAgent',
@@ -243,7 +246,7 @@ class LoginLog extends Component {
                                     } else {
                                         notification['error']({
                                             message: '提示',
-                                            description: '删除失败 :( ' + result.message,
+                                            description: result.message,
                                         });
                                     }
 
@@ -264,9 +267,6 @@ class LoginLog extends Component {
         };
         const hasSelected = selectedRowKeys.length > 0;
 
-        const userOptions = this.state.users.map(d => <Select.Option key={d.id}
-                                                                     value={d.id}>{d.nickname}</Select.Option>);
-
         return (
             <>
                 <Content className="site-layout-background page-content">
@@ -280,22 +280,27 @@ class LoginLog extends Component {
 
                                     <Search
                                         ref={this.inputRefOfClientIp}
-                                        placeholder="来源IP"
+                                        placeholder="登录账号"
+                                        allowClear
+                                        onSearch={this.handleSearchByUsername}
+                                    />
+
+                                    <Search
+                                        ref={this.inputRefOfClientIp}
+                                        placeholder="登录IP"
                                         allowClear
                                         onSearch={this.handleSearchByClientIp}
                                     />
 
                                     <Select
-                                        style={{width: 150}}
-                                        showSearch
-                                        value={this.state.queryParams.userId}
+                                        style={{width: 100}}
                                         placeholder='用户昵称'
-                                        onSearch={this.handleSearchByNickname}
-                                        onChange={this.handleChangeByUserId}
-                                        filterOption={false}
-                                        allowClear
+                                        onChange={this.handleChangeByState}
+                                        defaultValue={''}
                                     >
-                                        {userOptions}
+                                        <Select.Option value=''>全部状态</Select.Option>
+                                        <Select.Option value='1'>只看成功</Select.Option>
+                                        <Select.Option value='0'>只看失败</Select.Option>
                                     </Select>
 
                                     <Tooltip title='重置查询'>
@@ -325,7 +330,7 @@ class LoginLog extends Component {
                                     </Tooltip>
 
                                     <Tooltip title="批量删除">
-                                        <Button type="primary" danger disabled={!hasSelected} icon={<DeleteOutlined/>}
+                                        <Button type="dashed" danger disabled={!hasSelected} icon={<DeleteOutlined/>}
                                                 loading={this.state.delBtnLoading}
                                                 onClick={() => {
                                                     const content = <div>
@@ -334,7 +339,8 @@ class LoginLog extends Component {
                                                     </div>;
                                                     confirm({
                                                         icon: <ExclamationCircleOutlined/>,
-                                                        content: content,
+                                                        title: content,
+                                                        content: '删除用户未注销的登录日志将会强制用户下线',
                                                         onOk: () => {
                                                             this.batchDelete()
                                                         },

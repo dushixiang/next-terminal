@@ -1,8 +1,8 @@
 package api
 
 import (
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
+	"next-terminal/server/constant"
+	"next-terminal/server/global/cache"
 	"next-terminal/server/model"
 
 	"github.com/labstack/echo/v4"
@@ -41,17 +41,17 @@ func NotFound(c echo.Context, message string) error {
 }
 
 func GetToken(c echo.Context) string {
-	token := c.Request().Header.Get(Token)
+	token := c.Request().Header.Get(constant.Token)
 	if len(token) > 0 {
 		return token
 	}
-	return c.QueryParam(Token)
+	return c.QueryParam(constant.Token)
 }
 
 func GetCurrentAccount(c echo.Context) (model.User, bool) {
 	token := GetToken(c)
-	cacheKey := BuildCacheKeyByToken(token)
-	get, b := global.Cache.Get(cacheKey)
+	cacheKey := userService.BuildCacheKeyByToken(token)
+	get, b := cache.GlobalCache.Get(cacheKey)
 	if b {
 		return get.(Authorization).User, true
 	}

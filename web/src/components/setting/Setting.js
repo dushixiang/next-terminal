@@ -30,6 +30,7 @@ class Setting extends Component {
     vncSettingFormRef = React.createRef();
     guacdSettingFormRef = React.createRef();
     mailSettingFormRef = React.createRef();
+    otherSettingFormRef = React.createRef();
 
     componentDidMount() {
         this.getProperties();
@@ -111,60 +112,6 @@ class Setting extends Component {
                                   layout="vertical">
 
                                 <Title level={3}>RDP配置(远程桌面)</Title>
-
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="enable-drive"
-                                    label="启用设备映射"
-                                    valuePropName="checked"
-                                    rules={[
-                                        {
-                                            required: true,
-                                        },
-                                    ]}
-                                >
-                                    <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked, event) => {
-                                        this.setState({
-                                            properties: {
-                                                ...this.state.properties,
-                                                'enable-drive': checked,
-                                            }
-                                        })
-                                    }}/>
-                                </Form.Item>
-                                {
-                                    this.state.properties['enable-drive'] === true ?
-                                        <>
-                                            <Form.Item
-                                                {...formItemLayout}
-                                                name="drive-name"
-                                                label="设备名称"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: '请输入设备名称',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input type='text' placeholder="请输入设备名称"/>
-                                            </Form.Item>
-
-                                            <Form.Item
-                                                {...formItemLayout}
-                                                name="drive-path"
-                                                label="设备路径"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: '请输入设备路径',
-                                                    },
-                                                ]}
-                                            >
-                                                <Input type='text' placeholder="请输入设备路径"/>
-                                            </Form.Item>
-                                        </> : null
-                                }
-
                                 <Form.Item
                                     {...formItemLayout}
                                     name="enable-wallpaper"
@@ -450,39 +397,10 @@ class Setting extends Component {
                                 </Form.Item>
                             </Form>
                         </TabPane>
-                        <TabPane tab="Guacd服务配置" key="other">
-                            <Title level={3}>Guacd 服务配置</Title>
-                            <Form ref={this.guacdSettingFormRef} name="password" onFinish={this.changeProperties}
+                        <TabPane tab="录屏配置" key="guacd">
+                            <Title level={3}>录屏配置</Title>
+                            <Form ref={this.guacdSettingFormRef} name="guacd" onFinish={this.changeProperties}
                                   layout="vertical">
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="host"
-                                    label="Guacd监听地址"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Guacd监听地址',
-                                        },
-                                    ]}
-                                >
-                                    <Input type='text' placeholder="请输入Guacd监听地址"/>
-                                </Form.Item>
-
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="port"
-                                    label="Guacd监听端口"
-                                    rules={[
-                                        {
-                                            required: true,
-                                            message: 'Guacd监听端口',
-                                            min: 1,
-                                            max: 65535
-                                        },
-                                    ]}
-                                >
-                                    <Input type='number' placeholder="请输入Guacd监听端口"/>
-                                </Form.Item>
 
                                 <Form.Item
                                     {...formItemLayout}
@@ -507,37 +425,24 @@ class Setting extends Component {
                                 {
                                     this.state.properties['enable-recording'] === true ?
                                         <>
-
                                             <Form.Item
                                                 {...formItemLayout}
-                                                name="recording-path"
-                                                label="录屏存放路径"
-                                                rules={[
-                                                    {
-                                                        required: true,
-                                                        message: '请输入录屏存放路径',
-                                                    },
-                                                ]}
+                                                name="session-saved-limit"
+                                                label="会话录屏保存时长"
+                                                initialValue=""
                                             >
-                                                <Input type='text' placeholder="请输入录屏存放路径"/>
+                                                <Select onChange={null}>
+                                                    <Option value="">永久</Option>
+                                                    <Option value="30">30天</Option>
+                                                    <Option value="60">60天</Option>
+                                                    <Option value="180">180天</Option>
+                                                    <Option value="360">360天</Option>
+                                                </Select>
                                             </Form.Item>
                                         </> : null
                                 }
 
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="session-saved-limit"
-                                    label="会话录屏保存时长"
-                                    initialValue=""
-                                >
-                                    <Select onChange={null}>
-                                        <Option value="">永久</Option>
-                                        <Option value="30">30天</Option>
-                                        <Option value="60">60天</Option>
-                                        <Option value="180">180天</Option>
-                                        <Option value="360">360天</Option>
-                                    </Select>
-                                </Form.Item>
+
 
                                 <Form.Item {...formTailLayout}>
                                     <Button type="primary" htmlType="submit">
@@ -548,7 +453,7 @@ class Setting extends Component {
                         </TabPane>
                         <TabPane tab="邮箱配置" key="mail">
                             <Title level={3}>邮箱配置</Title>
-                            <Form ref={this.mailSettingFormRef} name="password" onFinish={this.changeProperties}
+                            <Form ref={this.mailSettingFormRef} name='mail' onFinish={this.changeProperties}
                                   layout="vertical">
 
                                 <Form.Item
@@ -572,13 +477,13 @@ class Setting extends Component {
                                     rules={[
                                         {
                                             required: false,
-                                            message: '邮件服务器地址',
+                                            message: '邮件服务器端口',
                                             min: 1,
                                             max: 65535
                                         },
                                     ]}
                                 >
-                                    <Input type='number' placeholder="请输入邮件服务器地址"/>
+                                    <Input type='number' placeholder="请输入邮件服务器端口"/>
                                 </Form.Item>
 
                                 <Form.Item
@@ -608,6 +513,49 @@ class Setting extends Component {
                                     ]}
                                 >
                                     <Input type='password' placeholder="请输入邮箱密码"/>
+                                </Form.Item>
+
+                                <Form.Item {...formTailLayout}>
+                                    <Button type="primary" htmlType="submit">
+                                        更新
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </TabPane>
+
+                        <TabPane tab="其他配置" key="other">
+                            <Title level={3}>其他配置</Title>
+                            <Form ref={this.guacdSettingFormRef} name="other" onFinish={this.changeProperties}
+                                  layout="vertical">
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="login-log-saved-limit"
+                                    label="登录日志保留时长"
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">永久</Option>
+                                        <Option value="30">30天</Option>
+                                        <Option value="60">60天</Option>
+                                        <Option value="180">180天</Option>
+                                        <Option value="360">360天</Option>
+                                    </Select>
+                                </Form.Item>
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="cron-log-saved-limit"
+                                    label="计划任务日志保留时长"
+                                    initialValue=""
+                                >
+                                    <Select onChange={null}>
+                                        <Option value="">永久</Option>
+                                        <Option value="30">30天</Option>
+                                        <Option value="60">60天</Option>
+                                        <Option value="180">180天</Option>
+                                        <Option value="360">360天</Option>
+                                    </Select>
                                 </Form.Item>
 
                                 <Form.Item {...formTailLayout}>

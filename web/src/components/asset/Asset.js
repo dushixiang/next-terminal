@@ -19,7 +19,6 @@ import {
     Table,
     Tag,
     Tooltip,
-    Transfer,
     Typography
 } from "antd";
 import qs from "qs";
@@ -40,7 +39,7 @@ import {
 } from '@ant-design/icons';
 import {PROTOCOL_COLORS} from "../../common/constants";
 
-import {hasPermission, isAdmin} from "../../service/permission";
+import {hasPermission} from "../../service/permission";
 import Upload from "antd/es/upload";
 import axios from "axios";
 import {server} from "../../common/env";
@@ -77,9 +76,7 @@ class Asset extends Component {
         selectedRowKeys: [],
         delBtnLoading: false,
         changeOwnerModalVisible: false,
-        changeSharerModalVisible: false,
         changeOwnerConfirmLoading: false,
-        changeSharerConfirmLoading: false,
         users: [],
         selected: {},
         selectedSharers: [],
@@ -106,7 +103,7 @@ class Asset extends Component {
             message.success('删除成功');
             await this.loadTableData(this.state.queryParams);
         } else {
-            message.error('删除失败 :( ' + result.message, 10);
+            message.error(result.message, 10);
         }
 
     }
@@ -239,6 +236,21 @@ class Asset extends Component {
         await this.showModal('复制资产', result.data);
     }
 
+    async connTest(id) {
+        message.info({content: '正在测试中...', key: id, duration: 5});
+        let result = await request.post(`/assets/${id}/tcping`);
+        if (result.code !== 1) {
+            message.error({content: result.message, key: id, duration: 10});
+            return;
+        }
+        if (result['data']['active'] === true) {
+            message.success({content: '连通性测试完成，当前资产在线。', key: id, duration: 3});
+        } else {
+            message.warning({content: `连通性测试完成，当前资产离线，原因: ${result['data']['message']}。`, key: id, duration: 10});
+        }
+        this.loadTableData(this.state.queryParams);
+    }
+
     async showModal(title, asset = {}) {
         // 并行请求
         let getCredentials = request.get('/credentials');
@@ -269,10 +281,8 @@ class Asset extends Component {
         }
 
         asset['use-ssl'] = asset['use-ssl'] === 'true';
-
         asset['ignore-cert'] = asset['ignore-cert'] === 'true';
-
-        console.log(asset)
+        asset['enable-drive'] = asset['enable-drive'] === 'true';
 
         this.setState({
             modalTitle: title,
@@ -296,9 +306,12 @@ class Asset extends Component {
             modalConfirmLoading: true
         });
 
-        console.log(formData)
         if (formData['tags']) {
             formData.tags = formData['tags'].join(',');
+        }
+
+        if (formData['accessGatewayId'] === undefined) {
+            formData['accessGatewayId'] = "-"
         }
 
         if (formData.id) {
@@ -312,7 +325,7 @@ class Asset extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } else {
             // 向后台提交数据
@@ -325,7 +338,7 @@ class Asset extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         }
 
@@ -333,31 +346,6 @@ class Asset extends Component {
             modalConfirmLoading: false
         });
     };
-
-    access = async (record) => {
-        const id = record['id'];
-        const protocol = record['protocol'];
-        const name = record['name'];
-        const sshMode = record['sshMode'];
-
-        message.loading({content: '正在检测资产是否在线...', key: id});
-        let result = await request.post(`/assets/${id}/tcping`);
-        if (result.code === 1) {
-            if (result.data === true) {
-                message.success({content: '检测完成，您访问的资产在线，即将打开窗口进行访问。', key: id, duration: 3});
-                if (protocol === 'ssh' && sshMode === 'naive') {
-                    window.open(`#/term?assetId=${id}&assetName=${name}`);
-                } else {
-                    window.open(`#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`);
-                }
-            } else {
-                message.warn({content: '您访问的资产未在线，请确认网络状态。', key: id, duration: 10});
-            }
-        } else {
-            message.error({content: result.message, key: id, duration: 10});
-        }
-
-    }
 
     batchDelete = async () => {
         this.setState({
@@ -372,7 +360,7 @@ class Asset extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({
@@ -394,43 +382,6 @@ class Asset extends Component {
 
         this.setState({
             users: items
-        })
-    }
-
-    handleSharersChange = async targetKeys => {
-        this.setState({
-            selectedSharers: targetKeys
-        })
-    }
-
-    handleShowSharer = async (record) => {
-        let r1 = this.handleSearchByNickname('');
-        let r2 = request.get(`/resource-sharers/sharers?resourceId=${record['id']}`);
-
-        await r1;
-        let result = await r2;
-
-        let selectedSharers = [];
-        if (result['code'] !== 1) {
-            message.error(result['message']);
-        } else {
-            selectedSharers = result['data'];
-        }
-
-        let users = this.state.users;
-        users = users.map(item => {
-            let disabled = false;
-            if (record['owner'] === item['id']) {
-                disabled = true;
-            }
-            return {...item, 'disabled': disabled}
-        });
-
-        this.setState({
-            selectedSharers: selectedSharers,
-            selected: record,
-            changeSharerModalVisible: true,
-            users: users
         })
     }
 
@@ -467,8 +418,8 @@ class Asset extends Component {
             key: 'name',
             render: (name, record) => {
                 let short = name;
-                if (short && short.length > 20) {
-                    short = short.substring(0, 20) + " ...";
+                if (short && short.length > 15) {
+                    short = short.substring(0, 15) + " ...";
                 }
 
                 if (hasPermission(record['owner'])) {
@@ -489,7 +440,7 @@ class Asset extends Component {
             },
             sorter: true,
         }, {
-            title: '连接协议',
+            title: '协议',
             dataIndex: 'protocol',
             key: 'protocol',
             render: (text, record) => {
@@ -501,20 +452,19 @@ class Asset extends Component {
                 )
             }
         }, {
+            title: '网络',
+            dataIndex: 'network',
+            key: 'network',
+            render: (text, record) => {
+                return `${record['ip'] + ':' + record['port']}`;
+            }
+        }, {
             title: '标签',
             dataIndex: 'tags',
             key: 'tags',
             render: tags => {
                 if (!isEmpty(tags)) {
-                    let tagDocuments = []
-                    let tagArr = tags.split(',');
-                    for (let i = 0; i < tagArr.length; i++) {
-                        if (tags[i] === '-') {
-                            continue;
-                        }
-                        tagDocuments.push(<Tag key={tagArr[i]}>{tagArr[i]}</Tag>)
-                    }
-                    return tagDocuments;
+                    return this.renderTags(tags);
                 }
             }
         }, {
@@ -522,17 +472,16 @@ class Asset extends Component {
             dataIndex: 'active',
             key: 'active',
             render: text => {
-
                 if (text) {
                     return (
                         <Tooltip title='运行中'>
-                            <Badge status="processing"/>
+                            <Badge status="processing" text='运行中'/>
                         </Tooltip>
                     )
                 } else {
                     return (
                         <Tooltip title='不可用'>
-                            <Badge status="error"/>
+                            <Badge status="error" text='不可用'/>
                         </Tooltip>
                     )
                 }
@@ -563,49 +512,38 @@ class Asset extends Component {
                         <Menu>
                             <Menu.Item key="1">
                                 <Button type="text" size='small'
-                                        disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.update(record.id)}>编辑</Button>
                             </Menu.Item>
 
                             <Menu.Item key="2">
                                 <Button type="text" size='small'
-                                        disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.copy(record.id)}>复制</Button>
                             </Menu.Item>
-
-                            {isAdmin() ?
-                                <Menu.Item key="4">
-                                    <Button type="text" size='small'
-                                            disabled={!hasPermission(record['owner'])}
-                                            onClick={() => {
-                                                this.handleSearchByNickname('')
-                                                    .then(() => {
-                                                        this.setState({
-                                                            changeOwnerModalVisible: true,
-                                                            selected: record,
-                                                        })
-                                                        this.changeOwnerFormRef
-                                                            .current
-                                                            .setFieldsValue({
-                                                                owner: record['owner']
-                                                            })
-                                                    });
-
-                                            }}>更换所有者</Button>
-                                </Menu.Item> : undefined
-                            }
-
-
-                            <Menu.Item key="5">
+                            <Menu.Item key="3">
+                                <Button type="text" size='small'
+                                        onClick={() => this.connTest(record.id)}>连通性测试</Button>
+                            </Menu.Item>
+                            <Menu.Item key="4">
                                 <Button type="text" size='small'
                                         disabled={!hasPermission(record['owner'])}
-                                        onClick={async () => {
-                                            await this.handleShowSharer(record);
-                                        }}>更新授权人</Button>
-                            </Menu.Item>
+                                        onClick={() => {
+                                            this.handleSearchByNickname('')
+                                                .then(() => {
+                                                    this.setState({
+                                                        changeOwnerModalVisible: true,
+                                                        selected: record,
+                                                    })
+                                                    this.changeOwnerFormRef
+                                                        .current
+                                                        .setFieldsValue({
+                                                            owner: record['owner']
+                                                        })
+                                                });
 
+                                        }}>更换所有者</Button>
+                            </Menu.Item>
                             <Menu.Divider/>
-                            <Menu.Item key="6">
+                            <Menu.Item key="5">
                                 <Button type="text" size='small' danger
                                         disabled={!hasPermission(record['owner'])}
                                         onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
@@ -613,11 +551,20 @@ class Asset extends Component {
                         </Menu>
                     );
 
+                    const id = record['id'];
+                    const protocol = record['protocol'];
+                    const name = record['name'];
+                    const sshMode = record['sshMode'];
+                    let url = '';
+                    if (protocol === 'ssh' && sshMode === 'naive') {
+                        url = `#/term?assetId=${id}&assetName=${name}`;
+                    } else {
+                        url = `#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`;
+                    }
+
                     return (
                         <div>
-                            <Button type="link" size='small'
-                                    onClick={() => this.access(record)}>接入</Button>
-
+                            <Button type="link" size='small' href={url} target='_blank'>接入</Button>
                             <Dropdown overlay={menu}>
                                 <Button type="link" size='small'>
                                     更多 <DownOutlined/>
@@ -628,19 +575,6 @@ class Asset extends Component {
                 },
             }
         ];
-
-        if (isAdmin()) {
-            columns.splice(6, 0, {
-                title: '授权人数',
-                dataIndex: 'sharerCount',
-                key: 'sharerCount',
-                render: (text, record, index) => {
-                    return <Button type='link' onClick={async () => {
-                        await this.handleShowSharer(record, true);
-                    }}>{text}</Button>
-                }
-            });
-        }
 
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
@@ -717,25 +651,19 @@ class Asset extends Component {
                                     </Tooltip>
 
                                     <Divider type="vertical"/>
-
-                                    {isAdmin() ?
-                                        <Tooltip title="批量导入">
-                                            <Button type="dashed" icon={<ImportOutlined/>}
-                                                    onClick={() => {
-                                                        this.setState({
-                                                            importModalVisible: true
-                                                        })
-                                                    }}>
-
-                                            </Button>
-                                        </Tooltip> : undefined
-                                    }
-
-
+                                    <Tooltip title="批量导入">
+                                        <Button type="dashed" icon={<ImportOutlined/>}
+                                                onClick={() => {
+                                                    this.setState({
+                                                        importModalVisible: true
+                                                    })
+                                                }}>
+                                        </Button>
+                                    </Tooltip>
                                     <Tooltip title="新增">
-                                        <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增资产', {})}>
-
+                                        <Button icon={<PlusOutlined/>}
+                                                onClick={() => this.showModal('新增资产', {})}
+                                        >
                                         </Button>
                                     </Tooltip>
 
@@ -962,68 +890,21 @@ class Asset extends Component {
 
                         </Form>
                     </Modal>
-
-
-                    {
-                        this.state.changeSharerModalVisible ?
-                            <Modal title={<Text>更新资源「<strong
-                                style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的授权人
-                            </Text>}
-                                   visible={this.state.changeSharerModalVisible}
-                                   confirmLoading={this.state.changeSharerConfirmLoading}
-
-                                   onOk={async () => {
-                                       this.setState({
-                                           changeSharerConfirmLoading: true
-                                       });
-
-                                       let changeSharerModalVisible = false;
-
-                                       let result = await request.post(`/resource-sharers/overwrite-sharers`, {
-                                           resourceId: this.state.selected['id'],
-                                           resourceType: 'asset',
-                                           userIds: this.state.selectedSharers
-                                       });
-                                       if (result['code'] === 1) {
-                                           message.success('操作成功');
-                                           this.loadTableData();
-                                       } else {
-                                           message.error(result['message'], 10);
-                                           changeSharerModalVisible = true;
-                                       }
-
-                                       this.setState({
-                                           changeSharerConfirmLoading: false,
-                                           changeSharerModalVisible: changeSharerModalVisible
-                                       })
-                                   }}
-                                   onCancel={() => {
-                                       this.setState({
-                                           changeSharerModalVisible: false
-                                       })
-                                   }}
-                                   okButtonProps={{disabled: !hasPermission(this.state.selected['owner'])}}
-                            >
-
-                                <Transfer
-                                    dataSource={this.state.users}
-                                    disabled={!hasPermission(this.state.selected['owner'])}
-                                    showSearch
-                                    titles={['未授权', '已授权']}
-                                    operations={['授权', '移除']}
-                                    listStyle={{
-                                        width: 250,
-                                        height: 300,
-                                    }}
-                                    targetKeys={this.state.selectedSharers}
-                                    onChange={this.handleSharersChange}
-                                    render={item => `${item.nickname}`}
-                                />
-                            </Modal> : undefined
-                    }
                 </Content>
             </>
         );
+    }
+
+    renderTags(tags) {
+        let tagDocuments = []
+        let tagArr = tags.split(',');
+        for (let i = 0; i < tagArr.length; i++) {
+            if (tags[i] === '-') {
+                continue;
+            }
+            tagDocuments.push(<Tag key={tagArr[i]}>{tagArr[i]}</Tag>)
+        }
+        return tagDocuments;
     }
 }
 

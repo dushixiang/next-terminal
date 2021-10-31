@@ -1,4 +1,8 @@
 # Next Terminal dashboard
 just do go dashboard
 
-## 主要功能
+## 安装依赖
+
+```shell
+npm install
+```

@@ -6,8 +6,8 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
+	"next-terminal/server/config"
+	"next-terminal/server/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -106,7 +106,7 @@ func CredentialUpdateEndpoint(c echo.Context) error {
 			item.Password = "-"
 		}
 		if item.Password != "-" {
-			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Password), global.Config.EncryptionPassword)
+			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Password), config.GlobalCfg.EncryptionPassword)
 			if err != nil {
 				return err
 			}
@@ -121,7 +121,7 @@ func CredentialUpdateEndpoint(c echo.Context) error {
 			item.PrivateKey = "-"
 		}
 		if item.PrivateKey != "-" {
-			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.PrivateKey), global.Config.EncryptionPassword)
+			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.PrivateKey), config.GlobalCfg.EncryptionPassword)
 			if err != nil {
 				return err
 			}
@@ -131,7 +131,7 @@ func CredentialUpdateEndpoint(c echo.Context) error {
 			item.Passphrase = "-"
 		}
 		if item.Passphrase != "-" {
-			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Passphrase), global.Config.EncryptionPassword)
+			encryptedCBC, err := utils.AesEncryptCBC([]byte(item.Passphrase), config.GlobalCfg.EncryptionPassword)
 			if err != nil {
 				return err
 			}

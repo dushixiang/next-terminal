@@ -18,14 +18,6 @@ func NewResourceSharerRepository(db *gorm.DB) *ResourceSharerRepository {
 	return resourceSharerRepository
 }
 
-func (r *ResourceSharerRepository) FindUserIdsByResourceId(resourceId string) (o []string, err error) {
-	err = r.DB.Table("resource_sharers").Select("user_id").Where("resource_id = ?", resourceId).Find(&o).Error
-	if o == nil {
-		o = make([]string, 0)
-	}
-	return
-}
-
 func (r *ResourceSharerRepository) OverwriteUserIdsByResourceId(resourceId, resourceType string, userIds []string) (err error) {
 	db := r.DB.Begin()
 
@@ -104,7 +96,7 @@ func (r *ResourceSharerRepository) DeleteResourceSharerByResourceId(resourceId s
 	return r.DB.Where("resource_id = ?", resourceId).Delete(&model.ResourceSharer{}).Error
 }
 
-func (r *ResourceSharerRepository) AddSharerResources(userGroupId, userId, resourceType string, resourceIds []string) error {
+func (r *ResourceSharerRepository) AddSharerResources(userGroupId, userId, strategyId, resourceType string, resourceIds []string) error {
 	return r.DB.Transaction(func(tx *gorm.DB) (err error) {
 
 		for i := range resourceIds {
@@ -138,11 +130,13 @@ func (r *ResourceSharerRepository) AddSharerResources(userGroupId, userId, resou
 				return echo.NewHTTPError(400, "参数错误")
 			}
 
+			// 保证同一个资产只能分配给一个用户或者组
 			id := utils.Sign([]string{resourceId, resourceType, userId, userGroupId})
 			resource := &model.ResourceSharer{
 				ID:           id,
 				ResourceId:   resourceId,
 				ResourceType: resourceType,
+				StrategyId:   strategyId,
 				UserId:       userId,
 				UserGroupId:  userGroupId,
 			}
@@ -190,5 +184,37 @@ func (r *ResourceSharerRepository) FindAssetIdsByUserId(userId string) (assetIds
 		assetIds = append(assetIds, sharerAssetIds...)
 	}
 
+	return
+}
+
+func (r *ResourceSharerRepository) FindByResourceIdAndUserId(assetId, userId string) (resourceSharers []model.ResourceSharer, err error) {
+	// 查询其他用户授权给该用户的资产
+	groupIds, err := userGroupRepository.FindUserGroupIdsByUserId(userId)
+	if err != nil {
+		return
+	}
+	db := r.DB.Where("( resource_id = ? and user_id = ? )", assetId, userId)
+	if len(groupIds) > 0 {
+		db = db.Or("user_group_id in ?", groupIds)
+	}
+	err = db.Find(&resourceSharers).Error
+	return
+}
+
+func (r *ResourceSharerRepository) Find(resourceId, resourceType, userId, userGroupId string) (resourceSharers []model.ResourceSharer, err error) {
+	db := r.DB
+	if resourceId != "" {
+		db = db.Where("resource_id = ?")
+	}
+	if resourceType != "" {
+		db = db.Where("resource_type = ?")
+	}
+	if userId != "" {
+		db = db.Where("user_id = ?")
+	}
+	if userGroupId != "" {
+		db = db.Where("user_group_id = ?")
+	}
+	err = db.Find(&resourceSharers).Error
 	return
 }

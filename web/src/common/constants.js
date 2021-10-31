@@ -5,3 +5,9 @@ export const PROTOCOL_COLORS = {
     'vnc': 'purple',
     'kubernetes': 'volcano'
 }
+
+export const MODE_COLORS = {
+    'guacd': 'green',
+    'naive': 'orange',
+    'terminal': 'purple',
+}

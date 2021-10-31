@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"next-terminal/pkg/constant"
+	"next-terminal/server/constant"
 	"next-terminal/server/model"
 
 	"gorm.io/gorm"
@@ -79,4 +79,18 @@ func (r CommandRepository) UpdateById(o *model.Command, id string) error {
 
 func (r CommandRepository) DeleteById(id string) error {
 	return r.DB.Where("id = ?", id).Delete(&model.Command{}).Error
+}
+
+func (r CommandRepository) FindByUser(account model.User) (o []model.CommandForPage, err error) {
+	db := r.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
+
+	if constant.TypeUser == account.Type {
+		owner := account.ID
+		db = db.Where("commands.owner = ? or resource_sharers.user_id = ?", owner, owner)
+	}
+	err = db.Order("commands.name asc").Find(&o).Error
+	if o == nil {
+		o = make([]model.CommandForPage, 0)
+	}
+	return
 }

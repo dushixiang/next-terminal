@@ -16,7 +16,6 @@ import {
     Table,
     Tag,
     Tooltip,
-    Transfer,
     Typography
 } from "antd";
 import qs from "qs";
@@ -32,7 +31,7 @@ import {
     UndoOutlined
 } from '@ant-design/icons';
 
-import {hasPermission, isAdmin} from "../../service/permission";
+import {hasPermission} from "../../service/permission";
 import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
@@ -60,12 +59,9 @@ class Credential extends Component {
         selectedRowKeys: [],
         delBtnLoading: false,
         changeOwnerModalVisible: false,
-        changeSharerModalVisible: false,
         changeOwnerConfirmLoading: false,
-        changeSharerConfirmLoading: false,
         users: [],
         selected: {},
-        selectedSharers: [],
     };
 
     componentDidMount() {
@@ -78,7 +74,7 @@ class Credential extends Component {
             message.success('删除成功');
             await this.loadTableData(this.state.queryParams);
         } else {
-            message.error('删除失败 :( ' + result.message, 10);
+            message.error(result.message, 10);
         }
 
     }
@@ -215,7 +211,7 @@ class Credential extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } else {
             // 向后台提交数据
@@ -228,7 +224,7 @@ class Credential extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         }
 
@@ -250,7 +246,7 @@ class Credential extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({
@@ -278,37 +274,6 @@ class Credential extends Component {
     handleSharersChange = async targetKeys => {
         this.setState({
             selectedSharers: targetKeys
-        })
-    }
-
-    handleShowSharer = async (record) => {
-        let r1 = this.handleSearchByNickname('');
-        let r2 = request.get(`/resource-sharers/sharers?resourceId=${record['id']}`);
-
-        await r1;
-        let result = await r2;
-
-        let selectedSharers = [];
-        if (result['code'] !== 1) {
-            message.error(result['message']);
-        } else {
-            selectedSharers = result['data'];
-        }
-
-        let users = this.state.users;
-        users = users.map(item => {
-            let disabled = false;
-            if (record['owner'] === item['id']) {
-                disabled = true;
-            }
-            return {...item, 'disabled': disabled}
-        });
-
-        this.setState({
-            selectedSharers: selectedSharers,
-            selected: record,
-            changeSharerModalVisible: true,
-            users: users
         })
     }
 
@@ -402,37 +367,25 @@ class Credential extends Component {
 
                     const menu = (
                         <Menu>
-                            {isAdmin() ?
-                                <Menu.Item key="1">
-                                    <Button type="text" size='small'
-                                            disabled={!hasPermission(record['owner'])}
-                                            onClick={() => {
-                                                this.handleSearchByNickname('')
-                                                    .then(() => {
-                                                        this.setState({
-                                                            changeOwnerModalVisible: true,
-                                                            selected: record,
-                                                        })
-                                                        this.changeOwnerFormRef
-                                                            .current
-                                                            .setFieldsValue({
-                                                                owner: record['owner']
-                                                            })
-                                                    });
-
-                                            }}>更换所有者</Button>
-                                </Menu.Item> : undefined
-                            }
-
-
-                            <Menu.Item key="2">
+                            <Menu.Item key="1">
                                 <Button type="text" size='small'
                                         disabled={!hasPermission(record['owner'])}
-                                        onClick={async () => {
-                                            await this.handleShowSharer(record);
-                                        }}>更新授权人</Button>
-                            </Menu.Item>
+                                        onClick={() => {
+                                            this.handleSearchByNickname('')
+                                                .then(() => {
+                                                    this.setState({
+                                                        changeOwnerModalVisible: true,
+                                                        selected: record,
+                                                    })
+                                                    this.changeOwnerFormRef
+                                                        .current
+                                                        .setFieldsValue({
+                                                            owner: record['owner']
+                                                        })
+                                                });
 
+                                        }}>更换所有者</Button>
+                            </Menu.Item>
                             <Menu.Divider/>
                             <Menu.Item key="3">
                                 <Button type="text" size='small' danger
@@ -457,19 +410,6 @@ class Credential extends Component {
                 },
             }
         ];
-
-        if (isAdmin()) {
-            columns.splice(5, 0, {
-                title: '授权人数',
-                dataIndex: 'sharerCount',
-                key: 'sharerCount',
-                render: (text, record, index) => {
-                    return <Button type='link' onClick={async () => {
-                        await this.handleShowSharer(record);
-                    }}>{text}</Button>
-                }
-            });
-        }
 
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
@@ -644,64 +584,6 @@ class Credential extends Component {
                             </Form.Item>
                         </Form>
                     </Modal>
-
-                    {
-                        this.state.changeSharerModalVisible ?
-                            <Modal title={<Text>更新资源「<strong
-                                style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的授权人
-                            </Text>}
-                                   visible={this.state.changeSharerModalVisible}
-                                   confirmLoading={this.state.changeSharerConfirmLoading}
-
-                                   onOk={async () => {
-                                       this.setState({
-                                           changeSharerConfirmLoading: true
-                                       });
-
-                                       let changeSharerModalVisible = false;
-
-                                       let result = await request.post(`/resource-sharers/overwrite-sharers`, {
-                                           resourceId: this.state.selected['id'],
-                                           resourceType: 'credential',
-                                           userIds: this.state.selectedSharers
-                                       });
-                                       if (result['code'] === 1) {
-                                           message.success('操作成功');
-                                           this.loadTableData();
-                                       } else {
-                                           message.error(result['message'], 10);
-                                           changeSharerModalVisible = true;
-                                       }
-
-                                       this.setState({
-                                           changeSharerConfirmLoading: false,
-                                           changeSharerModalVisible: changeSharerModalVisible
-                                       })
-                                   }}
-                                   onCancel={() => {
-                                       this.setState({
-                                           changeSharerModalVisible: false
-                                       })
-                                   }}
-                                   okButtonProps={{disabled: !hasPermission(this.state.selected['owner'])}}
-                            >
-
-                                <Transfer
-                                    dataSource={this.state.users}
-                                    disabled={!hasPermission(this.state.selected['owner'])}
-                                    showSearch
-                                    titles={['未授权', '已授权']}
-                                    operations={['授权', '移除']}
-                                    listStyle={{
-                                        width: 250,
-                                        height: 300,
-                                    }}
-                                    targetKeys={this.state.selectedSharers}
-                                    onChange={this.handleSharersChange}
-                                    render={item => `${item.nickname}`}
-                                />
-                            </Modal> : undefined
-                    }
 
                 </Content>
             </>

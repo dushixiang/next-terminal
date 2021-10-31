@@ -8,6 +8,18 @@ mysql:
   password: next-terminal
   database: next-terminal
 sqlite:
-  file: 'next-terminal.db'
+  file: './data/sqlite/next-terminal.db'
 server:
   addr: 0.0.0.0:8088
+guacd:
+  hostname: 172.16.101.32
+  port: 4822
+  # 此路径需要为绝对路径，并且next-terminal和guacd都能访问到
+  recording: 'data/recording'
+  # 此路径需要为绝对路径，并且next-terminal和guacd都能访问到
+  drive: 'data/drive'
+
+sshd:
+  enable: true
+  addr: 0.0.0.0:8089
+  key: ~/.ssh/id_rsa

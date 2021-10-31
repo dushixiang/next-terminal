@@ -20,11 +20,12 @@ import qs from "qs";
 import request from "../../common/request";
 import {differTime} from "../../utils/utils";
 import {message} from "antd/es";
-import {PROTOCOL_COLORS} from "../../common/constants";
+import {MODE_COLORS, PROTOCOL_COLORS} from "../../common/constants";
 import {DisconnectOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
-import Monitor from "../access/Monitor";
+import AccessMonitor from "../access/AccessMonitor";
 
 import dayjs from "dayjs";
+import TermMonitor from "../access/TermMonitor";
 
 const confirm = Modal.confirm;
 const {Content} = Layout;
@@ -53,7 +54,8 @@ class OnlineSession extends Component {
         accessVisible: false,
         sessionWidth: 1024,
         sessionHeight: 768,
-        sessionProtocol: ''
+        sessionProtocol: '',
+        sessionMode: '',
     };
 
     componentDidMount() {
@@ -189,7 +191,7 @@ class OnlineSession extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({
@@ -199,10 +201,11 @@ class OnlineSession extends Component {
     }
 
     showMonitor = (record) => {
-
         this.setState({
             connectionId: record.connectionId,
+            sessionId: record.id,
             sessionProtocol: record.protocol,
+            sessionMode: record.mode,
             accessVisible: true,
             sessionWidth: record.width,
             sessionHeight: record.height,
@@ -223,6 +226,15 @@ class OnlineSession extends Component {
             title: '来源IP',
             dataIndex: 'clientIp',
             key: 'clientIp'
+        }, {
+            title: '接入方式',
+            dataIndex: 'mode',
+            key: 'mode',
+            render: (text) => {
+                return (
+                    <Tag color={MODE_COLORS[text]}>{text}</Tag>
+                )
+            }
         }, {
             title: '用户昵称',
             dataIndex: 'creatorName',
@@ -269,7 +281,7 @@ class OnlineSession extends Component {
 
                     return (
                         <div>
-                            <Button type="link" size='small' disabled={record['mode'] === 'naive'} onClick={() => {
+                            <Button type="link" size='small' onClick={() => {
                                 this.showMonitor(record)
                             }}>监控</Button>
                             <Button type="link" size='small' onClick={async () => {
@@ -296,7 +308,7 @@ class OnlineSession extends Component {
                                     } else {
                                         notification['success']({
                                             message: '提示',
-                                            description: '断开失败 :( ' + result.message,
+                                            description: result.message,
                                         });
                                     }
                                 }
@@ -463,13 +475,23 @@ class OnlineSession extends Component {
                                     this.setState({accessVisible: false})
                                 }}
                             >
-                                <Monitor connectionId={this.state.connectionId}
-                                         width={this.state.sessionWidth}
-                                         height={this.state.sessionHeight}
-                                         protocol={this.state.sessionProtocol}
-                                         rate={window.innerWidth * 0.8 / this.state.sessionWidth}>
+                                {
+                                    this.state.sessionMode === 'guacd' ?
+                                        <AccessMonitor connectionId={this.state.connectionId}
+                                                       width={this.state.sessionWidth}
+                                                       height={this.state.sessionHeight}
+                                                       protocol={this.state.sessionProtocol}
+                                                       rate={window.innerWidth * 0.8 / this.state.sessionWidth}>
 
-                                </Monitor>
+                                        </AccessMonitor> :
+                                        <TermMonitor sessionId={this.state.sessionId}
+                                                     width={this.state.sessionWidth}
+                                                     height={this.state.sessionHeight}>
+
+                                        </TermMonitor>
+                                }
+
+
                             </Modal> : undefined
                     }
 

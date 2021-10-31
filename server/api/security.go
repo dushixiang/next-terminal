@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/pkg/global"
+	"next-terminal/server/global/security"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -24,9 +24,14 @@ func SecurityCreateEndpoint(c echo.Context) error {
 		return err
 	}
 	// 更新内存中的安全规则
-	if err := ReloadAccessSecurity(); err != nil {
-		return err
+	rule := &security.Security{
+		ID:       item.ID,
+		IP:       item.IP,
+		Rule:     item.Rule,
+		Priority: item.Priority,
 	}
+	security.GlobalSecurityManager.Add <- rule
+
 	return Success(c, "")
 }
 
@@ -36,15 +41,18 @@ func ReloadAccessSecurity() error {
 		return err
 	}
 	if len(rules) > 0 {
-		var securities []*global.Security
+		// 先清空
+		security.GlobalSecurityManager.Clear()
+		// 再添加到全局的安全管理器中
 		for i := 0; i < len(rules); i++ {
-			rule := global.Security{
-				IP:   rules[i].IP,
-				Rule: rules[i].Rule,
+			rule := &security.Security{
+				ID:       rules[i].ID,
+				IP:       rules[i].IP,
+				Rule:     rules[i].Rule,
+				Priority: rules[i].Priority,
 			}
-			securities = append(securities, &rule)
+			security.GlobalSecurityManager.Add <- rule
 		}
-		global.Securities = securities
 	}
 	return nil
 }
@@ -81,9 +89,15 @@ func SecurityUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 	// 更新内存中的安全规则
-	if err := ReloadAccessSecurity(); err != nil {
-		return err
+	security.GlobalSecurityManager.Del <- id
+	rule := &security.Security{
+		ID:       item.ID,
+		IP:       item.IP,
+		Rule:     item.Rule,
+		Priority: item.Priority,
 	}
+	security.GlobalSecurityManager.Add <- rule
+
 	return Success(c, nil)
 }
 
@@ -92,15 +106,14 @@ func SecurityDeleteEndpoint(c echo.Context) error {
 
 	split := strings.Split(ids, ",")
 	for i := range split {
-		jobId := split[i]
-		if err := accessSecurityRepository.DeleteById(jobId); err != nil {
+		id := split[i]
+		if err := accessSecurityRepository.DeleteById(id); err != nil {
 			return err
 		}
+		// 更新内存中的安全规则
+		security.GlobalSecurityManager.Del <- id
 	}
-	// 更新内存中的安全规则
-	if err := ReloadAccessSecurity(); err != nil {
-		return err
-	}
+
 	return Success(c, nil)
 }
 

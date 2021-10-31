@@ -1,18 +1,20 @@
 package api
 
 import (
+	"errors"
 	"strconv"
 	"strings"
 
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/log"
+	"next-terminal/server/global/cache"
+	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
-func UserCreateEndpoint(c echo.Context) error {
+func UserCreateEndpoint(c echo.Context) (err error) {
 	var item model.User
 	if err := c.Bind(&item); err != nil {
 		return err
@@ -20,7 +22,6 @@ func UserCreateEndpoint(c echo.Context) error {
 	password := item.Password
 
 	var pass []byte
-	var err error
 	if pass, err = utils.Encoder.Encode([]byte(password)); err != nil {
 		return err
 	}
@@ -30,6 +31,10 @@ func UserCreateEndpoint(c echo.Context) error {
 	item.Created = utils.NowJsonTime()
 
 	if err := userRepository.Create(&item); err != nil {
+		return err
+	}
+	err = storageService.CreateStorageByUser(&item)
+	if err != nil {
 		return err
 	}
 
@@ -89,22 +94,32 @@ func UserDeleteEndpoint(c echo.Context) error {
 		if account.ID == userId {
 			return Fail(c, -1, "不允许删除自身账户")
 		}
+		user, err := userRepository.FindById(userId)
+		if err != nil {
+			return err
+		}
 		// 将用户强制下线
-		loginLogs, err := loginLogRepository.FindAliveLoginLogsByUserId(userId)
+		loginLogs, err := loginLogRepository.FindAliveLoginLogsByUsername(user.Username)
 		if err != nil {
 			return err
 		}
 
 		for j := range loginLogs {
-			global.Cache.Delete(loginLogs[j].ID)
-			if err := userService.Logout(loginLogs[j].ID); err != nil {
-				log.WithError(err).WithField("id:", loginLogs[j].ID).Error("Cache Deleted Error")
+			token := loginLogs[j].ID
+			cacheKey := userService.BuildCacheKeyByToken(token)
+			cache.GlobalCache.Delete(cacheKey)
+			if err := userService.Logout(token); err != nil {
+				log.WithError(err).WithField("id:", token).Error("Cache Deleted Error")
 				return Fail(c, 500, "强制下线错误")
 			}
 		}
 
 		// 删除用户
 		if err := userRepository.DeleteById(userId); err != nil {
+			return err
+		}
+		// 删除用户的默认磁盘空间
+		if err := storageService.DeleteStorageById(userId, true); err != nil {
 			return err
 		}
 	}
@@ -125,7 +140,10 @@ func UserGetEndpoint(c echo.Context) error {
 
 func UserChangePasswordEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	password := c.QueryParam("password")
+	password := c.FormValue("password")
+	if password == "" {
+		return Fail(c, -1, "请输入密码")
+	}
 
 	user, err := userRepository.FindById(id)
 	if err != nil {
@@ -172,9 +190,11 @@ func ReloadToken() error {
 	for i := range loginLogs {
 		loginLog := loginLogs[i]
 		token := loginLog.ID
-		user, err := userRepository.FindById(loginLog.UserId)
+		user, err := userRepository.FindByUsername(loginLog.Username)
 		if err != nil {
-			log.Debugf("用户「%v」获取失败，忽略", loginLog.UserId)
+			if errors.Is(gorm.ErrRecordNotFound, err) {
+				_ = loginLogRepository.DeleteById(token)
+			}
 			continue
 		}
 
@@ -184,13 +204,13 @@ func ReloadToken() error {
 			User:     user,
 		}
 
-		cacheKey := BuildCacheKeyByToken(token)
+		cacheKey := userService.BuildCacheKeyByToken(token)
 
 		if authorization.Remember {
 			// 记住登录有效期两周
-			global.Cache.Set(cacheKey, authorization, RememberEffectiveTime)
+			cache.GlobalCache.Set(cacheKey, authorization, RememberEffectiveTime)
 		} else {
-			global.Cache.Set(cacheKey, authorization, NotRememberEffectiveTime)
+			cache.GlobalCache.Set(cacheKey, authorization, NotRememberEffectiveTime)
 		}
 		log.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
 	}

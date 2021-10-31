@@ -20,7 +20,7 @@ import request from "../../common/request";
 import {message} from "antd/es";
 
 
-import {PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
+import {SyncOutlined, UndoOutlined} from '@ant-design/icons';
 import {PROTOCOL_COLORS} from "../../common/constants";
 import {isEmpty} from "../../utils/utils";
 import dayjs from "dayjs";
@@ -172,6 +172,10 @@ class ChooseAsset extends Component {
             selectedRowKeys: selectedRowKeys,
             totalSelectedRows: totalSelectedRows
         })
+        if (this.checkedAssets) {
+            this.checkedAssets(totalSelectedRows);
+        }
+        console.log(totalSelectedRows);
     }
 
     render() {
@@ -236,13 +240,13 @@ class ChooseAsset extends Component {
                 if (text) {
                     return (
                         <Tooltip title='运行中'>
-                            <Badge status="processing"/>
+                            <Badge status="processing" text='运行中'/>
                         </Tooltip>
                     )
                 } else {
                     return (
                         <Tooltip title='不可用'>
-                            <Badge status="error"/>
+                            <Badge status="error" text='不可用'/>
                         </Tooltip>
                     )
                 }
@@ -267,26 +271,32 @@ class ChooseAsset extends Component {
 
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
-            selectedRowKeys: this.state.selectedRowKeys,
+            selectedRowKeys: selectedRowKeys,
             onChange: (selectedRowKeys, selectedRows) => {
                 this.setState({selectedRowKeys, selectedRows});
+
+                let totalSelectedRows = this.state.totalSelectedRows;
+                let totalSelectedRowKeys = totalSelectedRows.map(item => item['id']);
+                for (let i = 0; i < selectedRows.length; i++) {
+                    let selectedRow = selectedRows[i];
+                    if (totalSelectedRowKeys.includes(selectedRow['id'])) {
+                        continue;
+                    }
+                    totalSelectedRows.push(selectedRow);
+                }
+
+                this.setState({
+                    totalSelectedRows: totalSelectedRows
+                })
+                if (this.checkedAssets) {
+                    this.checkedAssets(totalSelectedRows);
+                }
+                console.log(totalSelectedRows);
             },
             getCheckboxProps: (record) => ({
                 disabled: record['disabled'],
             }),
         };
-        let hasSelected = false;
-        if (selectedRowKeys.length > 0) {
-            let totalSelectedRows = this.state.totalSelectedRows;
-            let allSelectedRowKeys = totalSelectedRows.map(item => item['id']);
-            for (let i = 0; i < selectedRowKeys.length; i++) {
-                let selectedRowKey = selectedRowKeys[i];
-                if (!allSelectedRowKeys.includes(selectedRowKey)) {
-                    hasSelected = true;
-                    break;
-                }
-            }
-        }
 
         return (
             <>
@@ -364,34 +374,6 @@ class ChooseAsset extends Component {
                                             this.loadTableData(this.state.queryParams)
                                         }}>
 
-                                        </Button>
-                                    </Tooltip>
-
-                                    <Tooltip title="添加选择">
-                                        <Button type="primary" disabled={!hasSelected} icon={<PlusOutlined/>}
-                                                onClick={async () => {
-                                                    console.log(this.state.selectedRows)
-                                                    let totalSelectedRows = this.state.totalSelectedRows;
-                                                    let totalSelectedRowKeys = totalSelectedRows.map(item => item['id']);
-
-                                                    let selectedRows = this.state.selectedRows;
-                                                    let newRowKeys = []
-                                                    for (let i = 0; i < selectedRows.length; i++) {
-                                                        let selectedRow = selectedRows[i];
-                                                        if (totalSelectedRowKeys.includes(selectedRow['id'])) {
-                                                            continue;
-                                                        }
-                                                        totalSelectedRows.push(selectedRow);
-                                                        newRowKeys.push(selectedRow['id']);
-                                                    }
-
-                                                    this.setState({
-                                                        totalSelectedRows: totalSelectedRows
-                                                    })
-                                                    if (this.checkedAssets) {
-                                                        this.checkedAssets(totalSelectedRows);
-                                                    }
-                                                }}>
                                         </Button>
                                     </Tooltip>
                                 </Space>

@@ -5,26 +5,22 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strings"
-	"time"
 
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/log"
-	"next-terminal/pkg/service"
+	"next-terminal/server/config"
+	"next-terminal/server/global/cache"
+	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
+	"next-terminal/server/service"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"github.com/patrickmn/go-cache"
 	"gorm.io/driver/mysql"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
-
-const Token = "X-Auth-Token"
 
 var (
 	userRepository           *repository.UserRepository
@@ -35,20 +31,23 @@ var (
 	propertyRepository       *repository.PropertyRepository
 	commandRepository        *repository.CommandRepository
 	sessionRepository        *repository.SessionRepository
-	numRepository            *repository.NumRepository
 	accessSecurityRepository *repository.AccessSecurityRepository
+	accessGatewayRepository  *repository.AccessGatewayRepository
 	jobRepository            *repository.JobRepository
 	jobLogRepository         *repository.JobLogRepository
 	loginLogRepository       *repository.LoginLogRepository
+	storageRepository        *repository.StorageRepository
+	strategyRepository       *repository.StrategyRepository
 
-	jobService        *service.JobService
-	propertyService   *service.PropertyService
-	userService       *service.UserService
-	sessionService    *service.SessionService
-	mailService       *service.MailService
-	numService        *service.NumService
-	assetService      *service.AssetService
-	credentialService *service.CredentialService
+	jobService           *service.JobService
+	propertyService      *service.PropertyService
+	userService          *service.UserService
+	sessionService       *service.SessionService
+	mailService          *service.MailService
+	assetService         *service.AssetService
+	credentialService    *service.CredentialService
+	storageService       *service.StorageService
+	accessGatewayService *service.AccessGatewayService
 )
 
 func SetupRoutes(db *gorm.DB) *echo.Echo {
@@ -56,8 +55,10 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 	InitRepository(db)
 	InitService()
 
+	cache.GlobalCache.OnEvicted(userService.OnEvicted)
+
 	if err := InitDBData(); err != nil {
-		log.WithError(err).Error("初始化数据异常")
+		log.Errorf("初始化数据异常: %v", err.Error())
 		os.Exit(0)
 	}
 
@@ -68,13 +69,10 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 	e := echo.New()
 	e.HideBanner = true
 	//e.Logger = log.GetEchoLogger()
-	e.Use(log.Hook())
+	//e.Use(log.Hook())
 	e.File("/", "web/build/index.html")
 	e.File("/asciinema.html", "web/build/asciinema.html")
-	e.File("/asciinema-player.js", "web/build/asciinema-player.js")
-	e.File("/asciinema-player.css", "web/build/asciinema-player.css")
 	e.File("/", "web/build/index.html")
-	e.File("/logo.svg", "web/build/logo.svg")
 	e.File("/favicon.ico", "web/build/favicon.ico")
 	e.Static("/static", "web/build/static")
 
@@ -93,7 +91,7 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 
 	e.GET("/tunnel", TunEndpoint)
 	e.GET("/ssh", SSHEndpoint)
-
+	e.GET("/ssh-monitor", SshMonitor)
 	e.POST("/logout", LogoutEndpoint)
 	e.POST("/change-password", ChangePasswordEndpoint)
 	e.GET("/reload-totp", ReloadTOTPEndpoint)
@@ -101,15 +99,21 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 	e.POST("/confirm-totp", ConfirmTOTPEndpoint)
 	e.GET("/info", InfoEndpoint)
 
-	users := e.Group("/users")
+	account := e.Group("/account")
 	{
-		users.POST("", Admin(UserCreateEndpoint))
+		account.GET("/assets", AccountAssetEndpoint)
+		account.GET("/storage", AccountStorageEndpoint)
+	}
+
+	users := e.Group("/users", Admin)
+	{
+		users.POST("", UserCreateEndpoint)
 		users.GET("/paging", UserPagingEndpoint)
-		users.PUT("/:id", Admin(UserUpdateEndpoint))
-		users.DELETE("/:id", Admin(UserDeleteEndpoint))
-		users.GET("/:id", Admin(UserGetEndpoint))
-		users.POST("/:id/change-password", Admin(UserChangePasswordEndpoint))
-		users.POST("/:id/reset-totp", Admin(UserResetTotpEndpoint))
+		users.PUT("/:id", UserUpdateEndpoint)
+		users.DELETE("/:id", UserDeleteEndpoint)
+		users.GET("/:id", UserGetEndpoint)
+		users.POST("/:id/change-password", UserChangePasswordEndpoint)
+		users.POST("/:id/reset-totp", UserResetTotpEndpoint)
 	}
 
 	userGroups := e.Group("/user-groups", Admin)
@@ -119,36 +123,35 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 		userGroups.PUT("/:id", UserGroupUpdateEndpoint)
 		userGroups.DELETE("/:id", UserGroupDeleteEndpoint)
 		userGroups.GET("/:id", UserGroupGetEndpoint)
-		//userGroups.POST("/:id/members", UserGroupAddMembersEndpoint)
-		//userGroups.DELETE("/:id/members/:memberId", UserGroupDelMembersEndpoint)
 	}
 
-	assets := e.Group("/assets")
+	assets := e.Group("/assets", Admin)
 	{
 		assets.GET("", AssetAllEndpoint)
 		assets.POST("", AssetCreateEndpoint)
-		assets.POST("/import", Admin(AssetImportEndpoint))
+		assets.POST("/import", AssetImportEndpoint)
 		assets.GET("/paging", AssetPagingEndpoint)
 		assets.POST("/:id/tcping", AssetTcpingEndpoint)
 		assets.PUT("/:id", AssetUpdateEndpoint)
-		assets.DELETE("/:id", AssetDeleteEndpoint)
 		assets.GET("/:id", AssetGetEndpoint)
-		assets.POST("/:id/change-owner", Admin(AssetChangeOwnerEndpoint))
+		assets.DELETE("/:id", AssetDeleteEndpoint)
+		assets.POST("/:id/change-owner", AssetChangeOwnerEndpoint)
 	}
 
 	e.GET("/tags", AssetTagsEndpoint)
 
 	commands := e.Group("/commands")
 	{
+		commands.GET("", CommandAllEndpoint)
 		commands.GET("/paging", CommandPagingEndpoint)
 		commands.POST("", CommandCreateEndpoint)
 		commands.PUT("/:id", CommandUpdateEndpoint)
 		commands.DELETE("/:id", CommandDeleteEndpoint)
 		commands.GET("/:id", CommandGetEndpoint)
-		commands.POST("/:id/change-owner", Admin(CommandChangeOwnerEndpoint))
+		commands.POST("/:id/change-owner", CommandChangeOwnerEndpoint, Admin)
 	}
 
-	credentials := e.Group("/credentials")
+	credentials := e.Group("/credentials", Admin)
 	{
 		credentials.GET("", CredentialAllEndpoint)
 		credentials.GET("/paging", CredentialPagingEndpoint)
@@ -156,45 +159,54 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 		credentials.PUT("/:id", CredentialUpdateEndpoint)
 		credentials.DELETE("/:id", CredentialDeleteEndpoint)
 		credentials.GET("/:id", CredentialGetEndpoint)
-		credentials.POST("/:id/change-owner", Admin(CredentialChangeOwnerEndpoint))
+		credentials.POST("/:id/change-owner", CredentialChangeOwnerEndpoint)
 	}
 
 	sessions := e.Group("/sessions")
 	{
-		sessions.POST("", SessionCreateEndpoint)
 		sessions.GET("/paging", Admin(SessionPagingEndpoint))
-		sessions.POST("/:id/connect", SessionConnectEndpoint)
 		sessions.POST("/:id/disconnect", Admin(SessionDisconnectEndpoint))
+		sessions.DELETE("/:id", Admin(SessionDeleteEndpoint))
+		sessions.GET("/:id/recording", Admin(SessionRecordingEndpoint))
+		sessions.GET("/:id", Admin(SessionGetEndpoint))
+
+		sessions.POST("", SessionCreateEndpoint)
+		sessions.POST("/:id/connect", SessionConnectEndpoint)
 		sessions.POST("/:id/resize", SessionResizeEndpoint)
-		sessions.GET("/:id/ls", SessionLsEndpoint)
+		sessions.GET("/:id/stats", SessionStatsEndpoint)
+
+		sessions.POST("/:id/ls", SessionLsEndpoint)
 		sessions.GET("/:id/download", SessionDownloadEndpoint)
 		sessions.POST("/:id/upload", SessionUploadEndpoint)
+		sessions.POST("/:id/edit", SessionEditEndpoint)
 		sessions.POST("/:id/mkdir", SessionMkDirEndpoint)
 		sessions.POST("/:id/rm", SessionRmEndpoint)
 		sessions.POST("/:id/rename", SessionRenameEndpoint)
-		sessions.DELETE("/:id", Admin(SessionDeleteEndpoint))
-		sessions.GET("/:id/recording", SessionRecordingEndpoint)
 	}
 
-	resourceSharers := e.Group("/resource-sharers")
+	resourceSharers := e.Group("/resource-sharers", Admin)
 	{
-		resourceSharers.GET("/sharers", RSGetSharersEndPoint)
-		resourceSharers.POST("/overwrite-sharers", RSOverwriteSharersEndPoint)
-		resourceSharers.POST("/remove-resources", Admin(ResourceRemoveByUserIdAssignEndPoint))
-		resourceSharers.POST("/add-resources", Admin(ResourceAddByUserIdAssignEndPoint))
+		resourceSharers.GET("", RSGetSharersEndPoint)
+		resourceSharers.POST("/remove-resources", ResourceRemoveByUserIdAssignEndPoint)
+		resourceSharers.POST("/add-resources", ResourceAddByUserIdAssignEndPoint)
 	}
 
 	loginLogs := e.Group("login-logs", Admin)
 	{
 		loginLogs.GET("/paging", LoginLogPagingEndpoint)
 		loginLogs.DELETE("/:id", LoginLogDeleteEndpoint)
+		//loginLogs.DELETE("/clear", LoginLogClearEndpoint)
 	}
 
 	e.GET("/properties", Admin(PropertyGetEndpoint))
 	e.PUT("/properties", Admin(PropertyUpdateEndpoint))
 
-	e.GET("/overview/counter", OverviewCounterEndPoint)
-	e.GET("/overview/sessions", OverviewSessionPoint)
+	overview := e.Group("overview", Admin)
+	{
+		overview.GET("/counter", OverviewCounterEndPoint)
+		overview.GET("/asset", OverviewAssetEndPoint)
+		overview.GET("/access", OverviewAccessEndPoint)
+	}
 
 	jobs := e.Group("/jobs", Admin)
 	{
@@ -216,6 +228,44 @@ func SetupRoutes(db *gorm.DB) *echo.Echo {
 		securities.PUT("/:id", SecurityUpdateEndpoint)
 		securities.DELETE("/:id", SecurityDeleteEndpoint)
 		securities.GET("/:id", SecurityGetEndpoint)
+	}
+
+	storages := e.Group("/storages")
+	{
+		storages.GET("/paging", StoragePagingEndpoint, Admin)
+		storages.POST("", StorageCreateEndpoint, Admin)
+		storages.DELETE("/:id", StorageDeleteEndpoint, Admin)
+		storages.PUT("/:id", StorageUpdateEndpoint, Admin)
+		storages.GET("/shares", StorageSharesEndpoint, Admin)
+		storages.GET("/:id", StorageGetEndpoint, Admin)
+
+		storages.POST("/:storageId/ls", StorageLsEndpoint)
+		storages.GET("/:storageId/download", StorageDownloadEndpoint)
+		storages.POST("/:storageId/upload", StorageUploadEndpoint)
+		storages.POST("/:storageId/mkdir", StorageMkDirEndpoint)
+		storages.POST("/:storageId/rm", StorageRmEndpoint)
+		storages.POST("/:storageId/rename", StorageRenameEndpoint)
+		storages.POST("/:storageId/edit", StorageEditEndpoint)
+	}
+
+	strategies := e.Group("/strategies", Admin)
+	{
+		strategies.GET("", StrategyAllEndpoint)
+		strategies.GET("/paging", StrategyPagingEndpoint)
+		strategies.POST("", StrategyCreateEndpoint)
+		strategies.DELETE("/:id", StrategyDeleteEndpoint)
+		strategies.PUT("/:id", StrategyUpdateEndpoint)
+	}
+
+	accessGateways := e.Group("/access-gateways", Admin)
+	{
+		accessGateways.GET("", AccessGatewayAllEndpoint)
+		accessGateways.POST("", AccessGatewayCreateEndpoint)
+		accessGateways.GET("/paging", AccessGatewayPagingEndpoint)
+		accessGateways.PUT("/:id", AccessGatewayUpdateEndpoint)
+		accessGateways.DELETE("/:id", AccessGatewayDeleteEndpoint)
+		accessGateways.GET("/:id", AccessGatewayGetEndpoint)
+		accessGateways.POST("/:id/reconnect", AccessGatewayReconnectEndpoint)
 	}
 
 	return e
@@ -241,29 +291,32 @@ func InitRepository(db *gorm.DB) {
 	propertyRepository = repository.NewPropertyRepository(db)
 	commandRepository = repository.NewCommandRepository(db)
 	sessionRepository = repository.NewSessionRepository(db)
-	numRepository = repository.NewNumRepository(db)
 	accessSecurityRepository = repository.NewAccessSecurityRepository(db)
+	accessGatewayRepository = repository.NewAccessGatewayRepository(db)
 	jobRepository = repository.NewJobRepository(db)
 	jobLogRepository = repository.NewJobLogRepository(db)
 	loginLogRepository = repository.NewLoginLogRepository(db)
+	storageRepository = repository.NewStorageRepository(db)
+	strategyRepository = repository.NewStrategyRepository(db)
 }
 
 func InitService() {
-	jobService = service.NewJobService(jobRepository, jobLogRepository, assetRepository, credentialRepository)
 	propertyService = service.NewPropertyService(propertyRepository)
 	userService = service.NewUserService(userRepository, loginLogRepository)
 	sessionService = service.NewSessionService(sessionRepository)
 	mailService = service.NewMailService(propertyRepository)
-	numService = service.NewNumService(numRepository)
 	assetService = service.NewAssetService(assetRepository)
+	jobService = service.NewJobService(jobRepository, jobLogRepository, assetRepository, credentialRepository, assetService)
 	credentialService = service.NewCredentialService(credentialRepository)
+	storageService = service.NewStorageService(storageRepository, userRepository, propertyRepository)
+	accessGatewayService = service.NewAccessGatewayService(accessGatewayRepository)
 }
 
 func InitDBData() (err error) {
-	if err := propertyService.InitProperties(); err != nil {
+	if err := propertyService.DeleteDeprecatedProperty(); err != nil {
 		return err
 	}
-	if err := numService.InitNums(); err != nil {
+	if err := propertyService.InitProperties(); err != nil {
 		return err
 	}
 	if err := userService.InitUser(); err != nil {
@@ -285,6 +338,12 @@ func InitDBData() (err error) {
 		return err
 	}
 	if err := assetService.Encrypt(); err != nil {
+		return err
+	}
+	if err := storageService.InitStorages(); err != nil {
+		return err
+	}
+	if err := accessGatewayService.ReConnectAll(); err != nil {
 		return err
 	}
 	return nil
@@ -368,59 +427,46 @@ func ChangeEncryptionKey(oldEncryptionKey, newEncryptionKey string) error {
 	return nil
 }
 
-func SetupCache() *cache.Cache {
-	// 配置缓存器
-	mCache := cache.New(5*time.Minute, 10*time.Minute)
-	mCache.OnEvicted(func(key string, value interface{}) {
-		if strings.HasPrefix(key, Token) {
-			token := GetTokenFormCacheKey(key)
-			log.Debugf("用户Token「%v」过期", token)
-			err := userService.Logout(token)
-			if err != nil {
-				log.Errorf("退出登录失败 %v", err)
-			}
-		}
-	})
-	return mCache
-}
-
 func SetupDB() *gorm.DB {
 
 	var logMode logger.Interface
-	if global.Config.Debug {
+	if config.GlobalCfg.Debug {
 		logMode = logger.Default.LogMode(logger.Info)
 	} else {
 		logMode = logger.Default.LogMode(logger.Silent)
 	}
 
-	fmt.Printf("当前数据库模式为：%v\n", global.Config.DB)
+	fmt.Printf("当前数据库模式为：%v\n", config.GlobalCfg.DB)
 	var err error
 	var db *gorm.DB
-	if global.Config.DB == "mysql" {
-		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
-			global.Config.Mysql.Username,
-			global.Config.Mysql.Password,
-			global.Config.Mysql.Hostname,
-			global.Config.Mysql.Port,
-			global.Config.Mysql.Database,
+	if config.GlobalCfg.DB == "mysql" {
+		dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local&timeout=60s",
+			config.GlobalCfg.Mysql.Username,
+			config.GlobalCfg.Mysql.Password,
+			config.GlobalCfg.Mysql.Hostname,
+			config.GlobalCfg.Mysql.Port,
+			config.GlobalCfg.Mysql.Database,
 		)
 		db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{
 			Logger: logMode,
 		})
 	} else {
-		db, err = gorm.Open(sqlite.Open(global.Config.Sqlite.File), &gorm.Config{
+		db, err = gorm.Open(sqlite.Open(config.GlobalCfg.Sqlite.File), &gorm.Config{
 			Logger: logMode,
 		})
 	}
 
 	if err != nil {
-		log.WithError(err).Panic("连接数据库异常")
+		log.Errorf("连接数据库异常: %v", err.Error())
+		os.Exit(0)
 	}
 
 	if err := db.AutoMigrate(&model.User{}, &model.Asset{}, &model.AssetAttribute{}, &model.Session{}, &model.Command{},
 		&model.Credential{}, &model.Property{}, &model.ResourceSharer{}, &model.UserGroup{}, &model.UserGroupMember{},
-		&model.LoginLog{}, &model.Num{}, &model.Job{}, &model.JobLog{}, &model.AccessSecurity{}); err != nil {
-		log.WithError(err).Panic("初始化数据库表结构异常")
+		&model.LoginLog{}, &model.Job{}, &model.JobLog{}, &model.AccessSecurity{}, &model.AccessGateway{},
+		&model.Storage{}, &model.Strategy{}); err != nil {
+		log.Errorf("初始化数据库表结构异常: %v", err.Error())
+		os.Exit(0)
 	}
 	return db
 }

@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
+	"next-terminal/server/config"
+	"next-terminal/server/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -32,6 +32,7 @@ func AssetCreateEndpoint(c echo.Context) error {
 	item.Owner = account.ID
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
+	item.Active = true
 
 	if err := assetRepository.Create(&item); err != nil {
 		return err
@@ -41,10 +42,12 @@ func AssetCreateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	// 创建后自动检测资产是否存活
 	go func() {
-		active := utils.Tcping(item.IP, item.Port)
-		_ = assetRepository.UpdateActiveById(active, item.ID)
+		active, _ := assetService.CheckStatus(item.AccessGatewayId, item.IP, item.Port)
+
+		if item.Active != active {
+			_ = assetRepository.UpdateActiveById(active, item.ID)
+		}
 	}()
 
 	return Success(c, item)
@@ -74,7 +77,6 @@ func AssetImportEndpoint(c echo.Context) error {
 	if total == 0 {
 		return errors.New("csv数据为空")
 	}
-
 	var successCount = 0
 	var errorCount = 0
 	m := echo.Map{}
@@ -97,6 +99,7 @@ func AssetImportEndpoint(c echo.Context) error {
 				Description: record[8],
 				Created:     utils.NowJsonTime(),
 				Owner:       account.ID,
+				Active:      true,
 			}
 
 			if len(record) >= 10 {
@@ -110,11 +113,6 @@ func AssetImportEndpoint(c echo.Context) error {
 				m[strconv.Itoa(i)] = err.Error()
 			} else {
 				successCount++
-				// 创建后自动检测资产是否存活
-				go func() {
-					active := utils.Tcping(asset.IP, asset.Port)
-					_ = assetRepository.UpdateActiveById(active, asset.ID)
-				}()
 			}
 		}
 	}
@@ -141,6 +139,7 @@ func AssetPagingEndpoint(c echo.Context) error {
 	field := c.QueryParam("field")
 
 	account, _ := GetCurrentAccount(c)
+
 	items, total, err := assetRepository.Find(pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
 	if err != nil {
 		return err
@@ -154,8 +153,7 @@ func AssetPagingEndpoint(c echo.Context) error {
 
 func AssetAllEndpoint(c echo.Context) error {
 	protocol := c.QueryParam("protocol")
-	account, _ := GetCurrentAccount(c)
-	items, _ := assetRepository.FindByProtocolAndUser(protocol, account)
+	items, _ := assetRepository.FindByProtocol(protocol)
 	return Success(c, items)
 }
 
@@ -205,7 +203,7 @@ func AssetUpdateEndpoint(c echo.Context) error {
 		item.Description = "-"
 	}
 
-	if err := assetRepository.Encrypt(&item, global.Config.EncryptionPassword); err != nil {
+	if err := assetRepository.Encrypt(&item, config.GlobalCfg.EncryptionPassword); err != nil {
 		return err
 	}
 	if err := assetRepository.UpdateById(&item, id); err != nil {
@@ -267,7 +265,7 @@ func AssetTcpingEndpoint(c echo.Context) (err error) {
 		return err
 	}
 
-	active := utils.Tcping(item.IP, item.Port)
+	active, err := assetService.CheckStatus(item.AccessGatewayId, item.IP, item.Port)
 
 	if item.Active != active {
 		if err := assetRepository.UpdateActiveById(active, item.ID); err != nil {
@@ -275,7 +273,15 @@ func AssetTcpingEndpoint(c echo.Context) (err error) {
 		}
 	}
 
-	return Success(c, active)
+	var message = ""
+	if err != nil {
+		message = err.Error()
+	}
+
+	return Success(c, H{
+		"active":  active,
+		"message": message,
+	})
 }
 
 func AssetTagsEndpoint(c echo.Context) (err error) {

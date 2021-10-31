@@ -1,6 +1,21 @@
 import React, {Component} from 'react';
 
-import {Badge, Button, Col, Divider, Input, Layout, Row, Select, Space, Table, Tag, Tooltip, Typography} from "antd";
+import {
+    Badge,
+    Button,
+    Col,
+    Divider,
+    Input,
+    Layout,
+    Popover,
+    Row,
+    Select,
+    Space,
+    Table,
+    Tag,
+    Tooltip,
+    Typography
+} from "antd";
 import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
@@ -42,7 +57,10 @@ class UserShareSelectedAsset extends Component {
         users: [],
         selected: {},
         totalSelectedRows: [],
-        sharer: ''
+        sharer: '',
+        strategies: [],
+        strategyId: undefined,
+        sharers: []
     };
 
     async componentDidMount() {
@@ -65,24 +83,67 @@ class UserShareSelectedAsset extends Component {
             userGroupId: userGroupId
         }
         let paramStr = qs.stringify(params);
-        let q1 = request.get('/tags');
-        let q2 = request.get(`/assets/paging?${paramStr}`);
+        let q1 = request.get(`/strategies`);
+        let q2 = request.get(`/resource-sharers`);
+        let q3 = request.get(`/assets/paging?${paramStr}`);
+        let q4 = request.get('/tags');
 
         let r1 = await q1;
         let r2 = await q2;
+        let r3 = await q3;
+        let r4 = await q4;
 
+        let strategies = [];
         if (r1['code'] === 1) {
+            strategies = r1['data'];
             this.setState({
-                tags: r1['data']
+                strategies: strategies
             })
         }
 
+        let sharers = [];
         if (r2['code'] === 1) {
+            sharers = r2['data'];
             this.setState({
-                totalSelectedRows: r2['data']['items']
+                sharers: sharers
             })
         }
 
+        if (r3['code'] === 1) {
+            let totalSelectedRows = r3['data']['items'];
+            for (let i = 0; i < totalSelectedRows.length; i++) {
+                let assetId = totalSelectedRows[i].id;
+                totalSelectedRows[i]['strategy'] = this.getStrategyByAssetId(strategies, sharers, assetId);
+            }
+            this.setState({
+                totalSelectedRows: totalSelectedRows
+            })
+        }
+
+        if (r4['code'] === 1) {
+            this.setState({
+                tags: r4['data']
+            })
+        }
+    }
+
+    getStrategyByAssetId = (strategies, sharers, assetId, strategyId) => {
+        if (strategyId === undefined) {
+            for (let i = 0; i < sharers.length; i++) {
+                if (sharers[i]['resourceId'] === assetId) {
+                    strategyId = sharers[i]['strategyId'];
+                    break;
+                }
+            }
+        }
+        if (strategyId) {
+            for (let i = 0; i < strategies.length; i++) {
+                if (strategies[i].id === strategyId) {
+                    return strategies[i]
+                }
+            }
+        }
+        return undefined;
     }
 
     async loadTableData(queryParams) {
@@ -227,8 +288,8 @@ class UserShareSelectedAsset extends Component {
             key: 'name',
             render: (name, record) => {
                 let short = name;
-                if (short && short.length > 20) {
-                    short = short.substring(0, 20) + " ...";
+                if (short && short.length > 15) {
+                    short = short.substring(0, 15) + " ...";
                 }
                 return (
                     <Tooltip placement="topLeft" title={name}>
@@ -237,7 +298,7 @@ class UserShareSelectedAsset extends Component {
                 );
             }
         }, {
-            title: '连接协议',
+            title: '协议',
             dataIndex: 'protocol',
             key: 'protocol',
             render: (text, record) => {
@@ -260,7 +321,7 @@ class UserShareSelectedAsset extends Component {
                         if (tags[i] === '-') {
                             continue;
                         }
-                        tagDocuments.push(<Tag>{tagArr[i]}</Tag>)
+                        tagDocuments.push(<Tag key={tagArr[i]}>{tagArr[i]}</Tag>)
                     }
                     return tagDocuments;
                 }
@@ -274,13 +335,13 @@ class UserShareSelectedAsset extends Component {
                 if (text) {
                     return (
                         <Tooltip title='运行中'>
-                            <Badge status="processing"/>
+                            <Badge status="processing" text='运行中'/>
                         </Tooltip>
                     )
                 } else {
                     return (
                         <Tooltip title='不可用'>
-                            <Badge status="error"/>
+                            <Badge status="error" text='不可用'/>
                         </Tooltip>
                     )
                 }
@@ -326,20 +387,67 @@ class UserShareSelectedAsset extends Component {
             }
         }
 
+        const renderStatus = (text) => {
+            if (text === '1') {
+                return <Tag color={'green'}>允许</Tag>
+            } else {
+                return <Tag color={'red'}>禁止</Tag>
+            }
+        }
+
         return (
             <>
-                <Title level={3}>授权资产列表</Title>
-                <div>
-                    {
-                        this.state.totalSelectedRows.map(item => {
-                            return <Tag color={PROTOCOL_COLORS[item['protocol']]} closable
-                                        onClose={() => this.unSelectRow(item['id'])}
-                                        key={item['id']}>{item['name']}</Tag>
-                        })
-                    }
-                </div>
+                <Row gutter={16}>
+                    <Col span={6}>
+                        <Title level={3}>授权策略</Title>
+                        <Select style={{minWidth: 200}} onChange={(strategyId) => {
+                            this.setState({
+                                'strategyId': strategyId
+                            })
+                        }}>
+                            {this.state.strategies.map(item => {
+                                return (
+                                    <Select.Option key={item.id}>{item.name}</Select.Option>
+                                );
+                            })}
+                        </Select>
+                    </Col>
+                    <Col span={18}>
+                        <Title level={3}>已授权资产列表</Title>
+                        <div>
+                            {
+                                this.state.totalSelectedRows.map(item => {
+                                    let strategyName = '「未配置策略」';
+                                    let content = '';
+                                    if (item['strategy'] !== undefined) {
+                                        strategyName = item['strategy']['name'];
+                                        content = (
+                                            <div>
+                                                <p>上传：{renderStatus(item['strategy']['upload'])}</p>
+                                                <p>下载：{renderStatus(item['strategy']['download'])}</p>
+                                                <p>删除：{renderStatus(item['strategy']['delete'])}</p>
+                                                <p>改名：{renderStatus(item['strategy']['rename'])}</p>
+                                            </div>
+                                        );
+                                    }
 
+                                    return (
+                                        <Popover content={content} title={strategyName}>
+                                            <Tag color={PROTOCOL_COLORS[item['protocol']]} closable
+                                                 onClose={(e) => {
+                                                     e.preventDefault()
+                                                     this.unSelectRow(item['id'])
+                                                 }}
+                                                 key={item['id']}>{[item['name'], strategyName].join(':')}</Tag>
+                                        </Popover>
+                                    );
+                                })
+                            }
+                        </div>
+                    </Col>
+                </Row>
                 <Divider/>
+
                 <Content key='page-content' className="site-layout-background">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
@@ -416,7 +524,6 @@ class UserShareSelectedAsset extends Component {
                                     <Tooltip title="添加授权">
                                         <Button type="primary" disabled={!hasSelected} icon={<PlusOutlined/>}
                                                 onClick={async () => {
-                                                    console.log(this.state.selectedRows)
                                                     let totalSelectedRows = this.state.totalSelectedRows;
                                                     let totalSelectedRowKeys = totalSelectedRows.map(item => item['id']);
 
@@ -427,15 +534,18 @@ class UserShareSelectedAsset extends Component {
                                                         if (totalSelectedRowKeys.includes(selectedRow['id'])) {
                                                             continue;
                                                         }
+                                                        selectedRow['strategy'] = this.getStrategyByAssetId(this.state.strategies, this.state.sharers, selectedRow['id'], this.state.strategyId);
                                                         totalSelectedRows.push(selectedRow);
                                                         newRowKeys.push(selectedRow['id']);
                                                     }
 
                                                     let userId = this.state.sharer;
                                                     let userGroupId = this.state.userGroupId;
+                                                    let strategyId = this.state.strategyId;
                                                     let result = await request.post(`/resource-sharers/add-resources`, {
                                                         userGroupId: userGroupId,
                                                         userId: userId,
+                                                        strategyId: strategyId,
                                                         resourceType: 'asset',
                                                         resourceIds: newRowKeys
                                                     });
@@ -457,6 +567,7 @@ class UserShareSelectedAsset extends Component {
                     </div>
 
                     <Table key='assets-table'
+
                            rowSelection={rowSelection}
                            dataSource={this.state.items}
                            columns={columns}

@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import 'antd/dist/antd.css';
 import './App.css';
-import {Col, Divider, Dropdown, Layout, Menu, Popconfirm, Row, Tooltip} from "antd";
+import {Button, Dropdown, Layout, Menu, Popconfirm} from "antd";
 import {Link, Route, Switch} from "react-router-dom";
 import Dashboard from "./components/dashboard/Dashboard";
 import Asset from "./components/asset/Asset";
@@ -13,6 +13,7 @@ import Login from "./components/Login";
 import DynamicCommand from "./components/command/DynamicCommand";
 import Credential from "./components/credential/Credential";
 import {
+    ApiOutlined,
     AuditOutlined,
     BlockOutlined,
     CloudServerOutlined,
@@ -22,20 +23,21 @@ import {
     DesktopOutlined,
     DisconnectOutlined,
     DownOutlined,
-    GithubOutlined,
+    FolderOutlined, GithubOutlined,
+    HddOutlined,
     IdcardOutlined,
+    InsuranceOutlined,
     LinkOutlined,
     LoginOutlined,
     LogoutOutlined,
-    QuestionCircleOutlined,
+    MenuFoldOutlined,
+    MenuUnfoldOutlined,
     SafetyCertificateOutlined,
     SettingOutlined,
     SolutionOutlined,
     TeamOutlined,
     UserOutlined,
-    UserSwitchOutlined,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
+    UserSwitchOutlined
 } from '@ant-design/icons';
 import Info from "./components/user/Info";
 import request from "./common/request";
@@ -50,8 +52,13 @@ import Term from "./components/access/Term";
 import Job from "./components/devops/Job";
 import {Header} from "antd/es/layout/layout";
 import Security from "./components/devops/Security";
+import Storage from "./components/devops/Storage";
+import MyFile from "./components/asset/MyFile";
+import Strategy from "./components/user/Strategy";
+import AccessGateway from "./components/asset/AccessGateway";
+import MyAsset from "./components/asset/MyAsset";
 
-const {Footer, Sider} = Layout;
+const {Footer, Content, Sider} = Layout;
 
 const {SubMenu} = Menu;
 const headerHeight = 60;
@@ -136,18 +143,9 @@ class App extends Component {
 
                 <Menu.Item>
                     <Link to={'/info'}>
-                        <SolutionOutlined/>
-                        个人中心
+                        <SolutionOutlined/> 个人中心
                     </Link>
                 </Menu.Item>
-
-                <Menu.Item>
-                    <a target='_blank' rel="noreferrer" href='https://github.com/dushixiang/next-terminal'>
-                        <GithubOutlined/>
-                        点个Star
-                    </a>
-                </Menu.Item>
-
                 <Menu.Divider/>
 
                 <Menu.Item>
@@ -160,8 +158,7 @@ class App extends Component {
                         cancelText="取消"
                         placement="left"
                     >
-                        <LogoutOutlined/>
-                        退出登录
+                        <LogoutOutlined/> 退出登录
                     </Popconfirm>
                 </Menu.Item>
 
@@ -178,58 +175,59 @@ class App extends Component {
                 <Route path="/">
                     <Layout className="layout" style={{minHeight: '100vh'}}>
 
-                        <Sider collapsible collapsed={this.state.collapsed} trigger={null}>
-                            <div className="logo">
-                                <img src='logo.svg' alt='logo'/>
-                                {
-                                    !this.state.collapsed ?
+                        {
+                            isAdmin() ?
+                                <>
+                                    <Sider collapsible collapsed={this.state.collapsed} trigger={null}>
+                                        <div className="logo">
+                                            <img
+                                                src='data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjxwYXRoIGQ9Ik0yNzIgMTIyLjI0aDQ4MHYxNTcuMDU2aDk2Vi40NDhoLTk2TDI3MiAwYy01Mi44IDAtOTYgLjQ0OC05NiAuNDQ4djI3OC44NDhoOTZ2LTE1Ny4xMnptNDAzLjY0OCA2MDMuMzkyTDg5NiA1MTIgNjc1LjY0OCAyOTguMzY4IDYwOCAzNjQuNDggNzYwLjEyOCA1MTIgNjA4IDY1OS41Mmw2Ny42NDggNjYuMTEyek00MTYgNjU5LjUyTDI2My44MDggNTEyIDQxNiAzNjQuNDhsLTY3LjcxMi02Ni4xMTJMMTI4IDUxMmwyMjAuMjg4IDIxMy42MzJMNDE2IDY1OS41MnptMzM2IDI0Mi4zMDRIMjcydi0xNTcuMTJoLTk2VjEwMjRoNjcyVjc0NC43MDRoLTk2djE1Ny4xMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4='
+                                                alt='logo'/>
+                                            {
+                                                !this.state.collapsed ?
+                                                    <>&nbsp;<h1>Next Terminal</h1></> :
+                                                    null
+                                            }
+                                        </div>
 
-                                        <>&nbsp;<h1>Next Terminal</h1></> :
-                                        null
-                                }
-                            </div>
+                                        <Menu
+                                            onClick={(e) => this.setCurrent(e.key)}
+                                            selectedKeys={[this.state.current]}
+                                            onOpenChange={this.subMenuChange}
+                                            defaultOpenKeys={this.state.openKeys}
+                                            theme="dark" mode="inline" defaultSelectedKeys={['dashboard']}
+                                            inlineCollapsed={this.state.collapsed}
+                                            style={{lineHeight: '64px'}}>
 
-                            <Divider/>
+                                            <Menu.Item key="dashboard" icon={<DashboardOutlined/>}>
+                                                <Link to={'/'}>
+                                                    控制面板
+                                                </Link>
+                                            </Menu.Item>
 
-                            <Menu
-                                onClick={(e) => this.setCurrent(e.key)}
-                                selectedKeys={[this.state.current]}
-                                onOpenChange={this.subMenuChange}
-                                defaultOpenKeys={this.state.openKeys}
-                                theme="dark" mode="inline" defaultSelectedKeys={['dashboard']}
-                                inlineCollapsed={this.state.collapsed}
-                                style={{lineHeight: '64px'}}>
+                                            <SubMenu key='resource' title='资源管理' icon={<CloudServerOutlined/>}>
+                                                <Menu.Item key="asset" icon={<DesktopOutlined/>}>
+                                                    <Link to={'/asset'}>
+                                                        资产列表
+                                                    </Link>
+                                                </Menu.Item>
+                                                <Menu.Item key="credential" icon={<IdcardOutlined/>}>
+                                                    <Link to={'/credential'}>
+                                                        授权凭证
+                                                    </Link>
+                                                </Menu.Item>
+                                                <Menu.Item key="dynamic-command" icon={<CodeOutlined/>}>
+                                                    <Link to={'/dynamic-command'}>
+                                                        动态指令
+                                                    </Link>
+                                                </Menu.Item>
+                                                <Menu.Item key="access-gateway" icon={<ApiOutlined/>}>
+                                                    <Link to={'/access-gateway'}>
+                                                        接入网关
+                                                    </Link>
+                                                </Menu.Item>
+                                            </SubMenu>
 
-                                <Menu.Item key="dashboard" icon={<DashboardOutlined/>}>
-                                    <Link to={'/'}>
-                                        控制面板
-                                    </Link>
-                                </Menu.Item>
-
-                                <SubMenu key='resource' title='资源管理' icon={<CloudServerOutlined/>}>
-                                    <Menu.Item key="asset" icon={<DesktopOutlined/>}>
-                                        <Link to={'/asset'}>
-                                            资产列表
-                                        </Link>
-                                    </Menu.Item>
-                                    <Menu.Item key="credential" icon={<IdcardOutlined/>}>
-                                        <Link to={'/credential'}>
-                                            授权凭证
-                                        </Link>
-                                    </Menu.Item>
-                                </SubMenu>
-
-                                <SubMenu key='command-manage' title='指令管理' icon={<CodeOutlined/>}>
-                                    <Menu.Item key="dynamic-command" icon={<BlockOutlined/>}>
-                                        <Link to={'/dynamic-command'}>
-                                            动态指令
-                                        </Link>
-                                    </Menu.Item>
-                                </SubMenu>
-
-                                {
-                                    this.state.triggerMenu && isAdmin() ?
-                                        <>
                                             <SubMenu key='audit' title='会话审计' icon={<AuditOutlined/>}>
                                                 <Menu.Item key="online-session" icon={<LinkOutlined/>}>
                                                     <Link to={'/online-session'}>
@@ -243,9 +241,7 @@ class App extends Component {
                                                     </Link>
                                                 </Menu.Item>
                                             </SubMenu>
-
                                             <SubMenu key='ops' title='系统运维' icon={<ControlOutlined/>}>
-
                                                 <Menu.Item key="login-log" icon={<LoginOutlined/>}>
                                                     <Link to={'/login-log'}>
                                                         登录日志
@@ -263,9 +259,14 @@ class App extends Component {
                                                         访问安全
                                                     </Link>
                                                 </Menu.Item>
+                                                <Menu.Item key="storage" icon={<HddOutlined/>}>
+                                                    <Link to={'/storage'}>
+                                                        磁盘空间
+                                                    </Link>
+                                                </Menu.Item>
                                             </SubMenu>
 
-                                            <SubMenu key='user-group' title='用户管理' icon={<UserSwitchOutlined/>}>
+                                            <SubMenu key='user-manage' title='用户管理' icon={<UserSwitchOutlined/>}>
                                                 <Menu.Item key="user" icon={<UserOutlined/>}>
                                                     <Link to={'/user'}>
                                                         用户管理
@@ -276,86 +277,134 @@ class App extends Component {
                                                         用户组管理
                                                     </Link>
                                                 </Menu.Item>
+                                                <Menu.Item key="strategy" icon={<InsuranceOutlined/>}>
+                                                    <Link to={'/strategy'}>
+                                                        授权策略
+                                                    </Link>
+                                                </Menu.Item>
                                             </SubMenu>
-
-                                        </> : undefined
-                                }
-
-
-                                <Menu.Item key="info" icon={<SolutionOutlined/>}>
-                                    <Link to={'/info'}>
-                                        个人中心
-                                    </Link>
-                                </Menu.Item>
-
-                                {
-                                    this.state.triggerMenu && isAdmin() ?
-                                        <>
+                                            <Menu.Item key="my-file" icon={<FolderOutlined/>}>
+                                                <Link to={'/my-file'}>
+                                                    我的文件
+                                                </Link>
+                                            </Menu.Item>
+                                            <Menu.Item key="info" icon={<SolutionOutlined/>}>
+                                                <Link to={'/info'}>
+                                                    个人中心
+                                                </Link>
+                                            </Menu.Item>
                                             <Menu.Item key="setting" icon={<SettingOutlined/>}>
                                                 <Link to={'/setting'}>
                                                     系统设置
                                                 </Link>
                                             </Menu.Item>
-                                        </> : undefined
-                                }
-                            </Menu>
-                        </Sider>
+                                        </Menu>
+                                    </Sider>
 
-                        <Layout className="site-layout">
-                            <Header className="site-layout-background"
-                                    style={{padding: 0, height: headerHeight, zIndex: 20}}>
-                                <div className='layout-header'>
-                                    <Row justify="space-around" align="middle" gutter={24} style={{height: headerHeight}}>
-                                        <Col span={4} key={1} style={{height: headerHeight}}>
-                                            {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
-                                                className: 'trigger',
-                                                onClick: this.onCollapse,
-                                            })}
-                                        </Col>
-                                        <Col span={20} key={2} style={{textAlign: 'right'}}
-                                             className={'layout-header-right'}>
-
-                                            <div className={'layout-header-right-item'}>
-                                                <Tooltip placement="bottom" title={'使用帮助'}>
-                                                    <a target='_blank' rel="noreferrer"
-                                                       href='https://github.com/dushixiang/next-terminal/blob/master/docs/faq.md'>
-                                                        <QuestionCircleOutlined/>
-                                                    </a>
-                                                </Tooltip>
-
-                                            </div>
-
-
-                                            <Dropdown overlay={menu}>
-                                                <div className='nickname layout-header-right-item'>
-                                                    {getCurrentUser()['nickname']} &nbsp;<DownOutlined/>
+                                    <Layout className="site-layout">
+                                        <Header className="site-layout-background"
+                                                style={{padding: 0, height: headerHeight, zIndex: 20}}>
+                                            <div className='layout-header'>
+                                                <div className='layout-header-left'>
+                                                    {React.createElement(this.state.collapsed ? MenuUnfoldOutlined : MenuFoldOutlined, {
+                                                        className: 'trigger',
+                                                        onClick: this.onCollapse,
+                                                    })}
                                                 </div>
-                                            </Dropdown>
-                                        </Col>
-                                    </Row>
 
-                                </div>
-                            </Header>
+                                                <div className='layout-header-right'>
+                                                    <div className={'layout-header-right-item'}>
+                                                        <a style={{color: 'black'}} target='_blank' href='https://github.com/dushixiang/next-terminal'>
+                                                            <GithubOutlined />
+                                                        </a>
+                                                    </div>
+                                                </div>
 
-                            <Route path="/" exact component={Dashboard}/>
-                            <Route path="/user" component={User}/>
-                            <Route path="/user-group" component={UserGroup}/>
-                            <Route path="/asset" component={Asset}/>
-                            <Route path="/credential" component={Credential}/>
-                            <Route path="/dynamic-command" component={DynamicCommand}/>
-                            <Route path="/batch-command" component={BatchCommand}/>
-                            <Route path="/online-session" component={OnlineSession}/>
-                            <Route path="/offline-session" component={OfflineSession}/>
-                            <Route path="/login-log" component={LoginLog}/>
-                            <Route path="/info" component={Info}/>
-                            <Route path="/setting" component={Setting}/>
-                            <Route path="/job" component={Job}/>
-                            <Route path="/access-security" component={Security}/>
+                                                <div className='layout-header-right'>
+                                                    <Dropdown overlay={menu}>
+                                                        <div className='nickname layout-header-right-item'>
+                                                            {getCurrentUser()['nickname']} &nbsp;<DownOutlined/>
+                                                        </div>
+                                                    </Dropdown>
+                                                </div>
+                                            </div>
+                                        </Header>
 
-                            <Footer style={{textAlign: 'center'}}>
-                                Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
-                            </Footer>
-                        </Layout>
+                                        <Route path="/" exact component={Dashboard}/>
+                                        <Route path="/user" component={User}/>
+                                        <Route path="/user-group" component={UserGroup}/>
+                                        <Route path="/asset" component={Asset}/>
+                                        <Route path="/credential" component={Credential}/>
+                                        <Route path="/dynamic-command" component={DynamicCommand}/>
+                                        <Route path="/batch-command" component={BatchCommand}/>
+                                        <Route path="/online-session" component={OnlineSession}/>
+                                        <Route path="/offline-session" component={OfflineSession}/>
+                                        <Route path="/login-log" component={LoginLog}/>
+                                        <Route path="/info" component={Info}/>
+                                        <Route path="/setting" component={Setting}/>
+                                        <Route path="/job" component={Job}/>
+                                        <Route path="/access-security" component={Security}/>
+                                        <Route path="/access-gateway" component={AccessGateway}/>
+                                        <Route path="/my-file" component={MyFile}/>
+                                        <Route path="/storage" component={Storage}/>
+                                        <Route path="/strategy" component={Strategy}/>
+
+                                        <Footer style={{textAlign: 'center'}}>
+                                            Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
+                                        </Footer>
+                                    </Layout>
+                                </> :
+                                <>
+                                    <Header style={{padding: 0}}>
+                                        <div className='km-header'>
+                                            <div style={{flex: '1 1 0%'}}>
+                                                <Link to={'/'}>
+                                                    <img
+                                                        style={{paddingBottom: 4, marginRight: 5}}
+                                                        src='data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjxwYXRoIGQ9Ik0yNzIgMTIyLjI0aDQ4MHYxNTcuMDU2aDk2Vi40NDhoLTk2TDI3MiAwYy01Mi44IDAtOTYgLjQ0OC05NiAuNDQ4djI3OC44NDhoOTZ2LTE1Ny4xMnptNDAzLjY0OCA2MDMuMzkyTDg5NiA1MTIgNjc1LjY0OCAyOTguMzY4IDYwOCAzNjQuNDggNzYwLjEyOCA1MTIgNjA4IDY1OS41Mmw2Ny42NDggNjYuMTEyek00MTYgNjU5LjUyTDI2My44MDggNTEyIDQxNiAzNjQuNDhsLTY3LjcxMi02Ni4xMTJMMTI4IDUxMmwyMjAuMjg4IDIxMy42MzJMNDE2IDY1OS41MnptMzM2IDI0Mi4zMDRIMjcydi0xNTcuMTJoLTk2VjEwMjRoNjcyVjc0NC43MDRoLTk2djE1Ny4xMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4='
+                                                        alt='logo'/>
+                                                    <span className='km-header-logo'>Next Terminal</span>
+                                                </Link>
+
+                                                <Link to={'/my-file'}>
+                                                    <Button type="text" style={{color: 'white'}}
+                                                            icon={<FolderOutlined/>}>
+                                                        文件
+                                                    </Button>
+                                                </Link>
+
+                                                <Link to={'/dynamic-command'}>
+                                                    <Button type="text" style={{color: 'white'}}
+                                                            icon={<CodeOutlined/>}>
+                                                        指令
+                                                    </Button>
+                                                </Link>
+                                            </div>
+                                            <div className='km-header-right'>
+                                                <Dropdown overlay={menu}>
+                                                <span className={'km-header-right-item'}>
+                                                    {getCurrentUser()['nickname']}
+                                                </span>
+                                                </Dropdown>
+                                            </div>
+                                        </div>
+                                    </Header>
+                                    <Content className='km-container'>
+                                        <Layout>
+                                            <Route path="/" exact component={MyAsset}/>
+                                            <Content className={'kd-content'}>
+                                                <Route path="/info" component={Info}/>
+                                                <Route path="/my-file" component={MyFile}/>
+                                                <Route path="/dynamic-command" component={DynamicCommand}/>
+                                            </Content>
+                                        </Layout>
+                                    </Content>
+                                    <Footer style={{textAlign: 'center'}}>
+                                        Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
+                                    </Footer>
+                                </>
+                        }
+
 
                     </Layout>
                 </Route>

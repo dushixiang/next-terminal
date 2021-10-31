@@ -11,7 +11,7 @@ const SecurityModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
     const [form] = Form.useForm();
 
     if (model['priority'] === undefined) {
-        model['priority'] = 0;
+        model['priority'] = 1;
     }
 
     return (
@@ -54,8 +54,8 @@ const SecurityModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
                     </Radio.Group>
                 </Form.Item>
 
-                <Form.Item label="优先级" name='priority' rules={[{required: true, message: '请输入优先级'}]}>
-                    <InputNumber min={0} max={100}/>
+                <Form.Item label="优先级" name='priority' rules={[{required: true, message: '请输入优先级'}]} tooltip='数字越小代表优先级越高'>
+                    <InputNumber min={1} max={100}/>
                 </Form.Item>
 
             </Form>

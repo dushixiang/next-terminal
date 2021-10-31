@@ -70,7 +70,7 @@ class Job extends Component {
             message.success('删除成功');
             this.loadTableData(this.state.queryParams);
         } else {
-            message.error('删除失败 :( ' + result.message, 10);
+            message.error(result.message, 10);
         }
 
     }
@@ -236,7 +236,7 @@ class Job extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({

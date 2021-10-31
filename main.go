@@ -1,19 +1,17 @@
 package main
 
 import (
-	"crypto/md5"
+	"encoding/json"
 	"fmt"
 
-	"next-terminal/pkg/config"
-	"next-terminal/pkg/global"
-	"next-terminal/pkg/task"
 	"next-terminal/server/api"
+	"next-terminal/server/config"
+	"next-terminal/server/constant"
 	"next-terminal/server/repository"
+	"next-terminal/server/task"
 
 	"github.com/labstack/gommon/log"
 )
-
-const Version = "v0.5.0"
 
 func main() {
 	err := Run()
@@ -24,47 +22,41 @@ func main() {
 
 func Run() error {
 
-	fmt.Printf(`
- _______                   __    ___________                  .__              .__   
- \      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |  
- /   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |  
-/    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
-\____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
-        \/     \/      \/                     \/            \/        \/     \/      ` + Version + "\n\n")
+	fmt.Printf(constant.Banner, constant.Version)
 
-	// 为了兼容之前调用global包的代码 后期预期会改为调用pgk/config
-	global.Config = config.GlobalCfg
-
-	if global.Config.EncryptionKey == "" {
-		global.Config.EncryptionKey = "next-terminal"
+	if config.GlobalCfg.Debug {
+		jsonBytes, err := json.MarshalIndent(config.GlobalCfg, "", "    ")
+		if err != nil {
+			return err
+		}
+		fmt.Printf("当前配置为: %v\n", string(jsonBytes))
 	}
-	md5Sum := fmt.Sprintf("%x", md5.Sum([]byte(global.Config.EncryptionKey)))
-	global.Config.EncryptionPassword = []byte(md5Sum)
 
-	global.Cache = api.SetupCache()
 	db := api.SetupDB()
 	e := api.SetupRoutes(db)
 
-	if global.Config.ResetPassword != "" {
-		return api.ResetPassword(global.Config.ResetPassword)
+	if config.GlobalCfg.ResetPassword != "" {
+		return api.ResetPassword(config.GlobalCfg.ResetPassword)
 	}
-	if global.Config.ResetTotp != "" {
-		return api.ResetTotp(global.Config.ResetTotp)
+	if config.GlobalCfg.ResetTotp != "" {
+		return api.ResetTotp(config.GlobalCfg.ResetTotp)
 	}
 
-	if global.Config.NewEncryptionKey != "" {
-		return api.ChangeEncryptionKey(global.Config.EncryptionKey, global.Config.NewEncryptionKey)
+	if config.GlobalCfg.NewEncryptionKey != "" {
+		return api.ChangeEncryptionKey(config.GlobalCfg.EncryptionKey, config.GlobalCfg.NewEncryptionKey)
 	}
 
 	sessionRepo := repository.NewSessionRepository(db)
 	propertyRepo := repository.NewPropertyRepository(db)
-	ticker := task.NewTicker(sessionRepo, propertyRepo)
+	loginLogRepo := repository.NewLoginLogRepository(db)
+	jobLogRepo := repository.NewJobLogRepository(db)
+	ticker := task.NewTicker(sessionRepo, propertyRepo, loginLogRepo, jobLogRepo)
 	ticker.SetupTicker()
 
-	if global.Config.Server.Cert != "" && global.Config.Server.Key != "" {
-		return e.StartTLS(global.Config.Server.Addr, global.Config.Server.Cert, global.Config.Server.Key)
+	if config.GlobalCfg.Server.Cert != "" && config.GlobalCfg.Server.Key != "" {
+		return e.StartTLS(config.GlobalCfg.Server.Addr, config.GlobalCfg.Server.Cert, config.GlobalCfg.Server.Key)
 	} else {
-		return e.Start(global.Config.Server.Addr)
+		return e.Start(config.GlobalCfg.Server.Addr)
 	}
 
 }

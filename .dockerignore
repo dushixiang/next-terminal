@@ -1,7 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 ### Go template
 # Binaries for programs and plugins
-*.exe
 *.exe~
 *.dll
 *.so
@@ -17,4 +16,12 @@
 # vendor/
 
 .gitignore
+bin
+data
+docs
+guacd
+logs
+playground
+screenshot
 web/node_modules/
+.dockerignore

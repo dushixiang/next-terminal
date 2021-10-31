@@ -1,19 +1,21 @@
 import React, {Component} from 'react';
-import {Button, Card, Form, Image, Input, Layout, Modal, Result, Space} from "antd";
+import {Button, Card, Divider, Form, Image, Input, Layout, Modal, Result, Space, Typography} from "antd";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {ExclamationCircleOutlined, ReloadOutlined} from "@ant-design/icons";
+import {isAdmin} from "../../service/permission";
 
 const {Content} = Layout;
 const {Meta} = Card;
+const {Title} = Typography;
 
 const formItemLayout = {
-    labelCol: {span: 3},
-    wrapperCol: {span: 6},
+    labelCol: {span: 4},
+    wrapperCol: {span: 10},
 };
 const formTailLayout = {
-    labelCol: {span: 3},
-    wrapperCol: {span: 6, offset: 3},
+    labelCol: {span: 4},
+    wrapperCol: {span: 10, offset: 4},
 };
 const {confirm} = Modal;
 
@@ -107,11 +109,13 @@ class Info extends Component {
     }
 
     render() {
+        let contentClassName = isAdmin() ? 'page-content' : 'page-content-user';
         return (
             <>
-                <Content className="site-layout-background page-content">
-                    <h1>修改密码</h1>
+                <Content className={["site-layout-background", contentClassName]}>
+                    <Title level={3}>修改密码</Title>
                     <Form ref={this.passwordFormRef} name="password" onFinish={this.changePassword}>
+                        <input type='password' hidden={true} autoComplete='new-password'/>
                         <Form.Item
                             {...formItemLayout}
                             name="oldPassword"
@@ -123,7 +127,7 @@ class Info extends Component {
                                 },
                             ]}
                         >
-                            <Input type='password' placeholder="请输入原始密码"/>
+                            <Input type='password' placeholder="请输入原始密码" style={{width: 240}}/>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -137,7 +141,7 @@ class Info extends Component {
                             ]}
                         >
                             <Input type='password' placeholder="新的密码"
-                                   onChange={(value) => this.onNewPasswordChange(value)}/>
+                                   onChange={(value) => this.onNewPasswordChange(value)} style={{width: 240}}/>
                         </Form.Item>
                         <Form.Item
                             {...formItemLayout}
@@ -153,7 +157,7 @@ class Info extends Component {
                             help={this.state.errorMsg || ''}
                         >
                             <Input type='password' placeholder="请和上面输入新的密码保持一致"
-                                   onChange={(value) => this.onNewPassword2Change(value)}/>
+                                   onChange={(value) => this.onNewPassword2Change(value)} style={{width: 240}}/>
                         </Form.Item>
                         <Form.Item {...formTailLayout}>
                             <Button type="primary" htmlType="submit">
@@ -161,11 +165,12 @@ class Info extends Component {
                             </Button>
                         </Form.Item>
                     </Form>
-                </Content>
-                <Content className="site-layout-background page-content">
-                    <h1>双因素认证</h1>
+
+                    <Divider/>
+
+                    <Title level={3}>双因素认证</Title>
                     <Form hidden={this.state.qr}>
-                        <Form.Item>
+                        <Form.Item {...formItemLayout}>
                             {
                                 this.state.user.enableTotp ?
                                     <Result
@@ -214,6 +219,7 @@ class Info extends Component {
 
                         </Form.Item>
                     </Form>
+
                     <Form hidden={!this.state.qr} onFinish={this.confirmTOTP}>
                         <Form.Item {...formItemLayout} label="二维码">
                             <Space size={12}>
@@ -222,8 +228,8 @@ class Info extends Component {
                                     hoverable
                                     style={{width: 280}}
                                     cover={<Image
-                                        style={{margin: 40, marginBottom: 20}}
-                                        width={200}
+                                        style={{padding: 20}}
+                                        width={280}
                                         src={"data:image/png;base64, " + this.state.qr}
                                     />
                                     }
@@ -260,6 +266,7 @@ class Info extends Component {
                             </Button>
                         </Form.Item>
                     </Form>
+
                 </Content>
             </>
         );

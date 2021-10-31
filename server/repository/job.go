@@ -44,10 +44,10 @@ func (r JobRepository) Find(pageIndex, pageSize int, name, status, order, field 
 
 	if field == "name" {
 		field = "name"
-	} else if field == "created" {
-		field = "created"
-	} else {
+	} else if field == "updated" {
 		field = "updated"
+	} else {
+		field = "created"
 	}
 
 	err = db.Order(field + " " + order).Find(&o).Offset((pageIndex - 1) * pageSize).Limit(pageSize).Error
@@ -60,6 +60,12 @@ func (r JobRepository) Find(pageIndex, pageSize int, name, status, order, field 
 func (r JobRepository) FindByFunc(function string) (o []model.Job, err error) {
 	db := r.DB
 	err = db.Where("func = ?", function).Find(&o).Error
+	return
+}
+
+func (r JobRepository) FindAll() (o []model.Job, err error) {
+	db := r.DB
+	err = db.Find(&o).Error
 	return
 }
 

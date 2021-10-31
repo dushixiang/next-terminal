@@ -6,8 +6,8 @@ import (
 	"path"
 	"time"
 
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
+	"next-terminal/server/config"
+	"next-terminal/server/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -110,7 +110,7 @@ func (r SessionRepository) Decrypt(item *model.Session) error {
 		if err != nil {
 			return err
 		}
-		decryptedCBC, err := utils.AesDecryptCBC(origData, global.Config.EncryptionPassword)
+		decryptedCBC, err := utils.AesDecryptCBC(origData, config.GlobalCfg.EncryptionPassword)
 		if err != nil {
 			return err
 		}
@@ -121,7 +121,7 @@ func (r SessionRepository) Decrypt(item *model.Session) error {
 		if err != nil {
 			return err
 		}
-		decryptedCBC, err := utils.AesDecryptCBC(origData, global.Config.EncryptionPassword)
+		decryptedCBC, err := utils.AesDecryptCBC(origData, config.GlobalCfg.EncryptionPassword)
 		if err != nil {
 			return err
 		}
@@ -132,7 +132,7 @@ func (r SessionRepository) Decrypt(item *model.Session) error {
 		if err != nil {
 			return err
 		}
-		decryptedCBC, err := utils.AesDecryptCBC(origData, global.Config.EncryptionPassword)
+		decryptedCBC, err := utils.AesDecryptCBC(origData, config.GlobalCfg.EncryptionPassword)
 		if err != nil {
 			return err
 		}
@@ -164,12 +164,9 @@ func (r SessionRepository) DeleteById(id string) error {
 }
 
 func (r SessionRepository) DeleteByIds(sessionIds []string) error {
-	drivePath, err := propertyRepository.GetRecordingPath()
-	if err != nil {
-		return err
-	}
+	recordingPath := config.GlobalCfg.Guacd.Recording
 	for i := range sessionIds {
-		if err := os.RemoveAll(path.Join(drivePath, sessionIds[i])); err != nil {
+		if err := os.RemoveAll(path.Join(recordingPath, sessionIds[i])); err != nil {
 			return err
 		}
 		if err := r.DeleteById(sessionIds[i]); err != nil {
@@ -188,35 +185,27 @@ func (r SessionRepository) CountOnlineSession() (total int64, err error) {
 	return
 }
 
-type D struct {
-	Day      string `json:"day"`
-	Count    int    `json:"count"`
-	Protocol string `json:"protocol"`
-}
-
-func (r SessionRepository) CountSessionByDay(day int) (results []D, err error) {
-
-	today := time.Now().Format("20060102")
-	sql := "select t1.`day`, count(t2.id) as count\nfrom (\n         SELECT @date := DATE_ADD(@date, INTERVAL - 1 DAY) day\n         FROM (SELECT @date := DATE_ADD('" + today + "', INTERVAL + 1 DAY) FROM nums) as t0\n         LIMIT ?\n     )\n         as t1\n         left join\n     (\n         select DATE(s.connected_time) as day, s.id\n         from sessions as s\n         WHERE protocol = ? and DATE(connected_time) <= '" + today + "'\n           AND DATE(connected_time) > DATE_SUB('" + today + "', INTERVAL ? DAY)\n     ) as t2 on t1.day = t2.day\ngroup by t1.day"
-
-	protocols := []string{"rdp", "ssh", "vnc", "telnet"}
-
-	for i := range protocols {
-		var result []D
-		err = r.DB.Raw(sql, day, protocols[i], day).Scan(&result).Error
-		if err != nil {
-			return nil, err
-		}
-		for j := range result {
-			result[j].Protocol = protocols[i]
-		}
-		results = append(results, result...)
-	}
-
-	return
-}
-
 func (r SessionRepository) EmptyPassword() error {
 	sql := "update sessions set password = '-',private_key = '-', passphrase = '-' where 1=1"
 	return r.DB.Exec(sql).Error
+}
+
+func (r SessionRepository) CountByStatus(status string) (total int64, err error) {
+	err = r.DB.Find(&model.Session{}).Where("status = ?", status).Count(&total).Error
+	return
+}
+
+func (r SessionRepository) OverviewAccess(account model.User) (o []model.SessionForAccess, err error) {
+	db := r.DB
+	if constant.TypeUser == account.Type {
+		sql := "SELECT s.asset_id, s.ip, s.port, s.protocol, s.username, count(s.asset_id) AS access_count FROM sessions AS s where s.creator = ? GROUP BY s.asset_id, s.ip, s.port, s.protocol, s.username ORDER BY access_count DESC limit 10"
+		err = db.Raw(sql, []string{account.ID}).Scan(&o).Error
+	} else {
+		sql := "SELECT s.asset_id, s.ip, s.port, s.protocol, s.username, count(s.asset_id) AS access_count FROM sessions AS s GROUP BY s.asset_id, s.ip, s.port, s.protocol, s.username ORDER BY access_count DESC limit 10"
+		err = db.Raw(sql).Scan(&o).Error
+	}
+	if o == nil {
+		o = make([]model.SessionForAccess, 0)
+	}
+	return
 }

@@ -21,7 +21,7 @@ import {differTime} from "../../utils/utils";
 import Playback from "./Playback";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
-import {PROTOCOL_COLORS} from "../../common/constants";
+import {MODE_COLORS, PROTOCOL_COLORS} from "../../common/constants";
 
 import dayjs from "dayjs";
 
@@ -204,7 +204,7 @@ class OfflineSession extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({
@@ -226,6 +226,15 @@ class OfflineSession extends Component {
             title: '来源IP',
             dataIndex: 'clientIp',
             key: 'clientIp'
+        }, {
+            title: '接入方式',
+            dataIndex: 'mode',
+            key: 'mode',
+            render: (text) => {
+                return (
+                    <Tag color={MODE_COLORS[text]}>{text}</Tag>
+                )
+            }
         }, {
             title: '用户昵称',
             dataIndex: 'creatorName',
@@ -298,7 +307,7 @@ class OfflineSession extends Component {
                                                 if (result.code === 1) {
                                                     message.success('禁用成功');
                                                 } else {
-                                                    message.error('禁用失败 :( ' + result.message, 10);
+                                                    message.error(result.message, 10);
                                                 }
                                             }
                                         });
@@ -326,7 +335,7 @@ class OfflineSession extends Component {
                                     } else {
                                         notification['error']({
                                             message: '提示',
-                                            description: '删除失败 :( ' + result.message,
+                                            description: result.message,
                                         });
                                     }
 
@@ -480,7 +489,7 @@ class OfflineSession extends Component {
                             <Modal
                                 className='modal-no-padding'
                                 title={`会话回放 来源IP：${this.state.selectedRow['clientIp']} 用户昵称：${this.state.selectedRow['creatorName']} 资产名称：${this.state.selectedRow['assetName']} 网络：${this.state.selectedRow['username']}@${this.state.selectedRow['ip']}:${this.state.selectedRow['port']}`}
-
+                                centered={true}
                                 visible={this.state.playbackVisible}
                                 onCancel={this.hidePlayback}
                                 width={window.innerWidth * 0.8}
@@ -489,7 +498,7 @@ class OfflineSession extends Component {
                                 maskClosable={false}
                             >
                                 {
-                                    this.state.selectedRow['mode'] === 'naive' ?
+                                    this.state.selectedRow['mode'] === 'naive' || this.state.selectedRow['mode'] === 'terminal' ?
                                         <iframe
                                             title='recording'
                                             style={{

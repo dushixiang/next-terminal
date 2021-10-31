@@ -3,12 +3,12 @@ package api
 import (
 	"fmt"
 	"net"
-	"regexp"
 	"strings"
 	"time"
 
-	"next-terminal/pkg/constant"
-	"next-terminal/pkg/global"
+	"next-terminal/server/constant"
+	"next-terminal/server/global/cache"
+	"next-terminal/server/global/security"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
@@ -33,27 +33,26 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 func TcpWall(next echo.HandlerFunc) echo.HandlerFunc {
 
 	return func(c echo.Context) error {
-
-		if global.Securities == nil {
+		securities := security.GlobalSecurityManager.Values()
+		if len(securities) == 0 {
 			return next(c)
 		}
 
 		ip := c.RealIP()
-		for i := 0; i < len(global.Securities); i++ {
-			security := global.Securities[i]
 
-			if strings.Contains(security.IP, "/") {
+		for _, s := range securities {
+			if strings.Contains(s.IP, "/") {
 				// CIDR
-				_, ipNet, err := net.ParseCIDR(security.IP)
+				_, ipNet, err := net.ParseCIDR(s.IP)
 				if err != nil {
 					continue
 				}
 				if !ipNet.Contains(net.ParseIP(ip)) {
 					continue
 				}
-			} else if strings.Contains(security.IP, "-") {
+			} else if strings.Contains(s.IP, "-") {
 				// 范围段
-				split := strings.Split(security.IP, "-")
+				split := strings.Split(s.IP, "-")
 				if len(split) < 2 {
 					continue
 				}
@@ -65,16 +64,16 @@ func TcpWall(next echo.HandlerFunc) echo.HandlerFunc {
 				}
 			} else {
 				// IP
-				if security.IP != ip {
+				if s.IP != ip {
 					continue
 				}
 			}
 
-			if security.Rule == constant.AccessRuleAllow {
+			if s.Rule == constant.AccessRuleAllow {
 				return next(c)
 			}
-			if security.Rule == constant.AccessRuleReject {
-				if c.Request().Header.Get("X-Requested-With") != "" || c.Request().Header.Get(Token) != "" {
+			if s.Rule == constant.AccessRuleReject {
+				if c.Request().Header.Get("X-Requested-With") != "" || c.Request().Header.Get(constant.Token) != "" {
 					return Fail(c, 0, "您的访问请求被拒绝 :(")
 				} else {
 					return c.HTML(666, "您的访问请求被拒绝 :(")
@@ -88,10 +87,7 @@ func TcpWall(next echo.HandlerFunc) echo.HandlerFunc {
 
 func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
-	startWithUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
-
-	download := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/download`)
-	recording := regexp.MustCompile(`^/sessions/\w{8}(-\w{4}){3}-\w{12}/recording`)
+	anonymousUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
 
 	return func(c echo.Context) error {
 
@@ -100,32 +96,27 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			return next(c)
 		}
 		// 路由拦截 - 登录身份、资源权限判断等
-		for i := range startWithUrls {
-			if strings.HasPrefix(uri, startWithUrls[i]) {
+		for i := range anonymousUrls {
+			if strings.HasPrefix(uri, anonymousUrls[i]) {
 				return next(c)
 			}
 		}
 
-		if download.FindString(uri) != "" {
-			return next(c)
-		}
-
-		if recording.FindString(uri) != "" {
-			return next(c)
-		}
-
 		token := GetToken(c)
-		cacheKey := BuildCacheKeyByToken(token)
-		authorization, found := global.Cache.Get(cacheKey)
+		if token == "" {
+			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+		}
+		cacheKey := userService.BuildCacheKeyByToken(token)
+		authorization, found := cache.GlobalCache.Get(cacheKey)
 		if !found {
 			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
 		}
 
 		if authorization.(Authorization).Remember {
 			// 记住登录有效期两周
-			global.Cache.Set(cacheKey, authorization, time.Hour*time.Duration(24*14))
+			cache.GlobalCache.Set(cacheKey, authorization, time.Hour*time.Duration(24*14))
 		} else {
-			global.Cache.Set(cacheKey, authorization, time.Hour*time.Duration(2))
+			cache.GlobalCache.Set(cacheKey, authorization, time.Hour*time.Duration(2))
 		}
 
 		return next(c)

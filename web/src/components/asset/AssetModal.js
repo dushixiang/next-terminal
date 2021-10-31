@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     Col,
     Collapse,
@@ -13,8 +13,8 @@ import {
     Tooltip,
     Typography
 } from "antd/lib/index";
-import {ExclamationCircleOutlined} from "@ant-design/icons";
 import {isEmpty} from "../../utils/utils";
+import request from "../../common/request";
 
 const {TextArea} = Input;
 const {Option} = Select;
@@ -125,6 +125,30 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
         model.accountType = v;
     }
 
+    let [enableDrive, setEnableDrive] = useState(model['enable-drive']);
+
+    let [storages, setStorages] = useState([]);
+    useEffect(() => {
+        const getStorages = async () => {
+            const result = await request.get('/storages/shares');
+            if (result.code === 1) {
+                setStorages(result['data']);
+            }
+        }
+        getStorages();
+    }, []);
+
+    let [accessGateways,setAccessGateways] = useState([]);
+    useEffect(() => {
+        const getAccessGateways = async () => {
+            const result = await request.get('/access-gateways');
+            if (result.code === 1) {
+                setAccessGateways(result['data']);
+            }
+        }
+        getAccessGateways();
+    }, []);
+
     return (
 
         <Modal
@@ -141,6 +165,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     .catch(info => {
                     });
             }}
+            centered={true}
             width={1040}
             onCancel={handleCancel}
             confirmLoading={confirmLoading}
@@ -163,7 +188,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                             <Input placeholder="资产的主机名称或者IP地址"/>
                         </Form.Item>
 
-                        <Form.Item label="接入协议" name='protocol' rules={[{required: true, message: '请选择接入协议'}]}>
+                        <Form.Item label="协议" name='protocol' rules={[{required: true, message: '请选择接入协议'}]}>
                             <Radio.Group onChange={handleProtocolChange}>
                                 <Radio value="rdp">RDP</Radio>
                                 <Radio value="ssh">SSH</Radio>
@@ -233,14 +258,13 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                                 {
                                     accountType === 'custom' ?
                                         <>
-                                            <Form.Item label="授权账户" name='username'
-                                                       noStyle={!(accountType === 'custom')}>
-                                                <Input placeholder="输入授权账户"/>
+                                            <input type='password' hidden={true} autoComplete='new-password'/>
+                                            <Form.Item label="授权账户" name='username'>
+                                                <Input autoComplete="off" placeholder="输入授权账户"/>
                                             </Form.Item>
 
-                                            <Form.Item label="授权密码" name='password'
-                                                       noStyle={!(accountType === 'custom')}>
-                                                <Input.Password placeholder="输入授权密码"/>
+                                            <Form.Item label="授权密码" name='password'>
+                                                <Input.Password autoComplete="off" placeholder="输入授权密码"/>
                                             </Form.Item>
                                         </>
                                         : null
@@ -266,6 +290,20 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                             </>
                         }
 
+                        <Form.Item label="接入网关" name='accessGatewayId' tooltip={'需要从接入网关才能访问的目标机器必选'}>
+                            <Select onChange={() => null} allowClear={true}>
+                                {accessGateways.map(item => {
+                                    return (
+                                        <Option key={item.id} value={item.id} placeholder={'需要从接入网关才能访问的目标机器必选'}>
+                                            <Tooltip placement="topLeft" title={item.name}>
+                                                {item.name}
+                                            </Tooltip>
+                                        </Option>
+                                    );
+                                })}
+                            </Select>
+                        </Form.Item>
+
                         <Form.Item label="标签" name='tags'>
                             <Select mode="tags" placeholder="标签可以更加方便的检索资产">
                                 {tags.map(tag => {
@@ -282,7 +320,8 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                         </Form.Item>
                     </Col>
                     <Col span={11}>
-                        <Collapse defaultActiveKey={['remote-app', '认证', 'VNC中继', '模式设置']} ghost>
+                        <Collapse defaultActiveKey={['remote-app', '认证', 'VNC中继', 'storage', '模式设置', '显示设置', '控制终端行为']}
+                                  ghost>
                             {
                                 protocol === 'rdp' ?
                                     <>
@@ -297,34 +336,62 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                                         <Panel header={<Text strong>Remote App</Text>} key="remote-app">
                                             <Form.Item
                                                 name="remote-app"
-                                                label={<Tooltip title="指定在远程桌面上启动的RemoteApp。
+                                                label='程序'
+                                                tooltip="指定在远程桌面上启动的RemoteApp。
 如果您的远程桌面服务器支持该应用程序，则该应用程序(且仅该应用程序)对用户可见。
 
 Windows需要对远程应用程序的名称使用特殊的符号。
 远程应用程序的名称必须以两个竖条作为前缀。
-例如，如果您已经在您的服务器上为notepad.exe创建了一个远程应用程序，并将其命名为“notepad”，则您将该参数设置为:“||notepad”。">
-                                                    程序&nbsp;<ExclamationCircleOutlined/>
-                                                </Tooltip>}
+例如，如果您已经在您的服务器上为notepad.exe创建了一个远程应用程序，并将其命名为“notepad”，则您将该参数设置为:“||notepad”。"
                                             >
                                                 <Input type='text' placeholder="remote app"/>
                                             </Form.Item>
 
                                             <Form.Item
                                                 name="remote-app-dir"
-                                                label={<Tooltip
-                                                    title="remote app的工作目录，如果未配置remote app，此参数无效。">工作目录&nbsp;
-                                                    <ExclamationCircleOutlined/></Tooltip>}
+                                                label='工作目录'
+                                                tooltip='remote app的工作目录，如果未配置remote app，此参数无效。'
                                             >
                                                 <Input type='text' placeholder="remote app的工作目录"/>
                                             </Form.Item>
 
                                             <Form.Item
                                                 name="remote-app-args"
-                                                label={<Tooltip title="remote app的命令行参数，如果未配置remote app，此参数无效。">参数&nbsp;
-                                                    <ExclamationCircleOutlined/></Tooltip>}
+                                                label='参数'
+                                                tooltip='remote app的命令行参数，如果未配置remote app，此参数无效。'
                                             >
                                                 <Input type='text' placeholder="remote app的命令行参数"/>
                                             </Form.Item>
+                                        </Panel>
+                                        <Panel header={<Text strong>网络驱动</Text>} key="storage">
+                                            <Form.Item
+                                                name="enable-drive"
+                                                label="启用设备映射"
+                                                valuePropName="checked"
+                                            >
+                                                <Switch checkedChildren="开启" unCheckedChildren="关闭"
+                                                        onChange={(checked, event) => {
+                                                            setEnableDrive(checked);
+                                                        }}/>
+                                            </Form.Item>
+                                            {
+                                                enableDrive ?
+                                                    <Form.Item
+                                                        name="drive-path"
+                                                        label="网络驱动"
+                                                        tooltip='用于文件传输的网络驱动，为空时使用操作人的默认空间'
+                                                    >
+                                                        <Select onChange={null} allowClear placeholder='为空时使用操作人的默认空间'>
+                                                            {
+                                                                storages.map(item => {
+                                                                    return <Option
+                                                                        value={item['id']}>{item['name']}</Option>
+                                                                })
+                                                            }
+                                                        </Select>
+                                                    </Form.Item> : undefined
+                                            }
+
                                         </Panel>
                                     </> : undefined
                             }
@@ -335,16 +402,14 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                         <Panel header={<Text strong>模式设置</Text>} key="模式设置">
                                             <Form.Item
                                                 name="ssh-mode"
-                                                label={<Tooltip
-                                                    title="guacd对部分SSH密钥支持不完善，当密钥类型为ED25519时请选择原生模式。">连接模式&nbsp;
-                                                    <ExclamationCircleOutlined/></Tooltip>}
+                                                label='连接模式'
                                                 initialValue=""
+                                                tooltip='guacd对部分SSH密钥支持不完善，当密钥类型为ED25519时请选择原生模式。'
                                             >
                                                 <Select onChange={(value) => {
                                                     setSshMode(value)
                                                 }}>
-                                                    <Option value="">默认</Option>
-                                                    <Option value="guacd">guacd</Option>
+                                                    <Option value="">guacd</Option>
                                                     <Option value="naive">原生</Option>
                                                 </Select>
                                             </Form.Item>
@@ -448,15 +513,13 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                             </Form.Item>
                                         </Panel>
                                         <Panel header={<Text strong>VNC中继</Text>} key="VNC中继">
-                                            <Form.Item label={<Tooltip
-                                                title="连接到VNC代理（例如UltraVNC Repeater）时要请求的目标主机。">目标主机&nbsp;
-                                                <ExclamationCircleOutlined/></Tooltip>}
+                                            <Form.Item label='目标主机'
+                                                       tooltip='连接到VNC代理（例如UltraVNC Repeater）时要请求的目标主机。'
                                                        name='dest-host'>
                                                 <Input placeholder="目标主机"/>
                                             </Form.Item>
-                                            <Form.Item label={<Tooltip
-                                                title="连接到VNC代理（例如UltraVNC Repeater）时要请求的目标端口。">目标端口&nbsp;
-                                                <ExclamationCircleOutlined/></Tooltip>}
+                                            <Form.Item label='目标端口'
+                                                       tooltip='连接到VNC代理（例如UltraVNC Repeater）时要请求的目标端口。'
                                                        name='dest-port'>
                                                 <Input type='number' min={1} max={65535}
                                                        placeholder='目标端口'/>

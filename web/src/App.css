@@ -11,8 +11,7 @@
 }
 
 .logo {
-    height: 32px;
-    margin: 16px;
+    margin: 24px;
     text-align: center;
 }
 
@@ -35,33 +34,26 @@
 .layout-header {
     height: 60px;
     align-items: center;
-    padding: 0 16px 0 0;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
+    position: relative;
+    display: flex;
+}
+
+.layout-header-left {
+    flex: 1 1 0;
 }
 
 .layout-header-right {
-    align-items: center;
-    padding: 0 12px;
-    cursor: pointer;
-    transition: all .3s;
-    line-height: 60px;
-    height: 60px;
+    text-align: right;
+    margin-right: 12px;
 }
 
 .layout-header-right-item {
-    margin: 0 6px;
-    display: inline;
-    height: 60px;
-}
-
-.nickname {
-    line-height: 60px;
-    height: 60px;
-    width: 125px;
-    text-align: left;
-    padding: 0 5px;
-    float: right;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
 }
 
 .page-herder {
@@ -85,7 +77,10 @@
 .page-content {
     margin: 16px;
     padding: 24px;
-    min-height: 280px;
+}
+
+.page-content-user {
+    padding: 24px;
 }
 
 .page-card {
@@ -114,4 +109,70 @@
 
 .modal-no-padding .ant-modal-body {
     padding: 0;
+}
+
+.disabled-icon {
+    cursor: not-allowed;
+    color: #ccc;
+}
+
+.disabled-icon:hover {
+    color: #ccc;
+}
+
+.km-header {
+    color: white;
+    width: 80%;
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    padding: 0 16px;
+}
+
+.km-header-logo {
+    font-size: 18px;
+    /*font-weight: 500;*/
+    font-weight: bold;
+    cursor: pointer;
+    color: white;
+}
+
+.km-header-right {
+    text-align: left;
+    height: 100%;
+    margin: 0 8px;
+}
+
+.km-header-right {
+    text-align: right;
+    height: 100%;
+    margin: 0 8px;
+}
+
+.km-header-right-item {
+    cursor: pointer;
+    /*padding: 23px 12px;*/
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    vertical-align: middle;
+    height: 100%;
+}
+
+.km-container {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.kd-content {
+    margin-top: 20px;
+    background-color: white;
+}
+
+.kd-page-header {
+    background-color: white;
+    margin-top: 20px;
 }

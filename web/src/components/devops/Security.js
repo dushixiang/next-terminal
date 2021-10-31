@@ -5,7 +5,6 @@ import qs from "qs";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {DeleteOutlined, ExclamationCircleOutlined, PlusOutlined, SyncOutlined, UndoOutlined} from '@ant-design/icons';
-import './Job.css'
 import SecurityModal from "./SecurityModal";
 
 const confirm = Modal.confirm;
@@ -42,7 +41,7 @@ class Security extends Component {
             message.success('删除成功');
             this.loadTableData(this.state.queryParams);
         } else {
-            message.error('删除失败 :( ' + result.message, 10);
+            message.error(result.message, 10);
         }
 
     }
@@ -188,7 +187,7 @@ class Security extends Component {
                 })
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('删除失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } finally {
             this.setState({
@@ -249,7 +248,7 @@ class Security extends Component {
                 return (
                     <div>
                         <Button type="link" size='small' loading={this.state.items[index]['execLoading']}
-                                onClick={() => this.showModal('更新计划任务', record)}>编辑</Button>
+                                onClick={() => this.showModal('更新', record)}>编辑</Button>
 
                         <Button type="text" size='small' danger
                                 onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
@@ -306,7 +305,6 @@ class Security extends Component {
 
                                         </Button>
                                     </Tooltip>
-
 
                                     <Tooltip title="刷新列表">
                                         <Button icon={<SyncOutlined/>} onClick={() => {

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"next-terminal/server/model"
 
 	"gorm.io/gorm"
@@ -24,6 +26,20 @@ func (r JobLogRepository) FindByJobId(jobId string) (o []model.JobLog, err error
 	return
 }
 
+func (r JobLogRepository) FindOutTimeLog(dayLimit int) (o []model.JobLog, err error) {
+	limitTime := time.Now().Add(time.Duration(-dayLimit*24) * time.Hour)
+	err = r.DB.Where("timestamp < ?", limitTime).Find(&o).Error
+	return
+}
+
 func (r JobLogRepository) DeleteByJobId(jobId string) error {
 	return r.DB.Where("job_id = ?", jobId).Delete(model.JobLog{}).Error
+}
+
+func (r JobLogRepository) DeleteByIdIn(ids []string) error {
+	return r.DB.Where("id in ?", ids).Delete(&model.JobLog{}).Error
+}
+
+func (r JobLogRepository) DeleteById(id string) error {
+	return r.DB.Where("id = ?", id).Delete(&model.JobLog{}).Error
 }

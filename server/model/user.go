@@ -5,16 +5,16 @@ import (
 )
 
 type User struct {
-	ID         string         `gorm:"primary_key" json:"id"`
-	Username   string         `gorm:"index" json:"username"`
-	Password   string         `json:"password"`
-	Nickname   string         `json:"nickname"`
+	ID         string         `gorm:"primary_key,type:varchar(36)" json:"id"`
+	Username   string         `gorm:"index,type:varchar(200)" json:"username"`
+	Password   string         `gorm:"type:varchar(500)" json:"password"`
+	Nickname   string         `gorm:"type:varchar(500)" json:"nickname"`
 	TOTPSecret string         `json:"-"`
 	Online     bool           `json:"online"`
 	Enabled    bool           `json:"enabled"`
 	Created    utils.JsonTime `json:"created"`
-	Type       string         `json:"type"`
-	Mail       string         `json:"mail"`
+	Type       string         `gorm:"type:varchar(20)" json:"type"`
+	Mail       string         `gorm:"type:varchar(500)" json:"mail"`
 }
 
 type UserForPage struct {

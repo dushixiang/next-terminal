@@ -1,11 +1,14 @@
 import React, {Component} from 'react';
 import Guacamole from "guacamole-common-js";
 import {server} from "../../common/env";
-import {Button, Col, Row, Slider, Typography} from "antd";
+import {Button, Col, Row, Select, Slider, Typography} from "antd";
 import {PauseCircleOutlined, PlayCircleOutlined} from '@ant-design/icons';
 import {Tooltip} from "antd/lib/index";
+import {getToken} from "../../utils/utils";
 
 const {Text} = Typography;
+
+let timer;
 
 class Playback extends Component {
 
@@ -15,6 +18,7 @@ class Playback extends Component {
         recording: undefined,
         percent: 0,
         max: 0,
+        speed: 1,
     }
 
     componentDidMount() {
@@ -27,14 +31,14 @@ class Playback extends Component {
     }
 
     initPlayer(sessionId) {
-        var RECORDING_URL = `${server}/sessions/${sessionId}/recording`;
+        const RECORDING_URL = `${server}/sessions/${sessionId}/recording?X-Auth-Token=${getToken()}`;
 
-        var display = document.getElementById('display');
+        const display = document.getElementById('display');
 
-        var tunnel = new Guacamole.StaticHTTPTunnel(RECORDING_URL);
-        var recording = new Guacamole.SessionRecording(tunnel);
+        const tunnel = new Guacamole.StaticHTTPTunnel(RECORDING_URL);
+        const recording = new Guacamole.SessionRecording(tunnel);
 
-        var recordingDisplay = recording.getDisplay();
+        const recordingDisplay = recording.getDisplay();
 
         /**
          * Converts the given number to a string, adding leading zeroes as necessary
@@ -50,7 +54,7 @@ class Playback extends Component {
          *     A string representation of the given number, with leading zeroes
          *     added as necessary to reach the specified minimum length.
          */
-        var zeroPad = function zeroPad(num, minLength) {
+        const zeroPad = function zeroPad(num, minLength) {
 
             // Convert provided number to string
             var str = num.toString();
@@ -74,7 +78,7 @@ class Playback extends Component {
          *     A human-readable string representation of the given timestamp, in
          *     MM:SS format.
          */
-        var formatTime = function formatTime(millis) {
+        const formatTime = function formatTime(millis) {
 
             // Calculate total number of whole seconds
             var totalSeconds = Math.floor(millis / 1000);
@@ -147,6 +151,33 @@ class Playback extends Component {
         });
     }
 
+    startSpeedUp = () => {
+        let speed = this.state.speed;
+        if (speed === 1) {
+            return;
+        }
+        let recording = this.state.recording;
+        if (!recording.isPlaying()) {
+            return;
+        }
+        const add_time = 100;
+        let delay = 1000 / (1000 / add_time) / (speed - 1);
+
+        let max = recording.getDuration();
+        let current = recording.getPosition();
+        if (current >= max) {
+            this.stopSpeedUp();
+            return;
+        }
+        recording.seek(current + add_time, () => {
+            timer = setTimeout(this.startSpeedUp, delay);
+        });
+    }
+
+    stopSpeedUp = () => {
+        clearTimeout(timer)
+    }
+
     handlePlayPause = () => {
         let recording = this.state.recording;
         if (recording) {
@@ -157,14 +188,17 @@ class Playback extends Component {
                 }, () => {
                     recording.seek(0, () => {
                         recording.play();
+                        this.startSpeedUp();
                     });
                 });
             }
 
             if (!recording.isPlaying()) {
                 recording.play();
+                this.startSpeedUp();
             } else {
                 recording.pause();
+                this.stopSpeedUp();
             }
         }
     }
@@ -202,6 +236,23 @@ class Playback extends Component {
                         <Col flex="auto">
                             <Slider value={this.state.percent} max={this.state.max} tooltipVisible={false}
                                     onChange={this.handleProgressChange}/>
+                        </Col>
+                        <Col flex='none'>
+                            <Select size={'small'} defaultValue='1' value={this.state.speed} onChange={(value) => {
+                                value = parseInt(value)
+                                this.setState({
+                                    'speed': value
+                                });
+                                if (value === 1) {
+                                    this.stopSpeedUp();
+                                } else {
+                                    this.startSpeedUp();
+                                }
+                            }}>
+                                <Select.Option key="1">1x</Select.Option>
+                                <Select.Option key="2">2x</Select.Option>
+                                <Select.Option key="5">5x</Select.Option>
+                            </Select>
                         </Col>
                         <Col flex='none'>
                             <Text>{this.state.position}</Text>/ <Text>{this.state.duration}</Text>

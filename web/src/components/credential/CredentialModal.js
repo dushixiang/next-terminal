@@ -98,6 +98,7 @@ const CredentialModal = ({title, visible, handleOk, handleCancel, confirmLoading
                         </>
                         :
                         <>
+                            <input type='password' hidden={true} autoComplete='new-password'/>
                             <Form.Item label="授权账户" name='username'>
                                 <Input placeholder="输入授权账户"/>
                             </Form.Item>

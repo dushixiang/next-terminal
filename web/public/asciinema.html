@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <link rel="stylesheet" type="text/css" href="asciinema-player.css"/>
+    <link rel="stylesheet" type="text/css" href="static/css/asciinema-player.css"/>
     <style>
         body {
             margin: 0;
@@ -13,11 +13,15 @@
 </head>
 <body>
 <asciinema-player id='asciinema-player' src="" rows="42" cols="150"></asciinema-player>
-<script src="asciinema-player.js"></script>
+<script src="static/js/asciinema-player.js"></script>
 </body>
 
 <script>
 
+    const getToken = function () {
+        return localStorage.getItem('X-Auth-Token');
+    }
+    // const server = '//127.0.0.1:8088';
     const server = '';
 
     function getQueryVariable(variable) {
@@ -33,6 +37,6 @@
     }
 
     let sessionId = getQueryVariable('sessionId');
-    document.getElementById('asciinema-player').setAttribute('src', `${server}/sessions/${sessionId}/recording`);
+    document.getElementById('asciinema-player').setAttribute('src', `${server}/sessions/${sessionId}/recording?X-Auth-Token=${getToken()}`);
 </script>
 </html>

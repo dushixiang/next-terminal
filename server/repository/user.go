@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"next-terminal/pkg/constant"
+	"next-terminal/server/constant"
 	"next-terminal/server/model"
 
 	"gorm.io/gorm"
@@ -105,9 +105,9 @@ func (r UserRepository) Update(o *model.User) error {
 	return r.DB.Updates(o).Error
 }
 
-func (r UserRepository) UpdateOnline(id string, online bool) error {
-	sql := "update users set online = ? where id = ?"
-	return r.DB.Exec(sql, online, id).Error
+func (r UserRepository) UpdateOnlineByUsername(username string, online bool) error {
+	sql := "update users set online = ? where username = ?"
+	return r.DB.Exec(sql, online, username).Error
 }
 
 func (r UserRepository) DeleteById(id string) error {
@@ -133,5 +133,10 @@ func (r UserRepository) DeleteById(id string) error {
 
 func (r UserRepository) CountOnlineUser() (total int64, err error) {
 	err = r.DB.Where("online = ?", true).Find(&model.User{}).Count(&total).Error
+	return
+}
+
+func (r UserRepository) Count() (total int64, err error) {
+	err = r.DB.Find(&model.User{}).Count(&total).Error
 	return
 }

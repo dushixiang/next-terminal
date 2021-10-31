@@ -53,7 +53,7 @@ func JobUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 	item.ID = id
-	if err := jobRepository.UpdateById(&item); err != nil {
+	if err := jobService.UpdateById(&item); err != nil {
 		return err
 	}
 
@@ -83,7 +83,7 @@ func JobDeleteEndpoint(c echo.Context) error {
 	split := strings.Split(ids, ",")
 	for i := range split {
 		jobId := split[i]
-		if err := jobRepository.DeleteJobById(jobId); err != nil {
+		if err := jobService.DeleteJobById(jobId); err != nil {
 			return err
 		}
 	}

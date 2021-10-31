@@ -1,20 +1,24 @@
 import React, {Component} from 'react';
 import Guacamole from 'guacamole-common-js';
-import {Affix, Button, Col, Drawer, Dropdown, Form, Input, Menu, message, Modal, Row} from 'antd'
+import {Affix, Button, Drawer, Dropdown, Form, Input, Menu, message, Modal, Tooltip} from 'antd'
 import qs from "qs";
 import request from "../../common/request";
 import {wsServer} from "../../common/env";
 import {
-    AppstoreTwoTone,
-    CopyTwoTone,
-    DesktopOutlined,
+    CodeOutlined,
+    CopyOutlined,
     ExclamationCircleOutlined,
-    ExpandOutlined
+    ExpandOutlined,
+    FolderOutlined,
+    LineChartOutlined,
+    WindowsOutlined
 } from '@ant-design/icons';
 import {exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
 import './Access.css'
 import Draggable from 'react-draggable';
-import FileSystem from "./FileSystem";
+import FileSystem from "../devops/FileSystem";
+import Stats from "./Stats";
+import {Base64} from "js-base64";
 
 const {TextArea} = Input;
 
@@ -28,8 +32,11 @@ const STATE_DISCONNECTED = 5;
 class Access extends Component {
 
     clipboardFormRef = React.createRef();
+    statsRef = undefined;
+    error = false;
 
     state = {
+        session: {},
         sessionId: '',
         client: {},
         clientState: STATE_IDLE,
@@ -48,7 +55,9 @@ class Access extends Component {
         startTime: new Date(),
         fullScreen: false,
         fullScreenBtnText: '进入全屏',
-        sink: undefined
+        sink: undefined,
+        commands: [],
+        showFileSystem: false
     };
 
     async componentDidMount() {
@@ -57,14 +66,20 @@ class Access extends Component {
         let assetId = urlParams.get('assetId');
         document.title = urlParams.get('assetName');
         let protocol = urlParams.get('protocol');
-        let sessionId = await this.createSession(assetId);
+        let session = await this.createSession(assetId);
+        if (!session) {
+            return;
+        }
+        let sessionId = session['id'];
         if (isEmpty(sessionId)) {
             return;
         }
 
         this.setState({
+            session: session,
             sessionId: sessionId,
-            protocol: protocol
+            protocol: protocol,
+            showFileSystem: session['fileSystem'] === '1'
         });
 
         this.renderDisplay(sessionId, protocol);
@@ -130,6 +145,17 @@ class Access extends Component {
         }
     }
 
+    getCommands = async () => {
+        let result = await request.get('/commands');
+        if (result.code !== 1) {
+            message.error(result.message);
+            return;
+        }
+        this.setState({
+            commands: result['data']
+        })
+    }
+
     onClientStateChange = (state) => {
         this.setState({
             clientState: state
@@ -154,11 +180,18 @@ class Access extends Component {
                 // 向后台发送请求，更新会话的状态
                 this.updateSessionStatus(this.state.sessionId).then(_ => {
                 })
+                if (this.state.protocol === 'ssh') {
+                    // 加载指令
+                    this.getCommands();
+                }
                 break;
             case STATE_DISCONNECTING:
 
                 break;
             case STATE_DISCONNECTED:
+                if (!this.error) {
+                    this.showMessage('连接已关闭');
+                }
 
                 break;
             default:
@@ -167,7 +200,7 @@ class Access extends Component {
     };
 
     onError = (status) => {
-
+        this.error = true;
         console.log('通道异常。', status);
 
         switch (status.code) {
@@ -175,7 +208,7 @@ class Access extends Component {
                 this.showMessage('未支持的访问');
                 break;
             case 512:
-                this.showMessage('远程服务异常');
+                this.showMessage('远程服务异常，请检查目标设备能否正常访问。');
                 break;
             case 513:
                 this.showMessage('服务器忙碌');
@@ -196,11 +229,7 @@ class Access extends Component {
                 this.showMessage('资源已关闭');
                 break;
             case 519:
-                if (new Date().getTime() - this.state.startTime.getTime() <= 1000 * 30) {
-                    this.showMessage('认证失败');
-                } else {
-                    this.showMessage('远程服务未找到');
-                }
+                this.showMessage('远程服务未找到');
                 break;
             case 520:
                 this.showMessage('远程服务不可用');
@@ -236,13 +265,19 @@ class Access extends Component {
                 this.showMessage('会话不存在');
                 break;
             case 801:
-                this.showMessage('创建隧道失败');
+                this.showMessage('创建隧道失败，请检查Guacd服务是否正常。');
                 break;
             case 802:
                 this.showMessage('管理员强制关闭了此会话');
                 break;
             default:
-                this.showMessage('未知错误。');
+                if (status.message) {
+                    // guacd 无法处理中文字符，所以进行了base64编码。
+                    this.showMessage(Base64.decode(status.message));
+                } else {
+                    this.showMessage('未知错误。');
+                }
+
         }
     };
 
@@ -270,10 +305,7 @@ class Access extends Component {
 
         // If the received data is text, read it as a simple string
         if (/^text\//.exec(mimetype)) {
-
             reader = new Guacamole.StringReader(stream);
-
-            // Assemble received data into a single string
             let data = '';
             reader.ontext = function textReceived(text) {
                 data += text;
@@ -281,7 +313,6 @@ class Access extends Component {
 
             // Set clipboard contents once stream is finished
             reader.onend = async () => {
-
                 // message.info('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
                 this.setState({
                     clipboardText: data
@@ -335,18 +366,16 @@ class Access extends Component {
                 fullScreenBtnText: '退出全屏'
             })
         }
-        if (this.state.sink) {
-            this.state.sink.focus();
-        }
+        this.focus();
     }
 
     async createSession(assetsId) {
         let result = await request.post(`/sessions?assetId=${assetsId}&mode=guacd`);
         if (result['code'] !== 1) {
             this.showMessage(result['message']);
-            return null;
+            return undefined;
         }
-        return result['data']['id'];
+        return result['data'];
     }
 
     async renderDisplay(sessionId, protocol) {
@@ -517,6 +546,12 @@ class Access extends Component {
         }
     };
 
+    focus = () => {
+        if (this.state.sink) {
+            this.state.sink.focus();
+        }
+    }
+
     sendCombinationKey = (keys) => {
         for (let i = 0; i < keys.length; i++) {
             this.state.client.sendKeyEvent(1, keys[i]);
@@ -526,9 +561,23 @@ class Access extends Component {
         }
     }
 
+    writeCommand = (command) => {
+        let client = this.state.client;
+        let outputStream = client.createPipeStream('text/plain', 'STDIN');
+        // Wrap output stream in writer
+        let writer = new Guacamole.StringWriter(outputStream);
+        writer.sendText(command);
+        writer.sendEnd();
+        this.focus();
+    }
+
+    onRef = (statsRef) => {
+        this.statsRef = statsRef;
+    }
+
     render() {
 
-        const menu = (
+        const hotKeyMenu = (
             <Menu>
                 <Menu.Item
                     onClick={() => this.sendCombinationKey(['65507', '65513', '65535'])}>Ctrl+Alt+Delete</Menu.Item>
@@ -547,6 +596,20 @@ class Access extends Component {
             </Menu>
         );
 
+        const cmdMenuItems = this.state.commands.map(item => {
+            return <Tooltip placement="left" title={item['content']} color='blue' key={'t-' + item['id']}>
+                <Menu.Item onClick={() => {
+                    this.writeCommand(item['content'])
+                }} key={'i-' + item['id']}>{item['name']}</Menu.Item>
+            </Tooltip>;
+        });
+
+        const cmdMenu = (
+            <Menu>
+                {cmdMenuItems}
+            </Menu>
+        );
+
         return (
             <div>
 
@@ -559,7 +622,7 @@ class Access extends Component {
                 </div>
 
                 <Draggable>
-                    <Affix style={{position: 'absolute', top: 50, right: 100}}>
+                    <Affix style={{position: 'absolute', top: 50, right: 50}}>
                         <Button icon={<ExpandOutlined/>} disabled={this.state.clientState !== STATE_CONNECTED}
                                 onClick={() => {
                                     this.fullScreen();
@@ -568,8 +631,8 @@ class Access extends Component {
                 </Draggable>
 
                 <Draggable>
-                    <Affix style={{position: 'absolute', top: 50, right: 150}}>
-                        <Button icon={<CopyTwoTone/>} disabled={this.state.clientState !== STATE_CONNECTED}
+                    <Affix style={{position: 'absolute', top: 50, right: 100}}>
+                        <Button icon={<CopyOutlined/>} disabled={this.state.clientState !== STATE_CONNECTED}
                                 onClick={() => {
                                     this.setState({
                                         clipboardVisible: true
@@ -579,11 +642,25 @@ class Access extends Component {
                 </Draggable>
 
                 {
-                    this.state.protocol === 'rdp' ?
+                    this.state.protocol === 'vnc' ?
                         <>
                             <Draggable>
                                 <Affix style={{position: 'absolute', top: 100, right: 100}}>
-                                    <Button icon={<AppstoreTwoTone/>}
+                                    <Dropdown overlay={hotKeyMenu} trigger={['click']} placement="bottomLeft">
+                                        <Button icon={<WindowsOutlined/>}
+                                                disabled={this.state.clientState !== STATE_CONNECTED}/>
+                                    </Dropdown>
+                                </Affix>
+                            </Draggable>
+                        </> : undefined
+                }
+
+                {
+                    this.state.protocol === 'rdp' && this.state.showFileSystem ?
+                        <>
+                            <Draggable>
+                                <Affix style={{position: 'absolute', top: 100, right: 50}}>
+                                    <Button icon={<FolderOutlined/>}
                                             disabled={this.state.clientState !== STATE_CONNECTED} onClick={() => {
                                         this.setState({
                                             fileSystemVisible: true,
@@ -591,11 +668,16 @@ class Access extends Component {
                                     }}/>
                                 </Affix>
                             </Draggable>
+                        </> : undefined
+                }
 
+                {
+                    this.state.protocol === 'rdp' ?
+                        <>
                             <Draggable>
-                                <Affix style={{position: 'absolute', top: 100, right: 150}}>
-                                    <Dropdown overlay={menu} trigger={['click']} placement="bottomLeft">
-                                        <Button icon={<DesktopOutlined/>}
+                                <Affix style={{position: 'absolute', top: 100, right: 100}}>
+                                    <Dropdown overlay={hotKeyMenu} trigger={['click']} placement="bottomLeft">
+                                        <Button icon={<WindowsOutlined/>}
                                                 disabled={this.state.clientState !== STATE_CONNECTED}/>
                                     </Dropdown>
                                 </Affix>
@@ -607,8 +689,8 @@ class Access extends Component {
                     this.state.protocol === 'ssh' ?
                         <>
                             <Draggable>
-                                <Affix style={{position: 'absolute', top: 100, right: 100}}>
-                                    <Button icon={<AppstoreTwoTone/>}
+                                <Affix style={{position: 'absolute', top: 100, right: 50}}>
+                                    <Button icon={<FolderOutlined/>}
                                             disabled={this.state.clientState !== STATE_CONNECTED} onClick={() => {
                                         this.setState({
                                             fileSystemVisible: true,
@@ -617,33 +699,79 @@ class Access extends Component {
                                 </Affix>
                             </Draggable>
 
+                            <Draggable>
+                                <Affix style={{position: 'absolute', top: 100, right: 100}}>
+                                    <Dropdown overlay={cmdMenu} trigger={['click']} placement="bottomLeft">
+                                        <Button icon={<CodeOutlined/>}
+                                                disabled={this.state.clientState !== STATE_CONNECTED}/>
+                                    </Dropdown>
+                                </Affix>
+                            </Draggable>
+
+                            <Draggable>
+                                <Affix style={{
+                                    position: 'absolute',
+                                    top: 150,
+                                    right: 100,
+                                    zIndex: this.state.enterBtnIndex
+                                }}>
+                                    <Button icon={<LineChartOutlined/>} onClick={() => {
+                                        this.setState({
+                                            statsVisible: true,
+                                        });
+                                        if (this.statsRef) {
+                                            this.statsRef.addInterval();
+                                        }
+                                    }}/>
+                                </Affix>
+                            </Draggable>
                         </> : undefined
                 }
 
 
                 <Drawer
-                    title={'会话详情'}
+                    title={'文件管理'}
                     placement="right"
                     width={window.innerWidth * 0.8}
                     closable={true}
                     // maskClosable={false}
                     onClose={() => {
-                        if (this.state.sink) {
-                            this.state.sink.focus();
-                        }
+                        this.focus();
                         this.setState({
                             fileSystemVisible: false
                         });
                     }}
                     visible={this.state.fileSystemVisible}
                 >
+                    <FileSystem
+                        storageId={this.state.sessionId}
+                        storageType={'sessions'}
+                        upload={this.state.session['upload'] === '1'}
+                        download={this.state.session['download'] === '1'}
+                        delete={this.state.session['delete'] === '1'}
+                        rename={this.state.session['rename'] === '1'}
+                        edit={this.state.session['edit'] === '1'}
+                        minHeight={window.innerHeight - 103}/>
 
+                </Drawer>
 
-                    <Row style={{marginTop: 10}}>
-                        <Col span={24}>
-                            <FileSystem sessionId={this.state.sessionId}/>
-                        </Col>
-                    </Row>
+                <Drawer
+                    title={'状态信息'}
+                    placement="right"
+                    width={window.innerWidth * 0.8}
+                    closable={true}
+                    onClose={() => {
+                        this.setState({
+                            statsVisible: false,
+                        });
+                        this.focus();
+                        if (this.statsRef) {
+                            this.statsRef.delInterval();
+                        }
+                    }}
+                    visible={this.state.statsVisible}
+                >
+                    <Stats sessionId={this.state.sessionId} onRef={this.onRef}/>
                 </Drawer>
 
                 {
@@ -675,9 +803,7 @@ class Access extends Component {
                             }}
                             confirmLoading={this.state.confirmLoading}
                             onCancel={() => {
-                                if (this.state.sink) {
-                                    this.state.sink.focus();
-                                }
+                                this.focus();
                                 this.setState({
                                     clipboardVisible: false
                                 })

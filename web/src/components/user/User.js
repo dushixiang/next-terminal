@@ -5,6 +5,7 @@ import {
     Button,
     Col,
     Divider,
+    Drawer,
     Dropdown,
     Form,
     Input,
@@ -32,9 +33,9 @@ import {
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import UserShareAsset from "./UserShareAsset";
 import {hasPermission} from "../../service/permission";
 import dayjs from "dayjs";
+import UserShareSelectedAsset from "./UserShareSelectedAsset";
 
 const confirm = Modal.confirm;
 const {Search} = Input;
@@ -78,7 +79,7 @@ class User extends Component {
             message.success('操作成功', 3);
             await this.loadTableData(this.state.queryParams);
         } else {
-            message.error('删除失败 :( ' + result.message, 10);
+            message.error(result.message, 10);
         }
     }
 
@@ -178,7 +179,7 @@ class User extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         } else {
             // 向后台提交数据
@@ -191,7 +192,7 @@ class User extends Component {
                 });
                 await this.loadTableData(this.state.queryParams);
             } else {
-                message.error('操作失败 :( ' + result.message, 10);
+                message.error(result.message, 10);
             }
         }
 
@@ -267,7 +268,9 @@ class User extends Component {
             changePasswordConfirmLoading: true
         })
 
-        let result = await request.post(`/users/${this.state.selectedRow['id']}/change-password?password=${values['password']}`);
+        let formData = new FormData();
+        formData.append('password', values['password']);
+        let result = await request.post(`/users/${this.state.selectedRow['id']}/change-password`, formData);
         if (result['code'] === 1) {
             message.success('操作成功', 3);
         } else {
@@ -428,6 +431,16 @@ class User extends Component {
                                                 }
                                             });
                                         }}>重置双因素认证</Button>
+                            </Menu.Item>
+
+                            <Menu.Item key="3">
+                                <Button type="text" size='small'
+                                        onClick={() => {
+                                            this.setState({
+                                                assetVisible: true,
+                                                sharer: record['id']
+                                            })
+                                        }}>资产授权</Button>
                             </Menu.Item>
 
                             <Menu.Divider/>
@@ -637,24 +650,26 @@ class User extends Component {
                             </UserModal> : undefined
                     }
 
-                    <Modal
-                        width={window.innerWidth * 0.8}
-                        title='已授权资产'
-                        visible={this.state.assetVisible}
-                        maskClosable={false}
+                    <Drawer
+                        title="资产授权"
+                        placement="right"
+                        closable={true}
                         destroyOnClose={true}
-                        onOk={() => {
-
+                        onClose={() => {
+                            this.loadTableData(this.state.queryParams);
+                            this.setState({
+                                assetVisible: false
+                            })
                         }}
-                        onCancel={this.handleAssetCancel}
-                        okText='确定'
-                        cancelText='取消'
-                        footer={null}
+                        visible={this.state.assetVisible}
+                        width={window.innerWidth * 0.8}
                     >
-                        <UserShareAsset
+                        <UserShareSelectedAsset
                             sharer={this.state.sharer}
-                        />
-                    </Modal>
+                            userGroupId={undefined}
+                        >
+                        </UserShareSelectedAsset>
+                    </Drawer>
 
                     {
                         this.state.changePasswordVisible ?

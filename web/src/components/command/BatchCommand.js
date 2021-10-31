@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import {Card, Input, List, Spin} from "antd";
-import Console from "../access/Console";
-
+import BatchCommandTerm from "../access/BatchCommandTerm";
 import './Command.css'
 import request from "../../common/request";
 import {message} from "antd/es";
+import Message from "../access/Message";
 
 const {Search} = Input;
 
@@ -63,10 +63,7 @@ class BatchCommand extends Component {
                             for (let i = 0; i < this.state.webSockets.length; i++) {
                                 let ws = this.state.webSockets[i]['ws'];
                                 if (ws.readyState === WebSocket.OPEN) {
-                                    ws.send(JSON.stringify({
-                                        type: 'data',
-                                        content: value + String.fromCharCode(13)
-                                    }));
+                                    ws.send(new Message(Message.Data, value + String.fromCharCode(13)).toString());
                                 }
                             }
                             this.commandRef.current.setValue('');
@@ -80,7 +77,7 @@ class BatchCommand extends Component {
                             renderItem={item => (
                                 <List.Item>
                                     <Card title={item.name}
-                                          className={this.state.active === item['id'] ? 'command-active' : ''}
+                                          className={['console-card',this.state.active === item['id'] ? 'command-active' : '']}
                                           onClick={() => {
                                               if (this.state.active === item['id']) {
                                                   this.setState({
@@ -93,10 +90,9 @@ class BatchCommand extends Component {
                                               }
                                           }}
                                     >
-                                        <Console assetId={item.id} command={this.state.command}
-                                                 width={(window.innerWidth - 350) / 2}
-                                                 height={420}
-                                                 appendWebsocket={this.appendWebsocket}/>
+                                        <BatchCommandTerm assetId={item.id}
+                                                          command={this.state.command}
+                                                          appendWebsocket={this.appendWebsocket}/>
                                     </Card>
                                 </List.Item>
                             )}

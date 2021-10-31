@@ -1,8 +1,7 @@
 package api
 
 import (
-	"next-terminal/pkg/constant"
-	"next-terminal/server/repository"
+	"next-terminal/server/constant"
 
 	"github.com/labstack/echo/v4"
 )
@@ -44,16 +43,43 @@ func OverviewCounterEndPoint(c echo.Context) error {
 	return Success(c, counter)
 }
 
-func OverviewSessionPoint(c echo.Context) (err error) {
-	d := c.QueryParam("d")
-	var results []repository.D
-	if d == "m" {
-		results, err = sessionRepository.CountSessionByDay(30)
+func OverviewAssetEndPoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+	var (
+		ssh        int64
+		rdp        int64
+		vnc        int64
+		telnet     int64
+		kubernetes int64
+	)
+	if constant.TypeUser == account.Type {
+		ssh, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.SSH)
+		rdp, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.RDP)
+		vnc, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.VNC)
+		telnet, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.Telnet)
+		kubernetes, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.K8s)
 	} else {
-		results, err = sessionRepository.CountSessionByDay(7)
+		ssh, _ = assetRepository.CountByProtocol(constant.SSH)
+		rdp, _ = assetRepository.CountByProtocol(constant.RDP)
+		vnc, _ = assetRepository.CountByProtocol(constant.VNC)
+		telnet, _ = assetRepository.CountByProtocol(constant.Telnet)
+		kubernetes, _ = assetRepository.CountByProtocol(constant.K8s)
 	}
+	m := echo.Map{
+		"ssh":        ssh,
+		"rdp":        rdp,
+		"vnc":        vnc,
+		"telnet":     telnet,
+		"kubernetes": kubernetes,
+	}
+	return Success(c, m)
+}
+
+func OverviewAccessEndPoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+	access, err := sessionRepository.OverviewAccess(account)
 	if err != nil {
 		return err
 	}
-	return Success(c, results)
+	return Success(c, access)
 }
