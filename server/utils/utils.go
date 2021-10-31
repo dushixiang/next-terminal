@@ -33,7 +33,6 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 
-	"github.com/denisbrodbeck/machineid"
 	"github.com/gofrs/uuid"
 	errors2 "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -434,10 +433,6 @@ func VerifyRSA(plainText, signText []byte, rsaPublicKey string) bool {
 	// 签名认证
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA512, hashText[:], signText)
 	return err == nil
-}
-
-func GetMachineId() (string, error) {
-	return machineid.ID()
 }
 
 // GetAvailablePort 获取可用端口

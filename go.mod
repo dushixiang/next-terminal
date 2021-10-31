@@ -3,7 +3,6 @@ module next-terminal
 go 1.16
 
 require (
-	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gliderlabs/ssh v0.3.3
 	github.com/gofrs/uuid v3.3.0+incompatible
 	github.com/gorilla/websocket v1.4.2
