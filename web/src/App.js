@@ -314,7 +314,7 @@ class App extends Component {
 
                                                 <div className='layout-header-right'>
                                                     <div className={'layout-header-right-item'}>
-                                                        <a style={{color: 'black'}} target='_blank' href='https://github.com/dushixiang/next-terminal'>
+                                                        <a style={{color: 'black'}} target='_blank' href='https://github.com/dushixiang/next-terminal' rel='noreferrer noopener'>
                                                             <GithubOutlined />
                                                         </a>
                                                     </div>

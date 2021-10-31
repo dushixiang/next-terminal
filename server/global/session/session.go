@@ -2,6 +2,7 @@ package session
 
 import (
 	"fmt"
+
 	"next-terminal/server/guacd"
 	"next-terminal/server/term"
 

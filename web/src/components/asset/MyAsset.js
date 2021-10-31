@@ -288,7 +288,7 @@ class MyAsset extends Component {
 
                             return (
                                 <List.Item>
-                                    <a target='_blank' href={url}>
+                                    <a target='_blank' href={url} rel='noreferrer noopener'>
                                         <Card title={item['name']}
                                               hoverable
                                               extra={item['active'] ?
