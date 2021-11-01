@@ -1,4 +1,4 @@
-FROM guacamole/guacd:1.3.0
+FROM xrsec/guacd:1.3.0
 
 LABEL MAINTAINER="helloworld1024@foxmail.com"
 
