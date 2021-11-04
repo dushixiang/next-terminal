@@ -1,6 +1,6 @@
 module next-terminal
 
-go 1.16
+go 1.17
 
 require (
 	github.com/gliderlabs/ssh v0.3.3
