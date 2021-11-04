@@ -20,7 +20,6 @@ jobs:
           cd web
           npm install
           npm run build
-      - uses: actions/checkout@v2
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v2
         with:
