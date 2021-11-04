@@ -2,11 +2,6 @@ name: Docker guacd Build
 
 on:
   workflow_dispatch:
-    inputs:
-      days:
-        description: 'Number of days.'
-        required: true
-        default: "30"
 
 jobs:
   DOCKERHUB_Guacd_Build:
