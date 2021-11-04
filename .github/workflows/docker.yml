@@ -86,7 +86,7 @@ jobs:
 
   DOCKERHUB_Hub_Description:
     needs: [DOCKERHUB_next-terminal_Build, DOCKERHUB_Guacd_Build]
-    name: Docker Build PHP_INIT
+    name: Change DockerHub Description
     runs-on: ubuntu-latest
     steps:
       - 
@@ -99,11 +99,3 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
           repository: ${{ secrets.DOCKERHUB_USERNAME }}/next-terminal
-      - 
-        name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@main
-        with:
-          token: ${{ secrets.TOKEN_GITHUB }}
-          repository: ${{ github.repository }}
-          retain_days: ${{ github.event.inputs.days }}
-          keep_minimum_runs: 3
