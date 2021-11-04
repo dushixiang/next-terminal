@@ -43,7 +43,7 @@ jobs:
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:cache,mode=max
 
   DOCKERHUB_Hub_Description:
-    needs: [ DOCKERHUB_next-terminal_Build, DOCKERHUB_Guacd_Build ]
+    needs: [ DOCKERHUB_next-terminal_Build ]
     name: Change DockerHub Description
     runs-on: ubuntu-latest
     steps:
