@@ -1,41 +1,109 @@
-name: Docker image
+name: Docker next-terminal Build
 
 on:
-  push:
-    branches:
-      - "master"
-    paths-ignore:
-      - ".gitignore"
-      - "*.md"
-      - "*.png"
+  workflow_dispatch:
+    inputs:
+      days:
+        description: 'Number of days.'
+        required: true
+        default: "20"
 
 jobs:
-  deploy:
+  DOCKERHUB_next-terminal_Build:
+    name: Docker next-terminal Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@master
-
-      - uses: actions/setup-node@v2
+      - 
+        name: Private Actions Checkout
+        uses: actions/checkout@v2.3.4
+      - 
+        name: Docker Setup QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+      - 
+        name: Docker Setup Buildx
+        uses: docker/setup-buildx-action@v1.6.0
+      - 
+        name: node Setup
+        uses: actions/setup-node@v2
         with:
           node-version: '14'
-
-      - run: |
+      - 
+        name: npm install
+        run: |
           cd web
           npm install
           npm run build
-
-      - name: Log into registry
-        run: echo "${{ secrets.CR_PAT }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-
-      - name: Build and push image
-        run: |
-          docker build -t ghcr.io/${{ github.repository_owner }}/next-terminal -f Dockerfile .
-          docker push ghcr.io/${{ github.repository_owner }}/next-terminal
-      
-      - name: Push to Docker Hub
-        uses: docker/build-push-action@v1
+      - 
+        name: Docker Login
+        uses: docker/login-action@v1.10.0
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-          repository: ${{ github.repository_owner }}/next-terminal
-          tag_with_ref: true
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - 
+        name: Build and push Docker images
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: .
+          platforms: linux/arm64,linux/amd64
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:cache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:cache,mode=max
+
+  DOCKERHUB_Guacd_Build:
+    name: Docker Guacd Build
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Private Actions Checkout
+        uses: actions/checkout@v2.3.4
+      - 
+        name: Docker Setup QEMU
+        uses: docker/setup-qemu-action@v1.2.0
+      - 
+        name: Docker Setup Buildx
+        uses: docker/setup-buildx-action@v1.6.0
+      - 
+        name: Docker Login
+        uses: docker/login-action@v1.10.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      -
+        name: Build and push Docker images
+        uses: docker/build-push-action@v2.7.0
+        with:
+          context: .
+          platforms: linux/arm64,linux/amd64
+          file: guacd/Dockerfile
+          push: true
+          tags: |
+            ${{ secrets.DOCKERHUB_USERNAME }}/guacd:1.3.0
+          cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacd:cache
+          cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacd:cache,mode=max
+
+  DOCKERHUB_Hub_Description:
+    needs: [DOCKERHUB_next-terminal_Build, DOCKERHUB_Guacd_Build]
+    name: Docker Build PHP_INIT
+    runs-on: ubuntu-latest
+    steps:
+      - 
+        name: Private Actions Checkout
+        uses: actions/checkout@v2.3.4
+      - 
+        name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+          repository: ${{ secrets.DOCKERHUB_USERNAME }}/next-terminal
+      - 
+        name: Delete workflow runs
+        uses: Mattraks/delete-workflow-runs@main
+        with:
+          token: ${{ secrets.TOKEN_GITHUB }}
+          repository: ${{ github.repository }}
+          retain_days: ${{ github.event.inputs.days }}
+          keep_minimum_runs: 3
