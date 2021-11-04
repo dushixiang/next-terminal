@@ -9,6 +9,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Private Actions Checkout
+        uses: actions/checkout@v2.3.4
       - name: node Setup
         uses: actions/setup-node@v2
         with:
