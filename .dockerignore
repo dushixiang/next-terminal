@@ -19,7 +19,7 @@
 bin
 data
 docs
-guacd
+# guacd
 logs
 playground
 screenshot
