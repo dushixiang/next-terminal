@@ -3,15 +3,9 @@ builds:
       - CGO_ENABLED=1
     goos:
       - linux
-      - windows
-      - darwin
     goarch:
       - arm
       - arm64
-      - 386
-      - amd64
-      - mips
-      - mipsle
 checksum:
   name_template: "checksums.txt"
 
