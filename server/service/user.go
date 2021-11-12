@@ -1,6 +1,7 @@
 package service
 
 import (
+	"next-terminal/server/global/cache"
 	"strings"
 
 	"next-terminal/server/constant"
@@ -21,7 +22,10 @@ func NewUserService(userRepository *repository.UserRepository, loginLogRepositor
 
 func (r UserService) InitUser() (err error) {
 
-	users := r.userRepository.FindAll()
+	users, err := r.userRepository.FindAll()
+	if err != nil {
+		return err
+	}
 
 	if len(users) == 0 {
 		initPassword := "admin"
@@ -37,6 +41,7 @@ func (r UserService) InitUser() (err error) {
 			Nickname: "超级管理员",
 			Type:     constant.TypeAdmin,
 			Created:  utils.NowJsonTime(),
+			Status:   constant.StatusEnabled,
 		}
 		if err := r.userRepository.Create(&user); err != nil {
 			return err
@@ -83,12 +88,14 @@ func (r UserService) FixUserOnlineState() error {
 	return nil
 }
 
-func (r UserService) Logout(token string) (err error) {
+func (r UserService) LogoutByToken(token string) (err error) {
 	loginLog, err := r.loginLogRepository.FindById(token)
 	if err != nil {
 		log.Warnf("登录日志「%v」获取失败", token)
 		return
 	}
+	cacheKey := r.BuildCacheKeyByToken(token)
+	cache.GlobalCache.Delete(cacheKey)
 
 	loginLogForUpdate := &model.LoginLog{LogoutTime: utils.NowJsonTime(), ID: token}
 	err = r.loginLogRepository.Update(loginLogForUpdate)
@@ -107,6 +114,26 @@ func (r UserService) Logout(token string) (err error) {
 	return
 }
 
+func (r UserService) LogoutById(id string) error {
+	user, err := r.userRepository.FindById(id)
+	if err != nil {
+		return err
+	}
+	username := user.Username
+	loginLogs, err := r.loginLogRepository.FindAliveLoginLogsByUsername(username)
+	if err != nil {
+		return err
+	}
+
+	for j := range loginLogs {
+		token := loginLogs[j].ID
+		if err := r.LogoutByToken(token); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (r UserService) BuildCacheKeyByToken(token string) string {
 	cacheKey := strings.Join([]string{constant.Token, token}, ":")
 	return cacheKey
@@ -121,9 +148,36 @@ func (r UserService) OnEvicted(key string, value interface{}) {
 	if strings.HasPrefix(key, constant.Token) {
 		token := r.GetTokenFormCacheKey(key)
 		log.Debugf("用户Token「%v」过期", token)
-		err := r.Logout(token)
+		err := r.LogoutByToken(token)
 		if err != nil {
 			log.Errorf("退出登录失败 %v", err)
 		}
 	}
+}
+
+func (r UserService) UpdateStatusById(id string, status string) error {
+	if constant.StatusDisabled == status {
+		// 将该用户下线
+		if err := r.LogoutById(id); err != nil {
+			return err
+		}
+	}
+	u := model.User{
+		ID:     id,
+		Status: status,
+	}
+	return r.userRepository.Update(&u)
+}
+
+func (r UserService) DeleteLoginLogs(tokens []string) error {
+	for i := range tokens {
+		token := tokens[i]
+		if err := r.LogoutByToken(token); err != nil {
+			return err
+		}
+		if err := r.loginLogRepository.DeleteById(token); err != nil {
+			return err
+		}
+	}
+	return nil
 }

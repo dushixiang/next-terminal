@@ -20,9 +20,16 @@ import request from "../../common/request";
 import {differTime} from "../../utils/utils";
 import Playback from "./Playback";
 import {message} from "antd/es";
-import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
+import {
+    CheckOutlined,
+    ClearOutlined,
+    DeleteOutlined,
+    ExclamationCircleOutlined, EyeInvisibleOutlined, EyeOutlined,
+    SyncOutlined,
+    UndoOutlined
+} from "@ant-design/icons";
 import {MODE_COLORS, PROTOCOL_COLORS} from "../../common/constants";
-
+import './OfflineSession.css'
 import dayjs from "dayjs";
 
 const confirm = Modal.confirm;
@@ -42,7 +49,8 @@ class OfflineSession extends Component {
             pageSize: 10,
             protocol: '',
             userId: undefined,
-            assetId: undefined
+            assetId: undefined,
+            reviewed: undefined
         },
         loading: false,
         playbackVisible: false,
@@ -147,6 +155,16 @@ class OfflineSession extends Component {
         this.loadTableData(query);
     }
 
+    handleChangeByRead = reviewed => {
+        let query = {
+            ...this.state.queryParams,
+            'pageIndex': 1,
+            'pageSize': this.state.queryParams.pageSize,
+            'reviewed': reviewed,
+        }
+        this.loadTableData(query);
+    }
+
     handleSearchByNickname = async nickname => {
         const result = await request.get(`/users/paging?pageIndex=1&pageSize=1000&nickname=${nickname}`);
         if (result.code !== 1) {
@@ -213,6 +231,110 @@ class OfflineSession extends Component {
         }
     }
 
+    handleAllReviewed = async () => {
+        this.setState({
+            reviewedAllBtnLoading: true
+        })
+        try {
+            let result = await request.post(`/sessions/reviewed`);
+            if (result.code === 1) {
+                message.success('操作成功', 3);
+                this.setState({
+                    selectedRowKeys: []
+                })
+                await this.loadTableData(this.state.queryParams);
+            } else {
+                message.error(result.message, 10);
+            }
+        } finally {
+            this.setState({
+                reviewedAllBtnLoading: false
+            })
+        }
+    }
+
+    handleReviewed = async () => {
+        this.setState({
+            reviewedBtnLoading: true
+        })
+        try {
+            let result = await request.post(`/sessions/${this.state.selectedRowKeys.join(',')}/reviewed`);
+            if (result.code === 1) {
+                message.success('操作成功', 3);
+                this.setState({
+                    selectedRowKeys: []
+                })
+                await this.loadTableData(this.state.queryParams);
+            } else {
+                message.error(result.message, 10);
+            }
+        } finally {
+            this.setState({
+                reviewedBtnLoading: false
+            })
+        }
+    }
+
+    handleUnreviewed = async () => {
+        this.setState({
+            unreviewedBtnLoading: true
+        })
+        try {
+            let result = await request.post(`/sessions/${this.state.selectedRowKeys.join(',')}/unreviewed`);
+            if (result.code === 1) {
+                message.success('操作成功', 3);
+                this.setState({
+                    selectedRowKeys: []
+                })
+                await this.loadTableData(this.state.queryParams);
+            } else {
+                message.error(result.message, 10);
+            }
+        } finally {
+            this.setState({
+                unreviewedBtnLoading: false
+            })
+        }
+    }
+
+    del = async (id) => {
+        const result = await request.delete(`/sessions/${id}`);
+        if (result.code === 1) {
+            notification['success']({
+                message: '提示',
+                description: '删除成功',
+            });
+            this.loadTableData();
+        } else {
+            notification['error']({
+                message: '提示',
+                description: result.message,
+            });
+        }
+    }
+
+    clearSession = async () => {
+        this.setState({
+            clearBtnLoading: true
+        })
+        try {
+            let result = await request.post('/sessions/clear');
+            if (result.code === 1) {
+                message.success('操作成功', 3);
+                this.setState({
+                    selectedRowKeys: []
+                })
+                await this.loadTableData(this.state.queryParams);
+            } else {
+                message.error(result.message, 10);
+            }
+        } finally {
+            this.setState({
+                clearBtnLoading: false
+            })
+        }
+    }
+
     render() {
 
         const columns = [{
@@ -221,7 +343,7 @@ class OfflineSession extends Component {
             key: 'id',
             render: (id, record, index) => {
                 return index + 1;
-            }
+            },
         }, {
             title: '来源IP',
             dataIndex: 'clientIp',
@@ -312,34 +434,17 @@ class OfflineSession extends Component {
                                             }
                                         });
                                     }}>禁用IP</Button>
-                            <Button type="link" size='small' onClick={() => {
+                            <Button type="link" size='small' danger onClick={() => {
                                 confirm({
                                     title: '您确定要删除此会话吗?',
                                     content: '',
                                     okText: '确定',
                                     okType: 'danger',
                                     cancelText: '取消',
-                                    onOk() {
-                                        del(record.id)
+                                    onOk: () => {
+                                        this.del(record.id)
                                     }
                                 });
-
-                                const del = async (id) => {
-                                    const result = await request.delete(`/sessions/${id}`);
-                                    if (result.code === 1) {
-                                        notification['success']({
-                                            message: '提示',
-                                            description: '删除成功',
-                                        });
-                                        this.loadTableData();
-                                    } else {
-                                        notification['error']({
-                                            message: '提示',
-                                            description: result.message,
-                                        });
-                                    }
-
-                                }
                             }}>删除</Button>
                         </div>
                     )
@@ -366,10 +471,10 @@ class OfflineSession extends Component {
                 <Content className="site-layout-background page-content">
                     <div style={{marginBottom: 20}}>
                         <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={8} key={1}>
+                            <Col span={4} key={1}>
                                 <Title level={3}>离线会话列表</Title>
                             </Col>
-                            <Col span={16} key={2} style={{textAlign: 'right'}}>
+                            <Col span={20} key={2} style={{textAlign: 'right'}}>
                                 <Space>
 
                                     <Search
@@ -380,7 +485,7 @@ class OfflineSession extends Component {
                                     />
 
                                     <Select
-                                        style={{width: 150}}
+                                        style={{width: 140}}
                                         showSearch
                                         value={this.state.queryParams.userId}
                                         placeholder='用户昵称'
@@ -393,7 +498,7 @@ class OfflineSession extends Component {
                                     </Select>
 
                                     <Select
-                                        style={{width: 150}}
+                                        style={{width: 140}}
                                         showSearch
                                         value={this.state.queryParams.assetId}
                                         placeholder='资产名称'
@@ -402,6 +507,14 @@ class OfflineSession extends Component {
                                         filterOption={false}
                                     >
                                         {assetOptions}
+                                    </Select>
+
+                                    <Select onChange={this.handleChangeByRead}
+                                            value={this.state.queryParams.reviewed ? this.state.queryParams.reviewed : ''}
+                                            style={{width: 100}}>
+                                        <Select.Option value="">全部会话</Select.Option>
+                                        <Select.Option value="true">只看已读</Select.Option>
+                                        <Select.Option value="false">只看未读</Select.Option>
                                     </Select>
 
                                     <Select onChange={this.handleChangeByProtocol}
@@ -422,9 +535,7 @@ class OfflineSession extends Component {
                                             this.loadTableData({
                                                 pageIndex: 1,
                                                 pageSize: 10,
-                                                protocol: '',
-                                                userId: undefined,
-                                                assetId: undefined
+                                                protocol: ''
                                             })
                                         }}>
 
@@ -437,6 +548,29 @@ class OfflineSession extends Component {
                                         <Button icon={<SyncOutlined/>} onClick={() => {
                                             this.loadTableData(this.state.queryParams)
                                         }}>
+
+                                        </Button>
+                                    </Tooltip>
+
+                                    <Tooltip title="全部标为已阅">
+                                        <Button icon={<CheckOutlined />}
+                                                loading={this.state.reviewedAllBtnLoading}
+                                                onClick={this.handleAllReviewed}>
+                                        </Button>
+                                    </Tooltip>
+
+                                    <Tooltip title="标为已阅">
+                                        <Button disabled={!hasSelected} icon={<EyeOutlined />}
+                                                loading={this.state.reviewedBtnLoading}
+                                                onClick={this.handleReviewed}>
+
+                                        </Button>
+                                    </Tooltip>
+
+                                    <Tooltip title="标为未阅">
+                                        <Button disabled={!hasSelected} icon={<EyeInvisibleOutlined />}
+                                                loading={this.state.unreviewedBtnLoading}
+                                                onClick={this.handleUnreviewed}>
 
                                         </Button>
                                     </Tooltip>
@@ -455,6 +589,25 @@ class OfflineSession extends Component {
                                                         onOk: () => {
                                                             this.batchDelete()
                                                         },
+                                                        onCancel() {
+
+                                                        },
+                                                    });
+                                                }}>
+                                        </Button>
+                                    </Tooltip>
+
+                                    <Tooltip title="清空">
+                                        <Button type="primary" danger icon={<ClearOutlined/>}
+                                                loading={this.state.clearBtnLoading}
+                                                onClick={() => {
+                                                    const content = <Text style={{color: 'red'}}
+                                                                          strong>您确定要清空全部的离线会话吗？</Text>;
+                                                    confirm({
+                                                        icon: <ExclamationCircleOutlined/>,
+                                                        content: content,
+                                                        okType: 'danger',
+                                                        onOk: this.clearSession,
                                                         onCancel() {
 
                                                         },
@@ -482,6 +635,9 @@ class OfflineSession extends Component {
                                showTotal: total => `总计 ${total} 条`
                            }}
                            loading={this.state.loading}
+                           rowClassName={(record, index) => {
+                               return record['reviewed'] ? '' : 'unreviewed';
+                           }}
                     />
 
                     {

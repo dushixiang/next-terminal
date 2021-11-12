@@ -54,6 +54,11 @@ func (r LoginLogRepository) FindAliveLoginLogs() (o []model.LoginLog, err error)
 	return
 }
 
+func (r LoginLogRepository) FindAllLoginLogs() (o []model.LoginLog, err error) {
+	err = r.DB.Find(&o).Error
+	return
+}
+
 func (r LoginLogRepository) FindAliveLoginLogsByUsername(username string) (o []model.LoginLog, err error) {
 	err = r.DB.Where("state = '1' and logout_time is null and username = ?", username).Find(&o).Error
 	return

@@ -1,8 +1,10 @@
 import React, {Component} from 'react';
-import {Button, Form, Input, Layout, Select, Switch, Tabs, Tooltip, Typography} from "antd";
+import {Alert, Button, Form, Input, Layout, Select, Space, Switch, Tabs, Tooltip, Typography} from "antd";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
+import {download, getToken} from "../../utils/utils";
+import {server} from "../../common/env";
 
 const {Content} = Layout;
 const {Option} = Select;
@@ -90,6 +92,10 @@ class Setting extends Component {
 
             if (this.mailSettingFormRef.current) {
                 this.mailSettingFormRef.current.setFieldsValue(properties)
+            }
+
+            if (this.otherSettingFormRef.current) {
+                this.otherSettingFormRef.current.setFieldsValue(properties)
             }
         } else {
             message.error(result['message']);
@@ -443,7 +449,6 @@ class Setting extends Component {
                                 }
 
 
-
                                 <Form.Item {...formTailLayout}>
                                     <Button type="primary" htmlType="submit">
                                         更新
@@ -525,7 +530,7 @@ class Setting extends Component {
 
                         <TabPane tab="其他配置" key="other">
                             <Title level={3}>其他配置</Title>
-                            <Form ref={this.guacdSettingFormRef} name="other" onFinish={this.changeProperties}
+                            <Form ref={this.otherSettingFormRef} name="other" onFinish={this.changeProperties}
                                   layout="vertical">
 
                                 <Form.Item
@@ -564,6 +569,30 @@ class Setting extends Component {
                                     </Button>
                                 </Form.Item>
                             </Form>
+                        </TabPane>
+
+                        <TabPane tab="备份与恢复" key="backup">
+                            <Title level={3}>备份与恢复</Title>
+
+                            <Space direction="vertical">
+                                <Alert
+                                    message="恢复数据时，如存在登录账号相同的用户时，会保留原系统中的数据，此外由于登录密码加密之后不可逆，恢复的账户密码将随机产生。"
+                                    type="info"
+                                />
+
+                                <Space>
+                                    <Button type="primary" onClick={() => {
+                                        download(`${server}/backup/export?X-Auth-Token=${getToken()}&t=${new Date().getTime()}`);
+                                    }}>
+                                        导出备份
+                                    </Button>
+
+                                    <Button type="dashed">
+                                        恢复备份
+                                    </Button>
+                                </Space>
+                            </Space>
+
                         </TabPane>
                     </Tabs>
                 </Content>

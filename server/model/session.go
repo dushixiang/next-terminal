@@ -34,6 +34,7 @@ type Session struct {
 	CreateDir        string         `gorm:"type:varchar(1)" json:"createDir"`
 	StorageId        string         `gorm:"type:varchar(36)" json:"storageId"`
 	AccessGatewayId  string         `gorm:"type:varchar(36)" json:"accessGatewayId"`
+	Reviewed         bool           `gorm:"type:tinyint(1)" json:"reviewed"`
 }
 
 func (r *Session) TableName() string {
@@ -61,6 +62,7 @@ type SessionForPage struct {
 	Code             int            `json:"code"`
 	Message          string         `json:"message"`
 	Mode             string         `json:"mode"`
+	Reviewed         bool           `json:"reviewed"`
 }
 
 type SessionForAccess struct {

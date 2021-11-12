@@ -35,8 +35,9 @@ func SessionPagingEndpoint(c echo.Context) error {
 	clientIp := c.QueryParam("clientIp")
 	assetId := c.QueryParam("assetId")
 	protocol := c.QueryParam("protocol")
+	reviewed := c.QueryParam("reviewed")
 
-	items, total, err := sessionRepository.Find(pageIndex, pageSize, status, userId, clientIp, assetId, protocol)
+	items, total, err := sessionRepository.Find(pageIndex, pageSize, status, userId, clientIp, assetId, protocol, reviewed)
 
 	if err != nil {
 		return err
@@ -69,13 +70,43 @@ func SessionPagingEndpoint(c echo.Context) error {
 }
 
 func SessionDeleteEndpoint(c echo.Context) error {
-	sessionIds := c.Param("id")
-	split := strings.Split(sessionIds, ",")
-	err := sessionRepository.DeleteByIds(split)
+	sessionIds := strings.Split(c.Param("id"), ",")
+	err := sessionRepository.DeleteByIds(sessionIds)
 	if err != nil {
 		return err
 	}
 
+	return Success(c, nil)
+}
+
+func SessionClearEndpoint(c echo.Context) error {
+	err := sessionService.ClearOfflineSession()
+	if err != nil {
+		return err
+	}
+	return Success(c, nil)
+}
+
+func SessionReviewedEndpoint(c echo.Context) error {
+	sessionIds := strings.Split(c.Param("id"), ",")
+	if err := sessionRepository.UpdateReadByIds(true, sessionIds); err != nil {
+		return err
+	}
+	return Success(c, nil)
+}
+
+func SessionUnViewedEndpoint(c echo.Context) error {
+	sessionIds := strings.Split(c.Param("id"), ",")
+	if err := sessionRepository.UpdateReadByIds(false, sessionIds); err != nil {
+		return err
+	}
+	return Success(c, nil)
+}
+
+func SessionReviewedAllEndpoint(c echo.Context) error {
+	if err := sessionService.ReviewedAll(); err != nil {
+		return err
+	}
 	return Success(c, nil)
 }
 
@@ -299,6 +330,7 @@ func SessionCreateEndpoint(c echo.Context) error {
 		Edit:            edit,
 		StorageId:       storageId,
 		AccessGatewayId: asset.AccessGatewayId,
+		Reviewed:        false,
 	}
 
 	if asset.AccountType == "credential" {
@@ -645,6 +677,7 @@ func SessionRecordingEndpoint(c echo.Context) error {
 	} else {
 		recording = s.Recording + "/recording"
 	}
+	_ = sessionRepository.UpdateReadByIds(true, []string{sessionId})
 
 	log.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
 	return c.File(recording)

@@ -249,9 +249,9 @@ class Playback extends Component {
                                     this.startSpeedUp();
                                 }
                             }}>
-                                <Select.Option key="1">1x</Select.Option>
-                                <Select.Option key="2">2x</Select.Option>
-                                <Select.Option key="5">5x</Select.Option>
+                                <Select.Option key="1" value={1}>1x</Select.Option>
+                                <Select.Option key="2" value={2}>2x</Select.Option>
+                                <Select.Option key="5" value={5}>5x</Select.Option>
                             </Select>
                         </Col>
                         <Col flex='none'>

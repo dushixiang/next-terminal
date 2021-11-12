@@ -15,9 +15,8 @@ func NewAccessSecurityRepository(db *gorm.DB) *AccessSecurityRepository {
 	return accessSecurityRepository
 }
 
-func (r AccessSecurityRepository) FindAllAccessSecurities() (o []model.AccessSecurity, err error) {
-	db := r.DB
-	err = db.Order("priority asc").Find(&o).Error
+func (r AccessSecurityRepository) FindAll() (o []model.AccessSecurity, err error) {
+	err = r.DB.Order("priority asc").Find(&o).Error
 	return
 }
 

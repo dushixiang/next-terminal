@@ -36,7 +36,7 @@ func SecurityCreateEndpoint(c echo.Context) error {
 }
 
 func ReloadAccessSecurity() error {
-	rules, err := accessSecurityRepository.FindAllAccessSecurities()
+	rules, err := accessSecurityRepository.FindAll()
 	if err != nil {
 		return err
 	}

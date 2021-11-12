@@ -49,6 +49,29 @@ func NewSshClient(ip string, port int, username, password, privateKey, passphras
 	}
 
 	addr := fmt.Sprintf("%s:%d", ip, port)
+	//
+	//socks5, err := proxy.SOCKS5("tcp", "",
+	//	&proxy.Auth{User: "username", Password: "password"},
+	//	&net.Dialer{
+	//		Timeout:   30 * time.Second,
+	//		KeepAlive: 30 * time.Second,
+	//	},
+	//)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//conn, err := socks5.Dial("tcp", addr)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//clientConn, channels, requests, err := ssh.NewClientConn(conn, addr, config)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//
+	//ssh.NewClient(clientConn, channels, requests)
 
 	return ssh.Dial("tcp", addr, config)
 }

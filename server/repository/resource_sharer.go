@@ -218,3 +218,8 @@ func (r *ResourceSharerRepository) Find(resourceId, resourceType, userId, userGr
 	err = db.Find(&resourceSharers).Error
 	return
 }
+
+func (r *ResourceSharerRepository) FindAll() (o []model.ResourceSharer, err error) {
+	err = r.DB.Find(&o).Error
+	return
+}

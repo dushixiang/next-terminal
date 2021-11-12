@@ -78,8 +78,7 @@ func AccessGatewayUpdateEndpoint(c echo.Context) error {
 	if err := accessGatewayRepository.UpdateById(&item, id); err != nil {
 		return err
 	}
-	accessGatewayService.DisconnectById(id)
-	_, _ = accessGatewayService.GetGatewayAndReconnectById(id)
+	accessGatewayService.ReConnect(&item)
 	return Success(c, nil)
 }
 

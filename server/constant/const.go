@@ -56,6 +56,9 @@ const (
 
 	TypeUser  = "user"  // 普通用户
 	TypeAdmin = "admin" // 管理员
+
+	StatusEnabled  = "enabled"
+	StatusDisabled = "disabled"
 )
 
 var SSHParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, SshMode}

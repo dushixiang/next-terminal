@@ -94,3 +94,8 @@ func (r CommandRepository) FindByUser(account model.User) (o []model.CommandForP
 	}
 	return
 }
+
+func (r CommandRepository) FindAll() (o []model.Command, err error) {
+	err = r.DB.Find(&o).Error
+	return
+}

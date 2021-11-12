@@ -11,7 +11,7 @@ type User struct {
 	Nickname   string         `gorm:"type:varchar(500)" json:"nickname"`
 	TOTPSecret string         `json:"-"`
 	Online     bool           `json:"online"`
-	Enabled    bool           `json:"enabled"`
+	Status     string         `gorm:"type:varchar(10)" json:"status"`
 	Created    utils.JsonTime `json:"created"`
 	Type       string         `gorm:"type:varchar(20)" json:"type"`
 	Mail       string         `gorm:"type:varchar(500)" json:"mail"`
@@ -24,7 +24,7 @@ type UserForPage struct {
 	TOTPSecret       string         `json:"totpSecret"`
 	Mail             string         `json:"mail"`
 	Online           bool           `json:"online"`
-	Enabled          bool           `json:"enabled"`
+	Status           string         `json:"status"`
 	Created          utils.JsonTime `json:"created"`
 	Type             string         `json:"type"`
 	SharerAssetCount int64          `json:"sharerAssetCount"`

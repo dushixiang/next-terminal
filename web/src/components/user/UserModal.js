@@ -61,7 +61,6 @@ const UserModal = ({title, visible, handleOk, handleCancel, confirmLoading, mode
                             <Input type="password" autoComplete="new-password" placeholder="输入登录密码"/>
                         </Form.Item>) : null
                 }
-
             </Form>
         </Modal>
     )
