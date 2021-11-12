@@ -49,3 +49,12 @@ test/test
 ## License 
 
 Next Terminal 使用 [AGPL-3.0](./LICENSE) 开源协议，请自觉准守。
+
+## 赞助支持
+
+如果你觉得 `next-terminal` 这款程序还不错，并且想要购买服务器，可以从这里点击购买腾讯云服务器。
+
+- 2核4G 8M带宽 80G磁盘 1200GB流量/月    70元/1年
+- 2核4G 8M带宽 80G磁盘 1200GB流量/月    198元/3年
+
+更多优惠购买链接: https://curl.qcloud.com/bvzoD87S
