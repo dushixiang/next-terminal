@@ -23,14 +23,14 @@ func NewSessionRepository(db *gorm.DB) *SessionRepository {
 	return sessionRepository
 }
 
-func (r SessionRepository) Find(pageIndex, pageSize int, status, userId, clientIp, assetId, protocol string) (results []model.SessionForPage, total int64, err error) {
+func (r SessionRepository) Find(pageIndex, pageSize int, status, userId, clientIp, assetId, protocol, reviewed string) (results []model.SessionForPage, total int64, err error) {
 
 	db := r.DB
 	var params []interface{}
 
 	params = append(params, status)
 
-	itemSql := "SELECT s.id,s.mode, s.protocol,s.recording, s.connection_id, s.asset_id, s.creator, s.client_ip, s.width, s.height, s.ip, s.port, s.username, s.status, s.connected_time, s.disconnected_time,s.code, s.message, a.name AS asset_name, u.nickname AS creator_name FROM sessions s LEFT JOIN assets a ON s.asset_id = a.id LEFT JOIN users u ON s.creator = u.id WHERE s.STATUS = ? "
+	itemSql := "SELECT s.id,s.mode, s.protocol,s.recording, s.connection_id, s.asset_id, s.creator, s.client_ip, s.width, s.height, s.ip, s.port, s.username, s.status, s.connected_time, s.disconnected_time,s.code,s.reviewed, s.message, a.name AS asset_name, u.nickname AS creator_name FROM sessions s LEFT JOIN assets a ON s.asset_id = a.id LEFT JOIN users u ON s.creator = u.id WHERE s.STATUS = ? "
 	countSql := "select count(*) from sessions as s where s.status = ? "
 
 	if len(userId) > 0 {
@@ -55,6 +55,13 @@ func (r SessionRepository) Find(pageIndex, pageSize int, status, userId, clientI
 		itemSql += " and s.protocol = ?"
 		countSql += " and s.protocol = ?"
 		params = append(params, protocol)
+	}
+
+	if reviewed != "" {
+		bReviewed := reviewed == "true"
+		itemSql += " and s.reviewed = ?"
+		countSql += " and s.reviewed = ?"
+		params = append(params, bReviewed)
 	}
 
 	params = append(params, (pageIndex-1)*pageSize, pageSize)
@@ -207,5 +214,15 @@ func (r SessionRepository) OverviewAccess(account model.User) (o []model.Session
 	if o == nil {
 		o = make([]model.SessionForAccess, 0)
 	}
+	return
+}
+
+func (r SessionRepository) UpdateReadByIds(reviewed bool, ids []string) error {
+	sql := "update sessions set reviewed = ? where id in ?"
+	return r.DB.Exec(sql, reviewed, ids).Error
+}
+
+func (r SessionRepository) FindAllUnReviewed() (o []model.Session, err error) {
+	err = r.DB.Where("reviewed = false or reviewed is null").Find(&o).Error
 	return
 }

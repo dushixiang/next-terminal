@@ -26,7 +26,10 @@ func NewStorageService(storageRepository *repository.StorageRepository, userRepo
 }
 
 func (r StorageService) InitStorages() error {
-	users := r.userRepository.FindAll()
+	users, err := r.userRepository.FindAll()
+	if err != nil {
+		return err
+	}
 	for i := range users {
 		userId := users[i].ID
 		_, err := r.storageRepository.FindByOwnerIdAndDefault(userId, true)

@@ -4,9 +4,6 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/server/global/cache"
-	"next-terminal/server/log"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -31,24 +28,26 @@ func LoginLogPagingEndpoint(c echo.Context) error {
 
 func LoginLogDeleteEndpoint(c echo.Context) error {
 	ids := c.Param("id")
-	split := strings.Split(ids, ",")
-	for i := range split {
-		token := split[i]
-		cache.GlobalCache.Delete(token)
-		if err := userService.Logout(token); err != nil {
-			log.WithError(err).Error("Cache Delete Failed")
-		}
-	}
-	if err := loginLogRepository.DeleteByIdIn(split); err != nil {
+	tokens := strings.Split(ids, ",")
+	if err := userService.DeleteLoginLogs(tokens); err != nil {
 		return err
 	}
 
 	return Success(c, nil)
 }
 
-//func LoginLogClearEndpoint(c echo.Context) error {
-//	loginLogs, err := loginLogRepository.FindAliveLoginLogs()
-//	if err != nil {
-//		return err
-//	}
-//}
+func LoginLogClearEndpoint(c echo.Context) error {
+	loginLogs, err := loginLogRepository.FindAllLoginLogs()
+	if err != nil {
+		return err
+	}
+	var tokens = make([]string, 0)
+	for i := range loginLogs {
+		tokens = append(tokens, loginLogs[i].ID)
+	}
+
+	if err := userService.DeleteLoginLogs(tokens); err != nil {
+		return err
+	}
+	return Success(c, nil)
+}

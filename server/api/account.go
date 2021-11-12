@@ -1,6 +1,7 @@
 package api
 
 import (
+	"next-terminal/server/constant"
 	"path"
 	"strconv"
 	"strings"
@@ -49,8 +50,6 @@ func LoginEndpoint(c echo.Context) error {
 		return err
 	}
 
-	user, err := userRepository.FindByUsername(loginAccount.Username)
-
 	// 存储登录失败次数信息
 	loginFailCountKey := c.RealIP() + loginAccount.Username
 	v, ok := cache.GlobalCache.Get(loginFailCountKey)
@@ -62,6 +61,7 @@ func LoginEndpoint(c echo.Context) error {
 		return Fail(c, -1, "登录失败次数过多，请等待5分钟后再试")
 	}
 
+	user, err := userRepository.FindByUsername(loginAccount.Username)
 	if err != nil {
 		count++
 		cache.GlobalCache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
@@ -70,6 +70,10 @@ func LoginEndpoint(c echo.Context) error {
 			return err
 		}
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
+	}
+
+	if user.Status == constant.StatusDisabled {
+		return Fail(c, -1, "该账户已停用")
 	}
 
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
@@ -172,6 +176,10 @@ func loginWithTotpEndpoint(c echo.Context) error {
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
+	if user.Status == constant.StatusDisabled {
+		return Fail(c, -1, "该账户已停用")
+	}
+
 	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
 		count++
 		cache.GlobalCache.Set(loginFailCountKey, count, time.Minute*time.Duration(5))
@@ -206,9 +214,7 @@ func loginWithTotpEndpoint(c echo.Context) error {
 
 func LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
-	cacheKey := userService.BuildCacheKeyByToken(token)
-	cache.GlobalCache.Delete(cacheKey)
-	err := userService.Logout(token)
+	err := userService.LogoutByToken(token)
 	if err != nil {
 		return err
 	}

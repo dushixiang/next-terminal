@@ -75,11 +75,6 @@ func (r AccessGatewayRepository) FindById(id string) (o model.AccessGateway, err
 }
 
 func (r AccessGatewayRepository) FindAll() (o []model.AccessGateway, err error) {
-	t := model.AccessGateway{}
-	db := r.DB.Table(t.TableName())
-	err = db.Find(&o).Error
-	if o == nil {
-		o = make([]model.AccessGateway, 0)
-	}
+	err = r.DB.Find(&o).Error
 	return
 }

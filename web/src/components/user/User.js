@@ -14,6 +14,7 @@ import {
     Modal,
     Row,
     Space,
+    Switch,
     Table,
     Tag,
     Tooltip,
@@ -26,14 +27,14 @@ import {message} from "antd/es";
 import {
     DeleteOutlined,
     DownOutlined,
-    ExclamationCircleOutlined,
+    ExclamationCircleOutlined, FrownOutlined,
     InsuranceOutlined,
     LockOutlined,
     PlusOutlined,
     SyncOutlined,
     UndoOutlined
 } from '@ant-design/icons';
-import {hasPermission} from "../../service/permission";
+import {getCurrentUser} from "../../service/permission";
 import dayjs from "dayjs";
 import UserShareSelectedAsset from "./UserShareSelectedAsset";
 
@@ -71,16 +72,6 @@ class User extends Component {
 
     componentDidMount() {
         this.loadTableData();
-    }
-
-    async delete(id) {
-        let result = await request.delete('/users/' + id);
-        if (result.code === 1) {
-            message.success('操作成功', 3);
-            await this.loadTableData(this.state.queryParams);
-        } else {
-            message.error(result.message, 10);
-        }
     }
 
     async loadTableData(queryParams) {
@@ -129,11 +120,10 @@ class User extends Component {
             queryParams: queryParams
         });
 
-        this.loadTableData(queryParams).then(r => {
-        })
+        this.loadTableData(queryParams);
     };
 
-    showDeleteConfirm(id, content) {
+    showDeleteConfirm(id, content, index) {
         let self = this;
         confirm({
             title: '您确定要删除此用户吗?',
@@ -142,7 +132,7 @@ class User extends Component {
             okType: 'danger',
             cancelText: '取消',
             onOk() {
-                self.delete(id);
+                self.delete(id, index);
             }
         });
     };
@@ -167,7 +157,6 @@ class User extends Component {
         this.setState({
             modalConfirmLoading: true
         });
-
         if (formData.id) {
             // 向后台提交数据
             const result = await request.put('/users/' + formData.id, formData);
@@ -293,6 +282,72 @@ class User extends Component {
         this.loadTableData(query);
     }
 
+    async delete(id, index) {
+        let items = this.state.items;
+        try {
+            items[index]['delLoading'] = true;
+            this.setState({
+                items: items
+            });
+            let result = await request.delete('/users/' + id);
+            if (result.code === 1) {
+                message.success('操作成功', 3);
+                await this.loadTableData(this.state.queryParams);
+            } else {
+                message.error(result.message, 10);
+            }
+        } finally {
+            items[index]['delLoading'] = false;
+            this.setState({
+                items: items
+            });
+        }
+    }
+
+    changeUserStatus = async (id, checked, index) => {
+        let items = this.state.items;
+        try {
+            items[index]['statusLoading'] = true;
+            this.setState({
+                items: items
+            });
+            let result = await request.patch(`/users/${id}/status?status=${checked ? 'enabled' : 'disabled'}`);
+            if (result['code'] !== 1) {
+                message.error(result['message']);
+                return
+            }
+            this.loadTableData(this.state.queryParams);
+        } finally {
+            items[index]['statusLoading'] = false;
+            this.setState({
+                items: items
+            });
+        }
+    }
+
+    resetTOTP = async (id, index) => {
+        let items = this.state.items;
+        try {
+            items[index]['resetTOTPLoading'] = true;
+            this.setState({
+                items: items
+            });
+            let result = await request.post(`/users/${id}/reset-totp`);
+            if (result['code'] === 1) {
+                message.success('操作成功', 3);
+                this.loadTableData();
+            } else {
+                message.error(result['message'], 10);
+            }
+        } finally {
+            items[index]['resetTOTPLoading'] = false;
+            this.setState({
+                items: items
+            });
+        }
+
+    }
+
     render() {
 
         const columns = [{
@@ -348,15 +403,28 @@ class User extends Component {
             dataIndex: 'mail',
             key: 'mail',
         }, {
-            title: '二次认证',
+            title: '状态',
+            dataIndex: 'status',
+            key: 'status',
+            render: (status, record, index) => {
+                return <Switch checkedChildren="启用" unCheckedChildren="停用"
+                               disabled={getCurrentUser()['id'] === record['id']}
+                               loading={record['statusLoading']}
+                               checked={status !== 'disabled'}
+                               onChange={checked => {
+                                   this.changeUserStatus(record['id'], checked, index);
+                               }}/>
+            }
+        }, {
+            title: '双因素认证',
             dataIndex: 'totpSecret',
             key: 'totpSecret',
             render: (text, record) => {
 
                 if (text === '1') {
-                    return <Tag icon={<InsuranceOutlined/>} color="success">开启</Tag>;
+                    return <Tag icon={<InsuranceOutlined/>} color="success">已开启</Tag>;
                 } else {
-                    return <Tag icon={<ExclamationCircleOutlined/>} color="warning">关闭</Tag>;
+                    return <Tag icon={<FrownOutlined />} color="warning">未开启</Tag>;
                 }
             }
         }, {
@@ -398,7 +466,7 @@ class User extends Component {
             {
                 title: '操作',
                 key: 'action',
-                render: (text, record) => {
+                render: (text, record, index) => {
 
                     const menu = (
                         <Menu>
@@ -414,6 +482,7 @@ class User extends Component {
 
                             <Menu.Item key="2">
                                 <Button type="text" size='small'
+                                        loading={record['resetTOTPLoading']}
                                         onClick={() => {
                                             confirm({
                                                 title: '您确定要重置此用户的双因素认证吗?',
@@ -421,13 +490,7 @@ class User extends Component {
                                                 okText: '确定',
                                                 cancelText: '取消',
                                                 onOk: async () => {
-                                                    let result = await request.post(`/users/${record['id']}/reset-totp`);
-                                                    if (result['code'] === 1) {
-                                                        message.success('操作成功', 3);
-                                                        this.loadTableData();
-                                                    } else {
-                                                        message.error(result['message'], 10);
-                                                    }
+                                                    this.resetTOTP(record['id'], index);
                                                 }
                                             });
                                         }}>重置双因素认证</Button>
@@ -446,8 +509,9 @@ class User extends Component {
                             <Menu.Divider/>
                             <Menu.Item key="5">
                                 <Button type="text" size='small' danger
-                                        disabled={!hasPermission(record['owner'])}
-                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
+                                        disabled={getCurrentUser()['id'] === record['id']}
+                                        loading={record['delLoading']}
+                                        onClick={() => this.showDeleteConfirm(record.id, record.name, index)}>删除</Button>
                             </Menu.Item>
                         </Menu>
                     );
@@ -543,53 +607,6 @@ class User extends Component {
 
                                         </Button>
                                     </Tooltip>
-
-                                    {/*<Tooltip title="批量启用">*/}
-                                    {/*    <Button type="dashed" danger disabled={!hasSelected}*/}
-                                    {/*            icon={<IssuesCloseOutlined/>}*/}
-                                    {/*            loading={this.state.delBtnLoading}*/}
-                                    {/*            onClick={() => {*/}
-                                    {/*                constant content = <div>*/}
-                                    {/*                    您确定要启用选中的<Text style={{color: '#1890FF'}}*/}
-                                    {/*                                   strong>{this.state.selectedRowKeys.length}</Text>条记录吗？*/}
-                                    {/*                </div>;*/}
-                                    {/*                confirm({*/}
-                                    {/*                    icon: <ExclamationCircleOutlined/>,*/}
-                                    {/*                    content: content,*/}
-                                    {/*                    onOk: () => {*/}
-
-                                    {/*                    },*/}
-                                    {/*                    onCancel() {*/}
-
-                                    {/*                    },*/}
-                                    {/*                });*/}
-                                    {/*            }}>*/}
-
-                                    {/*    </Button>*/}
-                                    {/*</Tooltip>*/}
-
-                                    {/*<Tooltip title="批量禁用">*/}
-                                    {/*    <Button type="default" danger disabled={!hasSelected} icon={<StopOutlined/>}*/}
-                                    {/*            loading={this.state.delBtnLoading}*/}
-                                    {/*            onClick={() => {*/}
-                                    {/*                constant content = <div>*/}
-                                    {/*                    您确定要禁用选中的<Text style={{color: '#1890FF'}}*/}
-                                    {/*                                   strong>{this.state.selectedRowKeys.length}</Text>条记录吗？*/}
-                                    {/*                </div>;*/}
-                                    {/*                confirm({*/}
-                                    {/*                    icon: <ExclamationCircleOutlined/>,*/}
-                                    {/*                    content: content,*/}
-                                    {/*                    onOk: () => {*/}
-
-                                    {/*                    },*/}
-                                    {/*                    onCancel() {*/}
-
-                                    {/*                    },*/}
-                                    {/*                });*/}
-                                    {/*            }}>*/}
-
-                                    {/*    </Button>*/}
-                                    {/*</Tooltip>*/}
 
                                     <Tooltip title="批量删除">
                                         <Button type="primary" danger disabled={!hasSelected} icon={<DeleteOutlined/>}

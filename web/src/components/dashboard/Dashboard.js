@@ -131,7 +131,7 @@ class Dashboard extends Component {
                 <div style={{margin: 16, marginBottom: 0}}>
                     <Row gutter={16}>
                         <Col span={6}>
-                            <Card bordered={true} hoverable>
+                            <Card bordered={true} hoverable={true}>
                                 <Link to={'/user'}>
                                     <Statistic title="在线用户" value={this.state.counter['user']}
                                                prefix={<UserOutlined/>}/>
@@ -139,7 +139,7 @@ class Dashboard extends Component {
                             </Card>
                         </Col>
                         <Col span={6}>
-                            <Card bordered={true} hoverable>
+                            <Card bordered={true} hoverable={true}>
                                 <Link to={'/asset'}>
                                     <Statistic title="资产数量" value={this.state.counter['asset']}
                                                prefix={<DesktopOutlined/>}/>
@@ -147,7 +147,7 @@ class Dashboard extends Component {
                             </Card>
                         </Col>
                         <Col span={6}>
-                            <Card bordered={true} hoverable>
+                            <Card bordered={true} hoverable={true}>
                                 <Link to={'/credential'} hoverable>
                                     <Statistic title="授权凭证" value={this.state.counter['credential']}
                                                prefix={<IdcardOutlined/>}/>
@@ -156,7 +156,7 @@ class Dashboard extends Component {
                             </Card>
                         </Col>
                         <Col span={6}>
-                            <Card bordered={true} hoverable>
+                            <Card bordered={true} hoverable={true}>
                                 <Link to={'/online-session'}>
                                     <Statistic title="在线会话" value={this.state.counter['onlineSession']}
                                                prefix={<LinkOutlined/>}/>

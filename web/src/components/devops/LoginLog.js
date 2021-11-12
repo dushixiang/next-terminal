@@ -20,7 +20,7 @@ import qs from "qs";
 import request from "../../common/request";
 import {formatDate, isEmpty} from "../../utils/utils";
 import {message} from "antd/es";
-import {DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
+import {ClearOutlined, DeleteOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
 
 
 const confirm = Modal.confirm;
@@ -148,6 +148,30 @@ class LoginLog extends Component {
         } finally {
             this.setState({
                 delBtnLoading: false
+            })
+        }
+    }
+
+    clearLoginLogs = async () => {
+        this.setState({
+            clearBtnLoading: true
+        })
+        try {
+            let result = await request.post('/login-logs/clear');
+            if (result.code === 1) {
+                message.success('操作成功，即将跳转至登录页面。', 3);
+                this.setState({
+                    selectedRowKeys: []
+                })
+                setTimeout(function () {
+                    window.location.reload();
+                }, 3000);
+            } else {
+                message.error(result.message, 10);
+            }
+        } finally {
+            this.setState({
+                clearBtnLoading: false
             })
         }
     }
@@ -353,6 +377,26 @@ class LoginLog extends Component {
                                         </Button>
                                     </Tooltip>
 
+                                    <Tooltip title="清空">
+                                        <Button type="primary" danger icon={<ClearOutlined/>}
+                                                loading={this.state.clearBtnLoading}
+                                                onClick={() => {
+                                                    const title = <Text style={{color: 'red'}}
+                                                                        strong>您确定要清空全部的登录日志吗？</Text>;
+                                                    confirm({
+                                                        icon: <ExclamationCircleOutlined/>,
+                                                        title: title,
+                                                        content: '删除用户未注销的登录日志将会强制用户下线，当前登录的用户也会退出登录。',
+                                                        okType: 'danger',
+                                                        onOk: this.clearLoginLogs,
+                                                        onCancel() {
+
+                                                        },
+                                                    });
+                                                }}>
+
+                                        </Button>
+                                    </Tooltip>
                                 </Space>
                             </Col>
                         </Row>

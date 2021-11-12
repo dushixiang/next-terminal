@@ -39,9 +39,12 @@ func (r AccessGatewayService) ReConnectAll() error {
 	if err != nil {
 		return err
 	}
-	for i := range gateways {
-		r.ReConnect(&gateways[i])
+	if len(gateways) > 0 {
+		for i := range gateways {
+			r.ReConnect(&gateways[i])
+		}
 	}
+
 	return nil
 }
 

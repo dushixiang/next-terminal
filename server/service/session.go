@@ -37,3 +37,41 @@ func (r SessionService) FixSessionState() error {
 func (r SessionService) EmptyPassword() error {
 	return r.sessionRepository.EmptyPassword()
 }
+
+func (r SessionService) ClearOfflineSession() error {
+	sessions, err := r.sessionRepository.FindByStatus(constant.Disconnected)
+	if err != nil {
+		return err
+	}
+	sessionIds := make([]string, 0)
+	for i := range sessions {
+		sessionIds = append(sessionIds, sessions[i].ID)
+	}
+	return r.sessionRepository.DeleteByIds(sessionIds)
+}
+
+func (r SessionService) ReviewedAll() error {
+	sessions, err := r.sessionRepository.FindAllUnReviewed()
+	if err != nil {
+		return err
+	}
+	var sessionIds = make([]string, 0)
+	total := len(sessions)
+	for i := range sessions {
+		sessionIds = append(sessionIds, sessions[i].ID)
+		if i >= 100 && i%100 == 0 {
+			if err := r.sessionRepository.UpdateReadByIds(true, sessionIds); err != nil {
+				return err
+			}
+			sessionIds = nil
+		} else {
+			if i == total-1 {
+				if err := r.sessionRepository.UpdateReadByIds(true, sessionIds); err != nil {
+					return err
+				}
+			}
+		}
+
+	}
+	return nil
+}

@@ -16,10 +16,8 @@ func NewUserGroupRepository(db *gorm.DB) *UserGroupRepository {
 	return userGroupRepository
 }
 
-func (r UserGroupRepository) FindAll() (o []model.UserGroup) {
-	if r.DB.Find(&o).Error != nil {
-		return nil
-	}
+func (r UserGroupRepository) FindAll() (o []model.UserGroup, err error) {
+	err = r.DB.Find(&o).Error
 	return
 }
 
@@ -140,4 +138,9 @@ func AddUserGroupMembers(tx *gorm.DB, userIds []string, userGroupId string) erro
 		}
 	}
 	return nil
+}
+
+func (r UserGroupRepository) FindAllUserGroupMembers() (o []model.UserGroupMember, err error) {
+	err = r.DB.Find(&o).Error
+	return
 }
