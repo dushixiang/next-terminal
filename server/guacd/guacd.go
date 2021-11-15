@@ -229,7 +229,7 @@ func (opt *Tunnel) WriteInstructionAndFlush(instruction Instruction) error {
 }
 
 func (opt *Tunnel) WriteAndFlush(p []byte) (int, error) {
-	//fmt.Printf("-> %v\n", string(p))
+	fmt.Printf("-> %v\n", string(p))
 	nn, err := opt.writer.Write(p)
 	if err != nil {
 		return nn, err
@@ -257,7 +257,7 @@ func (opt *Tunnel) Read() (p []byte, err error) {
 	}
 	buffer = buffer[0:read]
 	s := string(buffer)
-	//fmt.Printf("<- %v \n", s)
+	fmt.Printf("<- %v \n", s)
 	if s == "rate=44100,channels=2;" {
 		return make([]byte, 0), nil
 	}

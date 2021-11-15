@@ -134,8 +134,18 @@ func SSHEndpoint(c echo.Context) (err error) {
 		recording = path.Join(config.GlobalCfg.Guacd.Recording, sessionId, "recording.cast")
 	}
 
+	attributes, err := assetRepository.FindAssetAttrMapByAssetId(s.AssetId)
+	if err != nil {
+		return WriteMessage(ws, NewMessage(Closed, "获取资产属性失败："+err.Error()))
+	}
+
 	var xterm = "xterm-256color"
-	nextTerminal, err := term.NewNextTerminal(ip, port, username, password, privateKey, passphrase, rows, cols, recording, xterm, true)
+	var nextTerminal *term.NextTerminal
+	if "true" == attributes[constant.SocksProxyEnable] {
+		nextTerminal, err = term.NewNextTerminalUseSocks(ip, port, username, password, privateKey, passphrase, rows, cols, recording, xterm, true, attributes[constant.SocksProxyHost], attributes[constant.SocksProxyPort], attributes[constant.SocksProxyUsername], attributes[constant.SocksProxyPassword])
+	} else {
+		nextTerminal, err = term.NewNextTerminal(ip, port, username, password, privateKey, passphrase, rows, cols, recording, xterm, true)
+	}
 
 	if err != nil {
 		return WriteMessage(ws, NewMessage(Closed, "创建SSH客户端失败："+err.Error()))

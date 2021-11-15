@@ -22,7 +22,18 @@ func NewNextTerminal(ip string, port int, username, password, privateKey, passph
 	if err != nil {
 		return nil, err
 	}
+	return newNT(err, sshClient, pipe, recording, term, rows, cols)
+}
 
+func NewNextTerminalUseSocks(ip string, port int, username, password, privateKey, passphrase string, rows, cols int, recording, term string, pipe bool, socksProxyHost, socksProxyPort, socksProxyUsername, socksProxyPassword string) (*NextTerminal, error) {
+	sshClient, err := NewSshClientUseSocks(ip, port, username, password, privateKey, passphrase, socksProxyHost, socksProxyPort, socksProxyUsername, socksProxyPassword)
+	if err != nil {
+		return nil, err
+	}
+	return newNT(err, sshClient, pipe, recording, term, rows, cols)
+}
+
+func newNT(err error, sshClient *ssh.Client, pipe bool, recording string, term string, rows int, cols int) (*NextTerminal, error) {
 	sshSession, err := sshClient.NewSession()
 	if err != nil {
 		return nil, err
