@@ -12,7 +12,7 @@ sqlite:
 server:
   addr: 0.0.0.0:8088
 guacd:
-  hostname: 172.16.101.32
+  hostname: 127.0.0.1
   port: 4822
   # 此路径需要为绝对路径，并且next-terminal和guacd都能访问到
   recording: 'data/recording'
