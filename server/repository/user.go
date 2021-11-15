@@ -90,6 +90,16 @@ func (r UserRepository) FindByUsername(username string) (o model.User, err error
 	return
 }
 
+func (r UserRepository) ExistByUsername(username string) (exist bool) {
+	count := int64(0)
+	err := r.DB.Table("users").Where("username = ?", username).Count(&count).Error
+	if err != nil {
+		return false
+	}
+
+	return count > 0
+}
+
 func (r UserRepository) FindOnlineUsers() (o []model.User, err error) {
 	err = r.DB.Where("online = ?", true).Find(&o).Error
 	return

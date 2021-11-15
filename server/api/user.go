@@ -2,10 +2,10 @@ package api
 
 import (
 	"errors"
-	"next-terminal/server/constant"
 	"strconv"
 	"strings"
 
+	"next-terminal/server/constant"
 	"next-terminal/server/global/cache"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
@@ -20,6 +20,10 @@ func UserCreateEndpoint(c echo.Context) (err error) {
 	if err := c.Bind(&item); err != nil {
 		return err
 	}
+	if userRepository.ExistByUsername(item.Username) {
+		return Fail(c, -1, "username is already in use")
+	}
+
 	password := item.Password
 
 	var pass []byte
@@ -70,6 +74,11 @@ func UserPagingEndpoint(c echo.Context) error {
 
 func UserUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
+
+	account, _ := GetCurrentAccount(c)
+	if account.ID == id {
+		return Fail(c, -1, "cannot modify itself")
+	}
 
 	var item model.User
 	if err := c.Bind(&item); err != nil {
