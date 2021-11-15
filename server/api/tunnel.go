@@ -162,6 +162,10 @@ func TunEndpoint(c echo.Context) error {
 			Status:       constant.Connecting,
 			Recording:    configuration.GetParameter(guacd.RecordingPath),
 		}
+		if sess.Recording == "" {
+			// 未录屏时无需审计
+			sess.Reviewed = true
+		}
 		// 创建新会话
 		log.Debugf("[%v:%v] 创建新会话: %v", sessionId, connectionId, sess.ConnectionId)
 		if err := sessionRepository.UpdateById(&sess, sessionId); err != nil {
