@@ -1,6 +1,6 @@
 debug: true
 demo: false
-db: mysql
+db: sqlite
 mysql:
   hostname: localhost
   port: 3306

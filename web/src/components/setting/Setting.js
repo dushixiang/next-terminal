@@ -32,7 +32,7 @@ class Setting extends Component {
     vncSettingFormRef = React.createRef();
     guacdSettingFormRef = React.createRef();
     mailSettingFormRef = React.createRef();
-    otherSettingFormRef = React.createRef();
+    logSettingFormRef = React.createRef();
 
     componentDidMount() {
         this.getProperties();
@@ -94,8 +94,8 @@ class Setting extends Component {
                 this.mailSettingFormRef.current.setFieldsValue(properties)
             }
 
-            if (this.otherSettingFormRef.current) {
-                this.otherSettingFormRef.current.setFieldsValue(properties)
+            if (this.logSettingFormRef.current) {
+                this.logSettingFormRef.current.setFieldsValue(properties)
             }
         } else {
             message.error(result['message']);
@@ -104,6 +104,35 @@ class Setting extends Component {
 
     handleOnTabChange = () => {
         this.getProperties()
+    }
+
+    handleImport = () => {
+        let files = window.document.getElementById('file-upload').files;
+        if (files.length === 0) {
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async () => {
+            let backup = JSON.parse(reader.result.toString());
+            this.setState({
+                importBtnLoading: true
+            })
+            try {
+                let result = await request.post('/backup/import', backup);
+                if (result['code'] === 1) {
+                    message.success('恢复成功', 3);
+                } else {
+                    message.error(result['message'], 10);
+                }
+            } finally {
+                this.setState({
+                    importBtnLoading: false
+                })
+                window.document.getElementById('file-upload').value = "";
+            }
+        };
+        reader.readAsText(files[0]);
     }
 
     render() {
@@ -419,7 +448,7 @@ class Setting extends Component {
                                         },
                                     ]}
                                 >
-                                    <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked, event) => {
+                                    <Switch checkedChildren="开启" unCheckedChildren="关闭" onChange={(checked) => {
                                         this.setState({
                                             properties: {
                                                 ...this.state.properties,
@@ -528,9 +557,9 @@ class Setting extends Component {
                             </Form>
                         </TabPane>
 
-                        <TabPane tab="其他配置" key="other">
+                        <TabPane tab="日志配置" key="log">
                             <Title level={3}>其他配置</Title>
-                            <Form ref={this.otherSettingFormRef} name="other" onFinish={this.changeProperties}
+                            <Form ref={this.logSettingFormRef} name="log" onFinish={this.changeProperties}
                                   layout="vertical">
 
                                 <Form.Item
@@ -587,9 +616,13 @@ class Setting extends Component {
                                         导出备份
                                     </Button>
 
-                                    <Button type="dashed">
+                                    <Button type="dashed" loading={this.state['importBtnLoading']} onClick={() => {
+                                        window.document.getElementById('file-upload').click();
+                                    }}>
                                         恢复备份
                                     </Button>
+                                    <input type="file" id="file-upload" style={{display: 'none'}}
+                                           onChange={this.handleImport}/>
                                 </Space>
                             </Space>
 

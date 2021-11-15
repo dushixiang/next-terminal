@@ -8,6 +8,7 @@ type UserGroup struct {
 	ID      string         `gorm:"primary_key,type:varchar(36)" json:"id"`
 	Name    string         `gorm:"type:varchar(500)" json:"name"`
 	Created utils.JsonTime `json:"created"`
+	Members []string       `gorm:"-" json:"members"`
 }
 
 type UserGroupForPage struct {

@@ -79,9 +79,7 @@ func (r StorageRepository) FindById(id string) (m model.Storage, err error) {
 	return
 }
 
-func (r StorageRepository) FindAll() (o []model.Storage) {
-	if r.DB.Find(&o).Error != nil {
-		return nil
-	}
+func (r StorageRepository) FindAll() (o []model.Storage, err error) {
+	err = r.DB.Find(&o).Error
 	return
 }

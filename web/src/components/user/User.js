@@ -95,14 +95,9 @@ class User extends Component {
             } else {
                 message.error(result.message, 10);
             }
-        } catch (e) {
-
         } finally {
-            const items = data.items.map(item => {
-                return {'key': item['id'], ...item}
-            })
             this.setState({
-                items: items,
+                items: data.items,
                 total: data.total,
                 queryParams: queryParams,
                 loading: false
@@ -145,7 +140,7 @@ class User extends Component {
         });
     };
 
-    handleCancelModal = e => {
+    handleCancelModal = () => {
         this.setState({
             modalVisible: false,
             modalTitle: ''
@@ -243,13 +238,6 @@ class User extends Component {
                 delBtnLoading: false
             })
         }
-    }
-
-    handleAssetCancel = () => {
-        this.loadTableData()
-        this.setState({
-            assetVisible: false
-        })
     }
 
     handleChangePassword = async (values) => {
@@ -362,7 +350,7 @@ class User extends Component {
             dataIndex: 'username',
             key: 'username',
             sorter: true,
-            render: (username, record, index) => {
+            render: (username, record) => {
                 return (
                     <Button type="link" size='small'
                             onClick={async () => {
@@ -384,7 +372,7 @@ class User extends Component {
             title: '用户类型',
             dataIndex: 'type',
             key: 'type',
-            render: (text, record) => {
+            render: (text) => {
 
                 if (text === 'user') {
                     return (
@@ -419,7 +407,7 @@ class User extends Component {
             title: '双因素认证',
             dataIndex: 'totpSecret',
             key: 'totpSecret',
-            render: (text, record) => {
+            render: (text) => {
 
                 if (text === '1') {
                     return <Tag icon={<InsuranceOutlined/>} color="success">已开启</Tag>;
@@ -442,7 +430,7 @@ class User extends Component {
             title: '授权资产',
             dataIndex: 'sharerAssetCount',
             key: 'sharerAssetCount',
-            render: (text, record, index) => {
+            render: (text, record) => {
                 return <Button type='link' onClick={async () => {
                     this.setState({
                         assetVisible: true,
@@ -454,7 +442,7 @@ class User extends Component {
             title: '创建日期',
             dataIndex: 'created',
             key: 'created',
-            render: (text, record) => {
+            render: (text) => {
                 return (
                     <Tooltip title={text}>
                         {dayjs(text).fromNow()}
@@ -519,6 +507,7 @@ class User extends Component {
                     return (
                         <div>
                             <Button type="link" size='small'
+                                    disabled={getCurrentUser()['id'] === record['id']}
                                     onClick={async () => {
                                         let result = await request.get(`/users/${record['id']}`);
                                         if (result['code'] !== 1) {
@@ -541,7 +530,7 @@ class User extends Component {
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
             selectedRowKeys: this.state.selectedRowKeys,
-            onChange: (selectedRowKeys, selectedRows) => {
+            onChange: (selectedRowKeys) => {
                 this.setState({selectedRowKeys});
             },
         };
@@ -699,9 +688,6 @@ class User extends Component {
                                            .then(values => {
                                                this.changePasswordFormRef.current.resetFields();
                                                this.handleChangePassword(values);
-                                           })
-                                           .catch(info => {
-
                                            });
                                    }}
                                    onCancel={() => {

@@ -42,7 +42,10 @@ func (r StorageService) InitStorages() error {
 	}
 
 	drivePath := r.GetBaseDrivePath()
-	storages := r.storageRepository.FindAll()
+	storages, err := r.storageRepository.FindAll()
+	if err != nil {
+		return err
+	}
 	for i := 0; i < len(storages); i++ {
 		storage := storages[i]
 		// 判断是否为遗留的数据：磁盘空间在，但用户已删除
@@ -137,6 +140,9 @@ func (r StorageService) DeleteStorageById(id string, force bool) error {
 	drivePath := r.GetBaseDrivePath()
 	storage, err := r.storageRepository.FindById(id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
 		return err
 	}
 	if !force && storage.IsDefault {
