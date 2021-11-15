@@ -19,6 +19,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Docker Aliyun Login
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: registry.cn-beijing.aliyuncs.com
+          username: ${{ secrets.ALI_USERNAME }}
+          password: ${{ secrets.ALI_PASSWORD }}
+
       - name: Build and push Docker images
         uses: docker/build-push-action@v2.7.0
         with:
@@ -28,5 +35,6 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/guacd:1.3.0
+            registry.cn-beijing.aliyuncs.com/${{ secrets.DOCKERHUB_USERNAME }}/guacd:1.3.0
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacd:cache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacd:cache,mode=max
