@@ -128,8 +128,9 @@ func (opt *Instruction) Parse(content string) Instruction {
 }
 
 type Tunnel struct {
-	rw     *bufio.ReadWriter
 	conn   net.Conn
+	reader *bufio.Reader
+	writer *bufio.Writer
 	UUID   string
 	Config *Configuration
 	IsOpen bool
@@ -144,7 +145,8 @@ func NewTunnel(address string, config *Configuration) (ret *Tunnel, err error) {
 
 	ret = &Tunnel{}
 	ret.conn = conn
-	ret.rw = bufio.NewReadWriter(bufio.NewReader(conn), bufio.NewWriter(conn))
+	ret.reader = bufio.NewReader(conn)
+	ret.writer = bufio.NewWriter(conn)
 	ret.Config = config
 
 	selectArg := config.ConnectionID
@@ -226,52 +228,36 @@ func (opt *Tunnel) WriteInstructionAndFlush(instruction Instruction) error {
 	return nil
 }
 
-func (opt *Tunnel) WriteInstruction(instruction Instruction) error {
-	if _, err := opt.Write([]byte(instruction.String())); err != nil {
-		return err
-	}
-	return nil
-}
-
 func (opt *Tunnel) WriteAndFlush(p []byte) (int, error) {
 	//fmt.Printf("-> %v\n", string(p))
-	nn, err := opt.rw.Write(p)
+	nn, err := opt.writer.Write(p)
 	if err != nil {
 		return nn, err
 	}
-	err = opt.rw.Flush()
-	if err != nil {
-		return nn, err
-	}
-	return nn, nil
-}
-
-func (opt *Tunnel) Write(p []byte) (int, error) {
-	//fmt.Printf("-> %v \n", string(p))
-	nn, err := opt.rw.Write(p)
+	err = opt.writer.Flush()
 	if err != nil {
 		return nn, err
 	}
 	return nn, nil
-}
-
-func (opt *Tunnel) Flush() error {
-	return opt.rw.Flush()
 }
 
 func (opt *Tunnel) ReadInstruction() (instruction Instruction, err error) {
-	msg, err := opt.rw.ReadString(Delimiter)
-	//fmt.Printf("<- %v \n", msg)
+	msg, err := opt.Read()
 	if err != nil {
 		return instruction, err
 	}
-	return instruction.Parse(msg), err
+	return instruction.Parse(string(msg)), err
 }
 
 func (opt *Tunnel) Read() (p []byte, err error) {
-	p, err = opt.rw.ReadBytes(Delimiter)
-	//fmt.Printf("<- %v \n", string(p))
-	s := string(p)
+	buffer := make([]byte, 8096)
+	read, err := opt.reader.Read(buffer)
+	if err != nil {
+		return
+	}
+	buffer = buffer[0:read]
+	s := string(buffer)
+	//fmt.Printf("<- %v \n", s)
 	if s == "rate=44100,channels=2;" {
 		return make([]byte, 0), nil
 	}
@@ -299,6 +285,5 @@ func (opt *Tunnel) expect(opcode string) (instruction Instruction, err error) {
 
 func (opt *Tunnel) Close() error {
 	opt.IsOpen = false
-	_ = opt.rw.Flush()
 	return opt.conn.Close()
 }
