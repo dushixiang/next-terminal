@@ -166,6 +166,10 @@ func SSHEndpoint(c echo.Context) (err error) {
 		Status:       constant.Connecting,
 		Recording:    recording,
 	}
+	if sess.Recording == "" {
+		// 未录屏时无需审计
+		sess.Reviewed = true
+	}
 	// 创建新会话
 	log.Debugf("创建新会话 %v", sess.ConnectionId)
 	if err := sessionRepository.UpdateById(&sess, sessionId); err != nil {

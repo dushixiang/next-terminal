@@ -333,6 +333,11 @@ func handleAccessAsset(sess *ssh.Session, sessionId string) (err error) {
 	sessionForUpdate.Recording = recording
 	sessionForUpdate.ConnectedTime = utils.NowJsonTime()
 
+	if sessionForUpdate.Recording == "" {
+		// 未录屏时无需审计
+		sessionForUpdate.Reviewed = true
+	}
+
 	if err := sessionRepository.UpdateById(&sessionForUpdate, sessionId); err != nil {
 		return err
 	}
