@@ -126,6 +126,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
     }
 
     let [enableDrive, setEnableDrive] = useState(model['enable-drive']);
+    let [socksProxyEnable, setSocksProxyEnable] = useState(model['socks-proxy-enable']);
 
     let [storages, setStorages] = useState([]);
     useEffect(() => {
@@ -138,7 +139,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
         getStorages();
     }, []);
 
-    let [accessGateways,setAccessGateways] = useState([]);
+    let [accessGateways, setAccessGateways] = useState([]);
     useEffect(() => {
         const getAccessGateways = async () => {
             const result = await request.get('/access-gateways');
@@ -320,7 +321,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                         </Form.Item>
                     </Col>
                     <Col span={11}>
-                        <Collapse defaultActiveKey={['remote-app', '认证', 'VNC中继', 'storage', '模式设置', '显示设置', '控制终端行为']}
+                        <Collapse defaultActiveKey={['remote-app', '认证', 'VNC中继', 'storage', '模式设置', '显示设置', '控制终端行为', 'socks']}
                                   ghost>
                             {
                                 protocol === 'rdp' ?
@@ -476,7 +477,46 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                             </Select>
                                                         </Form.Item>
                                                     </Panel>
-                                                </> : undefined
+                                                </> : <>
+                                                    <Panel header={<Text strong>Socks 代理</Text>} key="socks">
+                                                        <Form.Item
+                                                            name="socks-proxy-enable"
+                                                            label="使用Socks代理"
+                                                            valuePropName="checked"
+                                                        >
+                                                            <Switch checkedChildren="是" unCheckedChildren="否"
+                                                                    onChange={(checked, event) => {
+                                                                        setSocksProxyEnable(checked);
+                                                                    }}/>
+                                                        </Form.Item>
+
+                                                        {
+                                                            socksProxyEnable ? <>
+                                                                <Form.Item label="代理地址" name='socks-proxy-host'
+                                                                           rules={[{required: true}]}>
+                                                                    <Input placeholder="Socks 代理的主机地址"/>
+                                                                </Form.Item>
+
+                                                                <Form.Item label="代理端口" name='socks-proxy-port'
+                                                                           rules={[{required: true}]}>
+                                                                    <InputNumber min={1} max={65535}
+                                                                                 placeholder='Socks 代理的主机端口'/>
+                                                                </Form.Item>
+
+                                                                <input type='password' hidden={true}
+                                                                       autoComplete='new-password'/>
+                                                                <Form.Item label="代理账号" name='socks-proxy-username'>
+                                                                    <Input autoComplete="off" placeholder="代理账号，没有可以不填"/>
+                                                                </Form.Item>
+
+                                                                <Form.Item label="代理密码" name='socks-proxy-password'>
+                                                                    <Input.Password autoComplete="off"
+                                                                                    placeholder="代理密码，没有可以不填"/>
+                                                                </Form.Item>
+                                                            </> : undefined
+                                                        }
+                                                    </Panel>
+                                                </>
                                         }
 
                                     </> : undefined
