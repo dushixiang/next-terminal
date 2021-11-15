@@ -21,14 +21,14 @@ import (
 )
 
 const (
-	TunnelClosed              int = -1
-	Normal                    int = 0
-	NotFoundSession           int = 800
-	NewTunnelError            int = 801
-	ForcedDisconnect          int = 802
-	AccessGatewayUnAvailable  int = 803
-	AccessGatewayCreateError  int = 804
-	AccessGatewayConnectError int = 804
+	TunnelClosed             int = -1
+	Normal                   int = 0
+	NotFoundSession          int = 800
+	NewTunnelError           int = 801
+	ForcedDisconnect         int = 802
+	AccessGatewayUnAvailable int = 803
+	AccessGatewayCreateError int = 804
+	AssetNotActive           int = 805
 )
 
 func TunEndpoint(c echo.Context) error {
@@ -99,6 +99,12 @@ func TunEndpoint(c echo.Context) error {
 			ip = exposedIP
 			port = exposedPort
 		}
+		active, err := utils.Tcping(ip, port)
+		if !active {
+			disconnect(ws, AssetNotActive, "目标资产不在线: "+err.Error())
+			return nil
+		}
+
 		configuration.SetParameter("hostname", ip)
 		configuration.SetParameter("port", strconv.Itoa(port))
 
@@ -141,10 +147,9 @@ func TunEndpoint(c echo.Context) error {
 	if len(s.ConnectionId) == 0 {
 		if configuration.Protocol == constant.SSH {
 			nextTerminal, err := CreateNextTerminalBySession(s)
-			if err != nil {
-				return err
+			if err == nil {
+				nextSession.NextTerminal = nextTerminal
 			}
-			nextSession.NextTerminal = nextTerminal
 		}
 
 		nextSession.Observer = session.NewObserver(sessionId)
