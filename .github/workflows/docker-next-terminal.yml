@@ -10,6 +10,9 @@ jobs:
     name: Docker next-terminal Build
     runs-on: ubuntu-latest
     steps:
+      - name: Get version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Private Actions Checkout
         uses: actions/checkout@v2.3.4
       - name: Docker Setup QEMU
@@ -45,9 +48,9 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:${{ github.ref }}
+            ${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:${{ steps.get_version.outputs.VERSION }}
             registry.cn-beijing.aliyuncs.com/${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:latest
-            registry.cn-beijing.aliyuncs.com/${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:${{ github.ref }}
+            registry.cn-beijing.aliyuncs.com/${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:${{ steps.get_version.outputs.VERSION }}
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:cache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/next-terminal:cache,mode=max
 
