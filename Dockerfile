@@ -11,7 +11,9 @@ COPY . .
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 RUN apk add gcc g++
 RUN go mod tidy
-RUN go env;ARCH="$(arch)";case "$ARCH" in 'x86_64') export ARCH='amd64';echo $ARCH;; 'aarch64') export ARCH='arm64';echo $ARCH;; 'i386') export ARCH='i386';echo $ARCH;; esac;CGO_ENABLED=1 GOOS=linux GOARCH=$ARCH go build -a -ldflags '-linkmode external -extldflags "-static"' -o next-terminal main.go
+RUN sh get_arch.sh
+RUN echo "Hello, my CPU architecture is $(uname -m)"
+RUN go env;CGO_ENABLED=1 GOOS=linux GOARCH=$ARCH go build -ldflags '-s -w' -o next-terminal main.go
 
 FROM alpine:latest
 

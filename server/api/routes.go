@@ -327,6 +327,9 @@ func InitDBData() (err error) {
 	if err := propertyService.DeleteDeprecatedProperty(); err != nil {
 		return err
 	}
+	if err := accessGatewayService.ReConnectAll(); err != nil {
+		return err
+	}
 	if err := propertyService.InitProperties(); err != nil {
 		return err
 	}
@@ -354,9 +357,7 @@ func InitDBData() (err error) {
 	if err := storageService.InitStorages(); err != nil {
 		return err
 	}
-	if err := accessGatewayService.ReConnectAll(); err != nil {
-		return err
-	}
+
 	return nil
 }
 
