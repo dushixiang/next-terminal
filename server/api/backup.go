@@ -109,6 +109,7 @@ func BackupExportEndpoint(c echo.Context) error {
 			for key := range attributeMap {
 				itemMap[key] = attributeMap[key]
 			}
+			itemMap["created"] = asset.Created.Format("2006-01-02 15:04:05")
 			assetMaps = append(assetMaps, itemMap)
 		}
 	}
