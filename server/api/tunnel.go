@@ -289,7 +289,7 @@ func setAssetConfig(attributes map[string]string, s model.Session, configuration
 func setConfig(propertyMap map[string]string, s model.Session, configuration *guacd.Configuration) {
 	if propertyMap[guacd.EnableRecording] == "true" {
 		configuration.SetParameter(guacd.RecordingPath, path.Join(config.GlobalCfg.Guacd.Recording, s.ID))
-		configuration.SetParameter(guacd.CreateRecordingPath, propertyMap[guacd.CreateRecordingPath])
+		configuration.SetParameter(guacd.CreateRecordingPath, "true")
 	} else {
 		configuration.SetParameter(guacd.RecordingPath, "")
 	}
