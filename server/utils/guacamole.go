@@ -2,9 +2,11 @@ package utils
 
 import (
 	"encoding/base64"
-	"github.com/gorilla/websocket"
-	"next-terminal/server/guacd"
 	"strconv"
+
+	"next-terminal/server/guacd"
+
+	"github.com/gorilla/websocket"
 )
 
 func Disconnect(ws *websocket.Conn, code int, reason string) {

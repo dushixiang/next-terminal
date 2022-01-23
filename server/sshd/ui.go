@@ -5,6 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path"
+	"strings"
+
 	"next-terminal/server/api"
 	"next-terminal/server/config"
 	"next-terminal/server/constant"
@@ -18,8 +21,6 @@ import (
 	"next-terminal/server/term"
 	"next-terminal/server/totp"
 	"next-terminal/server/utils"
-	"path"
-	"strings"
 
 	"github.com/gliderlabs/ssh"
 	"github.com/manifoldco/promptui"
