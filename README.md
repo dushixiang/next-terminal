@@ -40,11 +40,15 @@ test/test
 
 - [安装文档](https://next-terminal.typesafe.cn)
 
-默认账号密码为 admin/admin
+默认账号密码为 admin/admin 。
 
 ## 问题反馈
 
-请提 Issues
+请提 Issues 。
+
+## 安全问题
+
+如果您在使用过程中发现了安全问题，请发送邮件至 helloworld1024@foxmail.com 联系我，谢谢。
 
 ## License 
 
@@ -54,7 +58,10 @@ Next Terminal 使用 [AGPL-3.0](./LICENSE) 开源协议，请自觉准守。
 
 如果你觉得 `next-terminal` 这款程序还不错，并且想要购买服务器，可以从这里点击购买腾讯云服务器。
 
-- 2核4G 8M带宽 80G磁盘 1200GB流量/月    70元/1年
-- 2核4G 8M带宽 80G磁盘 1200GB流量/月    198元/3年
-
-更多优惠购买链接: https://curl.qcloud.com/bvzoD87S
+- 2022新春优惠抢先看 https://curl.qcloud.com/JN4kmKnL
+- 限时秒杀活动 https://curl.qcloud.com/ZioWA15a
+- 云服务器全球购 https://curl.qcloud.com/7QwcihVF
+- 星星海SA2云服务器 https://curl.qcloud.com/Iaih7ty0
+- 新客专属福利 https://curl.qcloud.com/MwPg07VQ
+- 企业上云特惠活动 https://curl.qcloud.com/skIyRHv6
+- 云开发CloudBase https://curl.qcloud.com/hpFpcHSB
