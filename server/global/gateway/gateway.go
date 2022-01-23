@@ -44,7 +44,7 @@ func (g *Gateway) Run() {
 		select {
 		case t := <-g.Add:
 			g.tunnels[t.ID] = t
-			go t.Run()
+			go t.Open()
 		case k := <-g.Del:
 			if _, ok := g.tunnels[k]; ok {
 				g.tunnels[k].Close()
