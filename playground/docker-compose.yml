@@ -2,6 +2,8 @@ version: '3.3'
 services:
   guacd:
     image: dushixiang/guacd:latest
+    environment:
+      GUACD_LOG_LEVEL: debug
     volumes:
       - ../data:/usr/local/next-terminal/data
     ports:

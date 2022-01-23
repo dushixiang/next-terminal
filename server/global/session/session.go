@@ -47,9 +47,9 @@ func NewObserver(id string) *Manager {
 	}
 }
 
-func (m *Manager) Run() {
+func (m *Manager) Start() {
 	defer fmt.Printf("Session Manager %v End\n", m.id)
-	fmt.Printf("Session Manager %v  Run\n", m.id)
+	fmt.Printf("Session Manager %v  Open\n", m.id)
 	for {
 		select {
 		case s := <-m.Add:
@@ -94,5 +94,5 @@ var GlobalSessionManager *Manager
 
 func init() {
 	GlobalSessionManager = NewManager()
-	go GlobalSessionManager.Run()
+	go GlobalSessionManager.Start()
 }

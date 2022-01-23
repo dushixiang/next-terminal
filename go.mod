@@ -30,14 +30,12 @@ require (
 )
 
 require (
-	github.com/Azure/go-ntlmssp v0.0.0-20200615164410-66371956d46c // indirect
 	github.com/anmitsu/go-shlex v0.0.0-20200514113438-38f4b401e2be // indirect
 	github.com/boombuler/barcode v1.0.1-0.20190219062509-6c824513bacc // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.4.7 // indirect
-	github.com/go-asn1-ber/asn1-ber v1.5.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/hashicorp/hcl v1.0.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

@@ -13,6 +13,7 @@ RUN apk add gcc g++
 RUN go mod tidy
 RUN sh get_arch.sh
 RUN echo "Hello, my CPU architecture is $(uname -m)"
+RUN cp -r /app/web/build /app/server/resource/
 RUN go env;CGO_ENABLED=1 GOOS=linux GOARCH=$ARCH go build -a -ldflags '-linkmode external -extldflags "-static"' -o next-terminal main.go
 
 FROM alpine:latest
@@ -34,7 +35,7 @@ RUN touch config.yml
 
 COPY --from=builder /app/next-terminal ./
 COPY --from=builder /app/LICENSE ./
-COPY --from=builder /app/web/build ./web/build
+#COPY --from=builder /app/web/build ./web/build
 
 EXPOSE $SERVER_PORT $SSHD_PORT
 

@@ -24,3 +24,7 @@ web/build
 # next terminal
 /data/
 /logs/
+/server/resource/static/
+/server/resource/*.html
+/server/resource/*.json
+/server/resource/*.ico

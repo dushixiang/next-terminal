@@ -25,7 +25,7 @@ func NewManager() *Manager {
 	}
 }
 
-func (m *Manager) Run() {
+func (m *Manager) Start() {
 	for {
 		select {
 		case s := <-m.Add:
@@ -66,5 +66,5 @@ var GlobalSecurityManager *Manager
 
 func init() {
 	GlobalSecurityManager = NewManager()
-	go GlobalSecurityManager.Run()
+	go GlobalSecurityManager.Start()
 }

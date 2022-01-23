@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"path"
 	"strconv"
@@ -105,14 +106,9 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 				utils.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
 				return nil
 			}
-			defer g.CloseSshTunnel(s.ID)
 			ip = exposedIP
 			port = exposedPort
-		}
-		active, err := utils.Tcping(ip, port)
-		if !active {
-			utils.Disconnect(ws, AssetNotActive, "目标资产不在线: "+err.Error())
-			return nil
+			defer g.CloseSshTunnel(s.ID)
 		}
 
 		configuration.SetParameter("hostname", ip)
@@ -135,14 +131,15 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	}
 
 	addr := config.GlobalCfg.Guacd.Hostname + ":" + strconv.Itoa(config.GlobalCfg.Guacd.Port)
-	log.Debugf("[%v:%v] 创建guacd隧道[%v]", sessionId, connectionId, addr)
+	asset := fmt.Sprintf("%s:%s", configuration.GetParameter("hostname"), configuration.GetParameter("port"))
+	log.Debugf("[%v] 新建 guacd 会话, guacd=%v, asset=%v", sessionId, addr, asset)
 
 	guacdTunnel, err := guacd.NewTunnel(addr, configuration)
 	if err != nil {
 		if connectionId == "" {
 			utils.Disconnect(ws, NewTunnelError, err.Error())
 		}
-		log.Printf("[%v:%v] 建立连接失败: %v", sessionId, connectionId, err.Error())
+		log.Printf("[%v] 建立连接失败: %v", sessionId, err.Error())
 		return err
 	}
 
@@ -164,7 +161,7 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 
 		nextSession.Observer = session.NewObserver(sessionId)
 		session.GlobalSessionManager.Add <- nextSession
-		go nextSession.Observer.Run()
+		go nextSession.Observer.Start()
 		sess := model.Session{
 			ConnectionId: guacdTunnel.UUID,
 			Width:        intWidth,
@@ -177,7 +174,7 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 			sess.Reviewed = true
 		}
 		// 创建新会话
-		log.Debugf("[%v:%v] 创建新会话: %v", sessionId, connectionId, sess.ConnectionId)
+		log.Debugf("[%v] 新建会话成功: %v", sessionId, sess.ConnectionId)
 		if err := repository.SessionRepository.UpdateById(ctx, &sess, sessionId); err != nil {
 			return err
 		}
@@ -199,7 +196,7 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	for {
 		_, message, err := ws.ReadMessage()
 		if err != nil {
-			log.Debugf("[%v:%v] WebSocket已关闭", sessionId, connectionId)
+			log.Debugf("[%v:%v] WebSocket已关闭, %v", sessionId, connectionId, err.Error())
 			// guacdTunnel.Read() 会阻塞，所以要先把guacdTunnel客户端关闭，才能退出Guacd循环
 			_ = guacdTunnel.Close()
 

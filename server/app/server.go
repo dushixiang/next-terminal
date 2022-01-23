@@ -1,13 +1,41 @@
 package app
 
 import (
+	"io/fs"
 	"net/http"
+	"os"
 
 	"next-terminal/server/api"
+	"next-terminal/server/config"
+	"next-terminal/server/log"
+	"next-terminal/server/resource"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
+
+func getFS(useOS bool) fs.FS {
+	if useOS {
+		log.Debug("using live mode")
+		return os.DirFS("web/build")
+	}
+
+	log.Debug("using embed mode")
+	fsys, err := fs.Sub(resource.Resource, "build")
+	if err != nil {
+		panic(err)
+	}
+
+	return fsys
+}
+
+func WrapHandler(h http.Handler) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Cache-Control", `public, max-age=31536000`)
+		h.ServeHTTP(c.Response(), c.Request())
+		return nil
+	}
+}
 
 func setupRoutes() *echo.Echo {
 
@@ -15,12 +43,14 @@ func setupRoutes() *echo.Echo {
 	e.HideBanner = true
 	//e.Logger = log.GetEchoLogger()
 	//e.Use(log.Hook())
-	e.File("/", "web/build/index.html")
-	e.File("/asciinema.html", "web/build/asciinema.html")
-	e.File("/", "web/build/index.html")
-	e.File("/favicon.ico", "web/build/favicon.ico")
-	e.File("/logo.png", "web/build/logo.png")
-	e.Static("/static", "web/build/static")
+
+	fsys := getFS(config.GlobalCfg.Debug)
+	fileServer := http.FileServer(http.FS(fsys))
+	handler := WrapHandler(fileServer)
+	e.GET("/", handler)
+	e.GET("/asciinema.html", handler)
+	e.GET("/favicon.ico", handler)
+	e.GET("/static/*", handler)
 
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{

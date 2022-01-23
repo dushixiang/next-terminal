@@ -15,7 +15,7 @@ func NewManager() *Manager {
 	}
 }
 
-func (m *Manager) Run() {
+func (m *Manager) Start() {
 	for {
 		select {
 		case g := <-m.Add:
@@ -38,5 +38,5 @@ var GlobalGatewayManager *Manager
 
 func init() {
 	GlobalGatewayManager = NewManager()
-	go GlobalGatewayManager.Run()
+	go GlobalGatewayManager.Start()
 }
