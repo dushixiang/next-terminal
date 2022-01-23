@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {
+    Alert,
     Col,
     Collapse,
     Form,
@@ -239,20 +240,29 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
 
                                 {
                                     accountType === 'credential' ?
-                                        <Form.Item label="授权凭证" name='credentialId'
-                                                   rules={[{required: true, message: '请选择授权凭证'}]}>
-                                            <Select onChange={() => null}>
-                                                {credentials.map(item => {
-                                                    return (
-                                                        <Option key={item.id} value={item.id}>
-                                                            <Tooltip placement="topLeft" title={item.name}>
-                                                                {item.name}
-                                                            </Tooltip>
-                                                        </Option>
-                                                    );
-                                                })}
-                                            </Select>
-                                        </Form.Item>
+                                        <>
+                                            {protocol === 'ssh' ?
+                                                <Form.Item wrapperCol={{offset: 6}}>
+                                                    <Alert
+                                                        message="GUACD 对ED25519、RSA等密钥类型支持不完善，请选择原生模式进行连接。"
+                                                        type="info"
+                                                    />
+                                                </Form.Item> : null}
+                                            <Form.Item label="授权凭证" name='credentialId'
+                                                       rules={[{required: true, message: '请选择授权凭证'}]}>
+                                                <Select onChange={() => null}>
+                                                    {credentials.map(item => {
+                                                        return (
+                                                            <Option key={item.id} value={item.id}>
+                                                                <Tooltip placement="topLeft" title={item.name}>
+                                                                    {item.name}
+                                                                </Tooltip>
+                                                            </Option>
+                                                        );
+                                                    })}
+                                                </Select>
+                                            </Form.Item>
+                                        </>
                                         : null
                                 }
 
@@ -274,6 +284,13 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                                 {
                                     accountType === 'private-key' ?
                                         <>
+                                            <Form.Item wrapperCol={{offset: 6}}>
+                                                <Alert
+                                                    message="GUACD 对ED25519、RSA等密钥类型支持不完善，请选择原生模式进行连接。"
+                                                    type="info"
+                                                />
+                                            </Form.Item>
+
                                             <Form.Item label="授权账户" name='username'>
                                                 <Input placeholder="输入授权账户"/>
                                             </Form.Item>
@@ -321,11 +338,39 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                         </Form.Item>
                     </Col>
                     <Col span={11}>
-                        <Collapse defaultActiveKey={['remote-app', '认证', 'VNC中继', 'storage', '模式设置', '显示设置', '控制终端行为', 'socks']}
-                                  ghost>
+                        <Collapse
+                            defaultActiveKey={['remote-app', '认证', 'VNC中继', 'storage', '模式设置', '显示设置', '控制终端行为', 'socks']}
+                            ghost>
                             {
                                 protocol === 'rdp' ?
                                     <>
+                                        <Panel header={<Text strong>显示设置</Text>} key="显示设置">
+                                            <Form.Item
+                                                name="color-depth"
+                                                label="色彩深度"
+                                                initialValue=""
+                                            >
+                                                <Select onChange={null}>
+                                                    <Option value="">默认</Option>
+                                                    <Option value="16">低色（16位）</Option>
+                                                    <Option value="24">真彩（24位）</Option>
+                                                    <Option value="32">真彩（32位）</Option>
+                                                    <Option value="8">256色</Option>
+                                                </Select>
+                                            </Form.Item>
+                                            <Form.Item
+                                                name="force-lossless"
+                                                label="无损压缩"
+                                                valuePropName="checked"
+                                                rules={[
+                                                    {
+                                                        required: true,
+                                                    },
+                                                ]}
+                                            >
+                                                <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
+                                            </Form.Item>
+                                        </Panel>
                                         <Panel header={<Text strong>认证</Text>} key="认证">
                                             <Form.Item
                                                 name="domain"

@@ -1,49 +1,30 @@
 version: '3.3'
 services:
+  guacd:
+    image: dushixiang/guacd:latest
+    volumes:
+      - ../data:/usr/local/next-terminal/data
+    ports:
+      - "4822:4822"
+    restart:
+      always
   mysql:
     image: mysql:8.0
-    container_name: mysql
     environment:
       MYSQL_DATABASE: next-terminal
       MYSQL_USER: next-terminal
       MYSQL_PASSWORD: next-terminal
       MYSQL_ROOT_PASSWORD: next-terminal
     volumes:
-      - ./data/mysql_data:/var/lib/mysql
+      - ../data/mysql:/var/lib/mysql
     ports:
       - "3306:3306"
     restart:
-          always
-    networks:
-      next-terminal:
-        ipv4_address: 172.77.77.2
-
-#  next-terminal:
-#    container_name: next-terminal
-#    image: "dushixiang/next-terminal:latest"
-#    environment:
-#      DB: "mysql"
-#      MYSQL_HOSTNAME: "mysql"
-#      MYSQL_PORT: 3306
-#      MYSQL_USERNAME: "next-terminal"
-#      MYSQL_PASSWORD: "next-terminal"
-#      MYSQL_DATABASE: "next-terminal"
-#    ports:
-#      - "8088:8088"
-#    volumes:
-#      - ./drive:/usr/local/next-terminal/drive
-#      - ./recording:/usr/local/next-terminal/recording
-#    depends_on:
-#      - mysql
-#    networks:
-#      next-terminal:
-#        ipv4_address: 172.77.77.3
-#    restart:
-#      always
+      always
 
 networks:
   next-terminal:
     ipam:
       driver: default
       config:
-        - subnet: "172.77.77.0/24"
+        - subnet: 172.77.77.0/24

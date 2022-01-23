@@ -1,16 +1,21 @@
 package api
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
 	"next-terminal/server/model"
+	"next-terminal/server/repository"
+	"next-terminal/server/service"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
 )
 
-func AccessGatewayCreateEndpoint(c echo.Context) error {
+type AccessGatewayApi struct{}
+
+func (api AccessGatewayApi) AccessGatewayCreateEndpoint(c echo.Context) error {
 	var item model.AccessGateway
 	if err := c.Bind(&item); err != nil {
 		return err
@@ -19,16 +24,16 @@ func AccessGatewayCreateEndpoint(c echo.Context) error {
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
-	if err := accessGatewayRepository.Create(&item); err != nil {
+	if err := repository.GatewayRepository.Create(context.TODO(), &item); err != nil {
 		return err
 	}
 	// 连接网关
-	accessGatewayService.ReConnect(&item)
+	service.GatewayService.ReConnect(&item)
 	return Success(c, "")
 }
 
-func AccessGatewayAllEndpoint(c echo.Context) error {
-	gateways, err := accessGatewayRepository.FindAll()
+func (api AccessGatewayApi) AccessGatewayAllEndpoint(c echo.Context) error {
+	gateways, err := repository.GatewayRepository.FindAll(context.TODO())
 	if err != nil {
 		return err
 	}
@@ -39,7 +44,7 @@ func AccessGatewayAllEndpoint(c echo.Context) error {
 	return Success(c, simpleGateways)
 }
 
-func AccessGatewayPagingEndpoint(c echo.Context) error {
+func (api AccessGatewayApi) AccessGatewayPagingEndpoint(c echo.Context) error {
 	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	ip := c.QueryParam("ip")
@@ -48,12 +53,12 @@ func AccessGatewayPagingEndpoint(c echo.Context) error {
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := accessGatewayRepository.Find(pageIndex, pageSize, ip, name, order, field)
+	items, total, err := repository.GatewayRepository.Find(context.TODO(), pageIndex, pageSize, ip, name, order, field)
 	if err != nil {
 		return err
 	}
 	for i := 0; i < len(items); i++ {
-		g, err := accessGatewayService.GetGatewayById(items[i].ID)
+		g, err := service.GatewayService.GetGatewayById(items[i].ID)
 		if err != nil {
 			return err
 		}
@@ -61,13 +66,13 @@ func AccessGatewayPagingEndpoint(c echo.Context) error {
 		items[i].Message = g.Message
 	}
 
-	return Success(c, H{
+	return Success(c, Map{
 		"total": total,
 		"items": items,
 	})
 }
 
-func AccessGatewayUpdateEndpoint(c echo.Context) error {
+func (api AccessGatewayApi) AccessGatewayUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
 	var item model.AccessGateway
@@ -75,30 +80,30 @@ func AccessGatewayUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	if err := accessGatewayRepository.UpdateById(&item, id); err != nil {
+	if err := repository.GatewayRepository.UpdateById(context.TODO(), &item, id); err != nil {
 		return err
 	}
-	accessGatewayService.ReConnect(&item)
+	service.GatewayService.ReConnect(&item)
 	return Success(c, nil)
 }
 
-func AccessGatewayDeleteEndpoint(c echo.Context) error {
+func (api AccessGatewayApi) AccessGatewayDeleteEndpoint(c echo.Context) error {
 	ids := c.Param("id")
 	split := strings.Split(ids, ",")
 	for i := range split {
 		id := split[i]
-		if err := accessGatewayRepository.DeleteById(id); err != nil {
+		if err := repository.GatewayRepository.DeleteById(context.TODO(), id); err != nil {
 			return err
 		}
-		accessGatewayService.DisconnectById(id)
+		service.GatewayService.DisconnectById(id)
 	}
 	return Success(c, nil)
 }
 
-func AccessGatewayGetEndpoint(c echo.Context) error {
+func (api AccessGatewayApi) AccessGatewayGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	item, err := accessGatewayRepository.FindById(id)
+	item, err := repository.GatewayRepository.FindById(context.TODO(), id)
 	if err != nil {
 		return err
 	}
@@ -106,13 +111,13 @@ func AccessGatewayGetEndpoint(c echo.Context) error {
 	return Success(c, item)
 }
 
-func AccessGatewayReconnectEndpoint(c echo.Context) error {
+func (api AccessGatewayApi) AccessGatewayReconnectEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	item, err := accessGatewayRepository.FindById(id)
+	item, err := repository.GatewayRepository.FindById(context.TODO(), id)
 	if err != nil {
 		return err
 	}
-	accessGatewayService.ReConnect(&item)
+	service.GatewayService.ReConnect(&item)
 	return Success(c, "")
 }

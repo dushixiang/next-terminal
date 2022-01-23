@@ -1,41 +1,33 @@
 package api
 
 import (
+	"context"
 	"strconv"
 	"strings"
 
-	"next-terminal/server/model"
-	"next-terminal/server/utils"
+	"next-terminal/server/dto"
+	"next-terminal/server/repository"
+	"next-terminal/server/service"
 
 	"github.com/labstack/echo/v4"
 )
 
-type UserGroup struct {
-	Id      string   `json:"id"`
-	Name    string   `json:"name"`
-	Members []string `json:"members"`
-}
+type UserGroupApi struct{}
 
-func UserGroupCreateEndpoint(c echo.Context) error {
-	var item UserGroup
+func (userGroupApi UserGroupApi) UserGroupCreateEndpoint(c echo.Context) error {
+	var item dto.UserGroup
 	if err := c.Bind(&item); err != nil {
 		return err
 	}
 
-	userGroup := model.UserGroup{
-		ID:      utils.UUID(),
-		Created: utils.NowJsonTime(),
-		Name:    item.Name,
-	}
-
-	if err := userGroupRepository.Create(&userGroup, item.Members); err != nil {
+	if _, err := service.UserGroupService.Create(item.Name, item.Members); err != nil {
 		return err
 	}
 
 	return Success(c, item)
 }
 
-func UserGroupPagingEndpoint(c echo.Context) error {
+func (userGroupApi UserGroupApi) UserGroupPagingEndpoint(c echo.Context) error {
 	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	name := c.QueryParam("name")
@@ -43,41 +35,38 @@ func UserGroupPagingEndpoint(c echo.Context) error {
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := userGroupRepository.Find(pageIndex, pageSize, name, order, field)
+	items, total, err := repository.UserGroupRepository.Find(context.TODO(), pageIndex, pageSize, name, order, field)
 	if err != nil {
 		return err
 	}
 
-	return Success(c, H{
+	return Success(c, Map{
 		"total": total,
 		"items": items,
 	})
 }
 
-func UserGroupUpdateEndpoint(c echo.Context) error {
+func (userGroupApi UserGroupApi) UserGroupUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	var item UserGroup
+	var item dto.UserGroup
 	if err := c.Bind(&item); err != nil {
 		return err
 	}
-	userGroup := model.UserGroup{
-		Name: item.Name,
-	}
 
-	if err := userGroupRepository.Update(&userGroup, item.Members, id); err != nil {
+	if err := service.UserGroupService.Update(id, item.Name, item.Members); err != nil {
 		return err
 	}
 
 	return Success(c, nil)
 }
 
-func UserGroupDeleteEndpoint(c echo.Context) error {
+func (userGroupApi UserGroupApi) UserGroupDeleteEndpoint(c echo.Context) error {
 	ids := c.Param("id")
 	split := strings.Split(ids, ",")
 	for i := range split {
 		userId := split[i]
-		if err := userGroupRepository.DeleteById(userId); err != nil {
+		if err := service.UserGroupService.DeleteById(userId); err != nil {
 			return err
 		}
 	}
@@ -85,20 +74,20 @@ func UserGroupDeleteEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func UserGroupGetEndpoint(c echo.Context) error {
+func (userGroupApi UserGroupApi) UserGroupGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	item, err := userGroupRepository.FindById(id)
+	item, err := repository.UserGroupRepository.FindById(context.TODO(), id)
 	if err != nil {
 		return err
 	}
 
-	members, err := userGroupRepository.FindMembersById(id)
+	members, err := repository.UserGroupMemberRepository.FindUserIdsByUserGroupId(context.TODO(), id)
 	if err != nil {
 		return err
 	}
 
-	userGroup := UserGroup{
+	userGroup := dto.UserGroup{
 		Id:      item.ID,
 		Name:    item.Name,
 		Members: members,

@@ -26,12 +26,15 @@ type Session struct {
 	ConnectedTime    utils.JsonTime `json:"connectedTime"`
 	DisconnectedTime utils.JsonTime `json:"disconnectedTime"`
 	Mode             string         `gorm:"type:varchar(10)" json:"mode"`
-	Upload           string         `gorm:"type:varchar(1)" json:"upload"` // 1 = true, 0 = false
+	FileSystem       string         `gorm:"type:varchar(1)" json:"fileSystem"` // 1 = true, 0 = false
+	Upload           string         `gorm:"type:varchar(1)" json:"upload"`
 	Download         string         `gorm:"type:varchar(1)" json:"download"`
 	Delete           string         `gorm:"type:varchar(1)" json:"delete"`
 	Rename           string         `gorm:"type:varchar(1)" json:"rename"`
 	Edit             string         `gorm:"type:varchar(1)" json:"edit"`
 	CreateDir        string         `gorm:"type:varchar(1)" json:"createDir"`
+	Copy             string         `gorm:"type:varchar(1)" json:"copy"`
+	Paste            string         `gorm:"type:varchar(1)" json:"paste"`
 	StorageId        string         `gorm:"type:varchar(36)" json:"storageId"`
 	AccessGatewayId  string         `gorm:"type:varchar(36)" json:"accessGatewayId"`
 	Reviewed         bool           `gorm:"type:tinyint(1)" json:"reviewed"`

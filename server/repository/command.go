@@ -1,24 +1,19 @@
 package repository
 
 import (
+	"context"
+
 	"next-terminal/server/constant"
 	"next-terminal/server/model"
-
-	"gorm.io/gorm"
 )
 
-type CommandRepository struct {
-	DB *gorm.DB
+type commandRepository struct {
+	baseRepository
 }
 
-func NewCommandRepository(db *gorm.DB) *CommandRepository {
-	commandRepository = &CommandRepository{DB: db}
-	return commandRepository
-}
-
-func (r CommandRepository) Find(pageIndex, pageSize int, name, content, order, field string, account model.User) (o []model.CommandForPage, total int64, err error) {
-	db := r.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
-	dbCounter := r.DB.Table("commands").Select("DISTINCT commands.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
+func (r commandRepository) Find(c context.Context, pageIndex, pageSize int, name, content, order, field string, account *model.User) (o []model.CommandForPage, total int64, err error) {
+	db := r.GetDB(c).Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
+	dbCounter := r.GetDB(c).Table("commands").Select("DISTINCT commands.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
 
 	if constant.TypeUser == account.Type {
 		owner := account.ID
@@ -60,29 +55,29 @@ func (r CommandRepository) Find(pageIndex, pageSize int, name, content, order, f
 	return
 }
 
-func (r CommandRepository) Create(o *model.Command) (err error) {
-	if err = r.DB.Create(o).Error; err != nil {
+func (r commandRepository) Create(c context.Context, o *model.Command) (err error) {
+	if err = r.GetDB(c).Create(o).Error; err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r CommandRepository) FindById(id string) (o model.Command, err error) {
-	err = r.DB.Where("id = ?", id).First(&o).Error
+func (r commandRepository) FindById(c context.Context, id string) (o model.Command, err error) {
+	err = r.GetDB(c).Where("id = ?", id).First(&o).Error
 	return
 }
 
-func (r CommandRepository) UpdateById(o *model.Command, id string) error {
+func (r commandRepository) UpdateById(c context.Context, o *model.Command, id string) error {
 	o.ID = id
-	return r.DB.Updates(o).Error
+	return r.GetDB(c).Updates(o).Error
 }
 
-func (r CommandRepository) DeleteById(id string) error {
-	return r.DB.Where("id = ?", id).Delete(&model.Command{}).Error
+func (r commandRepository) DeleteById(c context.Context, id string) error {
+	return r.GetDB(c).Where("id = ?", id).Delete(&model.Command{}).Error
 }
 
-func (r CommandRepository) FindByUser(account model.User) (o []model.CommandForPage, err error) {
-	db := r.DB.Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
+func (r commandRepository) FindByUser(c context.Context, account *model.User) (o []model.CommandForPage, err error) {
+	db := r.GetDB(c).Table("commands").Select("commands.id,commands.name,commands.content,commands.owner,commands.created, users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on commands.owner = users.id").Joins("left join resource_sharers on commands.id = resource_sharers.resource_id").Group("commands.id")
 
 	if constant.TypeUser == account.Type {
 		owner := account.ID
@@ -95,7 +90,7 @@ func (r CommandRepository) FindByUser(account model.User) (o []model.CommandForP
 	return
 }
 
-func (r CommandRepository) FindAll() (o []model.Command, err error) {
-	err = r.DB.Find(&o).Error
+func (r commandRepository) FindAll(c context.Context) (o []model.Command, err error) {
+	err = r.GetDB(c).Find(&o).Error
 	return
 }

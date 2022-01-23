@@ -2,23 +2,24 @@ package api
 
 import (
 	"next-terminal/server/constant"
+	"next-terminal/server/dto"
 	"next-terminal/server/global/cache"
 	"next-terminal/server/model"
 
 	"github.com/labstack/echo/v4"
 )
 
-type H map[string]interface{}
+type Map map[string]interface{}
 
 func Fail(c echo.Context, code int, message string) error {
-	return c.JSON(200, H{
+	return c.JSON(200, Map{
 		"code":    code,
 		"message": message,
 	})
 }
 
 func FailWithData(c echo.Context, code int, message string, data interface{}) error {
-	return c.JSON(200, H{
+	return c.JSON(200, Map{
 		"code":    code,
 		"message": message,
 		"data":    data,
@@ -26,17 +27,10 @@ func FailWithData(c echo.Context, code int, message string, data interface{}) er
 }
 
 func Success(c echo.Context, data interface{}) error {
-	return c.JSON(200, H{
+	return c.JSON(200, Map{
 		"code":    1,
 		"message": "success",
 		"data":    data,
-	})
-}
-
-func NotFound(c echo.Context, message string) error {
-	return c.JSON(200, H{
-		"code":    -1,
-		"message": message,
 	})
 }
 
@@ -48,14 +42,13 @@ func GetToken(c echo.Context) string {
 	return c.QueryParam(constant.Token)
 }
 
-func GetCurrentAccount(c echo.Context) (model.User, bool) {
+func GetCurrentAccount(c echo.Context) (*model.User, bool) {
 	token := GetToken(c)
-	cacheKey := userService.BuildCacheKeyByToken(token)
-	get, b := cache.GlobalCache.Get(cacheKey)
+	get, b := cache.TokenManager.Get(token)
 	if b {
-		return get.(Authorization).User, true
+		return get.(dto.Authorization).User, true
 	}
-	return model.User{}, false
+	return nil, false
 }
 
 func HasPermission(c echo.Context, owner string) bool {

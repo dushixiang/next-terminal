@@ -1,5 +1,20 @@
 import React, {Component} from 'react';
-import {Button, Card, Divider, Form, Image, Input, Layout, Modal, Result, Space, Typography} from "antd";
+import {
+    Button,
+    Card,
+    Col,
+    Descriptions,
+    Divider,
+    Form,
+    Image,
+    Input,
+    Layout,
+    Modal,
+    Result,
+    Row,
+    Space,
+    Typography
+} from "antd";
 import request from "../../common/request";
 import {message} from "antd/es";
 import {ExclamationCircleOutlined, ReloadOutlined} from "@ant-design/icons";
@@ -7,12 +22,13 @@ import {isAdmin} from "../../service/permission";
 
 const {Content} = Layout;
 const {Meta} = Card;
-const {Title} = Typography;
+const {Title, Text} = Typography;
 
 const formItemLayout = {
     labelCol: {span: 4},
     wrapperCol: {span: 10},
 };
+
 const formTailLayout = {
     labelCol: {span: 4},
     wrapperCol: {span: 10, offset: 4},
@@ -24,22 +40,44 @@ class Info extends Component {
     state = {
         user: {
             enableTotp: false
-        }
+        },
+        accessToken: {}
     }
 
     passwordFormRef = React.createRef();
 
     componentDidMount() {
         this.loadInfo();
+        this.loadAccessToken();
     }
 
     loadInfo = async () => {
-        let result = await request.get('/info');
+        let result = await request.get('/account/info');
         if (result['code'] === 1) {
             this.setState({
                 user: result['data']
             })
             sessionStorage.setItem('user', JSON.stringify(result['data']));
+        } else {
+            message.error(result['message']);
+        }
+    }
+
+    loadAccessToken = async () => {
+        let result = await request.get('/account/access-token');
+        if (result['code'] === 1) {
+            this.setState({
+                accessToken: result['data']
+            })
+        } else {
+            message.error(result['message']);
+        }
+    }
+
+    genAccessToken = async () => {
+        let result = await request.post('/account/access-token');
+        if (result['code'] === 1) {
+            this.loadAccessToken();
         } else {
             message.error(result['message']);
         }
@@ -72,7 +110,7 @@ class Info extends Component {
     }
 
     changePassword = async (values) => {
-        let result = await request.post('/change-password', values);
+        let result = await request.post('/account/change-password', values);
         if (result.code === 1) {
             message.success('密码修改成功，即将跳转至登录页面');
             window.location.href = '/#';
@@ -83,7 +121,7 @@ class Info extends Component {
 
     confirmTOTP = async (values) => {
         values['secret'] = this.state.secret
-        let result = await request.post('/confirm-totp', values);
+        let result = await request.post('/account/confirm-totp', values);
         if (result.code === 1) {
             message.success('TOTP启用成功');
             await this.loadInfo();
@@ -97,7 +135,7 @@ class Info extends Component {
     }
 
     resetTOTP = async () => {
-        let result = await request.get('/reload-totp');
+        let result = await request.get('/account/reload-totp');
         if (result.code === 1) {
             this.setState({
                 qr: result.data.qr,
@@ -113,60 +151,82 @@ class Info extends Component {
         return (
             <>
                 <Content className={["site-layout-background", contentClassName]}>
-                    <Title level={3}>修改密码</Title>
-                    <Form ref={this.passwordFormRef} name="password" onFinish={this.changePassword}>
-                        <input type='password' hidden={true} autoComplete='new-password'/>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="oldPassword"
-                            label="原始密码"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '原始密码',
-                                },
-                            ]}
-                        >
-                            <Input type='password' placeholder="请输入原始密码" style={{width: 240}}/>
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="newPassword"
-                            label="新的密码"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '请输入新的密码',
-                                },
-                            ]}
-                        >
-                            <Input type='password' placeholder="新的密码"
-                                   onChange={(value) => this.onNewPasswordChange(value)} style={{width: 240}}/>
-                        </Form.Item>
-                        <Form.Item
-                            {...formItemLayout}
-                            name="newPassword2"
-                            label="确认密码"
-                            rules={[
-                                {
-                                    required: true,
-                                    message: '请和上面输入新的密码保持一致',
-                                },
-                            ]}
-                            validateStatus={this.state.validateStatus}
-                            help={this.state.errorMsg || ''}
-                        >
-                            <Input type='password' placeholder="请和上面输入新的密码保持一致"
-                                   onChange={(value) => this.onNewPassword2Change(value)} style={{width: 240}}/>
-                        </Form.Item>
-                        <Form.Item {...formTailLayout}>
-                            <Button type="primary" htmlType="submit">
-                                提交
-                            </Button>
-                        </Form.Item>
-                    </Form>
+                    <Row>
+                        <Col span={12}>
+                            <Title level={3}>修改密码</Title>
+                            <Form ref={this.passwordFormRef} name="password" onFinish={this.changePassword}>
+                                <input type='password' hidden={true} autoComplete='new-password'/>
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="oldPassword"
+                                    label="原始密码"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '原始密码',
+                                        },
+                                    ]}
+                                >
+                                    <Input type='password' placeholder="请输入原始密码" style={{width: 240}}/>
+                                </Form.Item>
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="newPassword"
+                                    label="新的密码"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请输入新的密码',
+                                        },
+                                    ]}
+                                >
+                                    <Input type='password' placeholder="新的密码"
+                                           onChange={(value) => this.onNewPasswordChange(value)} style={{width: 240}}/>
+                                </Form.Item>
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="newPassword2"
+                                    label="确认密码"
+                                    rules={[
+                                        {
+                                            required: true,
+                                            message: '请和上面输入新的密码保持一致',
+                                        },
+                                    ]}
+                                    validateStatus={this.state.validateStatus}
+                                    help={this.state.errorMsg || ''}
+                                >
+                                    <Input type='password' placeholder="请和上面输入新的密码保持一致"
+                                           onChange={(value) => this.onNewPassword2Change(value)} style={{width: 240}}/>
+                                </Form.Item>
+                                <Form.Item {...formTailLayout}>
+                                    <Button type="primary" htmlType="submit">
+                                        提交
+                                    </Button>
+                                </Form.Item>
+                            </Form>
 
-                    <Divider/>
+                            <Divider/>
+                        </Col>
+                        <Col span={12}>
+                            <Title level={3}>授权信息</Title>
+                            <Descriptions column={1}>
+                                <Descriptions.Item label="授权令牌">
+                                    <Text strong copyable>{this.state.accessToken.token}</Text>
+                                </Descriptions.Item>
+                                <Descriptions.Item label="生成时间">
+                                    <Text strong>{this.state.accessToken.created}</Text>
+                                </Descriptions.Item>
+                            </Descriptions>
+
+                            <Space>
+                                <Button type="primary" onClick={this.genAccessToken}>
+                                    重新生成
+                                </Button>
+                            </Space>
+                        </Col>
+                    </Row>
+
 
                     <Title level={3}>双因素认证</Title>
                     <Form hidden={this.state.qr}>
@@ -187,7 +247,7 @@ class Info extends Component {
                                                     okType: 'danger',
                                                     cancelText: '取消',
                                                     onOk: async () => {
-                                                        let result = await request.post('/reset-totp');
+                                                        let result = await request.post('/account/reset-totp');
                                                         if (result.code === 1) {
                                                             message.success('双因素认证解除成功');
                                                             await this.loadInfo();

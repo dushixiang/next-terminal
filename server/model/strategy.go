@@ -11,6 +11,8 @@ type Strategy struct {
 	Rename    string         `gorm:"type:varchar(1)" json:"rename"`
 	Edit      string         `gorm:"type:varchar(1)" json:"edit"`
 	CreateDir string         `gorm:"type:varchar(1)" json:"createDir"`
+	Copy      string         `gorm:"type:varchar(1)" json:"copy"`
+	Paste     string         `gorm:"type:varchar(1)" json:"paste"`
 	Created   utils.JsonTime `json:"created"`
 }
 

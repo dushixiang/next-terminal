@@ -1,28 +1,31 @@
 package service
 
 import (
+	"context"
+	"errors"
+	"fmt"
+
+	"next-terminal/server/env"
 	"next-terminal/server/guacd"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
+
+	"gorm.io/gorm"
 )
 
-type PropertyService struct {
-	propertyRepository *repository.PropertyRepository
+type propertyService struct {
+	baseService
 }
 
-func NewPropertyService(propertyRepository *repository.PropertyRepository) *PropertyService {
-	return &PropertyService{propertyRepository: propertyRepository}
-}
-
-func (r PropertyService) InitProperties() error {
-	propertyMap := r.propertyRepository.FindAllMap()
+func (service propertyService) InitProperties() error {
+	propertyMap := repository.PropertyRepository.FindAllMap(context.TODO())
 
 	if len(propertyMap[guacd.EnableRecording]) == 0 {
 		property := model.Property{
 			Name:  guacd.EnableRecording,
 			Value: "true",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -32,7 +35,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.CreateRecordingPath,
 			Value: "true",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -42,7 +45,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.FontName,
 			Value: "menlo",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -52,7 +55,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.FontSize,
 			Value: "12",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -62,7 +65,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.ColorScheme,
 			Value: "gray-black",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -72,7 +75,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.EnableWallpaper,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -82,7 +85,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.EnableTheming,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -92,7 +95,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.EnableFontSmoothing,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -102,7 +105,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.EnableFullWindowDrag,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -112,7 +115,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.EnableDesktopComposition,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -122,7 +125,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.EnableMenuAnimations,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -132,7 +135,7 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.DisableBitmapCaching,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
@@ -142,39 +145,71 @@ func (r PropertyService) InitProperties() error {
 			Name:  guacd.DisableOffscreenCaching,
 			Value: "false",
 		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
 			return err
 		}
 	}
 
-	if len(propertyMap[guacd.DisableGlyphCaching]) == 0 {
-		property := model.Property{
-			Name:  guacd.DisableGlyphCaching,
-			Value: "true",
-		}
-		if err := r.propertyRepository.Create(&property); err != nil {
+	if len(propertyMap[guacd.DisableGlyphCaching]) > 0 {
+		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DisableGlyphCaching); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (r PropertyService) DeleteDeprecatedProperty() error {
-	propertyMap := r.propertyRepository.FindAllMap()
+func (service propertyService) DeleteDeprecatedProperty() error {
+	propertyMap := repository.PropertyRepository.FindAllMap(context.TODO())
 	if propertyMap[guacd.EnableDrive] != "" {
-		if err := r.propertyRepository.DeleteByName(guacd.DriveName); err != nil {
+		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DriveName); err != nil {
 			return err
 		}
 	}
 	if propertyMap[guacd.DrivePath] != "" {
-		if err := r.propertyRepository.DeleteByName(guacd.DrivePath); err != nil {
+		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DrivePath); err != nil {
 			return err
 		}
 	}
 	if propertyMap[guacd.DriveName] != "" {
-		if err := r.propertyRepository.DeleteByName(guacd.DriveName); err != nil {
+		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DriveName); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func (service propertyService) Update(item map[string]interface{}) error {
+	return env.GetDB().Transaction(func(tx *gorm.DB) error {
+		c := service.Context(tx)
+		for key := range item {
+			value := fmt.Sprintf("%v", item[key])
+			if value == "" {
+				value = "-"
+			}
+
+			property := model.Property{
+				Name:  key,
+				Value: value,
+			}
+
+			if key == "enable-ldap" && value == "false" {
+				if err := UserService.DeleteALlLdapUser(c); err != nil {
+					return err
+				}
+			}
+
+			_, err := repository.PropertyRepository.FindByName(c, key)
+			if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+				if err := repository.PropertyRepository.Create(c, &property); err != nil {
+					return err
+				}
+			} else {
+				if err := repository.PropertyRepository.UpdateByName(c, &property, key); err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	})
+
 }

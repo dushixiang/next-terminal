@@ -2,11 +2,10 @@ package api
 
 import (
 	"context"
-	"encoding/base64"
 	"errors"
+	"net/http"
 	"path"
 	"strconv"
-	"time"
 
 	"next-terminal/server/config"
 	"next-terminal/server/constant"
@@ -14,6 +13,8 @@ import (
 	"next-terminal/server/guacd"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
+	"next-terminal/server/repository"
+	"next-terminal/server/service"
 	"next-terminal/server/utils"
 
 	"github.com/gorilla/websocket"
@@ -31,18 +32,27 @@ const (
 	AssetNotActive           int = 805
 )
 
-func TunEndpoint(c echo.Context) error {
+var UpGrader = websocket.Upgrader{
+	CheckOrigin: func(r *http.Request) bool {
+		return true
+	},
+	Subprotocols: []string{"guacamole"},
+}
 
+type GuacamoleApi struct {
+}
+
+func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
 		log.Errorf("升级为WebSocket协议失败：%v", err.Error())
 		return err
 	}
-
+	ctx := context.TODO()
 	width := c.QueryParam("width")
 	height := c.QueryParam("height")
 	dpi := c.QueryParam("dpi")
-	sessionId := c.QueryParam("sessionId")
+	sessionId := c.Param("id")
 	connectionId := c.QueryParam("connectionId")
 
 	intWidth, _ := strconv.Atoi(width)
@@ -50,12 +60,12 @@ func TunEndpoint(c echo.Context) error {
 
 	configuration := guacd.NewConfiguration()
 
-	propertyMap := propertyRepository.FindAllMap()
+	propertyMap := repository.PropertyRepository.FindAllMap(ctx)
 
 	var s model.Session
 
 	if len(connectionId) > 0 {
-		s, err = sessionRepository.FindByConnectionId(connectionId)
+		s, err = repository.SessionRepository.FindByConnectionId(ctx, connectionId)
 		if err != nil {
 			return err
 		}
@@ -71,28 +81,28 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("width", width)
 		configuration.SetParameter("height", height)
 		configuration.SetParameter("dpi", dpi)
-		s, err = sessionRepository.FindByIdAndDecrypt(sessionId)
+		s, err = service.SessionService.FindByIdAndDecrypt(ctx, sessionId)
 		if err != nil {
 			return err
 		}
-		setConfig(propertyMap, s, configuration)
+		api.setConfig(propertyMap, s, configuration)
 		var (
 			ip   = s.IP
 			port = s.Port
 		)
 		if s.AccessGatewayId != "" && s.AccessGatewayId != "-" {
-			g, err := accessGatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
+			g, err := service.GatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
 			if err != nil {
-				disconnect(ws, AccessGatewayUnAvailable, "获取接入网关失败："+err.Error())
+				utils.Disconnect(ws, AccessGatewayUnAvailable, "获取接入网关失败："+err.Error())
 				return nil
 			}
 			if !g.Connected {
-				disconnect(ws, AccessGatewayUnAvailable, "接入网关不可用："+g.Message)
+				utils.Disconnect(ws, AccessGatewayUnAvailable, "接入网关不可用："+g.Message)
 				return nil
 			}
 			exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, ip, port)
 			if err != nil {
-				disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
+				utils.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
 				return nil
 			}
 			defer g.CloseSshTunnel(s.ID)
@@ -101,7 +111,7 @@ func TunEndpoint(c echo.Context) error {
 		}
 		active, err := utils.Tcping(ip, port)
 		if !active {
-			disconnect(ws, AssetNotActive, "目标资产不在线: "+err.Error())
+			utils.Disconnect(ws, AssetNotActive, "目标资产不在线: "+err.Error())
 			return nil
 		}
 
@@ -109,12 +119,12 @@ func TunEndpoint(c echo.Context) error {
 		configuration.SetParameter("port", strconv.Itoa(port))
 
 		// 加载资产配置的属性，优先级比全局配置的高，因此最后加载，覆盖掉全局配置
-		attributes, err := assetRepository.FindAssetAttrMapByAssetId(s.AssetId)
+		attributes, err := repository.AssetRepository.FindAssetAttrMapByAssetId(ctx, s.AssetId)
 		if err != nil {
 			return err
 		}
 		if len(attributes) > 0 {
-			setAssetConfig(attributes, s, configuration)
+			api.setAssetConfig(attributes, s, configuration)
 		}
 	}
 	for name := range configuration.Parameters {
@@ -130,7 +140,7 @@ func TunEndpoint(c echo.Context) error {
 	guacdTunnel, err := guacd.NewTunnel(addr, configuration)
 	if err != nil {
 		if connectionId == "" {
-			disconnect(ws, NewTunnelError, err.Error())
+			utils.Disconnect(ws, NewTunnelError, err.Error())
 		}
 		log.Printf("[%v:%v] 建立连接失败: %v", sessionId, connectionId, err.Error())
 		return err
@@ -144,7 +154,7 @@ func TunEndpoint(c echo.Context) error {
 		GuacdTunnel: guacdTunnel,
 	}
 
-	if len(s.ConnectionId) == 0 {
+	if connectionId == "" {
 		if configuration.Protocol == constant.SSH {
 			nextTerminal, err := CreateNextTerminalBySession(s)
 			if err == nil {
@@ -168,14 +178,14 @@ func TunEndpoint(c echo.Context) error {
 		}
 		// 创建新会话
 		log.Debugf("[%v:%v] 创建新会话: %v", sessionId, connectionId, sess.ConnectionId)
-		if err := sessionRepository.UpdateById(&sess, sessionId); err != nil {
+		if err := repository.SessionRepository.UpdateById(ctx, &sess, sessionId); err != nil {
 			return err
 		}
 	} else {
 		// 要监控会话
 		forObsSession := session.GlobalSessionManager.GetById(sessionId)
 		if forObsSession == nil {
-			disconnect(ws, NotFoundSession, "获取会话失败")
+			utils.Disconnect(ws, NotFoundSession, "获取会话失败")
 			return nil
 		}
 		nextSession.ID = utils.UUID()
@@ -183,56 +193,8 @@ func TunEndpoint(c echo.Context) error {
 		log.Debugf("[%v:%v] 观察者[%v]加入会话[%v]", sessionId, connectionId, nextSession.ID, s.ConnectionId)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
-	tick := time.NewTicker(time.Millisecond * time.Duration(60))
-	defer tick.Stop()
-	var buf []byte
-	dataChan := make(chan []byte)
-
-	go func() {
-	GuacdLoop:
-		for {
-			select {
-			case <-ctx.Done():
-				log.Debugf("[%v:%v] WebSocket 已关闭，即将关闭 Guacd 连接...", sessionId, connectionId)
-				break GuacdLoop
-			default:
-				instruction, err := guacdTunnel.Read()
-				if err != nil {
-					log.Debugf("[%v:%v] Guacd 读取失败，即将退出循环...", sessionId, connectionId)
-					disconnect(ws, TunnelClosed, "远程连接已关闭")
-					break GuacdLoop
-				}
-				if len(instruction) == 0 {
-					continue
-				}
-				dataChan <- instruction
-			}
-		}
-		log.Debugf("[%v:%v] Guacd 连接已关闭，退出 Guacd 循环。", sessionId, connectionId)
-	}()
-
-	go func() {
-	tickLoop:
-		for {
-			select {
-			case <-ctx.Done():
-				break tickLoop
-			case <-tick.C:
-				if len(buf) > 0 {
-					err = ws.WriteMessage(websocket.TextMessage, buf)
-					if err != nil {
-						log.Debugf("[%v:%v] WebSocket写入失败，即将关闭Guacd连接...", sessionId, connectionId)
-						break tickLoop
-					}
-					buf = []byte{}
-				}
-			case data := <-dataChan:
-				buf = append(buf, data...)
-			}
-		}
-		log.Debugf("[%v:%v] Guacd连接已关闭，退出定时器循环。", sessionId, connectionId)
-	}()
+	guacamoleHandler := NewGuacamoleHandler(ws, guacdTunnel)
+	guacamoleHandler.Start()
 
 	for {
 		_, message, err := ws.ReadMessage()
@@ -250,20 +212,20 @@ func TunEndpoint(c echo.Context) error {
 					log.Debugf("[%v:%v] 观察者[%v]退出会话", sessionId, connectionId, observerId)
 				}
 			} else {
-				CloseSessionById(sessionId, Normal, "用户正常退出")
+				service.SessionService.CloseSessionById(sessionId, Normal, "用户正常退出")
 			}
-			cancel()
-			break
+			guacamoleHandler.Stop()
+			return nil
 		}
 		_, err = guacdTunnel.WriteAndFlush(message)
 		if err != nil {
-			CloseSessionById(sessionId, TunnelClosed, "远程连接已关闭")
+			service.SessionService.CloseSessionById(sessionId, TunnelClosed, "远程连接已关闭")
+			return nil
 		}
 	}
-	return nil
 }
 
-func setAssetConfig(attributes map[string]string, s model.Session, configuration *guacd.Configuration) {
+func (api GuacamoleApi) setAssetConfig(attributes map[string]string, s model.Session, configuration *guacd.Configuration) {
 	for key, value := range attributes {
 		if guacd.DrivePath == key {
 			// 忽略该参数
@@ -275,7 +237,7 @@ func setAssetConfig(attributes map[string]string, s model.Session, configuration
 				// 默认空间ID和用户ID相同
 				storageId = s.Creator
 			}
-			realPath := path.Join(storageService.GetBaseDrivePath(), storageId)
+			realPath := path.Join(service.StorageService.GetBaseDrivePath(), storageId)
 			configuration.SetParameter(guacd.EnableDrive, "true")
 			configuration.SetParameter(guacd.DriveName, "Next Terminal Filesystem")
 			configuration.SetParameter(guacd.DrivePath, realPath)
@@ -286,7 +248,7 @@ func setAssetConfig(attributes map[string]string, s model.Session, configuration
 	}
 }
 
-func setConfig(propertyMap map[string]string, s model.Session, configuration *guacd.Configuration) {
+func (api GuacamoleApi) setConfig(propertyMap map[string]string, s model.Session, configuration *guacd.Configuration) {
 	if propertyMap[guacd.EnableRecording] == "true" {
 		configuration.SetParameter(guacd.RecordingPath, path.Join(config.GlobalCfg.Guacd.Recording, s.ID))
 		configuration.SetParameter(guacd.CreateRecordingPath, "true")
@@ -312,7 +274,8 @@ func setConfig(propertyMap map[string]string, s model.Session, configuration *gu
 		configuration.SetParameter(guacd.EnableMenuAnimations, propertyMap[guacd.EnableMenuAnimations])
 		configuration.SetParameter(guacd.DisableBitmapCaching, propertyMap[guacd.DisableBitmapCaching])
 		configuration.SetParameter(guacd.DisableOffscreenCaching, propertyMap[guacd.DisableOffscreenCaching])
-		configuration.SetParameter(guacd.DisableGlyphCaching, propertyMap[guacd.DisableGlyphCaching])
+		configuration.SetParameter(guacd.ColorDepth, propertyMap[guacd.ColorDepth])
+		configuration.SetParameter(guacd.ForceLossless, propertyMap[guacd.ForceLossless])
 	case "ssh":
 		if len(s.PrivateKey) > 0 && s.PrivateKey != "-" {
 			configuration.SetParameter("username", s.Username)
@@ -349,13 +312,4 @@ func setConfig(propertyMap map[string]string, s model.Session, configuration *gu
 	default:
 
 	}
-}
-
-func disconnect(ws *websocket.Conn, code int, reason string) {
-	// guacd 无法处理中文字符，所以进行了base64编码。
-	encodeReason := base64.StdEncoding.EncodeToString([]byte(reason))
-	err := guacd.NewInstruction("error", encodeReason, strconv.Itoa(code))
-	_ = ws.WriteMessage(websocket.TextMessage, []byte(err.String()))
-	disconnect := guacd.NewInstruction("disconnect")
-	_ = ws.WriteMessage(websocket.TextMessage, []byte(disconnect.String()))
 }

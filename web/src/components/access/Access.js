@@ -13,7 +13,7 @@ import {
     LineChartOutlined,
     WindowsOutlined
 } from '@ant-design/icons';
-import {exitFull, getToken, isEmpty, requestFullScreen} from "../../utils/utils";
+import {exitFull, getToken, isEmpty, requestFullScreen, setToken} from "../../utils/utils";
 import './Access.css'
 import Draggable from 'react-draggable';
 import FileSystem from "../devops/FileSystem";
@@ -38,13 +38,14 @@ class Access extends Component {
     state = {
         session: {},
         sessionId: '',
-        client: {},
+        client: undefined,
+        scale: 1,
         clientState: STATE_IDLE,
         clipboardVisible: false,
         clipboardText: '',
         containerOverflow: 'hidden',
-        containerWidth: 0,
-        containerHeight: 0,
+        containerWidth: 1024,
+        containerHeight: 768,
         uploadAction: '',
         uploadHeaders: {},
         keyboard: {},
@@ -57,15 +58,39 @@ class Access extends Component {
         fullScreenBtnText: '进入全屏',
         sink: undefined,
         commands: [],
-        showFileSystem: false
+        showFileSystem: false,
+        external: false,
+        fixedSize: false,
     };
 
     async componentDidMount() {
-
         let urlParams = new URLSearchParams(this.props.location.search);
         let assetId = urlParams.get('assetId');
         document.title = urlParams.get('assetName');
         let protocol = urlParams.get('protocol');
+        let width = urlParams.get('width');
+        let height = urlParams.get('height');
+        let fixedSize = false;
+
+        if (width && height) {
+            fixedSize = true
+        } else {
+            width = window.innerWidth;
+            height = window.innerHeight;
+        }
+
+        let shareSessionId = urlParams.get('shareSessionId');
+        let external = false;
+        if (shareSessionId && shareSessionId !== '') {
+            setToken(shareSessionId);
+            external = true;
+            let shareSession = await this.getShareSession(shareSessionId);
+            if (!shareSession) {
+                return
+            }
+            assetId = shareSession['assetId'];
+        }
+
         let session = await this.createSession(assetId);
         if (!session) {
             return;
@@ -79,10 +104,14 @@ class Access extends Component {
             session: session,
             sessionId: sessionId,
             protocol: protocol,
-            showFileSystem: session['fileSystem'] === '1'
+            showFileSystem: session['fileSystem'] === '1',
+            external: external,
+            fixedSize: fixedSize,
+            containerWidth: width,
+            containerHeight: height,
         });
 
-        this.renderDisplay(sessionId, protocol);
+        this.renderDisplay(sessionId, protocol, width, height);
 
         window.addEventListener('resize', this.onWindowResize);
         window.onfocus = this.onWindowFocus;
@@ -95,6 +124,10 @@ class Access extends Component {
     }
 
     sendClipboard(data) {
+        if (this.state.session['paste'] === '0') {
+            message.warn('禁止粘贴');
+            return
+        }
         let writer;
 
         // Create stream with proper mimetype
@@ -133,6 +166,7 @@ class Access extends Component {
     }
 
     onTunnelStateChange = (state) => {
+        console.log(state)
         if (state === Guacamole.Tunnel.State.CLOSED) {
             console.log('web socket 已关闭');
         }
@@ -175,12 +209,13 @@ class Access extends Component {
                 break;
             case STATE_CONNECTED:
                 this.onWindowResize(null);
+                Modal.destroyAll();
                 message.destroy();
                 message.success('连接成功');
                 // 向后台发送请求，更新会话的状态
                 this.updateSessionStatus(this.state.sessionId).then(_ => {
                 })
-                if (this.state.protocol === 'ssh') {
+                if (this.state.protocol === 'ssh' && !this.state.external) {
                     // 加载指令
                     this.getCommands();
                 }
@@ -300,9 +335,11 @@ class Access extends Component {
     }
 
     clientClipboardReceived = (stream, mimetype) => {
-        console.log('clientClipboardReceived', mimetype)
+        if (this.state.session['copy'] === '0') {
+            message.warn('禁止复制');
+            return
+        }
         let reader;
-
         // If the received data is text, read it as a simple string
         if (/^text\//.exec(mimetype)) {
             reader = new Guacamole.StringReader(stream);
@@ -378,9 +415,18 @@ class Access extends Component {
         return result['data'];
     }
 
-    async renderDisplay(sessionId, protocol) {
+    async getShareSession(shareSessionId) {
+        let result = await request.get(`/share-sessions/${shareSessionId}`);
+        if (result['code'] !== 1) {
+            this.showMessage(result['message']);
+            return undefined;
+        }
+        return result['data'];
+    }
 
-        let tunnel = new Guacamole.WebSocketTunnel(wsServer + '/tunnel');
+    async renderDisplay(sessionId, protocol, width, height) {
+
+        let tunnel = new Guacamole.WebSocketTunnel(`${wsServer}/sessions/${sessionId}/tunnel`);
 
         tunnel.onstatechange = this.onTunnelStateChange;
         // Get new client instance
@@ -404,17 +450,16 @@ class Access extends Component {
         const element = client.getDisplay().getElement();
         display.appendChild(element);
 
-        let width = window.innerWidth;
-        let height = window.innerHeight;
+        let scale = 1;
         let dpi = 96;
         if (protocol === 'ssh' || protocol === 'telnet') {
             dpi = dpi * 2;
+            scale = 0.5;
         }
 
         let token = getToken();
 
         let params = {
-            'sessionId': sessionId,
             'width': width,
             'height': height,
             'dpi': dpi,
@@ -439,13 +484,9 @@ class Access extends Component {
         };
 
         mouse.onmousemove = function (mouseState) {
-            if (protocol === 'ssh' || protocol === 'telnet') {
-                mouseState.x = mouseState.x * 2;
-                mouseState.y = mouseState.y * 2;
-                client.sendMouseState(mouseState);
-            } else {
-                client.sendMouseState(mouseState);
-            }
+            mouseState.x = mouseState.x / scale;
+            mouseState.y = mouseState.y / scale;
+            client.sendMouseState(mouseState);
         };
 
         const sink = new Guacamole.InputSink();
@@ -460,8 +501,7 @@ class Access extends Component {
 
         this.setState({
             client: client,
-            containerWidth: width,
-            containerHeight: height,
+            scale: scale,
             keyboard: keyboard,
             sink: sink
         });
@@ -469,19 +509,14 @@ class Access extends Component {
 
     onWindowResize = (e) => {
 
-        if (this.state.client) {
+        if (this.state.client && !this.state.fixedSize) {
             const display = this.state.client.getDisplay();
+            let scale = this.state.scale;
+            display.scale(scale);
+            let width = window.innerWidth;
+            let height = window.innerHeight;
 
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-
-            if (this.state.protocol === 'ssh' || this.state.protocol === 'telnet') {
-                let r = 2;
-                display.scale(1 / r);
-                this.state.client.sendSize(width * r, height * r);
-            } else {
-                this.state.client.sendSize(width, height);
-            }
+            this.state.client.sendSize(width / scale, height / scale);
 
             this.setState({
                 containerWidth: width,
@@ -502,47 +537,17 @@ class Access extends Component {
 
     onWindowFocus = (e) => {
         if (navigator.clipboard && this.state.clientState === STATE_CONNECTED) {
-            navigator.clipboard.readText().then((text) => {
-                this.sendClipboard({
-                    'data': text,
-                    'type': 'text/plain'
-                });
-            })
-        }
-    };
-
-    onPaste = (e) => {
-        const cbd = e.clipboardData;
-        const ua = window.navigator.userAgent;
-
-        // 如果是 Safari 直接 return
-        if (!(e.clipboardData && e.clipboardData.items)) {
-            return;
-        }
-
-        // Mac平台下Chrome49版本以下 复制Finder中的文件的Bug Hack掉
-        if (cbd.items && cbd.items.length === 2 && cbd.items[0].kind === "string" && cbd.items[1].kind === "file" &&
-            cbd.types && cbd.types.length === 2 && cbd.types[0] === "text/plain" && cbd.types[1] === "Files" &&
-            ua.match(/Macintosh/i) && Number(ua.match(/Chrome\/(\d{2})/i)[1]) < 49) {
-            return;
-        }
-
-        for (let i = 0; i < cbd.items.length; i++) {
-            let item = cbd.items[i];
-            if (item.kind === "file") {
-                let blob = item.getAsFile();
-                if (blob.size === 0) {
-                    return;
-                }
-                // blob 就是从剪切板获得的文件 可以进行上传或其他操作
-            } else if (item.kind === 'string') {
-                item.getAsString((str) => {
+            try {
+                navigator.clipboard.readText().then((text) => {
                     this.sendClipboard({
-                        'data': str,
+                        'data': text,
                         'type': 'text/plain'
                     });
                 })
+            } catch (e) {
+                // console.error(e);
             }
+
         }
     };
 
@@ -616,7 +621,8 @@ class Access extends Component {
                 <div className="container" style={{
                     overflow: this.state.containerOverflow,
                     width: this.state.containerWidth,
-                    height: this.state.containerHeight
+                    height: this.state.containerHeight,
+                    margin: '0 auto'
                 }}>
                     <div id="display"/>
                 </div>
@@ -630,16 +636,20 @@ class Access extends Component {
                     </Affix>
                 </Draggable>
 
-                <Draggable>
-                    <Affix style={{position: 'absolute', top: 50, right: 100}}>
-                        <Button icon={<CopyOutlined/>} disabled={this.state.clientState !== STATE_CONNECTED}
-                                onClick={() => {
-                                    this.setState({
-                                        clipboardVisible: true
-                                    });
-                                }}/>
-                    </Affix>
-                </Draggable>
+                {
+                    this.state.session['copy'] === '1' || this.state.session['paste'] === '1' ?
+                        <Draggable>
+                            <Affix style={{position: 'absolute', top: 50, right: 100}}>
+                                <Button icon={<CopyOutlined/>} disabled={this.state.clientState !== STATE_CONNECTED}
+                                        onClick={() => {
+                                            this.setState({
+                                                clipboardVisible: true
+                                            });
+                                        }}/>
+                            </Affix>
+                        </Draggable> : undefined
+                }
+
 
                 {
                     this.state.protocol === 'vnc' ?
@@ -734,7 +744,6 @@ class Access extends Component {
                     placement="right"
                     width={window.innerWidth * 0.8}
                     closable={true}
-                    // maskClosable={false}
                     onClose={() => {
                         this.focus();
                         this.setState({

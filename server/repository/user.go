@@ -1,35 +1,23 @@
 package repository
 
 import (
-	"next-terminal/server/constant"
-	"next-terminal/server/model"
+	"context"
 
-	"gorm.io/gorm"
+	"next-terminal/server/model"
 )
 
-type UserRepository struct {
-	DB *gorm.DB
+type userRepository struct {
+	baseRepository
 }
 
-func NewUserRepository(db *gorm.DB) *UserRepository {
-	userRepository = &UserRepository{DB: db}
-	return userRepository
-}
-
-func (r UserRepository) FindAll() (o []model.User, err error) {
-	err = r.DB.Find(&o).Error
+func (r userRepository) FindAll(c context.Context) (o []model.User, err error) {
+	err = r.GetDB(c).Find(&o).Error
 	return
 }
 
-func (r UserRepository) Find(pageIndex, pageSize int, username, nickname, mail, order, field string, account model.User) (o []model.UserForPage, total int64, err error) {
-	db := r.DB.Table("users").Select("users.id,users.username,users.nickname,users.mail,users.online,users.created,users.type,users.status, count(resource_sharers.user_id) as sharer_asset_count, users.totp_secret").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
-	dbCounter := r.DB.Table("users")
-
-	if constant.TypeUser == account.Type {
-		// 普通用户只能查看到普通用户
-		db = db.Where("users.type = ?", constant.TypeUser)
-		dbCounter = dbCounter.Where("type = ?", constant.TypeUser)
-	}
+func (r userRepository) Find(c context.Context, pageIndex, pageSize int, username, nickname, mail, order, field string) (o []model.UserForPage, total int64, err error) {
+	db := r.GetDB(c).Table("users").Select("users.id,users.username,users.nickname,users.mail,users.online,users.created,users.type,users.status,users.source, count(resource_sharers.user_id) as sharer_asset_count, users.totp_secret").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
+	dbCounter := r.GetDB(c).Table("users")
 
 	if len(username) > 0 {
 		db = db.Where("users.username like ?", "%"+username+"%")
@@ -80,19 +68,19 @@ func (r UserRepository) Find(pageIndex, pageSize int, username, nickname, mail, 
 	return
 }
 
-func (r UserRepository) FindById(id string) (o model.User, err error) {
-	err = r.DB.Where("id = ?", id).First(&o).Error
+func (r userRepository) FindById(c context.Context, id string) (o model.User, err error) {
+	err = r.GetDB(c).Where("id = ?", id).First(&o).Error
 	return
 }
 
-func (r UserRepository) FindByUsername(username string) (o model.User, err error) {
-	err = r.DB.Where("username = ?", username).First(&o).Error
+func (r userRepository) FindByUsername(c context.Context, username string) (o model.User, err error) {
+	err = r.GetDB(c).Where("username = ?", username).First(&o).Error
 	return
 }
 
-func (r UserRepository) ExistByUsername(username string) (exist bool) {
+func (r userRepository) ExistByUsername(c context.Context, username string) (exist bool) {
 	count := int64(0)
-	err := r.DB.Table("users").Where("username = ?", username).Count(&count).Error
+	err := r.GetDB(c).Table("users").Where("username = ?", username).Count(&count).Error
 	if err != nil {
 		return false
 	}
@@ -100,51 +88,38 @@ func (r UserRepository) ExistByUsername(username string) (exist bool) {
 	return count > 0
 }
 
-func (r UserRepository) FindOnlineUsers() (o []model.User, err error) {
-	err = r.DB.Where("online = ?", true).Find(&o).Error
+func (r userRepository) FindOnlineUsers(c context.Context) (o []model.User, err error) {
+	err = r.GetDB(c).Where("online = ?", true).Find(&o).Error
 	return
 }
 
-func (r UserRepository) Create(o *model.User) error {
-	return r.DB.Create(o).Error
+func (r userRepository) Create(c context.Context, o *model.User) error {
+	return r.GetDB(c).Create(o).Error
 }
 
-func (r UserRepository) Update(o *model.User) error {
-	return r.DB.Updates(o).Error
+func (r userRepository) Update(c context.Context, o *model.User) error {
+	return r.GetDB(c).Updates(o).Error
 }
 
-func (r UserRepository) UpdateOnlineByUsername(username string, online bool) error {
+func (r userRepository) UpdateOnlineByUsername(c context.Context, username string, online bool) error {
 	sql := "update users set online = ? where username = ?"
-	return r.DB.Exec(sql, online, username).Error
+	return r.GetDB(c).Exec(sql, online, username).Error
 }
 
-func (r UserRepository) DeleteById(id string) error {
-	return r.DB.Transaction(func(tx *gorm.DB) (err error) {
-		// 删除用户
-		err = tx.Where("id = ?", id).Delete(&model.User{}).Error
-		if err != nil {
-			return err
-		}
-		// 删除用户组中的用户关系
-		err = tx.Where("user_id = ?", id).Delete(&model.UserGroupMember{}).Error
-		if err != nil {
-			return err
-		}
-		// 删除用户分享到的资产
-		err = tx.Where("user_id = ?", id).Delete(&model.ResourceSharer{}).Error
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+func (r userRepository) DeleteById(c context.Context, id string) error {
+	return r.GetDB(c).Where("id = ?", id).Delete(&model.User{}).Error
 }
 
-func (r UserRepository) CountOnlineUser() (total int64, err error) {
-	err = r.DB.Where("online = ?", true).Find(&model.User{}).Count(&total).Error
+func (r userRepository) DeleteBySource(c context.Context, source string) error {
+	return r.GetDB(c).Where("source = ?", source).Delete(&model.User{}).Error
+}
+
+func (r userRepository) CountOnlineUser(c context.Context) (total int64, err error) {
+	err = r.GetDB(c).Where("online = ?", true).Find(&model.User{}).Count(&total).Error
 	return
 }
 
-func (r UserRepository) Count() (total int64, err error) {
-	err = r.DB.Find(&model.User{}).Count(&total).Error
+func (r userRepository) Count(c context.Context) (total int64, err error) {
+	err = r.GetDB(c).Find(&model.User{}).Count(&total).Error
 	return
 }

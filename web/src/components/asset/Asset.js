@@ -284,6 +284,7 @@ class Asset extends Component {
         asset['ignore-cert'] = asset['ignore-cert'] === 'true';
         asset['enable-drive'] = asset['enable-drive'] === 'true';
         asset['socks-proxy-enable'] = asset['socks-proxy-enable'] === 'true';
+        asset['force-lossless'] = asset['force-lossless'] === 'true';
 
         this.setState({
             modalTitle: title,

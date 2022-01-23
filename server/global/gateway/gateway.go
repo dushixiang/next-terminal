@@ -7,7 +7,6 @@ import (
 	"net"
 	"os"
 
-	"next-terminal/server/config"
 	"next-terminal/server/utils"
 
 	"golang.org/x/crypto/ssh"
@@ -17,7 +16,6 @@ import (
 type Gateway struct {
 	ID        string // 接入网关ID
 	Connected bool   // 是否已连接
-	LocalHost string // 隧道映射到本地的IP地址
 	SshClient *ssh.Client
 	Message   string // 失败原因
 
@@ -28,10 +26,9 @@ type Gateway struct {
 	exit chan bool
 }
 
-func NewGateway(id, localhost string, connected bool, message string, client *ssh.Client) *Gateway {
+func NewGateway(id string, connected bool, message string, client *ssh.Client) *Gateway {
 	return &Gateway{
 		ID:        id,
-		LocalHost: localhost,
 		Connected: connected,
 		Message:   message,
 		SshClient: client,
@@ -80,26 +77,13 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 	if err != nil {
 		return "", 0, err
 	}
-	localHost := g.LocalHost
-	if localHost == "" {
-		if config.GlobalCfg.Container {
-			localIp, err := utils.GetLocalIp()
-			if err != nil {
-				hostname, err := os.Hostname()
-				if err != nil {
-					return "", 0, err
-				} else {
-					localHost = hostname
-				}
-			} else {
-				localHost = localIp
-			}
-		} else {
-			localHost = "localhost"
-		}
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		return "", 0, err
 	}
 
-	localAddr := fmt.Sprintf("%s:%d", localHost, localPort)
+	localAddr := fmt.Sprintf("%s:%d", hostname, localPort)
 	listener, err := net.Listen("tcp", localAddr)
 	if err != nil {
 		return "", 0, err
@@ -108,7 +92,7 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 	ctx, cancel := context.WithCancel(context.Background())
 	tunnel := &Tunnel{
 		ID:         id,
-		LocalHost:  g.LocalHost,
+		LocalHost:  hostname,
 		LocalPort:  localPort,
 		Gateway:    g,
 		RemoteHost: ip,

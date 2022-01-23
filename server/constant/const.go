@@ -5,21 +5,23 @@ import (
 )
 
 const (
-	Version = "v1.2.2"
+	Version = "v1.2.3"
 	Banner  = `
- _______                   __    ___________                  .__              .__   
- \      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |  
- /   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |  
-/    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
-\____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
-        \/     \/      \/                     \/            \/        \/     \/      %s
-
-`
+	_______                   __    ___________                  .__              .__
+	\      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |
+	/   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |
+	/    |    \  ___/ >    <  |  |     |    |\  ___/|  | \/  Y Y  \  |   |  \/ __ \|  |__
+	\____|__  /\___  >__/\_ \ |__|     |____| \___  >__|  |__|_|  /__|___|  (____  /____/
+	       \/     \/      \/                     \/            \/        \/     \/      %s
+	
+	`
 )
 
 const Token = "X-Auth-Token"
 
 const (
+	DB = "db"
+
 	SSH    = "ssh"
 	RDP    = "rdp"
 	VNC    = "vnc"
@@ -57,6 +59,8 @@ const (
 	TypeUser  = "user"  // 普通用户
 	TypeAdmin = "admin" // 管理员
 
+	SourceLdap = "ldap" // 从LDAP同步的用户
+
 	StatusEnabled  = "enabled"
 	StatusDisabled = "disabled"
 
@@ -65,10 +69,16 @@ const (
 	SocksProxyPort     = "socks-proxy-port"
 	SocksProxyUsername = "socks-proxy-username"
 	SocksProxyPassword = "socks-proxy-password"
+
+	LoginToken   = "login-token"
+	AccessToken  = "access-token"
+	ShareSession = "share-session"
+
+	Anonymous = "anonymous"
 )
 
 var SSHParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, SshMode, SocksProxyEnable, SocksProxyHost, SocksProxyPort, SocksProxyUsername, SocksProxyPassword}
-var RDPParameterNames = []string{guacd.Domain, guacd.RemoteApp, guacd.RemoteAppDir, guacd.RemoteAppArgs, guacd.EnableDrive, guacd.DrivePath}
+var RDPParameterNames = []string{guacd.Domain, guacd.RemoteApp, guacd.RemoteAppDir, guacd.RemoteAppArgs, guacd.EnableDrive, guacd.DrivePath, guacd.ColorDepth, guacd.ForceLossless}
 var VNCParameterNames = []string{guacd.ColorDepth, guacd.Cursor, guacd.SwapRedBlue, guacd.DestHost, guacd.DestPort}
 var TelnetParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, guacd.UsernameRegex, guacd.PasswordRegex, guacd.LoginSuccessRegex, guacd.LoginFailureRegex}
 var KubernetesParameterNames = []string{guacd.FontName, guacd.FontSize, guacd.ColorScheme, guacd.Backspace, guacd.TerminalType, guacd.Namespace, guacd.Pod, guacd.Container, guacd.UesSSL, guacd.ClientCert, guacd.ClientKey, guacd.CaCert, guacd.IgnoreCert}

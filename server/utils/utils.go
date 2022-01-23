@@ -2,17 +2,12 @@ package utils
 
 import (
 	"bytes"
-	"crypto"
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
 	"crypto/rand"
-	"crypto/rsa"
 	"crypto/sha256"
-	"crypto/sha512"
-	"crypto/x509"
 	"encoding/base64"
-	"encoding/pem"
 	"errors"
 	"fmt"
 	"image"
@@ -41,6 +36,11 @@ import (
 func UUID() string {
 	v4, _ := uuid.NewV4()
 	return v4.String()
+}
+
+func LongUUID() string {
+	longUUID := strings.Join([]string{UUID(), UUID(), UUID(), UUID()}, "")
+	return strings.ReplaceAll(longUUID, "-", "")
 }
 
 func Tcping(ip string, port int) (bool, error) {
@@ -123,11 +123,16 @@ func Distinct(a []string) []string {
 	return result
 }
 
-// 排序+拼接+摘要
+// Sign 排序+拼接+摘要
 func Sign(a []string) string {
 	sort.Strings(a)
 	data := []byte(strings.Join(a, ""))
 	has := md5.Sum(data)
+	return fmt.Sprintf("%x", has)
+}
+
+func Md5(s string) string {
+	has := md5.Sum([]byte(s))
 	return fmt.Sprintf("%x", has)
 }
 
@@ -339,44 +344,6 @@ func Utf8ToGbk(s []byte) ([]byte, error) {
 		return nil, e
 	}
 	return d, nil
-}
-
-// SignatureRSA rsa私钥签名
-func SignatureRSA(plainText []byte, rsaPrivateKey string) (signed []byte, err error) {
-	// 使用pem对读取的内容解码得到block
-	block, _ := pem.Decode([]byte(rsaPrivateKey))
-	//x509将数据解析得到私钥结构体
-	privateKey, err := x509.ParsePKCS1PrivateKey(block.Bytes)
-	if err != nil {
-		return nil, err
-	}
-	// 创建一个hash对象
-	h := sha512.New()
-	_, _ = h.Write(plainText)
-	// 计算hash值
-	hashText := h.Sum(nil)
-	// 使用rsa函数对散列值签名
-	signed, err = rsa.SignPKCS1v15(rand.Reader, privateKey, crypto.SHA512, hashText)
-	if err != nil {
-		return
-	}
-	return signed, nil
-}
-
-// VerifyRSA rsa签名认证
-func VerifyRSA(plainText, signText []byte, rsaPublicKey string) bool {
-	// pem解码得到block
-	block, _ := pem.Decode([]byte(rsaPublicKey))
-	// x509解析得到接口
-	publicKey, err := x509.ParsePKCS1PublicKey(block.Bytes)
-	if err != nil {
-		return false
-	}
-	// 对原始明文进行hash运算得到散列值
-	hashText := sha512.Sum512(plainText)
-	// 签名认证
-	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA512, hashText[:], signText)
-	return err == nil
 }
 
 // GetAvailablePort 获取可用端口

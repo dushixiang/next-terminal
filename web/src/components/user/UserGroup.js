@@ -73,11 +73,8 @@ class UserGroup extends Component {
         } catch (e) {
 
         } finally {
-            const items = data.items.map(item => {
-                return {'key': item['id'], ...item}
-            })
             this.setState({
-                items: items,
+                items: data.items,
                 total: data.total,
                 queryParams: queryParams,
                 loading: false
@@ -95,8 +92,7 @@ class UserGroup extends Component {
             queryParams: queryParams
         });
 
-        this.loadTableData(queryParams).then(r => {
-        })
+        this.loadTableData(queryParams);
     };
 
     showDeleteConfirm(id, content) {
@@ -139,7 +135,6 @@ class UserGroup extends Component {
         }
 
         await this.handleSearchByNickname('');
-        console.log(model)
         this.setState({
             model: model,
             modalVisible: true,
@@ -147,7 +142,7 @@ class UserGroup extends Component {
         });
     };
 
-    handleCancelModal = e => {
+    handleCancelModal = () => {
         this.setState({
             modalVisible: false,
             modalTitle: '',
@@ -161,37 +156,43 @@ class UserGroup extends Component {
             modalConfirmLoading: true
         });
 
-        if (formData.id) {
-            // 向后台提交数据
-            const result = await request.put('/user-groups/' + formData.id, formData);
-            if (result.code === 1) {
-                message.success('操作成功', 3);
+        try {
+            if (formData.id) {
+                // 向后台提交数据
+                const result = await request.put('/user-groups/' + formData.id, formData);
+                if (result.code === 1) {
+                    message.success('操作成功', 3);
 
-                this.setState({
-                    modalVisible: false
-                });
-                await this.loadTableData(this.state.queryParams);
+                    this.setState({
+                        modalVisible: false
+                    });
+                    await this.loadTableData(this.state.queryParams);
+                    return true;
+                } else {
+                    message.error(result.message, 10);
+                    return false;
+                }
             } else {
-                message.error(result.message, 10);
-            }
-        } else {
-            // 向后台提交数据
-            const result = await request.post('/user-groups', formData);
-            if (result.code === 1) {
-                message.success('操作成功', 3);
+                // 向后台提交数据
+                const result = await request.post('/user-groups', formData);
+                if (result.code === 1) {
+                    message.success('操作成功', 3);
 
-                this.setState({
-                    modalVisible: false
-                });
-                await this.loadTableData(this.state.queryParams);
-            } else {
-                message.error(result.message, 10);
+                    this.setState({
+                        modalVisible: false
+                    });
+                    await this.loadTableData(this.state.queryParams);
+                    return true;
+                } else {
+                    message.error(result.message, 10);
+                    return false;
+                }
             }
+        } finally {
+            this.setState({
+                modalConfirmLoading: false
+            });
         }
-
-        this.setState({
-            modalConfirmLoading: false
-        });
     };
 
     handleSearchByName = name => {
@@ -280,7 +281,7 @@ class UserGroup extends Component {
             title: '授权资产',
             dataIndex: 'assetCount',
             key: 'assetCount',
-            render: (text, record, index) => {
+            render: (text, record) => {
                 return <Button type='link' onClick={async () => {
                     this.setState({
                         assetVisible: true,
@@ -292,7 +293,7 @@ class UserGroup extends Component {
             title: '创建日期',
             dataIndex: 'created',
             key: 'created',
-            render: (text, record) => {
+            render: (text) => {
                 return (
                     <Tooltip title={text}>
                         {dayjs(text).fromNow()}
@@ -328,7 +329,7 @@ class UserGroup extends Component {
         const selectedRowKeys = this.state.selectedRowKeys;
         const rowSelection = {
             selectedRowKeys: this.state.selectedRowKeys,
-            onChange: (selectedRowKeys, selectedRows) => {
+            onChange: (selectedRowKeys) => {
                 this.setState({selectedRowKeys});
             },
         };
@@ -408,6 +409,7 @@ class UserGroup extends Component {
                     </div>
 
                     <Table rowSelection={rowSelection}
+                           rowKey='id'
                            dataSource={this.state.items}
                            columns={columns}
                            position={'both'}

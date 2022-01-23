@@ -450,6 +450,17 @@ class User extends Component {
                 )
             },
             sorter: true,
+        }, {
+            title: '来源',
+            dataIndex: 'source',
+            key: 'source',
+            render: (text) => {
+                if (text === 'ldap') {
+                    return (
+                        <Tag color="gold">域同步</Tag>
+                    );
+                }
+            }
         },
             {
                 title: '操作',
@@ -460,6 +471,7 @@ class User extends Component {
                         <Menu>
                             <Menu.Item key="1">
                                 <Button type="text" size='small'
+                                        disabled={record['source'] === 'ldap'}
                                         onClick={() => {
                                             this.setState({
                                                 changePasswordVisible: true,
@@ -626,6 +638,7 @@ class User extends Component {
                     </div>
 
                     <Table rowSelection={rowSelection}
+                           rowKey='id'
                            dataSource={this.state.items}
                            columns={columns}
                            position={'both'}

@@ -86,3 +86,11 @@ func TestGetAvailablePort(t *testing.T) {
 	}
 	println(port)
 }
+
+func TestAesEncryptCBC2(t *testing.T) {
+	origData := []byte("{\"id\":\"xxxx\",\"opcode\":0,\"code\":0,\"message\":\"\",\"data\":\"\"}") // 待加密的数据
+	key, _ := base64.StdEncoding.DecodeString("aLSlrPelViToZvNF1T45PQ==")
+	encryptedCBC, err := utils.AesEncryptCBC(origData, key)
+	assert.NoError(t, err)
+	assert.Equal(t, "3Tbnz0MYHQNTsN2L6QDGCJumbNFsQcmErrRz/KglYI/IDh88lsyOhVi7mgaAs/bjevvJa2F1JT7jUMLsz9/cpw==", base64.StdEncoding.EncodeToString(encryptedCBC))
+}

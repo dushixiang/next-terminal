@@ -2,11 +2,11 @@ package term
 
 import (
 	"fmt"
-	"golang.org/x/net/proxy"
 	"net"
 	"time"
 
 	"golang.org/x/crypto/ssh"
+	"golang.org/x/net/proxy"
 )
 
 func NewSshClient(ip string, port int, username, password, privateKey, passphrase string) (*ssh.Client, error) {

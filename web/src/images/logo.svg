@@ -1,0 +1,10 @@
+<svg width="130" height="140" xmlns="http://www.w3.org/2000/svg">
+    <g fill="none">
+        <path fill="#40a9ff" d="M 10 10 V 110 L 65 135 L 120 110 V 10 Z"/>
+        <g fill="none">
+            <path fill="#40a9ff" d="M 10 10 V 110 L 65 135 L 120 110 V 10 Z"/>
+            <path fill="white" d="M 65 50 l -55 20 v 20 l 55 -20 l 55 20 v -20 l -55 -20 Z"/>
+            <path fill="#0050b3" d="M 65 70 l -55 20 v 20 l 55 25 l 55 -25 v -20 l -55 -20 Z"/>
+        </g>
+    </g>
+</svg>

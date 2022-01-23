@@ -23,7 +23,7 @@ func NowJsonTime() JsonTime {
 	}
 }
 
-func (j *JsonTime) MarshalJSON() ([]byte, error) {
+func (j JsonTime) MarshalJSON() ([]byte, error) {
 	var stamp = fmt.Sprintf("\"%s\"", j.Format("2006-01-02 15:04:05"))
 	return []byte(stamp), nil
 }
