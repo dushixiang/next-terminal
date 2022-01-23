@@ -1,28 +1,30 @@
 package service
 
 import (
-	"next-terminal/server/global/cache"
-	"strings"
+	"errors"
+	"fmt"
 
 	"next-terminal/server/constant"
+	"next-terminal/server/dto"
+	"next-terminal/server/env"
+	"next-terminal/server/global/cache"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
+	"strings"
+
+	"golang.org/x/net/context"
+	"gorm.io/gorm"
 )
 
-type UserService struct {
-	userRepository     *repository.UserRepository
-	loginLogRepository *repository.LoginLogRepository
+type userService struct {
+	baseService
 }
 
-func NewUserService(userRepository *repository.UserRepository, loginLogRepository *repository.LoginLogRepository) *UserService {
-	return &UserService{userRepository: userRepository, loginLogRepository: loginLogRepository}
-}
+func (service userService) InitUser() (err error) {
 
-func (r UserService) InitUser() (err error) {
-
-	users, err := r.userRepository.FindAll()
+	users, err := repository.UserRepository.FindAll(context.TODO())
 	if err != nil {
 		return err
 	}
@@ -43,7 +45,7 @@ func (r UserService) InitUser() (err error) {
 			Created:  utils.NowJsonTime(),
 			Status:   constant.StatusEnabled,
 		}
-		if err := r.userRepository.Create(&user); err != nil {
+		if err := repository.UserRepository.Create(context.TODO(), &user); err != nil {
 			return err
 		}
 
@@ -56,7 +58,7 @@ func (r UserService) InitUser() (err error) {
 					Type: constant.TypeAdmin,
 					ID:   users[i].ID,
 				}
-				if err := r.userRepository.Update(&user); err != nil {
+				if err := repository.UserRepository.Update(context.TODO(), &user); err != nil {
 					return err
 				}
 				log.Infof("自动修正用户「%v」ID「%v」类型为管理员", users[i].Nickname, users[i].ID)
@@ -66,20 +68,20 @@ func (r UserService) InitUser() (err error) {
 	return nil
 }
 
-func (r UserService) FixUserOnlineState() error {
+func (service userService) FixUserOnlineState() error {
 	// 修正用户登录状态
-	onlineUsers, err := r.userRepository.FindOnlineUsers()
+	onlineUsers, err := repository.UserRepository.FindOnlineUsers(context.TODO())
 	if err != nil {
 		return err
 	}
 	if len(onlineUsers) > 0 {
 		for i := range onlineUsers {
-			logs, err := r.loginLogRepository.FindAliveLoginLogsByUsername(onlineUsers[i].Username)
+			logs, err := repository.LoginLogRepository.FindAliveLoginLogsByUsername(context.TODO(), onlineUsers[i].Username)
 			if err != nil {
 				return err
 			}
 			if len(logs) == 0 {
-				if err := r.userRepository.UpdateOnlineByUsername(onlineUsers[i].Username, false); err != nil {
+				if err := repository.UserRepository.UpdateOnlineByUsername(context.TODO(), onlineUsers[i].Username, false); err != nil {
 					return err
 				}
 			}
@@ -88,96 +90,220 @@ func (r UserService) FixUserOnlineState() error {
 	return nil
 }
 
-func (r UserService) LogoutByToken(token string) (err error) {
-	loginLog, err := r.loginLogRepository.FindById(token)
-	if err != nil {
-		log.Warnf("登录日志「%v」获取失败", token)
-		return
-	}
-	cacheKey := r.BuildCacheKeyByToken(token)
-	cache.GlobalCache.Delete(cacheKey)
+func (service userService) LogoutByToken(token string) (err error) {
+	return env.GetDB().Transaction(func(tx *gorm.DB) error {
+		c := service.Context(tx)
+		loginLog, err := repository.LoginLogRepository.FindById(c, token)
+		if err != nil {
+			return err
+		}
+		cache.TokenManager.Delete(token)
 
-	loginLogForUpdate := &model.LoginLog{LogoutTime: utils.NowJsonTime(), ID: token}
-	err = r.loginLogRepository.Update(loginLogForUpdate)
-	if err != nil {
+		loginLogForUpdate := &model.LoginLog{LogoutTime: utils.NowJsonTime(), ID: token}
+		err = repository.LoginLogRepository.Update(c, loginLogForUpdate)
+		if err != nil {
+			return err
+		}
+
+		loginLogs, err := repository.LoginLogRepository.FindAliveLoginLogsByUsername(c, loginLog.Username)
+		if err != nil {
+			return err
+		}
+
+		if len(loginLogs) == 0 {
+			err = repository.UserRepository.UpdateOnlineByUsername(c, loginLog.Username, false)
+		}
 		return err
-	}
-
-	loginLogs, err := r.loginLogRepository.FindAliveLoginLogsByUsername(loginLog.Username)
-	if err != nil {
-		return
-	}
-
-	if len(loginLogs) == 0 {
-		err = r.userRepository.UpdateOnlineByUsername(loginLog.Username, false)
-	}
-	return
+	})
 }
 
-func (r UserService) LogoutById(id string) error {
-	user, err := r.userRepository.FindById(id)
+func (service userService) LogoutById(c context.Context, id string) error {
+	user, err := repository.UserRepository.FindById(c, id)
 	if err != nil {
 		return err
 	}
 	username := user.Username
-	loginLogs, err := r.loginLogRepository.FindAliveLoginLogsByUsername(username)
+	loginLogs, err := repository.LoginLogRepository.FindAliveLoginLogsByUsername(c, username)
 	if err != nil {
 		return err
 	}
 
 	for j := range loginLogs {
 		token := loginLogs[j].ID
-		if err := r.LogoutByToken(token); err != nil {
+		if err := service.LogoutByToken(token); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func (r UserService) BuildCacheKeyByToken(token string) string {
-	cacheKey := strings.Join([]string{constant.Token, token}, ":")
-	return cacheKey
-}
+func (service userService) OnEvicted(token string, value interface{}) {
 
-func (r UserService) GetTokenFormCacheKey(cacheKey string) string {
-	token := strings.Split(cacheKey, ":")[1]
-	return token
-}
-
-func (r UserService) OnEvicted(key string, value interface{}) {
-	if strings.HasPrefix(key, constant.Token) {
-		token := r.GetTokenFormCacheKey(key)
+	if strings.HasPrefix(token, "forever") {
+		log.Debugf("re gen forever token")
+	} else {
 		log.Debugf("用户Token「%v」过期", token)
-		err := r.LogoutByToken(token)
+		err := service.LogoutByToken(token)
 		if err != nil {
 			log.Errorf("退出登录失败 %v", err)
 		}
 	}
 }
 
-func (r UserService) UpdateStatusById(id string, status string) error {
-	if constant.StatusDisabled == status {
-		// 将该用户下线
-		if err := r.LogoutById(id); err != nil {
-			return err
+func (service userService) UpdateStatusById(id string, status string) error {
+	return env.GetDB().Transaction(func(tx *gorm.DB) error {
+		c := service.Context(tx)
+		if c.Value(constant.DB) == nil {
+			c = context.WithValue(c, constant.DB, env.GetDB())
 		}
-	}
-	u := model.User{
-		ID:     id,
-		Status: status,
-	}
-	return r.userRepository.Update(&u)
+		if constant.StatusDisabled == status {
+			// 将该用户下线
+			if err := service.LogoutById(c, id); err != nil {
+				return err
+			}
+		}
+		u := model.User{
+			ID:     id,
+			Status: status,
+		}
+		return repository.UserRepository.Update(c, &u)
+	})
+
 }
 
-func (r UserService) DeleteLoginLogs(tokens []string) error {
-	for i := range tokens {
-		token := tokens[i]
-		if err := r.LogoutByToken(token); err != nil {
+func (service userService) ReloadToken() error {
+	loginLogs, err := repository.LoginLogRepository.FindAliveLoginLogs(context.TODO())
+	if err != nil {
+		return err
+	}
+
+	for i := range loginLogs {
+		loginLog := loginLogs[i]
+		token := loginLog.ID
+		user, err := repository.UserRepository.FindByUsername(context.TODO(), loginLog.Username)
+		if err != nil {
+			if errors.Is(gorm.ErrRecordNotFound, err) {
+				_ = repository.LoginLogRepository.DeleteById(context.TODO(), token)
+			}
+			continue
+		}
+
+		authorization := dto.Authorization{
+			Token:    token,
+			Type:     constant.LoginToken,
+			Remember: loginLog.Remember,
+			User:     &user,
+		}
+
+		if authorization.Remember {
+			// 记住登录有效期两周
+			cache.TokenManager.Set(token, authorization, cache.RememberMeExpiration)
+		} else {
+			cache.TokenManager.Set(token, authorization, cache.NotRememberExpiration)
+		}
+		log.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
+	}
+	return nil
+}
+
+func (service userService) CreateUser(user model.User) (err error) {
+	return env.GetDB().Transaction(func(tx *gorm.DB) error {
+		c := service.Context(tx)
+		if repository.UserRepository.ExistByUsername(c, user.Username) {
+			return fmt.Errorf("username %s is already used", user.Username)
+		}
+		password := user.Password
+
+		var pass []byte
+		if pass, err = utils.Encoder.Encode([]byte(password)); err != nil {
 			return err
 		}
-		if err := r.loginLogRepository.DeleteById(token); err != nil {
+		user.Password = string(pass)
+
+		user.ID = utils.UUID()
+		user.Created = utils.NowJsonTime()
+		user.Status = constant.StatusEnabled
+
+		if err := repository.UserRepository.Create(c, &user); err != nil {
 			return err
+		}
+		err = StorageService.CreateStorageByUser(&user)
+		if err != nil {
+			return err
+		}
+
+		if user.Mail != "" {
+			go MailService.SendMail(user.Mail, "[Next Terminal] 注册通知", "你好，"+user.Nickname+"。管理员为你注册了账号："+user.Username+" 密码："+password)
+		}
+		return nil
+	})
+
+}
+
+func (service userService) DeleteUserById(userId string) error {
+	return env.GetDB().Transaction(func(tx *gorm.DB) error {
+		c := service.Context(tx)
+		// 下线该用户
+		if err := service.LogoutById(c, userId); err != nil {
+			return err
+		}
+		// 删除用户
+		if err := repository.UserRepository.DeleteById(c, userId); err != nil {
+			return err
+		}
+		// 删除用户与用户组的关系
+		if err := repository.UserGroupMemberRepository.DeleteByUserId(c, userId); err != nil {
+			return err
+		}
+		// 删除用户与资产的关系
+		if err := repository.ResourceSharerRepository.DeleteByUserId(c, userId); err != nil {
+			return err
+		}
+		// 删除用户的默认磁盘空间
+		if err := StorageService.DeleteStorageById(userId, true); err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+func (service userService) DeleteLoginLogs(tokens []string) error {
+	if len(tokens) > 0 {
+		for _, token := range tokens {
+			if err := service.LogoutByToken(token); err != nil {
+				return err
+			}
+			if err := repository.LoginLogRepository.DeleteById(context.TODO(), token); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
+}
+
+func (service userService) SaveLoginLog(clientIP, clientUserAgent string, username string, success, remember bool, id, reason string) error {
+	loginLog := model.LoginLog{
+		Username:        username,
+		ClientIP:        clientIP,
+		ClientUserAgent: clientUserAgent,
+		LoginTime:       utils.NowJsonTime(),
+		Reason:          reason,
+		Remember:        remember,
+	}
+	if success {
+		loginLog.State = "1"
+		loginLog.ID = id
+	} else {
+		loginLog.State = "0"
+		loginLog.ID = utils.LongUUID()
+	}
+
+	if err := repository.LoginLogRepository.Create(context.TODO(), &loginLog); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (service userService) DeleteALlLdapUser(ctx context.Context) error {
+	return repository.UserRepository.DeleteBySource(ctx, constant.SourceLdap)
 }

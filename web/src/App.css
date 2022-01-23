@@ -11,7 +11,7 @@
 }
 
 .logo {
-    margin: 24px;
+    margin: 30px 17px;
     text-align: center;
 }
 
@@ -128,25 +128,11 @@
     display: flex;
     align-items: center;
     height: 100%;
-    padding: 0 16px;
-}
-
-.km-header-logo {
-    font-size: 18px;
-    /*font-weight: 500;*/
-    font-weight: bold;
-    cursor: pointer;
-    color: white;
+    /*padding: 0 16px;*/
 }
 
 .km-header-right {
     text-align: left;
-    height: 100%;
-    margin: 0 8px;
-}
-
-.km-header-right {
-    text-align: right;
     height: 100%;
     margin: 0 8px;
 }

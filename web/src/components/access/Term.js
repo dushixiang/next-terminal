@@ -53,8 +53,8 @@ class Term extends Component {
             },
             rightClickSelectsWord: true,
         });
-
-        term.open(document.getElementById('terminal'));
+        let elementTerm = document.getElementById('terminal');
+        term.open(elementTerm);
         const fitAddon = new FitAddon();
         term.loadAddon(fitAddon);
         fitAddon.fit();
@@ -64,7 +64,6 @@ class Term extends Component {
 
         term.onSelectionChange(async () => {
             let selection = term.getSelection();
-            console.log(`selection: [${selection}]`);
             this.setState({
                 selection: selection
             })
@@ -79,6 +78,29 @@ class Term extends Component {
             }
             return !(e.ctrlKey && e.key === 'v');
         });
+
+        document.body.oncopy = (event) => {
+            event.preventDefault();
+            if (this.state.session['copy'] === '0') {
+                message.warn('禁止复制')
+                if (event.clipboardData) {
+                    return event.clipboardData.setData('text', '');
+                } else {
+                    // 兼容IE
+                    return window.clipboardData.setData("text", '');
+                }
+            }
+            return true;
+        }
+
+        document.body.onpaste = (event) => {
+            event.preventDefault();
+            if (this.state.session['paste'] === '0') {
+                message.warn('禁止粘贴')
+                return false;
+            }
+            return true;
+        }
 
         term.onData(data => {
             let webSocket = this.state.webSocket;

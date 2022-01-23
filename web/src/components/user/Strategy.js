@@ -13,7 +13,7 @@ const {Content} = Layout;
 const {Title, Text} = Typography;
 const {Search} = Input;
 
-const keys = ['upload', 'download', 'delete', 'rename', 'edit'];
+const keys = ['upload', 'download', 'delete', 'rename', 'edit', 'copy', 'paste'];
 
 class Strategy extends Component {
 
@@ -286,6 +286,20 @@ class Strategy extends Component {
             title: '重命名',
             dataIndex: 'rename',
             key: 'rename',
+            render: (text) => {
+                return renderStatus(text);
+            }
+        }, {
+            title: '复制',
+            dataIndex: 'copy',
+            key: 'copy',
+            render: (text) => {
+                return renderStatus(text);
+            }
+        }, {
+            title: '粘贴',
+            dataIndex: 'paste',
+            key: 'paste',
             render: (text) => {
                 return renderStatus(text);
             }

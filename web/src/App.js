@@ -12,6 +12,8 @@ import OfflineSession from "./components/session/OfflineSession";
 import Login from "./components/Login";
 import DynamicCommand from "./components/command/DynamicCommand";
 import Credential from "./components/credential/Credential";
+import LogoWithName from './images/logo-with-name.svg'
+import Logo from './images/logo.svg'
 import {
     ApiOutlined,
     AuditOutlined,
@@ -23,7 +25,8 @@ import {
     DesktopOutlined,
     DisconnectOutlined,
     DownOutlined,
-    FolderOutlined, GithubOutlined,
+    FolderOutlined,
+    GithubOutlined,
     HddOutlined,
     IdcardOutlined,
     InsuranceOutlined,
@@ -73,13 +76,26 @@ class App extends Component {
             'nickname': '未定义'
         },
         package: NT_PACKAGE(),
-        triggerMenu: true
+        triggerMenu: true,
+        logo: LogoWithName,
+        logoWidth: 140
     };
 
     onCollapse = () => {
-        this.setState({
-            collapsed: !this.state.collapsed,
-        });
+        let collapsed = !this.state.collapsed;
+        if (collapsed) {
+            this.setState({
+                logo: Logo,
+                logoWidth: 46,
+                collapsed: collapsed,
+            });
+        } else {
+            this.setState({
+                logo: LogoWithName,
+                logoWidth: 140,
+                collapsed: collapsed,
+            });
+        }
     };
 
     componentDidMount() {
@@ -94,7 +110,7 @@ class App extends Component {
 
     async getInfo() {
 
-        let result = await request.get('/info');
+        let result = await request.get('/account/info');
         if (result['code'] === 1) {
             sessionStorage.setItem('user', JSON.stringify(result['data']));
             this.setState({
@@ -126,8 +142,8 @@ class App extends Component {
         sessionStorage.setItem('openKeys', JSON.stringify(openKeys));
     }
 
-    confirm = async (e) => {
-        let result = await request.post('/logout');
+    confirm = async () => {
+        let result = await request.post('/account/logout');
         if (result['code'] !== 1) {
             message.error(result['message']);
         } else {
@@ -180,14 +196,7 @@ class App extends Component {
                                 <>
                                     <Sider collapsible collapsed={this.state.collapsed} trigger={null}>
                                         <div className="logo">
-                                            <img
-                                                src='data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjxwYXRoIGQ9Ik0yNzIgMTIyLjI0aDQ4MHYxNTcuMDU2aDk2Vi40NDhoLTk2TDI3MiAwYy01Mi44IDAtOTYgLjQ0OC05NiAuNDQ4djI3OC44NDhoOTZ2LTE1Ny4xMnptNDAzLjY0OCA2MDMuMzkyTDg5NiA1MTIgNjc1LjY0OCAyOTguMzY4IDYwOCAzNjQuNDggNzYwLjEyOCA1MTIgNjA4IDY1OS41Mmw2Ny42NDggNjYuMTEyek00MTYgNjU5LjUyTDI2My44MDggNTEyIDQxNiAzNjQuNDhsLTY3LjcxMi02Ni4xMTJMMTI4IDUxMmwyMjAuMjg4IDIxMy42MzJMNDE2IDY1OS41MnptMzM2IDI0Mi4zMDRIMjcydi0xNTcuMTJoLTk2VjEwMjRoNjcyVjc0NC43MDRoLTk2djE1Ny4xMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4='
-                                                alt='logo'/>
-                                            {
-                                                !this.state.collapsed ?
-                                                    <>&nbsp;<h1>Next Terminal</h1></> :
-                                                    null
-                                            }
+                                            <img src={this.state.logo} alt='logo' width={this.state.logoWidth}/>
                                         </div>
 
                                         <Menu
@@ -314,8 +323,10 @@ class App extends Component {
 
                                                 <div className='layout-header-right'>
                                                     <div className={'layout-header-right-item'}>
-                                                        <a style={{color: 'black'}} target='_blank' href='https://github.com/dushixiang/next-terminal' rel='noreferrer noopener'>
-                                                            <GithubOutlined />
+                                                        <a style={{color: 'black'}} target='_blank'
+                                                           href='https://github.com/dushixiang/next-terminal'
+                                                           rel='noreferrer noopener'>
+                                                            <GithubOutlined/>
                                                         </a>
                                                     </div>
                                                 </div>
@@ -350,7 +361,8 @@ class App extends Component {
                                         <Route path="/strategy" component={Strategy}/>
 
                                         <Footer style={{textAlign: 'center'}}>
-                                            Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
+                                            Copyright © 2020-2022 dushixiang, All Rights Reserved.
+                                            Version:{this.state.package['version']}
                                         </Footer>
                                     </Layout>
                                 </> :
@@ -359,11 +371,7 @@ class App extends Component {
                                         <div className='km-header'>
                                             <div style={{flex: '1 1 0%'}}>
                                                 <Link to={'/'}>
-                                                    <img
-                                                        style={{paddingBottom: 4, marginRight: 5}}
-                                                        src='data:image/svg+xml;base64,PHN2ZyBjbGFzcz0iaWNvbiIgdmlld0JveD0iMCAwIDEwMjQgMTAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB3aWR0aD0iMzIiIGhlaWdodD0iMzIiPjxwYXRoIGQ9Ik0yNzIgMTIyLjI0aDQ4MHYxNTcuMDU2aDk2Vi40NDhoLTk2TDI3MiAwYy01Mi44IDAtOTYgLjQ0OC05NiAuNDQ4djI3OC44NDhoOTZ2LTE1Ny4xMnptNDAzLjY0OCA2MDMuMzkyTDg5NiA1MTIgNjc1LjY0OCAyOTguMzY4IDYwOCAzNjQuNDggNzYwLjEyOCA1MTIgNjA4IDY1OS41Mmw2Ny42NDggNjYuMTEyek00MTYgNjU5LjUyTDI2My44MDggNTEyIDQxNiAzNjQuNDhsLTY3LjcxMi02Ni4xMTJMMTI4IDUxMmwyMjAuMjg4IDIxMy42MzJMNDE2IDY1OS41MnptMzM2IDI0Mi4zMDRIMjcydi0xNTcuMTJoLTk2VjEwMjRoNjcyVjc0NC43MDRoLTk2djE1Ny4xMnoiIGZpbGw9IiNmZmYiLz48L3N2Zz4='
-                                                        alt='logo'/>
-                                                    <span className='km-header-logo'>Next Terminal</span>
+                                                    <img src={this.state.logo} alt='logo' width={120}/>
                                                 </Link>
 
                                                 <Link to={'/my-file'}>
@@ -400,7 +408,8 @@ class App extends Component {
                                         </Layout>
                                     </Content>
                                     <Footer style={{textAlign: 'center'}}>
-                                        Next Terminal ©2021 dushixiang Version:{this.state.package['version']}
+                                        Copyright © 2020-2022 dushixiang, All Rights Reserved.
+                                        Version:{this.state.package['version']}
                                     </Footer>
                                 </>
                         }

@@ -5,7 +5,7 @@ import (
 )
 
 type LoginLog struct {
-	ID              string         `gorm:"primary_key,type:varchar(36)" json:"id"`
+	ID              string         `gorm:"primary_key,type:varchar(128)" json:"id"`
 	Username        string         `gorm:"index,type:varchar(200)" json:"username"`
 	ClientIP        string         `gorm:"type:varchar(200)" json:"clientIp"`
 	ClientUserAgent string         `gorm:"type:varchar(500)" json:"clientUserAgent"`

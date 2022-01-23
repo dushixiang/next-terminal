@@ -5,6 +5,10 @@ export const sleep = function (ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
 }
 
+export const setToken = function (token) {
+    localStorage.setItem('X-Auth-Token', token);
+}
+
 export const getToken = function () {
     return localStorage.getItem('X-Auth-Token');
 }

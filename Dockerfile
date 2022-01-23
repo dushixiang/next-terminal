@@ -21,7 +21,6 @@ LABEL MAINTAINER="helloworld1024@foxmail.com"
 
 ENV TZ Asia/Shanghai
 ENV DB sqlite
-ENV CONTAINER "true"
 ENV SQLITE_FILE './data/sqlite/next-terminal.db'
 ENV SERVER_PORT 8088
 ENV SERVER_ADDR 0.0.0.0:$SERVER_PORT

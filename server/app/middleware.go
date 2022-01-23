@@ -1,12 +1,13 @@
-package api
+package app
 
 import (
 	"fmt"
 	"net"
 	"strings"
-	"time"
 
+	"next-terminal/server/api"
 	"next-terminal/server/constant"
+	"next-terminal/server/dto"
 	"next-terminal/server/global/cache"
 	"next-terminal/server/global/security"
 	"next-terminal/server/utils"
@@ -21,10 +22,10 @@ func ErrorHandler(next echo.HandlerFunc) echo.HandlerFunc {
 
 			if he, ok := err.(*echo.HTTPError); ok {
 				message := fmt.Sprintf("%v", he.Message)
-				return Fail(c, he.Code, message)
+				return api.Fail(c, he.Code, message)
 			}
 
-			return Fail(c, 0, err.Error())
+			return api.Fail(c, 0, err.Error())
 		}
 		return nil
 	}
@@ -74,7 +75,7 @@ func TcpWall(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 			if s.Rule == constant.AccessRuleReject {
 				if c.Request().Header.Get("X-Requested-With") != "" || c.Request().Header.Get(constant.Token) != "" {
-					return Fail(c, 0, "您的访问请求被拒绝 :(")
+					return api.Fail(c, 0, "您的访问请求被拒绝 :(")
 				} else {
 					return c.HTML(666, "您的访问请求被拒绝 :(")
 				}
@@ -85,9 +86,9 @@ func TcpWall(next echo.HandlerFunc) echo.HandlerFunc {
 	}
 }
 
-func Auth(next echo.HandlerFunc) echo.HandlerFunc {
+var anonymousUrls = []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
 
-	anonymousUrls := []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/asciinema"}
+func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 
 	return func(c echo.Context) error {
 
@@ -102,21 +103,46 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			}
 		}
 
-		token := GetToken(c)
+		token := api.GetToken(c)
 		if token == "" {
-			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
-		}
-		cacheKey := userService.BuildCacheKeyByToken(token)
-		authorization, found := cache.GlobalCache.Get(cacheKey)
-		if !found {
-			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+			return api.Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
 		}
 
-		if authorization.(Authorization).Remember {
-			// 记住登录有效期两周
-			cache.GlobalCache.Set(cacheKey, authorization, time.Hour*time.Duration(24*14))
-		} else {
-			cache.GlobalCache.Set(cacheKey, authorization, time.Hour*time.Duration(2))
+		v, found := cache.TokenManager.Get(token)
+		if !found {
+			return api.Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+		}
+
+		authorization := v.(dto.Authorization)
+
+		if strings.EqualFold(constant.LoginToken, authorization.Type) {
+			if authorization.Remember {
+				// 记住登录有效期两周
+				cache.TokenManager.Set(token, authorization, cache.RememberMeExpiration)
+			} else {
+				cache.TokenManager.Set(token, authorization, cache.NotRememberExpiration)
+			}
+		} else if strings.EqualFold(constant.ShareSession, authorization.Type) {
+			id := c.Param("id")
+			uri = strings.Split(uri, "?")[0]
+			allowUrls := []string{
+				"/share-sessions/" + id,
+				"/sessions",
+				"/sessions/" + id + "/tunnel",
+				"/sessions/" + id + "/connect",
+				"/sessions/" + id + "/resize",
+				"/sessions/" + id + "/stats",
+				"/sessions/" + id + "/ls",
+				"/sessions/" + id + "/download",
+				"/sessions/" + id + "/upload",
+				"/sessions/" + id + "/edit",
+				"/sessions/" + id + "/mkdir",
+				"/sessions/" + id + "/rm",
+				"/sessions/" + id + "/rename",
+			}
+			if !utils.Contains(allowUrls, uri) {
+				return api.Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+			}
 		}
 
 		return next(c)
@@ -126,13 +152,13 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 func Admin(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
 
-		account, found := GetCurrentAccount(c)
+		account, found := api.GetCurrentAccount(c)
 		if !found {
-			return Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
+			return api.Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
 		}
 
 		if account.Type != constant.TypeAdmin {
-			return Fail(c, 403, "permission denied")
+			return api.Fail(c, 403, "permission denied")
 		}
 
 		return next(c)

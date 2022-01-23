@@ -1,26 +1,20 @@
 package repository
 
 import (
+	"context"
 	"time"
 
 	"next-terminal/server/model"
-
-	"gorm.io/gorm"
 )
 
-type LoginLogRepository struct {
-	DB *gorm.DB
+type loginLogRepository struct {
+	baseRepository
 }
 
-func NewLoginLogRepository(db *gorm.DB) *LoginLogRepository {
-	loginLogRepository = &LoginLogRepository{DB: db}
-	return loginLogRepository
-}
-
-func (r LoginLogRepository) Find(pageIndex, pageSize int, username, clientIp, state string) (o []model.LoginLog, total int64, err error) {
+func (r loginLogRepository) Find(c context.Context, pageIndex, pageSize int, username, clientIp, state string) (o []model.LoginLog, total int64, err error) {
 	m := model.LoginLog{}
-	db := r.DB.Table(m.TableName())
-	dbCounter := r.DB.Table(m.TableName())
+	db := r.GetDB(c).Table(m.TableName())
+	dbCounter := r.GetDB(c).Table(m.TableName())
 
 	if username != "" {
 		db = db.Where("username like ?", "%"+username+"%")
@@ -49,44 +43,44 @@ func (r LoginLogRepository) Find(pageIndex, pageSize int, username, clientIp, st
 	return
 }
 
-func (r LoginLogRepository) FindAliveLoginLogs() (o []model.LoginLog, err error) {
-	err = r.DB.Where("state = '1' and logout_time is null").Find(&o).Error
+func (r loginLogRepository) FindAliveLoginLogs(c context.Context) (o []model.LoginLog, err error) {
+	err = r.GetDB(c).Where("state = '1' and logout_time is null").Find(&o).Error
 	return
 }
 
-func (r LoginLogRepository) FindAllLoginLogs() (o []model.LoginLog, err error) {
-	err = r.DB.Find(&o).Error
+func (r loginLogRepository) FindAllLoginLogs(c context.Context) (o []model.LoginLog, err error) {
+	err = r.GetDB(c).Find(&o).Error
 	return
 }
 
-func (r LoginLogRepository) FindAliveLoginLogsByUsername(username string) (o []model.LoginLog, err error) {
-	err = r.DB.Where("state = '1' and logout_time is null and username = ?", username).Find(&o).Error
+func (r loginLogRepository) FindAliveLoginLogsByUsername(c context.Context, username string) (o []model.LoginLog, err error) {
+	err = r.GetDB(c).Where("state = '1' and logout_time is null and username = ?", username).Find(&o).Error
 	return
 }
 
-func (r LoginLogRepository) FindOutTimeLog(dayLimit int) (o []model.LoginLog, err error) {
+func (r loginLogRepository) FindOutTimeLog(c context.Context, dayLimit int) (o []model.LoginLog, err error) {
 	limitTime := time.Now().Add(time.Duration(-dayLimit*24) * time.Hour)
-	err = r.DB.Where("(state = '0' and login_time < ?) or (state = '1' and logout_time < ?) or (state is null and logout_time < ?)", limitTime, limitTime, limitTime).Find(&o).Error
+	err = r.GetDB(c).Where("(state = '0' and login_time < ?) or (state = '1' and logout_time < ?) or (state is null and logout_time < ?)", limitTime, limitTime, limitTime).Find(&o).Error
 	return
 }
 
-func (r LoginLogRepository) Create(o *model.LoginLog) (err error) {
-	return r.DB.Create(o).Error
+func (r loginLogRepository) Create(c context.Context, o *model.LoginLog) (err error) {
+	return r.GetDB(c).Create(o).Error
 }
 
-func (r LoginLogRepository) DeleteByIdIn(ids []string) (err error) {
-	return r.DB.Where("id in ?", ids).Delete(&model.LoginLog{}).Error
+func (r loginLogRepository) DeleteByIdIn(c context.Context, ids []string) (err error) {
+	return r.GetDB(c).Where("id in ?", ids).Delete(&model.LoginLog{}).Error
 }
 
-func (r LoginLogRepository) DeleteById(id string) (err error) {
-	return r.DB.Where("id = ?", id).Delete(&model.LoginLog{}).Error
+func (r loginLogRepository) DeleteById(c context.Context, id string) (err error) {
+	return r.GetDB(c).Where("id = ?", id).Delete(&model.LoginLog{}).Error
 }
 
-func (r LoginLogRepository) FindById(id string) (o model.LoginLog, err error) {
-	err = r.DB.Where("id = ?", id).First(&o).Error
+func (r loginLogRepository) FindById(c context.Context, id string) (o model.LoginLog, err error) {
+	err = r.GetDB(c).Where("id = ?", id).First(&o).Error
 	return
 }
 
-func (r LoginLogRepository) Update(o *model.LoginLog) error {
-	return r.DB.Updates(o).Error
+func (r loginLogRepository) Update(c context.Context, o *model.LoginLog) error {
+	return r.GetDB(c).Updates(o).Error
 }

@@ -1,48 +1,43 @@
 package repository
 
 import (
-	"next-terminal/server/model"
+	"context"
 
-	"gorm.io/gorm"
+	"next-terminal/server/model"
 )
 
-type PropertyRepository struct {
-	DB *gorm.DB
+type propertyRepository struct {
+	baseRepository
 }
 
-func NewPropertyRepository(db *gorm.DB) *PropertyRepository {
-	propertyRepository = &PropertyRepository{DB: db}
-	return propertyRepository
-}
-
-func (r PropertyRepository) FindAll() (o []model.Property) {
-	if r.DB.Find(&o).Error != nil {
+func (r propertyRepository) FindAll(c context.Context) (o []model.Property) {
+	if r.GetDB(c).Find(&o).Error != nil {
 		return nil
 	}
 	return
 }
 
-func (r PropertyRepository) Create(o *model.Property) (err error) {
-	err = r.DB.Create(o).Error
+func (r propertyRepository) Create(c context.Context, o *model.Property) (err error) {
+	err = r.GetDB(c).Create(o).Error
 	return
 }
 
-func (r PropertyRepository) UpdateByName(o *model.Property, name string) error {
+func (r propertyRepository) UpdateByName(c context.Context, o *model.Property, name string) error {
 	o.Name = name
-	return r.DB.Updates(o).Error
+	return r.GetDB(c).Updates(o).Error
 }
 
-func (r PropertyRepository) DeleteByName(name string) error {
-	return r.DB.Where("name = ?", name).Delete(model.Property{}).Error
+func (r propertyRepository) DeleteByName(c context.Context, name string) error {
+	return r.GetDB(c).Where("name = ?", name).Delete(model.Property{}).Error
 }
 
-func (r PropertyRepository) FindByName(name string) (o model.Property, err error) {
-	err = r.DB.Where("name = ?", name).First(&o).Error
+func (r propertyRepository) FindByName(c context.Context, name string) (o model.Property, err error) {
+	err = r.GetDB(c).Where("name = ?", name).First(&o).Error
 	return
 }
 
-func (r PropertyRepository) FindAllMap() map[string]string {
-	properties := r.FindAll()
+func (r propertyRepository) FindAllMap(c context.Context) map[string]string {
+	properties := r.FindAll(c)
 	propertyMap := make(map[string]string)
 	for i := range properties {
 		propertyMap[properties[i].Name] = properties[i].Value

@@ -15,6 +15,7 @@ type User struct {
 	Created    utils.JsonTime `json:"created"`
 	Type       string         `gorm:"type:varchar(20)" json:"type"`
 	Mail       string         `gorm:"type:varchar(500)" json:"mail"`
+	Source     string         `gorm:"type:varchar(20)" json:"source"`
 }
 
 type UserForPage struct {
@@ -27,6 +28,7 @@ type UserForPage struct {
 	Status           string         `json:"status"`
 	Created          utils.JsonTime `json:"created"`
 	Type             string         `json:"type"`
+	Source           string         `json:"source"`
 	SharerAssetCount int64          `json:"sharerAssetCount"`
 }
 

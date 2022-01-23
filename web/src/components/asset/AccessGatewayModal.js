@@ -38,8 +38,6 @@ const AccessGatewayModal = ({title, visible, handleOk, handleCancel, confirmLoad
                     .then(values => {
                         form.resetFields();
                         handleOk(values);
-                    })
-                    .catch(info => {
                     });
             }}
             onCancel={handleCancel}
@@ -102,10 +100,6 @@ const AccessGatewayModal = ({title, visible, handleOk, handleCancel, confirmLoad
                             </Form.Item>
                         </>
                 }
-
-                <Form.Item label="本地映射地址" name='localhost' tooltip='隧道映射到本地的地址，请确保Guacd可以访问到此IP'>
-                    <Input placeholder="localhost"/>
-                </Form.Item>
             </Form>
         </Modal>
     )

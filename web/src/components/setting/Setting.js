@@ -1,8 +1,7 @@
 import React, {Component} from 'react';
-import {Alert, Button, Form, Input, Layout, Select, Space, Switch, Tabs, Tooltip, Typography} from "antd";
+import {Alert, Button, Form, Input, Layout, Select, Space, Switch, Tabs, Typography} from "antd";
 import request from "../../common/request";
 import {message} from "antd/es";
-import {ExclamationCircleOutlined} from "@ant-design/icons";
 import {download, getToken} from "../../utils/utils";
 import {server} from "../../common/env";
 
@@ -24,7 +23,9 @@ const formTailLayout = {
 class Setting extends Component {
 
     state = {
-        properties: {}
+        refs: [],
+        properties: {},
+        ldapUserSyncLoading: false
     }
 
     rdpSettingFormRef = React.createRef();
@@ -32,10 +33,18 @@ class Setting extends Component {
     vncSettingFormRef = React.createRef();
     guacdSettingFormRef = React.createRef();
     mailSettingFormRef = React.createRef();
+    ldapSettingFormRef = React.createRef();
     logSettingFormRef = React.createRef();
 
     componentDidMount() {
-        this.getProperties();
+        // eslint-disable-next-line no-extend-native
+        String.prototype.bool = function () {
+            return (/^true$/i).test(this);
+        };
+
+        this.setState({
+            refs: [this.rdpSettingFormRef, this.sshSettingFormRef, this.vncSettingFormRef, this.guacdSettingFormRef, this.mailSettingFormRef, this.logSettingFormRef]
+        }, this.getProperties)
     }
 
     changeProperties = async (values) => {
@@ -48,11 +57,6 @@ class Setting extends Component {
     }
 
     getProperties = async () => {
-
-        // eslint-disable-next-line no-extend-native
-        String.prototype.bool = function () {
-            return (/^true$/i).test(this);
-        };
 
         let result = await request.get('/properties');
         if (result['code'] === 1) {
@@ -74,28 +78,10 @@ class Setting extends Component {
                 properties: properties
             })
 
-            if (this.rdpSettingFormRef.current) {
-                this.rdpSettingFormRef.current.setFieldsValue(properties)
-            }
-
-            if (this.sshSettingFormRef.current) {
-                this.sshSettingFormRef.current.setFieldsValue(properties)
-            }
-
-            if (this.vncSettingFormRef.current) {
-                this.vncSettingFormRef.current.setFieldsValue(properties)
-            }
-
-            if (this.guacdSettingFormRef.current) {
-                this.guacdSettingFormRef.current.setFieldsValue(properties)
-            }
-
-            if (this.mailSettingFormRef.current) {
-                this.mailSettingFormRef.current.setFieldsValue(properties)
-            }
-
-            if (this.logSettingFormRef.current) {
-                this.logSettingFormRef.current.setFieldsValue(properties)
+            for (let ref of this.state.refs) {
+                if (ref.current) {
+                    ref.current.setFieldsValue(properties)
+                }
             }
         } else {
             message.error(result['message']);
@@ -133,6 +119,26 @@ class Setting extends Component {
             }
         };
         reader.readAsText(files[0]);
+    }
+
+    ldapUserSync = async () => {
+        const id = 'ldap-user-sync'
+        try {
+            this.setState({
+                ldapUserSyncLoading: true
+            });
+            message.info({content: '同步中...', key: id, duration: 5});
+            let result = await request.post(`/properties/ldap-user-sync`);
+            if (result.code !== 1) {
+                message.error({content: result.message, key: id, duration: 10});
+                return;
+            }
+            message.success({content: '同步成功。', key: id, duration: 3});
+        } finally {
+            this.setState({
+                ldapUserSyncLoading: false
+            });
+        }
     }
 
     render() {
@@ -244,20 +250,6 @@ class Setting extends Component {
                                     {...formItemLayout}
                                     name="disable-offscreen-caching"
                                     label="禁用离屏缓存"
-                                    valuePropName="checked"
-                                    rules={[
-                                        {
-                                            required: true,
-                                        },
-                                    ]}
-                                >
-                                    <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
-                                </Form.Item>
-
-                                <Form.Item
-                                    {...formItemLayout}
-                                    name="disable-glyph-caching"
-                                    label="禁用字形缓存"
                                     valuePropName="checked"
                                     rules={[
                                         {
@@ -409,18 +401,18 @@ class Setting extends Component {
                                     <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
                                 </Form.Item>
 
-                                <Form.Item label={<Tooltip
-                                    title="连接到VNC代理（例如UltraVNC Repeater）时要请求的目标主机。">目标主机&nbsp;
-                                    <ExclamationCircleOutlined/></Tooltip>}
-                                           {...formItemLayout}
-                                           name='dest-host'>
+                                <Form.Item
+                                    {...formItemLayout}
+                                    label='目标主机'
+                                    tooltip='连接到VNC代理（例如UltraVNC Repeater）时要请求的目标主机。'
+                                    name='dest-host'>
                                     <Input placeholder="目标主机"/>
                                 </Form.Item>
-                                <Form.Item label={<Tooltip
-                                    title="连接到VNC代理（例如UltraVNC Repeater）时要请求的目标端口。">目标端口&nbsp;
-                                    <ExclamationCircleOutlined/></Tooltip>}
-                                           {...formItemLayout}
-                                           name='dest-port'>
+                                <Form.Item
+                                    {...formItemLayout}
+                                    label='目标端口'
+                                    tooltip='连接到VNC代理（例如UltraVNC Repeater）时要请求的目标端口。'
+                                    name='dest-port'>
                                     <Input type='number' min={1} max={65535}
                                            placeholder='目标端口'/>
                                 </Form.Item>
@@ -457,26 +449,21 @@ class Setting extends Component {
                                         })
                                     }}/>
                                 </Form.Item>
-                                {
-                                    this.state.properties['enable-recording'] === true ?
-                                        <>
-                                            <Form.Item
-                                                {...formItemLayout}
-                                                name="session-saved-limit"
-                                                label="会话录屏保存时长"
-                                                initialValue=""
-                                            >
-                                                <Select onChange={null}>
-                                                    <Option value="">永久</Option>
-                                                    <Option value="30">30天</Option>
-                                                    <Option value="60">60天</Option>
-                                                    <Option value="180">180天</Option>
-                                                    <Option value="360">360天</Option>
-                                                </Select>
-                                            </Form.Item>
-                                        </> : null
-                                }
 
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="session-saved-limit"
+                                    label="会话录屏保存时长"
+                                    initialValue=""
+                                >
+                                    <Select onChange={null} disabled={!this.state.properties['enable-recording']}>
+                                        <Option value="">永久</Option>
+                                        <Option value="30">30天</Option>
+                                        <Option value="60">60天</Option>
+                                        <Option value="180">180天</Option>
+                                        <Option value="360">360天</Option>
+                                    </Select>
+                                </Form.Item>
 
                                 <Form.Item {...formTailLayout}>
                                     <Button type="primary" htmlType="submit">
@@ -487,6 +474,11 @@ class Setting extends Component {
                         </TabPane>
                         <TabPane tab="邮箱配置" key="mail">
                             <Title level={3}>邮箱配置</Title>
+                            <Alert
+                                message="配置邮箱后，添加用户将向对方的邮箱发送账号密码。"
+                                type="info"
+                                style={{marginBottom: 10}}
+                            />
                             <Form ref={this.mailSettingFormRef} name='mail' onFinish={this.changeProperties}
                                   layout="vertical">
 
@@ -534,7 +526,7 @@ class Setting extends Component {
                                 >
                                     <Input type='email' placeholder="请输入邮箱账号"/>
                                 </Form.Item>
-
+                                <input type='password' hidden={true} autoComplete='new-password'/>
                                 <Form.Item
                                     {...formItemLayout}
                                     name="mail-password"
@@ -555,6 +547,7 @@ class Setting extends Component {
                                     </Button>
                                 </Form.Item>
                             </Form>
+
                         </TabPane>
 
                         <TabPane tab="日志配置" key="log">

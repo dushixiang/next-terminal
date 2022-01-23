@@ -1,0 +1,21 @@
+package repository
+
+var (
+	PropertyRepository        = new(propertyRepository)
+	UserRepository            = new(userRepository)
+	UserGroupRepository       = new(userGroupRepository)
+	UserGroupMemberRepository = new(userGroupMemberRepository)
+	ResourceSharerRepository  = new(resourceSharerRepository)
+	AssetRepository           = new(assetRepository)
+	CredentialRepository      = new(credentialRepository)
+	CommandRepository         = new(commandRepository)
+	SessionRepository         = new(sessionRepository)
+	SecurityRepository        = new(securityRepository)
+	GatewayRepository         = new(gatewayRepository)
+	JobRepository             = new(jobRepository)
+	JobLogRepository          = new(jobLogRepository)
+	LoginLogRepository        = new(loginLogRepository)
+	StorageRepository         = new(storageRepository)
+	StrategyRepository        = new(strategyRepository)
+	AccessTokenRepository     = new(accessTokenRepository)
+)

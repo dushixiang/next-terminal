@@ -1,55 +1,48 @@
 package api
 
 import (
+	"context"
+
+	"next-terminal/server/dto"
+	"next-terminal/server/repository"
+
 	"github.com/labstack/echo/v4"
 )
 
-type RU struct {
-	UserGroupId  string   `json:"userGroupId"`
-	UserId       string   `json:"userId"`
-	StrategyId   string   `json:"strategyId"`
-	ResourceType string   `json:"resourceType"`
-	ResourceIds  []string `json:"resourceIds"`
-}
+type ResourceSharerApi struct{}
 
-type UR struct {
-	ResourceId   string   `json:"resourceId"`
-	ResourceType string   `json:"resourceType"`
-	UserIds      []string `json:"userIds"`
-}
-
-func RSGetSharersEndPoint(c echo.Context) error {
+func (api ResourceSharerApi) RSGetSharersEndPoint(c echo.Context) error {
 	resourceId := c.QueryParam("resourceId")
 	resourceType := c.QueryParam("resourceType")
 	userId := c.QueryParam("userId")
 	userGroupId := c.QueryParam("userGroupId")
-	userIds, err := resourceSharerRepository.Find(resourceId, resourceType, userId, userGroupId)
+	userIds, err := repository.ResourceSharerRepository.Find(context.TODO(), resourceId, resourceType, userId, userGroupId)
 	if err != nil {
 		return err
 	}
 	return Success(c, userIds)
 }
 
-func ResourceRemoveByUserIdAssignEndPoint(c echo.Context) error {
-	var ru RU
+func (api ResourceSharerApi) ResourceRemoveByUserIdAssignEndPoint(c echo.Context) error {
+	var ru dto.RU
 	if err := c.Bind(&ru); err != nil {
 		return err
 	}
 
-	if err := resourceSharerRepository.DeleteByUserIdAndResourceTypeAndResourceIdIn(ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := repository.ResourceSharerRepository.DeleteByUserIdAndResourceTypeAndResourceIdIn(context.TODO(), ru.UserGroupId, ru.UserId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 
 	return Success(c, "")
 }
 
-func ResourceAddByUserIdAssignEndPoint(c echo.Context) error {
-	var ru RU
+func (api ResourceSharerApi) ResourceAddByUserIdAssignEndPoint(c echo.Context) error {
+	var ru dto.RU
 	if err := c.Bind(&ru); err != nil {
 		return err
 	}
 
-	if err := resourceSharerRepository.AddSharerResources(ru.UserGroupId, ru.UserId, ru.StrategyId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := repository.ResourceSharerRepository.AddSharerResources(ru.UserGroupId, ru.UserId, ru.StrategyId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 

@@ -8,7 +8,6 @@ type AccessGateway struct {
 	Name        string         `gorm:"type:varchar(500)" json:"name"`
 	IP          string         `gorm:"type:varchar(500)" json:"ip"`
 	Port        int            `gorm:"type:int(5)" json:"port"`
-	Localhost   string         `gorm:"type:varchar(200)" json:"localhost"` // 隧道映射到本地的地址
 	AccountType string         `gorm:"type:varchar(50)" json:"accountType"`
 	Username    string         `gorm:"type:varchar(200)" json:"username"`
 	Password    string         `gorm:"type:varchar(500)" json:"password"`

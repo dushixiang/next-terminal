@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"context"
+
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
 
@@ -9,17 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
-type ResourceSharerRepository struct {
-	DB *gorm.DB
+type resourceSharerRepository struct {
+	baseRepository
 }
 
-func NewResourceSharerRepository(db *gorm.DB) *ResourceSharerRepository {
-	resourceSharerRepository = &ResourceSharerRepository{DB: db}
-	return resourceSharerRepository
-}
-
-func (r *ResourceSharerRepository) OverwriteUserIdsByResourceId(resourceId, resourceType string, userIds []string) (err error) {
-	db := r.DB.Begin()
+func (r *resourceSharerRepository) OverwriteUserIdsByResourceId(c context.Context, resourceId, resourceType string, userIds []string) (err error) {
+	db := r.GetDB(c).Begin()
 
 	var owner string
 	// 检查资产是否存在
@@ -71,8 +68,8 @@ func (r *ResourceSharerRepository) OverwriteUserIdsByResourceId(resourceId, reso
 	return nil
 }
 
-func (r *ResourceSharerRepository) DeleteByUserIdAndResourceTypeAndResourceIdIn(userGroupId, userId, resourceType string, resourceIds []string) error {
-	db := r.DB
+func (r *resourceSharerRepository) DeleteByUserIdAndResourceTypeAndResourceIdIn(c context.Context, userGroupId, userId, resourceType string, resourceIds []string) error {
+	db := r.GetDB(c)
 	if userGroupId != "" {
 		db = db.Where("user_group_id = ?", userGroupId)
 	}
@@ -92,12 +89,20 @@ func (r *ResourceSharerRepository) DeleteByUserIdAndResourceTypeAndResourceIdIn(
 	return db.Delete(&model.ResourceSharer{}).Error
 }
 
-func (r *ResourceSharerRepository) DeleteResourceSharerByResourceId(resourceId string) error {
-	return r.DB.Where("resource_id = ?", resourceId).Delete(&model.ResourceSharer{}).Error
+func (r *resourceSharerRepository) DeleteByResourceId(c context.Context, resourceId string) error {
+	return r.GetDB(c).Where("resource_id = ?", resourceId).Delete(&model.ResourceSharer{}).Error
 }
 
-func (r *ResourceSharerRepository) AddSharerResources(userGroupId, userId, strategyId, resourceType string, resourceIds []string) error {
-	return r.DB.Transaction(func(tx *gorm.DB) (err error) {
+func (r *resourceSharerRepository) DeleteByUserId(c context.Context, userId string) error {
+	return r.GetDB(c).Where("user_id = ?", userId).Delete(&model.ResourceSharer{}).Error
+}
+
+func (r *resourceSharerRepository) DeleteByUserGroupId(c context.Context, userGroupId string) error {
+	return r.GetDB(c).Where("user_group_id = ?", userGroupId).Delete(&model.ResourceSharer{}).Error
+}
+
+func (r *resourceSharerRepository) AddSharerResources(userGroupId, userId, strategyId, resourceType string, resourceIds []string) error {
+	return r.GetDB(context.TODO()).Transaction(func(tx *gorm.DB) (err error) {
 
 		for i := range resourceIds {
 			resourceId := resourceIds[i]
@@ -149,22 +154,22 @@ func (r *ResourceSharerRepository) AddSharerResources(userGroupId, userId, strat
 	})
 }
 
-func (r *ResourceSharerRepository) FindAssetIdsByUserId(userId string) (assetIds []string, err error) {
+func (r *resourceSharerRepository) FindAssetIdsByUserId(c context.Context, userId string) (assetIds []string, err error) {
 	// 查询当前用户创建的资产
 	var ownerAssetIds, sharerAssetIds []string
 	asset := model.Asset{}
-	err = r.DB.Table(asset.TableName()).Select("id").Where("owner = ?", userId).Find(&ownerAssetIds).Error
+	err = r.GetDB(c).Table(asset.TableName()).Select("id").Where("owner = ?", userId).Find(&ownerAssetIds).Error
 	if err != nil {
 		return nil, err
 	}
 
 	// 查询其他用户授权给该用户的资产
-	groupIds, err := userGroupRepository.FindUserGroupIdsByUserId(userId)
+	groupIds, err := UserGroupMemberRepository.FindUserGroupIdsByUserId(c, userId)
 	if err != nil {
 		return nil, err
 	}
 
-	db := r.DB.Table("resource_sharers").Select("resource_id").Where("user_id = ?", userId)
+	db := r.GetDB(c).Table("resource_sharers").Select("resource_id").Where("user_id = ?", userId)
 	if len(groupIds) > 0 {
 		db = db.Or("user_group_id in ?", groupIds)
 	}
@@ -187,13 +192,13 @@ func (r *ResourceSharerRepository) FindAssetIdsByUserId(userId string) (assetIds
 	return
 }
 
-func (r *ResourceSharerRepository) FindByResourceIdAndUserId(assetId, userId string) (resourceSharers []model.ResourceSharer, err error) {
+func (r *resourceSharerRepository) FindByResourceIdAndUserId(c context.Context, assetId, userId string) (resourceSharers []model.ResourceSharer, err error) {
 	// 查询其他用户授权给该用户的资产
-	groupIds, err := userGroupRepository.FindUserGroupIdsByUserId(userId)
+	groupIds, err := UserGroupMemberRepository.FindUserGroupIdsByUserId(c, userId)
 	if err != nil {
 		return
 	}
-	db := r.DB.Where("( resource_id = ? and user_id = ? )", assetId, userId)
+	db := r.GetDB(c).Where("( resource_id = ? and user_id = ? )", assetId, userId)
 	if len(groupIds) > 0 {
 		db = db.Or("user_group_id in ?", groupIds)
 	}
@@ -201,8 +206,8 @@ func (r *ResourceSharerRepository) FindByResourceIdAndUserId(assetId, userId str
 	return
 }
 
-func (r *ResourceSharerRepository) Find(resourceId, resourceType, userId, userGroupId string) (resourceSharers []model.ResourceSharer, err error) {
-	db := r.DB
+func (r *resourceSharerRepository) Find(c context.Context, resourceId, resourceType, userId, userGroupId string) (resourceSharers []model.ResourceSharer, err error) {
+	db := r.GetDB(c)
 	if resourceId != "" {
 		db = db.Where("resource_id = ?")
 	}
@@ -219,7 +224,7 @@ func (r *ResourceSharerRepository) Find(resourceId, resourceType, userId, userGr
 	return
 }
 
-func (r *ResourceSharerRepository) FindAll() (o []model.ResourceSharer, err error) {
-	err = r.DB.Find(&o).Error
+func (r *resourceSharerRepository) FindAll(c context.Context) (o []model.ResourceSharer, err error) {
+	err = r.GetDB(c).Find(&o).Error
 	return
 }

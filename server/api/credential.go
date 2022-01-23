@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"strconv"
@@ -9,17 +10,23 @@ import (
 	"next-terminal/server/config"
 	"next-terminal/server/constant"
 	"next-terminal/server/model"
+	"next-terminal/server/repository"
+	"next-terminal/server/service"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
 )
 
-func CredentialAllEndpoint(c echo.Context) error {
-	account, _ := GetCurrentAccount(c)
-	items, _ := credentialRepository.FindByUser(account)
+type CredentialApi struct{}
+
+func (api CredentialApi) CredentialAllEndpoint(c echo.Context) error {
+	items, err := repository.CredentialRepository.FindByUser(context.TODO())
+	if err != nil {
+		return err
+	}
 	return Success(c, items)
 }
-func CredentialCreateEndpoint(c echo.Context) error {
+func (api CredentialApi) CredentialCreateEndpoint(c echo.Context) error {
 	var item model.Credential
 	if err := c.Bind(&item); err != nil {
 		return err
@@ -56,14 +63,15 @@ func CredentialCreateEndpoint(c echo.Context) error {
 	}
 
 	item.Encrypted = true
-	if err := credentialRepository.Create(&item); err != nil {
+
+	if err := service.CredentialService.Create(&item); err != nil {
 		return err
 	}
 
 	return Success(c, item)
 }
 
-func CredentialPagingEndpoint(c echo.Context) error {
+func (api CredentialApi) CredentialPagingEndpoint(c echo.Context) error {
 	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	name := c.QueryParam("name")
@@ -72,21 +80,21 @@ func CredentialPagingEndpoint(c echo.Context) error {
 	field := c.QueryParam("field")
 
 	account, _ := GetCurrentAccount(c)
-	items, total, err := credentialRepository.Find(pageIndex, pageSize, name, order, field, account)
+	items, total, err := repository.CredentialRepository.Find(context.TODO(), pageIndex, pageSize, name, order, field, account)
 	if err != nil {
 		return err
 	}
 
-	return Success(c, H{
+	return Success(c, Map{
 		"total": total,
 		"items": items,
 	})
 }
 
-func CredentialUpdateEndpoint(c echo.Context) error {
+func (api CredentialApi) CredentialUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	if err := PreCheckCredentialPermission(c, id); err != nil {
+	if err := api.PreCheckCredentialPermission(c, id); err != nil {
 		return err
 	}
 
@@ -142,25 +150,21 @@ func CredentialUpdateEndpoint(c echo.Context) error {
 	}
 	item.Encrypted = true
 
-	if err := credentialRepository.UpdateById(&item, id); err != nil {
+	if err := repository.CredentialRepository.UpdateById(context.TODO(), &item, id); err != nil {
 		return err
 	}
 
 	return Success(c, nil)
 }
 
-func CredentialDeleteEndpoint(c echo.Context) error {
+func (api CredentialApi) CredentialDeleteEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	split := strings.Split(id, ",")
 	for i := range split {
-		if err := PreCheckCredentialPermission(c, split[i]); err != nil {
+		if err := api.PreCheckCredentialPermission(c, split[i]); err != nil {
 			return err
 		}
-		if err := credentialRepository.DeleteById(split[i]); err != nil {
-			return err
-		}
-		// 删除资产与用户的关系
-		if err := resourceSharerRepository.DeleteResourceSharerByResourceId(split[i]); err != nil {
+		if err := repository.CredentialRepository.DeleteById(context.TODO(), split[i]); err != nil {
 			return err
 		}
 	}
@@ -168,13 +172,13 @@ func CredentialDeleteEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func CredentialGetEndpoint(c echo.Context) error {
+func (api CredentialApi) CredentialGetEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	if err := PreCheckCredentialPermission(c, id); err != nil {
+	if err := api.PreCheckCredentialPermission(c, id); err != nil {
 		return err
 	}
 
-	item, err := credentialRepository.FindByIdAndDecrypt(id)
+	item, err := service.CredentialService.FindByIdAndDecrypt(context.TODO(), id)
 	if err != nil {
 		return err
 	}
@@ -186,22 +190,22 @@ func CredentialGetEndpoint(c echo.Context) error {
 	return Success(c, item)
 }
 
-func CredentialChangeOwnerEndpoint(c echo.Context) error {
+func (api CredentialApi) CredentialChangeOwnerEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	if err := PreCheckCredentialPermission(c, id); err != nil {
+	if err := api.PreCheckCredentialPermission(c, id); err != nil {
 		return err
 	}
 
 	owner := c.QueryParam("owner")
-	if err := credentialRepository.UpdateById(&model.Credential{Owner: owner}, id); err != nil {
+	if err := repository.CredentialRepository.UpdateById(context.TODO(), &model.Credential{Owner: owner}, id); err != nil {
 		return err
 	}
 	return Success(c, "")
 }
 
-func PreCheckCredentialPermission(c echo.Context, id string) error {
-	item, err := credentialRepository.FindById(id)
+func (api CredentialApi) PreCheckCredentialPermission(c echo.Context, id string) error {
+	item, err := repository.CredentialRepository.FindById(context.TODO(), id)
 	if err != nil {
 		return err
 	}

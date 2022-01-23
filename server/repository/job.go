@@ -1,25 +1,20 @@
 package repository
 
 import (
+	"context"
+
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
-
-	"gorm.io/gorm"
 )
 
-type JobRepository struct {
-	DB *gorm.DB
+type jobRepository struct {
+	baseRepository
 }
 
-func NewJobRepository(db *gorm.DB) *JobRepository {
-	jobRepository = &JobRepository{DB: db}
-	return jobRepository
-}
-
-func (r JobRepository) Find(pageIndex, pageSize int, name, status, order, field string) (o []model.Job, total int64, err error) {
+func (r jobRepository) Find(c context.Context, pageIndex, pageSize int, name, status, order, field string) (o []model.Job, total int64, err error) {
 	job := model.Job{}
-	db := r.DB.Table(job.TableName())
-	dbCounter := r.DB.Table(job.TableName())
+	db := r.GetDB(c).Table(job.TableName())
+	dbCounter := r.GetDB(c).Table(job.TableName())
 
 	if len(name) > 0 {
 		db = db.Where("name like ?", "%"+name+"%")
@@ -57,45 +52,36 @@ func (r JobRepository) Find(pageIndex, pageSize int, name, status, order, field 
 	return
 }
 
-func (r JobRepository) FindByFunc(function string) (o []model.Job, err error) {
-	db := r.DB
+func (r jobRepository) FindByFunc(c context.Context, function string) (o []model.Job, err error) {
+	db := r.GetDB(c)
 	err = db.Where("func = ?", function).Find(&o).Error
 	return
 }
 
-func (r JobRepository) FindAll() (o []model.Job, err error) {
-	db := r.DB
+func (r jobRepository) FindAll(c context.Context) (o []model.Job, err error) {
+	db := r.GetDB(c)
 	err = db.Find(&o).Error
 	return
 }
 
-func (r JobRepository) Create(o *model.Job) (err error) {
-	return r.DB.Create(o).Error
+func (r jobRepository) Create(c context.Context, o *model.Job) (err error) {
+	return r.GetDB(c).Create(o).Error
 }
 
-func (r JobRepository) UpdateById(o *model.Job) (err error) {
-	return r.DB.Updates(o).Error
+func (r jobRepository) UpdateById(c context.Context, o *model.Job) (err error) {
+	return r.GetDB(c).Updates(o).Error
 }
 
-func (r JobRepository) UpdateLastUpdatedById(id string) (err error) {
-	err = r.DB.Updates(model.Job{ID: id, Updated: utils.NowJsonTime()}).Error
+func (r jobRepository) UpdateLastUpdatedById(c context.Context, id string) (err error) {
+	err = r.GetDB(c).Updates(model.Job{ID: id, Updated: utils.NowJsonTime()}).Error
 	return
 }
 
-func (r JobRepository) FindById(id string) (o model.Job, err error) {
-	err = r.DB.Where("id = ?", id).First(&o).Error
+func (r jobRepository) FindById(c context.Context, id string) (o model.Job, err error) {
+	err = r.GetDB(c).Where("id = ?", id).First(&o).Error
 	return
 }
 
-func (r JobRepository) DeleteJobById(id string) error {
-	//job, err := r.FindById(id)
-	//if err != nil {
-	//	return err
-	//}
-	//if job.Status == constant.JobStatusRunning {
-	//	if err := r.ChangeStatusById(id, constant.JobStatusNotRunning); err != nil {
-	//		return err
-	//	}
-	//}
-	return r.DB.Where("id = ?", id).Delete(model.Job{}).Error
+func (r jobRepository) DeleteJobById(c context.Context, id string) error {
+	return r.GetDB(c).Where("id = ?", id).Delete(model.Job{}).Error
 }

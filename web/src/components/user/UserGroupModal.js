@@ -27,11 +27,11 @@ const UserGroupModal = ({
             onOk={() => {
                 form
                     .validateFields()
-                    .then(values => {
-                        form.resetFields();
-                        handleOk(values);
-                    })
-                    .catch(info => {
+                    .then(async values => {
+                        let ok = await handleOk(values);
+                        if (ok) {
+                            form.resetFields();
+                        }
                     });
             }}
             onCancel={handleCancel}

@@ -17,6 +17,8 @@ const StrategyModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
             'delete': false,
             'rename': false,
             'edit': false,
+            'copy': false,
+            'paste': false,
         };
     }
 
@@ -32,8 +34,6 @@ const StrategyModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
                     .then(values => {
                         form.resetFields();
                         handleOk(values);
-                    })
-                    .catch(info => {
                     });
             }}
             onCancel={handleCancel}
@@ -59,7 +59,8 @@ const StrategyModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
                     <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
                 </Form.Item>
 
-                <Form.Item label="编辑" name='edit' rules={[{required: true}]} valuePropName="checked" tooltip={'编辑需要先开启下载'}>
+                <Form.Item label="编辑" name='edit' rules={[{required: true}]} valuePropName="checked"
+                           tooltip={'编辑需要先开启下载'}>
                     <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
                 </Form.Item>
 
@@ -68,6 +69,14 @@ const StrategyModal = ({title, visible, handleOk, handleCancel, confirmLoading, 
                 </Form.Item>
 
                 <Form.Item label="重命名" name='rename' rules={[{required: true}]} valuePropName="checked">
+                    <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
+                </Form.Item>
+
+                <Form.Item label="复制" name='copy' rules={[{required: true}]} valuePropName="checked">
+                    <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
+                </Form.Item>
+
+                <Form.Item label="粘贴" name='paste' rules={[{required: true}]} valuePropName="checked">
                     <Switch checkedChildren="开启" unCheckedChildren="关闭"/>
                 </Form.Item>
             </Form>

@@ -1,39 +1,30 @@
 package api
 
 import (
+	"context"
+
 	"next-terminal/server/constant"
+	"next-terminal/server/dto"
+	"next-terminal/server/repository"
 
 	"github.com/labstack/echo/v4"
 )
 
-type Counter struct {
-	User          int64 `json:"user"`
-	Asset         int64 `json:"asset"`
-	Credential    int64 `json:"credential"`
-	OnlineSession int64 `json:"onlineSession"`
-}
+type OverviewApi struct{}
 
-func OverviewCounterEndPoint(c echo.Context) error {
-	account, _ := GetCurrentAccount(c)
-
+func (api OverviewApi) OverviewCounterEndPoint(c echo.Context) error {
 	var (
 		countUser          int64
 		countOnlineSession int64
 		credential         int64
 		asset              int64
 	)
-	if constant.TypeUser == account.Type {
-		countUser, _ = userRepository.CountOnlineUser()
-		countOnlineSession, _ = sessionRepository.CountOnlineSession()
-		credential, _ = credentialRepository.CountByUserId(account.ID)
-		asset, _ = assetRepository.CountByUserId(account.ID)
-	} else {
-		countUser, _ = userRepository.CountOnlineUser()
-		countOnlineSession, _ = sessionRepository.CountOnlineSession()
-		credential, _ = credentialRepository.Count()
-		asset, _ = assetRepository.Count()
-	}
-	counter := Counter{
+	countUser, _ = repository.UserRepository.CountOnlineUser(context.TODO())
+	countOnlineSession, _ = repository.SessionRepository.CountOnlineSession(context.TODO())
+	credential, _ = repository.CredentialRepository.Count(context.TODO())
+	asset, _ = repository.AssetRepository.Count(context.TODO())
+
+	counter := dto.Counter{
 		User:          countUser,
 		OnlineSession: countOnlineSession,
 		Credential:    credential,
@@ -43,8 +34,7 @@ func OverviewCounterEndPoint(c echo.Context) error {
 	return Success(c, counter)
 }
 
-func OverviewAssetEndPoint(c echo.Context) error {
-	account, _ := GetCurrentAccount(c)
+func (api OverviewApi) OverviewAssetEndPoint(c echo.Context) error {
 	var (
 		ssh        int64
 		rdp        int64
@@ -52,19 +42,13 @@ func OverviewAssetEndPoint(c echo.Context) error {
 		telnet     int64
 		kubernetes int64
 	)
-	if constant.TypeUser == account.Type {
-		ssh, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.SSH)
-		rdp, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.RDP)
-		vnc, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.VNC)
-		telnet, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.Telnet)
-		kubernetes, _ = assetRepository.CountByUserIdAndProtocol(account.ID, constant.K8s)
-	} else {
-		ssh, _ = assetRepository.CountByProtocol(constant.SSH)
-		rdp, _ = assetRepository.CountByProtocol(constant.RDP)
-		vnc, _ = assetRepository.CountByProtocol(constant.VNC)
-		telnet, _ = assetRepository.CountByProtocol(constant.Telnet)
-		kubernetes, _ = assetRepository.CountByProtocol(constant.K8s)
-	}
+
+	ssh, _ = repository.AssetRepository.CountByProtocol(context.TODO(), constant.SSH)
+	rdp, _ = repository.AssetRepository.CountByProtocol(context.TODO(), constant.RDP)
+	vnc, _ = repository.AssetRepository.CountByProtocol(context.TODO(), constant.VNC)
+	telnet, _ = repository.AssetRepository.CountByProtocol(context.TODO(), constant.Telnet)
+	kubernetes, _ = repository.AssetRepository.CountByProtocol(context.TODO(), constant.K8s)
+
 	m := echo.Map{
 		"ssh":        ssh,
 		"rdp":        rdp,
@@ -75,9 +59,8 @@ func OverviewAssetEndPoint(c echo.Context) error {
 	return Success(c, m)
 }
 
-func OverviewAccessEndPoint(c echo.Context) error {
-	account, _ := GetCurrentAccount(c)
-	access, err := sessionRepository.OverviewAccess(account)
+func (api OverviewApi) OverviewAccessEndPoint(c echo.Context) error {
+	access, err := repository.SessionRepository.OverviewAccess(context.TODO())
 	if err != nil {
 		return err
 	}
