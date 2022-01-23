@@ -34,6 +34,6 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/guacamole-server:latest
-            ${{ secrets.DOCKERHUB_USERNAME }}/guacamole-server:1.3.0
+            ${{ secrets.DOCKERHUB_USERNAME }}/guacamole-server:1.4.0
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacamole-server:cache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacamole-server:cache,mode=max
