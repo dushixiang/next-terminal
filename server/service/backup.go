@@ -220,7 +220,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 			}
 		}
 
-		var accessGatewayIdMapping = make(map[string]string, 0)
+		var accessGatewayIdMapping = make(map[string]string)
 		if len(backup.AccessGateways) > 0 {
 			for _, item := range backup.AccessGateways {
 				oldId := item.ID
@@ -244,7 +244,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 			}
 		}
 
-		var credentialIdMapping = make(map[string]string, 0)
+		var credentialIdMapping = make(map[string]string)
 		if len(backup.Credentials) > 0 {
 			for _, item := range backup.Credentials {
 				oldId := item.ID
@@ -257,7 +257,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 			}
 		}
 
-		var assetIdMapping = make(map[string]string, 0)
+		var assetIdMapping = make(map[string]string)
 		if len(backup.Assets) > 0 {
 			for _, m := range backup.Assets {
 				data, err := json.Marshal(m)

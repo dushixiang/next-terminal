@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"next-terminal/server/constant"
 	"next-terminal/server/dto"
@@ -12,7 +13,6 @@ import (
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
-	"strings"
 
 	"golang.org/x/net/context"
 	"gorm.io/gorm"

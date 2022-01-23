@@ -19,8 +19,10 @@ const (
 
 const Token = "X-Auth-Token"
 
+type Key string
+
 const (
-	DB = "db"
+	DB Key = "db"
 
 	SSH    = "ssh"
 	RDP    = "rdp"

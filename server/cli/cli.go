@@ -4,12 +4,13 @@ import (
 	"context"
 	"crypto/md5"
 	"fmt"
-	"next-terminal/server/env"
-	"next-terminal/server/service"
 
+	"next-terminal/server/constant"
+	"next-terminal/server/env"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
+	"next-terminal/server/service"
 	"next-terminal/server/utils"
 
 	"gorm.io/gorm"
@@ -65,7 +66,7 @@ func (cli Cli) ChangeEncryptionKey(oldEncryptionKey, newEncryptionKey string) er
 	newPassword := []byte(fmt.Sprintf("%x", md5.Sum([]byte(newEncryptionKey))))
 
 	return env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := context.WithValue(context.TODO(), "db", tx)
+		c := context.WithValue(context.TODO(), constant.DB, tx)
 		credentials, err := repository.CredentialRepository.FindAll(c)
 		if err != nil {
 			return err
