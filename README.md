@@ -1,7 +1,5 @@
 # Next Terminal
 
-**说明：最新版前后端代码已经全部开源，1.2.x 及之后版本已去除授权限制。**
-
 [![Docker guacd build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml)
 [![Docker next-terminal build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml)
 
@@ -44,7 +42,9 @@ test/test
 
 ## 问题反馈
 
-请提 Issues 。
+- Issues
+- QQ群 938145268
+- Telegram https://t.me/next_terminal
 
 ## 安全问题
 
