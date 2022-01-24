@@ -90,6 +90,7 @@ func SetupConfig() (*Config, error) {
 	pflag.String("server.addr", "", "server listen addr")
 	pflag.String("server.cert", "", "tls cert file")
 	pflag.String("server.key", "", "tls key file")
+	pflag.String("reset-totp", "", "")
 	pflag.String("reset-password", "", "")
 	pflag.String("encryption-key", "", "")
 	pflag.String("new-encryption-key", "", "")
