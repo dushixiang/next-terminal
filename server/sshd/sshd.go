@@ -20,19 +20,20 @@ import (
 	"gorm.io/gorm"
 )
 
-type Sshd struct {
+var Sshd *sshd
+
+type sshd struct {
 	gui *Gui
 }
 
 func init() {
 	gui := &Gui{}
-	sshd := &Sshd{
+	Sshd = &sshd{
 		gui: gui,
 	}
-	go sshd.Serve()
 }
 
-func (sshd Sshd) passwordAuth(ctx ssh.Context, pass string) bool {
+func (sshd sshd) passwordAuth(ctx ssh.Context, pass string) bool {
 	username := ctx.User()
 	remoteAddr := strings.Split(ctx.RemoteAddr().String(), ":")[0]
 	user, err := repository.UserRepository.FindByUsername(context.TODO(), username)
@@ -51,7 +52,7 @@ func (sshd Sshd) passwordAuth(ctx ssh.Context, pass string) bool {
 	return true
 }
 
-func (sshd Sshd) connCallback(ctx ssh.Context, conn net.Conn) net.Conn {
+func (sshd sshd) connCallback(ctx ssh.Context, conn net.Conn) net.Conn {
 	securities := security.GlobalSecurityManager.Values()
 	if len(securities) == 0 {
 		return conn
@@ -100,7 +101,7 @@ func (sshd Sshd) connCallback(ctx ssh.Context, conn net.Conn) net.Conn {
 	return conn
 }
 
-func (sshd Sshd) sessionHandler(sess *ssh.Session) {
+func (sshd sshd) sessionHandler(sess *ssh.Session) {
 	defer func() {
 		_ = (*sess).Close()
 	}()
@@ -128,7 +129,7 @@ func (sshd Sshd) sessionHandler(sess *ssh.Session) {
 	}
 }
 
-func (sshd Sshd) Serve() {
+func (sshd sshd) Serve() {
 	ssh.Handle(func(s ssh.Session) {
 		_, _ = io.WriteString(s, fmt.Sprintf(constant.Banner, constant.Version))
 		sshd.sessionHandler(&s)
