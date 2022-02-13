@@ -8,6 +8,7 @@ import (
 	"next-terminal/server/config"
 	"next-terminal/server/constant"
 	"next-terminal/server/service"
+	"next-terminal/server/sshd"
 
 	"github.com/labstack/echo/v4"
 )
@@ -108,6 +109,10 @@ func Run() error {
 
 	if config.GlobalCfg.NewEncryptionKey != "" {
 		return _cli.ChangeEncryptionKey(config.GlobalCfg.EncryptionKey, config.GlobalCfg.NewEncryptionKey)
+	}
+
+	if config.GlobalCfg.Sshd.Enable {
+		go sshd.Sshd.Serve()
 	}
 
 	if config.GlobalCfg.Server.Cert != "" && config.GlobalCfg.Server.Key != "" {
