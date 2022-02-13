@@ -113,13 +113,12 @@ class Term extends Component {
         let params = {
             'cols': term.cols,
             'rows': term.rows,
-            'sessionId': sessionId,
             'X-Auth-Token': token
         };
 
         let paramStr = qs.stringify(params);
 
-        let webSocket = new WebSocket(wsServer + '/ssh?' + paramStr);
+        let webSocket = new WebSocket(`${wsServer}/sessions/${sessionId}/ssh?${paramStr}`);
 
         let pingInterval;
         webSocket.onopen = (e => {

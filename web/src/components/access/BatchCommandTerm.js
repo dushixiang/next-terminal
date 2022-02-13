@@ -62,7 +62,7 @@ class BatchCommandTerm extends Component {
 
         let paramStr = qs.stringify(params);
 
-        let webSocket = new WebSocket(wsServer + '/ssh?' + paramStr);
+        let webSocket = new WebSocket(`${wsServer}/sessions/${sessionId}/ssh?${paramStr}`);
 
         this.props.appendWebsocket({'id': assetId, 'ws': webSocket});
 

@@ -15,8 +15,6 @@ const STATE_DISCONNECTED = 5;
 
 class AccessMonitor extends Component {
 
-    formRef = React.createRef()
-
     state = {
         client: {},
         containerOverflow: 'hidden',
@@ -29,7 +27,7 @@ class AccessMonitor extends Component {
     };
 
     async componentDidMount() {
-        const connectionId = this.props.connectionId;
+        const sessionId = this.props.sessionId;
         let rate = this.props.rate;
         let protocol = this.props.protocol;
         let width = this.props.width;
@@ -45,7 +43,7 @@ class AccessMonitor extends Component {
             height: height * rate,
             rate: rate,
         })
-        this.renderDisplay(connectionId);
+        this.renderDisplay(sessionId);
     }
 
     componentWillUnmount() {
@@ -110,9 +108,9 @@ class AccessMonitor extends Component {
         });
     }
 
-    async renderDisplay(connectionId, protocol) {
+    async renderDisplay(sessionId, protocol) {
 
-        let tunnel = new Guacamole.WebSocketTunnel(wsServer + '/tunnel');
+        let tunnel = new Guacamole.WebSocketTunnel(`${wsServer}/sessions/${sessionId}/tunnel-monitor`);
 
         tunnel.onstatechange = this.onTunnelStateChange;
         let client = new Guacamole.Client(tunnel);
@@ -128,7 +126,6 @@ class AccessMonitor extends Component {
         let token = getToken();
 
         let params = {
-            'connectionId': connectionId,
             'X-Auth-Token': token
         };
 
