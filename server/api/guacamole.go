@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -54,7 +53,6 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	height := c.QueryParam("height")
 	dpi := c.QueryParam("dpi")
 	sessionId := c.Param("id")
-	connectionId := c.QueryParam("connectionId")
 
 	intWidth, _ := strconv.Atoi(width)
 	intHeight, _ := strconv.Atoi(height)
@@ -63,65 +61,48 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 
 	propertyMap := repository.PropertyRepository.FindAllMap(ctx)
 
-	var s model.Session
-
-	if len(connectionId) > 0 {
-		s, err = repository.SessionRepository.FindByConnectionId(ctx, connectionId)
+	configuration.SetParameter("width", width)
+	configuration.SetParameter("height", height)
+	configuration.SetParameter("dpi", dpi)
+	s, err := service.SessionService.FindByIdAndDecrypt(ctx, sessionId)
+	if err != nil {
+		return err
+	}
+	api.setConfig(propertyMap, s, configuration)
+	var (
+		ip   = s.IP
+		port = s.Port
+	)
+	if s.AccessGatewayId != "" && s.AccessGatewayId != "-" {
+		g, err := service.GatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
 		if err != nil {
-			return err
+			utils.Disconnect(ws, AccessGatewayUnAvailable, "获取接入网关失败："+err.Error())
+			return nil
 		}
-		if s.Status != constant.Connected {
-			return errors.New("会话未在线")
+		if !g.Connected {
+			utils.Disconnect(ws, AccessGatewayUnAvailable, "接入网关不可用："+g.Message)
+			return nil
 		}
-		configuration.ConnectionID = connectionId
-		sessionId = s.ID
-		configuration.SetParameter("width", strconv.Itoa(s.Width))
-		configuration.SetParameter("height", strconv.Itoa(s.Height))
-		configuration.SetParameter("dpi", "96")
-	} else {
-		configuration.SetParameter("width", width)
-		configuration.SetParameter("height", height)
-		configuration.SetParameter("dpi", dpi)
-		s, err = service.SessionService.FindByIdAndDecrypt(ctx, sessionId)
+		exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, ip, port)
 		if err != nil {
-			return err
+			utils.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
+			return nil
 		}
-		api.setConfig(propertyMap, s, configuration)
-		var (
-			ip   = s.IP
-			port = s.Port
-		)
-		if s.AccessGatewayId != "" && s.AccessGatewayId != "-" {
-			g, err := service.GatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
-			if err != nil {
-				utils.Disconnect(ws, AccessGatewayUnAvailable, "获取接入网关失败："+err.Error())
-				return nil
-			}
-			if !g.Connected {
-				utils.Disconnect(ws, AccessGatewayUnAvailable, "接入网关不可用："+g.Message)
-				return nil
-			}
-			exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, ip, port)
-			if err != nil {
-				utils.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
-				return nil
-			}
-			ip = exposedIP
-			port = exposedPort
-			defer g.CloseSshTunnel(s.ID)
-		}
+		ip = exposedIP
+		port = exposedPort
+		defer g.CloseSshTunnel(s.ID)
+	}
 
-		configuration.SetParameter("hostname", ip)
-		configuration.SetParameter("port", strconv.Itoa(port))
+	configuration.SetParameter("hostname", ip)
+	configuration.SetParameter("port", strconv.Itoa(port))
 
-		// 加载资产配置的属性，优先级比全局配置的高，因此最后加载，覆盖掉全局配置
-		attributes, err := repository.AssetRepository.FindAssetAttrMapByAssetId(ctx, s.AssetId)
-		if err != nil {
-			return err
-		}
-		if len(attributes) > 0 {
-			api.setAssetConfig(attributes, s, configuration)
-		}
+	// 加载资产配置的属性，优先级比全局配置的高，因此最后加载，覆盖掉全局配置
+	attributes, err := repository.AssetRepository.FindAssetAttrMapByAssetId(ctx, s.AssetId)
+	if err != nil {
+		return err
+	}
+	if len(attributes) > 0 {
+		api.setAssetConfig(attributes, s, configuration)
 	}
 	for name := range configuration.Parameters {
 		// 替换数据库空格字符串占位符为真正的空格
@@ -136,9 +117,7 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 
 	guacdTunnel, err := guacd.NewTunnel(addr, configuration)
 	if err != nil {
-		if connectionId == "" {
-			utils.Disconnect(ws, NewTunnelError, err.Error())
-		}
+		utils.Disconnect(ws, NewTunnelError, err.Error())
 		log.Printf("[%v] 建立连接失败: %v", sessionId, err.Error())
 		return err
 	}
@@ -151,43 +130,31 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 		GuacdTunnel: guacdTunnel,
 	}
 
-	if connectionId == "" {
-		if configuration.Protocol == constant.SSH {
-			nextTerminal, err := CreateNextTerminalBySession(s)
-			if err == nil {
-				nextSession.NextTerminal = nextTerminal
-			}
+	if configuration.Protocol == constant.SSH {
+		nextTerminal, err := CreateNextTerminalBySession(s)
+		if err == nil {
+			nextSession.NextTerminal = nextTerminal
 		}
+	}
 
-		nextSession.Observer = session.NewObserver(sessionId)
-		session.GlobalSessionManager.Add <- nextSession
-		go nextSession.Observer.Start()
-		sess := model.Session{
-			ConnectionId: guacdTunnel.UUID,
-			Width:        intWidth,
-			Height:       intHeight,
-			Status:       constant.Connecting,
-			Recording:    configuration.GetParameter(guacd.RecordingPath),
-		}
-		if sess.Recording == "" {
-			// 未录屏时无需审计
-			sess.Reviewed = true
-		}
-		// 创建新会话
-		log.Debugf("[%v] 新建会话成功: %v", sessionId, sess.ConnectionId)
-		if err := repository.SessionRepository.UpdateById(ctx, &sess, sessionId); err != nil {
-			return err
-		}
-	} else {
-		// 要监控会话
-		forObsSession := session.GlobalSessionManager.GetById(sessionId)
-		if forObsSession == nil {
-			utils.Disconnect(ws, NotFoundSession, "获取会话失败")
-			return nil
-		}
-		nextSession.ID = utils.UUID()
-		forObsSession.Observer.Add <- nextSession
-		log.Debugf("[%v:%v] 观察者[%v]加入会话[%v]", sessionId, connectionId, nextSession.ID, s.ConnectionId)
+	nextSession.Observer = session.NewObserver(sessionId)
+	session.GlobalSessionManager.Add <- nextSession
+	go nextSession.Observer.Start()
+	sess := model.Session{
+		ConnectionId: guacdTunnel.UUID,
+		Width:        intWidth,
+		Height:       intHeight,
+		Status:       constant.Connecting,
+		Recording:    configuration.GetParameter(guacd.RecordingPath),
+	}
+	if sess.Recording == "" {
+		// 未录屏时无需审计
+		sess.Reviewed = true
+	}
+	// 创建新会话
+	log.Debugf("[%v] 新建会话成功: %v", sessionId, sess.ConnectionId)
+	if err := repository.SessionRepository.UpdateById(ctx, &sess, sessionId); err != nil {
+		return err
 	}
 
 	guacamoleHandler := NewGuacamoleHandler(ws, guacdTunnel)
@@ -196,21 +163,11 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	for {
 		_, message, err := ws.ReadMessage()
 		if err != nil {
-			log.Debugf("[%v:%v] WebSocket已关闭, %v", sessionId, connectionId, err.Error())
+			log.Debugf("[%v] WebSocket已关闭, %v", sessionId, err.Error())
 			// guacdTunnel.Read() 会阻塞，所以要先把guacdTunnel客户端关闭，才能退出Guacd循环
 			_ = guacdTunnel.Close()
 
-			if connectionId != "" {
-				observerId := nextSession.ID
-				forObsSession := session.GlobalSessionManager.GetById(sessionId)
-				if forObsSession != nil {
-					// 移除会话中保存的观察者信息
-					forObsSession.Observer.Del <- observerId
-					log.Debugf("[%v:%v] 观察者[%v]退出会话", sessionId, connectionId, observerId)
-				}
-			} else {
-				service.SessionService.CloseSessionById(sessionId, Normal, "用户正常退出")
-			}
+			service.SessionService.CloseSessionById(sessionId, Normal, "用户正常退出")
 			guacamoleHandler.Stop()
 			return nil
 		}
@@ -241,6 +198,84 @@ func (api GuacamoleApi) setAssetConfig(attributes map[string]string, s model.Ses
 			log.Debugf("[%v] 会话 %v:%v 映射目录地址为 %v", s.ID, s.IP, s.Port, realPath)
 		} else {
 			configuration.SetParameter(key, value)
+		}
+	}
+}
+
+func (api GuacamoleApi) GuacamoleMonitor(c echo.Context) error {
+	ws, err := UpGrader.Upgrade(c.Response().Writer, c.Request(), nil)
+	if err != nil {
+		log.Errorf("升级为WebSocket协议失败：%v", err.Error())
+		return err
+	}
+	ctx := context.TODO()
+	sessionId := c.Param("id")
+
+	s, err := repository.SessionRepository.FindById(ctx, sessionId)
+	if err != nil {
+		return err
+	}
+	if s.Status != constant.Connected {
+		utils.Disconnect(ws, AssetNotActive, "会话离线")
+		return nil
+	}
+	connectionId := s.ConnectionId
+	configuration := guacd.NewConfiguration()
+	configuration.ConnectionID = connectionId
+	sessionId = s.ID
+	configuration.SetParameter("width", strconv.Itoa(s.Width))
+	configuration.SetParameter("height", strconv.Itoa(s.Height))
+	configuration.SetParameter("dpi", "96")
+
+	addr := config.GlobalCfg.Guacd.Hostname + ":" + strconv.Itoa(config.GlobalCfg.Guacd.Port)
+	asset := fmt.Sprintf("%s:%s", configuration.GetParameter("hostname"), configuration.GetParameter("port"))
+	log.Debugf("[%v] 新建 guacd 会话, guacd=%v, asset=%v", sessionId, addr, asset)
+
+	guacdTunnel, err := guacd.NewTunnel(addr, configuration)
+	if err != nil {
+		utils.Disconnect(ws, NewTunnelError, err.Error())
+		log.Printf("[%v] 建立连接失败: %v", sessionId, err.Error())
+		return err
+	}
+
+	nextSession := &session.Session{
+		ID:          sessionId,
+		Protocol:    s.Protocol,
+		Mode:        s.Mode,
+		WebSocket:   ws,
+		GuacdTunnel: guacdTunnel,
+	}
+
+	// 要监控会话
+	forObsSession := session.GlobalSessionManager.GetById(sessionId)
+	if forObsSession == nil {
+		utils.Disconnect(ws, NotFoundSession, "获取会话失败")
+		return nil
+	}
+	nextSession.ID = utils.UUID()
+	forObsSession.Observer.Add <- nextSession
+	log.Debugf("[%v:%v] 观察者[%v]加入会话[%v]", sessionId, connectionId, nextSession.ID, s.ConnectionId)
+
+	guacamoleHandler := NewGuacamoleHandler(ws, guacdTunnel)
+	guacamoleHandler.Start()
+
+	for {
+		_, message, err := ws.ReadMessage()
+		if err != nil {
+			log.Debugf("[%v:%v] WebSocket已关闭, %v", sessionId, connectionId, err.Error())
+			// guacdTunnel.Read() 会阻塞，所以要先把guacdTunnel客户端关闭，才能退出Guacd循环
+			_ = guacdTunnel.Close()
+
+			observerId := nextSession.ID
+			forObsSession.Observer.Del <- observerId
+			log.Debugf("[%v:%v] 观察者[%v]退出会话", sessionId, connectionId, observerId)
+			guacamoleHandler.Stop()
+			return nil
+		}
+		_, err = guacdTunnel.WriteAndFlush(message)
+		if err != nil {
+			service.SessionService.CloseSessionById(sessionId, TunnelClosed, "远程连接已关闭")
+			return nil
 		}
 	}
 }

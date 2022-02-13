@@ -33,13 +33,12 @@ class TermMonitor extends Component {
 
         let token = getToken();
         let params = {
-            'sessionId': sessionId,
             'X-Auth-Token': token
         };
 
         let paramStr = qs.stringify(params);
 
-        let webSocket = new WebSocket(wsServer + '/ssh-monitor?' + paramStr);
+        let webSocket = new WebSocket(`${wsServer}/sessions/${sessionId}/ssh-monitor?${paramStr}`);
         webSocket.onmessage = (e) => {
             let msg = Message.parse(e.data);
             switch (msg['type']) {

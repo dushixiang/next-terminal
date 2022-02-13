@@ -47,7 +47,7 @@ func (api WebTerminalApi) SshEndpoint(c echo.Context) error {
 	}()
 	ctx := context.TODO()
 
-	sessionId := c.QueryParam("sessionId")
+	sessionId := c.Param("id")
 	cols, _ := strconv.Atoi(c.QueryParam("cols"))
 	rows, _ := strconv.Atoi(c.QueryParam("rows"))
 
@@ -222,7 +222,7 @@ func (api WebTerminalApi) SshMonitorEndpoint(c echo.Context) error {
 	}()
 	ctx := context.TODO()
 
-	sessionId := c.QueryParam("sessionId")
+	sessionId := c.Param("id")
 	s, err := repository.SessionRepository.FindById(ctx, sessionId)
 	if err != nil {
 		return WriteMessage(ws, dto.NewMessage(Closed, "获取会话失败"))

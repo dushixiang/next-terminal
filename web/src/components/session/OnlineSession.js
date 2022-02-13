@@ -202,7 +202,6 @@ class OnlineSession extends Component {
 
     showMonitor = (record) => {
         this.setState({
-            connectionId: record.connectionId,
             sessionId: record.id,
             sessionProtocol: record.protocol,
             sessionMode: record.mode,
@@ -477,7 +476,7 @@ class OnlineSession extends Component {
                             >
                                 {
                                     this.state.sessionMode === 'guacd' ?
-                                        <AccessMonitor connectionId={this.state.connectionId}
+                                        <AccessMonitor sessionId={this.state.sessionId}
                                                        width={this.state.sessionWidth}
                                                        height={this.state.sessionHeight}
                                                        protocol={this.state.sessionProtocol}

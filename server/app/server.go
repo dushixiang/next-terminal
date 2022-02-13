@@ -85,9 +85,6 @@ func setupRoutes() *echo.Echo {
 	e.POST("/login", accountApi.LoginEndpoint)
 	e.POST("/loginWithTotp", accountApi.LoginWithTotpEndpoint)
 
-	e.GET("/ssh", webTerminalApi.SshEndpoint)
-	e.GET("/ssh-monitor", webTerminalApi.SshMonitorEndpoint)
-
 	account := e.Group("/account")
 	{
 		account.GET("/info", accountApi.InfoEndpoint)
@@ -175,6 +172,9 @@ func setupRoutes() *echo.Echo {
 		sessions.POST("", SessionApi.SessionCreateEndpoint)
 		sessions.POST("/:id/connect", SessionApi.SessionConnectEndpoint)
 		sessions.GET("/:id/tunnel", guacamoleApi.Guacamole)
+		sessions.GET("/:id/tunnel-monitor", guacamoleApi.GuacamoleMonitor)
+		sessions.GET("/:id/ssh", webTerminalApi.SshEndpoint)
+		sessions.GET("/:id/ssh-monitor", webTerminalApi.SshMonitorEndpoint)
 		sessions.POST("/:id/resize", SessionApi.SessionResizeEndpoint)
 		sessions.GET("/:id/stats", SessionApi.SessionStatsEndpoint)
 
