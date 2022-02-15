@@ -26,9 +26,15 @@ Next Terminal基于 [Apache Guacamole](https://guacamole.apache.org/) 开发，�
 
 ## 在线体验
 
-https://next.typesafe.cn/
+**web**
 
-test/test
+https://next.typesafe.cn/ 账号：test  密码：test
+
+**ssh server**
+
+主机：next.typesafe.cn
+端口：2022
+账号：test  密码：test
 
 ## 协议与条款
 
