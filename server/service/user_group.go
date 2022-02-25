@@ -82,7 +82,7 @@ func (service userGroupService) Update(userGroupId string, name string, members 
 		return constant.ErrNameAlreadyUsed
 	}
 
-	if !errors.Is(gorm.ErrRecordNotFound, err) {
+	if errors.Is(gorm.ErrRecordNotFound, err) {
 		return err
 	}
 
