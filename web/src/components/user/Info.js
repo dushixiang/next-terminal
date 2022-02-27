@@ -194,13 +194,13 @@ class Info extends Component {
                                         },
                                     ]}
                                     validateStatus={this.state.validateStatus}
-                                    help={this.state.errorMsg || ''}
+                                    help={this.state.errorMsg || ' '}
                                 >
                                     <Input type='password' placeholder="请和上面输入新的密码保持一致"
                                            onChange={(value) => this.onNewPassword2Change(value)} style={{width: 240}}/>
                                 </Form.Item>
                                 <Form.Item {...formTailLayout}>
-                                    <Button type="primary" htmlType="submit">
+                                    <Button disabled={this.state.errorMsg || !this.state.validateStatus} type="primary" htmlType="submit">
                                         提交
                                     </Button>
                                 </Form.Item>
