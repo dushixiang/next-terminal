@@ -228,6 +228,12 @@ func (s assetService) UpdateById(id string, m echo.Map) error {
 		item.PrivateKey = "-"
 		item.Passphrase = "-"
 		item.CredentialId = "-"
+		if len(item.Username) == 0 {
+			item.Username = "-"
+		}
+		if len(item.Password) == 0 {
+			item.Password = "-"
+		}
 	}
 
 	if len(item.Tags) == 0 {
