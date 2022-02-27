@@ -194,7 +194,7 @@ class Info extends Component {
                                         },
                                     ]}
                                     validateStatus={this.state.validateStatus}
-                                    help={this.state.errorMsg || ''}
+                                    help={this.state.errorMsg || ' '}
                                 >
                                     <Input type='password' placeholder="请和上面输入新的密码保持一致"
                                            onChange={(value) => this.onNewPassword2Change(value)} style={{width: 240}}/>
