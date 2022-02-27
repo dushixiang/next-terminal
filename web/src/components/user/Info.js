@@ -200,7 +200,7 @@ class Info extends Component {
                                            onChange={(value) => this.onNewPassword2Change(value)} style={{width: 240}}/>
                                 </Form.Item>
                                 <Form.Item {...formTailLayout}>
-                                    <Button type="primary" htmlType="submit">
+                                    <Button disabled={this.state.errorMsg || !this.state.validateStatus} type="primary" htmlType="submit">
                                         提交
                                     </Button>
                                 </Form.Item>
