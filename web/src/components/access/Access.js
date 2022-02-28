@@ -114,6 +114,7 @@ class Access extends Component {
         this.renderDisplay(sessionId, protocol, width, height);
 
         window.addEventListener('resize', this.onWindowResize);
+        window.addEventListener('beforeunload', this.handleUnload);
         window.onfocus = this.onWindowFocus;
     }
 
@@ -121,6 +122,7 @@ class Access extends Component {
         if (this.state.client) {
             this.state.client.disconnect();
         }
+        window.removeEventListener('beforeunload', this.handleUnload);
     }
 
     sendClipboard(data) {
@@ -527,6 +529,12 @@ class Access extends Component {
             });
         }
     };
+
+    handleUnload(e) {
+        var message = "要离开网站吗？";
+        (e || window.event).returnValue = message; //Gecko + IE
+        return message;
+    }
 
     resize = async (sessionId, width, height) => {
         let result = await request.post(`/sessions/${sessionId}/resize?width=${width}&height=${height}`);
