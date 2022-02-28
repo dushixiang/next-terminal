@@ -166,6 +166,7 @@ class Term extends Component {
         });
 
         window.addEventListener('resize', this.onWindowResize);
+        window.addEventListener('beforeunload', this.handleUnload);
         window.onunload = function () {
             webSocket.close();
         };
@@ -176,6 +177,7 @@ class Term extends Component {
         if (webSocket) {
             webSocket.close()
         }
+        window.removeEventListener('beforeunload', this.handleUnload);
     }
 
     getCommands = async () => {
@@ -250,6 +252,12 @@ class Term extends Component {
             }
         });
     };
+
+    handleUnload(e) {
+        var message = "要离开网站吗？";
+        (e || window.event).returnValue = message; //Gecko + IE
+        return message;
+    }
 
     writeCommand = (command) => {
         let webSocket = this.state.webSocket;
