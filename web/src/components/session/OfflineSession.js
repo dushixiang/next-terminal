@@ -654,7 +654,7 @@ class OfflineSession extends Component {
                                 maskClosable={false}
                             >
                                 {
-                                    this.state.selectedRow['mode'] === 'naive' || this.state.selectedRow['mode'] === 'terminal' ?
+                                    this.state.selectedRow['mode'] === 'native' || this.state.selectedRow['mode'] === 'terminal' ?
                                         <iframe
                                             title='recording'
                                             style={{

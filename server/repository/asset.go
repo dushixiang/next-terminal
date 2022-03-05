@@ -345,3 +345,8 @@ func (r assetRepository) FindAssetAttrMapByAssetId(c context.Context, assetId st
 	}
 	return attributeMap, nil
 }
+
+func (r assetRepository) UpdateAttrs(c context.Context, name, value, newValue string) error {
+	sql := "update asset_attributes set value = ? where name = ? and value = ?"
+	return r.GetDB(c).Exec(sql, newValue, name, value).Error
+}
