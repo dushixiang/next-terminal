@@ -124,7 +124,7 @@ class BatchCommandTerm extends Component {
     }
 
     async createSession(assetsId) {
-        let result = await request.post(`/sessions?assetId=${assetsId}&mode=naive`);
+        let result = await request.post(`/sessions?assetId=${assetsId}&mode=native`);
         if (result['code'] !== 1) {
             this.showMessage(result['message']);
             return null;

@@ -558,7 +558,7 @@ class Asset extends Component {
                     const name = record['name'];
                     const sshMode = record['sshMode'];
                     let url = '';
-                    if (protocol === 'ssh' && sshMode === 'naive') {
+                    if (protocol === 'ssh' && sshMode === 'native') {
                         url = `#/term?assetId=${id}&assetName=${name}`;
                     } else {
                         url = `#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`;

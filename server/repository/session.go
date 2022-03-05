@@ -168,3 +168,8 @@ func (r sessionRepository) FindAllUnReviewed(c context.Context) (o []model.Sessi
 	err = r.GetDB(c).Where("reviewed = false or reviewed is null").Find(&o).Error
 	return
 }
+
+func (r sessionRepository) UpdateMode(c context.Context) error {
+	sql := "update sessions set mode = 'native' where mode = 'naive'"
+	return r.GetDB(c).Exec(sql).Error
+}

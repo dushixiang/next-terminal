@@ -8,6 +8,6 @@ export const PROTOCOL_COLORS = {
 
 export const MODE_COLORS = {
     'guacd': 'green',
-    'naive': 'orange',
+    'native': 'orange',
     'terminal': 'purple',
 }

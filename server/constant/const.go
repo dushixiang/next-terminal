@@ -55,7 +55,7 @@ const (
 	Disconnected = "disconnected" // 会话状态：已断开连接
 
 	Guacd    = "guacd"    // 接入模式：guacd
-	Naive    = "naive"    // 接入模式：原生
+	Native   = "native"   // 接入模式：原生
 	Terminal = "terminal" // 接入模式：终端
 
 	TypeUser  = "user"  // 普通用户
