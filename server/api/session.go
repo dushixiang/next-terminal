@@ -47,7 +47,7 @@ func (api SessionApi) SessionPagingEndpoint(c echo.Context) error {
 		if status == constant.Disconnected && len(items[i].Recording) > 0 {
 
 			var recording string
-			if items[i].Mode == constant.Naive || items[i].Mode == constant.Terminal {
+			if items[i].Mode == constant.Native || items[i].Mode == constant.Terminal {
 				recording = items[i].Recording
 			} else {
 				recording = items[i].Recording + "/recording"
@@ -170,8 +170,8 @@ func (api SessionApi) SessionCreateEndpoint(c echo.Context) error {
 	assetId := c.QueryParam("assetId")
 	mode := c.QueryParam("mode")
 
-	if mode == constant.Naive {
-		mode = constant.Naive
+	if mode == constant.Native {
+		mode = constant.Native
 	} else {
 		mode = constant.Guacd
 	}
@@ -526,7 +526,7 @@ func (api SessionApi) SessionRecordingEndpoint(c echo.Context) error {
 	}
 
 	var recording string
-	if s.Mode == constant.Naive || s.Mode == constant.Terminal {
+	if s.Mode == constant.Native || s.Mode == constant.Terminal {
 		recording = s.Recording
 	} else {
 		recording = s.Recording + "/recording"

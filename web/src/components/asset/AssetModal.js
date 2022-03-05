@@ -456,7 +456,7 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                     setSshMode(value)
                                                 }}>
                                                     <Option value="">guacd</Option>
-                                                    <Option value="naive">原生</Option>
+                                                    <Option value="native">原生</Option>
                                                 </Select>
                                             </Form.Item>
                                         </Panel>

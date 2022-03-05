@@ -280,7 +280,7 @@ class MyAsset extends Component {
                             const name = item['name'];
                             const sshMode = item['sshMode'];
                             let url = '';
-                            if (protocol === 'ssh' && sshMode === 'naive') {
+                            if (protocol === 'ssh' && sshMode === 'native') {
                                 url = `#/term?assetId=${id}&assetName=${name}`;
                             } else {
                                 url = `#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`;
