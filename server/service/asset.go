@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"next-terminal/server/constant"
 
 	"next-terminal/server/config"
 	"next-terminal/server/constant"
