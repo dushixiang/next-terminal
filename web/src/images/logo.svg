@@ -1,10 +1,9 @@
-<svg width="130" height="140" xmlns="http://www.w3.org/2000/svg">
+<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
     <g fill="none">
-        <path fill="#40a9ff" d="M 10 10 V 110 L 65 135 L 120 110 V 10 Z"/>
         <g fill="none">
-            <path fill="#40a9ff" d="M 10 10 V 110 L 65 135 L 120 110 V 10 Z"/>
-            <path fill="white" d="M 65 50 l -55 20 v 20 l 55 -20 l 55 20 v -20 l -55 -20 Z"/>
-            <path fill="#0050b3" d="M 65 70 l -55 20 v 20 l 55 25 l 55 -25 v -20 l -55 -20 Z"/>
+            <path fill="#40a9ff" d="M 9 0 v 95 l 55 30 l 55 -30 v -95 h -90 z"/>
+            <path fill="white" d="M 64 35 l -55 25 v 20 l 55 -25 l 55 25 v -20 l -55 -25 z"/>
+            <path fill="#0050b3" d="M 64 55 l -55 25 v 15 l 55 30 l 55 -30 v -15 l -55 -25 z"/>
         </g>
     </g>
 </svg>

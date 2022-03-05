@@ -444,6 +444,7 @@ class Access extends Component {
         client.onstatechange = this.onClientStateChange;
 
         client.onerror = this.onError;
+        tunnel.onerror = this.onError;
 
         // Get display div from document
         const display = document.getElementById("display");

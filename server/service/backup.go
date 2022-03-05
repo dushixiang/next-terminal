@@ -133,7 +133,11 @@ func (service backupService) Import(backup *dto.Backup) error {
 		if len(backup.Users) > 0 {
 			for _, item := range backup.Users {
 				oldId := item.ID
-				if repository.UserRepository.ExistByUsername(c, item.Username) {
+				exist, err := repository.UserRepository.ExistByUsername(c, item.Username)
+				if err != nil {
+					return err
+				}
+				if exist {
 					delete(userIdMapping, oldId)
 					continue
 				}

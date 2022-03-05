@@ -78,14 +78,17 @@ func (r userRepository) FindByUsername(c context.Context, username string) (o mo
 	return
 }
 
-func (r userRepository) ExistByUsername(c context.Context, username string) (exist bool) {
-	count := int64(0)
-	err := r.GetDB(c).Table("users").Where("username = ?", username).Count(&count).Error
+func (r userRepository) ExistByUsername(c context.Context, username string) (exist bool, err error) {
+	user := model.User{}
+	var count uint64
+	err = r.GetDB(c).Table(user.TableName()).Select("count(*)").
+		Where("username = ?", username).
+		Find(&count).
+		Error
 	if err != nil {
-		return false
+		return false, err
 	}
-
-	return count > 0
+	return count > 0, nil
 }
 
 func (r userRepository) FindOnlineUsers(c context.Context) (o []model.User, err error) {
