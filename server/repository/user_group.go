@@ -57,6 +57,19 @@ func (r userGroupRepository) FindByName(c context.Context, name string) (o model
 	return
 }
 
+func (r userGroupRepository) ExistByName(ctx context.Context, name string) (exists bool, err error) {
+	userGroup := model.UserGroup{}
+	var count uint64
+	err = r.GetDB(ctx).Table(userGroup.TableName()).Select("count(*)").
+		Where("name = ?", name).
+		Find(&count).
+		Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r userGroupRepository) Create(c context.Context, o *model.UserGroup) (err error) {
 	return r.GetDB(c).Create(o).Error
 }

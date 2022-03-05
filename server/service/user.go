@@ -209,7 +209,11 @@ func (service userService) ReloadToken() error {
 func (service userService) CreateUser(user model.User) (err error) {
 	return env.GetDB().Transaction(func(tx *gorm.DB) error {
 		c := service.Context(tx)
-		if repository.UserRepository.ExistByUsername(c, user.Username) {
+		exist, err := repository.UserRepository.ExistByUsername(c, user.Username)
+		if err != nil {
+			return err
+		}
+		if exist {
 			return fmt.Errorf("username %s is already used", user.Username)
 		}
 		password := user.Password
@@ -306,4 +310,30 @@ func (service userService) SaveLoginLog(clientIP, clientUserAgent string, userna
 
 func (service userService) DeleteALlLdapUser(ctx context.Context) error {
 	return repository.UserRepository.DeleteBySource(ctx, constant.SourceLdap)
+}
+
+func (service userService) UpdateUser(id string, user model.User) error {
+
+	return env.GetDB().Transaction(func(tx *gorm.DB) error {
+		ctx := service.Context(tx)
+
+		dbUser, err := repository.UserRepository.FindById(ctx, id)
+		if err != nil {
+			return err
+		}
+
+		if dbUser.Username != user.Username {
+			// 修改了登录账号
+			exist, err := repository.UserRepository.ExistByUsername(ctx, user.Username)
+			if err != nil {
+				return err
+			}
+			if exist {
+				return fmt.Errorf("username %s is already used", user.Username)
+			}
+		}
+
+		return repository.UserRepository.Update(ctx, &user)
+	})
+
 }
