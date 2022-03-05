@@ -118,7 +118,7 @@ func (service sessionService) WriteCloseMessage(ws *websocket.Conn, mode string,
 			disconnect := guacd.NewInstruction("disconnect")
 			_ = ws.WriteMessage(websocket.TextMessage, []byte(disconnect.String()))
 		}
-	case constant.Naive:
+	case constant.Native:
 		if ws != nil {
 			msg := `0` + reason
 			_ = ws.WriteMessage(websocket.TextMessage, []byte(msg))
@@ -353,4 +353,8 @@ func (service sessionService) Create(clientIp, assetId, mode string, user *model
 		return nil, err
 	}
 	return s, nil
+}
+
+func (service sessionService) FixSshMode() error {
+	return repository.SessionRepository.UpdateMode(context.TODO())
 }

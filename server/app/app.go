@@ -70,6 +70,14 @@ func (app App) InitDBData() (err error) {
 		return err
 	}
 
+	// 修复数据
+	if err := service.AssetService.FixSshMode(); err != nil {
+		return err
+	}
+	if err := service.SessionService.FixSshMode(); err != nil {
+		return err
+	}
+
 	return nil
 }
 

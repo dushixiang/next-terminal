@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 
 	"next-terminal/server/config"
+	"next-terminal/server/constant"
 	"next-terminal/server/env"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
@@ -259,4 +260,8 @@ func (s assetService) UpdateById(id string, m echo.Map) error {
 		return nil
 	})
 
+}
+
+func (s assetService) FixSshMode() error {
+	return repository.AssetRepository.UpdateAttrs(context.TODO(), "ssh-mode", "naive", constant.Native)
 }
