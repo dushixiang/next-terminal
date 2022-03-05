@@ -62,9 +62,8 @@ func (userApi UserApi) UserUpdateEndpoint(c echo.Context) error {
 	if err := c.Bind(&item); err != nil {
 		return err
 	}
-	item.ID = id
 
-	if err := repository.UserRepository.Update(context.TODO(), &item); err != nil {
+	if err := service.UserService.UpdateUser(id, item); err != nil {
 		return err
 	}
 

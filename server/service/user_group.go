@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 
 	"next-terminal/server/constant"
 	"next-terminal/server/env"
@@ -36,14 +35,13 @@ func (service userGroupService) DeleteById(userGroupId string) error {
 }
 
 func (service userGroupService) Create(name string, members []string) (model.UserGroup, error) {
-	var err error
-	_, err = repository.UserGroupRepository.FindByName(context.TODO(), name)
-	if err == nil {
-		return model.UserGroup{}, constant.ErrNameAlreadyUsed
+	exist, err := repository.UserGroupRepository.ExistByName(context.TODO(), name)
+	if err != nil {
+		return model.UserGroup{}, err
 	}
 
-	if !errors.Is(gorm.ErrRecordNotFound, err) {
-		return model.UserGroup{}, err
+	if exist {
+		return model.UserGroup{}, constant.ErrNameAlreadyUsed
 	}
 
 	userGroupId := utils.UUID()
@@ -76,14 +74,20 @@ func (service userGroupService) Create(name string, members []string) (model.Use
 }
 
 func (service userGroupService) Update(userGroupId string, name string, members []string) (err error) {
-	var userGroup model.UserGroup
-	userGroup, err = repository.UserGroupRepository.FindByName(context.TODO(), name)
-	if err == nil && userGroup.ID != userGroupId {
-		return constant.ErrNameAlreadyUsed
-	}
-
-	if errors.Is(gorm.ErrRecordNotFound, err) {
+	dbUserGroup, err := repository.UserGroupRepository.FindById(context.TODO(), userGroupId)
+	if err != nil {
 		return err
+	}
+	if dbUserGroup.Name != name {
+		// 修改了名称
+		exist, err := repository.UserGroupRepository.ExistByName(context.TODO(), name)
+		if err != nil {
+			return err
+		}
+
+		if exist {
+			return constant.ErrNameAlreadyUsed
+		}
 	}
 
 	return env.GetDB().Transaction(func(tx *gorm.DB) error {
