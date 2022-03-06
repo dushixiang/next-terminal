@@ -6,8 +6,8 @@ import (
 	"next-terminal/server/config"
 	"next-terminal/server/model"
 
+	"github.com/glebarez/sqlite"
 	"gorm.io/driver/mysql"
-	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
