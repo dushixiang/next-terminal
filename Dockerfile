@@ -9,12 +9,13 @@ WORKDIR /app
 COPY . .
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
-RUN apk add gcc g++
+RUN apk add gcc g++ upx
 RUN go mod tidy
 RUN sh get_arch.sh
 RUN echo "Hello, my CPU architecture is $(uname -m)"
 RUN cp -r /app/web/build /app/server/resource/
 RUN go env;CGO_ENABLED=1 GOOS=linux GOARCH=$ARCH go build -a -ldflags '-linkmode external -extldflags "-static"' -o next-terminal main.go
+RUN upx next-terminal
 
 FROM alpine:latest
 
