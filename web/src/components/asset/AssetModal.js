@@ -409,10 +409,10 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                 <Input type='text' placeholder="remote app的命令行参数"/>
                                             </Form.Item>
                                         </Panel>
-                                        <Panel header={<Text strong>网络驱动</Text>} key="storage">
+                                        <Panel header={<Text strong>映射网络驱动器</Text>} key="storage">
                                             <Form.Item
                                                 name="enable-drive"
-                                                label="启用设备映射"
+                                                label="启用映射网络驱动器"
                                                 valuePropName="checked"
                                             >
                                                 <Switch checkedChildren="开启" unCheckedChildren="关闭"
@@ -424,8 +424,8 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                 enableDrive ?
                                                     <Form.Item
                                                         name="drive-path"
-                                                        label="网络驱动"
-                                                        tooltip='用于文件传输的网络驱动，为空时使用操作人的默认空间'
+                                                        label="映射网络驱动器"
+                                                        tooltip='用于文件传输的映射网络驱动器，为空时使用操作人的默认空间'
                                                     >
                                                         <Select onChange={null} allowClear placeholder='为空时使用操作人的默认空间'>
                                                             {
@@ -456,7 +456,7 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                     setSshMode(value)
                                                 }}>
                                                     <Option value="">guacd</Option>
-                                                    <Option value="native">原生</Option>
+                                                    <Option value="naive">原生</Option>
                                                 </Select>
                                             </Form.Item>
                                         </Panel>
