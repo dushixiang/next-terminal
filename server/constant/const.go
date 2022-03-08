@@ -72,9 +72,8 @@ const (
 	SocksProxyUsername = "socks-proxy-username"
 	SocksProxyPassword = "socks-proxy-password"
 
-	LoginToken   = "login-token"
-	AccessToken  = "access-token"
-	ShareSession = "share-session"
+	LoginToken  = "login-token"
+	AccessToken = "access-token"
 
 	Anonymous = "anonymous"
 )
