@@ -49,6 +49,10 @@ https://next.typesafe.cn/ 账号：test  密码：test
 ## 问题反馈
 
 - Issues
+- 微信群 加我微信拉你进群
+
+<img src="wx.png" width="300"  height="auto"/>
+
 - QQ群 938145268
 - Telegram https://t.me/next_terminal
 
