@@ -122,27 +122,6 @@ func Auth(next echo.HandlerFunc) echo.HandlerFunc {
 			} else {
 				cache.TokenManager.Set(token, authorization, cache.NotRememberExpiration)
 			}
-		} else if strings.EqualFold(constant.ShareSession, authorization.Type) {
-			id := c.Param("id")
-			uri = strings.Split(uri, "?")[0]
-			allowUrls := []string{
-				"/share-sessions/" + id,
-				"/sessions",
-				"/sessions/" + id + "/tunnel",
-				"/sessions/" + id + "/connect",
-				"/sessions/" + id + "/resize",
-				"/sessions/" + id + "/stats",
-				"/sessions/" + id + "/ls",
-				"/sessions/" + id + "/download",
-				"/sessions/" + id + "/upload",
-				"/sessions/" + id + "/edit",
-				"/sessions/" + id + "/mkdir",
-				"/sessions/" + id + "/rm",
-				"/sessions/" + id + "/rename",
-			}
-			if !utils.Contains(allowUrls, uri) {
-				return api.Fail(c, 401, "您的登录信息已失效，请重新登录后再试。")
-			}
 		}
 
 		return next(c)

@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"errors"
 	"path"
 	"strconv"
 
@@ -16,6 +17,7 @@ import (
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/gorm"
 )
 
 type AccountApi struct{}
@@ -345,7 +347,11 @@ func (api AccountApi) AccessTokenGetEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
 	accessToken, err := repository.AccessTokenRepository.FindByUserId(context.TODO(), account.ID)
 	if err != nil {
-		return err
+		if errors.Is(gorm.ErrRecordNotFound, err) {
+			accessToken = model.AccessToken{}
+		} else {
+			return err
+		}
 	}
 	return Success(c, accessToken)
 }
