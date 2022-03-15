@@ -280,8 +280,15 @@ func (api SessionApi) SessionEditEndpoint(c echo.Context) error {
 		}
 		defer dstFile.Close()
 		write := bufio.NewWriter(dstFile)
-		if _, err := write.WriteString(fileContent); err != nil {
+		// replace \r\n to \n
+		if _, err := write.WriteString(strings.Replace(fileContent, "\r\n", "\n", -1)); err != nil {
 			return err
+		}
+		// fix neoel
+		if !strings.HasSuffix(fileContent, "\n") {
+			if _, err := write.WriteString("\n"); err != nil {
+				return err
+			}
 		}
 		if err := write.Flush(); err != nil {
 			return err
