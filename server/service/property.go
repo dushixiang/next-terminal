@@ -17,161 +17,63 @@ type propertyService struct {
 	baseService
 }
 
+var deprecatedPropertyNames = []string{
+	guacd.EnableDrive,
+	guacd.DrivePath,
+	guacd.DriveName,
+	guacd.DisableGlyphCaching,
+	guacd.CreateRecordingPath,
+}
+
+var defaultProperties = map[string]string{
+	guacd.EnableRecording:          "true",
+	guacd.FontName:                 "menlo",
+	guacd.FontSize:                 "12",
+	guacd.ColorScheme:              "gray-black",
+	guacd.EnableWallpaper:          "true",
+	guacd.EnableTheming:            "true",
+	guacd.EnableFontSmoothing:      "true",
+	guacd.EnableFullWindowDrag:     "true",
+	guacd.EnableDesktopComposition: "true",
+	guacd.EnableMenuAnimations:     "true",
+	guacd.DisableBitmapCaching:     "false",
+	guacd.DisableOffscreenCaching:  "false",
+	"cron-log-saved-limit":         "360",
+	"login-log-saved-limit":        "360",
+	"session-saved-limit":          "360",
+	"user-default-storage-size":    "5120",
+}
+
 func (service propertyService) InitProperties() error {
 	propertyMap := repository.PropertyRepository.FindAllMap(context.TODO())
 
-	if len(propertyMap[guacd.EnableRecording]) == 0 {
-		property := model.Property{
-			Name:  guacd.EnableRecording,
-			Value: "true",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
+	for name, value := range defaultProperties {
+		if err := service.CreateIfAbsent(propertyMap, name, value); err != nil {
 			return err
 		}
 	}
 
-	if len(propertyMap[guacd.CreateRecordingPath]) == 0 {
-		property := model.Property{
-			Name:  guacd.CreateRecordingPath,
-			Value: "true",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
+	return nil
+}
 
-	if len(propertyMap[guacd.FontName]) == 0 {
+func (service propertyService) CreateIfAbsent(propertyMap map[string]string, name, value string) error {
+	if len(propertyMap[name]) == 0 {
 		property := model.Property{
-			Name:  guacd.FontName,
-			Value: "menlo",
+			Name:  name,
+			Value: value,
 		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.FontSize]) == 0 {
-		property := model.Property{
-			Name:  guacd.FontSize,
-			Value: "12",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.ColorScheme]) == 0 {
-		property := model.Property{
-			Name:  guacd.ColorScheme,
-			Value: "gray-black",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.EnableWallpaper]) == 0 {
-		property := model.Property{
-			Name:  guacd.EnableWallpaper,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.EnableTheming]) == 0 {
-		property := model.Property{
-			Name:  guacd.EnableTheming,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.EnableFontSmoothing]) == 0 {
-		property := model.Property{
-			Name:  guacd.EnableFontSmoothing,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.EnableFullWindowDrag]) == 0 {
-		property := model.Property{
-			Name:  guacd.EnableFullWindowDrag,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.EnableDesktopComposition]) == 0 {
-		property := model.Property{
-			Name:  guacd.EnableDesktopComposition,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.EnableMenuAnimations]) == 0 {
-		property := model.Property{
-			Name:  guacd.EnableMenuAnimations,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.DisableBitmapCaching]) == 0 {
-		property := model.Property{
-			Name:  guacd.DisableBitmapCaching,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.DisableOffscreenCaching]) == 0 {
-		property := model.Property{
-			Name:  guacd.DisableOffscreenCaching,
-			Value: "false",
-		}
-		if err := repository.PropertyRepository.Create(context.TODO(), &property); err != nil {
-			return err
-		}
-	}
-
-	if len(propertyMap[guacd.DisableGlyphCaching]) > 0 {
-		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DisableGlyphCaching); err != nil {
-			return err
-		}
+		return repository.PropertyRepository.Create(context.TODO(), &property)
 	}
 	return nil
 }
 
 func (service propertyService) DeleteDeprecatedProperty() error {
 	propertyMap := repository.PropertyRepository.FindAllMap(context.TODO())
-	if propertyMap[guacd.EnableDrive] != "" {
-		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DriveName); err != nil {
-			return err
+	for _, name := range deprecatedPropertyNames {
+		if propertyMap[name] == "" {
+			continue
 		}
-	}
-	if propertyMap[guacd.DrivePath] != "" {
-		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DrivePath); err != nil {
-			return err
-		}
-	}
-	if propertyMap[guacd.DriveName] != "" {
-		if err := repository.PropertyRepository.DeleteByName(context.TODO(), guacd.DriveName); err != nil {
+		if err := repository.PropertyRepository.DeleteByName(context.TODO(), name); err != nil {
 			return err
 		}
 	}

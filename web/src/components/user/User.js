@@ -280,7 +280,7 @@ class User extends Component {
             let result = await request.delete('/users/' + id);
             if (result.code === 1) {
                 message.success('操作成功', 3);
-                await this.loadTableData(this.state.queryParams);
+                this.loadTableData(this.state.queryParams);
             } else {
                 message.error(result.message, 10);
             }

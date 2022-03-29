@@ -26,13 +26,6 @@ func newApp() *App {
 func init() {
 	setupCache()
 	app = newApp()
-	if err := app.InitDBData(); err != nil {
-		panic(err)
-	}
-	if err := app.ReloadData(); err != nil {
-		panic(err)
-	}
-	app.Server = setupRoutes()
 }
 
 func (app App) InitDBData() (err error) {
@@ -96,7 +89,15 @@ func (app App) ReloadData() error {
 
 func Run() error {
 
-	fmt.Printf(constant.Banner, constant.Version)
+	fmt.Printf(constant.AppBanner, constant.AppVersion)
+
+	if err := app.InitDBData(); err != nil {
+		panic(err)
+	}
+	if err := app.ReloadData(); err != nil {
+		panic(err)
+	}
+	app.Server = setupRoutes()
 
 	if config.GlobalCfg.Debug {
 		jsonBytes, err := json.MarshalIndent(config.GlobalCfg, "", "    ")

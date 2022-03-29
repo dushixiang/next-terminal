@@ -13,11 +13,12 @@ import (
 )
 
 type userGroupService struct {
+	baseService
 }
 
 func (service userGroupService) DeleteById(userGroupId string) error {
 	return env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := context.WithValue(context.TODO(), constant.DB, tx)
+		c := service.Context(tx)
 		// 删除用户组
 		if err := repository.UserGroupRepository.DeleteById(c, userGroupId); err != nil {
 			return err
@@ -34,8 +35,8 @@ func (service userGroupService) DeleteById(userGroupId string) error {
 	})
 }
 
-func (service userGroupService) Create(name string, members []string) (model.UserGroup, error) {
-	exist, err := repository.UserGroupRepository.ExistByName(context.TODO(), name)
+func (service userGroupService) Create(ctx context.Context, name string, members []string) (model.UserGroup, error) {
+	exist, err := repository.UserGroupRepository.ExistByName(ctx, name)
 	if err != nil {
 		return model.UserGroup{}, err
 	}
@@ -51,26 +52,33 @@ func (service userGroupService) Create(name string, members []string) (model.Use
 		Name:    name,
 	}
 
-	return userGroup, env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := context.WithValue(context.TODO(), constant.DB, tx)
-		if err := repository.UserGroupRepository.Create(c, &userGroup); err != nil {
-			return err
-		}
-		if len(members) > 0 {
-			for _, member := range members {
-				userGroupMember := model.UserGroupMember{
-					ID:          utils.Sign([]string{userGroupId, member}),
-					UserId:      member,
-					UserGroupId: userGroupId,
-				}
-				if err := repository.UserGroupMemberRepository.Create(c, &userGroupMember); err != nil {
-					return err
-				}
+	if service.InTransaction(ctx) {
+		return userGroup, service.create(ctx, userGroup, members, userGroupId)
+	} else {
+		return userGroup, env.GetDB().Transaction(func(tx *gorm.DB) error {
+			c := service.Context(tx)
+			return service.create(c, userGroup, members, userGroupId)
+		})
+	}
+}
+
+func (service userGroupService) create(c context.Context, userGroup model.UserGroup, members []string, userGroupId string) error {
+	if err := repository.UserGroupRepository.Create(c, &userGroup); err != nil {
+		return err
+	}
+	if len(members) > 0 {
+		for _, member := range members {
+			userGroupMember := model.UserGroupMember{
+				ID:          utils.Sign([]string{userGroupId, member}),
+				UserId:      member,
+				UserGroupId: userGroupId,
+			}
+			if err := repository.UserGroupMemberRepository.Create(c, &userGroupMember); err != nil {
+				return err
 			}
 		}
-		return nil
-	})
-
+	}
+	return nil
 }
 
 func (service userGroupService) Update(userGroupId string, name string, members []string) (err error) {
@@ -91,7 +99,7 @@ func (service userGroupService) Update(userGroupId string, name string, members 
 	}
 
 	return env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := context.WithValue(context.TODO(), constant.DB, tx)
+		c := service.Context(tx)
 		userGroup := model.UserGroup{
 			ID:   userGroupId,
 			Name: name,

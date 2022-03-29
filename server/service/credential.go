@@ -99,8 +99,8 @@ func (s credentialService) Decrypt(item *model.Credential, password []byte) erro
 	return nil
 }
 
-func (s credentialService) FindByIdAndDecrypt(c context.Context, id string) (o model.Credential, err error) {
-	credential, err := repository.CredentialRepository.FindById(c, id)
+func (s credentialService) FindByIdAndDecrypt(ctx context.Context, id string) (o model.Credential, err error) {
+	credential, err := repository.CredentialRepository.FindById(ctx, id)
 	if err != nil {
 		return o, err
 	}
@@ -110,10 +110,10 @@ func (s credentialService) FindByIdAndDecrypt(c context.Context, id string) (o m
 	return credential, nil
 }
 
-func (s credentialService) Create(item *model.Credential) error {
+func (s credentialService) Create(ctx context.Context, item *model.Credential) error {
 	// 加密密码之后进行存储
 	if err := s.Encrypt(item, config.GlobalCfg.EncryptionPassword); err != nil {
 		return err
 	}
-	return repository.CredentialRepository.Create(context.TODO(), item)
+	return repository.CredentialRepository.Create(ctx, item)
 }

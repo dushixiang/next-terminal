@@ -5,8 +5,9 @@ import (
 )
 
 const (
-	Version = "v1.2.5"
-	Banner  = `
+	AppVersion = "v1.2.5"
+	AppName    = "Next Terminal"
+	AppBanner  = `
 	_______                   __    ___________                  .__              .__
 	\      \   ____ ___  ____/  |_  \__    ___/__________  _____ |__| ____ _____  |  |
 	/   |   \_/ __ \\  \/  /\   __\   |    |_/ __ \_  __ \/     \|  |/    \\__  \ |  |
@@ -72,8 +73,9 @@ const (
 	SocksProxyUsername = "socks-proxy-username"
 	SocksProxyPassword = "socks-proxy-password"
 
-	LoginToken  = "login-token"
-	AccessToken = "access-token"
+	LoginToken   = "login-token"
+	AccessToken  = "access-token"
+	ShareSession = "share-session"
 
 	Anonymous = "anonymous"
 )

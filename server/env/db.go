@@ -36,8 +36,10 @@ func setupDB() *gorm.DB {
 			Logger: logMode,
 		})
 	} else {
-		db, err = gorm.Open(sqlite.Open(config.GlobalCfg.Sqlite.File), &gorm.Config{
-			Logger: logMode,
+		dsn := fmt.Sprintf("file:%s?cache=shared&mode=rwc", config.GlobalCfg.Sqlite.File)
+		db, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{
+			Logger:                 logMode,
+			SkipDefaultTransaction: true,
 		})
 	}
 

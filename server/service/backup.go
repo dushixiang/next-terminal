@@ -128,12 +128,12 @@ func (service backupService) Export() (error, *dto.Backup) {
 
 func (service backupService) Import(backup *dto.Backup) error {
 	return env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := service.Context(tx)
+		ctx := service.Context(tx)
 		var userIdMapping = make(map[string]string)
 		if len(backup.Users) > 0 {
 			for _, item := range backup.Users {
 				oldId := item.ID
-				exist, err := repository.UserRepository.ExistByUsername(c, item.Username)
+				exist, err := repository.UserRepository.ExistByUsername(ctx, item.Username)
 				if err != nil {
 					return err
 				}
@@ -144,7 +144,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				newId := utils.UUID()
 				item.ID = newId
 				item.Password = utils.GenPassword()
-				if err := repository.UserRepository.Create(c, &item); err != nil {
+				if err := repository.UserRepository.Create(ctx, &item); err != nil {
 					return err
 				}
 				userIdMapping[oldId] = newId
@@ -163,7 +163,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 					}
 				}
 
-				userGroup, err := UserGroupService.Create(item.Name, members)
+				userGroup, err := UserGroupService.Create(ctx, item.Name, members)
 				if err != nil {
 					if errors.Is(constant.ErrNameAlreadyUsed, err) {
 						// 删除名称重复的用户组
@@ -187,7 +187,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				item.ID = utils.UUID()
 				item.Owner = owner
 				item.Created = utils.NowJsonTime()
-				if err := repository.StorageRepository.Create(c, &item); err != nil {
+				if err := repository.StorageRepository.Create(ctx, &item); err != nil {
 					return err
 				}
 			}
@@ -200,7 +200,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				newId := utils.UUID()
 				item.ID = newId
 				item.Created = utils.NowJsonTime()
-				if err := repository.StrategyRepository.Create(c, &item); err != nil {
+				if err := repository.StrategyRepository.Create(ctx, &item); err != nil {
 					return err
 				}
 				strategyIdMapping[oldId] = newId
@@ -210,7 +210,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 		if len(backup.AccessSecurities) > 0 {
 			for _, item := range backup.AccessSecurities {
 				item.ID = utils.UUID()
-				if err := repository.SecurityRepository.Create(c, &item); err != nil {
+				if err := repository.SecurityRepository.Create(ctx, &item); err != nil {
 					return err
 				}
 				// 更新内存中的安全规则
@@ -231,7 +231,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				newId := utils.UUID()
 				item.ID = newId
 				item.Created = utils.NowJsonTime()
-				if err := repository.GatewayRepository.Create(c, &item); err != nil {
+				if err := repository.GatewayRepository.Create(ctx, &item); err != nil {
 					return err
 				}
 				accessGatewayIdMapping[oldId] = newId
@@ -242,7 +242,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 			for _, item := range backup.Commands {
 				item.ID = utils.UUID()
 				item.Created = utils.NowJsonTime()
-				if err := repository.CommandRepository.Create(c, &item); err != nil {
+				if err := repository.CommandRepository.Create(ctx, &item); err != nil {
 					return err
 				}
 			}
@@ -254,7 +254,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				oldId := item.ID
 				newId := utils.UUID()
 				item.ID = newId
-				if err := CredentialService.Create(&item); err != nil {
+				if err := CredentialService.Create(ctx, &item); err != nil {
 					return err
 				}
 				credentialIdMapping[oldId] = newId
@@ -282,7 +282,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				}
 
 				oldId := m["id"].(string)
-				asset, err := AssetService.Create(m)
+				asset, err := AssetService.Create(ctx, m)
 				if err != nil {
 					return err
 				}
@@ -299,7 +299,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				strategyId := strategyIdMapping[item.StrategyId]
 				resourceId := assetIdMapping[item.ResourceId]
 
-				if err := repository.ResourceSharerRepository.AddSharerResources(userGroupId, userId, strategyId, item.ResourceType, []string{resourceId}); err != nil {
+				if err := UserService.AddSharerResources(ctx, userGroupId, userId, strategyId, item.ResourceType, []string{resourceId}); err != nil {
 					return err
 				}
 			}
@@ -311,6 +311,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 					continue
 				}
 
+				item.ID = utils.UUID()
 				resourceIds := strings.Split(item.ResourceIds, ",")
 				if len(resourceIds) > 0 {
 					var newResourceIds = make([]string, 0)
@@ -319,7 +320,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 					}
 					item.ResourceIds = strings.Join(newResourceIds, ",")
 				}
-				if err := JobService.Create(&item); err != nil {
+				if err := JobService.Create(ctx, &item); err != nil {
 					return err
 				}
 			}

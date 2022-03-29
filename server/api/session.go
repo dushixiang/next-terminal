@@ -312,16 +312,16 @@ func (api SessionApi) SessionDownloadEndpoint(c echo.Context) error {
 	if s.Download != "1" {
 		return errors.New("禁止操作")
 	}
-	remoteFile := c.QueryParam("file")
+	file := c.QueryParam("file")
 	// 获取带后缀的文件名称
-	filenameWithSuffix := path.Base(remoteFile)
+	filenameWithSuffix := path.Base(file)
 	if "ssh" == s.Protocol {
 		nextSession := session.GlobalSessionManager.GetById(sessionId)
 		if nextSession == nil {
 			return errors.New("获取会话失败")
 		}
 
-		dstFile, err := nextSession.NextTerminal.SftpClient.Open(remoteFile)
+		dstFile, err := nextSession.NextTerminal.SftpClient.Open(file)
 		if err != nil {
 			return err
 		}
@@ -337,7 +337,7 @@ func (api SessionApi) SessionDownloadEndpoint(c echo.Context) error {
 		return c.Stream(http.StatusOK, echo.MIMEOctetStream, bytes.NewReader(buff.Bytes()))
 	} else if "rdp" == s.Protocol {
 		storageId := s.StorageId
-		return service.StorageService.StorageDownload(c, remoteFile, storageId)
+		return service.StorageService.StorageDownload(c, file, storageId)
 	}
 
 	return err
@@ -541,7 +541,9 @@ func (api SessionApi) SessionRecordingEndpoint(c echo.Context) error {
 	_ = repository.SessionRepository.UpdateReadByIds(context.TODO(), true, []string{sessionId})
 
 	log.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
-	return c.File(recording)
+
+	http.ServeFile(c.Response(), c.Request(), recording)
+	return nil
 }
 
 func (api SessionApi) SessionGetEndpoint(c echo.Context) error {

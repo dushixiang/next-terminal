@@ -25,7 +25,7 @@ func (api BackupApi) BackupExportEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=next-terminal_backup_%s.json", time.Now().Format("20060102150405")))
+	c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=backup_%s.json", time.Now().Format("20060102150405")))
 	return c.Stream(http.StatusOK, echo.MIMEOctetStream, bytes.NewReader(jsonBytes))
 }
 

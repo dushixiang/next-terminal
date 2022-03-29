@@ -159,6 +159,7 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 
 	guacamoleHandler := NewGuacamoleHandler(ws, guacdTunnel)
 	guacamoleHandler.Start()
+	defer guacamoleHandler.Stop()
 
 	for {
 		_, message, err := ws.ReadMessage()
@@ -168,7 +169,6 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 			_ = guacdTunnel.Close()
 
 			service.SessionService.CloseSessionById(sessionId, Normal, "用户正常退出")
-			guacamoleHandler.Stop()
 			return nil
 		}
 		_, err = guacdTunnel.WriteAndFlush(message)
@@ -193,7 +193,7 @@ func (api GuacamoleApi) setAssetConfig(attributes map[string]string, s model.Ses
 			}
 			realPath := path.Join(service.StorageService.GetBaseDrivePath(), storageId)
 			configuration.SetParameter(guacd.EnableDrive, "true")
-			configuration.SetParameter(guacd.DriveName, "Next Terminal Filesystem")
+			configuration.SetParameter(guacd.DriveName, "Filesystem")
 			configuration.SetParameter(guacd.DrivePath, realPath)
 			log.Debugf("[%v] 会话 %v:%v 映射目录地址为 %v", s.ID, s.IP, s.Port, realPath)
 		} else {
@@ -258,6 +258,7 @@ func (api GuacamoleApi) GuacamoleMonitor(c echo.Context) error {
 
 	guacamoleHandler := NewGuacamoleHandler(ws, guacdTunnel)
 	guacamoleHandler.Start()
+	defer guacamoleHandler.Stop()
 
 	for {
 		_, message, err := ws.ReadMessage()
@@ -269,7 +270,6 @@ func (api GuacamoleApi) GuacamoleMonitor(c echo.Context) error {
 			observerId := nextSession.ID
 			forObsSession.Observer.Del <- observerId
 			log.Debugf("[%v:%v] 观察者[%v]退出会话", sessionId, connectionId, observerId)
-			guacamoleHandler.Stop()
 			return nil
 		}
 		_, err = guacdTunnel.WriteAndFlush(message)

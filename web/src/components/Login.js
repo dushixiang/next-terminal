@@ -5,8 +5,7 @@ import request from "../common/request";
 import {message} from "antd/es";
 import {withRouter} from "react-router-dom";
 import {LockOutlined, OneToOneOutlined, UserOutlined} from '@ant-design/icons';
-import Particles from "react-tsparticles";
-import Background  from '../images/bg.png'
+import Background  from '../images/bg.jpg'
 import {setToken} from "../utils/utils";
 
 const {Title} = Typography;
@@ -109,90 +108,7 @@ class LoginForm extends Component {
     render() {
         return (
             <div className='login-bg'
-                 style={{width: this.state.width, height: this.state.height}}>
-                <Particles
-                    id="tsparticles"
-                    options={{
-                        background: {
-                            color: {
-                                // value: "#0d47a1",
-                            },
-                            image: `url(${Background})`,
-                            repeat: 'no-repeat',
-                            size: '100% 100%'
-                        },
-                        fpsLimit: 60,
-                        interactivity: {
-                            events: {
-                                onClick: {
-                                    enable: true,
-                                    mode: "push",
-                                },
-                                onHover: {
-                                    enable: true,
-                                    mode: "repulse",
-                                },
-                                resize: true,
-                            },
-                            modes: {
-                                bubble: {
-                                    distance: 400,
-                                    duration: 2,
-                                    opacity: 0.8,
-                                    size: 40,
-                                },
-                                push: {
-                                    quantity: 4,
-                                },
-                                repulse: {
-                                    distance: 200,
-                                    duration: 0.4,
-                                },
-                            },
-                        },
-                        particles: {
-                            color: {
-                                value: "#ffffff",
-                            },
-                            links: {
-                                color: "#ffffff",
-                                distance: 150,
-                                enable: true,
-                                opacity: 0.5,
-                                width: 1,
-                            },
-                            collisions: {
-                                enable: true,
-                            },
-                            move: {
-                                direction: "none",
-                                enable: true,
-                                outMode: "bounce",
-                                random: false,
-                                speed: 3,
-                                straight: false,
-                            },
-                            number: {
-                                density: {
-                                    enable: true,
-                                    value_area: 800,
-                                },
-                                value: 80,
-                            },
-                            opacity: {
-                                value: 0.5,
-                            },
-                            shape: {
-                                type: "circle",
-                            },
-                            size: {
-                                random: true,
-                                value: 5,
-                            },
-                        },
-                        detectRetina: true,
-                    }}
-                />
+                 style={{width: this.state.width, height: this.state.height, background: `url(${Background})`}}>
                 <Card className='login-card' title={null}>
                     <div style={{textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff'}}>
                         <Title level={1}>Next Terminal</Title>
