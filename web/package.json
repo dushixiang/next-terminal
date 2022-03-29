@@ -1,6 +1,6 @@
 {
   "name": "next-terminal",
-  "version": "1.2.5",
+  "version": "1.2.6-beta",
   "private": true,
   "dependencies": {
     "@ant-design/charts": "^1.2.13",
