@@ -9,13 +9,13 @@ WORKDIR /app
 COPY . .
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
-RUN apk add upx
+RUN #apk add upx
 RUN go mod tidy
 RUN sh get_arch.sh
 RUN echo "Hello, my CPU architecture is $(uname -m)"
 RUN cp -r /app/web/build /app/server/resource/
 RUN go env;CGO_ENABLED=0 GOOS=linux GOARCH=$ARCH go build -ldflags '-s -w' -o next-terminal main.go
-RUN upx next-terminal
+RUN #upx next-terminal
 
 FROM alpine:latest
 
