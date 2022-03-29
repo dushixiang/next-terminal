@@ -59,19 +59,22 @@ func (gui Gui) AssetUI(sess *ssh.Session, user model.User) {
 		return
 	}
 
+	for i := range assets {
+		assets[i].IP = ""
+		assets[i].Port = 0
+	}
+
 	quitItem := model.Asset{ID: "quit", Name: "返回上级菜单", Description: "这里是返回上级菜单的选项"}
 	assets = append([]model.Asset{quitItem}, assets...)
 
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
-		Active:   "\U0001F336  {{ .Name | cyan }} ({{ .IP | red }}:{{ .Port | red }})",
-		Inactive: "  {{ .Name | cyan }} ({{ .IP | red }}:{{ .Port | red }})",
+		Active:   "\U0001F336  {{ .Name | cyan }}",
+		Inactive: "  {{ .Name | cyan }}",
 		Selected: "\U0001F336  {{ .Name | red | cyan }}",
 		Details: `
 --------- 详细信息 ----------
 {{ "名称:" | faint }}	{{ .Name }}
-{{ "主机:" | faint }}	{{ .IP }}
-{{ "端口:" | faint }}	{{ .Port }}
 {{ "标签:" | faint }}	{{ .Tags }}
 {{ "备注:" | faint }}	{{ .Description }}
 `,

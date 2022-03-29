@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"next-terminal/server/service"
 
 	"next-terminal/server/dto"
 	"next-terminal/server/repository"
@@ -42,7 +43,7 @@ func (api ResourceSharerApi) ResourceAddByUserIdAssignEndPoint(c echo.Context) e
 		return err
 	}
 
-	if err := repository.ResourceSharerRepository.AddSharerResources(ru.UserGroupId, ru.UserId, ru.StrategyId, ru.ResourceType, ru.ResourceIds); err != nil {
+	if err := service.UserService.AddSharerResources(context.TODO(), ru.UserGroupId, ru.UserId, ru.StrategyId, ru.ResourceType, ru.ResourceIds); err != nil {
 		return err
 	}
 

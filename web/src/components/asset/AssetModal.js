@@ -412,7 +412,7 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                         <Panel header={<Text strong>映射网络驱动器</Text>} key="storage">
                                             <Form.Item
                                                 name="enable-drive"
-                                                label="启用映射网络驱动器"
+                                                label="启用"
                                                 valuePropName="checked"
                                             >
                                                 <Switch checkedChildren="开启" unCheckedChildren="关闭"
@@ -424,7 +424,7 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                 enableDrive ?
                                                     <Form.Item
                                                         name="drive-path"
-                                                        label="映射网络驱动器"
+                                                        label="映射空间"
                                                         tooltip='用于文件传输的映射网络驱动器，为空时使用操作人的默认空间'
                                                     >
                                                         <Select onChange={null} allowClear placeholder='为空时使用操作人的默认空间'>
@@ -456,7 +456,7 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                                                     setSshMode(value)
                                                 }}>
                                                     <Option value="">guacd</Option>
-                                                    <Option value="native">原生</Option>
+                                                    <Option value="naive">原生</Option>
                                                 </Select>
                                             </Form.Item>
                                         </Panel>

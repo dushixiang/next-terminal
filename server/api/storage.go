@@ -134,7 +134,7 @@ func (api StorageApi) StorageDeleteEndpoint(c echo.Context) error {
 	split := strings.Split(ids, ",")
 	for i := range split {
 		id := split[i]
-		if err := service.StorageService.DeleteStorageById(id, false); err != nil {
+		if err := service.StorageService.DeleteStorageById(context.TODO(), id, false); err != nil {
 			return err
 		}
 	}
@@ -173,8 +173,8 @@ func (api StorageApi) StorageDownloadEndpoint(c echo.Context) error {
 	if err := api.PermissionCheck(c, storageId); err != nil {
 		return err
 	}
-	remoteFile := c.QueryParam("file")
-	return service.StorageService.StorageDownload(c, remoteFile, storageId)
+	file := c.QueryParam("file")
+	return service.StorageService.StorageDownload(c, file, storageId)
 }
 
 func (api StorageApi) StorageUploadEndpoint(c echo.Context) error {

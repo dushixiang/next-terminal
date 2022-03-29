@@ -25,7 +25,6 @@ class Setting extends Component {
     state = {
         refs: [],
         properties: {},
-        ldapUserSyncLoading: false
     }
 
     rdpSettingFormRef = React.createRef();
@@ -33,8 +32,8 @@ class Setting extends Component {
     vncSettingFormRef = React.createRef();
     guacdSettingFormRef = React.createRef();
     mailSettingFormRef = React.createRef();
-    ldapSettingFormRef = React.createRef();
     logSettingFormRef = React.createRef();
+    otherSettingFormRef = React.createRef();
 
     componentDidMount() {
         // eslint-disable-next-line no-extend-native
@@ -43,7 +42,15 @@ class Setting extends Component {
         };
 
         this.setState({
-            refs: [this.rdpSettingFormRef, this.sshSettingFormRef, this.vncSettingFormRef, this.guacdSettingFormRef, this.mailSettingFormRef, this.logSettingFormRef]
+            refs: [
+                this.rdpSettingFormRef,
+                this.sshSettingFormRef,
+                this.vncSettingFormRef,
+                this.guacdSettingFormRef,
+                this.mailSettingFormRef,
+                this.logSettingFormRef,
+                this.otherSettingFormRef
+            ]
         }, this.getProperties)
     }
 
@@ -119,26 +126,6 @@ class Setting extends Component {
             }
         };
         reader.readAsText(files[0]);
-    }
-
-    ldapUserSync = async () => {
-        const id = 'ldap-user-sync'
-        try {
-            this.setState({
-                ldapUserSyncLoading: true
-            });
-            message.info({content: '同步中...', key: id, duration: 5});
-            let result = await request.post(`/properties/ldap-user-sync`);
-            if (result.code !== 1) {
-                message.error({content: result.message, key: id, duration: 10});
-                return;
-            }
-            message.success({content: '同步成功。', key: id, duration: 3});
-        } finally {
-            this.setState({
-                ldapUserSyncLoading: false
-            });
-        }
     }
 
     render() {
@@ -551,7 +538,7 @@ class Setting extends Component {
                         </TabPane>
 
                         <TabPane tab="日志配置" key="log">
-                            <Title level={3}>其他配置</Title>
+                            <Title level={3}>日志配置</Title>
                             <Form ref={this.logSettingFormRef} name="log" onFinish={this.changeProperties}
                                   layout="vertical">
 
@@ -583,6 +570,28 @@ class Setting extends Component {
                                         <Option value="180">180天</Option>
                                         <Option value="360">360天</Option>
                                     </Select>
+                                </Form.Item>
+
+                                <Form.Item {...formTailLayout}>
+                                    <Button type="primary" htmlType="submit">
+                                        更新
+                                    </Button>
+                                </Form.Item>
+                            </Form>
+                        </TabPane>
+
+                        <TabPane tab="其他配置" key="other">
+                            <Title level={3}>其他配置</Title>
+                            <Form ref={this.otherSettingFormRef} name="other" onFinish={this.changeProperties}
+                                  layout="vertical">
+
+                                <Form.Item
+                                    {...formItemLayout}
+                                    name="user-default-storage-size"
+                                    label="用户空间默认大小"
+                                    tooltip='无限制请填写-1'
+                                >
+                                    <Input type={'number'} min={-1} suffix="MB"/>
                                 </Form.Item>
 
                                 <Form.Item {...formTailLayout}>

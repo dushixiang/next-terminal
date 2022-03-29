@@ -119,7 +119,7 @@ func (s assetService) FindByIdAndDecrypt(c context.Context, id string) (model.As
 func (s assetService) CheckStatus(accessGatewayId string, ip string, port int) (active bool, err error) {
 	if accessGatewayId != "" && accessGatewayId != "-" {
 		g, e1 := GatewayService.GetGatewayAndReconnectById(accessGatewayId)
-		if err != nil {
+		if e1 != nil {
 			return false, e1
 		}
 
@@ -141,7 +141,7 @@ func (s assetService) CheckStatus(accessGatewayId string, ip string, port int) (
 	return active, err
 }
 
-func (s assetService) Create(m echo.Map) (model.Asset, error) {
+func (s assetService) Create(ctx context.Context, m echo.Map) (model.Asset, error) {
 
 	data, err := json.Marshal(m)
 	if err != nil {
@@ -156,29 +156,36 @@ func (s assetService) Create(m echo.Map) (model.Asset, error) {
 	item.Created = utils.NowJsonTime()
 	item.Active = true
 
-	return item, env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := s.Context(tx)
+	if s.InTransaction(ctx) {
+		return item, s.create(ctx, item, m)
+	} else {
+		return item, env.GetDB().Transaction(func(tx *gorm.DB) error {
+			c := s.Context(tx)
+			return s.create(c, item, m)
+		})
+	}
+}
 
-		if err := s.Encrypt(&item, config.GlobalCfg.EncryptionPassword); err != nil {
-			return err
-		}
-		if err := repository.AssetRepository.Create(c, &item); err != nil {
-			return err
-		}
+func (s assetService) create(c context.Context, item model.Asset, m echo.Map) error {
+	if err := s.Encrypt(&item, config.GlobalCfg.EncryptionPassword); err != nil {
+		return err
+	}
+	if err := repository.AssetRepository.Create(c, &item); err != nil {
+		return err
+	}
 
-		if err := repository.AssetRepository.UpdateAttributes(c, item.ID, item.Protocol, m); err != nil {
-			return err
-		}
+	if err := repository.AssetRepository.UpdateAttributes(c, item.ID, item.Protocol, m); err != nil {
+		return err
+	}
 
-		go func() {
-			active, _ := s.CheckStatus(item.AccessGatewayId, item.IP, item.Port)
-
-			if item.Active != active {
-				_ = repository.AssetRepository.UpdateActiveById(context.TODO(), active, item.ID)
-			}
-		}()
-		return nil
-	})
+	//go func() {
+	//	active, _ := s.CheckStatus(item.AccessGatewayId, item.IP, item.Port)
+	//
+	//	if item.Active != active {
+	//		_ = repository.AssetRepository.UpdateActiveById(context.TODO(), active, item.ID)
+	//	}
+	//}()
+	return nil
 }
 
 func (s assetService) DeleteById(id string) error {

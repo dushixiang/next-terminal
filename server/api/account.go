@@ -168,10 +168,7 @@ func (api AccountApi) LoginWithTotpEndpoint(c echo.Context) error {
 
 func (api AccountApi) LogoutEndpoint(c echo.Context) error {
 	token := GetToken(c)
-	err := service.UserService.LogoutByToken(token)
-	if err != nil {
-		return err
-	}
+	service.UserService.Logout(token)
 	return Success(c, nil)
 }
 
@@ -316,6 +313,10 @@ func (api AccountApi) AccountAssetEndpoint(c echo.Context) error {
 	items, total, err := repository.AssetRepository.Find(context.TODO(), pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
 	if err != nil {
 		return err
+	}
+	for i := range items {
+		items[i].IP = ""
+		items[i].Port = 0
 	}
 
 	return Success(c, Map{

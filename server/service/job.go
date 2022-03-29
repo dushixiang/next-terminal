@@ -103,7 +103,7 @@ func (r jobService) InitJob() error {
 	return nil
 }
 
-func (r jobService) Create(o *model.Job) (err error) {
+func (r jobService) Create(ctx context.Context, o *model.Job) (err error) {
 
 	if o.Status == constant.JobStatusRunning {
 		j, err := getJob(o)
@@ -117,7 +117,7 @@ func (r jobService) Create(o *model.Job) (err error) {
 		o.CronJobId = int(jobId)
 	}
 
-	return repository.JobRepository.Create(context.TODO(), o)
+	return repository.JobRepository.Create(ctx, o)
 }
 
 func (r jobService) DeleteJobById(id string) error {

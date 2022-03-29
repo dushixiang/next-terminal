@@ -127,7 +127,7 @@ class Access extends Component {
 
     sendClipboard(data) {
         if (this.state.session['paste'] === '0') {
-            message.warn('禁止粘贴');
+            // message.warn('禁止粘贴');
             return
         }
         let writer;
@@ -338,7 +338,7 @@ class Access extends Component {
 
     clientClipboardReceived = (stream, mimetype) => {
         if (this.state.session['copy'] === '0') {
-            message.warn('禁止复制');
+            // message.warn('禁止复制');
             return
         }
         let reader;
