@@ -7,7 +7,6 @@ import (
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
-	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
 
@@ -101,57 +100,8 @@ func (r *resourceSharerRepository) DeleteByUserGroupId(c context.Context, userGr
 	return r.GetDB(c).Where("user_group_id = ?", userGroupId).Delete(&model.ResourceSharer{}).Error
 }
 
-func (r *resourceSharerRepository) AddSharerResources(userGroupId, userId, strategyId, resourceType string, resourceIds []string) error {
-	return r.GetDB(context.TODO()).Transaction(func(tx *gorm.DB) (err error) {
-
-		for i := range resourceIds {
-			resourceId := resourceIds[i]
-
-			var owner string
-			// 检查资产是否存在
-			switch resourceType {
-			case "asset":
-				resource := model.Asset{}
-				if err = tx.Where("id = ?", resourceId).First(&resource).Error; err != nil {
-					return errors.Wrap(err, "find asset  fail")
-				}
-				owner = resource.Owner
-			case "command":
-				resource := model.Command{}
-				if err = tx.Where("id = ?", resourceId).First(&resource).Error; err != nil {
-					return errors.Wrap(err, "find command  fail")
-				}
-				owner = resource.Owner
-			case "credential":
-				resource := model.Credential{}
-				if err = tx.Where("id = ?", resourceId).First(&resource).Error; err != nil {
-					return errors.Wrap(err, "find credential  fail")
-
-				}
-				owner = resource.Owner
-			}
-
-			if owner == userId {
-				return echo.NewHTTPError(400, "参数错误")
-			}
-
-			// 保证同一个资产只能分配给一个用户或者组
-			id := utils.Sign([]string{resourceId, resourceType, userId, userGroupId})
-			resource := &model.ResourceSharer{
-				ID:           id,
-				ResourceId:   resourceId,
-				ResourceType: resourceType,
-				StrategyId:   strategyId,
-				UserId:       userId,
-				UserGroupId:  userGroupId,
-			}
-			err = tx.Create(resource).Error
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	})
+func (r *resourceSharerRepository) AddSharerResource(c context.Context, m *model.ResourceSharer) error {
+	return r.GetDB(c).Create(m).Error
 }
 
 func (r *resourceSharerRepository) FindAssetIdsByUserId(c context.Context, userId string) (assetIds []string, err error) {
@@ -227,4 +177,8 @@ func (r *resourceSharerRepository) Find(c context.Context, resourceId, resourceT
 func (r *resourceSharerRepository) FindAll(c context.Context) (o []model.ResourceSharer, err error) {
 	err = r.GetDB(c).Find(&o).Error
 	return
+}
+
+func (r *resourceSharerRepository) DeleteById(ctx context.Context, id string) error {
+	return r.GetDB(ctx).Where("id = ?", id).Delete(&model.ResourceSharer{}).Error
 }

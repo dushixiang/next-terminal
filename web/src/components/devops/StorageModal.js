@@ -9,7 +9,7 @@ const formItemLayout = {
 const StorageModal = ({title, visible, handleOk, handleCancel, confirmLoading, model}) => {
 
     const [form] = Form.useForm();
-    if(!model){
+    if (!model) {
         model = {
             isShare: false
         }
@@ -46,11 +46,13 @@ const StorageModal = ({title, visible, handleOk, handleCancel, confirmLoading, m
                     <Input autoComplete="off" placeholder="网盘的名称"/>
                 </Form.Item>
 
-                <Form.Item label="是否共享" name='isShare' rules={[{required: true, message: '请选择是否共享'}]} valuePropName="checked">
-                    <Switch checkedChildren="是" unCheckedChildren="否" />
+                <Form.Item label="是否共享" name='isShare' rules={[{required: true, message: '请选择是否共享'}]}
+                           valuePropName="checked">
+                    <Switch checkedChildren="是" unCheckedChildren="否"/>
                 </Form.Item>
 
-                <Form.Item label="大小限制" name='limitSize' rules={[{required: true, message: '请输入大小限制'}]}>
+                <Form.Item label="大小限制" name='limitSize' rules={[{required: true, message: '请输入大小限制'}]}
+                           tooltip='无限制请填写-1'>
                     <Input type={'number'} min={-1} suffix="MB"/>
                 </Form.Item>
 

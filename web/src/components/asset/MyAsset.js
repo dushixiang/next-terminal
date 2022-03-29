@@ -18,7 +18,6 @@ import {
 import {
     CheckCircleOutlined,
     CodeOutlined,
-    DesktopOutlined,
     ExclamationCircleOutlined,
     SyncOutlined,
     TagsOutlined,
@@ -195,14 +194,6 @@ class MyAsset extends Component {
                                         style={{width: 200}}
                                     />
 
-                                    <Search
-                                        ref={this.inputRefOfIp}
-                                        placeholder="资产IP"
-                                        allowClear
-                                        onSearch={this.handleSearchByIp}
-                                        style={{width: 200}}
-                                    />
-
                                     <Select mode="multiple"
                                             allowClear
                                             value={this.state.selectedTags}
@@ -301,9 +292,6 @@ class MyAsset extends Component {
                                             <Descriptions title="" column={1}>
                                                 <Descriptions.Item label={<div><CodeOutlined/> 资产协议</div>}>
                                                     <strong>{item['protocol']}</strong>
-                                                </Descriptions.Item>
-                                                <Descriptions.Item label={<div><DesktopOutlined/> 主机地址</div>}>
-                                                    <strong>{item['ip'] + ':' + item['port']}</strong>
                                                 </Descriptions.Item>
                                                 <Descriptions.Item label={<div><TagsOutlined/> 标签</div>}>
                                                     <strong>{this.renderTags(item['tags'])}</strong>

@@ -64,7 +64,7 @@ func (api CredentialApi) CredentialCreateEndpoint(c echo.Context) error {
 
 	item.Encrypted = true
 
-	if err := service.CredentialService.Create(&item); err != nil {
+	if err := service.CredentialService.Create(context.TODO(), &item); err != nil {
 		return err
 	}
 

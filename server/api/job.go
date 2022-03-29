@@ -25,7 +25,7 @@ func (api JobApi) JobCreateEndpoint(c echo.Context) error {
 	item.ID = utils.UUID()
 	item.Created = utils.NowJsonTime()
 
-	if err := service.JobService.Create(&item); err != nil {
+	if err := service.JobService.Create(context.TODO(), &item); err != nil {
 		return err
 	}
 	return Success(c, "")

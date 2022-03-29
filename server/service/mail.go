@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"net/smtp"
 
 	"next-terminal/server/constant"
@@ -27,7 +28,7 @@ func (r mailService) SendMail(to, subject, text string) {
 	}
 
 	e := email.NewEmail()
-	e.From = "Next Terminal <" + username + ">"
+	e.From = fmt.Sprintf("%s <%s>", constant.AppName, username)
 	e.To = []string{to}
 	e.Subject = subject
 	e.Text = []byte(text)

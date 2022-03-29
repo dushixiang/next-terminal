@@ -18,7 +18,6 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "^4.0.0",
-    "react-tsparticles": "^1.37.5",
     "xterm": "^4.9.0",
     "xterm-addon-fit": "^0.4.0",
     "xterm-addon-web-links": "^0.4.0"

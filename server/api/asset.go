@@ -28,7 +28,7 @@ func (assetApi AssetApi) AssetCreateEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
 	m["owner"] = account.ID
 
-	if _, err := service.AssetService.Create(m); err != nil {
+	if _, err := service.AssetService.Create(context.TODO(), m); err != nil {
 		return err
 	}
 

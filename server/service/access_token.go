@@ -19,14 +19,9 @@ type accessTokenService struct {
 	baseService
 }
 
-func (service accessTokenService) FindByUserId(userId string) (model.AccessToken, error) {
-	return repository.AccessTokenRepository.FindByUserId(context.TODO(), userId)
-}
-
 func (service accessTokenService) GenAccessToken(userId string) error {
 	return env.GetDB().Transaction(func(tx *gorm.DB) error {
 		ctx := service.Context(tx)
-
 		user, err := repository.UserRepository.FindById(ctx, userId)
 		if err != nil {
 			return err
