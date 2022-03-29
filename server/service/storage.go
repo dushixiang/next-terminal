@@ -4,11 +4,14 @@ import (
 	"bufio"
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
+	"net/http"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"next-terminal/server/config"
@@ -33,7 +36,7 @@ func (service storageService) InitStorages() error {
 		userId := users[i].ID
 		_, err := repository.StorageRepository.FindByOwnerIdAndDefault(context.TODO(), userId, true)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			err = service.CreateStorageByUser(&users[i])
+			err = service.CreateStorageByUser(context.TODO(), &users[i])
 			if err != nil {
 				return err
 			}
@@ -58,7 +61,7 @@ func (service storageService) InitStorages() error {
 			}
 
 			if !userExist {
-				if err := service.DeleteStorageById(storage.ID, true); err != nil {
+				if err := service.DeleteStorageById(context.TODO(), storage.ID, true); err != nil {
 					return err
 				}
 			}
@@ -75,14 +78,29 @@ func (service storageService) InitStorages() error {
 	return nil
 }
 
-func (service storageService) CreateStorageByUser(user *model.User) error {
+func (service storageService) CreateStorageByUser(c context.Context, user *model.User) error {
 	drivePath := service.GetBaseDrivePath()
+	var limitSize int64 = -1
+	property, err := repository.PropertyRepository.FindByName(c, "user-default-storage-size")
+	if err != nil {
+		return err
+	}
+	limitSize, err = strconv.ParseInt(property.Value, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	limitSize = limitSize * 1024 * 1024
+	if limitSize < 0 {
+		limitSize = -1
+	}
+
 	storage := model.Storage{
 		ID:        user.ID,
 		Name:      user.Nickname + "的默认空间",
 		IsShare:   false,
 		IsDefault: true,
-		LimitSize: -1,
+		LimitSize: limitSize,
 		Owner:     user.ID,
 		Created:   utils.NowJsonTime(),
 	}
@@ -91,8 +109,9 @@ func (service storageService) CreateStorageByUser(user *model.User) error {
 		return err
 	}
 	log.Infof("创建storage:「%v」文件夹: %v", storage.Name, storageDir)
-	err := repository.StorageRepository.Create(context.TODO(), &storage)
+	err = repository.StorageRepository.Create(c, &storage)
 	if err != nil {
+		_ = os.RemoveAll(storageDir)
 		return err
 	}
 	return nil
@@ -135,9 +154,9 @@ func (service storageService) GetBaseDrivePath() string {
 	return config.GlobalCfg.Guacd.Drive
 }
 
-func (service storageService) DeleteStorageById(id string, force bool) error {
+func (service storageService) DeleteStorageById(c context.Context, id string, force bool) error {
 	drivePath := service.GetBaseDrivePath()
-	storage, err := repository.StorageRepository.FindById(context.TODO(), id)
+	storage, err := repository.StorageRepository.FindById(c, id)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil
@@ -152,7 +171,7 @@ func (service storageService) DeleteStorageById(id string, force bool) error {
 	if err := os.RemoveAll(path.Join(drivePath, id)); err != nil {
 		return err
 	}
-	if err := repository.StorageRepository.DeleteById(context.TODO(), id); err != nil {
+	if err := repository.StorageRepository.DeleteById(c, id); err != nil {
 		return err
 	}
 	return nil
@@ -229,14 +248,20 @@ func (service storageService) StorageEdit(file string, fileContent string, stora
 	return nil
 }
 
-func (service storageService) StorageDownload(c echo.Context, remoteFile, storageId string) error {
+func (service storageService) StorageDownload(c echo.Context, file, storageId string) error {
 	drivePath := service.GetBaseDrivePath()
-	if strings.Contains(remoteFile, "../") {
+	if strings.Contains(file, "../") {
 		return errors.New("非法请求 :(")
 	}
 	// 获取带后缀的文件名称
-	filenameWithSuffix := path.Base(remoteFile)
-	return c.Attachment(path.Join(path.Join(drivePath, storageId), remoteFile), filenameWithSuffix)
+	filenameWithSuffix := path.Base(file)
+	p := path.Join(path.Join(drivePath, storageId), file)
+	//log.Infof("download %v", p)
+	c.Response().Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filenameWithSuffix))
+	c.Response().Header().Set("Content-Type", "application/octet-stream")
+
+	http.ServeFile(c.Response(), c.Request(), p)
+	return nil
 }
 
 func (service storageService) StorageLs(remoteDir, storageId string) (error, []File) {

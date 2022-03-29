@@ -90,31 +90,31 @@ func (service userService) FixUserOnlineState() error {
 	return nil
 }
 
+func (service userService) Logout(token string) {
+	cache.TokenManager.Delete(token)
+}
+
 func (service userService) LogoutByToken(token string) (err error) {
-	return env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := service.Context(tx)
-		loginLog, err := repository.LoginLogRepository.FindById(c, token)
-		if err != nil {
-			return err
-		}
-		cache.TokenManager.Delete(token)
-
-		loginLogForUpdate := &model.LoginLog{LogoutTime: utils.NowJsonTime(), ID: token}
-		err = repository.LoginLogRepository.Update(c, loginLogForUpdate)
-		if err != nil {
-			return err
-		}
-
-		loginLogs, err := repository.LoginLogRepository.FindAliveLoginLogsByUsername(c, loginLog.Username)
-		if err != nil {
-			return err
-		}
-
-		if len(loginLogs) == 0 {
-			err = repository.UserRepository.UpdateOnlineByUsername(c, loginLog.Username, false)
-		}
+	loginLog, err := repository.LoginLogRepository.FindById(context.TODO(), token)
+	if err != nil {
 		return err
-	})
+	}
+
+	loginLogForUpdate := &model.LoginLog{LogoutTime: utils.NowJsonTime(), ID: token}
+	err = repository.LoginLogRepository.Update(context.TODO(), loginLogForUpdate)
+	if err != nil {
+		return err
+	}
+
+	loginLogs, err := repository.LoginLogRepository.FindAliveLoginLogsByUsername(context.TODO(), loginLog.Username)
+	if err != nil {
+		return err
+	}
+
+	if len(loginLogs) == 0 {
+		err = repository.UserRepository.UpdateOnlineByUsername(context.TODO(), loginLog.Username, false)
+	}
+	return err
 }
 
 func (service userService) LogoutById(c context.Context, id string) error {
@@ -130,11 +130,24 @@ func (service userService) LogoutById(c context.Context, id string) error {
 
 	for j := range loginLogs {
 		token := loginLogs[j].ID
-		if err := service.LogoutByToken(token); err != nil {
-			return err
-		}
+		service.Logout(token)
 	}
 	return nil
+}
+
+func (service userService) GetUserLoginToken(c context.Context, username string) ([]string, error) {
+
+	loginLogs, err := repository.LoginLogRepository.FindAliveLoginLogsByUsername(c, username)
+	if err != nil {
+		return nil, err
+	}
+
+	var tokens []string
+	for j := range loginLogs {
+		token := loginLogs[j].ID
+		tokens = append(tokens, token)
+	}
+	return tokens, nil
 }
 
 func (service userService) OnEvicted(token string, value interface{}) {
@@ -144,30 +157,24 @@ func (service userService) OnEvicted(token string, value interface{}) {
 	} else {
 		log.Debugf("用户Token「%v」过期", token)
 		err := service.LogoutByToken(token)
-		if err != nil {
+		if err != nil && !errors.Is(gorm.ErrRecordNotFound, err) {
 			log.Errorf("退出登录失败 %v", err)
 		}
 	}
 }
 
 func (service userService) UpdateStatusById(id string, status string) error {
-	return env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := service.Context(tx)
-		if c.Value(constant.DB) == nil {
-			c = context.WithValue(c, constant.DB, env.GetDB())
+	if constant.StatusDisabled == status {
+		// 将该用户下线
+		if err := service.LogoutById(context.TODO(), id); err != nil {
+			return err
 		}
-		if constant.StatusDisabled == status {
-			// 将该用户下线
-			if err := service.LogoutById(c, id); err != nil {
-				return err
-			}
-		}
-		u := model.User{
-			ID:     id,
-			Status: status,
-		}
-		return repository.UserRepository.Update(c, &u)
-	})
+	}
+	u := model.User{
+		ID:     id,
+		Status: status,
+	}
+	return repository.UserRepository.Update(context.TODO(), &u)
 
 }
 
@@ -231,13 +238,19 @@ func (service userService) CreateUser(user model.User) (err error) {
 		if err := repository.UserRepository.Create(c, &user); err != nil {
 			return err
 		}
-		err = StorageService.CreateStorageByUser(&user)
+		err = StorageService.CreateStorageByUser(c, &user)
 		if err != nil {
 			return err
 		}
 
 		if user.Mail != "" {
-			go MailService.SendMail(user.Mail, "[Next Terminal] 注册通知", "你好，"+user.Nickname+"。管理员为你注册了账号："+user.Username+" 密码："+password)
+			subject := fmt.Sprintf("%s 注册通知", constant.AppName)
+			text := fmt.Sprintf(`您好，%s。
+	管理员为你开通了账户。
+	账号：%s
+	密码：%s
+`, user.Username, user.Username, password)
+			go MailService.SendMail(user.Mail, subject, text)
 		}
 		return nil
 	})
@@ -245,16 +258,19 @@ func (service userService) CreateUser(user model.User) (err error) {
 }
 
 func (service userService) DeleteUserById(userId string) error {
-	return env.GetDB().Transaction(func(tx *gorm.DB) error {
+	user, err := repository.UserRepository.FindById(context.TODO(), userId)
+	if err != nil {
+		return err
+	}
+	username := user.Username
+	// 下线该用户
+	loginTokens, err := service.GetUserLoginToken(context.TODO(), username)
+	if err != nil {
+		return err
+	}
+
+	err = env.GetDB().Transaction(func(tx *gorm.DB) error {
 		c := service.Context(tx)
-		// 下线该用户
-		if err := service.LogoutById(c, userId); err != nil {
-			return err
-		}
-		// 删除用户
-		if err := repository.UserRepository.DeleteById(c, userId); err != nil {
-			return err
-		}
 		// 删除用户与用户组的关系
 		if err := repository.UserGroupMemberRepository.DeleteByUserId(c, userId); err != nil {
 			return err
@@ -264,19 +280,37 @@ func (service userService) DeleteUserById(userId string) error {
 			return err
 		}
 		// 删除用户的默认磁盘空间
-		if err := StorageService.DeleteStorageById(userId, true); err != nil {
+		if err := StorageService.DeleteStorageById(c, userId, true); err != nil {
+			return err
+		}
+
+		// 删除用户
+		if err := repository.UserRepository.DeleteById(c, userId); err != nil {
 			return err
 		}
 		return nil
 	})
+
+	if err != nil {
+		return err
+	}
+
+	for _, token := range loginTokens {
+		service.Logout(token)
+	}
+	return nil
 }
 
 func (service userService) DeleteLoginLogs(tokens []string) error {
 	if len(tokens) > 0 {
 		for _, token := range tokens {
+			// 手动触发用户退出登录
 			if err := service.LogoutByToken(token); err != nil {
 				return err
 			}
+			// 移除缓存中的token
+			service.Logout(token)
+			// 删除登录日志
 			if err := repository.LoginLogRepository.DeleteById(context.TODO(), token); err != nil {
 				return err
 			}
@@ -336,4 +370,38 @@ func (service userService) UpdateUser(id string, user model.User) error {
 		return repository.UserRepository.Update(ctx, &user)
 	})
 
+}
+
+func (service userService) AddSharerResources(ctx context.Context, userGroupId, userId, strategyId, resourceType string, resourceIds []string) error {
+	if service.InTransaction(ctx) {
+		return service.addSharerResources(ctx, resourceIds, userGroupId, userId, strategyId, resourceType)
+	} else {
+		return env.GetDB().Transaction(func(tx *gorm.DB) error {
+			ctx2 := service.Context(tx)
+			return service.addSharerResources(ctx2, resourceIds, userGroupId, userId, strategyId, resourceType)
+		})
+	}
+}
+
+func (service userService) addSharerResources(ctx context.Context, resourceIds []string, userGroupId string, userId string, strategyId string, resourceType string) error {
+	for i := range resourceIds {
+		resourceId := resourceIds[i]
+		// 保证同一个资产只能分配给一个用户或者组
+		id := utils.Sign([]string{resourceId, resourceType, userId, userGroupId})
+		if err := repository.ResourceSharerRepository.DeleteById(ctx, id); err != nil {
+			return err
+		}
+		rs := &model.ResourceSharer{
+			ID:           id,
+			ResourceId:   resourceId,
+			ResourceType: resourceType,
+			StrategyId:   strategyId,
+			UserId:       userId,
+			UserGroupId:  userGroupId,
+		}
+		if err := repository.ResourceSharerRepository.AddSharerResource(ctx, rs); err != nil {
+			return err
+		}
+	}
+	return nil
 }

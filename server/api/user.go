@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -141,7 +141,11 @@ func (userApi UserApi) UserChangePasswordEndpoint(c echo.Context) error {
 	}
 
 	if user.Mail != "" {
-		go service.MailService.SendMail(user.Mail, "[Next Terminal] 密码修改通知", "你好，"+user.Nickname+"。管理员已将你的密码修改为："+password)
+		subject := "密码修改通知"
+		text := fmt.Sprintf(`您好，%s。
+	管理员已将你的密码修改为：%s。
+`, user.Username, password)
+		go service.MailService.SendMail(user.Mail, subject, text)
 	}
 
 	return Success(c, "")

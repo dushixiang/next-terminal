@@ -131,7 +131,7 @@ func (sshd sshd) sessionHandler(sess *ssh.Session) {
 
 func (sshd sshd) Serve() {
 	ssh.Handle(func(s ssh.Session) {
-		_, _ = io.WriteString(s, fmt.Sprintf(constant.Banner, constant.Version))
+		_, _ = io.WriteString(s, fmt.Sprintf(constant.AppBanner, constant.AppVersion))
 		sshd.sessionHandler(&s)
 	})
 

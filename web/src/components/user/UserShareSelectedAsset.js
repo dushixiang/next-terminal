@@ -425,8 +425,11 @@ class UserShareSelectedAsset extends Component {
                                             <div>
                                                 <p>上传：{renderStatus(item['strategy']['upload'])}</p>
                                                 <p>下载：{renderStatus(item['strategy']['download'])}</p>
+                                                <p>编辑：{renderStatus(item['strategy']['edit'])}</p>
                                                 <p>删除：{renderStatus(item['strategy']['delete'])}</p>
-                                                <p>改名：{renderStatus(item['strategy']['rename'])}</p>
+                                                <p>重命名：{renderStatus(item['strategy']['rename'])}</p>
+                                                <p>复制：{renderStatus(item['strategy']['copy'])}</p>
+                                                <p>粘贴：{renderStatus(item['strategy']['paste'])}</p>
                                             </div>
                                         );
                                     }

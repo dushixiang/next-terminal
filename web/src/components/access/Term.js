@@ -82,7 +82,9 @@ class Term extends Component {
         document.body.oncopy = (event) => {
             event.preventDefault();
             if (this.state.session['copy'] === '0') {
-                message.warn('禁止复制')
+                // message.warn('禁止复制')
+                return false;
+            }else {
                 if (event.clipboardData) {
                     return event.clipboardData.setData('text', '');
                 } else {
@@ -90,13 +92,12 @@ class Term extends Component {
                     return window.clipboardData.setData("text", '');
                 }
             }
-            return true;
         }
 
         document.body.onpaste = (event) => {
             event.preventDefault();
             if (this.state.session['paste'] === '0') {
-                message.warn('禁止粘贴')
+                // message.warn('禁止粘贴')
                 return false;
             }
             return true;

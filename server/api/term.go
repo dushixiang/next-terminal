@@ -157,6 +157,7 @@ func (api WebTerminalApi) SshEndpoint(c echo.Context) error {
 
 	termHandler := NewTermHandler(sessionId, isRecording, ws, nextTerminal)
 	termHandler.Start()
+	defer termHandler.Stop()
 
 	for {
 		_, message, err := ws.ReadMessage()
@@ -164,7 +165,6 @@ func (api WebTerminalApi) SshEndpoint(c echo.Context) error {
 			// web socket会话关闭后主动关闭ssh会话
 			log.Debugf("WebSocket已关闭")
 			service.SessionService.CloseSessionById(sessionId, Normal, "用户正常退出")
-			termHandler.Stop()
 			break
 		}
 

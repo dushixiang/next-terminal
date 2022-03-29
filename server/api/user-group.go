@@ -20,7 +20,7 @@ func (userGroupApi UserGroupApi) UserGroupCreateEndpoint(c echo.Context) error {
 		return err
 	}
 
-	if _, err := service.UserGroupService.Create(item.Name, item.Members); err != nil {
+	if _, err := service.UserGroupService.Create(context.TODO(), item.Name, item.Members); err != nil {
 		return err
 	}
 

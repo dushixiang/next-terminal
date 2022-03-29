@@ -13,14 +13,9 @@ type baseRepository struct {
 }
 
 func (b *baseRepository) GetDB(c context.Context) *gorm.DB {
-	db := c.Value(constant.DB)
-	if db == nil {
+	db, ok := c.Value(constant.DB).(*gorm.DB)
+	if !ok {
 		return env.GetDB()
 	}
-	switch val := db.(type) {
-	case gorm.DB:
-		return &val
-	default:
-		return env.GetDB()
-	}
+	return db
 }
