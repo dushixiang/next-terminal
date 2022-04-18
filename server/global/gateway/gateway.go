@@ -83,8 +83,8 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 		return "", 0, err
 	}
 
-	// TODO debug
-	hostname = "0.0.0.0"
+	// debug
+	//hostname = "0.0.0.0"
 
 	localAddr := fmt.Sprintf("%s:%d", hostname, localPort)
 	listener, err := net.Listen("tcp", localAddr)
@@ -94,9 +94,9 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 
 	ctx, cancel := context.WithCancel(context.Background())
 	tunnel := &Tunnel{
-		ID: id,
-		//LocalHost:  hostname,
-		LocalHost:  "docker.for.mac.host.internal",
+		ID:        id,
+		LocalHost: hostname,
+		//LocalHost:  "docker.for.mac.host.internal",
 		LocalPort:  localPort,
 		Gateway:    g,
 		RemoteHost: ip,
