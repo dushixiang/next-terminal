@@ -80,7 +80,7 @@ func (service storageService) InitStorages() error {
 
 func (service storageService) CreateStorageByUser(c context.Context, user *model.User) error {
 	drivePath := service.GetBaseDrivePath()
-	var limitSize int64 = -1
+	var limitSize int64
 	property, err := repository.PropertyRepository.FindByName(c, "user-default-storage-size")
 	if err != nil {
 		return err
