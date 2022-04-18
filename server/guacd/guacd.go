@@ -20,6 +20,9 @@ const (
 	Backspace    = "backspace"
 	TerminalType = "terminal-type"
 
+	PreConnectionId   = "preconnection-id"
+	PreConnectionBlob = "preconnection-blob"
+
 	EnableDrive              = "enable-drive"
 	DriveName                = "drive-name"
 	DrivePath                = "drive-path"

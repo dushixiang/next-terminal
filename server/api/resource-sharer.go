@@ -2,10 +2,10 @@ package api
 
 import (
 	"context"
-	"next-terminal/server/service"
 
 	"next-terminal/server/dto"
 	"next-terminal/server/repository"
+	"next-terminal/server/service"
 
 	"github.com/labstack/echo/v4"
 )

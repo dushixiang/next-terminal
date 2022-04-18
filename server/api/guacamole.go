@@ -308,6 +308,8 @@ func (api GuacamoleApi) setConfig(propertyMap map[string]string, s model.Session
 		configuration.SetParameter(guacd.DisableOffscreenCaching, propertyMap[guacd.DisableOffscreenCaching])
 		configuration.SetParameter(guacd.ColorDepth, propertyMap[guacd.ColorDepth])
 		configuration.SetParameter(guacd.ForceLossless, propertyMap[guacd.ForceLossless])
+		configuration.SetParameter(guacd.PreConnectionId, propertyMap[guacd.PreConnectionId])
+		configuration.SetParameter(guacd.PreConnectionBlob, propertyMap[guacd.PreConnectionBlob])
 	case "ssh":
 		if len(s.PrivateKey) > 0 && s.PrivateKey != "-" {
 			configuration.SetParameter("username", s.Username)
