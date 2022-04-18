@@ -339,7 +339,7 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                     </Col>
                     <Col span={11}>
                         <Collapse
-                            defaultActiveKey={['remote-app', '认证', 'VNC中继', 'storage', '模式设置', '显示设置', '控制终端行为', 'socks']}
+                            defaultActiveKey={['VNC中继', 'storage', '模式设置', '显示设置', '控制终端行为', 'socks']}
                             ghost>
                             {
                                 protocol === 'rdp' ?
@@ -377,6 +377,21 @@ const AssetModal = function ({title, visible, handleOk, handleCancel, confirmLoa
                                                 label='域'
                                             >
                                                 <Input type='text' placeholder="身份验证时使用的域"/>
+                                            </Form.Item>
+                                        </Panel>
+                                        <Panel header={<Text strong>预连接 PDU (Hyper-V / VMConnect)</Text>} key="PDU">
+                                            <Form.Item
+                                                name="preconnection-id"
+                                                label='预连接ID'
+                                            >
+                                                <Input type='text' placeholder="RDP 源的数字 ID"/>
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                name="preconnection-blob"
+                                                label='预连接字符'
+                                            >
+                                                <Input type='text' placeholder="标识 RDP 源的任意字符串"/>
                                             </Form.Item>
                                         </Panel>
                                         <Panel header={<Text strong>Remote App</Text>} key="remote-app">
