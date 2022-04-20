@@ -30,6 +30,7 @@ const (
 	AccessGatewayUnAvailable int = 803
 	AccessGatewayCreateError int = 804
 	AssetNotActive           int = 805
+	NewSshClientError        int = 806
 )
 
 var UpGrader = websocket.Upgrader{
@@ -69,10 +70,7 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 		return err
 	}
 	api.setConfig(propertyMap, s, configuration)
-	var (
-		ip   = s.IP
-		port = s.Port
-	)
+
 	if s.AccessGatewayId != "" && s.AccessGatewayId != "-" {
 		g, err := service.GatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
 		if err != nil {
@@ -83,18 +81,18 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 			utils.Disconnect(ws, AccessGatewayUnAvailable, "接入网关不可用："+g.Message)
 			return nil
 		}
-		exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, ip, port)
+		exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, s.IP, s.Port)
 		if err != nil {
 			utils.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
 			return nil
 		}
-		ip = exposedIP
-		port = exposedPort
+		s.IP = exposedIP
+		s.Port = exposedPort
 		defer g.CloseSshTunnel(s.ID)
 	}
 
-	configuration.SetParameter("hostname", ip)
-	configuration.SetParameter("port", strconv.Itoa(port))
+	configuration.SetParameter("hostname", s.IP)
+	configuration.SetParameter("port", strconv.Itoa(s.Port))
 
 	// 加载资产配置的属性，优先级比全局配置的高，因此最后加载，覆盖掉全局配置
 	attributes, err := repository.AssetRepository.FindAssetAttrMapByAssetId(ctx, s.AssetId)
@@ -132,9 +130,12 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 
 	if configuration.Protocol == constant.SSH {
 		nextTerminal, err := CreateNextTerminalBySession(s)
-		if err == nil {
-			nextSession.NextTerminal = nextTerminal
+		if err != nil {
+			utils.Disconnect(ws, NewSshClientError, "建立SSH客户端失败: "+err.Error())
+			log.Printf("[%v] 建立 ssh 客户端失败: %v", sessionId, err.Error())
+			return err
 		}
+		nextSession.NextTerminal = nextTerminal
 	}
 
 	nextSession.Observer = session.NewObserver(sessionId)

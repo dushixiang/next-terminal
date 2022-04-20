@@ -5,7 +5,7 @@ import (
 )
 
 const (
-	AppVersion = "v1.2.6-beta"
+	AppVersion = "v1.2.7"
 	AppName    = "Next Terminal"
 	AppBanner  = `
 	_______                   __    ___________                  .__              .__

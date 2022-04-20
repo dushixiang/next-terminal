@@ -5,7 +5,7 @@ echo "clean build history"
 
 echo "build web..."
 cd web || exit
-yarn build
+yarn build || exit
 cp -r build ../server/resource/
 echo "build web success"
 
