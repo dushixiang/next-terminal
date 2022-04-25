@@ -1,7 +1,6 @@
 package gateway
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"net"
@@ -92,7 +91,6 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 		return "", 0, err
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
 	tunnel := &Tunnel{
 		ID:        id,
 		LocalHost: hostname,
@@ -101,8 +99,6 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 		Gateway:    g,
 		RemoteHost: ip,
 		RemotePort: port,
-		ctx:        ctx,
-		cancel:     cancel,
 		listener:   listener,
 	}
 	g.Add <- tunnel
