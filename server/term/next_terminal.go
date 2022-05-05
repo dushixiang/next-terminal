@@ -80,21 +80,21 @@ func (ret *NextTerminal) Write(p []byte) (int, error) {
 }
 
 func (ret *NextTerminal) Close() error {
-	
+
 	if ret.SftpClient != nil {
-		return ret.SftpClient.Close()
+		_ = ret.SftpClient.Close()
 	}
-	
+
 	if ret.SshSession != nil {
-		return ret.SshSession.Close()
+		_ = ret.SshSession.Close()
 	}
 
 	if ret.SshClient != nil {
-		return ret.SshClient.Close()
+		_ = ret.SshClient.Close()
 	}
 
 	if ret.Recorder != nil {
-		return ret.Close()
+		ret.Recorder.Close()
 	}
 
 	return nil
