@@ -57,15 +57,14 @@ func (g *Gateway) Run() {
 }
 
 func (g *Gateway) Close() {
-	g.exit <- true
 	if g.SshClient != nil {
 		_ = g.SshClient.Close()
 	}
-	if len(g.tunnels) > 0 {
-		for _, tunnel := range g.tunnels {
-			tunnel.Close()
-		}
+	for id := range g.tunnels {
+		g.CloseSshTunnel(id)
 	}
+
+	g.exit <- true
 }
 
 func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, exposedPort int, err error) {
@@ -111,7 +110,5 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 }
 
 func (g Gateway) CloseSshTunnel(id string) {
-	if g.tunnels[id] != nil {
-		g.tunnels[id].Close()
-	}
+	g.Del <- id
 }
