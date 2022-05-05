@@ -70,7 +70,7 @@ func sendObData(sessionId, s string) {
 		if nextSession.Observer != nil {
 			obs := nextSession.Observer.All()
 			for _, ob := range obs {
-				_ = api.WriteMessage(ob.WebSocket, dto.NewMessage(api.Data, s))
+				_ = ob.WriteMessage(dto.NewMessage(api.Data, s))
 			}
 		}
 	}
