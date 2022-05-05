@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"sync"
+
+	"next-terminal/server/log"
 
 	"next-terminal/server/utils"
 
@@ -19,7 +22,7 @@ type Gateway struct {
 	SshClient *ssh.Client
 	Message   string // 失败原因
 
-	tunnels map[string]*Tunnel
+	tunnels *sync.Map
 
 	Add  chan *Tunnel
 	Del  chan string
@@ -34,7 +37,7 @@ func NewGateway(id string, connected bool, message string, client *ssh.Client) *
 		SshClient: client,
 		Add:       make(chan *Tunnel),
 		Del:       make(chan string),
-		tunnels:   map[string]*Tunnel{},
+		tunnels:   new(sync.Map),
 		exit:      make(chan bool, 1),
 	}
 }
@@ -43,12 +46,15 @@ func (g *Gateway) Run() {
 	for {
 		select {
 		case t := <-g.Add:
-			g.tunnels[t.ID] = t
+			g.tunnels.Store(t.ID, t)
+			log.Info("add tunnel: %s", t.ID)
 			go t.Open()
 		case k := <-g.Del:
-			if _, ok := g.tunnels[k]; ok {
-				g.tunnels[k].Close()
-				delete(g.tunnels, k)
+			if val, ok := g.tunnels.Load(k); ok {
+				if vval, vok := val.(*Tunnel); vok {
+					vval.Close()
+					g.tunnels.Delete(k)
+				}
 			}
 		case <-g.exit:
 			return
@@ -57,14 +63,14 @@ func (g *Gateway) Run() {
 }
 
 func (g *Gateway) Close() {
-	if g.SshClient != nil {
-		_ = g.SshClient.Close()
-	}
-	for id := range g.tunnels {
-		g.CloseSshTunnel(id)
-	}
-
+	g.tunnels.Range(func(key, value interface{}) bool {
+		if val, ok := value.(*Tunnel); ok {
+			val.Close()
+		}
+		return true
+	})
 	g.exit <- true
+
 }
 
 func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, exposedPort int, err error) {

@@ -3,6 +3,10 @@ package app
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
+
+	"next-terminal/server/log"
 
 	"next-terminal/server/cli"
 	"next-terminal/server/config"
@@ -104,6 +108,9 @@ func Run() error {
 		if err != nil {
 			return err
 		}
+		go func() {
+			log.Fatal(http.ListenAndServe("localhost:8099", nil))
+		}()
 		fmt.Printf("当前配置为: %v\n", string(jsonBytes))
 	}
 
