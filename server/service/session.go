@@ -17,7 +17,6 @@ import (
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
 
-	"github.com/gorilla/websocket"
 	"gorm.io/gorm"
 )
 
@@ -94,12 +93,12 @@ func (service sessionService) CloseSessionById(sessionId string, code int, reaso
 	nextSession := session.GlobalSessionManager.GetById(sessionId)
 	if nextSession != nil {
 		log.Debugf("[%v] 会话关闭，原因：%v", sessionId, reason)
-		service.WriteCloseMessage(nextSession.WebSocket, nextSession.Mode, code, reason)
+		service.WriteCloseMessage(nextSession, nextSession.Mode, code, reason)
 
 		if nextSession.Observer != nil {
 			obs := nextSession.Observer.All()
 			for _, ob := range obs {
-				service.WriteCloseMessage(ob.WebSocket, ob.Mode, code, reason)
+				service.WriteCloseMessage(ob, ob.Mode, code, reason)
 				log.Debugf("[%v] 强制踢出会话的观察者: %v", sessionId, ob.ID)
 			}
 		}
@@ -109,26 +108,16 @@ func (service sessionService) CloseSessionById(sessionId string, code int, reaso
 	service.DisDBSess(sessionId, code, reason)
 }
 
-func (service sessionService) WriteCloseMessage(ws *websocket.Conn, mode string, code int, reason string) {
+func (service sessionService) WriteCloseMessage(sess *session.Session, mode string, code int, reason string) {
 	switch mode {
 	case constant.Guacd:
-		if ws != nil {
-			err := guacd.NewInstruction("error", "", strconv.Itoa(code))
-			_ = ws.WriteMessage(websocket.TextMessage, []byte(err.String()))
-			disconnect := guacd.NewInstruction("disconnect")
-			_ = ws.WriteMessage(websocket.TextMessage, []byte(disconnect.String()))
-		}
-	case constant.Native:
-		if ws != nil {
-			msg := `0` + reason
-			_ = ws.WriteMessage(websocket.TextMessage, []byte(msg))
-		}
-	case constant.Terminal:
-		// 这里是关闭观察者的ssh会话
-		if ws != nil {
-			msg := `0` + reason
-			_ = ws.WriteMessage(websocket.TextMessage, []byte(msg))
-		}
+		err := guacd.NewInstruction("error", "", strconv.Itoa(code))
+		_ = sess.WriteString(err.String())
+		disconnect := guacd.NewInstruction("disconnect")
+		_ = sess.WriteString(disconnect.String())
+	case constant.Native, constant.Terminal:
+		msg := `0` + reason
+		_ = sess.WriteString(msg)
 	}
 }
 

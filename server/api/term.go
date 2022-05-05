@@ -202,7 +202,7 @@ func (api WebTerminalApi) SshEndpoint(c echo.Context) error {
 			if err != nil {
 				service.SessionService.CloseSessionById(sessionId, TunnelClosed, "远程连接已关闭")
 			} else {
-				_ = WriteMessage(ws, dto.NewMessage(Ping, ""))
+				_ = termHandler.WriteMessage(dto.NewMessage(Ping, ""))
 			}
 
 		}

@@ -159,16 +159,16 @@ func (r *resourceSharerRepository) FindByResourceIdAndUserId(c context.Context, 
 func (r *resourceSharerRepository) Find(c context.Context, resourceId, resourceType, userId, userGroupId string) (resourceSharers []model.ResourceSharer, err error) {
 	db := r.GetDB(c)
 	if resourceId != "" {
-		db = db.Where("resource_id = ?")
+		db = db.Where("resource_id = ?", resourceId)
 	}
 	if resourceType != "" {
-		db = db.Where("resource_type = ?")
+		db = db.Where("resource_type = ?", resourceType)
 	}
 	if userId != "" {
-		db = db.Where("user_id = ?")
+		db = db.Where("user_id = ?", userId)
 	}
 	if userGroupId != "" {
-		db = db.Where("user_group_id = ?")
+		db = db.Where("user_group_id = ?", userGroupId)
 	}
 	err = db.Find(&resourceSharers).Error
 	return

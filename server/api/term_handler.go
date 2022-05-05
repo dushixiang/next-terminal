@@ -2,6 +2,7 @@ package api
 
 import (
 	"context"
+	"sync"
 	"time"
 	"unicode/utf8"
 
@@ -15,12 +16,13 @@ import (
 type TermHandler struct {
 	sessionId    string
 	isRecording  bool
-	ws           *websocket.Conn
+	webSocket    *websocket.Conn
 	nextTerminal *term.NextTerminal
 	ctx          context.Context
 	cancel       context.CancelFunc
 	dataChan     chan rune
 	tick         *time.Ticker
+	mutex        sync.Mutex
 }
 
 func NewTermHandler(sessionId string, isRecording bool, ws *websocket.Conn, nextTerminal *term.NextTerminal) *TermHandler {
@@ -29,7 +31,7 @@ func NewTermHandler(sessionId string, isRecording bool, ws *websocket.Conn, next
 	return &TermHandler{
 		sessionId:    sessionId,
 		isRecording:  isRecording,
-		ws:           ws,
+		webSocket:    ws,
 		nextTerminal: nextTerminal,
 		ctx:          ctx,
 		cancel:       cancel,
@@ -38,17 +40,17 @@ func NewTermHandler(sessionId string, isRecording bool, ws *websocket.Conn, next
 	}
 }
 
-func (r TermHandler) Start() {
+func (r *TermHandler) Start() {
 	go r.readFormTunnel()
 	go r.writeToWebsocket()
 }
 
-func (r TermHandler) Stop() {
+func (r *TermHandler) Stop() {
 	r.tick.Stop()
 	r.cancel()
 }
 
-func (r TermHandler) readFormTunnel() {
+func (r *TermHandler) readFormTunnel() {
 	for {
 		select {
 		case <-r.ctx.Done():
@@ -65,7 +67,7 @@ func (r TermHandler) readFormTunnel() {
 	}
 }
 
-func (r TermHandler) writeToWebsocket() {
+func (r *TermHandler) writeToWebsocket() {
 	var buf []byte
 	for {
 		select {
@@ -74,7 +76,7 @@ func (r TermHandler) writeToWebsocket() {
 		case <-r.tick.C:
 			if len(buf) > 0 {
 				s := string(buf)
-				if err := WriteMessage(r.ws, dto.NewMessage(Data, s)); err != nil {
+				if err := r.WriteMessage(dto.NewMessage(Data, s)); err != nil {
 					return
 				}
 				// 录屏
@@ -86,7 +88,7 @@ func (r TermHandler) writeToWebsocket() {
 				if nextSession != nil && len(nextSession.Observer.All()) > 0 {
 					obs := nextSession.Observer.All()
 					for _, ob := range obs {
-						_ = WriteMessage(ob.WebSocket, dto.NewMessage(Data, s))
+						_ = ob.WriteMessage(dto.NewMessage(Data, s))
 					}
 				}
 				buf = []byte{}
@@ -101,4 +103,14 @@ func (r TermHandler) writeToWebsocket() {
 			}
 		}
 	}
+}
+
+func (r *TermHandler) WriteMessage(msg dto.Message) error {
+	if r.webSocket == nil {
+		return nil
+	}
+	defer r.mutex.Unlock()
+	r.mutex.Lock()
+	message := []byte(msg.ToString())
+	return r.webSocket.WriteMessage(websocket.TextMessage, message)
 }
