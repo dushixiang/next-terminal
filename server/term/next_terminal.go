@@ -79,7 +79,7 @@ func (ret *NextTerminal) Write(p []byte) (int, error) {
 	return ret.StdinPipe.Write(p)
 }
 
-func (ret *NextTerminal) Close() error {
+func (ret *NextTerminal) Close() {
 
 	if ret.SftpClient != nil {
 		_ = ret.SftpClient.Close()
@@ -96,8 +96,6 @@ func (ret *NextTerminal) Close() error {
 	if ret.Recorder != nil {
 		ret.Recorder.Close()
 	}
-
-	return nil
 }
 
 func (ret *NextTerminal) WindowChange(h int, w int) error {

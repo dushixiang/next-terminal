@@ -84,7 +84,7 @@ func (m *Manager) Start() {
 					_ = ss.GuacdTunnel.Close()
 				}
 				if ss.NextTerminal != nil {
-					_ = ss.NextTerminal.Close()
+					ss.NextTerminal.Close()
 				}
 
 				if ss.WebSocket != nil {
