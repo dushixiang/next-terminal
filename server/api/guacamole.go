@@ -139,8 +139,7 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	}
 
 	nextSession.Observer = session.NewObserver(sessionId)
-	session.GlobalSessionManager.Add <- nextSession
-	go nextSession.Observer.Start()
+	session.GlobalSessionManager.Add(nextSession)
 	sess := model.Session{
 		ConnectionId: guacdTunnel.UUID,
 		Width:        intWidth,
@@ -254,7 +253,7 @@ func (api GuacamoleApi) GuacamoleMonitor(c echo.Context) error {
 		return nil
 	}
 	nextSession.ID = utils.UUID()
-	forObsSession.Observer.Add <- nextSession
+	forObsSession.Observer.Add(nextSession)
 	log.Debugf("[%v:%v] 观察者[%v]加入会话[%v]", sessionId, connectionId, nextSession.ID, s.ConnectionId)
 
 	guacamoleHandler := NewGuacamoleHandler(ws, guacdTunnel)
@@ -269,7 +268,7 @@ func (api GuacamoleApi) GuacamoleMonitor(c echo.Context) error {
 			_ = guacdTunnel.Close()
 
 			observerId := nextSession.ID
-			forObsSession.Observer.Del <- observerId
+			forObsSession.Observer.Del(observerId)
 			log.Debugf("[%v:%v] 观察者[%v]退出会话", sessionId, connectionId, observerId)
 			return nil
 		}

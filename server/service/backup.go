@@ -220,7 +220,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 					Rule:     item.Rule,
 					Priority: item.Priority,
 				}
-				security.GlobalSecurityManager.Add <- rule
+				security.GlobalSecurityManager.Add(rule)
 			}
 		}
 

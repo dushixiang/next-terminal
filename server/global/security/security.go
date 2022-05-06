@@ -1,6 +1,11 @@
 package security
 
-import "sort"
+import (
+	"sort"
+	"sync"
+
+	"next-terminal/server/log"
+)
 
 type Security struct {
 	ID       string
@@ -10,45 +15,29 @@ type Security struct {
 }
 
 type Manager struct {
-	securities map[string]*Security
+	securities sync.Map
 	values     []*Security
-
-	Add chan *Security
-	Del chan string
 }
 
 func NewManager() *Manager {
-	return &Manager{
-		Add:        make(chan *Security),
-		Del:        make(chan string),
-		securities: map[string]*Security{},
-	}
-}
-
-func (m *Manager) Start() {
-	for {
-		select {
-		case s := <-m.Add:
-			m.securities[s.ID] = s
-			m.LoadData()
-		case s := <-m.Del:
-			if _, ok := m.securities[s]; ok {
-				delete(m.securities, s)
-				m.LoadData()
-			}
-		}
-	}
+	return &Manager{}
 }
 
 func (m *Manager) Clear() {
-	m.securities = map[string]*Security{}
+	m.securities.Range(func(k, _ interface{}) bool {
+		m.securities.Delete(k)
+		return true
+	})
 }
 
 func (m *Manager) LoadData() {
 	var values []*Security
-	for _, security := range m.securities {
-		values = append(values, security)
-	}
+	m.securities.Range(func(key, value interface{}) bool {
+		if security, ok := value.(*Security); ok {
+			values = append(values, security)
+		}
+		return true
+	})
 
 	sort.Slice(values, func(i, j int) bool {
 		// 优先级数字越小代表优先级越高，因此此处用小于号
@@ -58,13 +47,24 @@ func (m *Manager) LoadData() {
 	m.values = values
 }
 
-func (m Manager) Values() []*Security {
+func (m *Manager) Values() []*Security {
 	return m.values
+}
+
+func (m *Manager) Add(s *Security) {
+	m.securities.Store(s.ID, s)
+	m.LoadData()
+	log.Infof("add security: %s", s.ID)
+}
+
+func (m *Manager) Del(id string) {
+	m.securities.Delete(id)
+	m.LoadData()
+	log.Infof("del security: %s", id)
 }
 
 var GlobalSecurityManager *Manager
 
 func init() {
 	GlobalSecurityManager = NewManager()
-	go GlobalSecurityManager.Start()
 }

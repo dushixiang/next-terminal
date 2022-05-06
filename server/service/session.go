@@ -96,14 +96,13 @@ func (service sessionService) CloseSessionById(sessionId string, code int, reaso
 		service.WriteCloseMessage(nextSession, nextSession.Mode, code, reason)
 
 		if nextSession.Observer != nil {
-			obs := nextSession.Observer.All()
-			for _, ob := range obs {
+			nextSession.Observer.Range(func(key string, ob *session.Session) {
 				service.WriteCloseMessage(ob, ob.Mode, code, reason)
 				log.Debugf("[%v] 强制踢出会话的观察者: %v", sessionId, ob.ID)
-			}
+			})
 		}
 	}
-	session.GlobalSessionManager.Del <- sessionId
+	session.GlobalSessionManager.Del(sessionId)
 
 	service.DisDBSess(sessionId, code, reason)
 }

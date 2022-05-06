@@ -1,11 +1,11 @@
 package session
 
 import (
-	"fmt"
 	"sync"
 
 	"next-terminal/server/dto"
 	"next-terminal/server/guacd"
+	"next-terminal/server/log"
 	"next-terminal/server/term"
 
 	"github.com/gorilla/websocket"
@@ -42,80 +42,79 @@ func (s *Session) WriteString(str string) error {
 	return s.WebSocket.WriteMessage(websocket.TextMessage, message)
 }
 
+func (s *Session) Close() {
+	if s.GuacdTunnel != nil {
+		_ = s.GuacdTunnel.Close()
+	}
+	if s.NextTerminal != nil {
+		s.NextTerminal.Close()
+	}
+	if s.WebSocket != nil {
+		_ = s.WebSocket.Close()
+	}
+}
+
 type Manager struct {
 	id       string
-	sessions map[string]*Session
-
-	Add  chan *Session
-	Del  chan string
-	exit chan bool
+	sessions sync.Map
 }
 
 func NewManager() *Manager {
-	return &Manager{
-		Add:      make(chan *Session),
-		Del:      make(chan string),
-		sessions: map[string]*Session{},
-		exit:     make(chan bool, 1),
-	}
+	return &Manager{}
 }
 
 func NewObserver(id string) *Manager {
 	return &Manager{
-		id:       id,
-		Add:      make(chan *Session),
-		Del:      make(chan string),
-		sessions: map[string]*Session{},
-		exit:     make(chan bool, 1),
+		id: id,
 	}
 }
 
-func (m *Manager) Start() {
-	defer fmt.Printf("Session Manager %v End\n", m.id)
-	fmt.Printf("Session Manager %v  Open\n", m.id)
-	for {
-		select {
-		case s := <-m.Add:
-			m.sessions[s.ID] = s
-		case k := <-m.Del:
-			if _, ok := m.sessions[k]; ok {
-				ss := m.sessions[k]
-				if ss.GuacdTunnel != nil {
-					_ = ss.GuacdTunnel.Close()
-				}
-				if ss.NextTerminal != nil {
-					ss.NextTerminal.Close()
-				}
+func (m *Manager) GetById(id string) *Session {
+	value, ok := m.sessions.Load(id)
+	if ok {
+		return value.(*Session)
+	}
+	return nil
+}
 
-				if ss.WebSocket != nil {
-					_ = ss.WebSocket.Close()
-				}
-				if ss.Observer != nil {
-					ss.Observer.Close()
-				}
-				delete(m.sessions, k)
-			}
-		case <-m.exit:
-			return
+func (m *Manager) Add(s *Session) {
+	m.sessions.Store(s.ID, s)
+	log.Infof("add session: %s", s.ID)
+}
+
+func (m *Manager) Del(id string) {
+	session := m.GetById(id)
+	if session != nil {
+		session.Close()
+		if session.Observer != nil {
+			session.Observer.Clear()
 		}
 	}
+	m.sessions.Delete(id)
+	log.Infof("del session: %s", id)
 }
 
-func (m *Manager) Close() {
-	m.exit <- true
+func (m *Manager) Clear() {
+	m.sessions.Range(func(key, value interface{}) bool {
+		if session, ok := value.(*Session); ok {
+			session.Close()
+		}
+		m.sessions.Delete(key)
+		return true
+	})
 }
 
-func (m Manager) GetById(id string) *Session {
-	return m.sessions[id]
-}
-
-func (m Manager) All() map[string]*Session {
-	return m.sessions
+func (m *Manager) Range(f func(key string, value *Session)) {
+	m.sessions.Range(func(key, value interface{}) bool {
+		if session, ok := value.(*Session); ok {
+			f(key.(string), session)
+		}
+		return true
+	})
 }
 
 var GlobalSessionManager *Manager
 
 func init() {
 	GlobalSessionManager = NewManager()
-	go GlobalSessionManager.Start()
 }

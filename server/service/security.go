@@ -25,7 +25,7 @@ func (service securityService) ReloadAccessSecurity() error {
 				Rule:     rules[i].Rule,
 				Priority: rules[i].Priority,
 			}
-			security.GlobalSecurityManager.Add <- rule
+			security.GlobalSecurityManager.Add(rule)
 		}
 	}
 	return nil

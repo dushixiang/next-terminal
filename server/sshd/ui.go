@@ -271,8 +271,7 @@ func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error
 		NextTerminal: nextTerminal,
 		Observer:     session.NewObserver(s.ID),
 	}
-	go nextSession.Observer.Start()
-	session.GlobalSessionManager.Add <- nextSession
+	session.GlobalSessionManager.Add(nextSession)
 
 	if err := sshSession.Wait(); err != nil {
 		return err
