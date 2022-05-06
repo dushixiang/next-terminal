@@ -5,8 +5,6 @@ import (
 	"strings"
 
 	"next-terminal/server/api"
-	"next-terminal/server/dto"
-	"next-terminal/server/global/session"
 	"next-terminal/server/term"
 
 	"github.com/gliderlabs/ssh"
@@ -51,24 +49,15 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 				if err != nil {
 					return 0, err
 				}
-				sendObData(w.sessionId, s)
+				api.SendObData(w.sessionId, s)
 			}
 		} else {
 			err := w.recorder.WriteData(s)
 			if err != nil {
 				return 0, err
 			}
-			sendObData(w.sessionId, s)
+			api.SendObData(w.sessionId, s)
 		}
 	}
 	return (*w.sess).Write(p)
-}
-
-func sendObData(sessionId, s string) {
-	nextSession := session.GlobalSessionManager.GetById(sessionId)
-	if nextSession != nil && nextSession.Observer != nil {
-		nextSession.Observer.Range(func(key string, ob *session.Session) {
-			_ = ob.WriteMessage(dto.NewMessage(api.Data, s))
-		})
-	}
 }
