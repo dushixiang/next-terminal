@@ -83,13 +83,8 @@ func (r *TermHandler) writeToWebsocket() {
 				if r.isRecording {
 					_ = r.nextTerminal.Recorder.WriteData(s)
 				}
-				nextSession := session.GlobalSessionManager.GetById(r.sessionId)
 				// 监控
-				if nextSession != nil && nextSession.Observer != nil {
-					nextSession.Observer.Range(func(key string, ob *session.Session) {
-						_ = ob.WriteMessage(dto.NewMessage(Data, s))
-					})
-				}
+				SendObData(r.sessionId, s)
 				buf = []byte{}
 			}
 		case data := <-r.dataChan:
@@ -112,4 +107,13 @@ func (r *TermHandler) WriteMessage(msg dto.Message) error {
 	r.mutex.Lock()
 	message := []byte(msg.ToString())
 	return r.webSocket.WriteMessage(websocket.TextMessage, message)
+}
+
+func SendObData(sessionId, s string) {
+	nextSession := session.GlobalSessionManager.GetById(sessionId)
+	if nextSession != nil && nextSession.Observer != nil {
+		nextSession.Observer.Range(func(key string, ob *session.Session) {
+			_ = ob.WriteMessage(dto.NewMessage(Data, s))
+		})
+	}
 }
