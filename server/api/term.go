@@ -152,7 +152,7 @@ func (api WebTerminalApi) SshEndpoint(c echo.Context) error {
 		NextTerminal: nextTerminal,
 		Observer:     session.NewObserver(s.ID),
 	}
-	session.GlobalSessionManager.Add <- nextSession
+	session.GlobalSessionManager.Add(nextSession)
 
 	termHandler := NewTermHandler(sessionId, isRecording, ws, nextTerminal)
 	termHandler.Start()
@@ -239,14 +239,14 @@ func (api WebTerminalApi) SshMonitorEndpoint(c echo.Context) error {
 		Mode:      s.Mode,
 		WebSocket: ws,
 	}
-	nextSession.Observer.Add <- obSession
+	nextSession.Observer.Add(obSession)
 	log.Debugf("会话 %v 观察者 %v 进入", sessionId, obId)
 
 	for {
 		_, _, err := ws.ReadMessage()
 		if err != nil {
 			log.Debugf("会话 %v 观察者 %v 退出", sessionId, obId)
-			nextSession.Observer.Del <- obId
+			nextSession.Observer.Del(obId)
 			break
 		}
 	}

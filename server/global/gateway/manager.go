@@ -7,49 +7,32 @@ import (
 )
 
 type Manager struct {
-	gateways *sync.Map
-
-	Add chan *Gateway
-	Del chan string
+	gateways sync.Map
 }
 
 func NewManager() *Manager {
-	return &Manager{
-		Add:      make(chan *Gateway),
-		Del:      make(chan string),
-		gateways: new(sync.Map),
-	}
+	return &Manager{}
 }
 
-func (m *Manager) Start() {
-	for {
-		select {
-		case g := <-m.Add:
-			m.gateways.Store(g.ID, g)
-			log.Info("add gateway: %s", g.ID)
-			go g.Run()
-		case k := <-m.Del:
-			if val, ok := m.gateways.Load(k); ok {
-				if vv, vok := val.(*Gateway); vok {
-					vv.Close()
-					m.gateways.Delete(k)
-				}
-
-			}
-		}
-	}
-}
-
-func (m Manager) GetById(id string) *Gateway {
+func (m *Manager) GetById(id string) *Gateway {
 	if val, ok := m.gateways.Load(id); ok {
 		return val.(*Gateway)
 	}
 	return nil
 }
 
+func (m *Manager) Add(g *Gateway) {
+	m.gateways.Store(g.ID, g)
+	log.Infof("add gateway: %s", g.ID)
+}
+
+func (m *Manager) Del(id string) {
+	m.gateways.Delete(id)
+	log.Infof("del gateway: %s", id)
+}
+
 var GlobalGatewayManager *Manager
 
 func init() {
 	GlobalGatewayManager = NewManager()
-	go GlobalGatewayManager.Start()
 }

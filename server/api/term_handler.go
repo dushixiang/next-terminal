@@ -85,11 +85,10 @@ func (r *TermHandler) writeToWebsocket() {
 				}
 				nextSession := session.GlobalSessionManager.GetById(r.sessionId)
 				// 监控
-				if nextSession != nil && len(nextSession.Observer.All()) > 0 {
-					obs := nextSession.Observer.All()
-					for _, ob := range obs {
+				if nextSession != nil && nextSession.Observer != nil {
+					nextSession.Observer.Range(func(key string, ob *session.Session) {
 						_ = ob.WriteMessage(dto.NewMessage(Data, s))
-					}
+					})
 				}
 				buf = []byte{}
 			}

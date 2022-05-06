@@ -8,8 +8,6 @@ import (
 	"os"
 	"sync"
 
-	"next-terminal/server/log"
-
 	"next-terminal/server/utils"
 
 	"golang.org/x/crypto/ssh"
@@ -22,11 +20,7 @@ type Gateway struct {
 	SshClient *ssh.Client
 	Message   string // 失败原因
 
-	tunnels *sync.Map
-
-	Add  chan *Tunnel
-	Del  chan string
-	exit chan bool
+	tunnels sync.Map
 }
 
 func NewGateway(id string, connected bool, message string, client *ssh.Client) *Gateway {
@@ -35,42 +29,14 @@ func NewGateway(id string, connected bool, message string, client *ssh.Client) *
 		Connected: connected,
 		Message:   message,
 		SshClient: client,
-		Add:       make(chan *Tunnel),
-		Del:       make(chan string),
-		tunnels:   new(sync.Map),
-		exit:      make(chan bool, 1),
-	}
-}
-
-func (g *Gateway) Run() {
-	for {
-		select {
-		case t := <-g.Add:
-			g.tunnels.Store(t.ID, t)
-			log.Info("add tunnel: %s", t.ID)
-			go t.Open()
-		case k := <-g.Del:
-			if val, ok := g.tunnels.Load(k); ok {
-				if vval, vok := val.(*Tunnel); vok {
-					vval.Close()
-					g.tunnels.Delete(k)
-				}
-			}
-		case <-g.exit:
-			return
-		}
 	}
 }
 
 func (g *Gateway) Close() {
 	g.tunnels.Range(func(key, value interface{}) bool {
-		if val, ok := value.(*Tunnel); ok {
-			val.Close()
-		}
+		g.CloseSshTunnel(key.(string))
 		return true
 	})
-	g.exit <- true
-
 }
 
 func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, exposedPort int, err error) {
@@ -110,11 +76,17 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 		cancel:     cancel,
 		listener:   listener,
 	}
-	g.Add <- tunnel
+	go tunnel.Open()
+	g.tunnels.Store(tunnel.ID, tunnel)
 
 	return tunnel.LocalHost, tunnel.LocalPort, nil
 }
 
-func (g Gateway) CloseSshTunnel(id string) {
-	g.Del <- id
+func (g *Gateway) CloseSshTunnel(id string) {
+	if value, ok := g.tunnels.Load(id); ok {
+		if tunnel, vok := value.(*Tunnel); vok {
+			tunnel.Close()
+			g.tunnels.Delete(id)
+		}
+	}
 }

@@ -66,12 +66,9 @@ func (w *Writer) Write(p []byte) (n int, err error) {
 
 func sendObData(sessionId, s string) {
 	nextSession := session.GlobalSessionManager.GetById(sessionId)
-	if nextSession != nil {
-		if nextSession.Observer != nil {
-			obs := nextSession.Observer.All()
-			for _, ob := range obs {
-				_ = ob.WriteMessage(dto.NewMessage(api.Data, s))
-			}
-		}
+	if nextSession != nil && nextSession.Observer != nil {
+		nextSession.Observer.Range(func(key string, ob *session.Session) {
+			_ = ob.WriteMessage(dto.NewMessage(api.Data, s))
+		})
 	}
 }

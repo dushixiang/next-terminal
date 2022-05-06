@@ -60,11 +60,11 @@ func (r gatewayService) ReConnect(m *model.AccessGateway) *gateway.Gateway {
 	} else {
 		g = gateway.NewGateway(m.ID, true, "", sshClient)
 	}
-	gateway.GlobalGatewayManager.Add <- g
+	gateway.GlobalGatewayManager.Add(g)
 	log.Debugf("重建接入网关「%v」完成", m.Name)
 	return g
 }
 
 func (r gatewayService) DisconnectById(accessGatewayId string) {
-	gateway.GlobalGatewayManager.Del <- accessGatewayId
+	gateway.GlobalGatewayManager.Del(accessGatewayId)
 }
