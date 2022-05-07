@@ -125,16 +125,16 @@ func (r ShellJob) Run() {
 
 func exec(shell, accessGatewayId, ip string, port int, username, password, privateKey, passphrase string) (string, error) {
 	if accessGatewayId != "" && accessGatewayId != "-" {
-		g, err := GatewayService.GetGatewayAndReconnectById(accessGatewayId)
+		g, err := GatewayService.GetGatewayById(accessGatewayId)
 		if err != nil {
 			return "", err
 		}
 		uuid := utils.UUID()
+		defer g.CloseSshTunnel(uuid)
 		exposedIP, exposedPort, err := g.OpenSshTunnel(uuid, ip, port)
 		if err != nil {
 			return "", err
 		}
-		defer g.CloseSshTunnel(uuid)
 		return ExecCommandBySSH(shell, exposedIP, exposedPort, username, password, privateKey, passphrase)
 	} else {
 		return ExecCommandBySSH(shell, ip, port, username, password, privateKey, passphrase)

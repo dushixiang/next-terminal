@@ -55,9 +55,9 @@ func (t *Ticker) deleteUnUsedSession() {
 				err := repository.SessionRepository.DeleteById(context.TODO(), sessions[i].ID)
 				s := sessions[i].Username + "@" + sessions[i].IP + ":" + strconv.Itoa(sessions[i].Port)
 				if err != nil {
-					log.Errorf("会话「%v」ID「%v」超过1小时未打开，删除失败: %v", s, sessions[i].ID, err.Error())
+					log.Errorf("会话「%v」id「%v」超过1小时未打开，删除失败: %v", s, sessions[i].ID, err.Error())
 				} else {
-					log.Infof("会话「%v」ID「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
+					log.Infof("会话「%v」id「%v」超过1小时未打开，已删除。", s, sessions[i].ID)
 				}
 			}
 		}

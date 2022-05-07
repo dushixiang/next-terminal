@@ -72,15 +72,13 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	api.setConfig(propertyMap, s, configuration)
 
 	if s.AccessGatewayId != "" && s.AccessGatewayId != "-" {
-		g, err := service.GatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
+		g, err := service.GatewayService.GetGatewayById(s.AccessGatewayId)
 		if err != nil {
 			utils.Disconnect(ws, AccessGatewayUnAvailable, "获取接入网关失败："+err.Error())
 			return nil
 		}
-		if !g.Connected {
-			utils.Disconnect(ws, AccessGatewayUnAvailable, "接入网关不可用："+g.Message)
-			return nil
-		}
+
+		defer g.CloseSshTunnel(s.ID)
 		exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, s.IP, s.Port)
 		if err != nil {
 			utils.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
@@ -88,7 +86,6 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 		}
 		s.IP = exposedIP
 		s.Port = exposedPort
-		defer g.CloseSshTunnel(s.ID)
 	}
 
 	configuration.SetParameter("hostname", s.IP)

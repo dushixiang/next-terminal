@@ -36,7 +36,7 @@ func (app App) InitDBData() (err error) {
 	if err := service.PropertyService.DeleteDeprecatedProperty(); err != nil {
 		return err
 	}
-	if err := service.GatewayService.ReConnectAll(); err != nil {
+	if err := service.GatewayService.LoadAll(); err != nil {
 		return err
 	}
 	if err := service.PropertyService.InitProperties(); err != nil {

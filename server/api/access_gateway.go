@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	"next-terminal/server/global/gateway"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
@@ -28,7 +29,7 @@ func (api AccessGatewayApi) AccessGatewayCreateEndpoint(c echo.Context) error {
 		return err
 	}
 	// 连接网关
-	service.GatewayService.ReConnect(&item)
+	service.GatewayService.ReLoad(&item)
 	return Success(c, "")
 }
 
@@ -58,12 +59,11 @@ func (api AccessGatewayApi) AccessGatewayPagingEndpoint(c echo.Context) error {
 		return err
 	}
 	for i := 0; i < len(items); i++ {
-		g, err := service.GatewayService.GetGatewayById(items[i].ID)
-		if err != nil {
-			return err
+		g := gateway.GlobalGatewayManager.GetById(items[i].ID)
+		if g != nil {
+			items[i].Connected = g.Connected
+			items[i].Message = g.Message
 		}
-		items[i].Connected = g.Connected
-		items[i].Message = g.Message
 	}
 
 	return Success(c, Map{
@@ -83,7 +83,7 @@ func (api AccessGatewayApi) AccessGatewayUpdateEndpoint(c echo.Context) error {
 	if err := repository.GatewayRepository.UpdateById(context.TODO(), &item, id); err != nil {
 		return err
 	}
-	service.GatewayService.ReConnect(&item)
+	service.GatewayService.ReLoad(&item)
 	return Success(c, nil)
 }
 
@@ -109,15 +109,4 @@ func (api AccessGatewayApi) AccessGatewayGetEndpoint(c echo.Context) error {
 	}
 
 	return Success(c, item)
-}
-
-func (api AccessGatewayApi) AccessGatewayReconnectEndpoint(c echo.Context) error {
-	id := c.Param("id")
-
-	item, err := repository.GatewayRepository.FindById(context.TODO(), id)
-	if err != nil {
-		return err
-	}
-	service.GatewayService.ReConnect(&item)
-	return Success(c, "")
 }
