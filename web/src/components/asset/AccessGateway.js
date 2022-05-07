@@ -141,29 +141,6 @@ class AccessGateway extends Component {
         await this.showModal('更新接入网关', result.data);
     }
 
-    async reconnect(id, index) {
-        let items = this.state.items;
-        try {
-            items[index]['reconnectLoading'] = true;
-            this.setState({
-                items: items
-            });
-            message.info({content: '正在重连中...', key: id, duration: 5});
-            let result = await request.post(`/access-gateways/${id}/reconnect`);
-            if (result.code !== 1) {
-                message.error({content: result.message, key: id, duration: 10});
-                return;
-            }
-            message.success({content: '重连完成。', key: id, duration: 3});
-            this.loadTableData(this.state.queryParams);
-        } finally {
-            items[index]['reconnectLoading'] = false;
-            this.setState({
-                items: items
-            });
-        }
-    }
-
     showModal(title, obj) {
         this.setState({
             modalTitle: title,
@@ -356,9 +333,6 @@ class AccessGateway extends Component {
                     <div>
                         <Button type="link" size='small'
                                 onClick={() => this.update(record['id'])}>编辑</Button>
-
-                        <Button type="link" size='small' loading={this.state.items[index]['reconnectLoading']}
-                                onClick={() => this.reconnect(record['id'], index)}>重连</Button>
 
                         <Button type="text" size='small' danger
                                 onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>

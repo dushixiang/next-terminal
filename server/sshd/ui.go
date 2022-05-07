@@ -189,18 +189,16 @@ func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error
 	)
 
 	if s.AccessGatewayId != "" && s.AccessGatewayId != "-" {
-		g, err := service.GatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
+		g, err := service.GatewayService.GetGatewayById(s.AccessGatewayId)
 		if err != nil {
 			return errors.New("获取接入网关失败：" + err.Error())
 		}
-		if !g.Connected {
-			return errors.New("接入网关不可用：" + g.Message)
-		}
+
+		defer g.CloseSshTunnel(s.ID)
 		exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, ip, port)
 		if err != nil {
 			return errors.New("开启SSH隧道失败：" + err.Error())
 		}
-		defer g.CloseSshTunnel(s.ID)
 		ip = exposedIP
 		port = exposedPort
 	}

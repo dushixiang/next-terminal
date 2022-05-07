@@ -116,29 +116,24 @@ func (s assetService) FindByIdAndDecrypt(c context.Context, id string) (model.As
 	return asset, nil
 }
 
-func (s assetService) CheckStatus(accessGatewayId string, ip string, port int) (active bool, err error) {
+func (s assetService) CheckStatus(accessGatewayId string, ip string, port int) (bool, error) {
 	if accessGatewayId != "" && accessGatewayId != "-" {
-		g, e1 := GatewayService.GetGatewayAndReconnectById(accessGatewayId)
-		if e1 != nil {
-			return false, e1
+		g, err := GatewayService.GetGatewayById(accessGatewayId)
+		if err != nil {
+			return false, err
 		}
 
 		uuid := utils.UUID()
-		exposedIP, exposedPort, e2 := g.OpenSshTunnel(uuid, ip, port)
-		if e2 != nil {
-			return false, e2
-		}
 		defer g.CloseSshTunnel(uuid)
-
-		if g.Connected {
-			active, err = utils.Tcping(exposedIP, exposedPort)
-		} else {
-			active = false
+		exposedIP, exposedPort, err := g.OpenSshTunnel(uuid, ip, port)
+		if err != nil {
+			return false, err
 		}
-	} else {
-		active, err = utils.Tcping(ip, port)
+
+		return utils.Tcping(exposedIP, exposedPort)
 	}
-	return active, err
+
+	return utils.Tcping(ip, port)
 }
 
 func (s assetService) Create(ctx context.Context, m echo.Map) (model.Asset, error) {
@@ -182,7 +177,7 @@ func (s assetService) create(c context.Context, item model.Asset, m echo.Map) er
 	//	active, _ := s.CheckStatus(item.AccessGatewayId, item.IP, item.Port)
 	//
 	//	if item.Active != active {
-	//		_ = repository.AssetRepository.UpdateActiveById(context.TODO(), active, item.ID)
+	//		_ = repository.AssetRepository.UpdateActiveById(context.TODO(), active, item.id)
 	//	}
 	//}()
 	return nil

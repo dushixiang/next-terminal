@@ -271,7 +271,6 @@ func setupRoutes() *echo.Echo {
 		accessGateways.PUT("/:id", AccessGatewayApi.AccessGatewayUpdateEndpoint)
 		accessGateways.DELETE("/:id", AccessGatewayApi.AccessGatewayDeleteEndpoint)
 		accessGateways.GET("/:id", AccessGatewayApi.AccessGatewayGetEndpoint)
-		accessGateways.POST("/:id/reconnect", AccessGatewayApi.AccessGatewayReconnectEndpoint)
 	}
 
 	backup := e.Group("/backup", Admin)

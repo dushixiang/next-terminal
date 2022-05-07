@@ -61,7 +61,7 @@ func (service userService) InitUser() (err error) {
 				if err := repository.UserRepository.Update(context.TODO(), &user); err != nil {
 					return err
 				}
-				log.Infof("自动修正用户「%v」ID「%v」类型为管理员", users[i].Nickname, users[i].ID)
+				log.Infof("自动修正用户「%v」id「%v」类型为管理员", users[i].Nickname, users[i].ID)
 			}
 		}
 	}

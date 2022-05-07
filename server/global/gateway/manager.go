@@ -4,35 +4,50 @@ import (
 	"sync"
 
 	"next-terminal/server/log"
+	"next-terminal/server/model"
 )
 
-type Manager struct {
+type manager struct {
 	gateways sync.Map
 }
 
-func NewManager() *Manager {
-	return &Manager{}
-}
-
-func (m *Manager) GetById(id string) *Gateway {
+func (m *manager) GetById(id string) *Gateway {
 	if val, ok := m.gateways.Load(id); ok {
 		return val.(*Gateway)
 	}
 	return nil
 }
 
-func (m *Manager) Add(g *Gateway) {
+func (m *manager) Add(model *model.AccessGateway) *Gateway {
+	g := &Gateway{
+		ID:         model.ID,
+		IP:         model.IP,
+		Port:       model.Port,
+		Username:   model.Username,
+		Password:   model.Password,
+		PrivateKey: model.PrivateKey,
+		Passphrase: model.Passphrase,
+		Connected:  false,
+		SshClient:  nil,
+		Message:    "暂未使用",
+		tunnels:    make(map[string]*Tunnel),
+	}
 	m.gateways.Store(g.ID, g)
-	log.Infof("add gateway: %s", g.ID)
+	log.Infof("add Gateway: %s", g.ID)
+	return g
 }
 
-func (m *Manager) Del(id string) {
+func (m *manager) Del(id string) {
+	g := m.GetById(id)
+	if g != nil {
+		g.Close()
+	}
 	m.gateways.Delete(id)
-	log.Infof("del gateway: %s", id)
+	log.Infof("del Gateway: %s", id)
 }
 
-var GlobalGatewayManager *Manager
+var GlobalGatewayManager *manager
 
 func init() {
-	GlobalGatewayManager = NewManager()
+	GlobalGatewayManager = &manager{}
 }

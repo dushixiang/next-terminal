@@ -70,18 +70,16 @@ func (api WebTerminalApi) SshEndpoint(c echo.Context) error {
 	)
 
 	if s.AccessGatewayId != "" && s.AccessGatewayId != "-" {
-		g, err := service.GatewayService.GetGatewayAndReconnectById(s.AccessGatewayId)
+		g, err := service.GatewayService.GetGatewayById(s.AccessGatewayId)
 		if err != nil {
 			return WriteMessage(ws, dto.NewMessage(Closed, "获取接入网关失败："+err.Error()))
 		}
-		if !g.Connected {
-			return WriteMessage(ws, dto.NewMessage(Closed, "接入网关不可用："+g.Message))
-		}
+
+		defer g.CloseSshTunnel(s.ID)
 		exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, ip, port)
 		if err != nil {
 			return WriteMessage(ws, dto.NewMessage(Closed, "创建隧道失败："+err.Error()))
 		}
-		defer g.CloseSshTunnel(s.ID)
 		ip = exposedIP
 		port = exposedPort
 	}
