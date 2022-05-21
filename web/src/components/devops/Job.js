@@ -148,7 +148,15 @@ class Job extends Component {
         });
     };
 
-    showModal(title, obj = null) {
+    showModal = async (title, obj = null) => {
+        if (obj['id']) {
+            let result = await request.get(`/jobs/${obj['id']}`);
+            if (result.code !== 1) {
+                message.error(result.message);
+                return;
+            }
+            obj = result.data;
+        }
         if (obj['func'] === 'shell-job') {
             obj['shell'] = JSON.parse(obj['metadata'])['shell'];
         }
