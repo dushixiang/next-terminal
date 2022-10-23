@@ -5,43 +5,45 @@ import (
 	"errors"
 	"fmt"
 
+	"next-terminal/server/common/guacamole"
 	"next-terminal/server/env"
-	"next-terminal/server/guacd"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 
 	"gorm.io/gorm"
 )
 
+var PropertyService = new(propertyService)
+
 type propertyService struct {
 	baseService
 }
 
 var deprecatedPropertyNames = []string{
-	guacd.EnableDrive,
-	guacd.DrivePath,
-	guacd.DriveName,
-	guacd.DisableGlyphCaching,
-	guacd.CreateRecordingPath,
+	guacamole.EnableDrive,
+	guacamole.DrivePath,
+	guacamole.DriveName,
+	guacamole.DisableGlyphCaching,
+	guacamole.CreateRecordingPath,
 }
 
 var defaultProperties = map[string]string{
-	guacd.EnableRecording:          "true",
-	guacd.FontName:                 "menlo",
-	guacd.FontSize:                 "12",
-	guacd.ColorScheme:              "gray-black",
-	guacd.EnableWallpaper:          "true",
-	guacd.EnableTheming:            "true",
-	guacd.EnableFontSmoothing:      "true",
-	guacd.EnableFullWindowDrag:     "true",
-	guacd.EnableDesktopComposition: "true",
-	guacd.EnableMenuAnimations:     "true",
-	guacd.DisableBitmapCaching:     "false",
-	guacd.DisableOffscreenCaching:  "false",
-	"cron-log-saved-limit":         "360",
-	"login-log-saved-limit":        "360",
-	"session-saved-limit":          "360",
-	"user-default-storage-size":    "5120",
+	guacamole.EnableRecording:          "true",
+	guacamole.FontName:                 "menlo",
+	guacamole.FontSize:                 "12",
+	guacamole.ColorScheme:              "gray-black",
+	guacamole.EnableWallpaper:          "true",
+	guacamole.EnableTheming:            "true",
+	guacamole.EnableFontSmoothing:      "true",
+	guacamole.EnableFullWindowDrag:     "true",
+	guacamole.EnableDesktopComposition: "true",
+	guacamole.EnableMenuAnimations:     "true",
+	guacamole.DisableBitmapCaching:     "false",
+	guacamole.DisableOffscreenCaching:  "false",
+	"cron-log-saved-limit":             "360",
+	"login-log-saved-limit":            "360",
+	"session-saved-limit":              "360",
+	"user-default-storage-size":        "5120",
 }
 
 func (service propertyService) InitProperties() error {

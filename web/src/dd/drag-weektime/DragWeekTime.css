@@ -1,0 +1,113 @@
+.week-time {
+    min-width: 640px;
+    position: relative;
+    display: inline-block;
+}
+
+.schedule {
+    background: #40a9ff;
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: .6;
+    pointer-events: none;
+}
+
+.schedule-notransi {
+    transition: width .12s ease, height .12s ease, top .12s ease, left .12s ease;
+}
+
+.week-time-table {
+    border-collapse: collapse;
+}
+
+.week-time-table th {
+    vertical-align: inherit;
+    font-weight: bold;
+}
+
+.week-time-table tr {
+    height: 30px;
+}
+
+.week-time-table tr,
+.week-time-table td,
+.week-time-table th {
+    user-select: none;
+    border: 1px solid #d9d9d9;
+    text-align: center;
+    min-width: 12px;
+    line-height: 1.8em;
+    transition: background .2s ease;
+}
+
+.week-time-table .week-time-head {
+    font-size: 12px;
+}
+
+.week-time-table .week-time-head .week-td {
+    width: 70px;
+}
+
+.week-time-table .week-time-body {
+    font-size: 12px;
+}
+
+.week-time-table .week-time-body td.week-time-item {
+    user-select: unset;
+    background-color: #f5f5f5;
+}
+
+.week-time-table .week-time-body td.ui-selected {
+    background-color: #5B8FF9;
+}
+
+.week-time-table .week-time-preview {
+    line-height: 2.4em;
+    padding: 0 10px;
+    font-size: 14px;
+}
+
+.week-time-table .week-time-preview .week-time-con {
+    line-height: 46px;
+    user-select: none;
+}
+
+.week-time-table .week-time-preview .week-time-time {
+    text-align: left;
+    line-height: 2.4em;
+}
+
+.week-time-table .week-time-preview .week-time-time p {
+    max-width: 625px;
+    line-height: 1.4em;
+    word-break: break-all;
+    margin-bottom: 8px;
+}
+
+.week-time-table tr,
+.week-time-table td,
+.week-time-table th {
+    min-width: 12px;
+}
+
+.d-clearfix:after,
+.d-clearfix:before {
+    clear: both;
+    content: " ";
+    display: table;
+}
+
+.g-pull-left {
+    float: left;
+}
+
+.g-pull-right {
+    float: right;
+    margin-left: 5px;
+}
+
+.g-tip-text {
+    color: #999;
+    margin-right: 10px;
+}

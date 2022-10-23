@@ -1,7 +1,3 @@
-.text-center{
-    width: 100px;
-    text-align: center;
-}
-.disable-link {
-    pointer-events: none;
+.pie-card .ant-pro-card-body {
+    padding: 16px !important;
 }

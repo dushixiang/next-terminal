@@ -6,12 +6,14 @@ import (
 	"next-terminal/server/model"
 )
 
+var StrategyRepository = new(strategyRepository)
+
 type strategyRepository struct {
 	baseRepository
 }
 
 func (r strategyRepository) FindAll(c context.Context) (o []model.Strategy, err error) {
-	err = r.GetDB(c).Order("name desc").Find(&o).Error
+	err = r.GetDB(c).Order("name asc").Find(&o).Error
 	return
 }
 

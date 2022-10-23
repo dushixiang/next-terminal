@@ -49,7 +49,7 @@ https://next.typesafe.cn/ 账号：test  密码：test
 ## 问题反馈
 
 - Issues
-- 微信群 加我微信拉你进群
+- 微信群 加我微信拉你进群 (请备注 next-terminal)
 
 <img src="wx.png" width="300"  height="auto"/>
 

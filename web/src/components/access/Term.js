@@ -1,57 +1,117 @@
-import React, {Component} from 'react';
-import "xterm/css/xterm.css"
+import React, {useEffect, useState} from 'react';
+import {useSearchParams} from "react-router-dom";
 import {Terminal} from "xterm";
+import {FitAddon} from "xterm-addon-fit";
+import {getToken} from "../../utils/utils";
+import request from "../../common/request";
+import {Affix, Button, Drawer, Dropdown, Menu, message, Select, Space, Typography} from "antd";
+import Message from "./Message";
 import qs from "qs";
 import {wsServer} from "../../common/env";
-import {getToken, isEmpty} from "../../utils/utils";
-import {FitAddon} from 'xterm-addon-fit';
-import "./Access.css"
-import request from "../../common/request";
-import {Affix, Button, Drawer, Dropdown, Menu, message, Modal, Tooltip} from "antd";
-import {CodeOutlined, ExclamationCircleOutlined, FolderOutlined, LineChartOutlined} from "@ant-design/icons";
 import Draggable from "react-draggable";
+import {CodeOutlined, FolderOutlined, LineChartOutlined} from "@ant-design/icons";
 import FileSystem from "../devops/FileSystem";
+import "xterm/css/xterm.css"
 import Stats from "./Stats";
-import Message from "./Message";
+import {debounce} from "../../utils/fun";
+import commandApi from "../../api/command";
+import strings from "../../utils/strings";
+import workCommandApi from "../../api/worker/command";
+import {xtermScrollPretty} from "../../utils/xterm-scroll-pretty";
 
-class Term extends Component {
+const {Text} = Typography;
 
-    statsRef = undefined;
+const Term = () => {
 
-    state = {
-        width: window.innerWidth,
-        height: window.innerHeight,
-        term: undefined,
-        webSocket: undefined,
-        fitAddon: undefined,
-        sessionId: undefined,
-        session: {},
-        enterBtnIndex: 1001,
-        commands: []
+    const [searchParams] = useSearchParams();
+    const assetId = searchParams.get('assetId');
+    const assetName = searchParams.get('assetName');
+    const isWorker = searchParams.get('isWorker');
+    const [box, setBox] = useState({width: window.innerWidth, height: window.innerHeight});
+
+    let [commands, setCommands] = useState([]);
+
+    let [term, setTerm] = useState();
+    let [fitAddon, setFitAddon] = useState();
+    let [websocket, setWebsocket] = useState();
+    let [session, setSession] = useState({});
+
+    let [fileSystemVisible, setFileSystemVisible] = useState(false);
+    let [statsVisible, setStatsVisible] = useState(false);
+    let [enterBtnZIndex, setEnterBtnZIndex] = useState(999);
+    let [queryInterval, setQueryInterval] = useState(5000);
+
+    const createSession = async (assetsId) => {
+        let result = await request.post(`/sessions?assetId=${assetsId}&mode=native`);
+        if (result['code'] !== 1) {
+            return [undefined, result['message']];
+        }
+        return [result['data'], ''];
+    }
+
+    const writeErrorMessage = (term, message) => {
+        term.writeln(`\x1B[1;3;31m${message}\x1B[0m `);
+    }
+
+    const updateSessionStatus = async (sessionId) => {
+        let result = await request.post(`/sessions/${sessionId}/connect`);
+        if (result['code'] !== 1) {
+            message.error(result['message']);
+        }
+    }
+
+    const writeCommand = (command) => {
+        if (websocket) {
+            websocket.send(new Message(Message.Data, command));
+        }
+    }
+
+    const getCommands = async () => {
+        if (strings.hasText(isWorker)) {
+            let items = await workCommandApi.getAll();
+            setCommands(items);
+        } else {
+            let items = await commandApi.getAll();
+            setCommands(items);
+        }
+    }
+
+    const focus = () => {
+        if (term) {
+            term.focus();
+        }
+    }
+
+    const fit = () => {
+        if (fitAddon) {
+            fitAddon.fit();
+        }
+    }
+
+    useEffect(() => {
+        if (term && websocket && fitAddon && websocket.readyState === WebSocket.OPEN) {
+            fit();
+            focus();
+            let terminalSize = {
+                cols: term.cols,
+                rows: term.rows
+            }
+            websocket.send(new Message(Message.Resize, window.btoa(JSON.stringify(terminalSize))).toString());
+        }
+
+    }, [box.width, box.height]);
+
+    const onWindowResize = () => {
+        setBox({width: window.innerWidth, height: window.innerHeight});
     };
 
-    componentDidMount = async () => {
-
-        let urlParams = new URLSearchParams(this.props.location.search);
-        let assetId = urlParams.get('assetId');
-        document.title = urlParams.get('assetName');
-
-        let session = await this.createSession(assetId);
-        if (!session) {
-            return;
-        }
-        let sessionId = session['id'];
-        if (isEmpty(sessionId)) {
-            return;
-        }
-
+    const init = async (assetId) => {
         let term = new Terminal({
             fontFamily: 'monaco, Consolas, "Lucida Console", monospace',
             fontSize: 15,
             theme: {
                 background: '#1b1b1b'
             },
-            rightClickSelectsWord: true,
         });
         let elementTerm = document.getElementById('terminal');
         term.open(elementTerm);
@@ -60,55 +120,40 @@ class Term extends Component {
         fitAddon.fit();
         term.focus();
 
-        term.writeln('Trying to connect to the server ...');
+        if (!assetId) {
+            writeErrorMessage(term, `参数缺失，请关闭此页面后重新打开。`)
+            return;
+        }
 
-        term.onSelectionChange(async () => {
-            let selection = term.getSelection();
-            this.setState({
-                selection: selection
-            })
-            if (navigator.clipboard) {
-                await navigator.clipboard.writeText(selection);
-            }
-        });
+        let [session, errMsg] = await createSession(assetId);
+        if (!session) {
+            writeErrorMessage(term, `创建会话失败，${errMsg}`)
+            return;
+        }
 
-        term.attachCustomKeyEventHandler((e) => {
-            if (e.ctrlKey && e.key === 'c' && this.state.selection) {
-                return false;
-            }
-            return !(e.ctrlKey && e.key === 'v');
-        });
+        let sessionId = session['id'];
+
+        term.writeln('trying to connect to the server ...');
 
         document.body.oncopy = (event) => {
             event.preventDefault();
-            if (this.state.session['copy'] === '0') {
-                // message.warn('禁止复制')
+            if (session['copy'] === '0') {
+                message.warn('禁止复制')
                 return false;
-            }else {
-                if (event.clipboardData) {
-                    return event.clipboardData.setData('text', '');
-                } else {
-                    // 兼容IE
-                    return window.clipboardData.setData("text", '');
-                }
+            } else {
+                return true;
             }
         }
 
         document.body.onpaste = (event) => {
             event.preventDefault();
-            if (this.state.session['paste'] === '0') {
-                // message.warn('禁止粘贴')
+            if (session['paste'] === '0') {
+                message.warn('禁止粘贴')
                 return false;
+            } else {
+                return true;
             }
-            return true;
         }
-
-        term.onData(data => {
-            let webSocket = this.state.webSocket;
-            if (webSocket !== undefined) {
-                webSocket.send(new Message(Message.Data, data).toString());
-            }
-        });
 
         let token = getToken();
         let params = {
@@ -125,32 +170,40 @@ class Term extends Component {
         webSocket.onopen = (e => {
             pingInterval = setInterval(() => {
                 webSocket.send(new Message(Message.Ping, "").toString());
-            }, 1000);
+            }, 10000);
+            xtermScrollPretty();
         });
 
         webSocket.onerror = (e) => {
-            term.writeln("Failed to connect to server.");
+            writeErrorMessage(term, `websocket error ${e.data}`)
         }
+
         webSocket.onclose = (e) => {
-            term.writeln("Connection is closed.");
+            term.writeln("connection is closed.");
             if (pingInterval) {
                 clearInterval(pingInterval);
             }
         }
+
+        term.onData(data => {
+            if (webSocket !== undefined) {
+                webSocket.send(new Message(Message.Data, data).toString());
+            }
+        });
 
         webSocket.onmessage = (e) => {
             let msg = Message.parse(e.data);
             switch (msg['type']) {
                 case Message.Connected:
                     term.clear();
-                    this.updateSessionStatus(sessionId);
-                    this.getCommands();
+                    updateSessionStatus(sessionId);
+                    getCommands();
                     break;
                 case Message.Data:
                     term.write(msg['content']);
                     break;
                 case Message.Closed:
-                    term.writeln(`\x1B[1;3;31m${msg['content']}\x1B[0m `)
+                    term.writeln(`\x1B[1;3;31m${msg['content']}\x1B[0m `);
                     webSocket.close();
                     break;
                 default:
@@ -158,232 +211,147 @@ class Term extends Component {
             }
         }
 
-        this.setState({
-            term: term,
-            webSocket: webSocket,
-            fitAddon: fitAddon,
-            sessionId: sessionId,
-            session: session
-        });
-
-        window.addEventListener('resize', this.onWindowResize);
-        window.addEventListener('beforeunload', this.handleUnload);
-        window.onunload = function () {
-            webSocket.close();
-        };
+        setSession(session);
+        setTerm(term);
+        setFitAddon(fitAddon);
+        setWebsocket(webSocket);
     }
 
-    componentWillUnmount() {
-        let webSocket = this.state.webSocket;
-        if (webSocket) {
-            webSocket.close()
-        }
-        window.removeEventListener('beforeunload', this.handleUnload);
-    }
-
-    getCommands = async () => {
-        let result = await request.get('/commands');
-        if (result.code !== 1) {
-            message.error(result.message);
-            return;
-        }
-        this.setState({
-            commands: result['data']
-        })
-    }
-
-    showMessage(msg) {
-        message.destroy();
-        Modal.confirm({
-            title: '提示',
-            icon: <ExclamationCircleOutlined/>,
-            content: msg,
-            centered: true,
-            okText: '重新连接',
-            cancelText: '关闭页面',
-            onOk() {
-                window.location.reload();
-            },
-            onCancel() {
-                window.close();
-            },
-        });
-    }
-
-    async createSession(assetsId) {
-        let result = await request.post(`/sessions?assetId=${assetsId}&mode=native`);
-        if (result['code'] !== 1) {
-            this.showMessage(result['message']);
-            return undefined;
-        }
-        return result['data'];
-    }
-
-    updateSessionStatus = async (sessionId) => {
-        let result = await request.post(`/sessions/${sessionId}/connect`);
-        if (result['code'] !== 1) {
-            message.error(result['message']);
-        }
-    }
-
-    terminalSize() {
-        return {
-            cols: Math.floor(this.state.width / 7.5),
-            rows: Math.floor(window.innerHeight / 17),
-        }
-    }
-
-    onWindowResize = (e) => {
-        let term = this.state.term;
-        let fitAddon = this.state.fitAddon;
-        let webSocket = this.state.webSocket;
-
-        this.setState({
-            width: window.innerWidth,
-            height: window.innerHeight,
-        }, () => {
-            if (webSocket && webSocket.readyState === WebSocket.OPEN) {
-                fitAddon.fit();
-                this.focus();
-                let terminalSize = {
-                    cols: term.cols,
-                    rows: term.rows
-                }
-                webSocket.send(new Message(Message.Resize, window.btoa(JSON.stringify(terminalSize))).toString());
-            }
-        });
-    };
-
-    handleUnload(e) {
-        var message = "要离开网站吗？";
+    const handleUnload = (e) => {
+        const message = "要离开网站吗？";
         (e || window.event).returnValue = message; //Gecko + IE
         return message;
     }
 
-    writeCommand = (command) => {
-        let webSocket = this.state.webSocket;
-        if (webSocket !== undefined) {
-            webSocket.send(new Message(Message.Data, command));
-        }
-        this.focus();
-    }
+    useEffect(() => {
+        document.title = assetName;
+        window.addEventListener('beforeunload', handleUnload);
 
-    focus = () => {
-        let term = this.state.term;
-        if (term) {
-            term.focus();
-        }
-    }
+        init(assetId);
 
-    onRef = (statsRef) => {
-        this.statsRef = statsRef;
-    }
-
-    render() {
-
-        const cmdMenuItems = this.state.commands.map(item => {
-            return <Tooltip placement="left" title={item['content']} color='blue' key={'t-' + item['id']}>
-                <Menu.Item onClick={() => {
-                    this.writeCommand(item['content'])
-                }} key={'i-' + item['id']}>{item['name']}</Menu.Item>
-            </Tooltip>;
+        let resize = debounce(() => {
+            onWindowResize();
         });
 
-        const cmdMenu = (
-            <Menu>
-                {cmdMenuItems}
-            </Menu>
-        );
+        window.addEventListener('resize', resize);
 
-        return (
-            <div>
-                <div id='terminal' style={{
-                    height: this.state.height,
-                    width: this.state.width,
-                    backgroundColor: '#1b1b1b'
-                }}/>
+        return () => {
+            if (websocket) {
+                websocket.close();
+            }
+            window.removeEventListener('resize', resize);
+            window.removeEventListener('beforeunload', handleUnload);
+        }
+    }, [assetId]);
 
-                <Draggable>
-                    <Affix style={{position: 'absolute', top: 50, right: 50, zIndex: this.state.enterBtnIndex}}>
-                        <Button icon={<FolderOutlined/>} onClick={() => {
-                            this.setState({
-                                fileSystemVisible: true,
-                                enterBtnIndex: 999, // xterm.js 输入框的zIndex是1000，在弹出文件管理页面后要隐藏此按钮
-                            });
-                        }}/>
-                    </Affix>
-                </Draggable>
+    const cmdMenuItems = commands.map(item => {
+        return {
+            key: item['id'],
+            label: item['name'],
+        };
+    });
 
-                <Draggable>
-                    <Affix style={{position: 'absolute', top: 50, right: 100, zIndex: this.state.enterBtnIndex}}>
-                        <Dropdown overlay={cmdMenu} trigger={['click']} placement="bottomLeft">
-                            <Button icon={<CodeOutlined/>}/>
-                        </Dropdown>
-                    </Affix>
-                </Draggable>
-
-                <Draggable>
-                    <Affix style={{position: 'absolute', top: 100, right: 100, zIndex: this.state.enterBtnIndex}}>
-                        <Button icon={<LineChartOutlined/>} onClick={() => {
-                            this.setState({
-                                statsVisible: true,
-                                enterBtnIndex: 999, // xterm.js 输入框的zIndex是1000，在弹出文件管理页面后要隐藏此按钮
-                            });
-                            if (this.statsRef) {
-                                this.statsRef.addInterval();
-                            }
-                        }}/>
-                    </Affix>
-                </Draggable>
-
-                <Drawer
-                    title={'会话详情'}
-                    placement="right"
-                    width={window.innerWidth * 0.8}
-                    closable={true}
-                    // maskClosable={false}
-                    onClose={() => {
-                        this.setState({
-                            fileSystemVisible: false,
-                            enterBtnIndex: 1001, // xterm.js 输入框的zIndex是1000，在隐藏文件管理页面后要显示此按钮
-                        });
-                        this.focus();
-                    }}
-                    visible={this.state.fileSystemVisible}
-                >
-                    <FileSystem
-                        storageId={this.state.sessionId}
-                        storageType={'sessions'}
-                        upload={this.state.session['upload'] === '1'}
-                        download={this.state.session['download'] === '1'}
-                        delete={this.state.session['delete'] === '1'}
-                        rename={this.state.session['rename'] === '1'}
-                        edit={this.state.session['edit'] === '1'}
-                        minHeight={window.innerHeight - 103}/>
-                </Drawer>
-
-                <Drawer
-                    title={'状态信息'}
-                    placement="right"
-                    width={window.innerWidth * 0.8}
-                    closable={true}
-                    onClose={() => {
-                        this.setState({
-                            statsVisible: false,
-                            enterBtnIndex: 1001, // xterm.js 输入框的zIndex是1000，在隐藏文件管理页面后要显示此按钮
-                        });
-                        this.focus();
-                        if (this.statsRef) {
-                            this.statsRef.delInterval();
-                        }
-                    }}
-                    visible={this.state.statsVisible}
-                >
-                    <Stats sessionId={this.state.sessionId} onRef={this.onRef}/>
-                </Drawer>
-            </div>
-        );
+    const handleCmdMenuClick = (e) => {
+        for (const command of commands) {
+            if (command['id'] === e.key) {
+                writeCommand(command['content']);
+            }
+        }
     }
-}
+
+    return (
+        <div>
+            <div id='terminal' style={{
+                overflow: 'hidden',
+                height: box.height,
+                width: box.width,
+                backgroundColor: '#1b1b1b'
+            }}/>
+
+            <Draggable>
+                <Affix style={{position: 'absolute', top: 50, right: 50, zIndex: enterBtnZIndex}}>
+                    <Button icon={<FolderOutlined/>} onClick={() => {
+                        setFileSystemVisible(true);
+                        setEnterBtnZIndex(999); // xterm.js 输入框的zIndex是1000，在弹出文件管理页面后要隐藏此按钮
+                    }}/>
+                </Affix>
+            </Draggable>
+
+            <Draggable>
+                <Affix style={{position: 'absolute', top: 50, right: 100, zIndex: enterBtnZIndex}}>
+                    <Dropdown overlay={<Menu onClick={handleCmdMenuClick} items={cmdMenuItems}/>} trigger={['click']}
+                              placement="bottomLeft">
+                        <Button icon={<CodeOutlined/>}/>
+                    </Dropdown>
+                </Affix>
+            </Draggable>
+
+            <Draggable>
+                <Affix style={{position: 'absolute', top: 100, right: 100, zIndex: enterBtnZIndex}}>
+                    <Button icon={<LineChartOutlined/>} onClick={() => {
+                        setStatsVisible(true);
+                        setEnterBtnZIndex(999);
+                    }}/>
+                </Affix>
+            </Draggable>
+
+            <Drawer
+                title={'会话详情'}
+                placement="right"
+                width={window.innerWidth * 0.8}
+                closable={true}
+                // maskClosable={false}
+                onClose={() => {
+                    setFileSystemVisible(false);
+                    setEnterBtnZIndex(1001); // xterm.js 输入框的zIndex是1000，在弹出文件管理页面后要隐藏此按钮
+                    focus();
+                }}
+                visible={fileSystemVisible}
+            >
+                <FileSystem
+                    storageId={session['id']}
+                    storageType={'sessions'}
+                    upload={session['upload'] === '1'}
+                    download={session['download'] === '1'}
+                    delete={session['delete'] === '1'}
+                    rename={session['rename'] === '1'}
+                    edit={session['edit'] === '1'}
+                    minHeight={window.innerHeight - 103}/>
+            </Drawer>
+
+            <Drawer
+                title={'状态信息'}
+                placement="right"
+                width={window.innerWidth * 0.8}
+                closable={true}
+                onClose={() => {
+                    setStatsVisible(false);
+                    setEnterBtnZIndex(1001);
+
+                    focus();
+                }}
+                visible={statsVisible}
+                extra={
+                    <Space>
+                        <div style={{width: 100}}>
+                            <Text>查询时间间隔</Text>
+                        </div>
+
+                        <Select defaultValue="5000" style={{width: 80}} onChange={(value) => {
+                            setQueryInterval(parseInt(value));
+                        }}>
+                            <Select.Option value="1000">1秒</Select.Option>
+                            <Select.Option value="5000">5秒</Select.Option>
+                            <Select.Option value="15000">15秒</Select.Option>
+                            <Select.Option value="30000">30秒</Select.Option>
+                        </Select>
+                    </Space>
+                }
+            >
+                <Stats sessionId={session['id']} visible={statsVisible} queryInterval={queryInterval}/>
+            </Drawer>
+        </div>
+    );
+};
 
 export default Term;

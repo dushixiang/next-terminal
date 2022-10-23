@@ -1,43 +1,66 @@
-import React from 'react';
-import {Form, Input, Modal, Switch} from "antd/lib/index";
+import React, {useEffect} from 'react';
+import {Form, Input, Modal, Switch} from "antd";
+import storageApi from "../../api/storage";
 
 const formItemLayout = {
     labelCol: {span: 6},
     wrapperCol: {span: 14},
 };
 
-const StorageModal = ({title, visible, handleOk, handleCancel, confirmLoading, model}) => {
+const StorageModal = ({
+                          visible,
+                          handleOk,
+                          handleCancel,
+                          confirmLoading,
+                          id,
+                      }) => {
 
     const [form] = Form.useForm();
-    if (!model) {
-        model = {
-            isShare: false
+
+
+    useEffect(() => {
+
+        const getItem = async () => {
+            let data = await storageApi.getById(id);
+            if (data) {
+                form.setFieldsValue(data);
+            }
         }
-    }
+        if (visible && id) {
+            getItem();
+        } else {
+            form.setFieldsValue({
+                isShare: false,
+            });
+        }
+    }, [visible])
 
     return (
         <Modal
-            title={title}
+            title={id ? '更新磁盘空间' : '新建磁盘空间'}
             visible={visible}
             maskClosable={false}
-
+            destroyOnClose={true}
             onOk={() => {
                 form
                     .validateFields()
-                    .then(values => {
-                        form.resetFields();
-                        handleOk(values);
-                    })
-                    .catch(info => {
+                    .then(async values => {
+                        let ok = await handleOk(values);
+                        if (ok) {
+                            form.resetFields();
+                        }
                     });
             }}
-            onCancel={handleCancel}
+            onCancel={() => {
+                form.resetFields();
+                handleCancel();
+            }}
             confirmLoading={confirmLoading}
             okText='确定'
             cancelText='取消'
         >
 
-            <Form form={form} {...formItemLayout} initialValues={model}>
+            <Form form={form} {...formItemLayout}>
                 <Form.Item name='id' noStyle>
                     <Input hidden={true}/>
                 </Form.Item>

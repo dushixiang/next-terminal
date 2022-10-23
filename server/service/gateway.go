@@ -4,10 +4,11 @@ import (
 	"context"
 
 	"next-terminal/server/global/gateway"
-	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 )
+
+var GatewayService = new(gatewayService)
 
 type gatewayService struct{}
 
@@ -37,10 +38,8 @@ func (r gatewayService) LoadAll() error {
 }
 
 func (r gatewayService) ReLoad(m *model.AccessGateway) *gateway.Gateway {
-	log.Debugf("重建接入网关「%v」中...", m.Name)
 	r.DisconnectById(m.ID)
 	g := gateway.GlobalGatewayManager.Add(m)
-	log.Debugf("重建接入网关「%v」完成", m.Name)
 	return g
 }
 

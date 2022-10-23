@@ -5,10 +5,12 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
+	"next-terminal/server/common"
+	"next-terminal/server/common/maps"
+	"next-terminal/server/common/nt"
 	"strconv"
 	"strings"
 
-	"next-terminal/server/constant"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
@@ -75,13 +77,13 @@ func (assetApi AssetApi) AssetImportEndpoint(c echo.Context) error {
 				Protocol:    record[1],
 				IP:          record[2],
 				Port:        port,
-				AccountType: constant.Custom,
+				AccountType: nt.Custom,
 				Username:    record[4],
 				Password:    record[5],
 				PrivateKey:  record[6],
 				Passphrase:  record[7],
 				Description: record[8],
-				Created:     utils.NowJsonTime(),
+				Created:     common.NowJsonTime(),
 				Owner:       account.ID,
 				Active:      true,
 			}
@@ -114,22 +116,18 @@ func (assetApi AssetApi) AssetPagingEndpoint(c echo.Context) error {
 	name := c.QueryParam("name")
 	protocol := c.QueryParam("protocol")
 	tags := c.QueryParam("tags")
-	owner := c.QueryParam("owner")
-	sharer := c.QueryParam("sharer")
-	userGroupId := c.QueryParam("userGroupId")
 	ip := c.QueryParam("ip")
+	active := c.QueryParam("active")
 
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	account, _ := GetCurrentAccount(c)
-
-	items, total, err := repository.AssetRepository.Find(context.TODO(), pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
+	items, total, err := repository.AssetRepository.Find(context.Background(), pageIndex, pageSize, name, protocol, tags, ip, active, order, field)
 	if err != nil {
 		return err
 	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"total": total,
 		"items": items,
 	})
@@ -137,16 +135,22 @@ func (assetApi AssetApi) AssetPagingEndpoint(c echo.Context) error {
 
 func (assetApi AssetApi) AssetAllEndpoint(c echo.Context) error {
 	protocol := c.QueryParam("protocol")
-	items, _ := repository.AssetRepository.FindByProtocol(context.TODO(), protocol)
+	assets, err := repository.AssetRepository.FindByProtocol(context.TODO(), protocol)
+	if err != nil {
+		return err
+	}
+	items := make([]maps.Map, len(assets))
+	for i, e := range assets {
+		items[i] = maps.Map{
+			"id":   e.ID,
+			"name": e.Name,
+		}
+	}
 	return Success(c, items)
 }
 
 func (assetApi AssetApi) AssetUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	if err := assetApi.PreCheckAssetPermission(c, id); err != nil {
-		return err
-	}
-
 	m := echo.Map{}
 	if err := c.Bind(&m); err != nil {
 		return err
@@ -161,9 +165,6 @@ func (assetApi AssetApi) AssetDeleteEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	split := strings.Split(id, ",")
 	for i := range split {
-		if err := assetApi.PreCheckAssetPermission(c, split[i]); err != nil {
-			return err
-		}
 		if err := service.AssetService.DeleteById(split[i]); err != nil {
 			return err
 		}
@@ -174,9 +175,6 @@ func (assetApi AssetApi) AssetDeleteEndpoint(c echo.Context) error {
 
 func (assetApi AssetApi) AssetGetEndpoint(c echo.Context) (err error) {
 	id := c.Param("id")
-	if err := assetApi.PreCheckAssetPermission(c, id); err != nil {
-		return err
-	}
 
 	var item model.Asset
 	if item, err = service.AssetService.FindByIdAndDecrypt(context.TODO(), id); err != nil {
@@ -202,20 +200,17 @@ func (assetApi AssetApi) AssetTcpingEndpoint(c echo.Context) (err error) {
 		return err
 	}
 
-	active, err := service.AssetService.CheckStatus(item.AccessGatewayId, item.IP, item.Port)
-
-	if item.Active != active {
-		if err := repository.AssetRepository.UpdateActiveById(context.TODO(), active, item.ID); err != nil {
-			return err
-		}
-	}
+	active, err := service.AssetService.CheckStatus(&item, item.IP, item.Port)
 
 	var message = ""
 	if err != nil {
 		message = err.Error()
 	}
+	if err := repository.AssetRepository.UpdateActiveById(context.TODO(), active, message, item.ID); err != nil {
+		return err
+	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"active":  active,
 		"message": message,
 	})
@@ -232,25 +227,9 @@ func (assetApi AssetApi) AssetTagsEndpoint(c echo.Context) (err error) {
 func (assetApi AssetApi) AssetChangeOwnerEndpoint(c echo.Context) (err error) {
 	id := c.Param("id")
 
-	if err := assetApi.PreCheckAssetPermission(c, id); err != nil {
-		return err
-	}
-
 	owner := c.QueryParam("owner")
 	if err := repository.AssetRepository.UpdateById(context.TODO(), &model.Asset{Owner: owner}, id); err != nil {
 		return err
 	}
 	return Success(c, "")
-}
-
-func (assetApi AssetApi) PreCheckAssetPermission(c echo.Context, id string) error {
-	item, err := repository.AssetRepository.FindById(context.TODO(), id)
-	if err != nil {
-		return err
-	}
-
-	if !HasPermission(c, item.Owner) {
-		return errors.New("permission denied")
-	}
-	return nil
 }

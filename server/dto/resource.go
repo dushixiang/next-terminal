@@ -27,6 +27,5 @@ type Backup struct {
 	Commands         []model.Command          `json:"commands"`
 	Credentials      []model.Credential       `json:"credentials"`
 	Assets           []map[string]interface{} `json:"assets"`
-	ResourceSharers  []model.ResourceSharer   `json:"resource_sharers"`
 	Jobs             []model.Job              `json:"jobs"`
 }

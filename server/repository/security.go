@@ -6,6 +6,8 @@ import (
 	"next-terminal/server/model"
 )
 
+var SecurityRepository = new(securityRepository)
+
 type securityRepository struct {
 	baseRepository
 }

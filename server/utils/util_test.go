@@ -94,3 +94,7 @@ func TestAesEncryptCBC2(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "3Tbnz0MYHQNTsN2L6QDGCJumbNFsQcmErrRz/KglYI/IDh88lsyOhVi7mgaAs/bjevvJa2F1JT7jUMLsz9/cpw==", base64.StdEncoding.EncodeToString(encryptedCBC))
 }
+
+func TestUUID(t *testing.T) {
+	println(utils.UUID())
+}

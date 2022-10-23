@@ -1,32 +1,32 @@
 import {isEmpty} from "../utils/utils";
 
-export function hasPermission(owner) {
-    let userJsonStr = sessionStorage.getItem('user');
-    if (isEmpty(userJsonStr)) {
-        return false;
-    }
-    let user = JSON.parse(userJsonStr);
-    if (user['type'] === 'admin') {
-        return true;
-    }
-
-    return user['id'] === owner;
-}
-
 export function isAdmin() {
-    let userJsonStr = sessionStorage.getItem('user');
-    if (isEmpty(userJsonStr)) {
-        return false;
-    }
-    let user = JSON.parse(userJsonStr);
+    let user = getCurrentUser();
     return user['type'] === 'admin';
 }
 
+export function setCurrentUser(user) {
+    if (!user) {
+        return
+    }
+    localStorage.setItem('user', JSON.stringify(user));
+}
+
 export function getCurrentUser() {
-    let userJsonStr = sessionStorage.getItem('user');
-    if (isEmpty(userJsonStr)) {
+    let jsonStr = localStorage.getItem('user');
+    if (isEmpty(jsonStr) || jsonStr === 'undefined') {
         return {};
     }
 
-    return JSON.parse(userJsonStr);
+    return JSON.parse(jsonStr);
+}
+
+export function hasMenu(...items) {
+    let menus = getCurrentUser()['menus'] || [];
+    for (const item of items) {
+        if (menus.includes(item)) {
+            return true;
+        }
+    }
+    return false;
 }

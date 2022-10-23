@@ -4,12 +4,13 @@ import (
 	"context"
 	"encoding/base64"
 
-	"next-terminal/server/model"
-	"next-terminal/server/utils"
-
 	"next-terminal/server/config"
+	"next-terminal/server/model"
 	"next-terminal/server/repository"
+	"next-terminal/server/utils"
 )
+
+var CredentialService = new(credentialService)
 
 type credentialService struct {
 }

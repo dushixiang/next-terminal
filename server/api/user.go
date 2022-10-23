@@ -2,21 +2,19 @@ package api
 
 import (
 	"context"
-	"fmt"
+	"next-terminal/server/common/maps"
 	"strconv"
 	"strings"
 
+	"github.com/labstack/echo/v4"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
-	"next-terminal/server/utils"
-
-	"github.com/labstack/echo/v4"
 )
 
 type UserApi struct{}
 
-func (userApi UserApi) UserCreateEndpoint(c echo.Context) (err error) {
+func (userApi UserApi) CreateEndpoint(c echo.Context) (err error) {
 	var item model.User
 	if err := c.Bind(&item); err != nil {
 		return err
@@ -29,7 +27,7 @@ func (userApi UserApi) UserCreateEndpoint(c echo.Context) (err error) {
 	return Success(c, item)
 }
 
-func (userApi UserApi) UserPagingEndpoint(c echo.Context) error {
+func (userApi UserApi) PagingEndpoint(c echo.Context) error {
 	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
 	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
 	username := c.QueryParam("username")
@@ -38,25 +36,26 @@ func (userApi UserApi) UserPagingEndpoint(c echo.Context) error {
 
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
+	online := c.QueryParam("online")
 
-	items, total, err := repository.UserRepository.Find(context.TODO(), pageIndex, pageSize, username, nickname, mail, order, field)
+	items, total, err := repository.UserRepository.Find(context.TODO(), pageIndex, pageSize, username, nickname, mail, online, "", order, field)
 	if err != nil {
 		return err
 	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"total": total,
 		"items": items,
 	})
 }
 
-func (userApi UserApi) UserUpdateEndpoint(c echo.Context) error {
+func (userApi UserApi) UpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	account, _ := GetCurrentAccount(c)
-	if account.ID == id {
-		return Fail(c, -1, "cannot modify itself")
-	}
+	//account, _ := GetCurrentAccount(c)
+	//if account.ID == id {
+	//	return Fail(c, -1, "cannot modify itself")
+	//}
 
 	var item model.User
 	if err := c.Bind(&item); err != nil {
@@ -70,7 +69,7 @@ func (userApi UserApi) UserUpdateEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func (userApi UserApi) UserUpdateStatusEndpoint(c echo.Context) error {
+func (userApi UserApi) UpdateStatusEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	status := c.QueryParam("status")
 	account, _ := GetCurrentAccount(c)
@@ -85,7 +84,7 @@ func (userApi UserApi) UserUpdateStatusEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func (userApi UserApi) UserDeleteEndpoint(c echo.Context) error {
+func (userApi UserApi) DeleteEndpoint(c echo.Context) error {
 	ids := c.Param("id")
 	account, found := GetCurrentAccount(c)
 	if !found {
@@ -105,10 +104,10 @@ func (userApi UserApi) UserDeleteEndpoint(c echo.Context) error {
 	return Success(c, nil)
 }
 
-func (userApi UserApi) UserGetEndpoint(c echo.Context) error {
+func (userApi UserApi) GetEndpoint(c echo.Context) error {
 	id := c.Param("id")
 
-	item, err := repository.UserRepository.FindById(context.TODO(), id)
+	item, err := service.UserService.FindById(id)
 	if err != nil {
 		return err
 	}
@@ -116,49 +115,41 @@ func (userApi UserApi) UserGetEndpoint(c echo.Context) error {
 	return Success(c, item)
 }
 
-func (userApi UserApi) UserChangePasswordEndpoint(c echo.Context) error {
+func (userApi UserApi) ChangePasswordEndpoint(c echo.Context) error {
 	id := c.Param("id")
 	password := c.FormValue("password")
 	if password == "" {
 		return Fail(c, -1, "请输入密码")
 	}
-
-	user, err := repository.UserRepository.FindById(context.TODO(), id)
-	if err != nil {
+	ids := strings.Split(id, ",")
+	if err := service.UserService.ChangePassword(ids, password); err != nil {
 		return err
-	}
-
-	passwd, err := utils.Encoder.Encode([]byte(password))
-	if err != nil {
-		return err
-	}
-	u := &model.User{
-		Password: string(passwd),
-		ID:       id,
-	}
-	if err := repository.UserRepository.Update(context.TODO(), u); err != nil {
-		return err
-	}
-
-	if user.Mail != "" {
-		subject := "密码修改通知"
-		text := fmt.Sprintf(`您好，%s。
-	管理员已将你的密码修改为：%s。
-`, user.Username, password)
-		go service.MailService.SendMail(user.Mail, subject, text)
 	}
 
 	return Success(c, "")
 }
 
-func (userApi UserApi) UserResetTotpEndpoint(c echo.Context) error {
+func (userApi UserApi) ResetTotpEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	u := &model.User{
-		TOTPSecret: "-",
-		ID:         id,
-	}
-	if err := repository.UserRepository.Update(context.TODO(), u); err != nil {
+	ids := strings.Split(id, ",")
+	if err := service.UserService.ResetTotp(ids); err != nil {
 		return err
 	}
+
 	return Success(c, "")
+}
+
+func (userApi UserApi) AllEndpoint(c echo.Context) error {
+	users, err := repository.UserRepository.FindAll(context.Background())
+	if err != nil {
+		return err
+	}
+	items := make([]maps.Map, len(users))
+	for i, user := range users {
+		items[i] = maps.Map{
+			"id":       user.ID,
+			"nickname": user.Nickname,
+		}
+	}
+	return Success(c, items)
 }

@@ -7,6 +7,8 @@ import (
 	"next-terminal/server/repository"
 )
 
+var SecurityService = new(securityService)
+
 type securityService struct{}
 
 func (service securityService) ReloadAccessSecurity() error {

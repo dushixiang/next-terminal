@@ -2,7 +2,8 @@ package api
 
 import (
 	"context"
-
+	"next-terminal/server/common"
+	"next-terminal/server/common/maps"
 	"strconv"
 	"strings"
 
@@ -23,7 +24,7 @@ func (api JobApi) JobCreateEndpoint(c echo.Context) error {
 	}
 
 	item.ID = utils.UUID()
-	item.Created = utils.NowJsonTime()
+	item.Created = common.NowJsonTime()
 
 	if err := service.JobService.Create(context.TODO(), &item); err != nil {
 		return err
@@ -45,7 +46,7 @@ func (api JobApi) JobPagingEndpoint(c echo.Context) error {
 		return err
 	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"total": total,
 		"items": items,
 	})
@@ -110,13 +111,17 @@ func (api JobApi) JobGetEndpoint(c echo.Context) error {
 
 func (api JobApi) JobGetLogsEndpoint(c echo.Context) error {
 	id := c.Param("id")
-
-	items, err := repository.JobLogRepository.FindByJobId(context.TODO(), id)
+	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
+	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
+	items, total, err := repository.JobLogRepository.FindByJobId(context.TODO(), id, pageIndex, pageSize)
 	if err != nil {
 		return err
 	}
 
-	return Success(c, items)
+	return Success(c, maps.Map{
+		"total": total,
+		"items": items,
+	})
 }
 
 func (api JobApi) JobDeleteLogsEndpoint(c echo.Context) error {

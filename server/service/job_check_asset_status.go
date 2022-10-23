@@ -3,10 +3,11 @@ package service
 import (
 	"context"
 	"fmt"
+	"next-terminal/server/common"
+	"next-terminal/server/common/nt"
 	"strings"
 	"time"
 
-	"next-terminal/server/constant"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
@@ -26,7 +27,7 @@ func (r CheckAssetStatusJob) Run() {
 	}
 
 	var assets []model.Asset
-	if r.Mode == constant.JobModeAll {
+	if r.Mode == nt.JobModeAll {
 		assets, _ = repository.AssetRepository.FindAll(context.TODO())
 	} else {
 		assets, _ = repository.AssetRepository.FindByIds(context.TODO(), strings.Split(r.ResourceIds, ","))
@@ -46,7 +47,8 @@ func (r CheckAssetStatusJob) Run() {
 				ip   = asset.IP
 				port = asset.Port
 			)
-			active, err := AssetService.CheckStatus(asset.AccessGatewayId, ip, port)
+
+			active, err := AssetService.CheckStatus(&asset, ip, port)
 
 			elapsed := time.Since(t1)
 			if err == nil {
@@ -55,8 +57,12 @@ func (r CheckAssetStatusJob) Run() {
 				msg = fmt.Sprintf("资产「%v」存活状态检测完成，存活「%v」，耗时「%v」，原因： %v", asset.Name, active, elapsed, err.Error())
 			}
 
-			_ = repository.AssetRepository.UpdateActiveById(context.TODO(), active, asset.ID)
-			log.Infof(msg)
+			var message = ""
+			if !active && err != nil {
+				message = err.Error()
+			}
+			_ = repository.AssetRepository.UpdateActiveById(context.TODO(), active, message, asset.ID)
+			log.Debug(msg)
 			msgChan <- msg
 		}()
 	}
@@ -70,7 +76,7 @@ func (r CheckAssetStatusJob) Run() {
 	jobLog := model.JobLog{
 		ID:        utils.UUID(),
 		JobId:     r.ID,
-		Timestamp: utils.NowJsonTime(),
+		Timestamp: common.NowJsonTime(),
 		Message:   message,
 	}
 

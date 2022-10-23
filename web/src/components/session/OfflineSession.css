@@ -1,3 +1,14 @@
-.unreviewed{
+.unreviewed {
     background: #e6f7ff;
+}
+
+.code {
+    padding: 8px;
+    margin-bottom: 0 !important;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: rgb(246, 248, 250);
+    border-radius: 3px;
+    width: min-content;
 }

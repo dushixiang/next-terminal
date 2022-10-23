@@ -227,6 +227,10 @@ export function renderSize(value) {
     return size + ' ' + unitArr[index];
 }
 
-export function getFileName(fullFileName){
+export function getFileName(fullFileName) {
     return fullFileName.substring(fullFileName.lastIndexOf('/') + 1, fullFileName.length);
+}
+
+export const hasText = (text) => {
+    return !(text === undefined || text === null || text.length === 0);
 }

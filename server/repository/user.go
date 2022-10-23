@@ -2,9 +2,12 @@ package repository
 
 import (
 	"context"
+	"strconv"
 
 	"next-terminal/server/model"
 )
+
+var UserRepository = new(userRepository)
 
 type userRepository struct {
 	baseRepository
@@ -15,9 +18,17 @@ func (r userRepository) FindAll(c context.Context) (o []model.User, err error) {
 	return
 }
 
-func (r userRepository) Find(c context.Context, pageIndex, pageSize int, username, nickname, mail, order, field string) (o []model.UserForPage, total int64, err error) {
-	db := r.GetDB(c).Table("users").Select("users.id,users.username,users.nickname,users.mail,users.online,users.created,users.type,users.status,users.source, count(resource_sharers.user_id) as sharer_asset_count, users.totp_secret").Joins("left join resource_sharers on users.id = resource_sharers.user_id and resource_sharers.resource_type = 'asset'").Group("users.id")
+func (r userRepository) Find(c context.Context, pageIndex, pageSize int, username, nickname, mail, online, loginPolicyId, order, field string) (o []model.UserForPage, total int64, err error) {
+	db := r.GetDB(c).Table("users").Select("users.id,users.username,users.nickname,users.mail,users.online,users.created,users.type,users.status,users.source, users.totp_secret")
 	dbCounter := r.GetDB(c).Table("users")
+
+	if loginPolicyId != "" {
+		db = db.Joins("left join login_policies_ref as ref on users.id = ref.user_id")
+		dbCounter = dbCounter.Joins("left join login_policies_ref as ref on users.id = ref.user_id")
+
+		db = db.Where("ref.login_policy_id = ?", loginPolicyId)
+		dbCounter = db.Where("ref.login_policy_id = ?", loginPolicyId)
+	}
 
 	if len(username) > 0 {
 		db = db.Where("users.username like ?", "%"+username+"%")
@@ -32,6 +43,15 @@ func (r userRepository) Find(c context.Context, pageIndex, pageSize int, usernam
 	if len(mail) > 0 {
 		db = db.Where("users.mail like ?", "%"+mail+"%")
 		dbCounter = dbCounter.Where("mail like ?", "%"+mail+"%")
+	}
+
+	if online != "" {
+		_online, err := strconv.ParseBool(online)
+		if err != nil {
+			return nil, 0, err
+		}
+		db = db.Where("users.online = ?", _online)
+		dbCounter = dbCounter.Where("users.online = ?", _online)
 	}
 
 	err = dbCounter.Count(&total).Error
@@ -83,6 +103,19 @@ func (r userRepository) ExistByUsername(c context.Context, username string) (exi
 	var count uint64
 	err = r.GetDB(c).Table(user.TableName()).Select("count(*)").
 		Where("username = ?", username).
+		Find(&count).
+		Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
+func (r userRepository) ExistById(c context.Context, id string) (exist bool, err error) {
+	user := model.User{}
+	var count uint64
+	err = r.GetDB(c).Table(user.TableName()).Select("count(*)").
+		Where("id = ?", id).
 		Find(&count).
 		Error
 	if err != nil {

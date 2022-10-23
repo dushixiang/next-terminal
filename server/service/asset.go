@@ -4,9 +4,15 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"golang.org/x/net/proxy"
+	"net"
+	"next-terminal/server/common/nt"
+	"strconv"
+	"time"
 
+	"next-terminal/server/common"
 	"next-terminal/server/config"
-	"next-terminal/server/constant"
 	"next-terminal/server/env"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
@@ -15,6 +21,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
+
+var AssetService = new(assetService)
 
 type assetService struct {
 	baseService
@@ -116,24 +124,53 @@ func (s assetService) FindByIdAndDecrypt(c context.Context, id string) (model.As
 	return asset, nil
 }
 
-func (s assetService) CheckStatus(accessGatewayId string, ip string, port int) (bool, error) {
-	if accessGatewayId != "" && accessGatewayId != "-" {
-		g, err := GatewayService.GetGatewayById(accessGatewayId)
-		if err != nil {
-			return false, err
-		}
-
-		uuid := utils.UUID()
-		defer g.CloseSshTunnel(uuid)
-		exposedIP, exposedPort, err := g.OpenSshTunnel(uuid, ip, port)
-		if err != nil {
-			return false, err
-		}
-
-		return utils.Tcping(exposedIP, exposedPort)
+func (s assetService) CheckStatus(asset *model.Asset, ip string, port int) (bool, error) {
+	attributes, err := repository.AssetRepository.FindAssetAttrMapByAssetId(context.Background(), asset.ID)
+	if err != nil {
+		return false, err
 	}
 
-	return utils.Tcping(ip, port)
+	if "true" == attributes[nt.SocksProxyEnable] {
+		socks5 := fmt.Sprintf("%s:%s", attributes[nt.SocksProxyHost], attributes[nt.SocksProxyPort])
+		auth := &proxy.Auth{
+			User:     attributes[nt.SocksProxyUsername],
+			Password: attributes[nt.SocksProxyPassword],
+		}
+		dailer, err := proxy.SOCKS5("tcp", socks5, auth, &net.Dialer{
+			Timeout:   15 * time.Second,
+			KeepAlive: 15 * time.Second,
+		})
+		if err != nil {
+			return false, err
+		}
+
+		target := fmt.Sprintf("%s:%s", ip, strconv.Itoa(port))
+		c, err := dailer.Dial("tcp", target)
+		if err != nil {
+			return false, err
+		}
+		defer c.Close()
+		return true, nil
+	} else {
+		accessGatewayId := asset.AccessGatewayId
+		if accessGatewayId != "" && accessGatewayId != "-" {
+			g, err := GatewayService.GetGatewayById(accessGatewayId)
+			if err != nil {
+				return false, err
+			}
+
+			uuid := utils.UUID()
+			defer g.CloseSshTunnel(uuid)
+			exposedIP, exposedPort, err := g.OpenSshTunnel(uuid, ip, port)
+			if err != nil {
+				return false, err
+			}
+
+			return utils.Tcping(exposedIP, exposedPort)
+		}
+
+		return utils.Tcping(ip, port)
+	}
 }
 
 func (s assetService) Create(ctx context.Context, m echo.Map) (model.Asset, error) {
@@ -148,39 +185,22 @@ func (s assetService) Create(ctx context.Context, m echo.Map) (model.Asset, erro
 	}
 
 	item.ID = utils.UUID()
-	item.Created = utils.NowJsonTime()
+	item.Created = common.NowJsonTime()
 	item.Active = true
 
-	if s.InTransaction(ctx) {
-		return item, s.create(ctx, item, m)
-	} else {
-		return item, env.GetDB().Transaction(func(tx *gorm.DB) error {
-			c := s.Context(tx)
-			return s.create(c, item, m)
-		})
-	}
-}
+	return item, s.Transaction(ctx, func(ctx context.Context) error {
+		if err := s.Encrypt(&item, config.GlobalCfg.EncryptionPassword); err != nil {
+			return err
+		}
+		if err := repository.AssetRepository.Create(ctx, &item); err != nil {
+			return err
+		}
 
-func (s assetService) create(c context.Context, item model.Asset, m echo.Map) error {
-	if err := s.Encrypt(&item, config.GlobalCfg.EncryptionPassword); err != nil {
-		return err
-	}
-	if err := repository.AssetRepository.Create(c, &item); err != nil {
-		return err
-	}
-
-	if err := repository.AssetRepository.UpdateAttributes(c, item.ID, item.Protocol, m); err != nil {
-		return err
-	}
-
-	//go func() {
-	//	active, _ := s.CheckStatus(item.AccessGatewayId, item.IP, item.Port)
-	//
-	//	if item.Active != active {
-	//		_ = repository.AssetRepository.UpdateActiveById(context.TODO(), active, item.id)
-	//	}
-	//}()
-	return nil
+		if err := repository.AssetRepository.UpdateAttributes(ctx, item.ID, item.Protocol, m); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (s assetService) DeleteById(id string) error {
@@ -195,7 +215,7 @@ func (s assetService) DeleteById(id string) error {
 			return err
 		}
 		// 删除资产与用户的关系
-		if err := repository.ResourceSharerRepository.DeleteByResourceId(c, id); err != nil {
+		if err := repository.AuthorisedRepository.DeleteByAssetId(c, id); err != nil {
 			return err
 		}
 		return nil
@@ -265,5 +285,5 @@ func (s assetService) UpdateById(id string, m echo.Map) error {
 }
 
 func (s assetService) FixSshMode() error {
-	return repository.AssetRepository.UpdateAttrs(context.TODO(), "ssh-mode", "naive", constant.Native)
+	return repository.AssetRepository.UpdateAttrs(context.TODO(), "ssh-mode", "naive", nt.Native)
 }

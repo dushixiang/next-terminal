@@ -1,301 +1,208 @@
-import React, {Component} from 'react';
-import {
-    Button,
-    Card,
-    Col,
-    Descriptions,
-    Divider,
-    Drawer,
-    Input,
-    Layout,
-    List,
-    Popconfirm,
-    Row,
-    Space,
-    Tooltip,
-    Typography
-} from "antd";
-import {
-    DeleteOutlined,
-    EditOutlined,
-    FireOutlined,
-    FolderOutlined,
-    HeartOutlined,
-    PlusOutlined,
-    SafetyCertificateOutlined,
-    SyncOutlined,
-    TeamOutlined,
-    UndoOutlined,
-    UserOutlined
-} from "@ant-design/icons";
-import request from "../../common/request";
-import {message} from "antd/es";
-import qs from "qs";
-import {cloneObj, renderSize} from "../../utils/utils";
-import FileSystem from "./FileSystem";
+import React, {useState} from 'react';
+import {Button, Drawer, Layout, Popconfirm, Tag} from "antd";
+import {ProTable} from "@ant-design/pro-components";
+import storageApi from "../../api/storage";
 import StorageModal from "./StorageModal";
+import {renderSize} from "../../utils/utils";
+import FileSystem from "./FileSystem";
+import ColumnState, {useColumnState} from "../../hook/column-state";
+import Show from "../../dd/fi/show";
+
+const api = storageApi;
 
 const {Content} = Layout;
-const {Title} = Typography;
-const {Search} = Input;
 
-class Storage extends Component {
+const actionRef = React.createRef();
 
-    inputRefOfName = React.createRef();
-    storageRef = undefined;
+const Storage = () => {
+    let [visible, setVisible] = useState(false);
+    let [confirmLoading, setConfirmLoading] = useState(false);
+    let [selectedRowKey, setSelectedRowKey] = useState(undefined);
 
-    state = {
-        items: [],
-        total: 0,
-        queryParams: {
-            pageIndex: 1,
-            pageSize: 10
+    let [fileSystemVisible, setFileSystemVisible] = useState(false);
+    const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.STORAGE);
+
+    const columns = [
+        {
+            dataIndex: 'index',
+            valueType: 'indexBorder',
+            width: 48,
         },
-        loading: false,
-        modalVisible: false,
-        modalTitle: '',
-        modalConfirmLoading: false,
-        selectedRow: undefined,
-        fileSystemVisible: false,
-        storageId: undefined
-    };
-
-    componentDidMount() {
-        this.loadTableData();
-    }
-
-    async delete(id) {
-        const result = await request.delete('/storages/' + id);
-        if (result.code === 1) {
-            message.success('删除成功');
-            this.loadTableData(this.state.queryParams);
-        } else {
-            message.error(result.message, 10);
-        }
-    }
-
-    async loadTableData(queryParams) {
-        this.setState({
-            loading: true
-        });
-
-        queryParams = queryParams || this.state.queryParams;
-
-        // queryParams
-        let paramsStr = qs.stringify(queryParams);
-
-        let data = {
-            items: [],
-            total: 0
-        };
-
-        try {
-            let result = await request.get(`/storages/paging?${paramsStr}`);
-            if (result.code === 1) {
-                data = result.data;
-            } else {
-                message.error(result.message);
+        {
+            title: '名称',
+            dataIndex: 'name',
+            key: 'name',
+        }, {
+            title: '是否共享',
+            dataIndex: 'isShare',
+            key: 'isShare',
+            hideInSearch: true,
+            render: (isShare) => {
+                if (isShare) {
+                    return <Tag color={'green'}>是</Tag>
+                } else {
+                    return <Tag color={'red'}>否</Tag>
+                }
             }
-        } catch (e) {
-
-        } finally {
-            this.setState({
-                items: data.items,
-                total: data.total,
-                queryParams: queryParams,
-                loading: false
-            });
-        }
-    }
-
-    onRef = (storageRef) => {
-        this.storageRef = storageRef;
-    }
-
-    handleSearchByName = name => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'name': name,
-        }
-        this.loadTableData(query);
-    };
-
-    showModal(title, obj = undefined) {
-        this.setState({
-            modalTitle: title,
-            modalVisible: true,
-            model: obj
-        });
-    };
-
-    handleOk = async (formData) => {
-        // 弹窗 form 传来的数据
-        this.setState({
-            modalConfirmLoading: true
-        });
-
-        if (formData.id) {
-            // 转换文件大小限制单位为字节
-            formData['limitSize'] = parseInt(formData['limitSize']) * 1024 * 1024;
-            // 向后台提交数据
-            const result = await request.put('/storages/' + formData.id, formData);
-            if (result.code === 1) {
-                message.success('更新成功');
-
-                this.setState({
-                    modalVisible: false
-                });
-                this.loadTableData(this.state.queryParams);
-            } else {
-                message.error('更新失败 :( ' + result.message, 10);
+        }, {
+            title: '是否默认',
+            dataIndex: 'isDefault',
+            key: 'isDefault',
+            hideInSearch: true,
+            render: (isDefault) => {
+                if (isDefault) {
+                    return <Tag color={'green'}>是</Tag>
+                } else {
+                    return <Tag color={'red'}>否</Tag>
+                }
             }
-        } else {
-            // 转换文件大小限制单位为字节
-            formData['limitSize'] = parseInt(formData['limitSize']) * 1024 * 1024;
-            // 向后台提交数据
-            const result = await request.post('/storages', formData);
-            if (result.code === 1) {
-                message.success('新增成功');
-
-                this.setState({
-                    modalVisible: false
-                });
-                this.loadTableData(this.state.queryParams);
-            } else {
-                message.error('新增失败 :( ' + result.message, 10);
-            }
-        }
-
-        this.setState({
-            modalConfirmLoading: false
-        });
-    };
-
-    render() {
-
-        return (
-            <div>
-                <Content className="site-layout-background page-content">
-                    <div>
-                        <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={12} key={1}>
-                                <Title level={3}>磁盘空间</Title>
-                            </Col>
-                            <Col span={12} key={2} style={{textAlign: 'right'}}>
-                                <Space>
-                                    <Search
-                                        ref={this.inputRefOfName}
-                                        placeholder="名称"
-                                        allowClear
-                                        onSearch={this.handleSearchByName}
-                                    />
-
-                                    <Tooltip title='重置查询'>
-
-                                        <Button icon={<UndoOutlined/>} onClick={() => {
-                                            this.inputRefOfName.current.setValue('');
-                                            this.loadTableData({pageIndex: 1, pageSize: 10, name: '', content: ''})
-                                        }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                    <Divider type="vertical"/>
-
-                                    <Tooltip title="新增">
-                                        <Button type="dashed" icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增磁盘空间')}>
-
-                                        </Button>
-                                    </Tooltip>
-
-
-                                    <Tooltip title="刷新列表">
-                                        <Button icon={<SyncOutlined/>} onClick={() => {
-                                            this.loadTableData(this.state.queryParams)
-                                        }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                </Space>
-                            </Col>
-                        </Row>
-                    </div>
-
-                </Content>
-
-                <div style={{margin: '0 16px'}}>
-                    <List
-                        loading={this.state.loading}
-                        grid={{gutter: 16, column: 4}}
-                        dataSource={this.state.items}
-                        renderItem={item => {
-                            let delBtn;
-                            if (item['isDefault']) {
-                                delBtn = <DeleteOutlined key="delete" className={'disabled-icon'}/>
-                            } else {
-                                delBtn = <Popconfirm
-                                    title="您确认要删除此空间吗?"
-                                    onConfirm={() => {
-                                        this.delete(item['id']);
-                                    }}
-                                    okText="是"
-                                    cancelText="否"
-                                >
-                                    <DeleteOutlined key="delete"/>
-                                </Popconfirm>
-                            }
-                            return (
-                                <List.Item>
-                                    <Card title={item['name']}
-                                          hoverable
-                                          actions={[
-                                              <FolderOutlined key='file' onClick={() => {
-                                                  this.setState({
-                                                      fileSystemVisible: true,
-                                                      storageId: item['id']
-                                                  });
-                                                  if (this.storageRef) {
-                                                      this.storageRef.reSetStorageId(item['id']);
-                                                  }
-                                              }}/>,
-                                              <EditOutlined key="edit" onClick={() => {
-                                                  // 转换文件大小限制单位为MB
-                                                  let model = cloneObj(item);
-                                                  if(model['limitSize'] > 0){
-                                                      model['limitSize'] = model['limitSize'] / 1024 / 1024;
-                                                  }
-                                                  this.showModal('修改磁盘空间', model);
-                                              }}/>,
-                                              delBtn
-                                              ,
-                                          ]}>
-                                        <Descriptions title="" column={1}>
-                                            <Descriptions.Item label={<div><TeamOutlined/> 是否共享</div>}>
-                                                <strong>{item['isShare'] ? '是' : '否'}</strong>
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label={<div><SafetyCertificateOutlined/> 是否默认</div>}>
-                                                <strong>{item['isDefault'] ? '是' : '否'}</strong>
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label={<div><FireOutlined/> 大小限制</div>}>
-                                                <strong>{item['limitSize'] < 0 ? '无限制' : renderSize(item['limitSize'])}</strong>
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label={<div><HeartOutlined/> 已用大小</div>}>
-                                                <strong>{renderSize(item['usedSize'])}</strong>
-                                            </Descriptions.Item>
-                                            <Descriptions.Item label={<div><UserOutlined/> 所属用户</div>}>
-                                                <strong>{item['ownerName']}</strong>
-                                            </Descriptions.Item>
-                                        </Descriptions>
-                                    </Card>
-                                </List.Item>
-                            )
+        }, {
+            title: '大小限制',
+            dataIndex: 'limitSize',
+            key: 'limitSize',
+            hideInSearch: true,
+            render: (text => {
+                return text < 0 ? '无限制' : renderSize(text);
+            })
+        }, {
+            title: '已用大小',
+            dataIndex: 'usedSize',
+            key: 'usedSize',
+            hideInSearch: true,
+            render: (text => {
+                return renderSize(text);
+            })
+        }, {
+            title: '所属用户',
+            dataIndex: 'ownerName',
+            key: 'ownerName',
+            hideInSearch: true,
+        },
+        {
+            title: '操作',
+            valueType: 'option',
+            key: 'option',
+            render: (text, record, _, action) => [
+                <Show menu={'storage-browse'} key={'storage-browse'}>
+                    <a
+                        key="edit"
+                        onClick={() => {
+                            setFileSystemVisible(true);
+                            setSelectedRowKey(record['id']);
                         }}
-                    />
-                </div>
+                    >
+                        浏览
+                    </a>
+                </Show>,
+                <Show menu={'storage-edit'} key={'storage-edit'}>
+                    <a
+                        key="edit"
+                        onClick={() => {
+                            setVisible(true);
+                            setSelectedRowKey(record['id']);
+                        }}
+                    >
+                        编辑
+                    </a>
+                </Show>,
+                <Show menu={'storage-del'} key={'storage-del'}>
+                    <Popconfirm
+                        key={'confirm-delete'}
+                        title="您确认要删除此行吗?"
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current.reload();
+                        }}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <a key='delete' disabled={record['isDefault']} className='danger'>删除</a>
+                    </Popconfirm>
+                </Show>,
+            ],
+        },
+    ];
+
+    return (
+        <div>
+            <Content className="page-container">
+                <ProTable
+                    columns={columns}
+                    actionRef={actionRef}
+                    columnsState={{
+                        value: columnsStateMap,
+                        onChange: setColumnsStateMap
+                    }}
+                    request={async (params = {}, sort, filter) => {
+
+                        let field = '';
+                        let order = '';
+                        if (Object.keys(sort).length > 0) {
+                            field = Object.keys(sort)[0];
+                            order = Object.values(sort)[0];
+                        }
+
+                        let queryParams = {
+                            pageIndex: params.current,
+                            pageSize: params.pageSize,
+                            name: params.name,
+                            field: field,
+                            order: order
+                        }
+                        let result = await api.getPaging(queryParams);
+                        return {
+                            data: result['items'],
+                            success: true,
+                            total: result['total']
+                        };
+                    }}
+                    rowKey="id"
+                    search={{
+                        labelWidth: 'auto',
+                    }}
+                    pagination={{
+                        pageSize: 10,
+                    }}
+                    dateFormatter="string"
+                    headerTitle="磁盘空间列表"
+                    toolBarRender={() => [
+                        <Show menu={'storage-add'}>
+                            <Button key="button" type="primary" onClick={() => {
+                                setVisible(true)
+                            }}>
+                                新建
+                            </Button>
+                        </Show>,
+                    ]}
+                />
+
+                <StorageModal
+                    id={selectedRowKey}
+                    visible={visible}
+                    confirmLoading={confirmLoading}
+                    handleCancel={() => {
+                        setVisible(false);
+                        setSelectedRowKey(undefined);
+                    }}
+                    handleOk={async (values) => {
+                        setConfirmLoading(true);
+
+                        try {
+                            let success;
+                            if (values['id']) {
+                                success = await api.updateById(values['id'], values);
+                            } else {
+                                success = await api.create(values);
+                            }
+                            if (success) {
+                                setVisible(false);
+                            }
+                            actionRef.current.reload();
+                        } finally {
+                            setConfirmLoading(false);
+                        }
+                    }}
+                />
 
                 <Drawer
                     title={'文件管理'}
@@ -304,45 +211,29 @@ class Storage extends Component {
                     closable={true}
                     maskClosable={true}
                     onClose={() => {
-                        this.setState({
-                            fileSystemVisible: false
-                        });
-                        this.loadTableData(this.state.queryParams);
+                        setFileSystemVisible(false);
+                        setSelectedRowKey(undefined);
+                        actionRef.current.reload();
                     }}
-                    visible={this.state.fileSystemVisible}
+                    visible={fileSystemVisible}
                 >
-                    <FileSystem
-                        storageId={this.state.storageId}
-                        storageType={'storages'}
-                        onRef={this.onRef}
-                        upload={true}
-                        download={true}
-                        delete={true}
-                        rename={true}
-                        edit={true}
-                        minHeight={window.innerHeight - 103}/>
-                </Drawer>
+                    {fileSystemVisible ?
+                        <FileSystem
+                            storageId={selectedRowKey}
+                            storageType={'storages'}
+                            upload={true}
+                            download={true}
+                            delete={true}
+                            rename={true}
+                            edit={true}
+                            minHeight={window.innerHeight - 103}/>
+                        : undefined
+                    }
 
-                {
-                    this.state.modalVisible ?
-                        <StorageModal
-                            visible={this.state.modalVisible}
-                            title={this.state.modalTitle}
-                            handleOk={this.handleOk}
-                            handleCancel={() => {
-                                this.setState({
-                                    modalTitle: '',
-                                    modalVisible: false
-                                });
-                            }}
-                            confirmLoading={this.state.modalConfirmLoading}
-                            model={this.state.model}
-                        >
-                        </StorageModal> : undefined
-                }
-            </div>
-        );
-    }
+                </Drawer>
+            </Content>
+        </div>
+    );
 }
 
 export default Storage;

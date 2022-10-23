@@ -1,14 +1,12 @@
 package session
 
 import (
+	"next-terminal/server/common/guacamole"
+	"next-terminal/server/common/term"
 	"sync"
 
-	"next-terminal/server/dto"
-	"next-terminal/server/guacd"
-	"next-terminal/server/log"
-	"next-terminal/server/term"
-
 	"github.com/gorilla/websocket"
+	"next-terminal/server/dto"
 )
 
 type Session struct {
@@ -16,10 +14,13 @@ type Session struct {
 	Protocol     string
 	Mode         string
 	WebSocket    *websocket.Conn
-	GuacdTunnel  *guacd.Tunnel
+	GuacdTunnel  *guacamole.Tunnel
 	NextTerminal *term.NextTerminal
 	Observer     *Manager
 	mutex        sync.Mutex
+
+	Uptime   int64
+	Hostname string
 }
 
 func (s *Session) WriteMessage(msg dto.Message) error {
@@ -79,7 +80,6 @@ func (m *Manager) GetById(id string) *Session {
 
 func (m *Manager) Add(s *Session) {
 	m.sessions.Store(s.ID, s)
-	log.Infof("add session: %s", s.ID)
 }
 
 func (m *Manager) Del(id string) {
@@ -91,7 +91,6 @@ func (m *Manager) Del(id string) {
 		}
 	}
 	m.sessions.Delete(id)
-	log.Infof("del session: %s", id)
 }
 
 func (m *Manager) Clear() {

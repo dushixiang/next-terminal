@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"next-terminal/server/common/term"
 	"os"
 	"sync"
 
-	"next-terminal/server/term"
 	"next-terminal/server/utils"
 
 	"golang.org/x/crypto/ssh"
@@ -90,7 +90,9 @@ func (g *Gateway) CloseSshTunnel(id string) {
 	}
 
 	if len(g.tunnels) == 0 {
-		_ = g.SshClient.Close()
+		if g.SshClient != nil {
+			_ = g.SshClient.Close()
+		}
 		g.Connected = false
 		g.Message = "暂未使用"
 	}

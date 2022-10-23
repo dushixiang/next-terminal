@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"next-terminal/server/common"
+	"next-terminal/server/common/nt"
+	"next-terminal/server/common/term"
 	"strings"
 	"time"
 
-	"next-terminal/server/constant"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
-	"next-terminal/server/term"
 	"next-terminal/server/utils"
 
 	"gorm.io/gorm"
@@ -35,7 +36,7 @@ func (r ShellJob) Run() {
 	}
 
 	var assets []model.Asset
-	if r.Mode == constant.JobModeAll {
+	if r.Mode == nt.JobModeAll {
 		assets, _ = repository.AssetRepository.FindByProtocol(context.TODO(), "ssh")
 	} else {
 		assets, _ = repository.AssetRepository.FindByProtocolAndIds(context.TODO(), "ssh", strings.Split(r.ResourceIds, ","))
@@ -48,7 +49,7 @@ func (r ShellJob) Run() {
 	var metadataShell MetadataShell
 	err := json.Unmarshal([]byte(r.Metadata), &metadataShell)
 	if err != nil {
-		log.Errorf("JSON数据解析失败 %v", err)
+		log.Error("JSON数据解析失败", log.String("err", err.Error()))
 		return
 	}
 
@@ -76,7 +77,7 @@ func (r ShellJob) Run() {
 				return
 			}
 
-			if credential.Type == constant.Custom {
+			if credential.Type == nt.Custom {
 				username = credential.Username
 				password = credential.Password
 			} else {
@@ -97,10 +98,10 @@ func (r ShellJob) Run() {
 				} else {
 					msg = fmt.Sprintf("资产「%v」Shell执行失败，错误内容为：「%v」，耗时「%v」", asset.Name, err.Error(), elapsed)
 				}
-				log.Infof(msg)
+				log.Debug(msg)
 			} else {
 				msg = fmt.Sprintf("资产「%v」Shell执行成功，返回值「%v」，耗时「%v」", asset.Name, result, elapsed)
-				log.Infof(msg)
+				log.Debug(msg)
 			}
 
 			msgChan <- msg
@@ -116,7 +117,7 @@ func (r ShellJob) Run() {
 	jobLog := model.JobLog{
 		ID:        utils.UUID(),
 		JobId:     r.ID,
-		Timestamp: utils.NowJsonTime(),
+		Timestamp: common.NowJsonTime(),
 		Message:   message,
 	}
 

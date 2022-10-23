@@ -3,7 +3,8 @@ package service
 import (
 	"context"
 
-	"next-terminal/server/constant"
+	"next-terminal/server/common"
+	"next-terminal/server/common/nt"
 	"next-terminal/server/env"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
@@ -11,6 +12,8 @@ import (
 
 	"gorm.io/gorm"
 )
+
+var UserGroupService = new(userGroupService)
 
 type userGroupService struct {
 	baseService
@@ -28,7 +31,7 @@ func (service userGroupService) DeleteById(userGroupId string) error {
 			return err
 		}
 		// 删除用户组与资产的关系
-		if err := repository.ResourceSharerRepository.DeleteByUserGroupId(c, userGroupId); err != nil {
+		if err := repository.AuthorisedRepository.DeleteByUserGroupId(c, userGroupId); err != nil {
 			return err
 		}
 		return nil
@@ -42,43 +45,34 @@ func (service userGroupService) Create(ctx context.Context, name string, members
 	}
 
 	if exist {
-		return model.UserGroup{}, constant.ErrNameAlreadyUsed
+		return model.UserGroup{}, nt.ErrNameAlreadyUsed
 	}
 
 	userGroupId := utils.UUID()
 	userGroup := model.UserGroup{
 		ID:      userGroupId,
-		Created: utils.NowJsonTime(),
+		Created: common.NowJsonTime(),
 		Name:    name,
 	}
 
-	if service.InTransaction(ctx) {
-		return userGroup, service.create(ctx, userGroup, members, userGroupId)
-	} else {
-		return userGroup, env.GetDB().Transaction(func(tx *gorm.DB) error {
-			c := service.Context(tx)
-			return service.create(c, userGroup, members, userGroupId)
-		})
-	}
-}
-
-func (service userGroupService) create(c context.Context, userGroup model.UserGroup, members []string, userGroupId string) error {
-	if err := repository.UserGroupRepository.Create(c, &userGroup); err != nil {
-		return err
-	}
-	if len(members) > 0 {
-		for _, member := range members {
-			userGroupMember := model.UserGroupMember{
-				ID:          utils.Sign([]string{userGroupId, member}),
-				UserId:      member,
-				UserGroupId: userGroupId,
-			}
-			if err := repository.UserGroupMemberRepository.Create(c, &userGroupMember); err != nil {
-				return err
+	return userGroup, service.Transaction(ctx, func(ctx context.Context) error {
+		if err := repository.UserGroupRepository.Create(ctx, &userGroup); err != nil {
+			return err
+		}
+		if len(members) > 0 {
+			for _, member := range members {
+				userGroupMember := model.UserGroupMember{
+					ID:          utils.Sign([]string{userGroupId, member}),
+					UserId:      member,
+					UserGroupId: userGroupId,
+				}
+				if err := repository.UserGroupMemberRepository.Create(ctx, &userGroupMember); err != nil {
+					return err
+				}
 			}
 		}
-	}
-	return nil
+		return nil
+	})
 }
 
 func (service userGroupService) Update(userGroupId string, name string, members []string) (err error) {
@@ -94,7 +88,7 @@ func (service userGroupService) Update(userGroupId string, name string, members 
 		}
 
 		if exist {
-			return constant.ErrNameAlreadyUsed
+			return nt.ErrNameAlreadyUsed
 		}
 	}
 

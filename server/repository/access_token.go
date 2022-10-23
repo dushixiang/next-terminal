@@ -6,6 +6,8 @@ import (
 	"next-terminal/server/model"
 )
 
+var AccessTokenRepository = new(accessTokenRepository)
+
 type accessTokenRepository struct {
 	baseRepository
 }

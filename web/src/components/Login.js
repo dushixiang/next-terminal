@@ -1,162 +1,124 @@
-import React, {Component} from 'react';
-import {Button, Card, Checkbox, Form, Input, Modal, Typography} from "antd";
+import React, {useEffect, useState} from 'react';
+import {Button, Card, Checkbox, Form, Input, message, Modal, Typography} from "antd";
 import './Login.css'
 import request from "../common/request";
-import {message} from "antd/es";
-import {withRouter} from "react-router-dom";
-import {LockOutlined, OneToOneOutlined, UserOutlined} from '@ant-design/icons';
-import Background  from '../images/bg.jpg'
+import {LockOutlined, LockTwoTone, UserOutlined} from '@ant-design/icons';
 import {setToken} from "../utils/utils";
+import accountApi from "../api/account";
+import brandingApi from "../api/branding";
+import strings from "../utils/strings";
 
 const {Title} = Typography;
 
-class LoginForm extends Component {
+const LoginForm = () => {
 
-    formRef = React.createRef();
-    totpInputRef = React.createRef();
+    let [inLogin, setInLogin] = useState(false);
+    let [branding, setBranding] = useState({});
 
-    state = {
-        inLogin: false,
-        height: window.innerHeight,
-        width: window.innerWidth,
-        loginAccount: undefined,
-        totpModalVisible: false,
-        confirmLoading: false
-    };
+    useEffect(() => {
+        const x = async () => {
+            let branding = await brandingApi.getBranding();
+            document.title = branding['name'];
+            setBranding(branding);
+        }
+        x();
+    }, []);
 
-    componentDidMount() {
-        window.addEventListener('resize', () => {
-            this.setState({
-                height: window.innerHeight,
-                width: window.innerWidth
-            })
+    const afterLoginSuccess = async (token) => {
+        // 跳转登录
+        sessionStorage.removeItem('current');
+        sessionStorage.removeItem('openKeys');
+        setToken(token);
+
+        let user = await accountApi.getUserInfo();
+        if (user) {
+            if (user['type'] === 'user') {
+                window.location.href = "/my-asset"
+            } else {
+                window.location.href = "/"
+            }
+        }
+    }
+
+    const login = async (values) => {
+        let result = await request.post('/login', values);
+        if (result['code'] === 1) {
+            Modal.destroyAll();
+            await afterLoginSuccess(result['data']);
+        }
+    }
+
+    const handleOk = (loginAccount, totp) => {
+        if (!strings.hasText(totp)) {
+            message.warn("请输入双因素认证码");
+            return false;
+        }
+        loginAccount['totp'] = totp;
+        login(loginAccount);
+        return false;
+    }
+
+    const showTOTP = (loginAccount) => {
+        let value = '';
+        Modal.confirm({
+            title: '双因素认证',
+            icon: <LockTwoTone/>,
+            content: <Input onChange={e => value = e.target.value} onPressEnter={() => handleOk(loginAccount, value)}
+                            placeholder="请输入双因素认证码"/>,
+            onOk: () => handleOk(loginAccount, value),
         });
     }
 
-    handleSubmit = async params => {
-        this.setState({
-            inLogin: true
-        });
+    const handleSubmit = async params => {
+        setInLogin(true);
 
         try {
             let result = await request.post('/login', params);
-
-            if (result.code === 0) {
-                // 进行双因子认证
-                this.setState({
-                    loginAccount: params,
-                    totpModalVisible: true
-                })
-
-                this.totpInputRef.current.focus();
+            if (result.code === 100) {
+                // 进行双因素认证
+                showTOTP(params);
                 return;
             }
             if (result.code !== 1) {
-                throw new Error(result.message);
-            }
-
-            // 跳转登录
-            sessionStorage.removeItem('current');
-            sessionStorage.removeItem('openKeys');
-            setToken(result['data']);
-            // this.props.history.push();
-            window.location.href = "/"
-        } catch (e) {
-            message.error(e.message);
-        } finally {
-            this.setState({
-                inLogin: false
-            });
-        }
-    };
-
-    handleOk = async (values) => {
-        this.setState({
-            confirmLoading: true
-        })
-        let loginAccount = this.state.loginAccount;
-        loginAccount['totp'] = values['totp'];
-        try {
-            let result = await request.post('/loginWithTotp', loginAccount);
-
-            if (result['code'] !== 1) {
-                message.error(result['message']);
                 return;
             }
 
-            // 跳转登录
-            sessionStorage.removeItem('current');
-            sessionStorage.removeItem('openKeys');
-            setToken(result['data']);
-            // this.props.history.push();
-            window.location.href = "/"
+            afterLoginSuccess(result['data']);
         } catch (e) {
             message.error(e.message);
         } finally {
-            this.setState({
-                confirmLoading: false
-            });
+            setInLogin(false);
         }
-    }
+    };
 
-    handleCancel = () => {
-        this.setState({
-            totpModalVisible: false
-        })
-    }
+    return (
+        <div style={{width: '100vw', height: '100vh', backgroundColor: '#fafafa'}}>
+            <Card className='login-card' title={null}>
+                <div style={{textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff'}}>
+                    <Title level={1}>{branding['name']}</Title>
+                    {/*<Text>一个轻量级的堡垒机系统</Text>*/}
+                </div>
+                <Form onFinish={handleSubmit} className="login-form">
+                    <Form.Item name='username' rules={[{required: true, message: '请输入登录账号！'}]}>
+                        <Input prefix={<UserOutlined/>} placeholder="登录账号"/>
+                    </Form.Item>
+                    <Form.Item name='password' rules={[{required: true, message: '请输入登录密码！'}]}>
+                        <Input.Password prefix={<LockOutlined/>} placeholder="登录密码"/>
+                    </Form.Item>
+                    <Form.Item name='remember' valuePropName='checked' initialValue={false}>
+                        <Checkbox>保持登录</Checkbox>
+                    </Form.Item>
+                    <Form.Item>
+                        <Button type="primary" htmlType="submit" className="login-form-button"
+                                loading={inLogin}>
+                            登录
+                        </Button>
+                    </Form.Item>
+                </Form>
+            </Card>
+        </div>
 
-    render() {
-        return (
-            <div className='login-bg'
-                 style={{width: this.state.width, height: this.state.height, background: `url(${Background})`}}>
-                <Card className='login-card' title={null}>
-                    <div style={{textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff'}}>
-                        <Title level={1}>Next Terminal</Title>
-                    </div>
-                    <Form onFinish={this.handleSubmit} className="login-form">
-                        <Form.Item name='username' rules={[{required: true, message: '请输入登录账号！'}]}>
-                            <Input prefix={<UserOutlined/>} placeholder="登录账号"/>
-                        </Form.Item>
-                        <Form.Item name='password' rules={[{required: true, message: '请输入登录密码！'}]}>
-                            <Input.Password prefix={<LockOutlined/>} placeholder="登录密码"/>
-                        </Form.Item>
-                        <Form.Item name='remember' valuePropName='checked' initialValue={false}>
-                            <Checkbox>记住登录</Checkbox>
-                        </Form.Item>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit" className="login-form-button"
-                                    loading={this.state.inLogin}>
-                                登录
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </Card>
-
-                <Modal title="双因素认证" visible={this.state.totpModalVisible} confirmLoading={this.state.confirmLoading}
-                       maskClosable={false}
-
-                       okButtonProps={{form:'totp-form', key: 'submit', htmlType: 'submit'}}
-                       onOk={() => {
-                           this.formRef.current
-                               .validateFields()
-                               .then(values => {
-                                   this.handleOk(values);
-                                   // this.formRef.current.resetFields();
-                               });
-                       }}
-                       onCancel={this.handleCancel}>
-
-                    <Form id='totp-form' ref={this.formRef}>
-
-                        <Form.Item name='totp' rules={[{required: true, message: '请输入双因素认证APP中显示的授权码'}]}>
-                            <Input ref={this.totpInputRef} prefix={<OneToOneOutlined/>} placeholder="请输入双因素认证APP中显示的授权码"/>
-                        </Form.Item>
-                    </Form>
-                </Modal>
-            </div>
-
-        );
-    }
+    );
 }
 
-export default withRouter(LoginForm);
+export default LoginForm;
