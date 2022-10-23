@@ -108,9 +108,7 @@ func SetupConfig() (*Config, error) {
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
 		return nil, err
 	}
-	if err := viper.ReadInConfig(); err != nil {
-		return nil, err
-	}
+	_ = viper.ReadInConfig()
 
 	sshdKey, err := homedir.Expand(viper.GetString("sshd.key"))
 	if err != nil {

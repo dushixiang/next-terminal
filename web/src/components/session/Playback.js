@@ -1,9 +1,8 @@
 import React, {Component} from 'react';
 import Guacamole from "guacamole-common-js";
 import {server} from "../../common/env";
-import {Button, Col, Row, Select, Slider, Typography} from "antd";
+import {Button, Col, Row, Select, Slider, Tooltip, Typography} from "antd";
 import {PauseCircleOutlined, PlayCircleOutlined} from '@ant-design/icons';
-import {Tooltip} from "antd/lib/index";
 import {getToken} from "../../utils/utils";
 
 const {Text} = Typography;
@@ -148,6 +147,9 @@ class Playback extends Component {
             recording: recording
         }, () => {
             this.handlePlayPause();
+            this.handlePlayPause();
+            this.handlePlayPause();
+            console.log('播放')
         });
     }
 

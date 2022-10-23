@@ -1,462 +1,121 @@
-import React, {Component} from 'react';
+import React, {useState} from 'react';
 
 import {
-    Alert,
     Badge,
     Button,
-    Col,
-    Divider,
-    Dropdown,
-    Form,
-    Input,
     Layout,
-    Menu,
     Modal,
     notification,
-    Row,
+    Popconfirm,
+    Popover,
     Select,
-    Space,
     Table,
     Tag,
     Tooltip,
-    Typography
+    Upload
 } from "antd";
-import qs from "qs";
-import AssetModal from "./AssetModal";
-import request from "../../common/request";
-import {message} from "antd/es";
-import {getHeaders, isEmpty} from "../../utils/utils";
-import dayjs from 'dayjs';
-import {
-    DeleteOutlined,
-    DownOutlined,
-    ExclamationCircleOutlined,
-    ImportOutlined,
-    PlusOutlined,
-    SyncOutlined,
-    UndoOutlined,
-    UploadOutlined
-} from '@ant-design/icons';
+import {Link} from "react-router-dom";
+import {ProTable, TableDropdown} from "@ant-design/pro-components";
+import assetApi from "../../api/asset";
+import tagApi from "../../api/tag";
 import {PROTOCOL_COLORS} from "../../common/constants";
+import strings from "../../utils/strings";
+import AssetModal from "./AssetModal";
+import ColumnState, {useColumnState} from "../../hook/column-state";
+import {useQuery} from "react-query";
+import Show from "../../dd/fi/show";
+import {hasMenu} from "../../service/permission";
+import ChangeOwner from "./ChangeOwner";
 
-import {hasPermission} from "../../service/permission";
-import Upload from "antd/es/upload";
-import axios from "axios";
-import {server} from "../../common/env";
-
-
-const confirm = Modal.confirm;
-const {Search} = Input;
+const api = assetApi;
 const {Content} = Layout;
-const {Title, Text} = Typography;
 
-class Asset extends Component {
+const actionRef = React.createRef();
 
-    inputRefOfName = React.createRef();
-    inputRefOfIp = React.createRef();
-    changeOwnerFormRef = React.createRef();
+function downloadImportExampleCsv() {
+    let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description,tag1|tag2|tag3';
+    //前置的"\uFEFF"为“零宽不换行空格”，可处理中文乱码问题
+    const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
+    let a = document.createElement('a');
+    a.download = 'sample.csv';
+    a.href = URL.createObjectURL(blob);
+    a.click();
+}
 
-    state = {
-        items: [],
-        total: 0,
-        queryParams: {
-            pageIndex: 1,
-            pageSize: 10,
-            protocol: '',
-            tags: ''
+const importExampleContent = <>
+    <a onClick={downloadImportExampleCsv}>下载示例</a>
+</>
+
+const Asset = () => {
+    let [visible, setVisible] = useState(false);
+    let [confirmLoading, setConfirmLoading] = useState(false);
+    let [selectedRowKey, setSelectedRowKey] = useState(undefined);
+    let [items, setItems] = useState([]);
+    let [selectedRowKeys, setSelectedRowKeys] = useState([]);
+    let [copied, setCopied] = useState(false);
+
+    let [selectedRow, setSelectedRow] = useState(undefined);
+    let [changeOwnerVisible, setChangeOwnerVisible] = useState(false);
+
+    const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.ASSET);
+
+    const tagQuery = useQuery('getAllTag', tagApi.getAll);
+
+    const columns = [
+        {
+            dataIndex: 'index',
+            valueType: 'indexBorder',
+            width: 48,
         },
-        loading: false,
-        modalVisible: false,
-        modalTitle: '',
-        modalConfirmLoading: false,
-        credentials: [],
-        tags: [],
-        selectedTags: [],
-        model: {},
-        selectedRowKeys: [],
-        delBtnLoading: false,
-        changeOwnerModalVisible: false,
-        changeOwnerConfirmLoading: false,
-        users: [],
-        selected: {},
-        selectedSharers: [],
-        importModalVisible: false,
-        fileList: [],
-        uploading: false,
-    };
-
-    async componentDidMount() {
-
-        this.loadTableData();
-
-        let result = await request.get('/tags');
-        if (result['code'] === 1) {
-            this.setState({
-                tags: result['data']
-            })
-        }
-    }
-
-    async delete(id) {
-        const result = await request.delete('/assets/' + id);
-        if (result['code'] === 1) {
-            message.success('删除成功');
-            await this.loadTableData(this.state.queryParams);
-        } else {
-            message.error(result.message, 10);
-        }
-
-    }
-
-    async loadTableData(queryParams) {
-        this.setState({
-            loading: true
-        });
-
-        queryParams = queryParams || this.state.queryParams;
-
-        // queryParams
-        let paramsStr = qs.stringify(queryParams);
-
-        let data = {
-            items: [],
-            total: 0
-        };
-
-        try {
-            let result = await request.get('/assets/paging?' + paramsStr);
-            if (result['code'] === 1) {
-                data = result['data'];
-            } else {
-                message.error(result['message']);
-            }
-        } catch (e) {
-
-        } finally {
-            const items = data.items.map(item => {
-                return {'key': item['id'], ...item}
-            })
-            this.setState({
-                items: items,
-                total: data.total,
-                queryParams: queryParams,
-                loading: false
-            });
-        }
-    }
-
-    handleChangPage = async (pageIndex, pageSize) => {
-        let queryParams = this.state.queryParams;
-        queryParams.pageIndex = pageIndex;
-        queryParams.pageSize = pageSize;
-
-        this.setState({
-            queryParams: queryParams
-        });
-
-        await this.loadTableData(queryParams)
-    };
-
-    handleSearchByName = name => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'name': name,
-        }
-
-        this.loadTableData(query);
-    };
-
-    handleSearchByIp = ip => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'ip': ip,
-        }
-
-        this.loadTableData(query);
-    };
-
-    handleTagsChange = tags => {
-        this.setState({
-            selectedTags: tags
-        })
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'tags': tags.join(','),
-        }
-
-        this.loadTableData(query);
-    }
-
-    handleSearchByProtocol = protocol => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'protocol': protocol,
-        }
-        this.loadTableData(query);
-    }
-
-    showDeleteConfirm(id, content) {
-        let self = this;
-        confirm({
-            title: '您确定要删除此资产吗?',
-            content: content,
-            okText: '确定',
-            okType: 'danger',
-            cancelText: '取消',
-            onOk() {
-                self.delete(id);
-            }
-        });
-    };
-
-    async update(id) {
-        let result = await request.get(`/assets/${id}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-        await this.showModal('更新资产', result.data);
-    }
-
-    async copy(id) {
-        let result = await request.get(`/assets/${id}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-        result.data['id'] = undefined;
-        await this.showModal('复制资产', result.data);
-    }
-
-    async connTest(id) {
-        message.info({content: '正在测试中...', key: id, duration: 5});
-        let result = await request.post(`/assets/${id}/tcping`);
-        if (result.code !== 1) {
-            message.error({content: result.message, key: id, duration: 10});
-            return;
-        }
-        if (result['data']['active'] === true) {
-            message.success({content: '连通性测试完成，当前资产在线。', key: id, duration: 3});
-        } else {
-            message.warning({content: `连通性测试完成，当前资产离线，原因: ${result['data']['message']}。`, key: id, duration: 10});
-        }
-        this.loadTableData(this.state.queryParams);
-    }
-
-    async showModal(title, asset = {}) {
-        // 并行请求
-        let getCredentials = request.get('/credentials');
-        let getTags = request.get('/tags');
-
-        let credentials = [];
-        let tags = [];
-
-        let r1 = await getCredentials;
-        let r2 = await getTags;
-
-        if (r1['code'] === 1) {
-            credentials = r1['data'];
-        }
-
-        if (r2['code'] === 1) {
-            tags = r2['data'];
-        }
-
-        if (asset['tags'] && typeof (asset['tags']) === 'string') {
-            if (asset['tags'] === '' || asset['tags'] === '-') {
-                asset['tags'] = [];
-            } else {
-                asset['tags'] = asset['tags'].split(',');
-            }
-        } else {
-            asset['tags'] = [];
-        }
-
-        asset['use-ssl'] = asset['use-ssl'] === 'true';
-        asset['ignore-cert'] = asset['ignore-cert'] === 'true';
-        asset['enable-drive'] = asset['enable-drive'] === 'true';
-        asset['socks-proxy-enable'] = asset['socks-proxy-enable'] === 'true';
-        asset['force-lossless'] = asset['force-lossless'] === 'true';
-
-        this.setState({
-            modalTitle: title,
-            modalVisible: true,
-            credentials: credentials,
-            tags: tags,
-            model: asset
-        });
-    };
-
-    handleCancelModal = e => {
-        this.setState({
-            modalTitle: '',
-            modalVisible: false
-        });
-    };
-
-    handleOk = async (formData) => {
-        // 弹窗 form 传来的数据
-        this.setState({
-            modalConfirmLoading: true
-        });
-
-        if (formData['tags']) {
-            formData.tags = formData['tags'].join(',');
-        }
-
-        if (formData['accessGatewayId'] === undefined) {
-            formData['accessGatewayId'] = "-"
-        }
-
-        if (formData.id) {
-            // 向后台提交数据
-            const result = await request.put('/assets/' + formData.id, formData);
-            if (result.code === 1) {
-                message.success('操作成功', 3);
-
-                this.setState({
-                    modalVisible: false
-                });
-                await this.loadTableData(this.state.queryParams);
-            } else {
-                message.error(result.message, 10);
-            }
-        } else {
-            // 向后台提交数据
-            const result = await request.post('/assets', formData);
-            if (result.code === 1) {
-                message.success('操作成功', 3);
-
-                this.setState({
-                    modalVisible: false
-                });
-                await this.loadTableData(this.state.queryParams);
-            } else {
-                message.error(result.message, 10);
-            }
-        }
-
-        this.setState({
-            modalConfirmLoading: false
-        });
-    };
-
-    batchDelete = async () => {
-        this.setState({
-            delBtnLoading: true
-        })
-        try {
-            let result = await request.delete('/assets/' + this.state.selectedRowKeys.join(','));
-            if (result.code === 1) {
-                message.success('操作成功', 3);
-                this.setState({
-                    selectedRowKeys: []
-                })
-                await this.loadTableData(this.state.queryParams);
-            } else {
-                message.error(result.message, 10);
-            }
-        } finally {
-            this.setState({
-                delBtnLoading: false
-            })
-        }
-    }
-
-    handleSearchByNickname = async nickname => {
-        const result = await request.get(`/users/paging?pageIndex=1&pageSize=100&nickname=${nickname}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-
-        const items = result['data']['items'].map(item => {
-            return {'key': item['id'], ...item}
-        })
-
-        this.setState({
-            users: items
-        })
-    }
-
-    handleCancelUpdateAttr = () => {
-        this.setState({
-            attrVisible: false,
-            selected: {},
-            attributes: {}
-        });
-    }
-
-    handleTableChange = (pagination, filters, sorter) => {
-        let query = {
-            ...this.state.queryParams,
-            'order': sorter.order,
-            'field': sorter.field
-        }
-
-        this.loadTableData(query);
-    }
-
-    render() {
-
-        const columns = [{
-            title: '序号',
-            dataIndex: 'id',
-            key: 'id',
-            render: (id, record, index) => {
-                return index + 1;
-            }
-        }, {
-            title: '资产名称',
+        {
+            title: '名称',
             dataIndex: 'name',
-            key: 'name',
-            render: (name, record) => {
-                let short = name;
-                if (short && short.length > 15) {
-                    short = short.substring(0, 15) + " ...";
+            render: (text, record) => {
+                if (record['description'] === '-') {
+                    record['description'] = '';
                 }
 
-                if (hasPermission(record['owner'])) {
-                    return (
-                        <Button type="link" size='small' onClick={() => this.update(record.id)}>
-                            <Tooltip placement="topLeft" title={name}>
-                                {short}
-                            </Tooltip>
-                        </Button>
-                    );
-                } else {
-                    return (
-                        <Tooltip placement="topLeft" title={name}>
-                            {short}
-                        </Tooltip>
-                    );
+                let view = <div>{text}</div>;
+                if (hasMenu('asset-detail')) {
+                    view = <Link to={`/asset/${record['id']}`}>{text}</Link>;
                 }
+                return <div>
+                    {view}
+                    <div style={{
+                        color: 'rgba(0, 0, 0, 0.45)',
+                        lineHeight: 1.45,
+                        fontSize: '14px'
+                    }}>{record['description']}</div>
+                </div>
             },
-            sorter: true,
         }, {
             title: '协议',
             dataIndex: 'protocol',
             key: 'protocol',
             render: (text, record) => {
-                const title = `${record['ip'] + ':' + record['port']}`
                 return (
-                    <Tooltip title={title}>
-                        <Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>
-                    </Tooltip>
+                    <Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>
                 )
-            }
+            },
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select>
+                        <Select.Option value="rdp">RDP</Select.Option>
+                        <Select.Option value="ssh">SSH</Select.Option>
+                        <Select.Option value="telnet">Telnet</Select.Option>
+                        <Select.Option value="kubernetes">Kubernetes</Select.Option>
+                    </Select>
+                );
+            },
         }, {
             title: '网络',
             dataIndex: 'network',
             key: 'network',
+            hideInSearch: true,
             render: (text, record) => {
                 return `${record['ip'] + ':' + record['port']}`;
             }
@@ -465,449 +124,363 @@ class Asset extends Component {
             dataIndex: 'tags',
             key: 'tags',
             render: tags => {
-                if (!isEmpty(tags)) {
-                    return this.renderTags(tags);
+                if (strings.hasText(tags)) {
+                    return tags.split(',').filter(tag => tag !== '-').map(tag => <Tag key={tag}>{tag}</Tag>);
                 }
-            }
+            },
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select mode="multiple"
+                            allowClear>
+                        {
+                            tagQuery.data?.map(tag => {
+                                if (tag === '-') {
+                                    return undefined;
+                                }
+                                return <Select.Option key={tag}>{tag}</Select.Option>
+                            })
+                        }
+                    </Select>
+                );
+            },
         }, {
             title: '状态',
             dataIndex: 'active',
             key: 'active',
-            render: text => {
+            render: (text, record) => {
+                if (record['testing'] === true) {
+                    return (
+                        <Tooltip title='测试中'>
+                            <Badge status="processing" text='测试中'/>
+                        </Tooltip>
+                    )
+                }
                 if (text) {
                     return (
                         <Tooltip title='运行中'>
-                            <Badge status="processing" text='运行中'/>
+                            <Badge status="success" text='运行中'/>
                         </Tooltip>
                     )
                 } else {
                     return (
-                        <Tooltip title='不可用'>
+                        <Tooltip title={record['activeMessage']}>
                             <Badge status="error" text='不可用'/>
                         </Tooltip>
                     )
                 }
-            }
+            },
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select>
+                        <Select.Option value="true">运行中</Select.Option>
+                        <Select.Option value="false">不可用</Select.Option>
+                    </Select>
+                );
+            },
         }, {
             title: '所有者',
             dataIndex: 'ownerName',
-            key: 'ownerName'
-        }, {
-            title: '创建日期',
-            dataIndex: 'created',
-            key: 'created',
-            render: (text, record) => {
-                return (
-                    <Tooltip title={text}>
-                        {dayjs(text).fromNow()}
-                    </Tooltip>
-                )
-            },
-            sorter: true,
+            key: 'ownerName',
+            hideInSearch: true,
         },
-            {
-                title: '操作',
-                key: 'action',
-                render: (text, record) => {
+        {
+            title: '创建时间',
+            key: 'created',
+            dataIndex: 'created',
+            hideInSearch: true,
+        },
+        {
+            title: '操作',
+            valueType: 'option',
+            key: 'option',
+            render: (text, record, index, action) => {
+                const id = record['id'];
+                const protocol = record['protocol'];
+                const name = record['name'];
+                let url = '';
+                if (protocol === 'ssh') {
+                    url = `#/term?assetId=${id}&assetName=${name}`;
+                } else {
+                    url = `#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`;
+                }
 
-                    const menu = (
-                        <Menu>
-                            <Menu.Item key="1">
-                                <Button type="text" size='small'
-                                        onClick={() => this.update(record.id)}>编辑</Button>
-                            </Menu.Item>
-
-                            <Menu.Item key="2">
-                                <Button type="text" size='small'
-                                        onClick={() => this.copy(record.id)}>复制</Button>
-                            </Menu.Item>
-                            <Menu.Item key="3">
-                                <Button type="text" size='small'
-                                        onClick={() => this.connTest(record.id)}>连通性测试</Button>
-                            </Menu.Item>
-                            <Menu.Item key="4">
-                                <Button type="text" size='small'
-                                        disabled={!hasPermission(record['owner'])}
-                                        onClick={() => {
-                                            this.handleSearchByNickname('')
-                                                .then(() => {
-                                                    this.setState({
-                                                        changeOwnerModalVisible: true,
-                                                        selected: record,
-                                                    })
-                                                    this.changeOwnerFormRef
-                                                        .current
-                                                        .setFieldsValue({
-                                                            owner: record['owner']
-                                                        })
-                                                });
-
-                                        }}>更换所有者</Button>
-                            </Menu.Item>
-                            <Menu.Divider/>
-                            <Menu.Item key="5">
-                                <Button type="text" size='small' danger
-                                        disabled={!hasPermission(record['owner'])}
-                                        onClick={() => this.showDeleteConfirm(record.id, record.name)}>删除</Button>
-                            </Menu.Item>
-                        </Menu>
-                    );
-
-                    const id = record['id'];
-                    const protocol = record['protocol'];
-                    const name = record['name'];
-                    const sshMode = record['sshMode'];
-                    let url = '';
-                    if (protocol === 'ssh' && (sshMode === 'native' || sshMode === 'naive')) {
-                        url = `#/term?assetId=${id}&assetName=${name}`;
-                    } else {
-                        url = `#/access?assetId=${id}&assetName=${name}&protocol=${protocol}`;
-                    }
-
-                    return (
-                        <div>
-                            <Button type="link" size='small' href={url} target='_blank'>接入</Button>
-                            <Dropdown overlay={menu}>
-                                <Button type="link" size='small'>
-                                    更多 <DownOutlined/>
-                                </Button>
-                            </Dropdown>
-                        </div>
-                    )
-                },
-            }
-        ];
-
-        const selectedRowKeys = this.state.selectedRowKeys;
-        const rowSelection = {
-            selectedRowKeys: this.state.selectedRowKeys,
-            onChange: (selectedRowKeys, selectedRows) => {
-                this.setState({selectedRowKeys});
+                return [
+                    <Show menu={'asset-access'} key={'asset-access'}>
+                        <a
+                            key="access"
+                            href={url}
+                            target='_blank'
+                        >
+                            接入
+                        </a>
+                    </Show>,
+                    <Show menu={'asset-edit'} key={'asset-edit'}>
+                        <a
+                            key="edit"
+                            onClick={() => {
+                                setVisible(true);
+                                setSelectedRowKey(record['id']);
+                            }}
+                        >
+                            编辑
+                        </a>
+                    </Show>,
+                    <Show menu={'asset-del'} key={'asset-del'}>
+                        <Popconfirm
+                            key={'confirm-delete'}
+                            title="您确认要删除此行吗?"
+                            onConfirm={async () => {
+                                await api.deleteById(record.id);
+                                actionRef.current.reload();
+                            }}
+                            okText="确认"
+                            cancelText="取消"
+                        >
+                            <a key='delete' className='danger'>删除</a>
+                        </Popconfirm>
+                    </Show>,
+                    <TableDropdown
+                        key="actionGroup"
+                        onSelect={(key) => {
+                            switch (key) {
+                                case "copy":
+                                    setCopied(true);
+                                    setVisible(true);
+                                    setSelectedRowKey(record['id']);
+                                    break;
+                                case "test":
+                                    connTest(record['id'], index);
+                                    break;
+                                case "change-owner":
+                                    handleChangeOwner(record);
+                                    break;
+                            }
+                        }}
+                        menus={[
+                            {key: 'copy', name: '复制', disabled: !hasMenu('asset-copy')},
+                            {key: 'test', name: '连通性测试', disabled: !hasMenu('asset-conn-test')},
+                            {key: 'change-owner', name: '更换所有者', disabled: !hasMenu('asset-change-owner')},
+                        ]}
+                    />,
+                ]
             },
-        };
-        const hasSelected = selectedRowKeys.length > 0;
+        },
+    ];
 
-        return (
-            <>
-                <Content key='page-content' className="site-layout-background page-content">
-                    <div style={{marginBottom: 20}}>
-                        <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={4} key={1}>
-                                <Title level={3}>资产列表</Title>
-                            </Col>
-                            <Col span={20} key={2} style={{textAlign: 'right'}}>
-                                <Space>
-
-                                    <Search
-                                        ref={this.inputRefOfName}
-                                        placeholder="资产名称"
-                                        allowClear
-                                        onSearch={this.handleSearchByName}
-                                        style={{width: 200}}
-                                    />
-
-                                    <Search
-                                        ref={this.inputRefOfIp}
-                                        placeholder="资产IP"
-                                        allowClear
-                                        onSearch={this.handleSearchByIp}
-                                        style={{width: 200}}
-                                    />
-
-                                    <Select mode="multiple"
-                                            allowClear
-                                            value={this.state.selectedTags}
-                                            placeholder="资产标签" onChange={this.handleTagsChange}
-                                            style={{minWidth: 150}}>
-                                        {this.state.tags.map(tag => {
-                                            if (tag === '-') {
-                                                return undefined;
-                                            }
-                                            return (<Select.Option key={tag}>{tag}</Select.Option>)
-                                        })}
-                                    </Select>
-
-                                    <Select onChange={this.handleSearchByProtocol}
-                                            value={this.state.queryParams.protocol ? this.state.queryParams.protocol : ''}
-                                            style={{width: 100}}>
-                                        <Select.Option value="">全部协议</Select.Option>
-                                        <Select.Option value="rdp">rdp</Select.Option>
-                                        <Select.Option value="ssh">ssh</Select.Option>
-                                        <Select.Option value="vnc">vnc</Select.Option>
-                                        <Select.Option value="telnet">telnet</Select.Option>
-                                        <Select.Option value="kubernetes">kubernetes</Select.Option>
-                                    </Select>
-
-                                    <Tooltip title='重置查询'>
-
-                                        <Button icon={<UndoOutlined/>} onClick={() => {
-                                            this.inputRefOfName.current.setValue('');
-                                            this.inputRefOfIp.current.setValue('');
-                                            this.setState({
-                                                selectedTags: []
-                                            })
-                                            this.loadTableData({pageIndex: 1, pageSize: 10, protocol: '', tags: ''})
-                                        }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                    <Divider type="vertical"/>
-                                    <Tooltip title="批量导入">
-                                        <Button type="dashed" icon={<ImportOutlined/>}
-                                                onClick={() => {
-                                                    this.setState({
-                                                        importModalVisible: true
-                                                    })
-                                                }}>
-                                        </Button>
-                                    </Tooltip>
-                                    <Tooltip title="新增">
-                                        <Button icon={<PlusOutlined/>}
-                                                onClick={() => this.showModal('新增资产', {})}
-                                        >
-                                        </Button>
-                                    </Tooltip>
-
-
-                                    <Tooltip title="刷新列表">
-                                        <Button icon={<SyncOutlined/>} onClick={() => {
-                                            this.loadTableData(this.state.queryParams)
-                                        }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                    <Tooltip title="批量删除">
-                                        <Button type="primary" danger disabled={!hasSelected} icon={<DeleteOutlined/>}
-                                                loading={this.state.delBtnLoading}
-                                                onClick={() => {
-                                                    const content = <div>
-                                                        您确定要删除选中的<Text style={{color: '#1890FF'}}
-                                                                       strong>{this.state.selectedRowKeys.length}</Text>条记录吗？
-                                                    </div>;
-                                                    confirm({
-                                                        icon: <ExclamationCircleOutlined/>,
-                                                        content: content,
-                                                        onOk: () => {
-                                                            this.batchDelete()
-                                                        },
-                                                        onCancel() {
-
-                                                        },
-                                                    });
-                                                }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                </Space>
-                            </Col>
-                        </Row>
-                    </div>
-
-                    <Table key='assets-table'
-                           rowSelection={rowSelection}
-                           dataSource={this.state.items}
-                           columns={columns}
-                           position={'both'}
-                           pagination={{
-                               showSizeChanger: true,
-                               current: this.state.queryParams.pageIndex,
-                               pageSize: this.state.queryParams.pageSize,
-                               onChange: this.handleChangPage,
-                               onShowSizeChange: this.handleChangPage,
-                               total: this.state.total,
-                               showTotal: total => `总计 ${total} 条`
-                           }}
-                           loading={this.state.loading}
-                           onChange={this.handleTableChange}
-                    />
-
-                    {
-                        this.state.modalVisible ?
-                            <AssetModal
-                                visible={this.state.modalVisible}
-                                title={this.state.modalTitle}
-                                handleOk={this.handleOk}
-                                handleCancel={this.handleCancelModal}
-                                confirmLoading={this.state.modalConfirmLoading}
-                                credentials={this.state.credentials}
-                                tags={this.state.tags}
-                                model={this.state.model}
-                            />
-                            : null
-                    }
-
-                    {
-                        this.state.importModalVisible ?
-                            <Modal title="资产导入" visible={true}
-                                   onOk={() => {
-                                       const formData = new FormData();
-                                       formData.append("file", this.state.fileList[0]);
-
-                                       let headers = getHeaders();
-                                       headers['Content-Type'] = 'multipart/form-data';
-
-                                       axios
-                                           .post(server + "/assets/import", formData, {
-                                               headers: headers
-                                           })
-                                           .then((resp) => {
-                                               console.log("上传成功", resp);
-                                               this.setState({
-                                                   importModalVisible: false
-                                               })
-                                               let result = resp.data;
-                                               if (result['code'] === 1) {
-                                                   let data = result['data'];
-                                                   let successCount = data['successCount'];
-                                                   let errorCount = data['errorCount'];
-                                                   if (errorCount === 0) {
-                                                       notification['success']({
-                                                           message: '导入资产成功',
-                                                           description: '共导入成功' + successCount + '条资产。',
-                                                       });
-                                                   } else {
-                                                       notification['info']({
-                                                           message: '导入资产完成',
-                                                           description: `共导入成功${successCount}条资产，失败${errorCount}条资产。`,
-                                                       });
-                                                   }
-                                               } else {
-                                                   notification['error']({
-                                                       message: '导入资产失败',
-                                                       description: result['message'],
-                                                   });
-                                               }
-                                               this.loadTableData();
-                                           });
-                                   }}
-                                   onCancel={() => {
-                                       this.setState({
-                                           importModalVisible: false
-                                       })
-                                   }}
-                                   okButtonProps={{
-                                       disabled: this.state.fileList.length === 0
-                                   }}
-                            >
-                                <Space>
-                                    <Upload
-                                        maxCount={1}
-                                        onRemove={file => {
-                                            this.setState(state => {
-                                                const index = state.fileList.indexOf(file);
-                                                const newFileList = state.fileList.slice();
-                                                newFileList.splice(index, 1);
-                                                return {
-                                                    fileList: newFileList,
-                                                };
-                                            });
-                                        }}
-                                        beforeUpload={(file) => {
-                                            this.setState(state => ({
-                                                fileList: [file],
-                                            }));
-                                            return false;
-                                        }}
-                                        fileList={this.state.fileList}
-                                    >
-                                        <Button icon={<UploadOutlined/>}>选择csv文件</Button>
-                                    </Upload>
-
-                                    <Button type="primary" onClick={() => {
-
-                                        let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description,tag1|tag2|tag3';
-                                        //前置的"\uFEFF"为“零宽不换行空格”，可处理中文乱码问题
-                                        const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
-                                        let a = document.createElement('a');
-                                        a.download = 'sample.csv';
-                                        a.href = URL.createObjectURL(blob);
-                                        a.click();
-                                    }}>
-                                        下载样本文件
-                                    </Button>
-                                </Space>
-
-                            </Modal>
-                            : undefined
-                    }
-
-                    <Modal title={<Text>更换资源「<strong style={{color: '#1890ff'}}>{this.state.selected['name']}</strong>」的所有者
-                    </Text>}
-                           visible={this.state.changeOwnerModalVisible}
-                           confirmLoading={this.state.changeOwnerConfirmLoading}
-
-                           onOk={() => {
-                               this.setState({
-                                   changeOwnerConfirmLoading: true
-                               });
-
-                               let changeOwnerModalVisible = false;
-                               this.changeOwnerFormRef
-                                   .current
-                                   .validateFields()
-                                   .then(async values => {
-                                       let result = await request.post(`/assets/${this.state.selected['id']}/change-owner?owner=${values['owner']}`);
-                                       if (result['code'] === 1) {
-                                           message.success('操作成功');
-                                           this.loadTableData();
-                                       } else {
-                                           message.error(result['message'], 10);
-                                           changeOwnerModalVisible = true;
-                                       }
-                                   })
-                                   .catch(info => {
-
-                                   })
-                                   .finally(() => {
-                                       this.setState({
-                                           changeOwnerConfirmLoading: false,
-                                           changeOwnerModalVisible: changeOwnerModalVisible
-                                       })
-                                   });
-                           }}
-                           onCancel={() => {
-                               this.setState({
-                                   changeOwnerModalVisible: false
-                               })
-                           }}
-                    >
-
-                        <Form ref={this.changeOwnerFormRef}>
-
-                            <Form.Item name='owner' rules={[{required: true, message: '请选择所有者'}]}>
-                                <Select
-                                    showSearch
-                                    placeholder='请选择所有者'
-                                    onSearch={this.handleSearchByNickname}
-                                    filterOption={false}
-                                >
-                                    {this.state.users.map(d => <Select.Option key={d.id}
-                                                                              value={d.id}>{d.nickname}</Select.Option>)}
-                                </Select>
-                            </Form.Item>
-                            <Alert message="更换资产所有者不会影响授权凭证的所有者" type="info" showIcon/>
-
-                        </Form>
-                    </Modal>
-                </Content>
-            </>
-        );
+    const connTest = async (id, index) => {
+        items[index]['testing'] = true;
+        setItems(items.slice());
+        let [active, msg] = await assetApi.connTest(id);
+        items[index]['active'] = active;
+        items[index]['activeMessage'] = msg;
+        items[index]['testing'] = false;
+        setItems(items.slice());
     }
 
-    renderTags(tags) {
-        let tagDocuments = []
-        let tagArr = tags.split(',');
-        for (let i = 0; i < tagArr.length; i++) {
-            if (tags[i] === '-') {
-                continue;
+    const connTestInBatch = async () => {
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            if (selectedRowKeys.includes(item['id'])) {
+                connTest(item['id'], i);
             }
-            tagDocuments.push(<Tag key={tagArr[i]}>{tagArr[i]}</Tag>)
         }
-        return tagDocuments;
+        setSelectedRowKeys([]);
     }
+
+    const handleImportAsset = (file) => {
+
+        let [success, data] = api.importAsset(file);
+        if (success === false) {
+            notification['error']({
+                message: '导入资产失败',
+                description: data,
+            });
+            return false;
+        }
+
+        let successCount = data['successCount'];
+        let errorCount = data['errorCount'];
+        if (errorCount === 0) {
+            notification['success']({
+                message: '导入资产成功',
+                description: '共导入成功' + successCount + '条资产。',
+            });
+        } else {
+            notification['info']({
+                message: '导入资产完成',
+                description: `共导入成功${successCount}条资产，失败${errorCount}条资产。`,
+            });
+        }
+        actionRef.current.reload();
+        return true;
+    }
+
+    const handleChangeOwner = (row) => {
+        setSelectedRow(row);
+        setChangeOwnerVisible(true);
+    }
+
+    return (<Content className="page-container">
+        <ProTable
+            columns={columns}
+            actionRef={actionRef}
+            columnsState={{
+                value: columnsStateMap,
+                onChange: setColumnsStateMap
+            }}
+            request={async (params = {}, sort, filter) => {
+
+                let field = '';
+                let order = '';
+                if (Object.keys(sort).length > 0) {
+                    field = Object.keys(sort)[0];
+                    order = Object.values(sort)[0];
+                }
+
+                let queryParams = {
+                    pageIndex: params.current,
+                    pageSize: params.pageSize,
+                    name: params.name,
+                    type: params.type,
+                    protocol: params.protocol,
+                    active: params.active,
+                    'tags': params.tags?.join(','),
+                    field: field,
+                    order: order
+                }
+                let result = await api.getPaging(queryParams);
+                setItems(result['items'])
+                return {
+                    data: items,
+                    success: true,
+                    total: result['total']
+                };
+            }}
+            rowSelection={{
+                // 自定义选择项参考: https://ant.design/components/table-cn/#components-table-demo-row-selection-custom
+                // 注释该行则默认不显示下拉选项
+                selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                selectedRowKeys: selectedRowKeys,
+                onChange: (keys) => {
+                    setSelectedRowKeys(keys);
+                }
+            }}
+            dataSource={items}
+            rowKey="id"
+            search={{
+                labelWidth: 'auto',
+            }}
+            pagination={{
+                defaultPageSize: 10,
+            }}
+            dateFormatter="string"
+            headerTitle="资产列表"
+            toolBarRender={() => {
+                return [
+                    <Show menu={'asset-add'}>
+                        <Button key="add" type="primary" onClick={() => {
+                            setVisible(true)
+                        }}>
+                            新建
+                        </Button>
+                    </Show>,
+                    <Show menu={'asset-import'}>
+                        <Popover content={importExampleContent}>
+                            <Upload
+                                maxCount={1}
+                                beforeUpload={handleImportAsset}
+                            >
+                                <Button key='import'>导入</Button>
+                            </Upload>
+                        </Popover>
+                    </Show>,
+                    <Show menu={'asset-del'}>
+                        <Button key="delete" danger
+                                type="primary"
+                                disabled={selectedRowKeys.length === 0}
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: '您确定要删除选中的行吗?',
+                                        content: '删除之后无法进行恢复，请慎重考虑。',
+                                        okText: '确定',
+                                        okType: 'danger',
+                                        cancelText: '取消',
+                                        onOk: async () => {
+                                            await api.deleteById(selectedRowKeys.join(","));
+                                            actionRef.current.reload();
+                                            setSelectedRowKeys([]);
+                                        }
+                                    });
+                                }}>
+                            删除
+                        </Button>
+                    </Show>,
+                    <Show menu={'asset-conn-test'}>
+                        <Button key="connTest"
+                                type="primary"
+                                disabled={selectedRowKeys.length === 0}
+                                onClick={connTestInBatch}>
+                            连通性测试
+                        </Button>
+                    </Show>
+                ];
+            }}
+        />
+
+        <AssetModal
+            id={selectedRowKey}
+            copied={copied}
+            visible={visible}
+            confirmLoading={confirmLoading}
+            handleCancel={() => {
+                setVisible(false);
+                setSelectedRowKey(undefined);
+                setCopied(false);
+            }}
+            handleOk={async (values) => {
+                setConfirmLoading(true);
+
+                try {
+                    let success;
+                    if (values['id']) {
+                        success = await api.updateById(values['id'], values);
+                    } else {
+                        success = await api.create(values);
+                    }
+                    if (success) {
+                        setVisible(false);
+                    }
+                    actionRef.current.reload();
+                } finally {
+                    setConfirmLoading(false);
+                }
+            }}
+        />
+
+        <ChangeOwner
+            lastOwner={selectedRow?.owner}
+            open={changeOwnerVisible}
+            handleOk={async (owner) => {
+                let success = await api.changeOwner(selectedRow?.id, owner);
+                if (success) {
+                    setChangeOwnerVisible(false);
+                    actionRef.current.reload();
+                }
+            }}
+            handleCancel={() => {
+                setChangeOwnerVisible(false);
+            }}
+        />
+
+    </Content>);
 }
 
 export default Asset;

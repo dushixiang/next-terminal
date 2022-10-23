@@ -3,7 +3,6 @@ package gateway
 import (
 	"sync"
 
-	"next-terminal/server/log"
 	"next-terminal/server/model"
 )
 
@@ -33,7 +32,6 @@ func (m *manager) Add(model *model.AccessGateway) *Gateway {
 		tunnels:    make(map[string]*Tunnel),
 	}
 	m.gateways.Store(g.ID, g)
-	log.Infof("add Gateway: %s", g.ID)
 	return g
 }
 
@@ -43,7 +41,6 @@ func (m *manager) Del(id string) {
 		g.Close()
 	}
 	m.gateways.Delete(id)
-	log.Infof("del Gateway: %s", id)
 }
 
 var GlobalGatewayManager *manager

@@ -27,18 +27,18 @@ import (
 	"golang.org/x/text/encoding/simplifiedchinese"
 	"golang.org/x/text/transform"
 
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 	errors2 "github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/crypto/pbkdf2"
 )
 
 func UUID() string {
-	v4, _ := uuid.NewV4()
-	return v4.String()
+	return uuid.New().String()
 }
 
 func LongUUID() string {
+	uuid.New()
 	longUUID := strings.Join([]string{UUID(), UUID(), UUID(), UUID()}, "")
 	return strings.ReplaceAll(longUUID, "-", "")
 }
@@ -56,7 +56,7 @@ func Tcping(ip string, port int) (bool, error) {
 	} else {
 		address = fmt.Sprintf("[%s]:%s", ip, strPort)
 	}
-	if conn, err = net.DialTimeout("tcp", address, 5*time.Second); err != nil {
+	if conn, err = net.DialTimeout("tcp", address, 15*time.Second); err != nil {
 		return false, err
 	}
 	defer func() {
@@ -344,6 +344,11 @@ func Utf8ToGbk(s []byte) ([]byte, error) {
 		return nil, e
 	}
 	return d, nil
+}
+
+func Decimal(value float64) float64 {
+	value, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", value), 64)
+	return value
 }
 
 // GetAvailablePort 获取可用端口

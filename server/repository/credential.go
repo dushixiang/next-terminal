@@ -3,29 +3,24 @@ package repository
 import (
 	"context"
 
-	"next-terminal/server/constant"
 	"next-terminal/server/model"
 )
+
+var CredentialRepository = new(credentialRepository)
 
 type credentialRepository struct {
 	baseRepository
 }
 
-func (r credentialRepository) FindByUser(c context.Context) (o []model.CredentialSimpleVo, err error) {
-	db := r.GetDB(c).Table("credentials").Select("DISTINCT credentials.id,credentials.name").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id")
+func (r credentialRepository) FindByAll(c context.Context) (o []model.CredentialSimpleVo, err error) {
+	db := r.GetDB(c).Table("credentials")
 	err = db.Find(&o).Error
 	return
 }
 
-func (r credentialRepository) Find(c context.Context, pageIndex, pageSize int, name, order, field string, account *model.User) (o []model.CredentialForPage, total int64, err error) {
-	db := r.GetDB(c).Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name,COUNT(resource_sharers.user_id) as sharer_count").Joins("left join users on credentials.owner = users.id").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id").Group("credentials.id")
-	dbCounter := r.GetDB(c).Table("credentials").Select("DISTINCT credentials.id").Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id").Group("credentials.id")
-
-	if constant.TypeUser == account.Type {
-		owner := account.ID
-		db = db.Where("credentials.owner = ? or resource_sharers.user_id = ?", owner, owner)
-		dbCounter = dbCounter.Where("credentials.owner = ? or resource_sharers.user_id = ?", owner, owner)
-	}
+func (r credentialRepository) Find(c context.Context, pageIndex, pageSize int, name, order, field string) (o []model.CredentialForPage, total int64, err error) {
+	db := r.GetDB(c).Table("credentials").Select("credentials.id,credentials.name,credentials.type,credentials.username,credentials.owner,credentials.created,users.nickname as owner_name").Joins("left join users on credentials.owner = users.id")
+	dbCounter := r.GetDB(c).Table("credentials")
 
 	if len(name) > 0 {
 		db = db.Where("credentials.name like ?", "%"+name+"%")
@@ -78,24 +73,6 @@ func (r credentialRepository) Count(c context.Context) (total int64, err error) 
 	err = r.GetDB(c).Find(&model.Credential{}).Count(&total).Error
 	return
 }
-
-//func (r credentialRepository) CountByUserId(c context.Context, userId string) (total int64, err error) {
-//	db := r.GetDB(c).Joins("left join resource_sharers on credentials.id = resource_sharers.resource_id")
-//
-//	db = db.Where("credentials.owner = ? or resource_sharers.user_id = ?", userId, userId)
-//
-//	// 查询用户所在用户组列表
-//	userGroupIds, err := userGroupRepository.FindUserGroupIdsByUserId(c, userId)
-//	if err != nil {
-//		return 0, err
-//	}
-//
-//	if len(userGroupIds) > 0 {
-//		db = db.Or("resource_sharers.user_group_id in ?", userGroupIds)
-//	}
-//	err = db.Find(&model.Credential{}).Count(&total).Error
-//	return
-//}
 
 func (r credentialRepository) FindAll(c context.Context) (o []model.Credential, err error) {
 	err = r.GetDB(c).Find(&o).Error

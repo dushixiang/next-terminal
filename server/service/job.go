@@ -4,13 +4,16 @@ import (
 	"context"
 	"errors"
 
-	"next-terminal/server/constant"
+	"next-terminal/server/common"
+	"next-terminal/server/common/nt"
 	"next-terminal/server/global/cron"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
 )
+
+var JobService = new(jobService)
 
 type jobService struct {
 }
@@ -20,7 +23,7 @@ func (r jobService) ChangeStatusById(id, status string) error {
 	if err != nil {
 		return err
 	}
-	if status == constant.JobStatusRunning {
+	if status == nt.JobStatusRunning {
 		j, err := getJob(&job)
 		if err != nil {
 			return err
@@ -29,29 +32,29 @@ func (r jobService) ChangeStatusById(id, status string) error {
 		if err != nil {
 			return err
 		}
-		log.Debugf("开启计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(cron.GlobalCron.Entries()))
+		log.Debug("开启计划任务", log.String("任务名称", job.Name), log.Int("运行中计划任务数量", len(cron.GlobalCron.Entries())))
 
-		jobForUpdate := model.Job{ID: id, Status: constant.JobStatusRunning, CronJobId: int(entryID)}
+		jobForUpdate := model.Job{ID: id, Status: nt.JobStatusRunning, CronJobId: int(entryID)}
 
 		return repository.JobRepository.UpdateById(context.TODO(), &jobForUpdate)
 	} else {
 		cron.GlobalCron.Remove(cron.JobId(job.CronJobId))
-		log.Debugf("关闭计划任务「%v」,运行中计划任务数量「%v」", job.Name, len(cron.GlobalCron.Entries()))
-		jobForUpdate := model.Job{ID: id, Status: constant.JobStatusNotRunning}
+		log.Debug("关闭计划任务", log.String("任务名称", job.Name), log.Int("运行中计划任务数量", len(cron.GlobalCron.Entries())))
+		jobForUpdate := model.Job{ID: id, Status: nt.JobStatusNotRunning}
 		return repository.JobRepository.UpdateById(context.TODO(), &jobForUpdate)
 	}
 }
 
 func getJob(j *model.Job) (job cron.Job, err error) {
 	switch j.Func {
-	case constant.FuncCheckAssetStatusJob:
+	case nt.FuncCheckAssetStatusJob:
 		job = CheckAssetStatusJob{
 			ID:          j.ID,
 			Mode:        j.Mode,
 			ResourceIds: j.ResourceIds,
 			Metadata:    j.Metadata,
 		}
-	case constant.FuncShellJob:
+	case nt.FuncShellJob:
 		job = ShellJob{ID: j.ID, Mode: j.Mode, ResourceIds: j.ResourceIds, Metadata: j.Metadata}
 	default:
 		return nil, errors.New("未识别的任务")
@@ -78,25 +81,23 @@ func (r jobService) InitJob() error {
 		job := model.Job{
 			ID:      utils.UUID(),
 			Name:    "资产状态检测",
-			Func:    constant.FuncCheckAssetStatusJob,
+			Func:    nt.FuncCheckAssetStatusJob,
 			Cron:    "0 0/10 * * * ?",
-			Mode:    constant.JobModeAll,
-			Status:  constant.JobStatusRunning,
-			Created: utils.NowJsonTime(),
-			Updated: utils.NowJsonTime(),
+			Mode:    nt.JobModeAll,
+			Status:  nt.JobStatusRunning,
+			Created: common.NowJsonTime(),
+			Updated: common.NowJsonTime(),
 		}
 		if err := repository.JobRepository.Create(context.TODO(), &job); err != nil {
 			return err
 		}
-		log.Debugf("创建计划任务「%v」cron「%v」", job.Name, job.Cron)
 	} else {
 		for i := range jobs {
-			if jobs[i].Status == constant.JobStatusRunning {
-				err := r.ChangeStatusById(jobs[i].ID, constant.JobStatusRunning)
+			if jobs[i].Status == nt.JobStatusRunning {
+				err := r.ChangeStatusById(jobs[i].ID, nt.JobStatusRunning)
 				if err != nil {
 					return err
 				}
-				log.Debugf("启动计划任务「%v」cron「%v」", jobs[i].Name, jobs[i].Cron)
 			}
 		}
 	}
@@ -105,7 +106,7 @@ func (r jobService) InitJob() error {
 
 func (r jobService) Create(ctx context.Context, o *model.Job) (err error) {
 
-	if o.Status == constant.JobStatusRunning {
+	if o.Status == nt.JobStatusRunning {
 		j, err := getJob(o)
 		if err != nil {
 			return err
@@ -125,8 +126,8 @@ func (r jobService) DeleteJobById(id string) error {
 	if err != nil {
 		return err
 	}
-	if job.Status == constant.JobStatusRunning {
-		if err := r.ChangeStatusById(id, constant.JobStatusNotRunning); err != nil {
+	if job.Status == nt.JobStatusRunning {
+		if err := r.ChangeStatusById(id, nt.JobStatusNotRunning); err != nil {
 			return err
 		}
 	}
@@ -138,10 +139,10 @@ func (r jobService) UpdateById(m *model.Job) error {
 		return err
 	}
 
-	if err := r.ChangeStatusById(m.ID, constant.JobStatusNotRunning); err != nil {
+	if err := r.ChangeStatusById(m.ID, nt.JobStatusNotRunning); err != nil {
 		return err
 	}
-	if err := r.ChangeStatusById(m.ID, constant.JobStatusRunning); err != nil {
+	if err := r.ChangeStatusById(m.ID, nt.JobStatusRunning); err != nil {
 		return err
 	}
 	return nil

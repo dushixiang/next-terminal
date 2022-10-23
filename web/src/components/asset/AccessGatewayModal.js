@@ -1,5 +1,6 @@
-import React, {useState} from 'react';
-import {Form, Input, InputNumber, Modal, Select} from "antd/lib/index";
+import React, {useEffect, useState} from 'react';
+import {Form, Input, InputNumber, Modal, Select} from "antd";
+import accessGatewayApi from "../../api/access-gateway";
 
 const formItemLayout = {
     labelCol: {span: 6},
@@ -7,46 +8,73 @@ const formItemLayout = {
 };
 
 const {TextArea} = Input;
+const api = accessGatewayApi;
 
-const AccessGatewayModal = ({title, visible, handleOk, handleCancel, confirmLoading, model}) => {
+const AccessGatewayModal = ({
+                                visible,
+                                handleOk,
+                                handleCancel,
+                                confirmLoading,
+                                id,
+                            }) => {
 
     const [form] = Form.useForm();
-
-    if (model['accountType'] === undefined) {
-        model['accountType'] = 'password';
-    }
-
-    if (model['port'] === undefined) {
-        model['port'] = 22;
-    }
-
-    let [accountType, setAccountType] = useState(model.accountType);
+    let [accountType, setAccountType] = useState('password');
 
     const handleAccountTypeChange = v => {
         setAccountType(v);
     }
 
+    useEffect(() => {
+
+        const getItem = async () => {
+            let data = await api.getById(id);
+            if (data) {
+                form.setFieldsValue(data);
+                setAccountType(data['accountType']);
+            }
+        }
+
+        if (visible) {
+            if(id){
+                getItem();
+            }else {
+                form.setFieldsValue({
+                    accountType: 'password',
+                    port: 22,
+                });
+            }
+        } else {
+            form.resetFields();
+        }
+    }, [visible]);
+
     return (
         <Modal
-            title={title}
+            title={id ? '更新接入网关' : '新建接入网关'}
             visible={visible}
             maskClosable={false}
-
+            destroyOnClose={true}
             onOk={() => {
                 form
                     .validateFields()
-                    .then(values => {
-                        form.resetFields();
-                        handleOk(values);
+                    .then(async values => {
+                        let ok = await handleOk(values);
+                        if (ok) {
+                            form.resetFields();
+                        }
                     });
             }}
-            onCancel={handleCancel}
+            onCancel={() => {
+                form.resetFields();
+                handleCancel();
+            }}
             confirmLoading={confirmLoading}
             okText='确定'
             cancelText='取消'
         >
 
-            <Form form={form} {...formItemLayout} initialValues={model}>
+            <Form form={form} {...formItemLayout}>
                 <Form.Item name='id' noStyle>
                     <Input hidden={true}/>
                 </Form.Item>

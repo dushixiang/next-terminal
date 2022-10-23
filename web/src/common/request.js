@@ -28,6 +28,14 @@ const handleResult = (result) => {
     if (result['code'] === 401) {
         window.location.href = '#/login';
         return false;
+    }if (result['code'] === 403) {
+        window.location.href = '#/permission-denied';
+        return false;
+    } else if (result['code'] === 100) {
+        return true;
+    } else if (result['code'] !== 1) {
+        message.error(result['message']);
+        return false;
     }
     return true;
 }
@@ -40,8 +48,9 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.get(url, {headers: headers})
                 .then((response) => {
-                    if (!handleResult(response.data)) {
-                        return;
+                    let contentType = response.headers['content-type'];
+                    if (contentType !== '' && contentType.includes('application/json')) {
+                        handleResult(response.data);
                     }
                     resolve(response.data);
                 })
@@ -54,16 +63,20 @@ const request = {
         })
     },
 
-    post: function (url, params) {
+    post: function (url, params, header) {
 
         const headers = getHeaders();
+        if (header) {
+            for (const k in header) {
+                headers[k] = header[k];
+            }
+        }
+
 
         return new Promise((resolve, reject) => {
             axios.post(url, params, {headers: headers})
                 .then((response) => {
-                    if (!handleResult(response.data)) {
-                        return;
-                    }
+                    handleResult(response.data);
                     resolve(response.data);
                 })
                 .catch((error) => {
@@ -82,9 +95,7 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.put(url, params, {headers: headers})
                 .then((response) => {
-                    if (!handleResult(response.data)) {
-                        return;
-                    }
+                    handleResult(response.data);
                     resolve(response.data);
                 })
                 .catch((error) => {
@@ -102,9 +113,7 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.delete(url, {headers: headers})
                 .then((response) => {
-                    if (!handleResult(response.data)) {
-                        return;
-                    }
+                    handleResult(response.data);
                     resolve(response.data);
                 })
                 .catch((error) => {
@@ -122,9 +131,7 @@ const request = {
         return new Promise((resolve, reject) => {
             axios.patch(url, params, {headers: headers})
                 .then((response) => {
-                    if (!handleResult(response.data)) {
-                        return;
-                    }
+                    handleResult(response.data);
                     resolve(response.data);
                 })
                 .catch((error) => {

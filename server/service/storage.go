@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"strings"
 
+	"next-terminal/server/common"
 	"next-terminal/server/config"
-	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
@@ -23,6 +23,8 @@ import (
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
+
+var StorageService = new(storageService)
 
 type storageService struct {
 }
@@ -72,7 +74,6 @@ func (service storageService) InitStorages() error {
 			if err := os.MkdirAll(storageDir, os.ModePerm); err != nil {
 				return err
 			}
-			log.Infof("创建storage:「%v」文件夹: %v", storage.Name, storageDir)
 		}
 	}
 	return nil
@@ -102,13 +103,12 @@ func (service storageService) CreateStorageByUser(c context.Context, user *model
 		IsDefault: true,
 		LimitSize: limitSize,
 		Owner:     user.ID,
-		Created:   utils.NowJsonTime(),
+		Created:   common.NowJsonTime(),
 	}
 	storageDir := path.Join(drivePath, storage.ID)
 	if err := os.MkdirAll(storageDir, os.ModePerm); err != nil {
 		return err
 	}
-	log.Infof("创建storage:「%v」文件夹: %v", storage.Name, storageDir)
 	err = repository.StorageRepository.Create(c, &storage)
 	if err != nil {
 		_ = os.RemoveAll(storageDir)
@@ -118,13 +118,13 @@ func (service storageService) CreateStorageByUser(c context.Context, user *model
 }
 
 type File struct {
-	Name    string         `json:"name"`
-	Path    string         `json:"path"`
-	IsDir   bool           `json:"isDir"`
-	Mode    string         `json:"mode"`
-	IsLink  bool           `json:"isLink"`
-	ModTime utils.JsonTime `json:"modTime"`
-	Size    int64          `json:"size"`
+	Name    string          `json:"name"`
+	Path    string          `json:"path"`
+	IsDir   bool            `json:"isDir"`
+	Mode    string          `json:"mode"`
+	IsLink  bool            `json:"isLink"`
+	ModTime common.JsonTime `json:"modTime"`
+	Size    int64           `json:"size"`
 }
 
 func (service storageService) Ls(drivePath, remoteDir string) ([]File, error) {
@@ -141,7 +141,7 @@ func (service storageService) Ls(drivePath, remoteDir string) ([]File, error) {
 			IsDir:   fileInfos[i].IsDir(),
 			Mode:    fileInfos[i].Mode().String(),
 			IsLink:  fileInfos[i].Mode()&os.ModeSymlink == os.ModeSymlink,
-			ModTime: utils.NewJsonTime(fileInfos[i].ModTime()),
+			ModTime: common.NewJsonTime(fileInfos[i].ModTime()),
 			Size:    fileInfos[i].Size(),
 		}
 

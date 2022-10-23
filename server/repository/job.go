@@ -3,9 +3,11 @@ package repository
 import (
 	"context"
 
+	"next-terminal/server/common"
 	"next-terminal/server/model"
-	"next-terminal/server/utils"
 )
+
+var JobRepository = new(jobRepository)
 
 type jobRepository struct {
 	baseRepository
@@ -73,7 +75,7 @@ func (r jobRepository) UpdateById(c context.Context, o *model.Job) (err error) {
 }
 
 func (r jobRepository) UpdateLastUpdatedById(c context.Context, id string) (err error) {
-	err = r.GetDB(c).Updates(model.Job{ID: id, Updated: utils.NowJsonTime()}).Error
+	err = r.GetDB(c).Updates(model.Job{ID: id, Updated: common.NowJsonTime()}).Error
 	return
 }
 

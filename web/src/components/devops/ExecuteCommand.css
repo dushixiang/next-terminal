@@ -1,0 +1,24 @@
+.term-container .ant-pro-card-header{
+    background-color: #2c2c2c;
+    padding-bottom: 10px;
+}
+
+.term-container .ant-pro-card-title{
+    color: white !important;
+}
+
+.term-container .ant-pro-card-extra{
+    color: white !important;
+}
+
+.term-container .ant-pro-card-body{
+    padding: 10px !important;
+    padding-right: 0 !important;
+    background-color: #2D2E2C;
+    height: 400px;
+}
+
+.term-adder .ant-pro-card-body{
+    padding: 0 !important;
+    height: 450px;
+}

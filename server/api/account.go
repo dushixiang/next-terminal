@@ -3,17 +3,17 @@ package api
 import (
 	"context"
 	"errors"
+	"next-terminal/server/common"
+	"next-terminal/server/common/nt"
 	"path"
-	"strconv"
+	"strings"
 
 	"next-terminal/server/config"
-	"next-terminal/server/constant"
 	"next-terminal/server/dto"
 	"next-terminal/server/global/cache"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
-	"next-terminal/server/totp"
 	"next-terminal/server/utils"
 
 	"github.com/labstack/echo/v4"
@@ -50,7 +50,7 @@ func (api AccountApi) LoginEndpoint(c echo.Context) error {
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
-	if user.Status == constant.StatusDisabled {
+	if user.Status == nt.StatusDisabled {
 		return Fail(c, -1, "该账户已停用")
 	}
 
@@ -64,11 +64,24 @@ func (api AccountApi) LoginEndpoint(c echo.Context) error {
 		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
 	}
 
+	// 账号密码正确，需要进行两步验证
 	if user.TOTPSecret != "" && user.TOTPSecret != "-" {
-		return Fail(c, 0, "")
+		if loginAccount.TOTP == "" {
+			return Fail(c, 100, "")
+		} else {
+			if !common.Validate(loginAccount.TOTP, user.TOTPSecret) {
+				count++
+				cache.LoginFailedKeyManager.Set(loginFailCountKey, count, cache.LoginLockExpiration)
+				// 保存登录日志
+				if err := service.UserService.SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "双因素认证授权码不正确"); err != nil {
+					return err
+				}
+				return FailWithData(c, -1, "您输入双因素认证授权码不正确", count)
+			}
+		}
 	}
 
-	token, err := api.LoginSuccess(loginAccount, user)
+	token, err := api.LoginSuccess(loginAccount, user, c.RealIP())
 	if err != nil {
 		return err
 	}
@@ -80,12 +93,17 @@ func (api AccountApi) LoginEndpoint(c echo.Context) error {
 	return Success(c, token)
 }
 
-func (api AccountApi) LoginSuccess(loginAccount dto.LoginAccount, user model.User) (string, error) {
+func (api AccountApi) LoginSuccess(loginAccount dto.LoginAccount, user model.User, ip string) (string, error) {
+	// 判断当前时间是否允许该用户登录
+	if err := service.LoginPolicyService.Check(user.ID, ip); err != nil {
+		return "", err
+	}
+
 	token := utils.LongUUID()
 
 	authorization := dto.Authorization{
 		Token:    token,
-		Type:     constant.LoginToken,
+		Type:     nt.LoginToken,
 		Remember: loginAccount.Remember,
 		User:     &user,
 	}
@@ -97,73 +115,10 @@ func (api AccountApi) LoginSuccess(loginAccount dto.LoginAccount, user model.Use
 		cache.TokenManager.Set(token, authorization, cache.NotRememberExpiration)
 	}
 
+	b := true
 	// 修改登录状态
-	err := repository.UserRepository.Update(context.TODO(), &model.User{Online: true, ID: user.ID})
+	err := repository.UserRepository.Update(context.TODO(), &model.User{Online: &b, ID: user.ID})
 	return token, err
-}
-
-func (api AccountApi) LoginWithTotpEndpoint(c echo.Context) error {
-	var loginAccount dto.LoginAccount
-	if err := c.Bind(&loginAccount); err != nil {
-		return err
-	}
-
-	// 存储登录失败次数信息
-	loginFailCountKey := c.RealIP() + loginAccount.Username
-	v, ok := cache.LoginFailedKeyManager.Get(loginFailCountKey)
-	if !ok {
-		v = 1
-	}
-	count := v.(int)
-	if count >= 5 {
-		return Fail(c, -1, "登录失败次数过多，请等待5分钟后再试")
-	}
-
-	user, err := repository.UserRepository.FindByUsername(context.TODO(), loginAccount.Username)
-	if err != nil {
-		count++
-		cache.LoginFailedKeyManager.Set(loginFailCountKey, count, cache.LoginLockExpiration)
-		// 保存登录日志
-		if err := service.UserService.SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
-			return err
-		}
-		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
-	}
-
-	if user.Status == constant.StatusDisabled {
-		return Fail(c, -1, "该账户已停用")
-	}
-
-	if err := utils.Encoder.Match([]byte(user.Password), []byte(loginAccount.Password)); err != nil {
-		count++
-		cache.LoginFailedKeyManager.Set(loginFailCountKey, count, cache.LoginLockExpiration)
-		// 保存登录日志
-		if err := service.UserService.SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "账号或密码不正确"); err != nil {
-			return err
-		}
-		return FailWithData(c, -1, "您输入的账号或密码不正确", count)
-	}
-
-	if !totp.Validate(loginAccount.TOTP, user.TOTPSecret) {
-		count++
-		cache.LoginFailedKeyManager.Set(loginFailCountKey, count, cache.LoginLockExpiration)
-		// 保存登录日志
-		if err := service.UserService.SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, false, loginAccount.Remember, "", "双因素认证授权码不正确"); err != nil {
-			return err
-		}
-		return FailWithData(c, -1, "您输入双因素认证授权码不正确", count)
-	}
-
-	token, err := api.LoginSuccess(loginAccount, user)
-	if err != nil {
-		return err
-	}
-	// 保存登录日志
-	if err := service.UserService.SaveLoginLog(c.RealIP(), c.Request().UserAgent(), loginAccount.Username, true, loginAccount.Remember, token, ""); err != nil {
-		return err
-	}
-
-	return Success(c, token)
 }
 
 func (api AccountApi) LogoutEndpoint(c echo.Context) error {
@@ -183,7 +138,7 @@ func (api AccountApi) ConfirmTOTPEndpoint(c echo.Context) error {
 		return err
 	}
 
-	if !totp.Validate(confirmTOTP.TOTP, confirmTOTP.Secret) {
+	if !common.Validate(confirmTOTP.TOTP, confirmTOTP.Secret) {
 		return Fail(c, -1, "TOTP 验证失败，请重试")
 	}
 
@@ -202,7 +157,7 @@ func (api AccountApi) ConfirmTOTPEndpoint(c echo.Context) error {
 func (api AccountApi) ReloadTOTPEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
 
-	key, err := totp.NewTOTP(totp.GenerateOpts{
+	key, err := common.NewTOTP(common.GenerateOpts{
 		Issuer:      c.Request().Host,
 		AccountName: account.Username,
 	})
@@ -270,19 +225,38 @@ func (api AccountApi) ChangePasswordEndpoint(c echo.Context) error {
 }
 
 type AccountInfo struct {
-	Id         string `json:"id"`
-	Username   string `json:"username"`
-	Nickname   string `json:"nickname"`
-	Type       string `json:"type"`
-	EnableTotp bool   `json:"enableTotp"`
+	Id         string   `json:"id"`
+	Username   string   `json:"username"`
+	Nickname   string   `json:"nickname"`
+	Type       string   `json:"type"`
+	EnableTotp bool     `json:"enableTotp"`
+	Roles      []string `json:"roles"`
+	Menus      []string `json:"menus"`
 }
 
 func (api AccountApi) InfoEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
+	if strings.EqualFold("anonymous", account.Type) {
+		return Success(c, account)
+	}
 
-	user, err := repository.UserRepository.FindById(context.TODO(), account.ID)
+	user, err := service.UserService.FindById(account.ID)
 	if err != nil {
 		return err
+	}
+
+	var menus []string
+	if service.UserService.IsSuperAdmin(account.ID) {
+		menus = service.MenuService.GetMenus()
+	} else {
+		roles, err := service.RoleService.GetRolesByUserId(account.ID)
+		if err != nil {
+			return err
+		}
+		for _, role := range roles {
+			items := service.RoleService.GetMenuListByRole(role)
+			menus = append(menus, items...)
+		}
 	}
 
 	info := AccountInfo{
@@ -291,38 +265,28 @@ func (api AccountApi) InfoEndpoint(c echo.Context) error {
 		Nickname:   user.Nickname,
 		Type:       user.Type,
 		EnableTotp: user.TOTPSecret != "" && user.TOTPSecret != "-",
+		Roles:      user.Roles,
+		Menus:      menus,
 	}
 	return Success(c, info)
 }
 
-func (api AccountApi) AccountAssetEndpoint(c echo.Context) error {
-	pageIndex, _ := strconv.Atoi(c.QueryParam("pageIndex"))
-	pageSize, _ := strconv.Atoi(c.QueryParam("pageSize"))
-	name := c.QueryParam("name")
-	protocol := c.QueryParam("protocol")
-	tags := c.QueryParam("tags")
-	owner := c.QueryParam("owner")
-	sharer := c.QueryParam("sharer")
-	userGroupId := c.QueryParam("userGroupId")
-	ip := c.QueryParam("ip")
-
-	order := c.QueryParam("order")
-	field := c.QueryParam("field")
+func (api AccountApi) MenuEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
-
-	items, total, err := repository.AssetRepository.Find(context.TODO(), pageIndex, pageSize, name, protocol, tags, account, owner, sharer, userGroupId, ip, order, field)
+	if service.UserService.IsSuperAdmin(account.ID) {
+		items := service.MenuService.GetMenus()
+		return Success(c, items)
+	}
+	roles, err := service.RoleService.GetRolesByUserId(account.ID)
 	if err != nil {
 		return err
 	}
-	for i := range items {
-		items[i].IP = ""
-		items[i].Port = 0
+	var menus []string
+	for _, role := range roles {
+		items := service.RoleService.GetMenuListByRole(role)
+		menus = append(menus, items...)
 	}
-
-	return Success(c, Map{
-		"total": total,
-		"items": items,
-	})
+	return Success(c, menus)
 }
 
 func (api AccountApi) AccountStorageEndpoint(c echo.Context) error {
@@ -360,6 +324,14 @@ func (api AccountApi) AccessTokenGetEndpoint(c echo.Context) error {
 func (api AccountApi) AccessTokenGenEndpoint(c echo.Context) error {
 	account, _ := GetCurrentAccount(c)
 	if err := service.AccessTokenService.GenAccessToken(account.ID); err != nil {
+		return err
+	}
+	return Success(c, nil)
+}
+
+func (api AccountApi) AccessTokenDelEndpoint(c echo.Context) error {
+	account, _ := GetCurrentAccount(c)
+	if err := service.AccessTokenService.DelAccessToken(context.Background(), account.ID); err != nil {
 		return err
 	}
 	return Success(c, nil)

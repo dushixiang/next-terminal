@@ -6,6 +6,8 @@ import (
 	"next-terminal/server/model"
 )
 
+var UserGroupRepository = new(userGroupRepository)
+
 type userGroupRepository struct {
 	baseRepository
 }
@@ -16,7 +18,7 @@ func (r userGroupRepository) FindAll(c context.Context) (o []model.UserGroup, er
 }
 
 func (r userGroupRepository) Find(c context.Context, pageIndex, pageSize int, name, order, field string) (o []model.UserGroupForPage, total int64, err error) {
-	db := r.GetDB(c).Table("user_groups").Select("user_groups.id, user_groups.name, user_groups.created, count(resource_sharers.user_group_id) as asset_count").Joins("left join resource_sharers on user_groups.id = resource_sharers.user_group_id and resource_sharers.resource_type = 'asset'").Group("user_groups.id")
+	db := r.GetDB(c).Table("user_groups")
 	dbCounter := r.GetDB(c).Table("user_groups")
 	if len(name) > 0 {
 		db = db.Where("user_groups.name like ?", "%"+name+"%")

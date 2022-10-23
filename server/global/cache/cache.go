@@ -15,8 +15,10 @@ const (
 
 var TokenManager *cache.Cache
 var LoginFailedKeyManager *cache.Cache
+var UserRolesManager *cache.Cache
 
 func init() {
 	TokenManager = cache.New(5*time.Minute, 10*time.Minute)
 	LoginFailedKeyManager = cache.New(5*time.Minute, 10*time.Minute)
+	UserRolesManager = cache.New(5*time.Minute, 10*time.Minute)
 }

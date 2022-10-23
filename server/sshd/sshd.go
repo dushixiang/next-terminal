@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net"
+	"next-terminal/server/common/nt"
 	"strings"
 
+	"next-terminal/server/branding"
 	"next-terminal/server/config"
-	"next-terminal/server/constant"
 	"next-terminal/server/global/security"
 	"next-terminal/server/log"
 	"next-terminal/server/repository"
@@ -89,10 +90,10 @@ func (sshd sshd) connCallback(ctx ssh.Context, conn net.Conn) net.Conn {
 			}
 		}
 
-		if s.Rule == constant.AccessRuleAllow {
+		if s.Rule == nt.AccessRuleAllow {
 			return conn
 		}
-		if s.Rule == constant.AccessRuleReject {
+		if s.Rule == nt.AccessRuleReject {
 			_, _ = conn.Write([]byte("your access request was denied :(\n"))
 			return nil
 		}
@@ -101,20 +102,20 @@ func (sshd sshd) connCallback(ctx ssh.Context, conn net.Conn) net.Conn {
 	return conn
 }
 
-func (sshd sshd) sessionHandler(sess *ssh.Session) {
+func (sshd sshd) sessionHandler(sess ssh.Session) {
 	defer func() {
-		_ = (*sess).Close()
+		_ = sess.Close()
 	}()
 
-	username := (*sess).User()
-	remoteAddr := strings.Split((*sess).RemoteAddr().String(), ":")[0]
+	username := sess.User()
+	remoteAddr := strings.Split(sess.RemoteAddr().String(), ":")[0]
 
 	user, err := repository.UserRepository.FindByUsername(context.TODO(), username)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			_, _ = io.WriteString(*sess, "您输入的账户或密码不正确.\n")
+			_, _ = io.WriteString(sess, "您输入的账户或密码不正确.\n")
 		} else {
-			_, _ = io.WriteString(*sess, err.Error())
+			_, _ = io.WriteString(sess, err.Error())
 		}
 		return
 	}
@@ -131,8 +132,8 @@ func (sshd sshd) sessionHandler(sess *ssh.Session) {
 
 func (sshd sshd) Serve() {
 	ssh.Handle(func(s ssh.Session) {
-		_, _ = io.WriteString(s, fmt.Sprintf(constant.AppBanner, constant.AppVersion))
-		sshd.sessionHandler(&s)
+		_, _ = io.WriteString(s, branding.Hi)
+		sshd.sessionHandler(s)
 	})
 
 	fmt.Printf("⇨ sshd server started on %v\n", config.GlobalCfg.Sshd.Addr)

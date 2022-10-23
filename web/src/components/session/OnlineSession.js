@@ -1,230 +1,31 @@
-import React, {Component} from 'react';
-
-import {
-    Button,
-    Col,
-    Divider,
-    Input,
-    Layout,
-    Modal,
-    notification,
-    Row,
-    Select,
-    Space,
-    Table,
-    Tag,
-    Tooltip,
-    Typography
-} from "antd";
-import qs from "qs";
-import request from "../../common/request";
-import {differTime} from "../../utils/utils";
-import {message} from "antd/es";
+import React from 'react';
+import ColumnState, {useColumnState} from "../../hook/column-state";
+import {Button, Layout, message, Popconfirm, Select, Tag, Tooltip} from "antd";
+import {ProTable} from "@ant-design/pro-components";
+import sessionApi from "../../api/session";
 import {MODE_COLORS, PROTOCOL_COLORS} from "../../common/constants";
-import {DisconnectOutlined, ExclamationCircleOutlined, SyncOutlined, UndoOutlined} from "@ant-design/icons";
-import AccessMonitor from "../access/AccessMonitor";
+import {differTime} from "../../utils/utils";
+import {openTinyWin} from "../../utils/window";
+import Show from "../../dd/fi/show";
 
-import dayjs from "dayjs";
-import TermMonitor from "../access/TermMonitor";
-
-const confirm = Modal.confirm;
 const {Content} = Layout;
-const {Search} = Input;
-const {Title, Text} = Typography;
+const actionRef = React.createRef();
+const api = sessionApi;
 
-class OnlineSession extends Component {
+const OnlineSession = () => {
 
-    inputRefOfClientIp = React.createRef();
+    const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.ONLINE_SESSION);
 
-    state = {
-        items: [],
-        total: 0,
-        queryParams: {
-            pageIndex: 1,
-            pageSize: 10,
-            protocol: '',
-            userId: undefined,
-            assetId: undefined
-        },
-        loading: false,
-        selectedRowKeys: [],
-        delBtnLoading: false,
-        users: [],
-        assets: [],
-        accessVisible: false,
-        sessionWidth: 1024,
-        sessionHeight: 768,
-        sessionProtocol: '',
-        sessionMode: '',
-    };
-
-    componentDidMount() {
-        this.loadTableData();
-        this.handleSearchByNickname('');
-        this.handleSearchByAssetName('');
-    }
-
-    async loadTableData(queryParams) {
-        this.setState({
-            loading: true
-        });
-
-        queryParams = queryParams || this.state.queryParams;
-        queryParams['status'] = 'connected';
-
-        // queryParams
-        let paramsStr = qs.stringify(queryParams);
-
-        let data = {
-            items: [],
-            total: 0
-        };
-
-        try {
-            let result = await request.get('/sessions/paging?' + paramsStr);
-            if (result.code === 1) {
-                data = result.data;
-            } else {
-                message.error(result.message);
-            }
-        } catch (e) {
-
-        } finally {
-            const items = data.items.map(item => {
-                return {'key': item['id'], ...item}
-            })
-            this.setState({
-                items: items,
-                total: data.total,
-                queryParams: queryParams,
-                loading: false
-            });
-        }
-    }
-
-    handleChangPage = (pageIndex, pageSize) => {
-        let queryParams = this.state.queryParams;
-        queryParams.pageIndex = pageIndex;
-        queryParams.pageSize = pageSize;
-
-        this.setState({
-            queryParams: queryParams
-        });
-
-        this.loadTableData(queryParams)
-    };
-
-    handleSearchByClientIp = clientIp => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'clientIp': clientIp,
-        }
-        this.loadTableData(query);
-    }
-
-    handleChangeByProtocol = protocol => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'protocol': protocol,
-        }
-        this.loadTableData(query);
-    }
-
-    handleSearchByNickname = async nickname => {
-        const result = await request.get(`/users/paging?pageIndex=1&pageSize=100&nickname=${nickname}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-
-        this.setState({
-            users: result.data.items
-        })
-    }
-
-    handleChangeByUserId = userId => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'userId': userId,
-        }
-        this.loadTableData(query);
-    }
-
-    handleSearchByAssetName = async assetName => {
-        const result = await request.get(`/assets/paging?pageIndex=1&pageSize=100&name=${assetName}`);
-        if (result.code !== 1) {
-            message.error(result.message, 10);
-            return;
-        }
-
-        this.setState({
-            assets: result.data.items
-        })
-    }
-
-    handleChangeByAssetId = (assetId, options) => {
-        let query = {
-            ...this.state.queryParams,
-            'pageIndex': 1,
-            'pageSize': this.state.queryParams.pageSize,
-            'assetId': assetId,
-        }
-        this.loadTableData(query);
-    }
-
-    batchDis = async () => {
-        this.setState({
-            delBtnLoading: true
-        })
-        try {
-            let result = await request.post('/sessions/' + this.state.selectedRowKeys.join(',') + '/disconnect');
-            if (result.code === 1) {
-                message.success('操作成功', 3);
-                this.setState({
-                    selectedRowKeys: []
-                })
-                await this.loadTableData(this.state.queryParams);
-            } else {
-                message.error(result.message, 10);
-            }
-        } finally {
-            this.setState({
-                delBtnLoading: false
-            })
-        }
-    }
-
-    showMonitor = (record) => {
-        this.setState({
-            sessionId: record.id,
-            sessionProtocol: record.protocol,
-            sessionMode: record.mode,
-            accessVisible: true,
-            sessionWidth: record.width,
-            sessionHeight: record.height,
-            sessionTitle: `${record.username}@${record.ip}:${record.port} ${record.width}x${record.height}`
-        })
-    }
-
-    render() {
-
-        const columns = [{
-            title: '序号',
-            dataIndex: 'id',
-            key: 'id',
-            render: (id, record, index) => {
-                return index + 1;
-            }
+    const columns = [
+        {
+            dataIndex: 'index',
+            valueType: 'indexBorder',
+            width: 48,
         }, {
             title: '来源IP',
             dataIndex: 'clientIp',
-            key: 'clientIp'
+            key: 'clientIp',
+            hideInSearch: true,
         }, {
             title: '接入方式',
             dataIndex: 'mode',
@@ -233,15 +34,18 @@ class OnlineSession extends Component {
                 return (
                     <Tag color={MODE_COLORS[text]}>{text}</Tag>
                 )
-            }
+            },
+            hideInSearch: true,
         }, {
             title: '用户昵称',
             dataIndex: 'creatorName',
-            key: 'creatorName'
+            key: 'creatorName',
+            hideInSearch: true,
         }, {
             title: '资产名称',
             dataIndex: 'assetName',
-            key: 'assetName'
+            key: 'assetName',
+            hideInSearch: true,
         }, {
             title: '连接协议',
             dataIndex: 'protocol',
@@ -253,251 +57,128 @@ class OnlineSession extends Component {
                         <Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>
                     </Tooltip>
                 )
-            }
+            },
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select>
+                        <Select.Option value="rdp">RDP</Select.Option>
+                        <Select.Option value="ssh">SSH</Select.Option>
+                        <Select.Option value="telnet">Telnet</Select.Option>
+                        <Select.Option value="kubernetes">Kubernetes</Select.Option>
+                    </Select>
+                );
+            },
         }, {
             title: '接入时间',
             dataIndex: 'connectedTime',
             key: 'connectedTime',
-            render: (text, record) => {
-                return (
-                    <Tooltip title={text}>
-                        {dayjs(text).fromNow()}
-                    </Tooltip>
-                )
-            }
+            hideInSearch: true,
         }, {
             title: '接入时长',
-            dataIndex: 'connectedTime',
-            key: 'connectedTime',
+            dataIndex: 'connectedTimeDur',
+            key: 'connectedTimeDur',
             render: (text, record) => {
+                if (!record['connectedTime']) {
+                    return '-';
+                }
                 return differTime(new Date(record['connectedTime']), new Date());
-            }
-        },
-            {
-                title: '操作',
-                key: 'action',
-                render: (text, record) => {
-
-                    return (
-                        <div>
-                            <Button type="link" size='small' onClick={() => {
-                                this.showMonitor(record)
-                            }}>监控</Button>
-                            <Button type="link" size='small' onClick={async () => {
-
-                                confirm({
-                                    title: '您确定要断开此会话吗?',
-                                    content: '',
-                                    okText: '确定',
-                                    okType: 'danger',
-                                    cancelText: '取消',
-                                    onOk() {
-                                        dis(record.id)
-                                    }
-                                });
-
-                                const dis = async (id) => {
-                                    const result = await request.post(`/sessions/${id}/disconnect`);
-                                    if (result.code === 1) {
-                                        notification['success']({
-                                            message: '提示',
-                                            description: '断开成功',
-                                        });
-                                        this.loadTableData();
-                                    } else {
-                                        notification['success']({
-                                            message: '提示',
-                                            description: result.message,
-                                        });
-                                    }
-                                }
-
-                            }}>断开</Button>
-                        </div>
-                    )
-                },
-            }
-        ];
-
-        const selectedRowKeys = this.state.selectedRowKeys;
-        const rowSelection = {
-            selectedRowKeys: selectedRowKeys,
-            onChange: (selectedRowKeys, selectedRows) => {
-                this.setState({selectedRowKeys});
             },
-        };
-        const hasSelected = selectedRowKeys.length > 0;
+            hideInSearch: true,
+        },
+        {
+            title: '操作',
+            valueType: 'option',
+            key: 'option',
+            render: (text, record, _, action) => [
+                <Show menu={'online-session-monitor'} key={'online-session-monitor'}>
+                    <Button
+                        key='monitor'
+                        type="link"
+                        size='small'
+                        onClick={() => {
+                            switch (record['mode']) {
+                                case 'naive':
+                                case 'native':
+                                case 'terminal':
+                                    openTinyWin(`#/term-monitor?sessionId=${record['id']}`, record['id'], 1024, 768);
+                                    break;
+                                case 'guacd':
+                                    openTinyWin(`#/guacd-monitor?sessionId=${record['id']}`, record['id'], 1024, 768);
+                                    break;
+                                default:
+                                    message.info('数据异常');
+                                    break;
+                            }
+                        }}>
+                        监控
+                    </Button>
+                </Show>,
+                <Show menu={'online-session-disconnect'} key={'online-session-disconnect'}>
+                    <Popconfirm
+                        key={'confirm-disconnect'}
+                        title="您确定要断开此会话吗?"
+                        onConfirm={async () => {
+                            await api.disconnect(record.id);
+                            actionRef.current.reload();
+                        }}
+                        okText="确认"
+                        cancelText="取消"
+                    >
+                        <a key='delete' className='danger'>断开</a>
+                    </Popconfirm>
+                </Show>,
+            ],
+        },
+    ];
 
-        const userOptions = this.state.users.map(d => <Select.Option key={d.id}
-                                                                     value={d.id}>{d.nickname}</Select.Option>);
-        const assetOptions = this.state.assets.map(d => <Select.Option key={d.id}
-                                                                       value={d.id}>{d.name}</Select.Option>);
+    return (<Content className="page-container">
+        <ProTable
+            columns={columns}
+            actionRef={actionRef}
+            columnsState={{
+                value: columnsStateMap,
+                onChange: setColumnsStateMap
+            }}
+            request={async (params = {}, sort, filter) => {
 
-        return (
-            <>
-                <Content className="site-layout-background page-content">
+                let field = '';
+                let order = '';
+                if (Object.keys(sort).length > 0) {
+                    field = Object.keys(sort)[0];
+                    order = Object.values(sort)[0];
+                }
 
-                    <div style={{marginBottom: 20}}>
-                        <Row justify="space-around" align="middle" gutter={24}>
-                            <Col span={8} key={1}>
-                                <Title level={3}>在线会话列表</Title>
-                            </Col>
-                            <Col span={16} key={2} style={{textAlign: 'right'}}>
-                                <Space>
-
-                                    <Search
-                                        ref={this.inputRefOfClientIp}
-                                        placeholder="来源IP"
-                                        allowClear
-                                        onSearch={this.handleSearchByClientIp}
-                                    />
-
-                                    <Select
-                                        style={{width: 150}}
-                                        showSearch
-                                        value={this.state.queryParams.userId}
-                                        placeholder='用户昵称'
-                                        onSearch={this.handleSearchByNickname}
-                                        onChange={this.handleChangeByUserId}
-                                        filterOption={false}
-                                        allowClear
-                                    >
-                                        {userOptions}
-                                    </Select>
-
-                                    <Select
-                                        style={{width: 150}}
-                                        showSearch
-                                        value={this.state.queryParams.assetId}
-                                        placeholder='资产名称'
-                                        onSearch={this.handleSearchByAssetName}
-                                        onChange={this.handleChangeByAssetId}
-                                        filterOption={false}
-                                    >
-                                        {assetOptions}
-                                    </Select>
-
-                                    <Select onChange={this.handleChangeByProtocol}
-                                            value={this.state.queryParams.protocol ? this.state.queryParams.protocol : ''}
-                                            style={{width: 100}}>
-                                        <Select.Option value="">全部协议</Select.Option>
-                                        <Select.Option value="rdp">rdp</Select.Option>
-                                        <Select.Option value="ssh">ssh</Select.Option>
-                                        <Select.Option value="vnc">vnc</Select.Option>
-                                        <Select.Option value="telnet">telnet</Select.Option>
-                                        <Select.Option value="kubernetes">kubernetes</Select.Option>
-                                    </Select>
-
-                                    <Tooltip title='重置查询'>
-
-                                        <Button icon={<UndoOutlined/>} onClick={() => {
-                                            this.inputRefOfClientIp.current.setValue('');
-                                            this.loadTableData({
-                                                pageIndex: 1,
-                                                pageSize: 10,
-                                                protocol: '',
-                                                userId: undefined,
-                                                assetId: undefined
-                                            })
-                                        }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                    <Divider type="vertical"/>
-
-                                    <Tooltip title="刷新列表">
-                                        <Button icon={<SyncOutlined/>} onClick={() => {
-                                            this.loadTableData(this.state.queryParams)
-                                        }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                    <Tooltip title="批量断开">
-                                        <Button type="primary" danger disabled={!hasSelected}
-                                                icon={<DisconnectOutlined/>}
-                                                loading={this.state.delBtnLoading}
-                                                onClick={() => {
-                                                    const content = <div>
-                                                        您确定要断开选中的<Text style={{color: '#1890FF'}}
-                                                                       strong>{this.state.selectedRowKeys.length}</Text>个会话吗？
-                                                    </div>;
-                                                    confirm({
-                                                        icon: <ExclamationCircleOutlined/>,
-                                                        content: content,
-                                                        onOk: () => {
-                                                            this.batchDis()
-                                                        },
-                                                        onCancel() {
-
-                                                        },
-                                                    });
-                                                }}>
-
-                                        </Button>
-                                    </Tooltip>
-
-                                </Space>
-                            </Col>
-                        </Row>
-                    </div>
-
-                    <Table rowSelection={rowSelection}
-                           dataSource={this.state.items}
-                           columns={columns}
-                           position={'both'}
-                           pagination={{
-                               showSizeChanger: true,
-                               current: this.state.queryParams.pageIndex,
-                               pageSize: this.state.queryParams.pageSize,
-                               onChange: this.handleChangPage,
-                               total: this.state.total,
-                               showTotal: total => `总计 ${total} 条`
-                           }}
-                           loading={this.state.loading}
-                    />
-
-                    {
-                        this.state.accessVisible ?
-                            <Modal
-                                className='modal-no-padding'
-                                title={this.state.sessionTitle}
-
-                                maskClosable={false}
-                                visible={this.state.accessVisible}
-                                footer={null}
-                                width={window.innerWidth * 0.8}
-                                height={window.innerWidth * 0.8 / this.state.sessionWidth * this.state.sessionHeight}
-                                onCancel={() => {
-                                    message.destroy();
-                                    this.setState({accessVisible: false})
-                                }}
-                            >
-                                {
-                                    this.state.sessionMode === 'guacd' ?
-                                        <AccessMonitor sessionId={this.state.sessionId}
-                                                       width={this.state.sessionWidth}
-                                                       height={this.state.sessionHeight}
-                                                       protocol={this.state.sessionProtocol}
-                                                       rate={window.innerWidth * 0.8 / this.state.sessionWidth}>
-
-                                        </AccessMonitor> :
-                                        <TermMonitor sessionId={this.state.sessionId}
-                                                     width={this.state.sessionWidth}
-                                                     height={this.state.sessionHeight}>
-
-                                        </TermMonitor>
-                                }
-
-
-                            </Modal> : undefined
-                    }
-
-                </Content>
-            </>
-        );
-    }
-}
+                let queryParams = {
+                    pageIndex: params.current,
+                    pageSize: params.pageSize,
+                    protocol: params.protocol,
+                    field: field,
+                    order: order,
+                    status: 'connected'
+                }
+                let result = await api.getPaging(queryParams);
+                return {
+                    data: result['items'],
+                    success: true,
+                    total: result['total']
+                };
+            }}
+            rowKey="id"
+            search={{
+                labelWidth: 'auto',
+            }}
+            pagination={{
+                defaultPageSize: 10,
+            }}
+            dateFormatter="string"
+            headerTitle="在线会话列表"
+            toolBarRender={() => []}
+        />
+    </Content>);
+};
 
 export default OnlineSession;

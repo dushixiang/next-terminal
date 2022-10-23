@@ -1,41 +1,54 @@
 import React, {useEffect, useState} from 'react';
-import {Form, Input, Modal, Radio, Select, Spin} from "antd/lib/index";
-import TextArea from "antd/es/input/TextArea";
-import request from "../../common/request";
-import {message} from "antd";
+import {Form, Input, Modal, Radio, Select, Spin} from "antd";
+import jobApi from "../../api/job";
+import assetApi from "../../api/asset";
 
-const JobModal = ({title, visible, handleOk, handleCancel, confirmLoading, model}) => {
+const {TextArea} = Input;
+
+const JobModal = ({
+                      visible,
+                      handleOk,
+                      handleCancel,
+                      confirmLoading,
+                      id,
+                  }) => {
 
     const [form] = Form.useForm();
-    if (model.func === undefined) {
-        model.func = 'shell-job';
-    }
 
-    if (model.mode === undefined) {
-        model.mode = 'all';
-    }
-
-    let [func, setFunc] = useState(model.func);
-    let [mode, setMode] = useState(model.mode);
+    let [func, setFunc] = useState('shell-job');
+    let [mode, setMode] = useState('all');
     let [resources, setResources] = useState([]);
+    let [resourcesLoading, setResourcesLoading] = useState(false);
+
     useEffect(() => {
         const fetchData = async () => {
             setResourcesLoading(true);
-            let result = await request.get('/assets?protocol=ssh');
-            if (result['code'] === 1) {
-                setResources(result['data']);
-            } else {
-                message.error(result['message'], 10);
-            }
+            let result = await assetApi.GetAll('ssh');
+            setResources(result);
             setResourcesLoading(false);
         };
 
         fetchData();
 
-    }, []);
+        const getItem = async () => {
+            let data = await jobApi.getById(id);
+            if (data) {
+                form.setFieldsValue(data);
+                setMode(data['mode']);
+                setFunc(data['func']);
+            }
+        }
 
+        if (visible && id) {
+            getItem();
+        } else {
+            form.setFieldsValue({
+                func: 'shell-job',
+                mode: 'all',
+            });
+        }
 
-    let [resourcesLoading, setResourcesLoading] = useState(false);
+    }, [visible]);
 
     const formItemLayout = {
         labelCol: {span: 6},
@@ -44,27 +57,30 @@ const JobModal = ({title, visible, handleOk, handleCancel, confirmLoading, model
 
     return (
         <Modal
-            title={title}
+            title={id ? '更新计划任务' : '新建计划任务'}
             visible={visible}
             maskClosable={false}
-
+            destroyOnClose={true}
             onOk={() => {
                 form
                     .validateFields()
-                    .then(values => {
-                        form.resetFields();
-                        handleOk(values);
-                    })
-                    .catch(info => {
+                    .then(async values => {
+                        let ok = await handleOk(values);
+                        if (ok) {
+                            form.resetFields();
+                        }
                     });
             }}
-            onCancel={handleCancel}
+            onCancel={() => {
+                form.resetFields();
+                handleCancel();
+            }}
             confirmLoading={confirmLoading}
             okText='确定'
             cancelText='取消'
         >
 
-            <Form form={form} {...formItemLayout} initialValues={model}>
+            <Form form={form} {...formItemLayout}>
                 <Form.Item name='id' noStyle>
                     <Input hidden={true}/>
                 </Form.Item>

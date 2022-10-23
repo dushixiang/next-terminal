@@ -3,9 +3,11 @@ package service
 import (
 	"errors"
 	"fmt"
+	"next-terminal/server/common/nt"
 	"strings"
 
-	"next-terminal/server/constant"
+	"next-terminal/server/branding"
+	"next-terminal/server/common"
 	"next-terminal/server/dto"
 	"next-terminal/server/env"
 	"next-terminal/server/global/cache"
@@ -17,6 +19,10 @@ import (
 	"golang.org/x/net/context"
 	"gorm.io/gorm"
 )
+
+const SuperAdminID = `abcdefghijklmnopqrstuvwxyz`
+
+var UserService = new(userService)
 
 type userService struct {
 	baseService
@@ -37,35 +43,50 @@ func (service userService) InitUser() (err error) {
 		}
 
 		user := model.User{
-			ID:       utils.UUID(),
+			ID:       SuperAdminID,
 			Username: "admin",
 			Password: string(pass),
 			Nickname: "超级管理员",
-			Type:     constant.TypeAdmin,
-			Created:  utils.NowJsonTime(),
-			Status:   constant.StatusEnabled,
+			Type:     nt.TypeAdmin,
+			Created:  common.NowJsonTime(),
+			Status:   nt.StatusEnabled,
 		}
 		if err := repository.UserRepository.Create(context.TODO(), &user); err != nil {
 			return err
 		}
 
-		log.Infof("初始用户创建成功，账号：「%v」密码：「%v」", user.Username, initPassword)
 	} else {
 		for i := range users {
 			// 修正默认用户类型为管理员
 			if users[i].Type == "" {
 				user := model.User{
-					Type: constant.TypeAdmin,
+					Type: nt.TypeUser,
 					ID:   users[i].ID,
 				}
 				if err := repository.UserRepository.Update(context.TODO(), &user); err != nil {
 					return err
 				}
-				log.Infof("自动修正用户「%v」id「%v」类型为管理员", users[i].Nickname, users[i].ID)
+			}
+
+			if users[i].Type == nt.TypeAdmin {
+				roles, err := RoleService.GetRolesByUserId(users[i].ID)
+				if err != nil {
+					return err
+				}
+				if len(roles) == 0 {
+					users[i].Roles = []string{"system-administrator"}
+					if err := service.saveUserRoles(context.Background(), users[i]); err != nil {
+						return err
+					}
+				}
 			}
 		}
 	}
 	return nil
+}
+
+func (service userService) IsSuperAdmin(userId string) bool {
+	return SuperAdminID == userId
 }
 
 func (service userService) FixUserOnlineState() error {
@@ -100,7 +121,7 @@ func (service userService) LogoutByToken(token string) (err error) {
 		return err
 	}
 
-	loginLogForUpdate := &model.LoginLog{LogoutTime: utils.NowJsonTime(), ID: token}
+	loginLogForUpdate := &model.LoginLog{LogoutTime: common.NowJsonTime(), ID: token}
 	err = repository.LoginLogRepository.Update(context.TODO(), loginLogForUpdate)
 	if err != nil {
 		return err
@@ -153,18 +174,15 @@ func (service userService) GetUserLoginToken(c context.Context, username string)
 func (service userService) OnEvicted(token string, value interface{}) {
 
 	if strings.HasPrefix(token, "forever") {
-		log.Debugf("re gen forever token")
 	} else {
-		log.Debugf("用户Token「%v」过期", token)
 		err := service.LogoutByToken(token)
 		if err != nil && !errors.Is(gorm.ErrRecordNotFound, err) {
-			log.Errorf("退出登录失败 %v", err)
 		}
 	}
 }
 
 func (service userService) UpdateStatusById(id string, status string) error {
-	if constant.StatusDisabled == status {
+	if nt.StatusDisabled == status {
 		// 将该用户下线
 		if err := service.LogoutById(context.TODO(), id); err != nil {
 			return err
@@ -197,7 +215,7 @@ func (service userService) ReloadToken() error {
 
 		authorization := dto.Authorization{
 			Token:    token,
-			Type:     constant.LoginToken,
+			Type:     nt.LoginToken,
 			Remember: loginLog.Remember,
 			User:     &user,
 		}
@@ -208,7 +226,7 @@ func (service userService) ReloadToken() error {
 		} else {
 			cache.TokenManager.Set(token, authorization, cache.NotRememberExpiration)
 		}
-		log.Debugf("重新加载用户「%v」授权Token「%v」到缓存", user.Nickname, token)
+		log.Debug("重新加载用户授权Token", log.String("username", user.Nickname), log.String("token", token))
 	}
 	return nil
 }
@@ -232,19 +250,21 @@ func (service userService) CreateUser(user model.User) (err error) {
 		user.Password = string(pass)
 
 		user.ID = utils.UUID()
-		user.Created = utils.NowJsonTime()
-		user.Status = constant.StatusEnabled
+		user.Created = common.NowJsonTime()
+		user.Status = nt.StatusEnabled
 
 		if err := repository.UserRepository.Create(c, &user); err != nil {
 			return err
 		}
-		err = StorageService.CreateStorageByUser(c, &user)
-		if err != nil {
+		if err := service.saveUserRoles(c, user); err != nil {
+			return err
+		}
+		if err := StorageService.CreateStorageByUser(c, &user); err != nil {
 			return err
 		}
 
 		if user.Mail != "" {
-			subject := fmt.Sprintf("%s 注册通知", constant.AppName)
+			subject := fmt.Sprintf("%s 注册通知", branding.Name)
 			text := fmt.Sprintf(`您好，%s。
 	管理员为你开通了账户。
 	账号：%s
@@ -255,6 +275,20 @@ func (service userService) CreateUser(user model.User) (err error) {
 		return nil
 	})
 
+}
+
+func (service userService) saveUserRoles(c context.Context, user model.User) error {
+	for _, role := range user.Roles {
+		ref := &model.UserRoleRef{
+			ID:     utils.UUID(),
+			UserId: user.ID,
+			RoleId: role,
+		}
+		if err := repository.UserRoleRefRepository.Create(c, ref); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func (service userService) DeleteUserById(userId string) error {
@@ -276,14 +310,17 @@ func (service userService) DeleteUserById(userId string) error {
 			return err
 		}
 		// 删除用户与资产的关系
-		if err := repository.ResourceSharerRepository.DeleteByUserId(c, userId); err != nil {
+		if err := repository.AuthorisedRepository.DeleteByUserId(c, userId); err != nil {
 			return err
 		}
 		// 删除用户的默认磁盘空间
 		if err := StorageService.DeleteStorageById(c, userId, true); err != nil {
 			return err
 		}
-
+		// 删除用户与角色的关系
+		if err := repository.UserRoleRefRepository.DeleteByUserId(c, user.ID); err != nil {
+			return err
+		}
 		// 删除用户
 		if err := repository.UserRepository.DeleteById(c, userId); err != nil {
 			return err
@@ -324,7 +361,7 @@ func (service userService) SaveLoginLog(clientIP, clientUserAgent string, userna
 		Username:        username,
 		ClientIP:        clientIP,
 		ClientUserAgent: clientUserAgent,
-		LoginTime:       utils.NowJsonTime(),
+		LoginTime:       common.NowJsonTime(),
 		Reason:          reason,
 		Remember:        remember,
 	}
@@ -343,7 +380,7 @@ func (service userService) SaveLoginLog(clientIP, clientUserAgent string, userna
 }
 
 func (service userService) DeleteALlLdapUser(ctx context.Context) error {
-	return repository.UserRepository.DeleteBySource(ctx, constant.SourceLdap)
+	return repository.UserRepository.DeleteBySource(ctx, nt.SourceLdap)
 }
 
 func (service userService) UpdateUser(id string, user model.User) error {
@@ -367,41 +404,83 @@ func (service userService) UpdateUser(id string, user model.User) error {
 			}
 		}
 
+		if err := repository.UserRoleRefRepository.DeleteByUserId(ctx, user.ID); err != nil {
+			return err
+		}
+
+		if err := service.saveUserRoles(ctx, user); err != nil {
+			return err
+		}
+
+		// 移除用户角色的缓存
+		cache.UserRolesManager.Delete(id)
+
 		return repository.UserRepository.Update(ctx, &user)
 	})
 
 }
 
-func (service userService) AddSharerResources(ctx context.Context, userGroupId, userId, strategyId, resourceType string, resourceIds []string) error {
-	if service.InTransaction(ctx) {
-		return service.addSharerResources(ctx, resourceIds, userGroupId, userId, strategyId, resourceType)
-	} else {
-		return env.GetDB().Transaction(func(tx *gorm.DB) error {
-			ctx2 := service.Context(tx)
-			return service.addSharerResources(ctx2, resourceIds, userGroupId, userId, strategyId, resourceType)
-		})
+func (service userService) FindById(id string) (*model.User, error) {
+	item, err := repository.UserRepository.FindById(context.TODO(), id)
+	if err != nil {
+		return nil, err
 	}
+
+	roles, err := RoleService.GetRolesByUserId(id)
+	if err != nil {
+		return nil, err
+	}
+	item.Roles = roles
+
+	return &item, nil
 }
 
-func (service userService) addSharerResources(ctx context.Context, resourceIds []string, userGroupId string, userId string, strategyId string, resourceType string) error {
-	for i := range resourceIds {
-		resourceId := resourceIds[i]
-		// 保证同一个资产只能分配给一个用户或者组
-		id := utils.Sign([]string{resourceId, resourceType, userId, userGroupId})
-		if err := repository.ResourceSharerRepository.DeleteById(ctx, id); err != nil {
-			return err
+func (service userService) ResetTotp(ids []string) error {
+	return service.Transaction(context.Background(), func(ctx context.Context) error {
+		for _, id := range ids {
+			u := &model.User{
+				TOTPSecret: "-",
+				ID:         id,
+			}
+			if err := repository.UserRepository.Update(ctx, u); err != nil {
+				return err
+			}
 		}
-		rs := &model.ResourceSharer{
-			ID:           id,
-			ResourceId:   resourceId,
-			ResourceType: resourceType,
-			StrategyId:   strategyId,
-			UserId:       userId,
-			UserGroupId:  userGroupId,
-		}
-		if err := repository.ResourceSharerRepository.AddSharerResource(ctx, rs); err != nil {
-			return err
-		}
+		return nil
+	})
+}
+
+func (service userService) ChangePassword(ids []string, password string) error {
+
+	passwd, err := utils.Encoder.Encode([]byte(password))
+	if err != nil {
+		return err
 	}
-	return nil
+
+	return service.Transaction(context.Background(), func(ctx context.Context) error {
+		for _, id := range ids {
+			u := &model.User{
+				Password: string(passwd),
+				ID:       id,
+			}
+			if err := repository.UserRepository.Update(ctx, u); err != nil {
+				return err
+			}
+
+			user, err := repository.UserRepository.FindById(ctx, id)
+			if err != nil {
+				return err
+			}
+
+			if user.Mail != "" {
+				subject := "密码修改通知"
+				text := fmt.Sprintf(`您好，%s。
+	管理员已将你的密码修改为：%s。
+`, user.Username, password)
+				go MailService.SendMail(user.Mail, subject, text)
+			}
+		}
+
+		return nil
+	})
 }

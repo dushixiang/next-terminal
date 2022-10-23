@@ -1,266 +1,151 @@
 package log
 
 import (
-	"fmt"
-	"io"
 	"os"
-	"path"
-	"path/filepath"
-	"strconv"
-	"strings"
 	"time"
 
-	"next-terminal/server/config"
-
-	"github.com/labstack/echo/v4"
-	"github.com/sirupsen/logrus"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 
-type Formatter struct{}
+var (
+	_logger *zap.Logger // zap ensure that zap.Logger is safe for concurrent use
+)
 
-func (s *Formatter) Format(entry *logrus.Entry) ([]byte, error) {
-	timestamp := time.Now().Local().Format("2006-01-02 15:04:05")
-	var file string
-	var l int
-	if entry.HasCaller() {
-		file = filepath.Base(entry.Caller.Function)
-		l = entry.Caller.Line
+func init() {
+	cfg := zap.NewProductionConfig()
+	cfg.EncoderConfig.EncodeTime = func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
+		enc.AppendString(t.Format("2006-01-02 15:04:05.000"))
 	}
 
-	msg := fmt.Sprintf("%s %s [%s:%d]%s\n", timestamp, strings.ToUpper(entry.Level.String()), file, l, entry.Message)
-	return []byte(msg), nil
-}
-
-var stdOut = NewLogger()
-
-// Trace logs a message at level Trace on the standard logger.
-func Trace(args ...interface{}) {
-	stdOut.Trace(args...)
-}
-
-// Debug logs a message at level Debug on the standard logger.
-func Debug(args ...interface{}) {
-	stdOut.Debug(args...)
-}
-
-// Print logs a message at level Info on the standard logger.
-func Print(args ...interface{}) {
-	stdOut.Print(args...)
-}
-
-// Info logs a message at level Info on the standard logger.
-func Info(args ...interface{}) {
-	stdOut.Info(args...)
-}
-
-// Warn logs a message at level Warn on the standard logger.
-func Warn(args ...interface{}) {
-	stdOut.Warn(args...)
-}
-
-// Warning logs a message at level Warn on the standard logger.
-func Warning(args ...interface{}) {
-	stdOut.Warning(args...)
-}
-
-// Error logs a message at level Error on the standard logger.
-func Error(args ...interface{}) {
-	stdOut.Error(args...)
-}
-
-// Panic logs a message at level Panic on the standard logger.
-func Panic(args ...interface{}) {
-	stdOut.Panic(args...)
-}
-
-// Fatal logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
-func Fatal(args ...interface{}) {
-	stdOut.Fatal(args...)
-}
-
-// Tracef logs a message at level Trace on the standard logger.
-func Tracef(format string, args ...interface{}) {
-	stdOut.Tracef(format, args...)
-}
-
-// Debugf logs a message at level Debug on the standard logger.
-func Debugf(format string, args ...interface{}) {
-	stdOut.Debugf(format, args...)
-}
-
-// Printf logs a message at level Info on the standard logger.
-func Printf(format string, args ...interface{}) {
-	stdOut.Printf(format, args...)
-}
-
-// Infof logs a message at level Info on the standard logger.
-func Infof(format string, args ...interface{}) {
-	stdOut.Infof(format, args...)
-}
-
-// Warnf logs a message at level Warn on the standard logger.
-func Warnf(format string, args ...interface{}) {
-	stdOut.Warnf(format, args...)
-}
-
-// Warningf logs a message at level Warn on the standard logger.
-func Warningf(format string, args ...interface{}) {
-	stdOut.Warningf(format, args...)
-}
-
-// Errorf logs a message at level Error on the standard logger.
-func Errorf(format string, args ...interface{}) {
-	stdOut.Errorf(format, args...)
-}
-
-// Panicf logs a message at level Panic on the standard logger.
-func Panicf(format string, args ...interface{}) {
-	stdOut.Panicf(format, args...)
-}
-
-// Fatalf logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
-func Fatalf(format string, args ...interface{}) {
-	stdOut.Fatalf(format, args...)
-}
-
-// Traceln logs a message at level Trace on the standard logger.
-func Traceln(args ...interface{}) {
-	stdOut.Traceln(args...)
-}
-
-// Debugln logs a message at level Debug on the standard logger.
-func Debugln(args ...interface{}) {
-	stdOut.Debugln(args...)
-}
-
-// Println logs a message at level Info on the standard logger.
-func Println(args ...interface{}) {
-	stdOut.Println(args...)
-}
-
-// Infoln logs a message at level Info on the standard logger.
-func Infoln(args ...interface{}) {
-	stdOut.Infoln(args...)
-}
-
-// Warnln logs a message at level Warn on the standard logger.
-func Warnln(args ...interface{}) {
-	stdOut.Warnln(args...)
-}
-
-// Warningln logs a message at level Warn on the standard logger.
-func Warningln(args ...interface{}) {
-	stdOut.Warningln(args...)
-}
-
-// Errorln logs a message at level Error on the standard logger.
-func Errorln(args ...interface{}) {
-	stdOut.Errorln(args...)
-}
-
-// Panicln logs a message at level Panic on the standard logger.
-func Panicln(args ...interface{}) {
-	stdOut.Panicln(args...)
-}
-
-// Fatalln logs a message at level Fatal on the standard logger then the process will exit with status set to 1.
-func Fatalln(args ...interface{}) {
-	stdOut.Fatalln(args...)
-}
-
-// WithError creates an entry from the standard logger and adds an error to it, using the value defined in ErrorKey as key.
-func WithError(err error) *logrus.Entry {
-	return stdOut.WithField(logrus.ErrorKey, err)
-}
-
-// WithField creates an entry from the standard logger and adds a field to
-// it. If you want multiple fields, use `WithFields`.
-//
-// Note that it doesn't log until you call Debug, Print, Info, Warn, Fatal
-// or Panic on the Entry it returns.
-func WithField(key string, value interface{}) *logrus.Entry {
-	return stdOut.WithField(key, value)
-}
-
-// Logrus : implement log
-type Logrus struct {
-	*logrus.Logger
-}
-
-// GetEchoLogger for e.l
-func NewLogger() Logrus {
-	logFilePath := ""
-	if dir, err := os.Getwd(); err == nil {
-		logFilePath = dir + "/logs/"
-	}
-	if err := os.MkdirAll(logFilePath, 0755); err != nil {
-		fmt.Println(err.Error())
-	}
-	logFileName := "next-terminal.log"
-	//日志文件
-	fileName := path.Join(logFilePath, logFileName)
-	if _, err := os.Stat(fileName); err != nil {
-		if _, err := os.Create(fileName); err != nil {
-			fmt.Println(err.Error())
-		}
+	var cores = []zapcore.Core{
+		zapcore.NewCore(
+			zapcore.NewConsoleEncoder(cfg.EncoderConfig),
+			zapcore.Lock(os.Stdout),
+			zap.LevelEnablerFunc(func(level zapcore.Level) bool {
+				return level <= zapcore.InfoLevel
+			}),
+		),
+		zapcore.NewCore(
+			zapcore.NewJSONEncoder(cfg.EncoderConfig),
+			zapcore.AddSync(&lumberjack.Logger{
+				Filename:   "logs/next-terminal.log",
+				MaxSize:    100,
+				MaxAge:     7,
+				MaxBackups: 3,
+				Compress:   true,
+			}),
+			zap.LevelEnablerFunc(func(level zapcore.Level) bool {
+				return level <= zapcore.InfoLevel
+			}),
+		),
+		zapcore.NewCore(
+			zapcore.NewConsoleEncoder(cfg.EncoderConfig),
+			zapcore.Lock(os.Stdout),
+			zap.LevelEnablerFunc(func(level zapcore.Level) bool {
+				return level > zapcore.InfoLevel
+			}),
+		),
+		zapcore.NewCore(
+			zapcore.NewJSONEncoder(cfg.EncoderConfig),
+			zapcore.AddSync(&lumberjack.Logger{
+				Filename:   "logs/next-terminal-error.log",
+				MaxSize:    100,
+				MaxAge:     7,
+				MaxBackups: 3,
+				Compress:   true,
+			}),
+			zap.LevelEnablerFunc(func(level zapcore.Level) bool {
+				return level > zapcore.InfoLevel
+			}),
+		),
 	}
 
-	//实例化
-	logger := logrus.New()
-	//设置输出
-	logger.SetOutput(io.MultiWriter(&lumberjack.Logger{
-		Filename:   fileName,
-		MaxSize:    100, // megabytes
-		MaxBackups: 3,
-		MaxAge:     7,    //days
-		Compress:   true, // disabled by default
-	}, os.Stdout))
-	logger.SetReportCaller(true)
-	//设置日志级别
-	if config.GlobalCfg.Debug {
-		logger.SetLevel(logrus.DebugLevel)
-	} else {
-		logger.SetLevel(logrus.InfoLevel)
-	}
-	//设置日志格式
-	logger.SetFormatter(new(Formatter))
-	return Logrus{Logger: logger}
+	_logger = zap.New(zapcore.NewTee(cores...), zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 }
 
-func logrusMiddlewareHandler(c echo.Context, next echo.HandlerFunc) error {
-	l := NewLogger()
-	req := c.Request()
-	res := c.Response()
-	start := time.Now()
-	if err := next(c); err != nil {
-		c.Error(err)
-	}
-	stop := time.Now()
+type Field = zap.Field
 
-	l.Debugf("%s %s %s %s %s %3d %s %13v %s %s",
-		c.RealIP(),
-		req.Host,
-		req.Method,
-		req.RequestURI,
-		req.URL.Path,
-		res.Status,
-		strconv.FormatInt(res.Size, 10),
-		stop.Sub(start).String(),
-		req.Referer(),
-		req.UserAgent(),
-	)
+// function variables for all field types
+// in github.com/uber-go/zap/field.go
 
-	return nil
+var (
+	Skip        = zap.Skip
+	Binary      = zap.Binary
+	Bool        = zap.Bool
+	Boolp       = zap.Boolp
+	ByteString  = zap.ByteString
+	Complex128  = zap.Complex128
+	Complex128p = zap.Complex128p
+	Complex64   = zap.Complex64
+	Complex64p  = zap.Complex64p
+	Float64     = zap.Float64
+	Float64p    = zap.Float64p
+	Float32     = zap.Float32
+	Float32p    = zap.Float32p
+	Int         = zap.Int
+	Intp        = zap.Intp
+	Int64       = zap.Int64
+	Int64p      = zap.Int64p
+	Int32       = zap.Int32
+	Int32p      = zap.Int32p
+	Int16       = zap.Int16
+	Int16p      = zap.Int16p
+	Int8        = zap.Int8
+	Int8p       = zap.Int8p
+	String      = zap.String
+	Stringp     = zap.Stringp
+	Uint        = zap.Uint
+	Uintp       = zap.Uintp
+	Uint64      = zap.Uint64
+	Uint64p     = zap.Uint64p
+	Uint32      = zap.Uint32
+	Uint32p     = zap.Uint32p
+	Uint16      = zap.Uint16
+	Uint16p     = zap.Uint16p
+	Uint8       = zap.Uint8
+	Uint8p      = zap.Uint8p
+	Uintptr     = zap.Uintptr
+	Uintptrp    = zap.Uintptrp
+	Reflect     = zap.Reflect
+	Namespace   = zap.Namespace
+	Stringer    = zap.Stringer
+	Time        = zap.Time
+	Timep       = zap.Timep
+	Stack       = zap.Stack
+	StackSkip   = zap.StackSkip
+	Duration    = zap.Duration
+	Durationp   = zap.Durationp
+	Any         = zap.Any
+	NamedError  = zap.NamedError
+)
+
+func Debug(msg string, fields ...Field) {
+	_logger.Debug(msg, fields...)
 }
 
-func logger(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		return logrusMiddlewareHandler(c, next)
-	}
+func Info(msg string, fields ...Field) {
+	_logger.Info(msg, fields...)
 }
 
-// Hook is a function to process log.
-func Hook() echo.MiddlewareFunc {
-	return logger
+func Warn(msg string, fields ...Field) {
+	_logger.Warn(msg, fields...)
+}
+
+func Error(msg string, fields ...Field) {
+	_logger.Error(msg, fields...)
+}
+func DPanic(msg string, fields ...Field) {
+	_logger.DPanic(msg, fields...)
+}
+func Panic(msg string, fields ...Field) {
+	_logger.Panic(msg, fields...)
+}
+func Fatal(msg string, fields ...Field) {
+	_logger.Fatal(msg, fields...)
+}
+
+func Sync() error {
+	return _logger.Sync()
 }

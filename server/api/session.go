@@ -13,9 +13,10 @@ import (
 	"strconv"
 	"strings"
 
-	"next-terminal/server/constant"
+	"next-terminal/server/common"
+	"next-terminal/server/common/maps"
+	"next-terminal/server/common/nt"
 	"next-terminal/server/global/session"
-	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
@@ -44,10 +45,10 @@ func (api SessionApi) SessionPagingEndpoint(c echo.Context) error {
 	}
 
 	for i := 0; i < len(items); i++ {
-		if status == constant.Disconnected && len(items[i].Recording) > 0 {
+		if status == nt.Disconnected && len(items[i].Recording) > 0 {
 
 			var recording string
-			if items[i].Mode == constant.Native || items[i].Mode == constant.Terminal {
+			if items[i].Mode == nt.Native || items[i].Mode == nt.Terminal {
 				recording = items[i].Recording
 			} else {
 				recording = items[i].Recording + "/recording"
@@ -63,7 +64,7 @@ func (api SessionApi) SessionPagingEndpoint(c echo.Context) error {
 		}
 	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"total": total,
 		"items": items,
 	})
@@ -71,7 +72,7 @@ func (api SessionApi) SessionPagingEndpoint(c echo.Context) error {
 
 func (api SessionApi) SessionDeleteEndpoint(c echo.Context) error {
 	sessionIds := strings.Split(c.Param("id"), ",")
-	err := repository.SessionRepository.DeleteByIds(context.TODO(), sessionIds)
+	err := service.SessionService.DeleteByIds(context.TODO(), sessionIds)
 	if err != nil {
 		return err
 	}
@@ -115,8 +116,8 @@ func (api SessionApi) SessionConnectEndpoint(c echo.Context) error {
 
 	s := model.Session{}
 	s.ID = sessionId
-	s.Status = constant.Connected
-	s.ConnectedTime = utils.NowJsonTime()
+	s.Status = nt.Connected
+	s.ConnectedTime = common.NowJsonTime()
 
 	if err := repository.SessionRepository.UpdateById(context.TODO(), &s, sessionId); err != nil {
 		return err
@@ -170,10 +171,10 @@ func (api SessionApi) SessionCreateEndpoint(c echo.Context) error {
 	assetId := c.QueryParam("assetId")
 	mode := c.QueryParam("mode")
 
-	if mode == constant.Native {
-		mode = constant.Native
+	if mode == nt.Native {
+		mode = nt.Native
 	} else {
-		mode = constant.Guacd
+		mode = nt.Guacd
 	}
 
 	user, _ := GetCurrentAccount(c)
@@ -220,6 +221,10 @@ func (api SessionApi) SessionUploadEndpoint(c echo.Context) error {
 
 	remoteDir := c.QueryParam("dir")
 	remoteFile := path.Join(remoteDir, filename)
+
+	// 记录日志
+	account, _ := GetCurrentAccount(c)
+	_ = service.StorageLogService.Save(context.Background(), s.AssetId, sessionId, account.ID, nt.StorageLogActionUpload, remoteFile)
 
 	if "ssh" == s.Protocol {
 		nextSession := session.GlobalSessionManager.GetById(sessionId)
@@ -313,6 +318,11 @@ func (api SessionApi) SessionDownloadEndpoint(c echo.Context) error {
 		return errors.New("禁止操作")
 	}
 	file := c.QueryParam("file")
+
+	// 记录日志
+	account, _ := GetCurrentAccount(c)
+	_ = service.StorageLogService.Save(context.Background(), s.AssetId, sessionId, account.ID, nt.StorageLogActionDownload, file)
+
 	// 获取带后缀的文件名称
 	filenameWithSuffix := path.Base(file)
 	if "ssh" == s.Protocol {
@@ -360,7 +370,6 @@ func (api SessionApi) SessionLsEndpoint(c echo.Context) error {
 		if nextSession.NextTerminal.SftpClient == nil {
 			sftpClient, err := sftp.NewClient(nextSession.NextTerminal.SshClient)
 			if err != nil {
-				log.Errorf("创建sftp客户端失败：%v", err.Error())
 				return err
 			}
 			nextSession.NextTerminal.SftpClient = sftpClient
@@ -374,18 +383,13 @@ func (api SessionApi) SessionLsEndpoint(c echo.Context) error {
 		var files = make([]service.File, 0)
 		for i := range fileInfos {
 
-			// 忽略隐藏文件
-			if strings.HasPrefix(fileInfos[i].Name(), ".") {
-				continue
-			}
-
 			file := service.File{
 				Name:    fileInfos[i].Name(),
 				Path:    path.Join(remoteDir, fileInfos[i].Name()),
 				IsDir:   fileInfos[i].IsDir(),
 				Mode:    fileInfos[i].Mode().String(),
 				IsLink:  fileInfos[i].Mode()&os.ModeSymlink == os.ModeSymlink,
-				ModTime: utils.NewJsonTime(fileInfos[i].ModTime()),
+				ModTime: common.NewJsonTime(fileInfos[i].ModTime()),
 				Size:    fileInfos[i].Size(),
 			}
 
@@ -415,6 +419,11 @@ func (api SessionApi) SessionMkDirEndpoint(c echo.Context) error {
 		return errors.New("禁止操作")
 	}
 	remoteDir := c.QueryParam("dir")
+
+	// 记录日志
+	account, _ := GetCurrentAccount(c)
+	_ = service.StorageLogService.Save(context.Background(), s.AssetId, sessionId, account.ID, nt.StorageLogActionMkdir, remoteDir)
+
 	if "ssh" == s.Protocol {
 		nextSession := session.GlobalSessionManager.GetById(sessionId)
 		if nextSession == nil {
@@ -445,6 +454,11 @@ func (api SessionApi) SessionRmEndpoint(c echo.Context) error {
 	}
 	// 文件夹或者文件
 	file := c.FormValue("file")
+
+	// 记录日志
+	account, _ := GetCurrentAccount(c)
+	_ = service.StorageLogService.Save(context.Background(), s.AssetId, sessionId, account.ID, nt.StorageLogActionRm, file)
+
 	if "ssh" == s.Protocol {
 		nextSession := session.GlobalSessionManager.GetById(sessionId)
 		if nextSession == nil {
@@ -502,6 +516,11 @@ func (api SessionApi) SessionRenameEndpoint(c echo.Context) error {
 	}
 	oldName := c.QueryParam("oldName")
 	newName := c.QueryParam("newName")
+
+	// 记录日志
+	account, _ := GetCurrentAccount(c)
+	_ = service.StorageLogService.Save(context.Background(), s.AssetId, sessionId, account.ID, nt.StorageLogActionRename, oldName)
+
 	if "ssh" == s.Protocol {
 		nextSession := session.GlobalSessionManager.GetById(sessionId)
 		if nextSession == nil {
@@ -533,14 +552,12 @@ func (api SessionApi) SessionRecordingEndpoint(c echo.Context) error {
 	}
 
 	var recording string
-	if s.Mode == constant.Native || s.Mode == constant.Terminal {
+	if s.Mode == nt.Native || s.Mode == nt.Terminal {
 		recording = s.Recording
 	} else {
 		recording = s.Recording + "/recording"
 	}
 	_ = repository.SessionRepository.UpdateReadByIds(context.TODO(), true, []string{sessionId})
-
-	log.Debugf("读取录屏文件：%v,是否存在: %v, 是否为文件: %v", recording, utils.FileExists(recording), utils.IsFile(recording))
 
 	http.ServeFile(c.Response(), c.Request(), recording)
 	return nil
@@ -570,8 +587,8 @@ func (api SessionApi) SessionStatsEndpoint(c echo.Context) error {
 	if nextSession == nil {
 		return errors.New("获取会话失败")
 	}
-	sshClient := nextSession.NextTerminal.SshClient
-	stats, err := GetAllStats(sshClient)
+
+	stats, err := GetAllStats(nextSession)
 	if err != nil {
 		return err
 	}

@@ -9,17 +9,18 @@ import (
 	"strings"
 
 	"next-terminal/server/api"
+	"next-terminal/server/branding"
+	"next-terminal/server/common"
+	"next-terminal/server/common/guacamole"
+	"next-terminal/server/common/nt"
+	"next-terminal/server/common/term"
 	"next-terminal/server/config"
-	"next-terminal/server/constant"
 	"next-terminal/server/global/cache"
 	"next-terminal/server/global/session"
-	"next-terminal/server/guacd"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
-	"next-terminal/server/term"
-	"next-terminal/server/totp"
 	"next-terminal/server/utils"
 
 	"github.com/gliderlabs/ssh"
@@ -29,12 +30,12 @@ import (
 type Gui struct {
 }
 
-func (gui Gui) MainUI(sess *ssh.Session, user model.User) {
+func (gui Gui) MainUI(sess ssh.Session, user model.User) {
 	prompt := promptui.Select{
-		Label:  "欢迎使用 Next Terminal，请选择您要使用的功能",
+		Label:  "欢迎使用 " + branding.Name + "，请选择您要使用的功能",
 		Items:  []string{"我的资产", "退出系统"},
-		Stdin:  *sess,
-		Stdout: *sess,
+		Stdin:  sess,
+		Stdout: sess,
 	}
 
 MainLoop:
@@ -53,8 +54,8 @@ MainLoop:
 	}
 }
 
-func (gui Gui) AssetUI(sess *ssh.Session, user model.User) {
-	assets, err := repository.AssetRepository.FindByProtocolAndUser(context.TODO(), constant.SSH, user)
+func (gui Gui) AssetUI(sess ssh.Session, user model.User) {
+	assets, err := service.WorkerService.FindMyAsset("", nt.SSH, "", "", "", "")
 	if err != nil {
 		return
 	}
@@ -64,8 +65,8 @@ func (gui Gui) AssetUI(sess *ssh.Session, user model.User) {
 		assets[i].Port = 0
 	}
 
-	quitItem := model.Asset{ID: "quit", Name: "返回上级菜单", Description: "这里是返回上级菜单的选项"}
-	assets = append([]model.Asset{quitItem}, assets...)
+	quitItem := model.AssetForPage{ID: "quit", Name: "返回上级菜单", Description: "这里是返回上级菜单的选项"}
+	assets = append([]model.AssetForPage{quitItem}, assets...)
 
 	templates := &promptui.SelectTemplates{
 		Label:    "{{ . }}?",
@@ -94,8 +95,8 @@ func (gui Gui) AssetUI(sess *ssh.Session, user model.User) {
 		Templates: templates,
 		Size:      4,
 		Searcher:  searcher,
-		Stdin:     *sess,
-		Stdout:    *sess,
+		Stdin:     sess,
+		Stdout:    sess,
 	}
 
 AssetUILoop:
@@ -113,20 +114,20 @@ AssetUILoop:
 			break AssetUILoop
 		default:
 			if err := gui.createSession(sess, chooseAssetId, user.ID); err != nil {
-				_, _ = io.WriteString(*sess, err.Error()+"\r\n")
+				_, _ = io.WriteString(sess, err.Error()+"\r\n")
 				return
 			}
 		}
 	}
 }
 
-func (gui Gui) createSession(sess *ssh.Session, assetId, creator string) (err error) {
+func (gui Gui) createSession(sess ssh.Session, assetId, creator string) (err error) {
 	asset, err := repository.AssetRepository.FindById(context.TODO(), assetId)
 	if err != nil {
 		return err
 	}
 
-	ClientIP := strings.Split((*sess).RemoteAddr().String(), ":")[0]
+	ClientIP := strings.Split((sess).RemoteAddr().String(), ":")[0]
 
 	s := &model.Session{
 		ID:              utils.UUID(),
@@ -138,10 +139,10 @@ func (gui Gui) createSession(sess *ssh.Session, assetId, creator string) (err er
 		Protocol:        asset.Protocol,
 		IP:              asset.IP,
 		Port:            asset.Port,
-		Status:          constant.NoConnect,
+		Status:          nt.NoConnect,
 		Creator:         creator,
 		ClientIP:        ClientIP,
-		Mode:            constant.Terminal,
+		Mode:            nt.Terminal,
 		Upload:          "0",
 		Download:        "0",
 		Delete:          "0",
@@ -156,7 +157,7 @@ func (gui Gui) createSession(sess *ssh.Session, assetId, creator string) (err er
 			return nil
 		}
 
-		if credential.Type == constant.Custom {
+		if credential.Type == nt.Custom {
 			s.Username = credential.Username
 			s.Password = credential.Password
 		} else {
@@ -173,7 +174,7 @@ func (gui Gui) createSession(sess *ssh.Session, assetId, creator string) (err er
 	return gui.handleAccessAsset(sess, s.ID)
 }
 
-func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error) {
+func (gui Gui) handleAccessAsset(sess ssh.Session, sessionId string) (err error) {
 	s, err := service.SessionService.FindByIdAndDecrypt(context.TODO(), sessionId)
 	if err != nil {
 		return err
@@ -203,13 +204,13 @@ func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error
 		port = exposedPort
 	}
 
-	pty, winCh, isPty := (*sess).Pty()
+	pty, winCh, isPty := (sess).Pty()
 	if !isPty {
 		return errors.New("No PTY requested.\n")
 	}
 
 	recording := ""
-	property, err := repository.PropertyRepository.FindByName(context.TODO(), guacd.EnableRecording)
+	property, err := repository.PropertyRepository.FindByName(context.TODO(), guacamole.EnableRecording)
 	if err == nil && property.Value == "true" {
 		recording = path.Join(config.GlobalCfg.Guacd.Recording, sessionId, "recording.cast")
 	}
@@ -220,11 +221,11 @@ func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error
 	}
 	sshSession := nextTerminal.SshSession
 
-	writer := NewWriter(sessionId, sess, nextTerminal.Recorder)
+	writer := NewWriter(sessionId, sess, nextTerminal)
 
 	sshSession.Stdout = writer
-	sshSession.Stdin = *sess
-	sshSession.Stderr = *sess
+	sshSession.Stdin = writer
+	sshSession.Stderr = writer
 
 	if err := nextTerminal.RequestPty(pty.Term, pty.Window.Height, pty.Window.Width); err != nil {
 		return err
@@ -235,11 +236,11 @@ func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error
 	}
 
 	go func() {
-		log.Debugf("开启窗口大小监控...")
+		log.Debug("开启窗口大小监控...")
 		for win := range winCh {
 			_ = sshSession.WindowChange(win.Height, win.Width)
 		}
-		log.Debugf("退出窗口大小监控")
+		log.Debug("退出窗口大小监控")
 		// ==== 修改数据库中的会话状态为已断开,修复用户直接关闭窗口时会话状态不正确的问题 ====
 		service.SessionService.CloseSessionById(sessionId, api.Normal, "用户正常退出")
 		// ==== 修改数据库中的会话状态为已断开,修复用户直接关闭窗口时会话状态不正确的问题 ====
@@ -248,9 +249,9 @@ func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error
 	// ==== 修改数据库中的会话状态为已连接 ====
 	sessionForUpdate := model.Session{}
 	sessionForUpdate.ID = sessionId
-	sessionForUpdate.Status = constant.Connected
+	sessionForUpdate.Status = nt.Connected
 	sessionForUpdate.Recording = recording
-	sessionForUpdate.ConnectedTime = utils.NowJsonTime()
+	sessionForUpdate.ConnectedTime = common.NowJsonTime()
 
 	if sessionForUpdate.Recording == "" {
 		// 未录屏时无需审计
@@ -282,7 +283,7 @@ func (gui Gui) handleAccessAsset(sess *ssh.Session, sessionId string) (err error
 	return nil
 }
 
-func (gui Gui) totpUI(sess *ssh.Session, user model.User, remoteAddr string, username string) {
+func (gui Gui) totpUI(sess ssh.Session, user model.User, remoteAddr string, username string) {
 
 	validate := func(input string) error {
 		if len(input) < 6 {
@@ -295,8 +296,8 @@ func (gui Gui) totpUI(sess *ssh.Session, user model.User, remoteAddr string, use
 		Label:    "请输入双因素认证授权码",
 		Validate: validate,
 		Mask:     '*',
-		Stdin:    *sess,
-		Stdout:   *sess,
+		Stdin:    sess,
+		Stdout:   sess,
 	}
 
 	var success = false
@@ -314,16 +315,16 @@ func (gui Gui) totpUI(sess *ssh.Session, user model.User, remoteAddr string, use
 		}
 		count := v.(int)
 		if count >= 5 {
-			_, _ = io.WriteString(*sess, "登录失败次数过多，请等待5分钟后再试\r\n")
+			_, _ = io.WriteString(sess, "登录失败次数过多，请等待5分钟后再试\r\n")
 			continue
 		}
-		if !totp.Validate(result, user.TOTPSecret) {
+		if !common.Validate(result, user.TOTPSecret) {
 			count++
 			println(count)
 			cache.LoginFailedKeyManager.Set(loginFailCountKey, count, cache.LoginLockExpiration)
 			// 保存登录日志
 			_ = service.UserService.SaveLoginLog(remoteAddr, "terminal", username, false, false, "", "双因素认证授权码不正确")
-			_, _ = io.WriteString(*sess, "您输入的双因素认证授权码不匹配\r\n")
+			_, _ = io.WriteString(sess, "您输入的双因素认证授权码不匹配\r\n")
 			continue
 		}
 		success = true

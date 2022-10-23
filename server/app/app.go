@@ -3,16 +3,12 @@ package app
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
-	_ "net/http/pprof"
 
-	"next-terminal/server/log"
-
-	"next-terminal/server/cli"
+	"next-terminal/server/branding"
 	"next-terminal/server/config"
-	"next-terminal/server/constant"
 	"next-terminal/server/service"
 	"next-terminal/server/sshd"
+	"next-terminal/server/task"
 
 	"github.com/labstack/echo/v4"
 )
@@ -66,7 +62,12 @@ func (app App) InitDBData() (err error) {
 	if err := service.StorageService.InitStorages(); err != nil {
 		return err
 	}
-
+	if err := service.MenuService.Init(); err != nil {
+		return err
+	}
+	if err := service.RoleService.Init(); err != nil {
+		return err
+	}
 	// 修复数据
 	if err := service.AssetService.FixSshMode(); err != nil {
 		return err
@@ -93,7 +94,7 @@ func (app App) ReloadData() error {
 
 func Run() error {
 
-	fmt.Printf(constant.AppBanner, constant.AppVersion)
+	fmt.Printf(branding.Hi)
 
 	if err := app.InitDBData(); err != nil {
 		panic(err)
@@ -108,13 +109,10 @@ func Run() error {
 		if err != nil {
 			return err
 		}
-		go func() {
-			log.Fatal(http.ListenAndServe("localhost:8099", nil))
-		}()
 		fmt.Printf("当前配置为: %v\n", string(jsonBytes))
 	}
 
-	_cli := cli.NewCli()
+	_cli := service.NewCli()
 
 	if config.GlobalCfg.ResetPassword != "" {
 		return _cli.ResetPassword(config.GlobalCfg.ResetPassword)
@@ -126,6 +124,9 @@ func Run() error {
 	if config.GlobalCfg.NewEncryptionKey != "" {
 		return _cli.ChangeEncryptionKey(config.GlobalCfg.EncryptionKey, config.GlobalCfg.NewEncryptionKey)
 	}
+
+	ticker := task.NewTicker()
+	ticker.SetupTicker()
 
 	if config.GlobalCfg.Sshd.Enable {
 		go sshd.Sshd.Serve()

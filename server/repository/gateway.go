@@ -6,6 +6,8 @@ import (
 	"next-terminal/server/model"
 )
 
+var GatewayRepository = new(gatewayRepository)
+
 type gatewayRepository struct {
 	baseRepository
 }

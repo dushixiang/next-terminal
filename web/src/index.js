@@ -8,15 +8,20 @@ import {ConfigProvider} from 'antd';
 import {HashRouter as Router} from "react-router-dom";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import 'dayjs/locale/zh-cn'
+import 'dayjs/locale/zh-cn';
+import {QueryClient, QueryClientProvider,} from 'react-query';
 
 dayjs.extend(relativeTime);
 dayjs.locale('zh-cn');
 
+const queryClient = new QueryClient();
+
 ReactDOM.render(
     <ConfigProvider locale={zhCN}>
         <Router>
-            <App/>
+            <QueryClientProvider client={queryClient}>
+                <App/>
+            </QueryClientProvider>
         </Router>
     </ConfigProvider>,
     document.getElementById('root')

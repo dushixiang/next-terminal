@@ -1,9 +1,0 @@
-<svg width="128" height="128" xmlns="http://www.w3.org/2000/svg">
-    <g fill="none">
-        <g fill="none">
-            <path fill="#40a9ff" d="M 9 0 v 95 l 55 30 l 55 -30 v -95 h -90 z"/>
-            <path fill="white" d="M 64 35 l -55 25 v 20 l 55 -25 l 55 25 v -20 l -55 -25 z"/>
-            <path fill="#0050b3" d="M 64 55 l -55 25 v 15 l 55 30 l 55 -30 v -15 l -55 -25 z"/>
-        </g>
-    </g>
-</svg>

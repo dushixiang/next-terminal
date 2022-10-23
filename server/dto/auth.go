@@ -7,6 +7,7 @@ type Authorization struct {
 	Remember bool
 	Type     string // LoginToken: 登录令牌, AccessToken: 授权令牌, ShareSession: 会话分享, AccessSession: 只允许访问特定的会话
 	User     *model.User
+	Roles    []string
 }
 
 type LoginAccount struct {

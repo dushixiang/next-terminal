@@ -2,6 +2,8 @@ package api
 
 import (
 	"context"
+	"next-terminal/server/common"
+	"next-terminal/server/common/maps"
 	"strconv"
 	"strings"
 
@@ -23,7 +25,7 @@ func (api AccessGatewayApi) AccessGatewayCreateEndpoint(c echo.Context) error {
 	}
 
 	item.ID = utils.UUID()
-	item.Created = utils.NowJsonTime()
+	item.Created = common.NowJsonTime()
 
 	if err := repository.GatewayRepository.Create(context.TODO(), &item); err != nil {
 		return err
@@ -38,11 +40,14 @@ func (api AccessGatewayApi) AccessGatewayAllEndpoint(c echo.Context) error {
 	if err != nil {
 		return err
 	}
-	var simpleGateways = make([]model.AccessGatewayForPage, 0)
-	for i := 0; i < len(gateways); i++ {
-		simpleGateways = append(simpleGateways, model.AccessGatewayForPage{ID: gateways[i].ID, Name: gateways[i].Name})
+	items := make([]maps.Map, len(gateways))
+	for i, e := range gateways {
+		items[i] = maps.Map{
+			"id":   e.ID,
+			"name": e.Name,
+		}
 	}
-	return Success(c, simpleGateways)
+	return Success(c, items)
 }
 
 func (api AccessGatewayApi) AccessGatewayPagingEndpoint(c echo.Context) error {
@@ -66,7 +71,7 @@ func (api AccessGatewayApi) AccessGatewayPagingEndpoint(c echo.Context) error {
 		}
 	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"total": total,
 		"items": items,
 	})

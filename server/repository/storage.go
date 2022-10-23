@@ -6,6 +6,8 @@ import (
 	"next-terminal/server/model"
 )
 
+var StorageRepository = new(storageRepository)
+
 type storageRepository struct {
 	baseRepository
 }

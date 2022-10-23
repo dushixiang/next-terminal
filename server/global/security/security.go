@@ -3,8 +3,6 @@ package security
 import (
 	"sort"
 	"sync"
-
-	"next-terminal/server/log"
 )
 
 type Security struct {
@@ -54,13 +52,11 @@ func (m *Manager) Values() []*Security {
 func (m *Manager) Add(s *Security) {
 	m.securities.Store(s.ID, s)
 	m.LoadData()
-	log.Infof("add security: %s", s.ID)
 }
 
 func (m *Manager) Del(id string) {
 	m.securities.Delete(id)
 	m.LoadData()
-	log.Infof("del security: %s", id)
 }
 
 var GlobalSecurityManager *Manager

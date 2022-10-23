@@ -3,15 +3,23 @@ package repository
 import (
 	"context"
 
+	"next-terminal/server/dto"
 	"next-terminal/server/model"
 )
+
+var UserGroupMemberRepository = new(userGroupMemberRepository)
 
 type userGroupMemberRepository struct {
 	baseRepository
 }
 
+func (r userGroupMemberRepository) FindByUserGroupId(c context.Context, userGroupId string) (o []dto.UserGroupMember, err error) {
+	err = r.GetDB(c).Table("user_group_members").Select("users.id as id, users.nickname as name").Joins("left join users on users.id = user_group_members.user_id").Group("users.id").Where("user_group_id = ?", userGroupId).Find(&o).Error
+	return
+}
+
 func (r userGroupMemberRepository) FindUserIdsByUserGroupId(c context.Context, userGroupId string) (o []string, err error) {
-	err = r.GetDB(c).Table("user_group_members").Select("user_id").Where("user_group_id = ?", userGroupId).Find(&o).Error
+	err = r.GetDB(c).Table("user_group_members").Select("users.id").Where("user_group_id = ?", userGroupId).Find(&o).Error
 	return
 }
 

@@ -1,15 +1,22 @@
 import React, {Component} from 'react';
-import {Card, Col, Row, Statistic} from "antd";
-import {DesktopOutlined, IdcardOutlined, LinkOutlined, UserOutlined} from '@ant-design/icons';
+import {DesktopOutlined, DisconnectOutlined, LoginOutlined, UserOutlined} from '@ant-design/icons';
 import request from "../../common/request";
 import './Dashboard.css'
-import {Link} from "react-router-dom";
-import {Bar, Pie} from '@ant-design/charts';
+import {ProCard, StatisticCard} from '@ant-design/pro-components';
+import {Line, Pie} from '@ant-design/charts';
+import {Segmented} from 'antd';
 
 class Dashboard extends Component {
 
     state = {
-        counter: {},
+        counter: {
+            onlineUser: 0,
+            totalUser: 0,
+            activeAsset: 0,
+            totalAsset: 0,
+            failLoginCount: 0,
+            offlineSession: 0,
+        },
         asset: {
             "ssh": 0,
             "rdp": 0,
@@ -17,13 +24,13 @@ class Dashboard extends Component {
             "telnet": 0,
             "kubernetes": 0,
         },
-        access: []
+        dateCounter: [],
     }
 
     componentDidMount() {
         this.getCounter();
         this.getAsset();
-        this.getAccess();
+        this.getDateCounter('week');
     }
 
     componentWillUnmount() {
@@ -39,6 +46,15 @@ class Dashboard extends Component {
         }
     }
 
+    getDateCounter = async (d) => {
+        let result = await request.get('/overview/date-counter?d=' + d);
+        if (result['code'] === 1) {
+            this.setState({
+                dateCounter: result['data']
+            })
+        }
+    }
+
     getAsset = async () => {
         let result = await request.get('/overview/asset');
         if (result['code'] === 1) {
@@ -48,18 +64,17 @@ class Dashboard extends Component {
         }
     }
 
-    getAccess = async () => {
-        let result = await request.get('/overview/access');
-        if (result['code'] === 1) {
-            this.setState({
-                access: result['data']
-            })
+    handleChangeDateCounter = (value) => {
+        if(value === '按周'){
+            this.getDateCounter('week');
+        }else {
+            this.getDateCounter('month');
         }
     }
 
     render() {
 
-        const data = [
+        const assetData = [
             {
                 type: 'RDP',
                 value: this.state.asset['rdp'],
@@ -81,9 +96,11 @@ class Dashboard extends Component {
                 value: this.state.asset['kubernetes'],
             }
         ];
-        const config = {
+        const assetConfig = {
+            width: 200,
+            height: 200,
             appendPadding: 10,
-            data: data,
+            data: assetData,
             angleField: 'value',
             colorField: 'type',
             radius: 1,
@@ -104,85 +121,90 @@ class Dashboard extends Component {
                     formatter: () => {
                         return '资产类型';
                     },
+                    style: {
+                        fontSize: 18,
+                    }
                 },
             },
         };
 
-        let accessData = this.state.access.map(item=>{
-            return {
-                title: `${item['username']}@${item['ip']}:${item['port']}`,
-                // title: `${item['assetId']}`,
-                value: item['accessCount'],
-                protocol: item['protocol']
-            }
-        });
+        const dateCounterConfig = {
+            height: 270,
+            data: this.state.dateCounter,
+            xField: 'date',
+            yField: 'value',
+            seriesField: 'type',
+            legend: {
+                position: 'top',
+            },
+            smooth: true,
+            animation: {
+                appear: {
+                    animation: 'path-in',
+                    duration: 5000,
+                },
+            },
+        };
 
-        const accessConfig = {
-            data: accessData,
-            xField: 'value',
-            yField: 'title',
-            seriesField: 'protocol',
-            legend: { position: 'top-left' },
-        }
+        return (<>
+            <div style={{margin: 16}}>
+                <ProCard
+                    title="数据概览"
+                    // extra={dayjs().format("YYYY[年]MM[月]DD[日]") + ' 星期' + weekMapping[dayjs().day()]}
+                    split={'horizontal'}
+                    headerBordered
+                    bordered
+                >
+                    <ProCard split={'vertical'}>
+                        <ProCard split="horizontal">
+                            <ProCard split='vertical'>
+                                <StatisticCard
+                                    statistic={{
+                                        title: '在线用户',
+                                        value: this.state.counter['onlineUser'] + '/' + this.state.counter['totalUser'],
+                                        prefix: <UserOutlined/>
+                                    }}
+                                />
+                                <StatisticCard
+                                    statistic={{
+                                        title: '运行中资产',
+                                        value: this.state.counter['activeAsset'] + '/' + this.state.counter['totalAsset'],
+                                        prefix: <DesktopOutlined/>
+                                    }}
+                                />
+                            </ProCard>
+                            <ProCard split='vertical'>
+                                <StatisticCard
+                                    statistic={{
+                                        title: '登录失败次数',
+                                        value: this.state.counter['failLoginCount'],
+                                        prefix: <LoginOutlined/>
+                                    }}
+                                />
+                                <StatisticCard
+                                    statistic={{
+                                        title: '历史会话总数',
+                                        value: this.state.counter['offlineSession'],
+                                        prefix: <DisconnectOutlined/>
+                                    }}
+                                />
+                            </ProCard>
+                        </ProCard>
+                        <ProCard className='pie-card'>
+                            <ProCard>
+                                <Pie {...assetConfig} />
+                            </ProCard>
+                        </ProCard>
+                    </ProCard>
 
-        return (
-            <>
+                </ProCard>
 
-                <div style={{margin: 16, marginBottom: 0}}>
-                    <Row gutter={16}>
-                        <Col span={6}>
-                            <Card bordered={true} hoverable>
-                                <Link to={'/user'}>
-                                    <Statistic title="在线用户" value={this.state.counter['user']}
-                                               prefix={<UserOutlined/>}/>
-                                </Link>
-                            </Card>
-                        </Col>
-                        <Col span={6}>
-                            <Card bordered={true} hoverable>
-                                <Link to={'/asset'}>
-                                    <Statistic title="资产数量" value={this.state.counter['asset']}
-                                               prefix={<DesktopOutlined/>}/>
-                                </Link>
-                            </Card>
-                        </Col>
-                        <Col span={6}>
-                            <Card bordered={true} hoverable>
-                                <Link to={'/credential'} hoverable>
-                                    <Statistic title="授权凭证" value={this.state.counter['credential']}
-                                               prefix={<IdcardOutlined/>}/>
-                                </Link>
-
-                            </Card>
-                        </Col>
-                        <Col span={6}>
-                            <Card bordered={true} hoverable>
-                                <Link to={'/online-session'}>
-                                    <Statistic title="在线会话" value={this.state.counter['onlineSession']}
-                                               prefix={<LinkOutlined/>}/>
-                                </Link>
-                            </Card>
-                        </Col>
-                    </Row>
-                </div>
-
-                <div className="page-card">
-                    <Row gutter={16}>
-                        <Col span={12}>
-                            <Card bordered={true} title="资产类型">
-                                <Pie {...config} />
-                            </Card>
-                        </Col>
-                        <Col span={12}>
-                            <Card bordered={true} title="使用次数Top10 资产">
-                                <Bar {...accessConfig} />
-                            </Card>
-                        </Col>
-                    </Row>
-
-                </div>
-            </>
-        );
+                <ProCard title="会话统计" style={{marginTop: 16}}
+                         extra={<Segmented options={['按周', '按月']} onChange={this.handleChangeDateCounter}/>}>
+                    <Line {...dateCounterConfig} />
+                </ProCard>
+            </div>
+        </>);
     }
 }
 

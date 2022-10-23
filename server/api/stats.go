@@ -3,6 +3,8 @@ package api
 import (
 	"bufio"
 	"fmt"
+	"next-terminal/server/common/taskrunner"
+	"next-terminal/server/global/session"
 	"strconv"
 	"strings"
 	"time"
@@ -70,40 +72,56 @@ type Stat struct {
 	CPU            CPU                `json:"cpu"`
 }
 
-func GetAllStats(client *ssh.Client) (*Stat, error) {
+func GetAllStats(nextSession *session.Session) (*Stat, error) {
+	client := nextSession.NextTerminal.SshClient
 	start := time.Now()
-	stats := &Stat{}
-	if err := getUptime(client, stats); err != nil {
-		return nil, err
+
+	stats := &Stat{
+		Uptime:   nextSession.Uptime,
+		Hostname: nextSession.Hostname,
 	}
-	if err := getHostname(client, stats); err != nil {
-		return nil, err
+	if stats.Uptime == 0 {
+		if err := getUptime(client, stats); err != nil {
+			return nil, err
+		}
+		nextSession.Uptime = stats.Uptime
 	}
-	if err := getLoad(client, stats); err != nil {
-		return nil, err
+
+	if stats.Hostname == "" {
+		if err := getHostname(client, stats); err != nil {
+			return nil, err
+		}
+		nextSession.Hostname = stats.Hostname
 	}
-	if err := getMem(client, stats); err != nil {
-		return nil, err
-	}
-	if err := getFileSystems(client, stats); err != nil {
-		return nil, err
-	}
-	if err := getInterfaces(client, stats); err != nil {
-		return nil, err
-	}
-	if err := getInterfaceInfo(client, stats); err != nil {
-		return nil, err
-	}
-	if err := getCPU(client, stats); err != nil {
-		return nil, err
-	}
+
+	runner := taskrunner.Runner{}
+
+	runner.Add(func() error {
+		return getLoad(client, stats)
+	})
+	runner.Add(func() error {
+		return getMem(client, stats)
+	})
+	runner.Add(func() error {
+		return getFileSystems(client, stats)
+	})
+	runner.Add(func() error {
+		return getInterfaces(client, stats)
+	})
+	runner.Add(func() error {
+		return getInterfaceInfo(client, stats)
+	})
+	runner.Add(func() error {
+		return getCPU(client, stats)
+	})
+	runner.Wait()
 	cost := time.Since(start)
 	fmt.Printf("%s: %v\n", "GetAllStats", cost)
 	return stats, nil
 }
 
 func getHostname(client *ssh.Client, stat *Stat) (err error) {
-	//defer utils.TimeWatcher("getHostname")
+	defer utils.TimeWatcher("getHostname")
 	hostname, err := utils.RunCommand(client, "/bin/hostname -f")
 	if err != nil {
 		return
@@ -113,7 +131,7 @@ func getHostname(client *ssh.Client, stat *Stat) (err error) {
 }
 
 func getUptime(client *ssh.Client, stat *Stat) (err error) {
-	//defer utils.TimeWatcher("getUptime")
+	defer utils.TimeWatcher("getUptime")
 	uptime, err := utils.RunCommand(client, "/bin/cat /proc/uptime")
 	if err != nil {
 		return
@@ -132,7 +150,7 @@ func getUptime(client *ssh.Client, stat *Stat) (err error) {
 }
 
 func getLoad(client *ssh.Client, stat *Stat) (err error) {
-	//defer utils.TimeWatcher("getLoad")
+	defer utils.TimeWatcher("getLoad")
 	line, err := utils.RunCommand(client, "/bin/cat /proc/loadavg")
 	if err != nil {
 		return
@@ -154,7 +172,7 @@ func getLoad(client *ssh.Client, stat *Stat) (err error) {
 }
 
 func getMem(client *ssh.Client, stat *Stat) (err error) {
-	//defer utils.TimeWatcher("getMem")
+	defer utils.TimeWatcher("getMem")
 	lines, err := utils.RunCommand(client, "/bin/cat /proc/meminfo")
 	if err != nil {
 		return
@@ -192,7 +210,7 @@ func getMem(client *ssh.Client, stat *Stat) (err error) {
 }
 
 func getFileSystems(client *ssh.Client, stat *Stat) (err error) {
-	//defer utils.TimeWatcher("getFileSystems")
+	defer utils.TimeWatcher("getFileSystems")
 	lines, err := utils.RunCommand(client, "/bin/df -B1")
 	if err != nil {
 		return
@@ -228,7 +246,7 @@ func getFileSystems(client *ssh.Client, stat *Stat) (err error) {
 }
 
 func getInterfaces(client *ssh.Client, stats *Stat) (err error) {
-	//defer utils.TimeWatcher("getInterfaces")
+	defer utils.TimeWatcher("getInterfaces")
 	var lines string
 	lines, err = utils.RunCommand(client, "/bin/ip -o addr")
 	if err != nil {
@@ -273,16 +291,16 @@ func getInterfaces(client *ssh.Client, stats *Stat) (err error) {
 }
 
 func getInterfaceInfo(client *ssh.Client, stats *Stat) (err error) {
-	//defer utils.TimeWatcher("getInterfaceInfo")
-	lines, err := utils.RunCommand(client, "/bin/cat /proc/net/dev")
-	if err != nil {
-		return
-	}
+	defer utils.TimeWatcher("getInterfaceInfo")
 
 	if stats.Network == nil {
 		return
 	} // should have been here already
 
+	lines, err := utils.RunCommand(client, "/bin/cat /proc/net/dev")
+	if err != nil {
+		return
+	}
 	scanner := bufio.NewScanner(strings.NewReader(lines))
 	for scanner.Scan() {
 		line := scanner.Text()
@@ -345,7 +363,7 @@ func parseCPUFields(fields []string, stat *cpuRaw) {
 var preCPU cpuRaw
 
 func getCPU(client *ssh.Client, stats *Stat) (err error) {
-	//defer utils.TimeWatcher("getCPU")
+	defer utils.TimeWatcher("getCPU")
 	lines, err := utils.RunCommand(client, "/bin/cat /proc/stat")
 	if err != nil {
 		return

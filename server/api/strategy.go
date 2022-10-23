@@ -2,7 +2,8 @@ package api
 
 import (
 	"context"
-
+	"next-terminal/server/common"
+	"next-terminal/server/common/maps"
 	"strconv"
 	"strings"
 
@@ -36,7 +37,7 @@ func (api StrategyApi) StrategyPagingEndpoint(c echo.Context) error {
 		return err
 	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"total": total,
 		"items": items,
 	})
@@ -48,7 +49,7 @@ func (api StrategyApi) StrategyCreateEndpoint(c echo.Context) error {
 		return err
 	}
 	item.ID = utils.UUID()
-	item.Created = utils.NowJsonTime()
+	item.Created = common.NowJsonTime()
 
 	if err := repository.StrategyRepository.Create(context.TODO(), &item); err != nil {
 		return err
@@ -79,4 +80,13 @@ func (api StrategyApi) StrategyUpdateEndpoint(c echo.Context) error {
 		return err
 	}
 	return Success(c, "")
+}
+
+func (api StrategyApi) GetEndpoint(c echo.Context) error {
+	id := c.Param("id")
+	strategy, err := repository.StrategyRepository.FindById(context.Background(), id)
+	if err != nil {
+		return err
+	}
+	return Success(c, strategy)
 }

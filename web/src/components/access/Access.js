@@ -64,9 +64,17 @@ class Access extends Component {
     };
 
     async componentDidMount() {
-        let urlParams = new URLSearchParams(this.props.location.search);
+        let href = window.location.href;
+        let search = href.split('?')[1];
+        let urlParams = new URLSearchParams(search);
         let assetId = urlParams.get('assetId');
         document.title = urlParams.get('assetName');
+
+        if (!assetId) {
+            this.showMessage('获取资产ID失败');
+            return;
+        }
+
         let protocol = urlParams.get('protocol');
         let width = urlParams.get('width');
         let height = urlParams.get('height');
@@ -789,7 +797,7 @@ class Access extends Component {
                     }}
                     visible={this.state.statsVisible}
                 >
-                    <Stats sessionId={this.state.sessionId} onRef={this.onRef}/>
+                    <Stats sessionId={this.state.sessionId}/>
                 </Drawer>
 
                 {

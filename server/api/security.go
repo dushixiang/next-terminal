@@ -2,7 +2,7 @@ package api
 
 import (
 	"context"
-
+	"next-terminal/server/common/maps"
 	"strconv"
 	"strings"
 
@@ -54,7 +54,7 @@ func (api SecurityApi) SecurityPagingEndpoint(c echo.Context) error {
 		return err
 	}
 
-	return Success(c, Map{
+	return Success(c, maps.Map{
 		"total": total,
 		"items": items,
 	})
