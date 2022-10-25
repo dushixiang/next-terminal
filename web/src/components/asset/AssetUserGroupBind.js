@@ -27,13 +27,13 @@ const AssetUserGroupBind = ({id, visible, handleOk, handleCancel, confirmLoading
             let items = await authorisedApi.GetSelected(queryParam);
             setSelectedUserGroupIds(items);
 
-            let userGroups = await userGroupApi.GetAll();
+            let userGroups = await userGroupApi.getAll();
             setUserGroups(userGroups);
 
-            let strategies = await strategyApi.GetAll();
+            let strategies = await strategyApi.getAll();
             setStrategies(strategies);
 
-            let commandFilters = await commandFilterApi.GetAll();
+            let commandFilters = await commandFilterApi.getAll();
             setCommandFilters(commandFilters);
         }
 

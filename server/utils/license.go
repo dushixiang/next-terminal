@@ -7,6 +7,8 @@ import (
 	"crypto/sha512"
 	"crypto/x509"
 	"encoding/pem"
+
+	"github.com/denisbrodbeck/machineid"
 )
 
 // SignatureRSA rsa私钥签名
@@ -45,4 +47,8 @@ func VerifyRSA(plainText, signText []byte, rsaPublicKey string) bool {
 	// 签名认证
 	err = rsa.VerifyPKCS1v15(publicKey, crypto.SHA512, hashText[:], signText)
 	return err == nil
+}
+
+func GetMachineId() (string, error) {
+	return machineid.ID()
 }

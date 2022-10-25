@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"next-terminal/server/common"
+	"next-terminal/server/common/maps"
 	"next-terminal/server/common/nt"
 	"path"
 	"strings"
@@ -90,7 +91,34 @@ func (api AccountApi) LoginEndpoint(c echo.Context) error {
 		return err
 	}
 
-	return Success(c, token)
+	var menus []string
+	if service.UserService.IsSuperAdmin(user.ID) {
+		menus = service.MenuService.GetMenus()
+	} else {
+		roles, err := service.RoleService.GetRolesByUserId(user.ID)
+		if err != nil {
+			return err
+		}
+		for _, role := range roles {
+			items := service.RoleService.GetMenuListByRole(role)
+			menus = append(menus, items...)
+		}
+	}
+
+	info := AccountInfo{
+		Id:         user.ID,
+		Username:   user.Username,
+		Nickname:   user.Nickname,
+		Type:       user.Type,
+		EnableTotp: user.TOTPSecret != "" && user.TOTPSecret != "-",
+		Roles:      user.Roles,
+		Menus:      menus,
+	}
+
+	return Success(c, maps.Map{
+		"info":  info,
+		"token": token,
+	})
 }
 
 func (api AccountApi) LoginSuccess(loginAccount dto.LoginAccount, user model.User, ip string) (string, error) {

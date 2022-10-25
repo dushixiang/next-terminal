@@ -46,6 +46,11 @@ class SessionApi extends Api {
         }
         return result['data'];
     }
+
+    resize = async (sessionId, width, height) => {
+        let result = await request.post(`/sessions/${sessionId}/resize?width=${width}&height=${height}`);
+        return result.code === 1;
+    }
 }
 
 const sessionApi = new SessionApi();

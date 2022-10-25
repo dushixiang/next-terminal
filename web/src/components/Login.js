@@ -4,7 +4,6 @@ import './Login.css'
 import request from "../common/request";
 import {LockOutlined, LockTwoTone, UserOutlined} from '@ant-design/icons';
 import {setToken} from "../utils/utils";
-import accountApi from "../api/account";
 import brandingApi from "../api/branding";
 import strings from "../utils/strings";
 
@@ -24,18 +23,18 @@ const LoginForm = () => {
         x();
     }, []);
 
-    const afterLoginSuccess = async (token) => {
+    const afterLoginSuccess = async (data) => {
         // 跳转登录
         sessionStorage.removeItem('current');
         sessionStorage.removeItem('openKeys');
-        setToken(token);
+        setToken(data['token']);
 
-        let user = await accountApi.getUserInfo();
+        let user = data['user'];
         if (user) {
             if (user['type'] === 'user') {
-                window.location.href = "/my-asset"
+                window.location.href = "#/my-asset";
             } else {
-                window.location.href = "/"
+                window.location.href = "#/";
             }
         }
     }

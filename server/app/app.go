@@ -76,6 +76,10 @@ func (app App) InitDBData() (err error) {
 		return err
 	}
 
+	if err := service.MigrateService.Migrate(); err != nil {
+		return err
+	}
+
 	return nil
 }
 

@@ -115,6 +115,6 @@ func (r commandRepository) FindAll(c context.Context) (o []model.Command, err er
 }
 
 func (r commandRepository) FindByUserId(c context.Context, userId string) (o []model.Command, err error) {
-	err = r.GetDB(c).Where("owner = ?", userId).First(&o).Error
+	err = r.GetDB(c).Where("owner = ?", userId).Find(&o).Error
 	return
 }

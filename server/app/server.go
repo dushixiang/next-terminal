@@ -178,7 +178,7 @@ func setupRoutes() *echo.Echo {
 
 	credentials := e.Group("/credentials", mw.Admin)
 	{
-		//credentials.GET("", CredentialApi.CredentialAllEndpoint)
+		credentials.GET("", CredentialApi.CredentialAllEndpoint)
 		credentials.GET("/paging", CredentialApi.CredentialPagingEndpoint)
 		credentials.POST("", CredentialApi.CredentialCreateEndpoint)
 		credentials.PUT("/:id", CredentialApi.CredentialUpdateEndpoint)
