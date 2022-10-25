@@ -6,6 +6,7 @@
     "@ant-design/charts": "^1.4.2",
     "@ant-design/icons": "^4.7.0",
     "@ant-design/pro-components": "1.1.21",
+    "@turf/bbox": "^6.5.0",
     "antd": "4.23.5",
     "asciinema-player": "^3.0.1",
     "axios": "0.27.2",
@@ -35,8 +36,8 @@
   },
   "eslintConfig": {
     "extends": "react-app",
-    "rules":{
-      "jsx-a11y/anchor-is-valid":"off"
+    "rules": {
+      "jsx-a11y/anchor-is-valid": "off"
     }
   },
   "browserslist": [
