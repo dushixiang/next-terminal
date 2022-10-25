@@ -32,7 +32,7 @@ const MyAsset = React.lazy(() => import("./components/worker/MyAsset"));
 const MyCommand = React.lazy(() => import("./components/worker/MyCommand"));
 const MyInfo = React.lazy(() => import("./components/worker/MyInfo"));
 
-const Access = React.lazy(() => import("./components/access/Access"));
+const Guacd = React.lazy(() => import("./components/access/Guacd"));
 const Term = React.lazy(() => import("./components/access/Term"));
 
 const User = React.lazy(() => import("./components/user/user/User"));
@@ -81,7 +81,7 @@ const App = () => {
                     <Outlet/>
                 </Suspense>
             }>
-                <Route path="/access" element={<Access/>}/>
+                <Route path="/access" element={<Guacd/>}/>
                 <Route path="/term" element={<Term/>}/>
                 <Route path="/term-monitor" element={<TermMonitor/>}/>
                 <Route path="/term-playback" element={<TermPlayback/>}/>

@@ -21,7 +21,7 @@ import (
 type CredentialApi struct{}
 
 func (api CredentialApi) CredentialAllEndpoint(c echo.Context) error {
-	items, err := repository.CredentialRepository.FindByAll(context.TODO())
+	items, err := repository.CredentialRepository.FindByAll(context.Background())
 	if err != nil {
 		return err
 	}

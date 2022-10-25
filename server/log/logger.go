@@ -149,3 +149,7 @@ func Fatal(msg string, fields ...Field) {
 func Sync() error {
 	return _logger.Sync()
 }
+
+func GetLogger() *zap.Logger {
+	return _logger
+}

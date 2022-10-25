@@ -38,7 +38,7 @@ func (r authorisedRepository) FindByUserId(c context.Context, userId string) (it
 }
 
 func (r authorisedRepository) FindById(c context.Context, id string) (item model.Authorised, err error) {
-	err = r.GetDB(c).Where("id = ?", id).Find(&item).Error
+	err = r.GetDB(c).Where("id = ?", id).First(&item).Error
 	return
 }
 

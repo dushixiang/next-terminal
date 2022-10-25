@@ -55,7 +55,7 @@ MainLoop:
 }
 
 func (gui Gui) AssetUI(sess ssh.Session, user model.User) {
-	assets, err := service.WorkerService.FindMyAsset("", nt.SSH, "", "", "", "")
+	assets, err := service.WorkerService.FindMyAsset("", nt.SSH, "", user.ID, "", "")
 	if err != nil {
 		return
 	}
