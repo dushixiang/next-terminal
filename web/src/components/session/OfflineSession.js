@@ -102,7 +102,6 @@ const OfflineSession = () => {
             key: 'option',
             render: (text, record, _, action) => {
                 let disablePlayback = record['recording'] !== '1';
-                let disableCmdRecord = record['commandCount'] === 0;
                 return [
                     <Show menu={'offline-session-playback'} key={'offline-session-playback'}>
                         <Button

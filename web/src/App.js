@@ -1,5 +1,5 @@
 import React, {Suspense} from 'react';
-import {Outlet, Route, Routes, useNavigate} from "react-router-dom";
+import {Outlet, Route, Routes} from "react-router-dom";
 
 import './App.css';
 import './Arco.css';
@@ -9,9 +9,6 @@ import UserLayout from "./layout/UserLayout";
 import NoMatch from "./components/NoMatch";
 import Landing from "./components/Landing";
 import NoPermission from "./components/NoPermission";
-import {useQuery} from "react-query";
-import accountApi from "./api/account";
-import {setCurrentUser} from "./service/permission";
 
 const GuacdMonitor = React.lazy(() => import("./components/session/GuacdMonitor"));
 const GuacdPlayback = React.lazy(() => import("./components/session/GuacdPlayback"));
@@ -62,17 +59,6 @@ const Setting = React.lazy(() => import("./components/setting/Setting"));
 const LoginPolicy = React.lazy(() => import("./components/security/LoginPolicy"));
 
 const App = () => {
-
-    const navigate = useNavigate();
-
-    useQuery('getUserInfo', accountApi.getUserInfo, {
-        onSuccess: (data) => {
-            setCurrentUser(data);
-            if (data?.type === 'user') {
-                navigate('/my-asset');
-            }
-        }
-    });
 
     return (
         <Routes>
