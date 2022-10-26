@@ -6,10 +6,14 @@ import {LockOutlined, LockTwoTone, UserOutlined} from '@ant-design/icons';
 import {setToken} from "../utils/utils";
 import brandingApi from "../api/branding";
 import strings from "../utils/strings";
+import {useNavigate} from "react-router-dom";
+import {setCurrentUser} from "../service/permission";
 
 const {Title} = Typography;
 
 const LoginForm = () => {
+
+    const navigate = useNavigate();
 
     let [inLogin, setInLogin] = useState(false);
     let [branding, setBranding] = useState({});
@@ -29,12 +33,13 @@ const LoginForm = () => {
         sessionStorage.removeItem('openKeys');
         setToken(data['token']);
 
-        let user = data['user'];
+        let user = data['info'];
+        setCurrentUser(user);
         if (user) {
             if (user['type'] === 'user') {
-                window.location.href = "#/my-asset";
+                navigate('/my-asset');
             } else {
-                window.location.href = "#/";
+                navigate('/');
             }
         }
     }
