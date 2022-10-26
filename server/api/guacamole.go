@@ -224,6 +224,7 @@ func (api GuacamoleApi) GuacamoleMonitor(c echo.Context) error {
 	configuration.SetParameter("width", strconv.Itoa(s.Width))
 	configuration.SetParameter("height", strconv.Itoa(s.Height))
 	configuration.SetParameter("dpi", "96")
+	configuration.SetReadOnlyMode()
 
 	addr := config.GlobalCfg.Guacd.Hostname + ":" + strconv.Itoa(config.GlobalCfg.Guacd.Port)
 

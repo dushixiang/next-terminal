@@ -52,6 +52,7 @@ const (
 	SwapRedBlue = "swap-red-blue"
 	DestHost    = "dest-host"
 	DestPort    = "dest-port"
+	ReadOnly    = "read-only"
 
 	UsernameRegex     = "username-regex"
 	PasswordRegex     = "password-regex"
@@ -81,6 +82,10 @@ func NewConfiguration() (config *Configuration) {
 	config = &Configuration{}
 	config.Parameters = make(map[string]string)
 	return config
+}
+
+func (opt *Configuration) SetReadOnlyMode() {
+	opt.Parameters[ReadOnly] = "true"
 }
 
 func (opt *Configuration) SetParameter(name, value string) {
