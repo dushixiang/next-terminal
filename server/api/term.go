@@ -50,7 +50,7 @@ func (api WebTerminalApi) SshEndpoint(c echo.Context) error {
 
 	s, err := service.SessionService.FindByIdAndDecrypt(ctx, sessionId)
 	if err != nil {
-		return WriteMessage(ws, dto.NewMessage(Closed, "获取会话失败"))
+		return WriteMessage(ws, dto.NewMessage(Closed, "获取会话或解密数据失败"))
 	}
 
 	if err := api.permissionCheck(c, s.AssetId); err != nil {

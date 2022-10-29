@@ -88,19 +88,6 @@ const Term = () => {
         }
     }
 
-    useEffect(() => {
-        if (term && websocket && fitAddon && websocket.readyState === WebSocket.OPEN) {
-            fit();
-            focus();
-            let terminalSize = {
-                cols: term.cols,
-                rows: term.rows
-            }
-            websocket.send(new Message(Message.Resize, window.btoa(JSON.stringify(terminalSize))).toString());
-        }
-
-    }, [box.width, box.height]);
-
     const onWindowResize = () => {
         setBox({width: window.innerWidth, height: window.innerHeight});
     };
@@ -225,9 +212,20 @@ const Term = () => {
 
     useEffect(() => {
         document.title = assetName;
-        window.addEventListener('beforeunload', handleUnload);
-
         init(assetId);
+    }, [assetId]);
+
+    useEffect(() => {
+        if (term && websocket && fitAddon && websocket.readyState === WebSocket.OPEN) {
+            fit();
+            focus();
+            let terminalSize = {
+                cols: term.cols,
+                rows: term.rows
+            }
+            websocket.send(new Message(Message.Resize, window.btoa(JSON.stringify(terminalSize))).toString());
+        }
+        window.addEventListener('beforeunload', handleUnload);
 
         let resize = debounce(() => {
             onWindowResize();
@@ -242,7 +240,7 @@ const Term = () => {
             window.removeEventListener('resize', resize);
             window.removeEventListener('beforeunload', handleUnload);
         }
-    }, [assetId]);
+    }, [box.width, box.height]);
 
     const cmdMenuItems = commands.map(item => {
         return {

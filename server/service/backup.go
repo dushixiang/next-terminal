@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"next-terminal/server/common/maps"
 	"strings"
 
 	"next-terminal/server/common"
@@ -15,7 +16,6 @@ import (
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
 
-	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -265,7 +265,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				if err != nil {
 					return err
 				}
-				m := echo.Map{}
+				m := maps.Map{}
 				if err := json.Unmarshal(data, &m); err != nil {
 					return err
 				}

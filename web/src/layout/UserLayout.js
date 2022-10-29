@@ -1,5 +1,5 @@
 import React, {Suspense, useEffect} from 'react';
-import {Link, Outlet, useLocation} from "react-router-dom";
+import {Link, Outlet, useLocation, useNavigate} from "react-router-dom";
 import {Breadcrumb, Button, Dropdown, Layout, Menu, Popconfirm} from "antd";
 import {
     CodeOutlined,
@@ -27,6 +27,8 @@ const breadcrumbNameMap = {
 const UserLayout = () => {
 
     const location = useLocation();
+    const navigate = useNavigate();
+
     let _current = location.pathname.split('/')[1];
 
     useEffect(() => {
@@ -63,7 +65,10 @@ const UserLayout = () => {
                 <Popconfirm
                     key='login-btn-pop'
                     title="您确定要退出登录吗?"
-                    onConfirm={accountApi.logout}
+                    onConfirm={async ()=>{
+                        await accountApi.logout();
+                        navigate('/login');
+                    }}
                     okText="确定"
                     cancelText="取消"
                     placement="left"

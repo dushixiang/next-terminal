@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"golang.org/x/net/proxy"
 	"net"
+	"next-terminal/server/common/maps"
 	"next-terminal/server/common/nt"
 	"strconv"
 	"time"
@@ -18,7 +19,6 @@ import (
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
 
-	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
 )
 
@@ -173,22 +173,22 @@ func (s assetService) CheckStatus(asset *model.Asset, ip string, port int) (bool
 	}
 }
 
-func (s assetService) Create(ctx context.Context, m echo.Map) (model.Asset, error) {
+func (s assetService) Create(ctx context.Context, m maps.Map) (*model.Asset, error) {
 
 	data, err := json.Marshal(m)
 	if err != nil {
-		return model.Asset{}, err
+		return nil, err
 	}
 	var item model.Asset
 	if err := json.Unmarshal(data, &item); err != nil {
-		return model.Asset{}, err
+		return nil, err
 	}
 
 	item.ID = utils.UUID()
 	item.Created = common.NowJsonTime()
 	item.Active = true
 
-	return item, s.Transaction(ctx, func(ctx context.Context) error {
+	return &item, s.Transaction(ctx, func(ctx context.Context) error {
 		if err := s.Encrypt(&item, config.GlobalCfg.EncryptionPassword); err != nil {
 			return err
 		}
@@ -222,7 +222,7 @@ func (s assetService) DeleteById(id string) error {
 	})
 }
 
-func (s assetService) UpdateById(id string, m echo.Map) error {
+func (s assetService) UpdateById(id string, m maps.Map) error {
 	data, err := json.Marshal(m)
 	if err != nil {
 		return err
