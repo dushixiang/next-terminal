@@ -44,6 +44,7 @@ function downloadImportExampleCsv() {
 
 const importExampleContent = <>
     <a onClick={downloadImportExampleCsv}>下载示例</a>
+    <div>导入资产时，账号、密码和密钥、密码属于二选一，都填写时优先选择私钥和密码。</div>
 </>
 
 const Asset = () => {
@@ -295,9 +296,9 @@ const Asset = () => {
         setSelectedRowKeys([]);
     }
 
-    const handleImportAsset = (file) => {
+    const handleImportAsset = async (file) => {
 
-        let [success, data] = api.importAsset(file);
+        let [success, data] = await api.importAsset(file);
         if (success === false) {
             notification['error']({
                 message: '导入资产失败',
@@ -320,7 +321,7 @@ const Asset = () => {
             });
         }
         actionRef.current.reload();
-        return true;
+        return false;
     }
 
     const handleChangeOwner = (row) => {
@@ -397,6 +398,7 @@ const Asset = () => {
                             <Upload
                                 maxCount={1}
                                 beforeUpload={handleImportAsset}
+                                showUploadList={false}
                             >
                                 <Button key='import'>导入</Button>
                             </Upload>
@@ -461,6 +463,8 @@ const Asset = () => {
                     actionRef.current.reload();
                 } finally {
                     setConfirmLoading(false);
+                    setSelectedRowKey(undefined);
+                    setCopied(false);
                 }
             }}
         />

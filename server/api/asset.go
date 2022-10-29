@@ -5,12 +5,11 @@ import (
 	"context"
 	"encoding/csv"
 	"errors"
-	"next-terminal/server/common"
-	"next-terminal/server/common/maps"
-	"next-terminal/server/common/nt"
 	"strconv"
 	"strings"
 
+	"next-terminal/server/common/maps"
+	"next-terminal/server/common/nt"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
@@ -22,7 +21,7 @@ import (
 type AssetApi struct{}
 
 func (assetApi AssetApi) AssetCreateEndpoint(c echo.Context) error {
-	m := echo.Map{}
+	m := maps.Map{}
 	if err := c.Bind(&m); err != nil {
 		return err
 	}
@@ -71,29 +70,31 @@ func (assetApi AssetApi) AssetImportEndpoint(c echo.Context) error {
 		record := records[i]
 		if len(record) >= 9 {
 			port, _ := strconv.Atoi(record[3])
-			asset := model.Asset{
-				ID:          utils.UUID(),
-				Name:        record[0],
-				Protocol:    record[1],
-				IP:          record[2],
-				Port:        port,
-				AccountType: nt.Custom,
-				Username:    record[4],
-				Password:    record[5],
-				PrivateKey:  record[6],
-				Passphrase:  record[7],
-				Description: record[8],
-				Created:     common.NowJsonTime(),
-				Owner:       account.ID,
-				Active:      true,
+			asset := maps.Map{
+				"id":          utils.UUID(),
+				"name":        record[0],
+				"protocol":    record[1],
+				"ip":          record[2],
+				"port":        port,
+				"accountType": nt.Custom,
+				"username":    record[4],
+				"password":    record[5],
+				"privateKey":  record[6],
+				"passphrase":  record[7],
+				"Description": record[8],
+				"owner":       account.ID,
+			}
+
+			if record[6] != "" {
+				asset["accountType"] = nt.PrivateKey
 			}
 
 			if len(record) >= 10 {
 				tags := strings.ReplaceAll(record[9], "|", ",")
-				asset.Tags = tags
+				asset["tags"] = tags
 			}
 
-			err := repository.AssetRepository.Create(context.TODO(), &asset)
+			_, err := service.AssetService.Create(context.Background(), asset)
 			if err != nil {
 				errorCount++
 				m[strconv.Itoa(i)] = err.Error()
@@ -151,7 +152,7 @@ func (assetApi AssetApi) AssetAllEndpoint(c echo.Context) error {
 
 func (assetApi AssetApi) AssetUpdateEndpoint(c echo.Context) error {
 	id := c.Param("id")
-	m := echo.Map{}
+	m := maps.Map{}
 	if err := c.Bind(&m); err != nil {
 		return err
 	}

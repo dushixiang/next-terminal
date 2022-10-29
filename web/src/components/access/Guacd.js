@@ -19,6 +19,7 @@ import Draggable from "react-draggable";
 import FileSystem from "../devops/FileSystem";
 import GuacdClipboard from "./GuacdClipboard";
 import {debounce} from "../../utils/fun";
+import './Guacd.css';
 
 let fixedSize = false;
 
@@ -74,17 +75,15 @@ const Guacd = () => {
             tunnel.onerror = onError;
 
             // Get display div from document
-            const display = document.getElementById("display");
+            const displayEle = document.getElementById("display");
 
             // Add client to display div
             const element = client.getDisplay().getElement();
-            display.appendChild(element);
+            displayEle.appendChild(element);
 
-            let scale = 1;
             let dpi = 96;
             if (protocol === 'telnet') {
                 dpi = dpi * 2;
-                scale = 0.5;
             }
 
             let token = getToken();
@@ -99,21 +98,31 @@ const Guacd = () => {
             let paramStr = qs.stringify(params);
 
             client.connect(paramStr);
+            let display = client.getDisplay();
+            display.onresize = function (width, height) {
+                display.scale(Math.min(
+                    window.innerHeight / display.getHeight(),
+                    window.innerWidth / display.getHeight()
+                ))
+            }
 
             const mouse = new Guacamole.Mouse(element);
 
-            mouse.onmousedown = mouse.onmouseup = function (mouseState) {
+            mouse.onmousedown = mouse.onmouseup = mouse.onmousemove = function (mouseState) {
+                client.getDisplay().showCursor(false);
+                mouseState.x = mouseState.x / display.getScale();
+                mouseState.y = mouseState.y / display.getScale();
                 client.sendMouseState(mouseState);
             };
 
-            mouse.onmousemove = function (mouseState) {
-                mouseState.x = mouseState.x / scale;
-                mouseState.y = mouseState.y / scale;
-                client.sendMouseState(mouseState);
+            const touch = new Guacamole.Mouse.Touchpad(element); // or Guacamole.Touchscreen
+
+            touch.onmousedown = touch.onmousemove = touch.onmouseup = function (state) {
+                client.sendMouseState(state);
             };
 
             const sink = new Guacamole.InputSink();
-            display.appendChild(sink.getElement());
+            displayEle.appendChild(sink.getElement());
             sink.focus();
 
             const keyboard = new Guacamole.Keyboard(sink.getElement());
@@ -130,7 +139,6 @@ const Guacd = () => {
 
             setGuacd({
                 client,
-                scale,
                 sink,
             });
         }
@@ -162,17 +170,12 @@ const Guacd = () => {
     }, [guacd])
 
     const onWindowResize = () => {
-        console.log(guacd, fixedSize);
         if (guacd.client && !fixedSize) {
             const display = guacd.client.getDisplay();
-            let scale = guacd.scale;
-            display.scale(scale);
-            let width = window.innerWidth;
-            let height = window.innerHeight;
-
-            guacd.client.sendSize(width / scale, height / scale);
-
-            setBox({width, height})
+            display.scale(Math.min(
+                window.innerHeight / display.getHeight(),
+                window.innerWidth / display.getHeight()
+            ));
         }
     }
 
@@ -438,7 +441,6 @@ const Guacd = () => {
         <div>
 
             <div className="container" style={{
-                overflow: 'hidden',
                 width: box.width,
                 height: box.height,
                 margin: '0 auto'

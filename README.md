@@ -46,6 +46,14 @@ https://next.typesafe.cn/ 账号：test  密码：test
 
 默认账号密码为 admin/admin 。
 
+## 手动编译
+
+1. 找一台Linux 机器或者Mac
+2. 安装 go 1.18 或以上版本
+3. 安装 nodejs 16，安装 npm 或 yarn
+4. 进入 web 目录 执行 yarn install 或 npm install
+5. 返回上级目录，也就是项目根目录，执行 sh build.sh
+
 ## 问题反馈
 
 - Issues

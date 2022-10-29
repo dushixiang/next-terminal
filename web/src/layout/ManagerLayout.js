@@ -116,7 +116,10 @@ const ManagerLayout = () => {
                 <Popconfirm
                     key='login-btn-pop'
                     title="您确定要退出登录吗?"
-                    onConfirm={accountApi.logout}
+                    onConfirm={async ()=>{
+                        await accountApi.logout();
+                        navigate('/login');
+                    }}
                     okText="确定"
                     cancelText="取消"
                     placement="left"

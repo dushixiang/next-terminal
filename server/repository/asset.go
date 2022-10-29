@@ -3,15 +3,14 @@ package repository
 import (
 	"context"
 	"fmt"
-	"next-terminal/server/common/nt"
 	"strconv"
 	"strings"
 
+	"next-terminal/server/common/maps"
+	"next-terminal/server/common/nt"
 	"next-terminal/server/config"
 	"next-terminal/server/model"
 	"next-terminal/server/utils"
-
-	"github.com/labstack/echo/v4"
 )
 
 var AssetRepository = new(assetRepository)
@@ -172,7 +171,7 @@ func (r assetRepository) FindTags(c context.Context) (o []string, err error) {
 	return utils.Distinct(o), nil
 }
 
-func (r assetRepository) UpdateAttributes(c context.Context, assetId, protocol string, m echo.Map) error {
+func (r assetRepository) UpdateAttributes(c context.Context, assetId, protocol string, m maps.Map) error {
 	var data []model.AssetAttribute
 	var parameterNames []string
 	switch protocol {
@@ -202,7 +201,7 @@ func (r assetRepository) UpdateAttributes(c context.Context, assetId, protocol s
 	return r.GetDB(c).CreateInBatches(&data, len(data)).Error
 }
 
-func genAttribute(assetId, name string, m echo.Map) model.AssetAttribute {
+func genAttribute(assetId, name string, m maps.Map) model.AssetAttribute {
 	value := fmt.Sprintf("%v", m[name])
 	attribute := model.AssetAttribute{
 		Id:      utils.Sign([]string{assetId, name}),
