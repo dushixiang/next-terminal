@@ -30,6 +30,8 @@ const STATE_CONNECTED = 3;
 const STATE_DISCONNECTING = 4;
 const STATE_DISCONNECTED = 5;
 
+let clientState = STATE_IDLE;
+
 const Guacd = () => {
 
     let [searchParams] = useSearchParams();
@@ -46,13 +48,10 @@ const Guacd = () => {
         height = window.innerHeight;
     }
 
-    const [box, setBox] = useState({width: width, height: height});
-
     let [guacd, setGuacd] = useState({});
     let [session, setSession] = useState({});
     let [clipboardText, setClipboardText] = useState('');
     let [fullScreened, setFullScreened] = useState(false);
-    let [clientState, setClientState] = useState(STATE_IDLE);
     let [clipboardVisible, setClipboardVisible] = useState(false);
     let [fileSystemVisible, setFileSystemVisible] = useState(false);
 
@@ -201,7 +200,7 @@ const Guacd = () => {
                     });
                 })
             } catch (e) {
-                // console.error(e);
+                console.error('复制剪贴板失败', e);
             }
         }
     };
@@ -228,7 +227,6 @@ const Guacd = () => {
         } else {
             let reader = new Guacamole.BlobReader(stream, mimetype);
             reader.onend = () => {
-                console.log(stream, mimetype, reader)
                 setClipboardText(reader.getBlob());
             }
         }
@@ -264,7 +262,7 @@ const Guacd = () => {
     }
 
     const onClientStateChange = (state, sessionId) => {
-        setClientState(state);
+        clientState = state;
         const key = 'message';
         switch (state) {
             case STATE_IDLE:
@@ -328,7 +326,6 @@ const Guacd = () => {
     }
 
     const onError = (status) => {
-        console.log('通道异常。', status);
         switch (status.code) {
             case 256:
                 showMessage('未支持的访问');
@@ -439,10 +436,9 @@ const Guacd = () => {
 
     return (
         <div>
-
             <div className="container" style={{
-                width: box.width,
-                height: box.height,
+                width: width,
+                height: height,
                 margin: '0 auto'
             }}>
                 <div id="display"/>
