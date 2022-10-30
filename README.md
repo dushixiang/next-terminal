@@ -5,9 +5,7 @@
 
 ## 快速了解
 
-Next Terminal是一个轻量级堡垒机系统，支持RDP、SSH、VNC、Telnet、Kubernetes协议。
-
-Next Terminal基于 [Apache Guacamole](https://guacamole.apache.org/) 开发，使用到了guacd服务。
+Next Terminal是一个简单好用安全的开源交互审计系统，支持RDP、SSH、VNC、Telnet、Kubernetes协议。
 
 目前支持的功能有：
 
@@ -23,6 +21,8 @@ Next Terminal基于 [Apache Guacamole](https://guacamole.apache.org/) 开发，�
 - 多用户&用户分组
 - 计划任务
 - ssh server
+- 登录策略
+- 系统监控
 
 ## 在线体验
 
