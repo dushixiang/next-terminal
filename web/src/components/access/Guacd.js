@@ -107,7 +107,11 @@ const Guacd = () => {
 
             const mouse = new Guacamole.Mouse(element);
 
-            mouse.onmousedown = mouse.onmouseup = mouse.onmousemove = function (mouseState) {
+            mouse.onmousedown = mouse.onmouseup = function (mouseState) {
+                client.sendMouseState(mouseState);
+            }
+
+            mouse.onmousemove = function (mouseState) {
                 client.getDisplay().showCursor(false);
                 mouseState.x = mouseState.x / display.getScale();
                 mouseState.y = mouseState.y / display.getScale();
