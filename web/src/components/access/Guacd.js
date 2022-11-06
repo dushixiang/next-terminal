@@ -30,8 +30,6 @@ const STATE_CONNECTED = 3;
 const STATE_DISCONNECTING = 4;
 const STATE_DISCONNECTED = 5;
 
-let clientState = STATE_IDLE;
-
 const Guacd = () => {
 
     let [searchParams] = useSearchParams();
@@ -48,6 +46,7 @@ const Guacd = () => {
         height = window.innerHeight;
     }
 
+    let [box, setBox] = useState({width, height});
     let [guacd, setGuacd] = useState({});
     let [session, setSession] = useState({});
     let [clipboardText, setClipboardText] = useState('');
@@ -57,105 +56,105 @@ const Guacd = () => {
 
     useEffect(() => {
         document.title = assetName;
-
-        const renderDisplay = (sessionId, protocol, width, height) => {
-            let tunnel = new Guacamole.WebSocketTunnel(`${wsServer}/sessions/${sessionId}/tunnel`);
-            let client = new Guacamole.Client(tunnel);
-
-            // 处理从虚拟机收到的剪贴板内容
-            client.onclipboard = handleClipboardReceived;
-
-            // 处理客户端的状态变化事件
-            client.onstatechange = (state) => {
-                onClientStateChange(state, sessionId);
-            };
-
-            client.onerror = onError;
-            tunnel.onerror = onError;
-
-            // Get display div from document
-            const displayEle = document.getElementById("display");
-
-            // Add client to display div
-            const element = client.getDisplay().getElement();
-            displayEle.appendChild(element);
-
-            let dpi = 96;
-            if (protocol === 'telnet') {
-                dpi = dpi * 2;
-            }
-
-            let token = getToken();
-
-            let params = {
-                'width': width,
-                'height': height,
-                'dpi': dpi,
-                'X-Auth-Token': token
-            };
-
-            let paramStr = qs.stringify(params);
-
-            client.connect(paramStr);
-            let display = client.getDisplay();
-            display.onresize = function (width, height) {
-                display.scale(Math.min(
-                    window.innerHeight / display.getHeight(),
-                    window.innerWidth / display.getHeight()
-                ))
-            }
-
-            const mouse = new Guacamole.Mouse(element);
-
-            mouse.onmousedown = mouse.onmouseup = function (mouseState) {
-                client.sendMouseState(mouseState);
-            }
-
-            mouse.onmousemove = function (mouseState) {
-                client.getDisplay().showCursor(false);
-                mouseState.x = mouseState.x / display.getScale();
-                mouseState.y = mouseState.y / display.getScale();
-                client.sendMouseState(mouseState);
-            };
-
-            const touch = new Guacamole.Mouse.Touchpad(element); // or Guacamole.Touchscreen
-
-            touch.onmousedown = touch.onmousemove = touch.onmouseup = function (state) {
-                client.sendMouseState(state);
-            };
-
-            const sink = new Guacamole.InputSink();
-            displayEle.appendChild(sink.getElement());
-            sink.focus();
-
-            const keyboard = new Guacamole.Keyboard(sink.getElement());
-
-            keyboard.onkeydown = (keysym) => {
-                client.sendKeyEvent(1, keysym);
-                if (keysym === 65288) {
-                    return false;
-                }
-            };
-            keyboard.onkeyup = (keysym) => {
-                client.sendKeyEvent(0, keysym);
-            };
-
-            setGuacd({
-                client,
-                sink,
-            });
-        }
-
-        const x = async () => {
-            let session = await sessionApi.create(assetId, 'guacd');
-            if (!strings.hasText(session['id'])) {
-                return;
-            }
-            setSession(session);
-            renderDisplay(session['id'], protocol, width, height);
-        }
-        x();
+        createSession();
     }, [assetId, assetName]);
+
+    const createSession = async () => {
+        let session = await sessionApi.create(assetId, 'guacd');
+        if (!strings.hasText(session['id'])) {
+            return;
+        }
+        setSession(session);
+        renderDisplay(session['id'], protocol, width, height);
+    }
+
+    const renderDisplay = (sessionId, protocol, width, height) => {
+        let tunnel = new Guacamole.WebSocketTunnel(`${wsServer}/sessions/${sessionId}/tunnel`);
+        let client = new Guacamole.Client(tunnel);
+
+        // 处理从虚拟机收到的剪贴板内容
+        client.onclipboard = handleClipboardReceived;
+
+        // 处理客户端的状态变化事件
+        client.onstatechange = (state) => {
+            onClientStateChange(state, sessionId);
+        };
+
+        client.onerror = onError;
+        tunnel.onerror = onError;
+
+        // Get display div from document
+        const displayEle = document.getElementById("display");
+
+        // Add client to display div
+        const element = client.getDisplay().getElement();
+        displayEle.appendChild(element);
+
+        let dpi = 96;
+        if (protocol === 'telnet') {
+            dpi = dpi * 2;
+        }
+
+        let token = getToken();
+
+        let params = {
+            'width': width,
+            'height': height,
+            'dpi': dpi,
+            'X-Auth-Token': token
+        };
+
+        let paramStr = qs.stringify(params);
+
+        client.connect(paramStr);
+        let display = client.getDisplay();
+        display.onresize = function (width, height) {
+            display.scale(Math.min(
+                window.innerHeight / display.getHeight(),
+                window.innerWidth / display.getHeight()
+            ))
+        }
+
+        const mouse = new Guacamole.Mouse(element);
+
+        mouse.onmousedown = mouse.onmouseup = function (mouseState) {
+            client.sendMouseState(mouseState);
+        }
+
+        mouse.onmousemove = function (mouseState) {
+            client.getDisplay().showCursor(false);
+            mouseState.x = mouseState.x / display.getScale();
+            mouseState.y = mouseState.y / display.getScale();
+            client.sendMouseState(mouseState);
+        };
+
+        const touch = new Guacamole.Mouse.Touchpad(element); // or Guacamole.Touchscreen
+
+        touch.onmousedown = touch.onmousemove = touch.onmouseup = function (state) {
+            client.sendMouseState(state);
+        };
+
+        const sink = new Guacamole.InputSink();
+        displayEle.appendChild(sink.getElement());
+        sink.focus();
+
+        const keyboard = new Guacamole.Keyboard(sink.getElement());
+
+        keyboard.onkeydown = (keysym) => {
+            client.sendKeyEvent(1, keysym);
+            if (keysym === 65288) {
+                return false;
+            }
+        };
+        keyboard.onkeyup = (keysym) => {
+            client.sendKeyEvent(0, keysym);
+        };
+
+        setGuacd({
+            client,
+            sink,
+        });
+    }
 
     useEffect(() => {
         let resize = debounce(() => {
@@ -175,10 +174,15 @@ const Guacd = () => {
     const onWindowResize = () => {
         if (guacd.client && !fixedSize) {
             const display = guacd.client.getDisplay();
-            display.scale(Math.min(
-                window.innerHeight / display.getHeight(),
-                window.innerWidth / display.getHeight()
-            ));
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+            setBox({width, height});
+            let scale = Math.min(
+                height / display.getHeight(),
+                width / display.getHeight()
+            );
+            display.scale(scale);
+            guacd.client.sendSize(width, height);
         }
     }
 
@@ -226,7 +230,7 @@ const Guacd = () => {
                 if (navigator.clipboard) {
                     await navigator.clipboard.writeText(data);
                 }
-                message.info('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
+                message.success('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
             };
         } else {
             let reader = new Guacamole.BlobReader(stream, mimetype);
@@ -237,9 +241,6 @@ const Guacd = () => {
     };
 
     const sendClipboard = (data) => {
-        if (clientState !== STATE_CONNECTED) {
-            return;
-        }
         if (!guacd.client) {
             return;
         }
@@ -266,7 +267,6 @@ const Guacd = () => {
     }
 
     const onClientStateChange = (state, sessionId) => {
-        clientState = state;
         const key = 'message';
         switch (state) {
             case STATE_IDLE:
@@ -309,6 +309,7 @@ const Guacd = () => {
         for (let j = 0; j < keys.length; j++) {
             guacd.client.sendKeyEvent(0, keys[j]);
         }
+        message.success('发送组合键成功');
     }
 
     const showMessage = (msg) => {
@@ -441,19 +442,19 @@ const Guacd = () => {
     return (
         <div>
             <div className="container" style={{
-                width: width,
-                height: height,
-                margin: '0 auto'
+                width: box.width,
+                height: box.height,
+                margin: '0 auto',
+                backgroundColor: '#1b1b1b'
             }}>
                 <div id="display"/>
             </div>
 
             <Draggable>
                 <Affix style={{position: 'absolute', top: 50, right: 50}}>
-                    <Button icon={<ExpandOutlined/>} disabled={clientState !== STATE_CONNECTED}
-                            onClick={() => {
-                                fullScreen();
-                            }}/>
+                    <Button icon={<ExpandOutlined/>} onClick={() => {
+                        fullScreen();
+                    }}/>
                 </Affix>
             </Draggable>
 
@@ -461,7 +462,7 @@ const Guacd = () => {
                 session['copy'] === '1' || session['paste'] === '1' ?
                     <Draggable>
                         <Affix style={{position: 'absolute', top: 50, right: 100}}>
-                            <Button icon={<CopyOutlined/>} disabled={clientState !== STATE_CONNECTED}
+                            <Button icon={<CopyOutlined/>}
                                     onClick={() => {
                                         setClipboardVisible(true);
                                     }}/>
@@ -475,8 +476,7 @@ const Guacd = () => {
                 <Draggable>
                     <Affix style={{position: 'absolute', top: 100, right: 100}}>
                         <Dropdown overlay={hotKeyMenu} trigger={['click']} placement="bottomLeft">
-                            <Button icon={<WindowsOutlined/>}
-                                    disabled={clientState !== STATE_CONNECTED}/>
+                            <Button icon={<WindowsOutlined/>}/>
                         </Dropdown>
                     </Affix>
                 </Draggable>
@@ -486,8 +486,7 @@ const Guacd = () => {
                 (protocol === 'rdp' && session['fileSystem'] === '1') &&
                 <Draggable>
                     <Affix style={{position: 'absolute', top: 100, right: 50}}>
-                        <Button icon={<FolderOutlined/>}
-                                disabled={clientState !== STATE_CONNECTED} onClick={() => {
+                        <Button icon={<FolderOutlined/>} onClick={() => {
                             setFileSystemVisible(true);
                         }}/>
                     </Affix>
@@ -499,8 +498,7 @@ const Guacd = () => {
                 <Draggable>
                     <Affix style={{position: 'absolute', top: 100, right: 100}}>
                         <Dropdown overlay={hotKeyMenu} trigger={['click']} placement="bottomLeft">
-                            <Button icon={<WindowsOutlined/>}
-                                    disabled={clientState !== STATE_CONNECTED}/>
+                            <Button icon={<WindowsOutlined/>}/>
                         </Dropdown>
                     </Affix>
                 </Draggable>

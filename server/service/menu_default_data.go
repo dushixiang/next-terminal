@@ -216,6 +216,9 @@ var DefaultMenu = []*model.Menu{
 	model.NewMenu("job-log", "日志", "job",
 		model.NewPermission("GET", "/jobs/:id/logs/paging"),
 	),
+	model.NewMenu("job-log-clear", "日志清空", "job",
+		model.NewPermission("DELETE", "/jobs/:id/logs"),
+	),
 
 	model.NewMenu("storage", "磁盘空间", "ops",
 		model.NewPermission("GET", "/storages/paging"),

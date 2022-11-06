@@ -217,7 +217,7 @@ export function exitFull() {
 
 export function renderSize(value) {
     if (null == value || value === '' || value === 0) {
-        return "0 Bytes";
+        return "0 B";
     }
     const unitArr = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     let srcSize = parseFloat(value);
