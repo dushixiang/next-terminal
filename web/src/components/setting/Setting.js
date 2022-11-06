@@ -369,7 +369,7 @@ class Setting extends Component {
                         <Form ref={this.sshSettingFormRef} name="ssh" onFinish={this.changeProperties}
                               layout="vertical">
 
-                            <Title level={4}>SSH/TELNET配置</Title>
+                            <Title level={4}>TELNET配置</Title>
 
                             <Form.Item
                                 {...formItemLayout}

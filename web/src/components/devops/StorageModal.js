@@ -1,6 +1,9 @@
-import React, {useEffect} from 'react';
-import {Form, Input, Modal, Switch} from "antd";
+import React, {useState} from 'react';
+import {Form, Input, InputNumber, Modal, Select, Switch} from "antd";
 import storageApi from "../../api/storage";
+import {renderSize} from "../../utils/utils";
+import {useQuery} from "react-query";
+import strings from "../../utils/strings";
 
 const formItemLayout = {
     labelCol: {span: 6},
@@ -17,23 +20,38 @@ const StorageModal = ({
 
     const [form] = Form.useForm();
 
-
-    useEffect(() => {
-
-        const getItem = async () => {
-            let data = await storageApi.getById(id);
-            if (data) {
-                form.setFieldsValue(data);
+    useQuery('getStorageById', () => storageApi.getById(id), {
+        enabled: visible && strings.hasText(id),
+        onSuccess: data => {
+            if (data['limitSize'] > 0) {
+                let limitSize = renderSize(data['limitSize']);
+                let ss = limitSize.split(' ');
+                data['limitSize'] = parseInt(ss[0]);
+                setUnit(ss[1]);
+            } else {
+                data['limitSize'] = -1;
             }
-        }
-        if (visible && id) {
-            getItem();
-        } else {
-            form.setFieldsValue({
-                isShare: false,
-            });
-        }
-    }, [visible])
+            form.setFieldsValue(data);
+        },
+    });
+
+    let [unit, setUnit] = useState('MB');
+
+    const selectAfter = (
+        <Select value={unit} style={{width: 65}} onChange={(value) => {
+            setUnit(value);
+        }}>
+            <Select.Option value="B">B</Select.Option>
+            <Select.Option value="KB">KB</Select.Option>
+            <Select.Option value="MB">MB</Select.Option>
+            <Select.Option value="GB">GB</Select.Option>
+            <Select.Option value="TB">TB</Select.Option>
+            <Select.Option value="PB">PB</Select.Option>
+            <Select.Option value="EB">EB</Select.Option>
+            <Select.Option value="ZB">ZB</Select.Option>
+            <Select.Option value="YB">YB</Select.Option>
+        </Select>
+    );
 
     return (
         <Modal
@@ -45,6 +63,35 @@ const StorageModal = ({
                 form
                     .validateFields()
                     .then(async values => {
+                        let limitSize = values['limitSize'];
+                        switch (unit) {
+                            case 'B':
+                                break;
+                            case 'KB':
+                                limitSize = limitSize * 1024;
+                                break;
+                            case 'MB':
+                                limitSize = limitSize * 1024 * 1024;
+                                break;
+                            case 'GB':
+                                limitSize = limitSize * 1024 * 1024 * 1024;
+                                break;
+                            case 'TB':
+                                limitSize = limitSize * 1024 * 1024 * 1024 * 1024 * 1024;
+                                break;
+                            case 'EB':
+                                limitSize = limitSize * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+                                break;
+                            case 'ZB':
+                                limitSize = limitSize * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+                                break;
+                            case 'YB':
+                                limitSize = limitSize * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024 * 1024;
+                                break;
+                            default:
+                                break;
+                        }
+                        values['limitSize'] = limitSize;
                         let ok = await handleOk(values);
                         if (ok) {
                             form.resetFields();
@@ -53,6 +100,7 @@ const StorageModal = ({
             }}
             onCancel={() => {
                 form.resetFields();
+                setUnit('MB');
                 handleCancel();
             }}
             confirmLoading={confirmLoading}
@@ -76,7 +124,7 @@ const StorageModal = ({
 
                 <Form.Item label="大小限制" name='limitSize' rules={[{required: true, message: '请输入大小限制'}]}
                            tooltip='无限制请填写-1'>
-                    <Input type={'number'} min={-1} suffix="MB"/>
+                    <InputNumber min={-1} addonAfter={selectAfter} style={{width: 275}}/>
                 </Form.Item>
 
             </Form>

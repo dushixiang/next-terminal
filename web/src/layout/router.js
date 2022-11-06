@@ -83,11 +83,6 @@ export const routers = [
                 label: '登录日志',
                 icon: <LoginOutlined/>,
             },
-            {
-                key: 'storage-log',
-                label: '文件日志',
-                icon: <LoginOutlined/>,
-            },
         ]
     },
     {
@@ -95,11 +90,6 @@ export const routers = [
         label: '系统运维',
         icon: <ControlOutlined/>,
         children: [
-            // {
-            //     key: 'batch-command',
-            //     label: '批量命令',
-            //     icon: <BlockOutlined/>,
-            // },
             {
                 key: 'job',
                 label: '计划任务',
