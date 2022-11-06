@@ -43,7 +43,7 @@ func (r assetRepository) FindByProtocolAndIds(c context.Context, protocol string
 	return
 }
 
-func (r assetRepository) Find(c context.Context, pageIndex, pageSize int, name, protocol, tags, ip, active, order, field string) (o []model.AssetForPage, total int64, err error) {
+func (r assetRepository) Find(c context.Context, pageIndex, pageSize int, name, protocol, tags, ip, port, active, order, field string) (o []model.AssetForPage, total int64, err error) {
 	db := r.GetDB(c).Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.active_message,assets.owner,assets.created,assets.tags,assets.description, users.nickname as owner_name").Joins("left join users on assets.owner = users.id")
 	dbCounter := r.GetDB(c).Table("assets")
 
@@ -55,6 +55,11 @@ func (r assetRepository) Find(c context.Context, pageIndex, pageSize int, name, 
 	if len(ip) > 0 {
 		db = db.Where("assets.ip like ?", "%"+ip+"%")
 		dbCounter = dbCounter.Where("assets.ip like ?", "%"+ip+"%")
+	}
+
+	if len(port) > 0 {
+		db = db.Where("assets.port = ?", port)
+		dbCounter = dbCounter.Where("assets.port = ?", ip)
 	}
 
 	if len(protocol) > 0 {

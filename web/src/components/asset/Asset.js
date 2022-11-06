@@ -116,7 +116,9 @@ const Asset = () => {
             title: '网络',
             dataIndex: 'network',
             key: 'network',
-            hideInSearch: true,
+            fieldProps: {
+                placeholder: '示例: 127.0.0.1:22'
+            },
             render: (text, record) => {
                 return `${record['ip'] + ':' + record['port']}`;
             }
@@ -346,6 +348,15 @@ const Asset = () => {
                     order = Object.values(sort)[0];
                 }
 
+                let ip, port;
+                if (params.network) {
+                    let split = params.network.split(':');
+                    if (split.length >= 2) {
+                        ip = split[0];
+                        port = split[1];
+                    }
+                }
+
                 let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
@@ -354,6 +365,8 @@ const Asset = () => {
                     protocol: params.protocol,
                     active: params.active,
                     'tags': params.tags?.join(','),
+                    ip: ip,
+                    port: port,
                     field: field,
                     order: order
                 }

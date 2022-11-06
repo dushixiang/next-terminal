@@ -118,12 +118,13 @@ func (assetApi AssetApi) AssetPagingEndpoint(c echo.Context) error {
 	protocol := c.QueryParam("protocol")
 	tags := c.QueryParam("tags")
 	ip := c.QueryParam("ip")
+	port := c.QueryParam("port")
 	active := c.QueryParam("active")
 
 	order := c.QueryParam("order")
 	field := c.QueryParam("field")
 
-	items, total, err := repository.AssetRepository.Find(context.Background(), pageIndex, pageSize, name, protocol, tags, ip, active, order, field)
+	items, total, err := repository.AssetRepository.Find(context.Background(), pageIndex, pageSize, name, protocol, tags, ip, port, active, order, field)
 	if err != nil {
 		return err
 	}
