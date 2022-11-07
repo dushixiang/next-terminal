@@ -76,10 +76,29 @@ Next Terminal 使用 [AGPL-3.0](./LICENSE) 开源协议，请自觉遵守。
 
 如果你觉得 `next-terminal` 这款程序还不错，并且想要购买服务器，可以从这里点击购买腾讯云服务器。
 
-- 2022新春优惠抢先看 https://curl.qcloud.com/JN4kmKnL
-- 限时秒杀活动 https://curl.qcloud.com/ZioWA15a
-- 云服务器全球购 https://curl.qcloud.com/7QwcihVF
-- 星星海SA2云服务器 https://curl.qcloud.com/Iaih7ty0
-- 新客专属福利 https://curl.qcloud.com/MwPg07VQ
-- 企业上云特惠活动 https://curl.qcloud.com/skIyRHv6
-- 云开发CloudBase https://curl.qcloud.com/hpFpcHSB
+- 【腾讯云】双十一同价！云服务器等爆品抢先购，低至4.2元/月
+  https://cloud.tencent.com/act/cps/redirect?redirect=2446&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】领 11111元代金券大礼包，购后抽奖100%中奖，开团冲榜赢iPhone 14 Pro
+  https://cloud.tencent.com/act/cps/redirect?redirect=2853&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】11.11 特惠购，CDN 0.02元/GB起，短信0.029元/条起，直播/点播/TRTC/IM等套餐包0.1折起，更有云呼叫中心/媒体处理/视频播放License等新品1元起
+  https://cloud.tencent.com/act/cps/redirect?redirect=3045&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】爆款云服务器限时体验20元起，更多上云必备产品低至1元
+  https://cloud.tencent.com/act/cps/redirect?redirect=2496&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】网络产品专场特惠，流量包1分钱起，负载均衡7.3折起，最高可领299元NAT网关代金券，速来抢购
+  https://cloud.tencent.com/act/cps/redirect?redirect=2089&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】推广者专属福利，新客户无门槛领取总价值高达2860元代金券，每种代金券限量500张，先到先得。
+  https://cloud.tencent.com/act/cps/redirect?redirect=1040&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】腾讯云图，像PPT一样简单的数据可视化工具。5元搞定数据可视化，模板丰富，拖拖拽拽就能做出好看的可视化大屏。
+  https://cloud.tencent.com/act/cps/redirect?redirect=1046&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】视频通信爆款 9.9 元起， 提供电商、教育、社交娱乐等多行业多场景的一站式解决方案，最快 1 天布局火爆赛道
+  https://cloud.tencent.com/act/cps/redirect?redirect=1051&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】即时通信 IM 首购 1 折特惠，仅需99.9元/月，支持直播电商、在线教育等多种热门应用场景
+  https://cloud.tencent.com/act/cps/redirect?redirect=1056&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】9.9元体验2万分钟实时音视频通话,支持1对1或多人音视频通话,单房可支持300人同时在线，10万人同时观看；全平台互通高品质通话
+  https://cloud.tencent.com/act/cps/redirect?redirect=1057&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】云数据库MySQL基础版1元体验，为中小企业量身打造，单节点架构，保证数据可靠性
+  https://cloud.tencent.com/act/cps/redirect?redirect=1034&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】专业版APP加固特惠5折起，可享免费兼容性测试
+  https://cloud.tencent.com/act/cps/redirect?redirect=1037&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
+- 【腾讯云】中小企业福利专场，多款刚需产品，满足企业通用场景需求
+  https://cloud.tencent.com/act/cps/redirect?redirect=1060&cps_key=fe4fb1b1f00810fb1cc94528441d0df1&from=console
