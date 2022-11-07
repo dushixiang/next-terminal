@@ -19,7 +19,7 @@ func (r userGroupMemberRepository) FindByUserGroupId(c context.Context, userGrou
 }
 
 func (r userGroupMemberRepository) FindUserIdsByUserGroupId(c context.Context, userGroupId string) (o []string, err error) {
-	err = r.GetDB(c).Table("user_group_members").Select("users.id").Where("user_group_id = ?", userGroupId).Find(&o).Error
+	err = r.GetDB(c).Table("user_group_members").Select("user_id").Where("user_group_id = ?", userGroupId).Find(&o).Error
 	return
 }
 
