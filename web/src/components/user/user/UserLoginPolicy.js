@@ -109,8 +109,8 @@ const UserLoginPolicy = ({active, userId}) => {
                     labelWidth: 'auto',
                 }}
                 pagination={{
-                    pageSize: 10,
-                }}
+                        defaultPageSize: 10,
+                    }}
                 dateFormatter="string"
                 headerTitle="用户登录策略"
                 toolBarRender={() => [

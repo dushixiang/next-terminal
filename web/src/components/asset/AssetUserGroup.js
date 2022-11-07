@@ -102,8 +102,8 @@ const AssetUserGroup = ({id, active}) => {
                     labelWidth: 'auto',
                 }}
                 pagination={{
-                    pageSize: 10,
-                }}
+                        defaultPageSize: 10,
+                    }}
                 dateFormatter="string"
                 headerTitle="授权的用户组列表"
                 toolBarRender={() => [
