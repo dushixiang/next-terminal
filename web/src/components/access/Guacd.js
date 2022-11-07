@@ -536,9 +536,11 @@ const Guacd = () => {
                     });
                     setClipboardText(text);
                     setClipboardVisible(false);
+                    focus();
                 }}
                 handleCancel={() => {
                     setClipboardVisible(false);
+                    focus();
                 }}
             />
         </div>
