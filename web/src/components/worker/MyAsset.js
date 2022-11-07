@@ -191,7 +191,7 @@ const MyAsset = () => {
                     labelWidth: 'auto',
                 }}
                 pagination={{
-                    pageSize: 10,
+                    defaultPageSize: 10,
                 }}
                 dateFormatter="string"
                 headerTitle="资产列表"

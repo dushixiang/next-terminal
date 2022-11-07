@@ -114,8 +114,8 @@ const SessionCommandRecord = ({visible, sessionId}) => {
                     labelWidth: 'auto',
                 }}
                 pagination={{
-                    pageSize: 10,
-                }}
+                        defaultPageSize: 10,
+                    }}
                 dateFormatter="string"
                 headerTitle="命令记录"
             />

@@ -101,8 +101,8 @@ const UserAsset = ({active, id, type}) => {
                     labelWidth: 'auto',
                 }}
                 pagination={{
-                    pageSize: 10,
-                }}
+                        defaultPageSize: 10,
+                    }}
                 dateFormatter="string"
                 headerTitle="授权的资产列表"
                 toolBarRender={() => [
