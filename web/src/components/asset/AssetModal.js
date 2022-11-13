@@ -61,19 +61,12 @@ const AssetModal = function ({
     let [tags, setTags] = useState([]);
     let [credentials, setCredentials] = useState([]);
 
-    const [current, setCurrent] = useState(0);
-
     const getStorages = async () => {
         const result = await request.get('/storages/shares');
         if (result.code === 1) {
             setStorages(result['data']);
         }
     }
-
-    const handleStepChange = (value) => {
-        console.log('onChange:', current);
-        setCurrent(value);
-    };
 
     useEffect(() => {
 
