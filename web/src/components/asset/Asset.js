@@ -71,6 +71,7 @@ const Asset = () => {
         {
             title: '名称',
             dataIndex: 'name',
+            sorter: true,
             render: (text, record) => {
                 if (record['description'] === '-') {
                     record['description'] = '';
@@ -93,6 +94,7 @@ const Asset = () => {
             title: '协议',
             dataIndex: 'protocol',
             key: 'protocol',
+            sorter: true,
             render: (text, record) => {
                 return (
                     <Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>
@@ -116,6 +118,7 @@ const Asset = () => {
             title: '网络',
             dataIndex: 'network',
             key: 'network',
+            sorter: true,
             fieldProps: {
                 placeholder: '示例: 127.0.0.1:22'
             },
@@ -154,6 +157,7 @@ const Asset = () => {
             title: '状态',
             dataIndex: 'active',
             key: 'active',
+            sorter: true,
             render: (text, record) => {
                 if (record['testing'] === true) {
                     return (
@@ -198,6 +202,7 @@ const Asset = () => {
             title: '创建时间',
             key: 'created',
             dataIndex: 'created',
+            sorter: true,
             hideInSearch: true,
         },
         {
@@ -345,6 +350,9 @@ const Asset = () => {
                 let order = '';
                 if (Object.keys(sort).length > 0) {
                     field = Object.keys(sort)[0];
+                    if (field === 'network') {
+                        field = 'ip';
+                    }
                     order = Object.values(sort)[0];
                 }
 

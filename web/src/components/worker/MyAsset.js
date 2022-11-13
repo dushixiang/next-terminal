@@ -21,6 +21,7 @@ const MyAsset = () => {
         {
             title: '名称',
             dataIndex: 'name',
+            sorter: true,
             render: (text, record) => {
                 if (record['description'] === '-') {
                     record['description'] = '';
@@ -38,6 +39,7 @@ const MyAsset = () => {
             title: '协议',
             dataIndex: 'protocol',
             key: 'protocol',
+            sorter: true,
             render: (text, record) => {
                 return (
                     <Tag color={PROTOCOL_COLORS[text]}>{text}</Tag>
@@ -89,6 +91,7 @@ const MyAsset = () => {
             title: '状态',
             dataIndex: 'active',
             key: 'active',
+            sorter: true,
             render: (text, record) => {
                 if (record['testing'] === true) {
                     return (
