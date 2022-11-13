@@ -99,9 +99,13 @@ func (r assetRepository) Find(c context.Context, pageIndex, pageSize int, name, 
 		order = "desc"
 	}
 
-	if field == "name" {
-		field = "name"
-	} else {
+	switch field {
+	case "name":
+	case "protocol":
+	case "ip":
+	case "active":
+
+	default:
 		field = "created"
 	}
 
@@ -319,9 +323,13 @@ func (r assetRepository) FindMyAssets(c context.Context, pageIndex, pageSize int
 		order = "desc"
 	}
 
-	if field == "name" {
-		field = "name"
-	} else {
+	switch field {
+	case "name":
+	case "protocol":
+	case "ip":
+	case "active":
+
+	default:
 		field = "created"
 	}
 
