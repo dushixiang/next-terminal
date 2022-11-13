@@ -59,12 +59,12 @@ func (r sessionRepository) Find(c context.Context, pageIndex, pageSize int, stat
 		params = append(params, bReviewed)
 	}
 
+	db.Raw(countSql, params...).Find(&total)
+
 	params = append(params, (pageIndex-1)*pageSize, pageSize)
 	itemSql += " order by s.connected_time desc LIMIT ?, ?"
 
-	db.Raw(countSql, params...).Scan(&total)
-
-	err = db.Raw(itemSql, params...).Scan(&results).Error
+	err = db.Raw(itemSql, params...).Find(&results).Error
 
 	if results == nil {
 		results = make([]model.SessionForPage, 0)
