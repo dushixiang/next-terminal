@@ -267,21 +267,23 @@ func (s assetService) UpdateById(id string, m maps.Map) error {
 		item.Description = "-"
 	}
 
+	if item.AccessGatewayId == "" {
+		item.AccessGatewayId = "-"
+	}
+
 	if err := s.Encrypt(&item, config.GlobalCfg.EncryptionPassword); err != nil {
 		return err
 	}
-	return env.GetDB().Transaction(func(tx *gorm.DB) error {
-		c := s.Context(tx)
 
-		if err := repository.AssetRepository.UpdateById(c, &item, id); err != nil {
+	return s.Transaction(context.Background(), func(ctx context.Context) error {
+		if err := repository.AssetRepository.UpdateById(ctx, &item, id); err != nil {
 			return err
 		}
-		if err := repository.AssetRepository.UpdateAttributes(c, id, item.Protocol, m); err != nil {
+		if err := repository.AssetRepository.UpdateAttributes(ctx, id, item.Protocol, m); err != nil {
 			return err
 		}
 		return nil
 	})
-
 }
 
 func (s assetService) FixSshMode() error {
