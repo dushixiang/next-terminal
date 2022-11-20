@@ -55,7 +55,12 @@ func getJob(j *model.Job) (job cron.Job, err error) {
 			Metadata:    j.Metadata,
 		}
 	case nt.FuncShellJob:
-		job = ShellJob{ID: j.ID, Mode: j.Mode, ResourceIds: j.ResourceIds, Metadata: j.Metadata}
+		job = ShellJob{
+			ID:          j.ID,
+			Mode:        j.Mode,
+			ResourceIds: j.ResourceIds,
+			Metadata:    j.Metadata,
+		}
 	default:
 		return nil, errors.New("未识别的任务")
 	}

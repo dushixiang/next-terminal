@@ -366,6 +366,9 @@ func (service sessionService) Create(clientIp, assetId, mode string, user *model
 	if err := repository.SessionRepository.Create(context.TODO(), s); err != nil {
 		return nil, err
 	}
+	if err := repository.AssetRepository.UpdateLastAccessTime(context.Background(), s.AssetId, common.NowJsonTime()); err != nil {
+		return nil, err
+	}
 	return s, nil
 }
 

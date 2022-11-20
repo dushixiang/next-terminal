@@ -1,6 +1,6 @@
 import React, {Suspense, useEffect, useState} from 'react';
 import {Breadcrumb, Dropdown, Layout, Menu, Popconfirm} from "antd";
-import {DesktopOutlined, DownOutlined, LogoutOutlined,} from "@ant-design/icons";
+import {BugTwoTone, DesktopOutlined, DownOutlined, LogoutOutlined} from "@ant-design/icons";
 import {Link, Outlet, useLocation, useNavigate} from "react-router-dom";
 import {getCurrentUser, isAdmin} from "../service/permission";
 import LogoWithName from "../images/logo-with-name.png";
@@ -19,6 +19,7 @@ const breadcrumbMatchMap = {
     '/role/': '角色详情',
     '/user-group/': '用户组详情',
     '/login-policy/': '登录策略详情',
+    '/command-filter/': '命令过滤器详情',
     '/strategy/': '授权策略详情',
 };
 const breadcrumbNameMap = {};
@@ -113,10 +114,14 @@ const ManagerLayout = () => {
                 <Link to={'/my-asset'}><DesktopOutlined/> 我的资产</Link>
             </Menu.Item>
             <Menu.Item>
+                <Link to={'/debug/pprof'}><BugTwoTone/> DEBUG</Link>
+                <a target='_blank' href={`/debug/pprof/`}></a>
+            </Menu.Item>
+            <Menu.Item>
                 <Popconfirm
                     key='login-btn-pop'
                     title="您确定要退出登录吗?"
-                    onConfirm={async ()=>{
+                    onConfirm={async () => {
                         await accountApi.logout();
                         navigate('/login');
                     }}
@@ -189,7 +194,7 @@ const ManagerLayout = () => {
                     </div>
                 </Header>
 
-                <Suspense fallback={<Landing/>}>
+                <Suspense fallback={<div className={'page-container'}><Landing/></div>}>
                     <Outlet/>
                 </Suspense>
 

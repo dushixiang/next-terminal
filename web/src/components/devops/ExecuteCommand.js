@@ -15,6 +15,7 @@ import {wsServer} from "../../common/env";
 import {CloseOutlined} from "@ant-design/icons";
 import {useQuery} from "react-query";
 import {xtermScrollPretty} from "../../utils/xterm-scroll-pretty";
+import strings from "../../utils/strings";
 
 const {Search} = Input;
 const {Content} = Layout;
@@ -25,8 +26,21 @@ const ExecuteCommand = () => {
     const [searchParams, _] = useSearchParams();
     let commandId = searchParams.get('commandId');
 
-    let commandQuery = useQuery('commandQuery', () => commandApi.getById(commandId));
-    let [inputValue, setInputValue] = useState(commandQuery.data?.content);
+    let commandQuery = useQuery('commandQuery', () => commandApi.getById(commandId),{
+        onSuccess: data => {
+            let commands = data.content.split('\n');
+            if (!commands) {
+                return;
+            }
+
+            items.forEach(item => {
+                if (getReady(item['id']) === false) {
+                    initTerm(item['id'], commands);
+                }
+            })
+        }
+    });
+    let [inputValue, setInputValue] = useState('');
 
     let items = JSON.parse(searchParams.get('assets'));
     let [assets, setAssets] = useState(items);
@@ -38,13 +52,6 @@ const ExecuteCommand = () => {
     }
 
     useEffect(() => {
-
-        items.forEach(item => {
-            console.log(getReady(item['id']));
-            if (getReady(item['id']) === false) {
-                initTerm(item['id']);
-            }
-        })
 
         window.addEventListener('resize', handleWindowResize);
 
@@ -104,7 +111,7 @@ const ExecuteCommand = () => {
         return readies[id];
     }
 
-    const initTerm = async (assetId) => {
+    const initTerm = async (assetId, commands) => {
         let session = await sessionApi.create(assetId, 'native');
         let sessionId = session['id'];
 
@@ -151,6 +158,14 @@ const ExecuteCommand = () => {
                 case Message.Connected:
                     term.clear();
                     sessionApi.connect(sessionId);
+
+                    for (let i = 0; i < commands.length; i++) {
+                        let command = commands[i];
+                        if (!strings.hasText(command)) {
+                            continue
+                        }
+                        webSocket.send(new Message(Message.Data, command + String.fromCharCode(13)).toString());
+                    }
                     break;
                 case Message.Data:
                     term.write(msg['content']);

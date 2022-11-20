@@ -2,14 +2,15 @@ import React, {useEffect, useState} from 'react';
 import {Button, Card, Checkbox, Form, Input, message, Modal, Typography} from "antd";
 import './Login.css'
 import request from "../common/request";
-import {LockOutlined, LockTwoTone, UserOutlined} from '@ant-design/icons';
+import {LockOutlined, UserOutlined} from '@ant-design/icons';
 import {setToken} from "../utils/utils";
 import brandingApi from "../api/branding";
 import strings from "../utils/strings";
 import {useNavigate} from "react-router-dom";
 import {setCurrentUser} from "../service/permission";
+import PromptModal from "../dd/prompt-modal/prompt-modal";
 
-const {Title} = Typography;
+const {Title, Text} = Typography;
 
 const LoginForm = () => {
 
@@ -17,6 +18,8 @@ const LoginForm = () => {
 
     let [inLogin, setInLogin] = useState(false);
     let [branding, setBranding] = useState({});
+    let [prompt, setPrompt] = useState(false);
+    let [account, setAccount] = useState({});
 
     useEffect(() => {
         const x = async () => {
@@ -62,17 +65,6 @@ const LoginForm = () => {
         return false;
     }
 
-    const showTOTP = (loginAccount) => {
-        let value = '';
-        Modal.confirm({
-            title: '双因素认证',
-            icon: <LockTwoTone/>,
-            content: <Input onChange={e => value = e.target.value} onPressEnter={() => handleOk(loginAccount, value)}
-                            placeholder="请输入双因素认证码"/>,
-            onOk: () => handleOk(loginAccount, value),
-        });
-    }
-
     const handleSubmit = async params => {
         setInLogin(true);
 
@@ -80,7 +72,8 @@ const LoginForm = () => {
             let result = await request.post('/login', params);
             if (result.code === 100) {
                 // 进行双因素认证
-                showTOTP(params);
+                setPrompt(true);
+                setAccount(params);
                 return;
             }
             if (result.code !== 1) {
@@ -100,7 +93,7 @@ const LoginForm = () => {
             <Card className='login-card' title={null}>
                 <div style={{textAlign: "center", margin: '15px auto 30px auto', color: '#1890ff'}}>
                     <Title level={1}>{branding['name']}</Title>
-                    {/*<Text>一个轻量级的堡垒机系统</Text>*/}
+                    <Text>{branding['description']}</Text>
                 </div>
                 <Form onFinish={handleSubmit} className="login-form">
                     <Form.Item name='username' rules={[{required: true, message: '请输入登录账号！'}]}>
@@ -120,6 +113,18 @@ const LoginForm = () => {
                     </Form.Item>
                 </Form>
             </Card>
+
+            <PromptModal
+                title={'双因素认证'}
+                open={prompt}
+                onOk={(value) => {
+                    handleOk(account, value)
+                }}
+                onCancel={() => setPrompt(false)}
+                placeholder={"请输入双因素认证码"}
+            >
+
+            </PromptModal>
         </div>
 
     );

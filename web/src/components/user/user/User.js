@@ -2,8 +2,8 @@ import React, {useState} from 'react';
 
 import {Button, Input, Layout, message, Modal, Popconfirm, Switch, Table} from "antd";
 import UserModal from "./UserModal";
-import {Link} from "react-router-dom";
-import {ProTable} from "@ant-design/pro-components";
+import {Link, useNavigate} from "react-router-dom";
+import {ProTable, TableDropdown} from "@ant-design/pro-components";
 import userApi from "../../../api/user";
 import arrays from "../../../utils/array";
 import {ExclamationCircleOutlined, LockTwoTone} from "@ant-design/icons";
@@ -25,6 +25,7 @@ const User = () => {
     let [selectedRowKeys, setSelectedRowKeys] = useState([]);
 
     const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.USER);
+    let navigate = useNavigate();
 
     const columns = [
         {
@@ -112,6 +113,27 @@ const User = () => {
                         <a key='delete' className='danger'>删除</a>
                     </Popconfirm>
                 </Show>,
+                <TableDropdown
+                    key="actionGroup"
+                    onSelect={(key) => {
+                        switch (key) {
+                            case 'user-detail':
+                                navigate(`/user/${record['id']}?activeKey=info`);
+                                break;
+                            case 'user-authorised-asset':
+                                navigate(`/user/${record['id']}?activeKey=asset`);
+                                break;
+                            case 'user-login-policy':
+                                navigate(`/user/${record['id']}?activeKey=login-policy`);
+                                break;
+                        }
+                    }}
+                    menus={[
+                        {key: 'user-detail', name: '详情', disabled: !hasMenu('user-detail')},
+                        {key: 'user-authorised-asset', name: '授权资产', disabled: !hasMenu('user-authorised-asset')},
+                        {key: 'user-login-policy', name: '登录策略', disabled: !hasMenu('user-login-policy')},
+                    ]}
+                />,
             ],
         },
     ];

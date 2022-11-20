@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Badge, Col, Divider, Layout, Row, Space, Table, Tag, Tooltip, Typography} from "antd";
+import {Badge, Divider, Layout, Space, Table, Tag, Tooltip, Typography} from "antd";
 import {ProTable} from "@ant-design/pro-components";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import assetApi from "../../api/asset";

@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 
 import {Button, Layout, Popconfirm} from "antd";
-import {ProTable} from "@ant-design/pro-components";
+import {ProTable, TableDropdown} from "@ant-design/pro-components";
 import UserGroupModal from "./UserGroupModal";
 import userGroupApi from "../../api/user-group";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import ColumnState, {useColumnState} from "../../hook/column-state";
 import {hasMenu} from "../../service/permission";
 import Show from "../../dd/fi/show";
@@ -21,6 +21,7 @@ const UserGroup = () => {
     let [selectedRowKey, setSelectedRowKey] = useState(undefined);
 
     const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.USER_GROUP);
+    let navigate = useNavigate();
 
     const columns = [
         {
@@ -77,6 +78,23 @@ const UserGroup = () => {
                     </Popconfirm>
                 </Show>
                 ,
+                <TableDropdown
+                    key="actionGroup"
+                    onSelect={(key) => {
+                        switch (key) {
+                            case 'user-group-detail':
+                                navigate(`/user-group/${record['id']}?activeKey=info`);
+                                break;
+                            case 'user-group-authorised-asset':
+                                navigate(`/user-group/${record['id']}?activeKey=asset`);
+                                break;
+                        }
+                    }}
+                    menus={[
+                        {key: 'user-group-detail', name: '详情', disabled: !hasMenu('user-group-detail')},
+                        {key: 'user-group-authorised-asset', name: '授权资产', disabled: !hasMenu('user-group-authorised-asset')},
+                    ]}
+                />,
             ],
         },
     ];
