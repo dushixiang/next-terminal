@@ -33,10 +33,12 @@ var DefaultMenu = []*model.Menu{
 	),
 	model.NewMenu("asset-add", "新建", "asset",
 		model.NewPermission("POST", "/assets"),
+		model.NewPermission("GET", "/access-gateways"),
 	),
 	model.NewMenu("asset-edit", "编辑", "asset",
 		model.NewPermission("GET", "/assets/:id"),
 		model.NewPermission("PUT", "/assets/:id"),
+		model.NewPermission("GET", "/access-gateways"),
 	),
 	model.NewMenu("asset-del", "删除", "asset",
 		model.NewPermission("DELETE", "/assets/:id"),
@@ -189,6 +191,10 @@ var DefaultMenu = []*model.Menu{
 	),
 	model.NewMenu("storage-log-clear", "清空", "storage-log",
 		model.NewPermission("POST", "/storage-logs/clear"),
+	),
+
+	model.NewMenu("session-command", "命令日志", "log-audit",
+		model.NewPermission("GET", "/session-commands/paging"),
 	),
 
 	model.NewMenu("ops", "系统运维", "root"),

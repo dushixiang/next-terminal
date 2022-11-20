@@ -112,6 +112,10 @@ const Strategy = () => {
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
+                <Show menu={'strategy-detail'} key={'strategy-get'}>
+                    <Link key="get" to={`/strategy/${record['id']}`}>详情</Link>
+                </Show>
+                ,
                 <Show menu={'strategy-edit'} key={'strategy-edit'}>
                     <a
                         key="edit"
@@ -182,7 +186,7 @@ const Strategy = () => {
                         labelWidth: 'auto',
                     }}
                     pagination={{
-                        pageSize: 10,
+                        defaultPageSize: 10,
                     }}
                     dateFormatter="string"
                     headerTitle="授权策略"

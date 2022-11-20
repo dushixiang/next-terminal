@@ -128,6 +128,13 @@ const MyAsset = () => {
             },
         },
         {
+            title: '最后接入时间',
+            key: 'lastAccessTime',
+            sorter: true,
+            dataIndex: 'lastAccessTime',
+            hideInSearch: true,
+        },
+        {
             title: '操作',
             valueType: 'option',
             key: 'option',
@@ -146,8 +153,8 @@ const MyAsset = () => {
                     <a
                         key="access"
                         href={url}
-                        rel="noreferrer"
-                        target='_blank'
+                        // rel="noreferrer"
+                        // target='_blank'
                     >
                         接入
                     </a>,
@@ -194,7 +201,7 @@ const MyAsset = () => {
                     labelWidth: 'auto',
                 }}
                 pagination={{
-                    defaultPageSize: 10,
+                    pageSize: 10,
                 }}
                 dateFormatter="string"
                 headerTitle="资产列表"

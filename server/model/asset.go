@@ -22,6 +22,7 @@ type Asset struct {
 	Active          bool            `json:"active"`
 	ActiveMessage   string          `gorm:"type:varchar(200)" json:"activeMessage"`
 	Created         common.JsonTime `json:"created"`
+	LastAccessTime  common.JsonTime `json:"lastAccessTime"`
 	Tags            string          `json:"tags"`
 	Owner           string          `gorm:"index,type:varchar(36)" json:"owner"`
 	Encrypted       bool            `json:"encrypted"`
@@ -29,18 +30,19 @@ type Asset struct {
 }
 
 type AssetForPage struct {
-	ID            string          `json:"id"`
-	Name          string          `json:"name"`
-	Description   string          `json:"description"`
-	IP            string          `json:"ip"`
-	Protocol      string          `json:"protocol"`
-	Port          int             `json:"port"`
-	Active        bool            `json:"active"`
-	ActiveMessage string          `json:"activeMessage"`
-	Created       common.JsonTime `json:"created"`
-	Tags          string          `json:"tags"`
-	Owner         string          `json:"owner"`
-	OwnerName     string          `json:"ownerName"`
+	ID             string          `json:"id"`
+	Name           string          `json:"name"`
+	Description    string          `json:"description"`
+	IP             string          `json:"ip"`
+	Protocol       string          `json:"protocol"`
+	Port           int             `json:"port"`
+	Active         bool            `json:"active"`
+	ActiveMessage  string          `json:"activeMessage"`
+	Created        common.JsonTime `json:"created"`
+	LastAccessTime common.JsonTime `json:"lastAccessTime"`
+	Tags           string          `json:"tags"`
+	Owner          string          `json:"owner"`
+	OwnerName      string          `json:"ownerName"`
 }
 
 func (r *Asset) TableName() string {

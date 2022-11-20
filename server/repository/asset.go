@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"next-terminal/server/common"
 	"next-terminal/server/common/maps"
 	"next-terminal/server/common/nt"
 	"next-terminal/server/config"
@@ -44,7 +45,7 @@ func (r assetRepository) FindByProtocolAndIds(c context.Context, protocol string
 }
 
 func (r assetRepository) Find(c context.Context, pageIndex, pageSize int, name, protocol, tags, ip, port, active, order, field string) (o []model.AssetForPage, total int64, err error) {
-	db := r.GetDB(c).Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.active_message,assets.owner,assets.created,assets.tags,assets.description, users.nickname as owner_name").Joins("left join users on assets.owner = users.id")
+	db := r.GetDB(c).Table("assets").Select("assets.id,assets.name,assets.ip,assets.port,assets.protocol,assets.active,assets.active_message,assets.owner,assets.created,assets.last_access_time,assets.tags,assets.description, users.nickname as owner_name").Joins("left join users on assets.owner = users.id")
 	dbCounter := r.GetDB(c).Table("assets")
 
 	if len(name) > 0 {
@@ -104,7 +105,8 @@ func (r assetRepository) Find(c context.Context, pageIndex, pageSize int, name, 
 	case "protocol":
 	case "ip":
 	case "active":
-
+	case "lastAccessTime":
+		field = "last_access_time"
 	default:
 		field = "created"
 	}
@@ -285,7 +287,7 @@ func (r assetRepository) ExistById(c context.Context, id string) (bool, error) {
 }
 
 func (r assetRepository) FindMyAssets(c context.Context, pageIndex, pageSize int, name, protocol, tags string, assetIds []string, order, field string) (o []model.AssetForPage, total int64, err error) {
-	db := r.GetDB(c).Table("assets").Select("assets.id,assets.name,assets.protocol,assets.active,assets.active_message,assets.tags,assets.description").
+	db := r.GetDB(c).Table("assets").Select("assets.id,assets.name,assets.protocol,assets.active,assets.active_message,assets.tags,assets.description,assets.last_access_time,").
 		Where("id in ?", assetIds)
 	dbCounter := r.GetDB(c).Table("assets").Where("id in ?", assetIds)
 
@@ -328,7 +330,8 @@ func (r assetRepository) FindMyAssets(c context.Context, pageIndex, pageSize int
 	case "protocol":
 	case "ip":
 	case "active":
-
+	case "lastAccessTime":
+		field = "last_access_time"
 	default:
 		field = "created"
 	}
@@ -361,4 +364,9 @@ func (r assetRepository) FindMyAssetTags(c context.Context, assetIds []string) (
 	}
 
 	return utils.Distinct(o), nil
+}
+
+func (r assetRepository) UpdateLastAccessTime(ctx context.Context, assetId string, now common.JsonTime) error {
+	asset := &model.Asset{ID: assetId, LastAccessTime: now}
+	return r.GetDB(ctx).Table("assets").Updates(asset).Error
 }

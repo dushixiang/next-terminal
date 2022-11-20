@@ -44,7 +44,8 @@ const Job = () => {
             key: 'status',
             hideInSearch: true,
             render: (status, record, index) => {
-                return <Switch disabled={!hasMenu('job-change-status')} checkedChildren="开启" unCheckedChildren="关闭" checked={status === 'running'}
+                return <Switch disabled={!hasMenu('job-change-status')} checkedChildren="开启" unCheckedChildren="关闭"
+                               checked={status === 'running'}
                                onChange={(checked) => handleChangeStatus(record['id'], checked ? 'running' : 'not-running', index)}
                 />
             }
@@ -218,7 +219,7 @@ const Job = () => {
                         labelWidth: 'auto',
                     }}
                     pagination={{
-                        pageSize: 10,
+                        defaultPageSize: 10,
                     }}
                     dateFormatter="string"
                     headerTitle="计划任务列表"
@@ -245,6 +246,11 @@ const Job = () => {
                         setConfirmLoading(true);
 
                         try {
+                            if (values['func'] === 'shell-job') {
+                                values['metadata'] = JSON.stringify({
+                                    'shell': values['shell']
+                                });
+                            }
                             let success;
                             if (values['id']) {
                                 success = await api.updateById(values['id'], values);

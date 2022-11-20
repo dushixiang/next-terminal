@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"next-terminal/server/common"
-	"next-terminal/server/common/nt"
-	"next-terminal/server/common/term"
 	"strings"
 	"time"
 
+	"next-terminal/server/common"
+	"next-terminal/server/common/nt"
+	"next-terminal/server/common/term"
 	"next-terminal/server/log"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
@@ -35,13 +35,19 @@ func (r ShellJob) Run() {
 		return
 	}
 
-	var assets []model.Asset
-	if r.Mode == nt.JobModeAll {
-		assets, _ = repository.AssetRepository.FindByProtocol(context.TODO(), "ssh")
-	} else {
-		assets, _ = repository.AssetRepository.FindByProtocolAndIds(context.TODO(), "ssh", strings.Split(r.ResourceIds, ","))
+	switch r.Mode {
+	case nt.JobModeAll:
+		assets, _ := repository.AssetRepository.FindByProtocol(context.TODO(), "ssh")
+		r.executeShellByAssets(assets)
+	case nt.JobModeCustom:
+		assets, _ := repository.AssetRepository.FindByProtocolAndIds(context.TODO(), "ssh", strings.Split(r.ResourceIds, ","))
+		r.executeShellByAssets(assets)
+	case nt.JobModeSelf:
+		r.executeShellByLocal()
 	}
+}
 
+func (r ShellJob) executeShellByAssets(assets []model.Asset) {
 	if len(assets) == 0 {
 		return
 	}
@@ -89,7 +95,7 @@ func (r ShellJob) Run() {
 
 		go func() {
 			t1 := time.Now()
-			result, err := exec(metadataShell.Shell, asset.AccessGatewayId, ip, port, username, password, privateKey, passphrase)
+			result, err := execute(metadataShell.Shell, asset.AccessGatewayId, ip, port, username, password, privateKey, passphrase)
 			elapsed := time.Since(t1)
 			var msg string
 			if err != nil {
@@ -124,7 +130,36 @@ func (r ShellJob) Run() {
 	_ = repository.JobLogRepository.Create(context.TODO(), &jobLog)
 }
 
-func exec(shell, accessGatewayId, ip string, port int, username, password, privateKey, passphrase string) (string, error) {
+func (r ShellJob) executeShellByLocal() {
+	var metadataShell MetadataShell
+	err := json.Unmarshal([]byte(r.Metadata), &metadataShell)
+	if err != nil {
+		log.Error("JSON数据解析失败", log.String("err", err.Error()))
+		return
+	}
+
+	now := time.Now()
+	var msg = ""
+	log.Debug("run local command", log.String("cmd", metadataShell.Shell))
+	output, outerr, err := utils.Exec(metadataShell.Shell)
+	if err != nil {
+		msg = fmt.Sprintf("命令执行失败，错误内容为：「%v」，耗时「%v」", err.Error(), time.Since(now).String())
+	} else {
+		msg = fmt.Sprintf("命令执行成功，stdout 返回值「%v」，stderr 返回值「%v」，耗时「%v」", output, outerr, time.Since(now).String())
+	}
+
+	_ = repository.JobRepository.UpdateLastUpdatedById(context.Background(), r.ID)
+	jobLog := model.JobLog{
+		ID:        utils.UUID(),
+		JobId:     r.ID,
+		Timestamp: common.NowJsonTime(),
+		Message:   msg,
+	}
+
+	_ = repository.JobLogRepository.Create(context.Background(), &jobLog)
+}
+
+func execute(shell, accessGatewayId, ip string, port int, username, password, privateKey, passphrase string) (string, error) {
 	if accessGatewayId != "" && accessGatewayId != "-" {
 		g, err := GatewayService.GetGatewayById(accessGatewayId)
 		if err != nil {

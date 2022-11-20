@@ -14,7 +14,7 @@ import {
     Tooltip,
     Upload
 } from "antd";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import {ProTable, TableDropdown} from "@ant-design/pro-components";
 import assetApi from "../../api/asset";
 import tagApi from "../../api/tag";
@@ -61,6 +61,7 @@ const Asset = () => {
     const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.ASSET);
 
     const tagQuery = useQuery('getAllTag', tagApi.getAll);
+    let navigate = useNavigate();
 
     const columns = [
         {
@@ -120,7 +121,7 @@ const Asset = () => {
             key: 'network',
             sorter: true,
             fieldProps: {
-                placeholder: '示例: 127.0.0.1:22'
+                placeholder: '示例: 127、127.0.0.1、:22、127.0.0.1:22'
             },
             render: (text, record) => {
                 return `${record['ip'] + ':' + record['port']}`;
@@ -201,8 +202,15 @@ const Asset = () => {
         {
             title: '创建时间',
             key: 'created',
-            dataIndex: 'created',
             sorter: true,
+            dataIndex: 'created',
+            hideInSearch: true,
+        },
+        {
+            title: '最后接入时间',
+            key: 'lastAccessTime',
+            sorter: true,
+            dataIndex: 'lastAccessTime',
             hideInSearch: true,
         },
         {
@@ -270,12 +278,32 @@ const Asset = () => {
                                 case "change-owner":
                                     handleChangeOwner(record);
                                     break;
+                                case 'asset-detail':
+                                    navigate(`/asset/${record['id']}?activeKey=info`);
+                                    break;
+                                case 'asset-authorised-user':
+                                    navigate(`/asset/${record['id']}?activeKey=bind-user`);
+                                    break;
+                                case 'asset-authorised-user-group':
+                                    navigate(`/asset/${record['id']}?activeKey=bind-user-group`);
+                                    break;
                             }
                         }}
                         menus={[
                             {key: 'copy', name: '复制', disabled: !hasMenu('asset-copy')},
                             {key: 'test', name: '连通性测试', disabled: !hasMenu('asset-conn-test')},
                             {key: 'change-owner', name: '更换所有者', disabled: !hasMenu('asset-change-owner')},
+                            {key: 'asset-detail', name: '详情', disabled: !hasMenu('asset-detail')},
+                            {
+                                key: 'asset-authorised-user',
+                                name: '授权用户',
+                                disabled: !hasMenu('asset-authorised-user')
+                            },
+                            {
+                                key: 'asset-authorised-user-group',
+                                name: '授权用户组',
+                                disabled: !hasMenu('asset-authorised-user-group')
+                            },
                         ]}
                     />,
                 ]
@@ -362,6 +390,8 @@ const Asset = () => {
                     if (split.length >= 2) {
                         ip = split[0];
                         port = split[1];
+                    } else {
+                        ip = split[0];
                     }
                 }
 
@@ -379,7 +409,7 @@ const Asset = () => {
                     order: order
                 }
                 let result = await api.getPaging(queryParams);
-                setItems(result['items'])
+                setItems(result['items']);
                 return {
                     data: items,
                     success: true,
@@ -402,6 +432,7 @@ const Asset = () => {
             }}
             pagination={{
                 defaultPageSize: 10,
+                showSizeChanger: true
             }}
             dateFormatter="string"
             headerTitle="资产列表"

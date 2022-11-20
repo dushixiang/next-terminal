@@ -33,6 +33,14 @@ const JobModal = ({
         const getItem = async () => {
             let data = await jobApi.getById(id);
             if (data) {
+                if (data['func'] === 'shell-job') {
+                    try {
+                        data['shell'] = JSON.parse(data['metadata'])['shell'];
+                    } catch (e) {
+                        data['shell'] = '';
+                    }
+
+                }
                 form.setFieldsValue(data);
                 setMode(data['mode']);
                 setFunc(data['func']);
@@ -65,10 +73,11 @@ const JobModal = ({
                 form
                     .validateFields()
                     .then(async values => {
-                        let ok = await handleOk(values);
-                        if (ok) {
-                            form.resetFields();
+                        if (values['resourceIds']) {
+                            values['resourceIds'] = values['resourceIds'].join(',');
                         }
+                        form.resetFields();
+                        handleOk(values);
                     });
             }}
             onCancel={() => {
@@ -100,7 +109,8 @@ const JobModal = ({
 
                 {
                     func === 'shell-job' ?
-                        <Form.Item label="Shell脚本" name='shell' rules={[{required: true, message: '请输入Shell脚本'}]}>
+                        <Form.Item label="Shell脚本" name='shell'
+                                   rules={[{required: true, message: '请输入Shell脚本'}]}>
                             <TextArea autoSize={{minRows: 5, maxRows: 10}} placeholder="在此处填写Shell脚本内容"/>
                         </Form.Item> : undefined
                 }
@@ -115,27 +125,27 @@ const JobModal = ({
                     }}>
                         <Radio value={'all'}>全部资产</Radio>
                         <Radio value={'custom'}>自定义</Radio>
+                        <Radio value={'self'}>本机</Radio>
                     </Radio.Group>
                 </Form.Item>
 
                 {
-                    mode === 'custom' ?
-                        <Spin tip='加载中...' spinning={resourcesLoading}>
-                            <Form.Item label="已选择资产" name='resourceIds' rules={[{required: true}]}>
-                                <Select
-                                    mode="multiple"
-                                    allowClear
-                                    placeholder="请选择资产"
-                                >
-                                    {
-                                        resources.map(item => {
-                                            return <Select.Option key={item['id']}>{item['name']}</Select.Option>
-                                        })
-                                    }
-                                </Select>
-                            </Form.Item>
-                        </Spin>
-                        : undefined
+                    mode === 'custom' &&
+                    <Spin tip='加载中...' spinning={resourcesLoading}>
+                        <Form.Item label="已选择资产" name='resourceIds' rules={[{required: true}]}>
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                placeholder="请选择资产"
+                            >
+                                {
+                                    resources.map(item => {
+                                        return <Select.Option key={item['id']}>{item['name']}</Select.Option>
+                                    })
+                                }
+                            </Select>
+                        </Form.Item>
+                    </Spin>
                 }
             </Form>
         </Modal>

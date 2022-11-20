@@ -33,6 +33,12 @@ const OfflineSession = () => {
             dataIndex: 'clientIp',
             key: 'clientIp',
             hideInSearch: true,
+        },{
+            title: 'IP定位',
+            tip: '国家|区域|省份|城市|ISP',
+            dataIndex: 'region',
+            key: 'region',
+            hideInSearch: true,
         }, {
             title: '接入方式',
             dataIndex: 'mode',
@@ -102,6 +108,7 @@ const OfflineSession = () => {
             key: 'option',
             render: (text, record, _, action) => {
                 let disablePlayback = record['recording'] !== '1';
+                let disableCmdRecord = record['commandCount'] === 0;
                 return [
                     <Show menu={'offline-session-playback'} key={'offline-session-playback'}>
                         <Button
@@ -125,6 +132,19 @@ const OfflineSession = () => {
                                 }
                             }}>
                             回放
+                        </Button>
+                    </Show>,
+                    <Show menu={'offline-session-command'} key={'offline-session-command'}>
+                        <Button
+                            key='command'
+                            disabled={disableCmdRecord}
+                            type="link"
+                            size='small'
+                            onClick={() => {
+                                setSelectedRow(record);
+                                setSessionCommandVisible(true);
+                            }}>
+                            命令记录({record['commandCount']})
                         </Button>
                     </Show>,
                     <Show menu={'offline-session-del'} key={'offline-session-del'}>
@@ -196,6 +216,7 @@ const OfflineSession = () => {
             }}
             pagination={{
                 defaultPageSize: 10,
+                showSizeChanger: true
             }}
             dateFormatter="string"
             headerTitle="离线会话列表"

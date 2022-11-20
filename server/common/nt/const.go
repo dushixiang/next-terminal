@@ -27,6 +27,7 @@ const (
 	JobStatusNotRunning     = "not-running"            // 计划任务未运行状态
 	FuncCheckAssetStatusJob = "check-asset-status-job" // 检测资产是否在线
 	FuncShellJob            = "shell-job"              // 执行Shell脚本
+	JobModeSelf             = "self"                   // 本机
 	JobModeAll              = "all"                    // 全部资产
 	JobModeCustom           = "custom"                 // 自定义选择资产
 

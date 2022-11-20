@@ -71,8 +71,7 @@ func (r authorisedRepository) FindAssetPage(c context.Context, pageIndex, pageSi
 	db := r.GetDB(c).Table("assets").
 		Select("authorised.id, authorised.created, assets.id as asset_id, assets.name as asset_name, strategies.id as strategy_id, strategies.name as strategy_name ").
 		Joins("left join authorised on authorised.asset_id = assets.id").
-		Joins("left join strategies      on strategies.id      = authorised.strategy_id").
-		Group("assets.id")
+		Joins("left join strategies      on strategies.id      = authorised.strategy_id")
 	dbCounter := r.GetDB(c).Table("assets").Joins("left join authorised on assets.id = authorised.asset_id").Group("assets.id")
 
 	if assetName != "" {
@@ -110,8 +109,7 @@ func (r authorisedRepository) FindUserPage(c context.Context, pageIndex, pageSiz
 	db := r.GetDB(c).Table("users").
 		Select("authorised.id, authorised.created, users.id as user_id, users.nickname as user_name, strategies.id as strategy_id, strategies.name as strategy_name ").
 		Joins("left join authorised on authorised.user_id = users.id").
-		Joins("left join strategies      on strategies.id      = authorised.strategy_id").
-		Group("users.id")
+		Joins("left join strategies      on strategies.id      = authorised.strategy_id")
 	dbCounter := r.GetDB(c).Table("assets").Joins("left join authorised on assets.id = authorised.asset_id").Group("assets.id")
 
 	if userName != "" {
@@ -140,8 +138,7 @@ func (r authorisedRepository) FindUserGroupPage(c context.Context, pageIndex, pa
 	db := r.GetDB(c).Table("user_groups").
 		Select("authorised.id, authorised.created, user_groups.id as user_group_id, user_groups.name as user_group_name, strategies.id as strategy_id, strategies.name as strategy_name ").
 		Joins("left join authorised on authorised.user_group_id = user_groups.id").
-		Joins("left join strategies      on strategies.id      = authorised.strategy_id").
-		Group("user_groups.id")
+		Joins("left join strategies      on strategies.id      = authorised.strategy_id")
 	dbCounter := r.GetDB(c).Table("assets").Joins("left join authorised on assets.id = authorised.asset_id").Group("assets.id")
 
 	if userName != "" {

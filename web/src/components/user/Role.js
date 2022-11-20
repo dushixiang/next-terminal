@@ -60,6 +60,10 @@ const Role = () => {
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
+                <Show menu={'role-detail'} key={'role-get'}>
+                    <Link key="get" to={`/role/${record['id']}`}>详情</Link>
+                </Show>
+                ,
                 <Show menu={'role-edit'} key={'role-edit'}>
                     <a
                         key="edit"
