@@ -287,7 +287,7 @@ func (r assetRepository) ExistById(c context.Context, id string) (bool, error) {
 }
 
 func (r assetRepository) FindMyAssets(c context.Context, pageIndex, pageSize int, name, protocol, tags string, assetIds []string, order, field string) (o []model.AssetForPage, total int64, err error) {
-	db := r.GetDB(c).Table("assets").Select("assets.id,assets.name,assets.protocol,assets.active,assets.active_message,assets.tags,assets.description,assets.last_access_time,").
+	db := r.GetDB(c).Table("assets").Select("assets.id,assets.name,assets.protocol,assets.active,assets.active_message,assets.tags,assets.description,assets.last_access_time").
 		Where("id in ?", assetIds)
 	dbCounter := r.GetDB(c).Table("assets").Where("id in ?", assetIds)
 
