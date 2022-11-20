@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Form, Modal, Select} from "antd";
 import authorisedApi from "../../api/authorised";
 import strategyApi from "../../api/strategy";
+import commandFilterApi from "../../api/command-filter";
 import userApi from "../../api/user";
 
 const formItemLayout = {
@@ -14,6 +15,7 @@ const AssetUserBind = ({id, visible, handleOk, handleCancel, confirmLoading}) =>
 
     let [selectedUserIds, setSelectedUserIds] = useState([]);
     let [users, setUsers] = useState([]);
+    let [commandFilters, setCommandFilters] = useState([]);
     let [strategies, setStrategies] = useState([]);
 
     useEffect(() => {
@@ -29,6 +31,9 @@ const AssetUserBind = ({id, visible, handleOk, handleCancel, confirmLoading}) =>
 
             let strategies = await strategyApi.getAll();
             setStrategies(strategies);
+
+            let commandFilters = await commandFilterApi.getAll();
+            setCommandFilters(commandFilters);
         }
 
         if (visible) {
@@ -37,6 +42,29 @@ const AssetUserBind = ({id, visible, handleOk, handleCancel, confirmLoading}) =>
             form.resetFields();
         }
     }, [visible])
+
+    let strategyOptions = strategies.map(item => {
+        return {
+            value: item.id,
+            label: item.name
+        }
+    });
+
+    let commandFilterOptions = commandFilters.map(item => {
+        return {
+            value: item.id,
+            label: item.name
+        }
+    });
+
+
+    let userOptions = users.map(item => {
+        return {
+            value: item.id,
+            label: item.name,
+            disabled: selectedUserIds.includes(item.id)
+        }
+    });
 
     return (
         <Modal
@@ -71,11 +99,28 @@ const AssetUserBind = ({id, visible, handleOk, handleCancel, confirmLoading}) =>
                         allowClear
                         style={{width: '100%'}}
                         placeholder="请选择用户"
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        options={userOptions}
                     >
-                        {users.map(item => {
-                            return <Select.Option key={item.id}
-                                                  disabled={selectedUserIds.includes(item.id)}>{item.nickname}</Select.Option>
-                        })}
+
+                    </Select>
+                </Form.Item>
+
+                <Form.Item label="命令过滤器" name='commandFilterId' extra={'可控制授权用户允许或不允许执行某些指令'}>
+                    <Select
+                        allowClear
+                        style={{width: '100%'}}
+                        placeholder="此字段不是必填的"
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        options={commandFilterOptions}
+                    >
+
                     </Select>
                 </Form.Item>
 
@@ -84,10 +129,13 @@ const AssetUserBind = ({id, visible, handleOk, handleCancel, confirmLoading}) =>
                         allowClear
                         style={{width: '100%'}}
                         placeholder="此字段不是必填的"
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        options={strategyOptions}
                     >
-                        {strategies.map(item => {
-                            return <Select.Option key={item.id}>{item.name}</Select.Option>
-                        })}
+
                     </Select>
                 </Form.Item>
 
