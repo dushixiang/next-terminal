@@ -153,8 +153,8 @@ const MyAsset = () => {
                     <a
                         key="access"
                         href={url}
-                        // rel="noreferrer"
-                        // target='_blank'
+                        rel="noreferrer"
+                        target='_blank'
                     >
                         接入
                     </a>,

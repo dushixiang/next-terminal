@@ -17,11 +17,9 @@ const NoPermission = () => {
                     subTitle="抱歉，您似乎没有此页面的权限。"
                     extra={
                         <Space>
-                            <Button type="primary" onClick={() => {
-                                navigate(-1);
-                            }
-                            }>返回上一页</Button>
-                            <Button type="primary"><Link to={'/'}>回到首页</Link></Button>
+                            <Button type="primary" onClick={() => {navigate(-1);}}>返回上一页</Button>
+                            <Button type="primary"><Link to={'/my-asset'}>我的资产</Link></Button>
+                            <Button type="primary"><Link to={'/'}>后台首页</Link></Button>
                         </Space>
                     }
                 />
