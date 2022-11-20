@@ -1,10 +1,13 @@
 import React from 'react';
 import {Button, Layout, Result, Space} from "antd";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 const {Content} = Layout;
 
 const NoMatch = () => {
+
+    let navigate = useNavigate();
+
     return (
         <div>
             <Content>
