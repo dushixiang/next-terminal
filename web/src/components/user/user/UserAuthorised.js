@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import {Form, Modal, Select} from "antd";
 import assetApi from "../../../api/asset";
 import strategyApi from "../../../api/strategy";
-import commandFilterApi from "../../../api/command-filter";
 import authorisedApi from "../../../api/authorised";
 
 const formItemLayout = {
@@ -15,7 +14,6 @@ const UserAuthorised = ({type, id, visible, handleOk, handleCancel, confirmLoadi
 
     let [selectedAssetIds, setSelectedAssetIds] = useState([]);
     let [assets, setAssets] = useState([]);
-    let [commandFilters, setCommandFilters] = useState([]);
     let [strategies, setStrategies] = useState([]);
 
     useEffect(() => {
@@ -37,9 +35,6 @@ const UserAuthorised = ({type, id, visible, handleOk, handleCancel, confirmLoadi
 
             let strategies = await strategyApi.GetAll();
             setStrategies(strategies);
-
-            let commandFilters = await commandFilterApi.GetAll();
-            setCommandFilters(commandFilters);
         }
 
         if (visible) {
@@ -55,14 +50,6 @@ const UserAuthorised = ({type, id, visible, handleOk, handleCancel, confirmLoadi
             label: item.name
         }
     });
-
-    let commandFilterOptions = commandFilters.map(item=>{
-        return {
-            value: item.id,
-            label: item.name
-        }
-    });
-
 
     let assetOptions = assets.map(item=>{
         return {
@@ -112,20 +99,6 @@ const UserAuthorised = ({type, id, visible, handleOk, handleCancel, confirmLoadi
                         options={assetOptions}
                     >
 
-                    </Select>
-                </Form.Item>
-
-                <Form.Item label="命令过滤器" name='commandFilterId' extra={'可控制授权用户允许或不允许执行某些指令'}>
-                    <Select
-                        allowClear
-                        style={{width: '100%'}}
-                        placeholder="此字段不是必填的"
-                        showSearch
-                        filterOption={(input, option) =>
-                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                        }
-                        options={commandFilterOptions}
-                    >
                     </Select>
                 </Form.Item>
 

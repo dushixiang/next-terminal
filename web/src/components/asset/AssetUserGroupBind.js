@@ -3,7 +3,6 @@ import {Form, Modal, Select} from "antd";
 import authorisedApi from "../../api/authorised";
 import userGroupApi from "../../api/user-group";
 import strategyApi from "../../api/strategy";
-import commandFilterApi from "../../api/command-filter";
 
 const formItemLayout = {
     labelCol: {span: 6},
@@ -16,7 +15,6 @@ const AssetUserGroupBind = ({id, visible, handleOk, handleCancel, confirmLoading
 
     let [selectedUserGroupIds, setSelectedUserGroupIds] = useState([]);
     let [userGroups, setUserGroups] = useState([]);
-    let [commandFilters, setCommandFilters] = useState([]);
     let [strategies, setStrategies] = useState([]);
 
     useEffect(() => {
@@ -32,9 +30,6 @@ const AssetUserGroupBind = ({id, visible, handleOk, handleCancel, confirmLoading
 
             let strategies = await strategyApi.getAll();
             setStrategies(strategies);
-
-            let commandFilters = await commandFilterApi.getAll();
-            setCommandFilters(commandFilters);
         }
 
         if (visible) {
@@ -43,6 +38,21 @@ const AssetUserGroupBind = ({id, visible, handleOk, handleCancel, confirmLoading
             form.resetFields();
         }
     }, [visible])
+
+    let strategyOptions = strategies.map(item => {
+        return {
+            value: item.id,
+            label: item.name
+        }
+    });
+
+    let userGroupOptions = userGroups.map(item => {
+        return {
+            value: item.id,
+            label: item.name,
+            disabled: selectedUserGroupIds.includes(item.id)
+        }
+    });
 
     return (
         <Modal
@@ -77,11 +87,13 @@ const AssetUserGroupBind = ({id, visible, handleOk, handleCancel, confirmLoading
                         allowClear
                         style={{width: '100%'}}
                         placeholder="请选择用户组"
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        options={userGroupOptions}
                     >
-                        {userGroups.map(item => {
-                            return <Select.Option key={item.id}
-                                                  disabled={selectedUserGroupIds.includes(item.id)}>{item.name}</Select.Option>
-                        })}
+
                     </Select>
                 </Form.Item>
 
@@ -90,10 +102,13 @@ const AssetUserGroupBind = ({id, visible, handleOk, handleCancel, confirmLoading
                         allowClear
                         style={{width: '100%'}}
                         placeholder="此字段不是必填的"
+                        showSearch
+                        filterOption={(input, option) =>
+                            (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                        }
+                        options={strategyOptions}
                     >
-                        {strategies.map(item => {
-                            return <Select.Option key={item.id}>{item.name}</Select.Option>
-                        })}
+
                     </Select>
                 </Form.Item>
 
