@@ -22,7 +22,7 @@ jobs:
           mv /tmp/guacamole-server-master/* .
           old="Guacamole RDP"
           new="RDP"
-          sed -i "s/${old}/${new}/" `grep -rn "${old}" *`
+          sed -i "s/${old}/${new}/" src/protocols/rdp/settings.c
           
       - name: Docker Login
         uses: docker/login-action@v1.10.0
