@@ -20,6 +20,9 @@ jobs:
           wget -O /tmp/master.zip https://github.com/apache/guacamole-server/archive/refs/heads/master.zip
           unzip /tmp/master.zip -d /tmp
           mv /tmp/guacamole-server-master/* .
+          old="Guacamole RDP"
+          new="RDP"
+          sed -i "s/${old}/${new}/" `grep -rn "${old}" *`
           
       - name: Docker Login
         uses: docker/login-action@v1.10.0
