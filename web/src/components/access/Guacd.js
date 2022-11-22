@@ -115,13 +115,36 @@ const Guacd = () => {
             ))
         }
 
+        const sink = new Guacamole.InputSink();
+        displayEle.appendChild(sink.getElement());
+        sink.focus();
+
+        const keyboard = new Guacamole.Keyboard(sink.getElement());
+
+        keyboard.onkeydown = (keysym) => {
+            console.log('aaa')
+            client.sendKeyEvent(1, keysym);
+            if (keysym === 65288) {
+                return false;
+            }
+        };
+        keyboard.onkeyup = (keysym) => {
+            client.sendKeyEvent(0, keysym);
+        };
+
+        const sinkFocus = debounce(() => {
+            sink.focus();
+        });
+
         const mouse = new Guacamole.Mouse(element);
 
         mouse.onmousedown = mouse.onmouseup = function (mouseState) {
+            sinkFocus();
             client.sendMouseState(mouseState);
         }
 
         mouse.onmousemove = function (mouseState) {
+            sinkFocus();
             client.getDisplay().showCursor(false);
             mouseState.x = mouseState.x / display.getScale();
             mouseState.y = mouseState.y / display.getScale();
@@ -134,21 +157,7 @@ const Guacd = () => {
             client.sendMouseState(state);
         };
 
-        const sink = new Guacamole.InputSink();
-        displayEle.appendChild(sink.getElement());
-        sink.focus();
 
-        const keyboard = new Guacamole.Keyboard(sink.getElement());
-
-        keyboard.onkeydown = (keysym) => {
-            client.sendKeyEvent(1, keysym);
-            if (keysym === 65288) {
-                return false;
-            }
-        };
-        keyboard.onkeyup = (keysym) => {
-            client.sendKeyEvent(0, keysym);
-        };
 
         setGuacd({
             client,
@@ -193,6 +202,7 @@ const Guacd = () => {
     }
 
     const focus = () => {
+        console.log(guacd.sink)
         if (guacd.sink) {
             guacd.sink.focus();
         }

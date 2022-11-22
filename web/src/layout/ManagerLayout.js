@@ -2,7 +2,7 @@ import React, {Suspense, useEffect, useState} from 'react';
 import {Breadcrumb, Dropdown, Layout, Menu, Popconfirm} from "antd";
 import {BugTwoTone, DesktopOutlined, DownOutlined, LogoutOutlined} from "@ant-design/icons";
 import {Link, Outlet, useLocation, useNavigate} from "react-router-dom";
-import {getCurrentUser, isAdmin} from "../service/permission";
+import {getCurrentUser} from "../service/permission";
 import LogoWithName from "../images/logo-with-name.png";
 import Logo from "../images/logo.png";
 import FooterComponent from "./FooterComponent";
@@ -134,11 +134,6 @@ const ManagerLayout = () => {
             </Menu.Item>
         </Menu>
     );
-
-    if (!isAdmin()) {
-        window.location.href = "#/my-asset";
-        return;
-    }
 
     return (
         <Layout className="layout" style={{minHeight: '100vh'}}>
