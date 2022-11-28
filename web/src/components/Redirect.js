@@ -14,7 +14,7 @@ const Redirect = () => {
             setCurrentUser(data);
             if (data.type === 'user') {
                 navigate('/my-asset');
-            } else {
+            } else if (data.type === 'admin'){
                 navigate('/dashboard');
             }
         }
