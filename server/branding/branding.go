@@ -9,5 +9,5 @@ var Banner = `    ___       ___
  \/|::/  /  /:/\/__/
    |:/  /   \/__/   
    \/__/            `
-var Version = `v1.3.4`
+var Version = `v1.3.5`
 var Hi = Banner + Version
