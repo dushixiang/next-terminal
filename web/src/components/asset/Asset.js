@@ -26,6 +26,7 @@ import {useQuery} from "react-query";
 import Show from "../../dd/fi/show";
 import {hasMenu} from "../../service/permission";
 import ChangeOwner from "./ChangeOwner";
+import dayjs from "dayjs";
 
 const api = assetApi;
 const {Content} = Layout;
@@ -212,6 +213,16 @@ const Asset = () => {
             sorter: true,
             dataIndex: 'lastAccessTime',
             hideInSearch: true,
+            render: (text, record) => {
+                if (text === '0001-01-01 00:00:00') {
+                    return '-';
+                }
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
+            },
         },
         {
             title: '操作',
