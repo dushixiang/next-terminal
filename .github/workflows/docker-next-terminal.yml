@@ -28,8 +28,7 @@ jobs:
         run: |
           cd web
           npm install --global yarn
-          yarn 
-          yarn build
+          yarn
       - name: go Setup
         uses: actions/setup-go@v2
         with:
@@ -37,8 +36,9 @@ jobs:
       - name: Build package Linux
         run: |
           sh build.sh
+          mv next-terminal next-terminal-bin
           mkdir next-terminal
-          mv next-terminal next-terminal/
+          mv next-terminal-bin next-terminal/next-terminal
           mv config.yml.example next-terminal/config.yml
           mv LICENSE next-terminal/
           tar zcvf next-terminal.tar.gz next-terminal/
