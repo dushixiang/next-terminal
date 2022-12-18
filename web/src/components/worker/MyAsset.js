@@ -5,6 +5,7 @@ import {PROTOCOL_COLORS} from "../../common/constants";
 import strings from "../../utils/strings";
 import {useQuery} from "react-query";
 import workAssetApi from "../../api/worker/asset";
+import dayjs from "dayjs";
 
 const actionRef = React.createRef();
 
@@ -133,6 +134,16 @@ const MyAsset = () => {
             sorter: true,
             dataIndex: 'lastAccessTime',
             hideInSearch: true,
+            render: (text, record) => {
+                if (text === '0001-01-01 00:00:00') {
+                    return '-';
+                }
+                return (
+                    <Tooltip title={text}>
+                        {dayjs(text).fromNow()}
+                    </Tooltip>
+                )
+            },
         },
         {
             title: '操作',

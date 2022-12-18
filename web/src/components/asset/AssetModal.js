@@ -789,10 +789,8 @@ Windows需要对远程应用程序的名称使用特殊的符号。
                         } else {
                             values.tags = '';
                         }
-                        let ok = await handleOk(values);
-                        if (ok) {
-                            form.resetFields();
-                        }
+                        await handleOk(values);
+                        form.resetFields();
                     });
             }}
             onCancel={() => {
