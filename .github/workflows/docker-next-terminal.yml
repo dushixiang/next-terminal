@@ -38,9 +38,9 @@ jobs:
           sh build.sh
           mv next-terminal next-terminal-bin
           mkdir next-terminal
-          mv next-terminal-bin next-terminal/next-terminal
-          mv config.yml.example next-terminal/config.yml
-          mv LICENSE next-terminal/
+          cp next-terminal-bin next-terminal/next-terminal
+          cp config.yml.example next-terminal/config.yml
+          cp LICENSE next-terminal/
           tar zcvf next-terminal.tar.gz next-terminal/
       - name: release
         uses: softprops/action-gh-release@v1
