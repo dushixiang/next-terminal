@@ -8,7 +8,6 @@ import {openTinyWin} from "../../utils/window";
 import {MODE_COLORS, PROTOCOL_COLORS} from "../../common/constants";
 import sessionApi from "../../api/session";
 import './OfflineSession.css'
-import SessionCommandRecord from "./SessionCommandRecord";
 import Show from "../../dd/fi/show";
 
 const {Content} = Layout;
@@ -32,12 +31,6 @@ const OfflineSession = () => {
             title: '来源IP',
             dataIndex: 'clientIp',
             key: 'clientIp',
-            hideInSearch: true,
-        },{
-            title: 'IP定位',
-            tip: '国家|区域|省份|城市|ISP',
-            dataIndex: 'region',
-            key: 'region',
             hideInSearch: true,
         }, {
             title: '接入方式',
@@ -132,19 +125,6 @@ const OfflineSession = () => {
                                 }
                             }}>
                             回放
-                        </Button>
-                    </Show>,
-                    <Show menu={'offline-session-command'} key={'offline-session-command'}>
-                        <Button
-                            key='command'
-                            disabled={disableCmdRecord}
-                            type="link"
-                            size='small'
-                            onClick={() => {
-                                setSelectedRow(record);
-                                setSessionCommandVisible(true);
-                            }}>
-                            命令记录({record['commandCount']})
                         </Button>
                     </Show>,
                     <Show menu={'offline-session-del'} key={'offline-session-del'}>
@@ -264,21 +244,6 @@ const OfflineSession = () => {
                 </Show>,
             ]}
         />
-
-        <Drawer title="命令记录"
-                placement="right"
-                width={window.innerWidth * 0.9}
-                onClose={() => {
-                    setSelectedRow({});
-                    setSessionCommandVisible(false);
-                }}
-                visible={sessionCommandVisible}
-        >
-            <SessionCommandRecord
-                visible={sessionCommandVisible}
-                sessionId={selectedRow['id']}
-            />
-        </Drawer>
     </Content>);
 };
 
