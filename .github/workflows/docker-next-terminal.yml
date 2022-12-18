@@ -30,6 +30,24 @@ jobs:
           npm install --global yarn
           yarn 
           yarn build
+      - name: go Setup
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.18
+      - name: Build package Linux
+        run: |
+          sh build.sh
+          mkdir next-terminal
+          mv next-terminal next-terminal/
+          mv config.yml.example next-terminal/config.yml
+          mv LICENSE next-terminal/
+          tar zcvf next-terminal.tar.gz next-terminal/
+      - name: release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: next-terminal.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Docker Login
         uses: docker/login-action@v1.10.0
         with:
