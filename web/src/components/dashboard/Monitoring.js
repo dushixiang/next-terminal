@@ -52,7 +52,7 @@ const Monitoring = () => {
 
     let monitorQuery = useQuery('getMonitorData', monitorApi.getData, {
         initialData: initData,
-        refetchInterval: 5
+        refetchInterval: 5000
     });
 
     let loadPercent = monitorQuery.data?.loadStat['percent'];
