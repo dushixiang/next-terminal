@@ -2,8 +2,8 @@ package repository
 
 import (
 	"context"
-	"next-terminal/server/common/nt"
 
+	"next-terminal/server/common/nt"
 	"next-terminal/server/env"
 
 	"gorm.io/gorm"

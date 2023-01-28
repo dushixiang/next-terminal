@@ -2,13 +2,15 @@ package service
 
 import (
 	"context"
-	"github.com/pkg/errors"
-	"gorm.io/gorm"
+
 	"next-terminal/server/common"
 	"next-terminal/server/dto"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
 	"next-terminal/server/utils"
+
+	"github.com/pkg/errors"
+	"gorm.io/gorm"
 )
 
 var AuthorisedService = new(authorisedService)
