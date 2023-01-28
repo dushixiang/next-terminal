@@ -4,10 +4,10 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"next-terminal/server/common/maps"
 	"strings"
 
 	"next-terminal/server/common"
+	"next-terminal/server/common/maps"
 	"next-terminal/server/common/nt"
 	"next-terminal/server/config"
 	"next-terminal/server/dto"
@@ -177,12 +177,8 @@ func (service backupService) Import(backup *dto.Backup) error {
 
 		if len(backup.Storages) > 0 {
 			for _, item := range backup.Storages {
-				owner := userIdMapping[item.Owner]
-				if owner == "" {
-					continue
-				}
 				item.ID = utils.UUID()
-				item.Owner = owner
+				item.Owner = userIdMapping[item.Owner]
 				item.Created = common.NowJsonTime()
 				if err := repository.StorageRepository.Create(ctx, &item); err != nil {
 					return err
@@ -251,6 +247,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				oldId := item.ID
 				newId := utils.UUID()
 				item.ID = newId
+				item.Owner = userIdMapping[item.Owner]
 				if err := CredentialService.Create(ctx, &item); err != nil {
 					return err
 				}
@@ -279,6 +276,7 @@ func (service backupService) Import(backup *dto.Backup) error {
 				}
 
 				oldId := m["id"].(string)
+				m["owner"] = userIdMapping[m["owner"].(string)]
 				asset, err := AssetService.Create(ctx, m)
 				if err != nil {
 					return err

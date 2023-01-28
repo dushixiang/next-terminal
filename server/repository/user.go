@@ -27,7 +27,7 @@ func (r userRepository) Find(c context.Context, pageIndex, pageSize int, usernam
 		dbCounter = dbCounter.Joins("left join login_policies_ref as ref on users.id = ref.user_id")
 
 		db = db.Where("ref.login_policy_id = ?", loginPolicyId)
-		dbCounter = db.Where("ref.login_policy_id = ?", loginPolicyId)
+		dbCounter = dbCounter.Where("ref.login_policy_id = ?", loginPolicyId)
 	}
 
 	if len(username) > 0 {
