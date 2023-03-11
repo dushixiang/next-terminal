@@ -14,9 +14,9 @@ guacd:
   hostname: 127.0.0.1
   port: 4822
   # 此路径需要为绝对路径，并且next-terminal和guacd都能访问到
-  recording: 'data/recording'
+  recording: '/usr/local/next-terminal/data/recording'
   # 此路径需要为绝对路径，并且next-terminal和guacd都能访问到
-  drive: 'data/drive'
+  drive: '/usr/local/next-terminal/data/drive'
 
 sshd:
   enable: true
