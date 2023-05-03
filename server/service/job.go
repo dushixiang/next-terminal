@@ -140,15 +140,22 @@ func (r jobService) DeleteJobById(id string) error {
 }
 
 func (r jobService) UpdateById(m *model.Job) error {
+	job, err := repository.JobRepository.FindById(context.TODO(), m.ID)
+	if err != nil {
+		return err
+	}
 	if err := repository.JobRepository.UpdateById(context.TODO(), m); err != nil {
 		return err
 	}
 
-	if err := r.ChangeStatusById(m.ID, nt.JobStatusNotRunning); err != nil {
-		return err
+	if job.Status == nt.JobStatusRunning {
+		if err := r.ChangeStatusById(m.ID, nt.JobStatusNotRunning); err != nil {
+			return err
+		}
+		if err := r.ChangeStatusById(m.ID, nt.JobStatusRunning); err != nil {
+			return err
+		}
 	}
-	if err := r.ChangeStatusById(m.ID, nt.JobStatusRunning); err != nil {
-		return err
-	}
+
 	return nil
 }
