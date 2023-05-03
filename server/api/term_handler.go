@@ -77,6 +77,9 @@ func (r *TermHandler) writeToWebsocket() {
 			return
 		case <-r.tick.C:
 			s := r.buf.String()
+			if s == "" {
+				continue
+			}
 			if err := r.SendMessageToWebSocket(dto.NewMessage(Data, s)); err != nil {
 				return
 			}
