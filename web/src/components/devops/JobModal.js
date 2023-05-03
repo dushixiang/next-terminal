@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {Form, Input, Modal, Radio, Select, Spin} from "antd";
 import jobApi from "../../api/job";
 import assetApi from "../../api/asset";
+import {useQuery} from "react-query";
+import strings from "../../utils/strings";
 
 const {TextArea} = Input;
 
@@ -17,46 +19,35 @@ const JobModal = ({
 
     let [func, setFunc] = useState('shell-job');
     let [mode, setMode] = useState('all');
-    let [resources, setResources] = useState([]);
-    let [resourcesLoading, setResourcesLoading] = useState(false);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            setResourcesLoading(true);
-            let result = await assetApi.GetAll('ssh');
-            setResources(result);
-            setResourcesLoading(false);
-        };
-
-        fetchData();
-
-        const getItem = async () => {
-            let data = await jobApi.getById(id);
-            if (data) {
-                if (data['func'] === 'shell-job') {
-                    try {
-                        data['shell'] = JSON.parse(data['metadata'])['shell'];
-                    } catch (e) {
-                        data['shell'] = '';
-                    }
-
+    useQuery('getJobById', () => jobApi.getById(id), {
+        enabled: visible && strings.hasText(id),
+        onSuccess: data => {
+            if (data['func'] === 'shell-job') {
+                try {
+                    data['shell'] = JSON.parse(data['metadata'])['shell'];
+                } catch (e) {
+                    data['shell'] = '';
                 }
-                form.setFieldsValue(data);
-                setMode(data['mode']);
-                setFunc(data['func']);
             }
-        }
 
-        if (visible && id) {
-            getItem();
-        } else {
-            form.setFieldsValue({
-                func: 'shell-job',
-                mode: 'all',
-            });
-        }
+            if (data.resourceIds) {
+                data.resourceIds = data.resourceIds.split(',');
+            }
+            form.setFieldsValue(data);
+            setMode(data['mode']);
+            setFunc(data['func']);
+        },
+    });
 
-    }, [visible]);
+    let resQuery = useQuery(`resQuery`, () => assetApi.GetAll('ssh'));
+
+    let resOptions = resQuery.data?.map(item => {
+        return {
+            label: item.name,
+            value: item.id
+        }
+    });
 
     const formItemLayout = {
         labelCol: {span: 6},
@@ -73,6 +64,7 @@ const JobModal = ({
                 form
                     .validateFields()
                     .then(async values => {
+                        console.log(values)
                         if (values['resourceIds']) {
                             values['resourceIds'] = values['resourceIds'].join(',');
                         }
@@ -89,7 +81,13 @@ const JobModal = ({
             cancelText='取消'
         >
 
-            <Form form={form} {...formItemLayout}>
+            <Form form={form} {...formItemLayout}
+                  initialValues={
+                      {
+                          func: 'shell-job',
+                          mode: 'all',
+                      }
+                  }>
                 <Form.Item name='id' noStyle>
                     <Input hidden={true}/>
                 </Form.Item>
@@ -131,18 +129,14 @@ const JobModal = ({
 
                 {
                     mode === 'custom' &&
-                    <Spin tip='加载中...' spinning={resourcesLoading}>
+                    <Spin tip='加载中...' spinning={resQuery.isLoading}>
                         <Form.Item label="已选择资产" name='resourceIds' rules={[{required: true}]}>
                             <Select
                                 mode="multiple"
                                 allowClear
                                 placeholder="请选择资产"
+                                options={resOptions}
                             >
-                                {
-                                    resources.map(item => {
-                                        return <Select.Option key={item['id']}>{item['name']}</Select.Option>
-                                    })
-                                }
                             </Select>
                         </Form.Item>
                     </Spin>
