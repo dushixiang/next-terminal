@@ -3,10 +3,13 @@ import ColumnState, {useColumnState} from "../../hook/column-state";
 import {Button, Layout, message, Popconfirm, Select, Tag, Tooltip} from "antd";
 import {ProTable} from "@ant-design/pro-components";
 import sessionApi from "../../api/session";
-import {MODE_COLORS, PROTOCOL_COLORS} from "../../common/constants";
+import {PROTOCOL_COLORS} from "../../common/constants";
 import {differTime} from "../../utils/utils";
 import {openTinyWin} from "../../utils/window";
 import Show from "../../dd/fi/show";
+import {useQuery} from "react-query";
+import userApi from "../../api/user";
+import assetApi from "../../api/asset";
 
 const {Content} = Layout;
 const actionRef = React.createRef();
@@ -15,6 +18,22 @@ const api = sessionApi;
 const OnlineSession = () => {
 
     const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.ONLINE_SESSION);
+    let userQuery = useQuery('userQuery', userApi.getAll);
+    let assetQuery = useQuery('assetQuery', assetApi.getAll);
+
+    const userOptions = userQuery.data?.map(item=>{
+        return {
+            label: item.nickname,
+            value: item.id
+        }
+    })
+
+    const assetOptions = assetQuery.data?.map(item=>{
+        return {
+            label: item.name,
+            value: item.id
+        }
+    })
 
     const columns = [
         {
@@ -25,27 +44,46 @@ const OnlineSession = () => {
             title: '来源IP',
             dataIndex: 'clientIp',
             key: 'clientIp',
-            hideInSearch: true,
-        }, {
-            title: '接入方式',
-            dataIndex: 'mode',
-            key: 'mode',
-            render: (text) => {
-                return (
-                    <Tag color={MODE_COLORS[text]}>{text}</Tag>
-                )
-            },
-            hideInSearch: true,
         }, {
             title: '用户昵称',
             dataIndex: 'creatorName',
             key: 'creatorName',
-            hideInSearch: true,
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select showSearch
+                            filterOption={(input, option) =>
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            }
+                            allowClear
+                            options={userOptions}
+                    >
+
+                    </Select>
+                );
+            },
         }, {
             title: '资产名称',
             dataIndex: 'assetName',
             key: 'assetName',
-            hideInSearch: true,
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select showSearch
+                            filterOption={(input, option) =>
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            }
+                            allowClear
+                            options={assetOptions}>
+                    </Select>
+                );
+            },
         }, {
             title: '连接协议',
             dataIndex: 'protocol',

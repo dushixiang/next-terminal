@@ -66,6 +66,14 @@ func (r storageRepository) UpdateById(c context.Context, o *model.Storage, id st
 	return r.GetDB(c).Updates(o).Error
 }
 
+// Save 保存所有的字段，即使字段是零值
+func (r storageRepository) SaveById(ctx context.Context, m *model.Storage, id string) (err error) {
+	m.ID = id
+	db := r.GetDB(ctx)
+	err = db.Save(m).Error
+	return
+}
+
 func (r storageRepository) FindByOwnerIdAndDefault(c context.Context, owner string, isDefault bool) (m model.Storage, err error) {
 	err = r.GetDB(c).Where("owner = ? and is_default = ?", owner, isDefault).First(&m).Error
 	return
