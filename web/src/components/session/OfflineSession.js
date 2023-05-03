@@ -9,6 +9,9 @@ import {MODE_COLORS, PROTOCOL_COLORS} from "../../common/constants";
 import sessionApi from "../../api/session";
 import './OfflineSession.css'
 import Show from "../../dd/fi/show";
+import {useQuery} from "react-query";
+import userApi from "../../api/user";
+import assetApi from "../../api/asset";
 
 const {Content} = Layout;
 const actionRef = React.createRef();
@@ -18,9 +21,24 @@ const OfflineSession = () => {
 
     const [columnsStateMap, setColumnsStateMap] = useColumnState(ColumnState.OFFLINE_SESSION);
 
-    let [selectedRow, setSelectedRow] = useState({});
     let [selectedRowKeys, setSelectedRowKeys] = useState([]);
-    let [sessionCommandVisible, setSessionCommandVisible] = useState(false);
+
+    let userQuery = useQuery('userQuery', userApi.getAll);
+    let assetQuery = useQuery('assetQuery', assetApi.getAll);
+
+    const userOptions = userQuery.data?.map(item=>{
+        return {
+            label: item.nickname,
+            value: item.id
+        }
+    })
+
+    const assetOptions = assetQuery.data?.map(item=>{
+        return {
+            label: item.name,
+            value: item.id
+        }
+    })
 
     const columns = [
         {
@@ -31,27 +49,46 @@ const OfflineSession = () => {
             title: '来源IP',
             dataIndex: 'clientIp',
             key: 'clientIp',
-            hideInSearch: true,
-        }, {
-            title: '接入方式',
-            dataIndex: 'mode',
-            key: 'mode',
-            render: (text) => {
-                return (
-                    <Tag color={MODE_COLORS[text]}>{text}</Tag>
-                )
-            },
-            hideInSearch: true,
         }, {
             title: '用户昵称',
             dataIndex: 'creatorName',
             key: 'creatorName',
-            hideInSearch: true,
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select showSearch
+                            filterOption={(input, option) =>
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            }
+                            allowClear
+                            options={userOptions}
+                    >
+
+                    </Select>
+                );
+            },
         }, {
             title: '资产名称',
             dataIndex: 'assetName',
             key: 'assetName',
-            hideInSearch: true,
+            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+
+                return (
+                    <Select showSearch
+                            filterOption={(input, option) =>
+                                (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                            }
+                            allowClear
+                            options={assetOptions}>
+                    </Select>
+                );
+            },
         }, {
             title: '连接协议',
             dataIndex: 'protocol',
@@ -167,6 +204,9 @@ const OfflineSession = () => {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
                     protocol: params.protocol,
+                    clientIp: params.clientIp,
+                    userId: params.creatorName,
+                    assetId: params.assetName,
                     field: field,
                     order: order,
                     status: 'disconnected',
