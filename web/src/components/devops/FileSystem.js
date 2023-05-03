@@ -91,7 +91,6 @@ class FileSystem extends Component {
             edit: this.props.edit,
         }, () => {
             this.loadFiles(this.state.currentDirectory);
-            console.log(this.state)
         });
     }
 
@@ -314,21 +313,37 @@ class FileSystem extends Component {
         }, false)
         xhr.onreadystatechange = (data) => {
             if (xhr.readyState !== 4) {
+                let responseText = data.currentTarget.responseText;
+                let result = responseText.split(`㊥`).filter(item => item !== '');
+                if (result.length > 0) {
+                    let upload = result[result.length - 1];
+                    let uploadToTarget = parseInt(upload);
+
+                    percent = Math.min(Math.floor(uploadToTarget * 100 / size), 99);
+
+                    let description = (
+                        <React.Fragment>
+                            <div>{name}</div>
+                            <div>{renderSize(uploadToTarget)}/{renderSize(size)}</div>
+                            <Progress percent={percent}/>
+                        </React.Fragment>
+                    );
+                    notification.info({
+                        key,
+                        message: `向目标机器传输中...`,
+                        duration: null,
+                        description: description,
+                        placement: 'bottomRight',
+                        onClose: () => {
+                            xhr.abort();
+                            message.info(`您已取消上传"${name}"`, 10);
+                        }
+                    });
+                }
                 return;
             }
             if (xhr.status >= 200 && xhr.status < 300) {
-                const responseText = data.currentTarget.responseText
-                let result;
-                try {
-                    result = JSON.parse(responseText)
-                } catch (e) {
-                    result = {}
-                }
-                if (result.code !== 1) {
-                    uploadEnd(false, result['message']);
-                } else {
-                    uploadEnd(true, result['message']);
-                }
+                uploadEnd(true, `上传成功`);
             } else if (xhr.status >= 400 && xhr.status < 500) {
                 uploadEnd(false, '服务器内部错误');
             }
