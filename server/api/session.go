@@ -8,11 +8,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
-	"path"
-	"strconv"
-	"strings"
-
 	"next-terminal/server/common"
 	"next-terminal/server/common/maps"
 	"next-terminal/server/common/nt"
@@ -21,6 +16,10 @@ import (
 	"next-terminal/server/repository"
 	"next-terminal/server/service"
 	"next-terminal/server/utils"
+	"os"
+	"path"
+	"strconv"
+	"strings"
 
 	"github.com/labstack/echo/v4"
 	"github.com/pkg/sftp"
@@ -246,7 +245,13 @@ func (api SessionApi) SessionUploadEndpoint(c echo.Context) error {
 		}
 		defer dstFile.Close()
 
-		if _, err = io.Copy(dstFile, src); err != nil {
+		counter := &WriteCounter{Resp: c.Response()}
+
+		c.Response().Header().Set(echo.HeaderContentType, `text/event-stream`)
+		c.Response().WriteHeader(http.StatusOK)
+
+		srcReader := io.TeeReader(src, counter)
+		if _, err = io.Copy(dstFile, srcReader); err != nil {
 			return err
 		}
 		return Success(c, nil)
