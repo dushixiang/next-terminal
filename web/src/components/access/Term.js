@@ -166,6 +166,7 @@ const Term = () => {
         }
 
         webSocket.onclose = (e) => {
+            console.log(`e`, e);
             term.writeln("connection is closed.");
             if (pingInterval) {
                 clearInterval(pingInterval);
@@ -190,6 +191,7 @@ const Term = () => {
                     term.write(msg['content']);
                     break;
                 case Message.Closed:
+                    console.log(`服务端通知需要关闭连接`)
                     term.writeln(`\x1B[1;3;31m${msg['content']}\x1B[0m `);
                     webSocket.close();
                     break;
@@ -234,9 +236,9 @@ const Term = () => {
         window.addEventListener('resize', resize);
 
         return () => {
-            if (websocket) {
-                websocket.close();
-            }
+            // if (websocket) {
+            //     websocket.close();
+            // }
             window.removeEventListener('resize', resize);
             window.removeEventListener('beforeunload', handleUnload);
         }
