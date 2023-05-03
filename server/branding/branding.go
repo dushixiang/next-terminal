@@ -1,7 +1,12 @@
 package branding
 
+import (
+	"fmt"
+	"time"
+)
+
 var Name = "Next Terminal"
-var Copyright = "Copyright © 2020-2022 dushixiang, All Rights Reserved."
+var Copyright = fmt.Sprintf("Copyright © 2020-%d dushixiang, All Rights Reserved.", time.Now().Year())
 var Banner = `    ___       ___   
    /\__\     /\  \  
   /:| _|_    \:\  \ 
@@ -9,5 +14,5 @@ var Banner = `    ___       ___
  \/|::/  /  /:/\/__/
    |:/  /   \/__/   
    \/__/            `
-var Version = `v1.3.6`
+var Version = `v1.3.8`
 var Hi = Banner + Version

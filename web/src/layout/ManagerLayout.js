@@ -174,7 +174,7 @@ const ManagerLayout = () => {
                 <Header style={{padding: 0, height: 60, zIndex: 20}}>
                     <div className='layout-header'>
                         <div className='layout-header-left'>
-                            <div style={{marginLeft: 16}}>
+                            <div>
                                 <Breadcrumb>{breadcrumbItems}</Breadcrumb>
                             </div>
                         </div>
