@@ -29,25 +29,6 @@ jobs:
           cd web
           npm install --global yarn
           yarn
-      - name: go Setup
-        uses: actions/setup-go@v2
-        with:
-          go-version: 1.20
-      - name: Build package Linux
-        run: |
-          sh build.sh
-          mv next-terminal next-terminal-bin
-          mkdir next-terminal
-          cp next-terminal-bin next-terminal/next-terminal
-          cp config.yml.example next-terminal/config.yml
-          cp LICENSE next-terminal/
-          tar zcvf next-terminal.tar.gz next-terminal/
-      - name: release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: next-terminal.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Docker Login
         uses: docker/login-action@v1.10.0
         with:
