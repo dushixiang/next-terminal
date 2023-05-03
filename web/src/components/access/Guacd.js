@@ -225,7 +225,7 @@ const Guacd = () => {
 
     const handleClipboardReceived = (stream, mimetype) => {
         if (session['copy'] === '0') {
-            message.warn('禁止复制');
+            // message.warn('禁止复制');
             return
         }
 
@@ -240,7 +240,7 @@ const Guacd = () => {
                 if (navigator.clipboard) {
                     await navigator.clipboard.writeText(data);
                 }
-                message.success('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
+                // message.success('您选择的内容已复制到您的粘贴板中，在右侧的输入框中可同时查看到。');
             };
         } else {
             let reader = new Guacamole.BlobReader(stream, mimetype);
@@ -272,7 +272,7 @@ const Guacd = () => {
         }
 
         if (data.data && data.data.length > 0) {
-            message.info('您输入的内容已复制到远程服务器上');
+            // message.info('您输入的内容已复制到远程服务器上');
         }
     }
 
