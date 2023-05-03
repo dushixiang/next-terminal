@@ -9,6 +9,7 @@ import UserLayout from "./layout/UserLayout";
 import NoMatch from "./components/NoMatch";
 import Landing from "./components/Landing";
 import NoPermission from "./components/NoPermission";
+import Redirect from "./components/Redirect";
 
 const GuacdMonitor = React.lazy(() => import("./components/session/GuacdMonitor"));
 const GuacdPlayback = React.lazy(() => import("./components/session/GuacdPlayback"));
@@ -61,6 +62,9 @@ const App = () => {
 
     return (
         <Routes>
+
+            <Route path="/" element={<Redirect/>}/>
+
             <Route element={
                 <Suspense fallback={<Landing/>}>
                     <Outlet/>
@@ -78,7 +82,6 @@ const App = () => {
             </Route>
 
             <Route element={<ManagerLayout/>}>
-                <Route path="/" element={<Dashboard/>}/>
                 <Route path="/dashboard" element={<Dashboard/>}/>
                 <Route path="/monitoring" element={<Monitoring/>}/>
 
