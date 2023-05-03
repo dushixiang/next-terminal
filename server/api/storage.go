@@ -99,7 +99,7 @@ func (api StorageApi) StorageUpdateEndpoint(c echo.Context) error {
 	storage.LimitSize = item.LimitSize
 	storage.IsShare = item.IsShare
 
-	if err := repository.StorageRepository.UpdateById(context.TODO(), &storage, id); err != nil {
+	if err := repository.StorageRepository.SaveById(context.TODO(), &storage, id); err != nil {
 		return err
 	}
 	return Success(c, "")

@@ -41,11 +41,12 @@
 
 .layout-header-left {
     flex: 1 1 0;
+    margin-left: 24px;
 }
 
 .layout-header-right {
     text-align: right;
-    margin-right: 12px;
+    margin-right: 24px;
 }
 
 .layout-header-right-item {
