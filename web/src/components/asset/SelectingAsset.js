@@ -1,10 +1,13 @@
 import React, {useState} from 'react';
-import {Badge, Modal, Space, Table, Tag, Tooltip, Typography} from "antd";
+import {Badge, Modal, Select, Space, Table, Tag, Tooltip, Typography} from "antd";
 import {PROTOCOL_COLORS} from "../../common/constants";
 import {isEmpty} from "../../utils/utils";
 import dayjs from "dayjs";
 import {ProTable} from "@ant-design/pro-components";
 import assetApi from "../../api/asset";
+import strings from "../../utils/strings";
+import {useQuery} from "react-query";
+import tagApi from "../../api/tag";
 
 const {Title} = Typography;
 
@@ -19,6 +22,7 @@ const SelectingAsset = ({
                         }) => {
 
     let [rows, setRows] = useState([]);
+    const tagQuery = useQuery('getAllTag', tagApi.getAll);
 
     const addRows = (selectedRows) => {
         selectedRows.forEach(selectedRow => {
@@ -76,18 +80,29 @@ const SelectingAsset = ({
         dataIndex: 'tags',
         key: 'tags',
         render: tags => {
-            if (!isEmpty(tags)) {
-                let tagDocuments = []
-                let tagArr = tags.split(',');
-                for (let i = 0; i < tagArr.length; i++) {
-                    if (tags[i] === '-') {
-                        continue;
-                    }
-                    tagDocuments.push(<Tag>{tagArr[i]}</Tag>)
-                }
-                return tagDocuments;
+            if (strings.hasText(tags)) {
+                return tags.split(',').filter(tag => tag !== '-').map(tag => <Tag key={tag}>{tag}</Tag>);
             }
-        }
+        },
+        renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+            if (type === 'form') {
+                return null;
+            }
+
+            return (
+                <Select mode="multiple"
+                        allowClear>
+                    {
+                        tagQuery.data?.map(tag => {
+                            if (tag === '-') {
+                                return undefined;
+                            }
+                            return <Select.Option key={tag}>{tag}</Select.Option>
+                        })
+                    }
+                </Select>
+            );
+        },
     }, {
         title: '状态',
         dataIndex: 'active',
@@ -107,15 +122,29 @@ const SelectingAsset = ({
                     </Tooltip>
                 )
             }
-        }
+        },
+        renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
+            if (type === 'form') {
+                return null;
+            }
+
+            return (
+                <Select>
+                    <Select.Option value="true">运行中</Select.Option>
+                    <Select.Option value="false">不可用</Select.Option>
+                </Select>
+            );
+        },
     }, {
         title: '所有者',
         dataIndex: 'ownerName',
-        key: 'ownerName'
+        key: 'ownerName',
+        hideInSearch: true,
     }, {
         title: '创建时间',
         dataIndex: 'created',
         key: 'created',
+        hideInSearch: true,
         render: (text, record) => {
             return (
                 <Tooltip title={text}>
@@ -190,6 +219,8 @@ const SelectingAsset = ({
                             pageSize: params.pageSize,
                             name: params.name,
                             protocol: 'ssh',
+                            active: params.active,
+                            'tags': params.tags?.join(','),
                             field: field,
                             order: order
                         }
