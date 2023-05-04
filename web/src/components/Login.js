@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Button, Card, Checkbox, Form, Input, message, Modal, Typography} from "antd";
 import './Login.css'
 import request from "../common/request";
-import {LockOutlined, UserOutlined} from '@ant-design/icons';
+import {LockOutlined, UserOutlined, KeyOutlined} from '@ant-design/icons';
 import {setToken} from "../utils/utils";
 import brandingApi from "../api/branding";
 import strings from "../utils/strings";
@@ -29,6 +29,10 @@ const LoginForm = () => {
         }
         x();
     }, []);
+
+    const changeCaptchaImage = () => {
+        window.location.reload();
+    }
 
     const afterLoginSuccess = async (data) => {
         // 跳转登录
@@ -77,6 +81,8 @@ const LoginForm = () => {
                 return;
             }
             if (result.code !== 1) {
+                alert(result.message);
+                window.location.reload();
                 return;
             }
 
@@ -101,6 +107,12 @@ const LoginForm = () => {
                     </Form.Item>
                     <Form.Item name='password' rules={[{required: true, message: '请输入登录密码！'}]}>
                         <Input.Password prefix={<LockOutlined/>} placeholder="登录密码"/>
+                    </Form.Item>
+                    <Form.Item name='captchaimg' style={{ display: "flex" }}>
+                        <img src="/captcha" alt="验证码"/><a href='#' onClick={changeCaptchaImage} style={{margin: 'auto auto auto 50px'}}>看不清换一张</a>
+                    </Form.Item>
+                    <Form.Item name="captcha" rules={[{required: true, message: '请输入验证码！'}]}>
+                        <Input prefix={<KeyOutlined/>} placeholder="请输入验证码！"/>
                     </Form.Item>
                     <Form.Item name='remember' valuePropName='checked' initialValue={false}>
                         <Checkbox>保持登录</Checkbox>

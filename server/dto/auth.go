@@ -13,6 +13,7 @@ type Authorization struct {
 type LoginAccount struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Captcha  string `json:"captcha"` //Felix add this
 	Remember bool   `json:"remember"`
 	TOTP     string `json:"totp"`
 }

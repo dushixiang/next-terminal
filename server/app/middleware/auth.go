@@ -13,7 +13,7 @@ import (
 	"github.com/ucarion/urlpath"
 )
 
-var anonymousUrls = []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/branding"}
+var anonymousUrls = []string{"/login", "/static", "/favicon.ico", "/logo.svg", "/branding", "/captcha"} //Felix modified
 
 var allowUrls = []urlpath.Path{
 	urlpath.New("/account/info"),
