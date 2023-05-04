@@ -90,6 +90,7 @@ func setupRoutes() *echo.Echo {
 	StorageLogApi := new(api.StorageLogApi)
 	AuthorisedApi := new(api.AuthorisedApi)
 
+	e.GET("/captcha", accountApi.CaptchaHandler) //Felix add this
 	e.POST("/login", accountApi.LoginEndpoint)
 
 	account := e.Group("/account")

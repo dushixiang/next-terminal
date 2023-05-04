@@ -3,6 +3,7 @@ package api
 import (
 	"context"
 	"errors"
+	"fmt"
 	"next-terminal/server/common"
 	"next-terminal/server/common/maps"
 	"next-terminal/server/common/nt"
@@ -19,9 +20,13 @@ import (
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/gorm"
+
+	"github.com/steambap/captcha"
 )
 
 type AccountApi struct{}
+
+var captchaval string //Felix add this
 
 func (api AccountApi) LoginEndpoint(c echo.Context) error {
 	var loginAccount dto.LoginAccount
@@ -38,6 +43,11 @@ func (api AccountApi) LoginEndpoint(c echo.Context) error {
 	count := v.(int)
 	if count >= 5 {
 		return Fail(c, -1, "登录失败次数过多，请等待5分钟后再试")
+	}
+
+	if captchaval != loginAccount.Captcha { //Felix add this
+		count++
+		return FailWithData(c, -1, "验证码错误", count)
 	}
 
 	user, err := repository.UserRepository.FindByUsername(context.TODO(), loginAccount.Username)
@@ -362,5 +372,25 @@ func (api AccountApi) AccessTokenDelEndpoint(c echo.Context) error {
 	if err := service.AccessTokenService.DelAccessToken(context.Background(), account.ID); err != nil {
 		return err
 	}
+	return Success(c, nil)
+}
+
+func (api AccountApi) CaptchaHandler(c echo.Context) error { //Felix add this
+
+	img, err := captcha.New(150, 50)
+
+	w := c.Response().Writer
+
+	if err != nil {
+		fmt.Fprint(w, nil)
+		fmt.Println(err.Error())
+		return Fail(c, 100, "Create captcha failed!")
+	}
+
+	captchaval = img.Text
+	fmt.Println("This is captchaHandler, and captcha is " + img.Text)
+
+	img.WriteImage(w)
+
 	return Success(c, nil)
 }
