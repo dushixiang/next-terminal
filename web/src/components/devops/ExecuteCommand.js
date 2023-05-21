@@ -38,7 +38,8 @@ const ExecuteCommand = () => {
                     initTerm(item['id'], commands);
                 }
             })
-        }
+        },
+        refetchOnWindowFocus: false
     });
     let [inputValue, setInputValue] = useState('');
 
