@@ -20,6 +20,10 @@ func (userApi UserApi) CreateEndpoint(c echo.Context) (err error) {
 		return err
 	}
 
+	if len(item.Password) > 100 {
+		return Fail(c, -1, "您输入的密码过长")
+	}
+
 	if err := service.UserService.CreateUser(item); err != nil {
 		return err
 	}

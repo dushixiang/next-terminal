@@ -40,6 +40,10 @@ func (api AccountApi) LoginEndpoint(c echo.Context) error {
 		return Fail(c, -1, "登录失败次数过多，请等待5分钟后再试")
 	}
 
+	if len(loginAccount.Password) > 100 {
+		return Fail(c, -1, "您输入的密码过长")
+	}
+
 	user, err := repository.UserRepository.FindByUsername(context.TODO(), loginAccount.Username)
 	if err != nil {
 		count++
@@ -230,6 +234,10 @@ func (api AccountApi) ChangePasswordEndpoint(c echo.Context) error {
 	var changePassword dto.ChangePassword
 	if err := c.Bind(&changePassword); err != nil {
 		return err
+	}
+
+	if len(changePassword.NewPassword) > 100 {
+		return Fail(c, -1, "您输入的密码过长")
 	}
 
 	if err := utils.Encoder.Match([]byte(account.Password), []byte(changePassword.OldPassword)); err != nil {
