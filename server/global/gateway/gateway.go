@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net"
 	"next-terminal/server/common/term"
-	"os"
 	"sync"
 
 	"next-terminal/server/utils"
@@ -51,15 +50,10 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 		return "", 0, err
 	}
 
-	hostname, err := os.Hostname()
-	if err != nil {
-		return "", 0, err
-	}
-
 	// debug
 	//hostname = "0.0.0.0"
 
-	localAddr := fmt.Sprintf("%s:%d", hostname, localPort)
+	localAddr := fmt.Sprintf("localhost:%d", localPort)
 	listener, err := net.Listen("tcp", localAddr)
 	if err != nil {
 		return "", 0, err
@@ -67,7 +61,7 @@ func (g *Gateway) OpenSshTunnel(id, ip string, port int) (exposedIP string, expo
 
 	tunnel := &Tunnel{
 		id:        id,
-		localHost: hostname,
+		localHost: "localhost",
 		//localHost:  "docker.for.mac.host.internal",
 		localPort:  localPort,
 		remoteHost: ip,
