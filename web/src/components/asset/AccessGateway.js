@@ -1,13 +1,13 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 
-import {Badge, Button, Layout, Popconfirm, Tag, Tooltip} from "antd";
+import { Badge, Button, Layout, Popconfirm, Tag, Tooltip } from "antd";
 import accessGatewayApi from "../../api/access-gateway";
-import {ProTable} from "@ant-design/pro-components";
+import { ProTable } from "@ant-design/pro-components";
 import AccessGatewayModal from "./AccessGatewayModal";
-import ColumnState, {useColumnState} from "../../hook/column-state";
+import ColumnState, { useColumnState } from "../../hook/column-state";
 import Show from "../../dd/fi/show";
 
-const {Content} = Layout;
+const { Content } = Layout;
 
 const api = accessGatewayApi;
 
@@ -25,6 +25,12 @@ const AccessGateway = () => {
             dataIndex: 'index',
             valueType: 'indexBorder',
             width: 48,
+        },
+        {
+            title: '网关类型',
+            dataIndex: 'gatewayType',
+            key: 'gatewayType',
+            hideInSearch: true
         },
         {
             title: '名称',
@@ -51,10 +57,12 @@ const AccessGateway = () => {
                     return (
                         <Tag color="green">密钥</Tag>
                     );
-                } else {
+                } else if (accountType === 'password') {
                     return (
                         <Tag color="red">密码</Tag>
                     );
+                } else {
+                    return <>-</>
                 }
             }
         }, {
@@ -71,13 +79,13 @@ const AccessGateway = () => {
                 if (text) {
                     return (
                         <Tooltip title='连接成功'>
-                            <Badge status="success" text='已连接'/>
+                            <Badge status="success" text='已连接' />
                         </Tooltip>
                     )
                 } else {
                     return (
                         <Tooltip title={record['message']}>
-                            <Badge status="default" text='已断开'/>
+                            <Badge status="default" text='已断开' />
                         </Tooltip>
                     )
                 }
