@@ -51,6 +51,7 @@ const AccessGatewayModal = ({
                     accountType: 'password',
                     port: 22,
                 });
+                // TODO: resolve this issue in guacd
                 setGatewayType('ssh');
                 setAccountType('password');
             }
