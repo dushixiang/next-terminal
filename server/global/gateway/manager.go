@@ -19,17 +19,18 @@ func (m *manager) GetById(id string) *Gateway {
 
 func (m *manager) Add(model *model.AccessGateway) *Gateway {
 	g := &Gateway{
-		ID:         model.ID,
-		IP:         model.IP,
-		Port:       model.Port,
-		Username:   model.Username,
-		Password:   model.Password,
-		PrivateKey: model.PrivateKey,
-		Passphrase: model.Passphrase,
-		Connected:  false,
-		SshClient:  nil,
-		Message:    "暂未使用",
-		tunnels:    make(map[string]*Tunnel),
+		ID:          model.ID,
+		GatewayType: model.GatewayType,
+		IP:          model.IP,
+		Port:        model.Port,
+		Username:    model.Username,
+		Password:    model.Password,
+		PrivateKey:  model.PrivateKey,
+		Passphrase:  model.Passphrase,
+		Connected:   false,
+		SshClient:   nil,
+		Message:     "暂未使用",
+		tunnels:     make(map[string]*Tunnel),
 	}
 	m.gateways.Store(g.ID, g)
 	return g
