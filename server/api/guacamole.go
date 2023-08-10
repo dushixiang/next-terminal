@@ -80,14 +80,21 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 			return nil
 		}
 
-		defer g.CloseSshTunnel(s.ID)
-		exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, s.IP, s.Port)
-		if err != nil {
-			guacamole.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
-			return nil
+		if g.GatewayType == "rdp" {
+			configuration.SetParameter("gateway-hostname", g.IP)
+			configuration.SetParameter("gateway-port", strconv.Itoa(g.Port))
+			configuration.SetParameter("gateway-username", s.Username)
+			configuration.SetParameter("gateway-password", s.Password)
+		} else {
+			defer g.CloseSshTunnel(s.ID)
+			exposedIP, exposedPort, err := g.OpenSshTunnel(s.ID, s.IP, s.Port)
+			if err != nil {
+				guacamole.Disconnect(ws, AccessGatewayCreateError, "创建SSH隧道失败："+err.Error())
+				return nil
+			}
+			s.IP = exposedIP
+			s.Port = exposedPort
 		}
-		s.IP = exposedIP
-		s.Port = exposedPort
 	}
 
 	configuration.SetParameter("hostname", s.IP)
