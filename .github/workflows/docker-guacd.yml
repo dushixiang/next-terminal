@@ -34,9 +34,9 @@ jobs:
           file: guacd/Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKERHUB_USERNAME }}/guacd:1.5.2
+            ${{ secrets.DOCKERHUB_USERNAME }}/guacd:1.5.3
             ${{ secrets.DOCKERHUB_USERNAME }}/guacd:latest
-            registry.cn-beijing.aliyuncs.com/${{ secrets.DOCKERHUB_USERNAME }}/guacd:1.5.2
+            registry.cn-beijing.aliyuncs.com/${{ secrets.DOCKERHUB_USERNAME }}/guacd:1.5.3
             registry.cn-beijing.aliyuncs.com/${{ secrets.DOCKERHUB_USERNAME }}/guacd:latest
           cache-from: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacd:cache
           cache-to: type=registry,ref=${{ secrets.DOCKERHUB_USERNAME }}/guacd:cache,mode=max
