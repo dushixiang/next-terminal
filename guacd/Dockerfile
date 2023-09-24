@@ -1,4 +1,4 @@
-FROM dushixiang/guacamole-server:1.5.3
+FROM dushixiang/guacamole-server:1.4.0
 
 LABEL MAINTAINER="helloworld1024@foxmail.com"
 
