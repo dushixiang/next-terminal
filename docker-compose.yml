@@ -1,0 +1,32 @@
+version: '3.3'
+services:
+  guacd:
+    image: dushixiang/guacd:latest
+    environment:
+      GUACD_LOG_LEVEL: debug
+    volumes:
+      - ./data:/usr/local/next-terminal/data
+    ports:
+      - "4822:4822"
+    restart:
+      always
+  next-terminal:
+    build:
+      dockerfile: ./Dockerfile
+    environment:
+      DB: sqlite
+      GUACD_HOSTNAME: guacd
+      GUACD_PORT: 4822
+    ports:
+      - "8088:8088"
+    volumes:
+      - /etc/localtime:/etc/localtime
+      - ./data:/usr/local/next-terminal/data
+    restart:
+      always
+networks:
+  next-terminal:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.77.77.0/24

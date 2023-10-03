@@ -10,6 +10,8 @@ COPY . .
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 RUN #apk add upx
+RUN apk add yarn
+RUN cd /app/web && yarn && yarn build
 RUN go mod tidy
 RUN sh get_arch.sh
 RUN echo "Hello, my CPU architecture is $(uname -m)"
@@ -21,14 +23,14 @@ FROM alpine:latest
 
 LABEL MAINTAINER="helloworld1024@foxmail.com"
 
-ENV TZ Asia/Shanghai
+ENV TZ Asia/Tokyo
 ENV DB sqlite
 ENV SQLITE_FILE './data/sqlite/next-terminal.db'
 ENV SERVER_PORT 8088
 ENV SERVER_ADDR 0.0.0.0:$SERVER_PORT
 ENV SSHD_PORT 8089
 ENV SSHD_ADDR 0.0.0.0:$SSHD_PORT
-ENV TIME_ZONE=Asia/Shanghai
+ENV TIME_ZONE=Asia/Tokyo
 RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /etc/timezone
 
 WORKDIR /usr/local/next-terminal
