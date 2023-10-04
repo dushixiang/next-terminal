@@ -41,7 +41,7 @@ COPY --from=builder /app/LICENSE ./
 
 EXPOSE $SERVER_PORT $SSHD_PORT
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+# RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 RUN apk add tzdata
 RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime
 RUN echo ${TZ} > /etc/timezone
