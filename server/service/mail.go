@@ -4,13 +4,15 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/jordan-wright/email"
 	"github.com/spf13/cast"
 	"net/smtp"
-	"next-terminal/server/branding"
 	"next-terminal/server/common/nt"
+
+	"next-terminal/server/branding"
 	"next-terminal/server/log"
 	"next-terminal/server/repository"
+
+	"github.com/jordan-wright/email"
 )
 
 var MailService = new(mailService)
@@ -35,7 +37,6 @@ func (r mailService) SendMail(to, subject, text string) {
 	e.To = []string{to}
 	e.Subject = subject
 	e.Text = []byte(text)
-
 	emailServer := fmt.Sprintf("%s:%s", host, port)
 	var err error
 	if cast.ToInt(port) != 465 {
