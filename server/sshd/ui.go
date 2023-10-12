@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"path"
+	"sort"
 	"strings"
 
 	"next-terminal/server/api"
@@ -55,10 +56,13 @@ MainLoop:
 }
 
 func (gui Gui) AssetUI(sess ssh.Session, user model.User) {
-	assets, err := service.WorkerService.FindMyAsset("", nt.SSH, "", user.ID, "", "")
+	assetsNoSort, err := service.WorkerService.FindMyAsset("", nt.SSH, "", user.ID, "", "")
 	if err != nil {
 		return
 	}
+
+	assets := _AssetsSortByName(assetsNoSort)
+	sort.Sort(assets)
 
 	for i := range assets {
 		assets[i].IP = ""
@@ -93,7 +97,7 @@ func (gui Gui) AssetUI(sess ssh.Session, user model.User) {
 		Label:     "请选择您要访问的资产",
 		Items:     assets,
 		Templates: templates,
-		Size:      4,
+		Size:      15,
 		Searcher:  searcher,
 		Stdin:     sess,
 		Stdout:    sess,
