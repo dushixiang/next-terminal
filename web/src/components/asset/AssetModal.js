@@ -359,6 +359,18 @@ const AssetModal = function ({
                                 </Select>
                             </Form.Item>
                             <Form.Item
+                                name="width"
+                                label="宽度"
+                            >
+                                <Input type="text" placeholder="客户端显示的宽度"/>
+                            </Form.Item>
+                            <Form.Item
+                                name="height"
+                                label="高度"
+                            >
+                                <Input type="text" placeholder="客户端显示的高度"/>
+                            </Form.Item>
+                            <Form.Item
                                 name="force-lossless"
                                 label="无损压缩"
                                 valuePropName="checked"

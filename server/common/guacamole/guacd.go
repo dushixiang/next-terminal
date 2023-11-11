@@ -48,6 +48,8 @@ const (
 	RemoteAppArgs = "remote-app-args"
 
 	ColorDepth  = "color-depth"
+	Width       = "width"
+	Height      = "height"
 	Cursor      = "cursor"
 	SwapRedBlue = "swap-red-blue"
 	DestHost    = "dest-host"
