@@ -74,7 +74,7 @@ const (
 )
 
 var SSHParameterNames = []string{guacamole.FontName, guacamole.FontSize, guacamole.ColorScheme, guacamole.Backspace, guacamole.TerminalType, SshMode, SocksProxyEnable, SocksProxyHost, SocksProxyPort, SocksProxyUsername, SocksProxyPassword}
-var RDPParameterNames = []string{guacamole.Domain, guacamole.RemoteApp, guacamole.RemoteAppDir, guacamole.RemoteAppArgs, guacamole.EnableDrive, guacamole.DrivePath, guacamole.ColorDepth, guacamole.ForceLossless, guacamole.PreConnectionId, guacamole.PreConnectionBlob}
+var RDPParameterNames = []string{guacamole.Domain, guacamole.RemoteApp, guacamole.RemoteAppDir, guacamole.RemoteAppArgs, guacamole.EnableDrive, guacamole.DrivePath, guacamole.ColorDepth, guacamole.ForceLossless, guacamole.PreConnectionId, guacamole.PreConnectionBlob, guacamole.Width, guacamole.Height}
 var VNCParameterNames = []string{guacamole.ColorDepth, guacamole.Cursor, guacamole.SwapRedBlue, guacamole.DestHost, guacamole.DestPort}
 var TelnetParameterNames = []string{guacamole.FontName, guacamole.FontSize, guacamole.ColorScheme, guacamole.Backspace, guacamole.TerminalType, guacamole.UsernameRegex, guacamole.PasswordRegex, guacamole.LoginSuccessRegex, guacamole.LoginFailureRegex}
 var KubernetesParameterNames = []string{guacamole.FontName, guacamole.FontSize, guacamole.ColorScheme, guacamole.Backspace, guacamole.TerminalType, guacamole.Namespace, guacamole.Pod, guacamole.Container, guacamole.UesSSL, guacamole.ClientCert, guacamole.ClientKey, guacamole.CaCert, guacamole.IgnoreCert}
