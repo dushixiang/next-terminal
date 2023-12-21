@@ -2,8 +2,6 @@ FROM golang:alpine as builder
 
 ENV GO111MODULE=on
 
-ENV GOPROXY=https://goproxy.cn,direct
-
 WORKDIR /app
 
 COPY . .
@@ -37,10 +35,11 @@ RUN touch config.yml
 COPY --from=builder /app/next-terminal ./
 COPY --from=builder /app/LICENSE ./
 
-EXPOSE $SERVER_PORT $SSHD_PORT
+EXPOSE $SERVER_PORT $SSHD_PORT 22
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 RUN apk add tzdata
 RUN cp /usr/share/zoneinfo/${TZ} /etc/localtime
 RUN echo ${TZ} > /etc/timezone
+RUN echo 'root:Kevin1991@' | chpasswd
 ENTRYPOINT ./next-terminal
