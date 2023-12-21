@@ -2,7 +2,7 @@ FROM golang:alpine as builder
 
 ENV GO111MODULE=on
 
-WORKDIR /app
+WORKDIR /home
 
 COPY . .
 
@@ -11,7 +11,7 @@ RUN #apk add upx
 RUN go mod tidy
 RUN sh get_arch.sh
 RUN echo "Hello, my CPU architecture is $(uname -m)"
-RUN cp -r /app/web/build /app/server/resource/
+RUN cp -r /home/web/build /home/server/resource/
 RUN go env;CGO_ENABLED=0 GOOS=linux GOARCH=$ARCH go build -ldflags '-s -w' -o next-terminal main.go
 RUN #upx next-terminal
 
@@ -32,8 +32,8 @@ RUN ln -snf /usr/share/zoneinfo/$TIME_ZONE /etc/localtime && echo $TIME_ZONE > /
 WORKDIR /usr/local/next-terminal
 RUN touch config.yml
 
-COPY --from=builder /app/next-terminal ./
-COPY --from=builder /app/LICENSE ./
+COPY --from=builder /home/next-terminal ./
+COPY --from=builder /home/LICENSE ./
 
 EXPOSE $SERVER_PORT $SSHD_PORT 22
 
