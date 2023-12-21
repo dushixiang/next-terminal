@@ -11,7 +11,7 @@ RUN #apk add upx
 RUN go mod tidy
 RUN sh get_arch.sh
 RUN echo "Hello, my CPU architecture is $(uname -m)"
-RUN mkdir –p app
+RUN mkdir –p /app
 RUN cp -r /app/web/build /app/server/resource/
 RUN go env;CGO_ENABLED=0 GOOS=linux GOARCH=$ARCH go build -ldflags '-s -w' -o next-terminal main.go
 RUN #upx next-terminal
