@@ -16,6 +16,7 @@ type AccessGateway struct {
 	Password    string          `gorm:"type:varchar(500)" json:"password"`
 	PrivateKey  string          `gorm:"type:text" json:"privateKey"`
 	Passphrase  string          `gorm:"type:varchar(500)" json:"passphrase"`
+	Command     string          `gorm:"type:text" json:"command"`
 	Created     common.JsonTime `json:"created"`
 }
 
