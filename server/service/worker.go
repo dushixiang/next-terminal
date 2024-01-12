@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	"next-terminal/server/common/sets"
 	"next-terminal/server/model"
 	"next-terminal/server/repository"
@@ -25,6 +26,26 @@ func (s *workerService) FindMyAssetPaging(pageIndex, pageSize int, name, protoco
 	}
 
 	return items, total, nil
+}
+
+func (s *workerService) FindMyAssetByName(name, protocol, userId string) (o model.Asset, err error) {
+	assetIdList, err := s.getAssetIdListByUserId(userId)
+	if err != nil {
+		return model.Asset{}, err
+	}
+	item, err := repository.AssetRepository.FindAssetByName(context.Background(), name, protocol)
+	if err != nil {
+		return model.Asset{}, err
+	}
+
+	if len(assetIdList) > 0 {
+		for _, id := range assetIdList {
+			if item.ID == id {
+				return item, nil
+			}
+		}
+	}
+	return model.Asset{}, fmt.Errorf("资产不存在")
 }
 
 func (s *workerService) FindMyAsset(name, protocol, tags string, userId string, order, field string) (o []model.AssetForPage, err error) {

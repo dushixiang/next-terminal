@@ -5,6 +5,7 @@
   "dependencies": {
     "@ant-design/charts": "^1.4.2",
     "@ant-design/icons": "^4.7.0",
+    "@ant-design/plots": "^2.1.11",
     "@ant-design/pro-components": "1.1.21",
     "@turf/bbox": "^6.5.0",
     "antd": "4.23.5",
