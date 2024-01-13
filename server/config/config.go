@@ -64,9 +64,10 @@ type Guacd struct {
 }
 
 type Sshd struct {
-	Enable bool
-	Addr   string
-	Key    string
+	Enable         bool
+	Addr           string
+	Key            string
+	AuthorizedKeys string
 }
 
 func SetupConfig() (*Config, error) {
@@ -103,6 +104,7 @@ func SetupConfig() (*Config, error) {
 	pflag.Bool("sshd.enable", false, "true or false")
 	pflag.String("sshd.addr", "", "sshd server listen addr")
 	pflag.String("sshd.key", "~/.ssh/id_rsa", "sshd public key filepath")
+	pflag.String("sshd.authorized-keys", "/root/.ssh/authorized_keys", "sshd authorized keys filepath")
 
 	pflag.Parse()
 	if err := viper.BindPFlags(pflag.CommandLine); err != nil {
@@ -156,9 +158,10 @@ func SetupConfig() (*Config, error) {
 			Drive:     guacdDrive,
 		},
 		Sshd: &Sshd{
-			Enable: viper.GetBool("sshd.enable"),
-			Addr:   viper.GetString("sshd.addr"),
-			Key:    sshdKey,
+			Enable:         viper.GetBool("sshd.enable"),
+			Addr:           viper.GetString("sshd.addr"),
+			Key:            sshdKey,
+			AuthorizedKeys: viper.GetString("sshd.authorized-keys"),
 		},
 	}
 

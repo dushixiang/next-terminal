@@ -22,3 +22,4 @@ sshd:
   enable: true
   addr: 0.0.0.0:2022
   key: ~/.ssh/id_rsa
+  authorized-keys: ~/.ssh/authorized_keys
