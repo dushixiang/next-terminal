@@ -1,12 +1,14 @@
 package sshd
 
 import (
+	"bufio"
 	"context"
 	"errors"
 	"fmt"
 	"io"
 	"net"
 	"next-terminal/server/common/nt"
+	"os"
 	"strings"
 
 	"next-terminal/server/branding"
@@ -107,7 +109,12 @@ func (sshd sshd) sessionHandler(sess ssh.Session) {
 		_ = sess.Close()
 	}()
 
-	username := sess.User()
+	rawReq := strings.Split(sess.User(), "@")
+	username := rawReq[0]
+	if len(rawReq) == 2 {
+		assetname := rawReq[1]
+		sess.Context().SetValue("publicKeyAsset", assetname)
+	}
 	remoteAddr := strings.Split(sess.RemoteAddr().String(), ":")[0]
 
 	user, err := repository.UserRepository.FindByUsername(context.TODO(), username)
@@ -120,14 +127,83 @@ func (sshd sshd) sessionHandler(sess ssh.Session) {
 		return
 	}
 
+	if sess.PublicKey() != nil {
+		publicKeyComment, ok := sess.Context().Value("publicKeyComment").(string)
+		if publicKeyComment == "" && !ok {
+			return
+		}
+
+		if user.Username != publicKeyComment {
+			_, _ = io.WriteString(sess, "您输入的账户或密码不正确.\n")
+			return
+		}
+	}
+
 	// 判断是否需要进行双因素认证
-	if user.TOTPSecret != "" && user.TOTPSecret != "-" {
+	if user.TOTPSecret != "" && user.TOTPSecret != "-" && sess.PublicKey() == nil {
 		sshd.gui.totpUI(sess, user, remoteAddr, username)
 	} else {
 		// 保存登录日志
 		_ = service.UserService.SaveLoginLog(remoteAddr, "terminal", username, true, false, utils.LongUUID(), "")
+		if sess.PublicKey() != nil {
+			_, _ = io.WriteString(sess, "\n公钥认证成功\n")
+		}
 		sshd.gui.MainUI(sess, user)
 	}
+}
+
+func (sshd sshd) publicKeyAuth(ctx ssh.Context, key ssh.PublicKey) bool {
+	if len(config.GlobalCfg.Sshd.AuthorizedKeys) == 0 {
+		return false
+	}
+	f, err := os.Open(config.GlobalCfg.Sshd.AuthorizedKeys)
+	if err != nil {
+		fmt.Printf("failed to open authorized_keys file: %v\n", err)
+		return false
+	}
+	defer f.Close()
+
+	keys := []struct {
+		key     ssh.PublicKey
+		comment string
+	}{}
+	scanner := bufio.NewScanner(f)
+	for scanner.Scan() {
+		t := scanner.Text()
+		if t == "" {
+			continue
+		}
+		if strings.HasPrefix(t, "#") {
+			continue
+		}
+		pk, c, _, _, err := ssh.ParseAuthorizedKey([]byte(t))
+		if err != nil {
+			continue
+		}
+		keys = append(keys, struct {
+			key     ssh.PublicKey
+			comment string
+		}{
+			key:     pk,
+			comment: c,
+		})
+	}
+
+	fmt.Printf("public key: %+v\n", keys)
+
+	if err := scanner.Err(); err != nil {
+		return false
+	}
+
+	// check if the public key is in the authorized_keys file
+	for _, k := range keys {
+		if ssh.KeysEqual(key, k.key) {
+			ctx.SetValue("publicKeyComment", k.comment)
+			return true
+		}
+	}
+
+	return false
 }
 
 func (sshd sshd) Serve() {
@@ -140,6 +216,7 @@ func (sshd sshd) Serve() {
 	err := ssh.ListenAndServe(
 		config.GlobalCfg.Sshd.Addr,
 		nil,
+		ssh.PublicKeyAuth(sshd.publicKeyAuth),
 		ssh.PasswordAuth(sshd.passwordAuth),
 		ssh.HostKeyFile(config.GlobalCfg.Sshd.Key),
 		ssh.WrapConn(sshd.connCallback),

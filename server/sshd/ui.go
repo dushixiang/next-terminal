@@ -41,7 +41,17 @@ func (gui Gui) MainUI(sess ssh.Session, user model.User) {
 
 MainLoop:
 	for {
-		_, result, err := prompt.Run()
+		var (
+			result string
+			err    error
+		)
+		publicKeyAsset, ok := sess.Context().Value("publicKeyAsset").(string)
+		if ok && publicKeyAsset != "" {
+			gui.AssetUI(sess, user)
+			return
+		} else {
+			_, result, err = prompt.Run()
+		}
 		if err != nil {
 			fmt.Printf("Prompt failed %v\n", err)
 			return
@@ -56,6 +66,19 @@ MainLoop:
 }
 
 func (gui Gui) AssetUI(sess ssh.Session, user model.User) {
+	var (
+		selectedAssetId string
+		err             error
+	)
+	publicKeyAsset, ok := sess.Context().Value("publicKeyAsset").(string)
+	if ok && publicKeyAsset != "" {
+		asset, err := service.WorkerService.FindMyAssetByName(publicKeyAsset, nt.SSH, user.ID)
+		if err != nil || asset.ID == "" {
+			sess.Write([]byte("未找到对应资产\n"))
+			return
+		}
+		selectedAssetId = asset.ID
+	}
 	assetsNoSort, err := service.WorkerService.FindMyAsset("", nt.SSH, "", user.ID, "", "")
 	if err != nil {
 		return
@@ -105,14 +128,22 @@ func (gui Gui) AssetUI(sess ssh.Session, user model.User) {
 
 AssetUILoop:
 	for {
-		i, _, err := prompt.Run()
-
-		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-			return
+		var (
+			err           error
+			i             int
+			chooseAssetId string
+		)
+		if len(selectedAssetId) != 0 {
+			chooseAssetId = selectedAssetId
+		} else {
+			i, _, err = prompt.Run()
+			if err != nil {
+				fmt.Printf("Prompt failed %v\n", err)
+				return
+			}
+			chooseAssetId = assets[i].ID
 		}
 
-		chooseAssetId := assets[i].ID
 		switch chooseAssetId {
 		case "quit":
 			break AssetUILoop
