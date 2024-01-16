@@ -1,4 +1,4 @@
-# Next terminal helm charts
+# Next-Terminal helm charts
 
 ## Prerequisites
 
