@@ -9,7 +9,7 @@
 
 ## nfs 
 
-next-terminal need share file between guacd and web backend server, so we use nfs.  defaule enable  you can disable  in `value.yaml` and set existingClaim name.
+next-terminal need share file between guacd and web backend server, so we use nfs.  default enable  you can disable  in `value.yaml` and set existingClaim name.
 ```
 nfs:
   enabled: false
