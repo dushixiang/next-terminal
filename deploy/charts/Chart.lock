@@ -1,0 +1,12 @@
+dependencies:
+- name: common
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 2.14.1
+- name: nfs-subdir-external-provisioner
+  repository: https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner
+  version: 4.0.18
+- name: mysql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 9.16.1
+digest: sha256:a4237a0269eaef0f8f6e58f8da6913f2f9c865b51ac7380971656221151a571e
+generated: "2024-01-14T21:47:18.234376962+08:00"
