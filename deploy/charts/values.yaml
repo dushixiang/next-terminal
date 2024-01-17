@@ -167,7 +167,7 @@ web:
     existingSecret:
 
   service:
-    type: NodePort
+    type: ClusterIP
     clusterIP: ""
     externalTrafficPolicy: Cluster
     sessionAffinity: None

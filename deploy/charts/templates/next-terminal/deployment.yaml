@@ -56,11 +56,9 @@ spec:
           {{ if .Values.web.command }}
           command: {{- include "common.tplvalues.render" (dict "value" .Values.web.command "context" $) | nindent 12 }}
           {{- end }}
-          {{- if  .Values.mysql.enabled }}
           env:
             - name: DB
               value: mysql
-          {{- end }}
           ports:
             - name: http
               containerPort: {{ .Values.web.service.ports.http }}

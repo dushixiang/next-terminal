@@ -10,8 +10,7 @@ metadata:
   {{- end }}
 
 spec: 
-  # TODO test mutiple replicas
-  replicas: 1
+  replicas: {{ .value.guacd.replicas }}
   {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.guacd.podLabels .Values.guacd.commonLabels ) "context" . ) }}
   selector:
     matchLabels: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 6 }}
