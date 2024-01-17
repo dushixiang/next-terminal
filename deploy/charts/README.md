@@ -68,6 +68,12 @@ helm install my-release -f value.yaml  ./
 
 - next-terminal 后端自身有一些local cache 所以多实例的情况下会出现数据错乱，暂时只支持一个副本。
 - 当前版本不提供Ingress 如果需要提供稳定的对外服务， 请自行配置Ingress 
+
+## 感谢
+
+- [bitnami-common](https://github.com/bitnami/charts)
+- [nfs-subdir-external-provisioner](https://github.com/kubernetes-sigs/nfs-subdir-external-provisioner/tree/master)
+
 <!-- | Parameter                            | Description                                                                                           | Default                                                       |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | `replicaCount`                       | Number of provisioner instances to deployed                                                           | `1`                                                           | -->
