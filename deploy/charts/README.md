@@ -14,7 +14,7 @@
 
 ## nfs 
 
-当前版本(1.3.9) next-terminal 需要guacd 和web 后端之间共享目录，所以使用了nfs pvc 来实现pod 间文件共享， 你也可以使用已有的支持ReadWriteMany 的StorageClass 来替换，需要修改`value.yaml` 里的下列内容
+当前版本(1.3.9) next-terminal 需要guacd 和web 后端之间共享目录，所以使用了nfs pvc 来实现pod 间文件共享， 你也可以使用已有的支持ReadWriteMany 的PVC 来替换，需要修改`value.yaml` 里的下列内容
 ```
 nfs:
   enabled: false
@@ -31,7 +31,8 @@ nfs:
     
 ```
 ## mysql
-next-terminal on kubernetes 不建议使用（也不支持）使用SQLite作为后端数据库， 我们更推荐使用MySQL来作为后端存储数据库
+
+next-terminal on Kubernetes 不建议使用（也不支持）使用SQLite作为后端数据库， 我们更推荐使用MySQL来作为后端存储数据库
 安全起见，安装时请修改`value.yaml` 中的认证信息
 ```
 mysql:
@@ -41,7 +42,7 @@ mysql:
     password: next-terminal
     database: next-terminal
 ```
-如果你已经有一个Mysql 可以修改`value.yaml` 里的这些信息来修改默认的mysql 连接
+如果想用一个已有MySQL 作为后端存储，可以修改`value.yaml`  里的这些配置来使用已有的MySQL
 ```
 mysql:
   enabled: false
@@ -60,10 +61,13 @@ mysql:
 helm install my-release -f value.yaml  ./
 ```
 ## 配置
+
 更多配置参见 value.yaml
 
 ## 已知问题
-next-terminal 后端自身有一些local cache 所以多示例的情况下会有问题，暂时只支持一个副本。
+
+- next-terminal 后端自身有一些local cache 所以多实例的情况下会出现数据错乱，暂时只支持一个副本。
+- 当前版本不提供Ingress 如果需要提供稳定的对外服务， 请自行配置Ingress 
 <!-- | Parameter                            | Description                                                                                           | Default                                                       |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
 | `replicaCount`                       | Number of provisioner instances to deployed                                                           | `1`                                                           | -->
