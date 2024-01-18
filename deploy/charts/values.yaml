@@ -1,0 +1,220 @@
+# Default values for next-terminal.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+clusterDomain: cluster.local
+namespaceOverride: ""
+affinity: {}
+commonAnnotations: {}
+
+global:
+  imageRegistry: ""
+  storageClass: ""
+  imagePullSecrets: []
+
+image:
+  repository:
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+guacd:
+  replicas: 1
+  enabled: true
+  debug: false
+  servicePort: 4822
+  podAnnotations: {}
+  podLabels: {}
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+  commonLabels: {}
+  commonAnnotations: {}
+  command: {}
+  podSecurityContext:
+    enabled: false
+    fsGroup: 1001
+  podAffinityPreset: ""
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    type: ""
+    key: ""
+    values: []
+  resources:
+    ## Example:
+    ## limits:
+    ##    cpu: 500m
+    ##    memory: 1Gi
+    limits: {}
+    ## Examples:
+    ## requests:
+    ##    cpu: 250m
+    ##    memory: 256Mi
+    requests: {}
+  restartPolicy: Always
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: "dushixiang/guacd"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  persistence:
+    existingClaim: ""
+  service:
+    type: ClusterIP
+    clusterIP: ""
+    externalTrafficPolicy: Cluster
+    sessionAffinity: None
+    loadBalancerIP:
+    nodePorts:
+      guacd: ""
+    ports:
+      guacd: 4822
+    annotations: {}
+    extraPorts: []
+
+web:
+  # caution!!! next-terminal web has local cache. so unsupport replicas !!
+  replicas: 1
+  dataPath: /opt/next-terminal/data
+  podAnnotations: {}
+  podLabels: {}
+  affinity: {}
+  nodeSelector: {}
+  tolerations: []
+  podSecurityContext:
+    enabled: false
+    fsGroup: 1001
+  podAffinityPreset: ""
+  podAntiAffinityPreset: soft
+  nodeAffinityPreset:
+    type: ""
+    key: ""
+    values: []
+  resources:
+    ## Example:
+    ## limits:
+    ##    cpu: 500m
+    ##    memory: 1Gi
+    limits: {}
+    ## Examples:
+    ## requests:
+    ##    cpu: 250m
+    ##    memory: 256Mi
+    requests: {}
+  restartPolicy: Always
+  commonLabels: {}
+  commonAnnotations: {}
+  command: []
+  image:
+    registry: "registry.cn-beijing.aliyuncs.com"
+    repository: "dushixiang/next-terminal"
+    tag: "latest"
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+  persistence:
+    existingClaim: ""
+  existingConfigmap: ""
+  containerPorts:
+    http: 8088
+    sshd: 8089
+  configuration: ""
+
+  sshd:
+    enabled: true
+    port: 8089
+    keyPath: "/opt/next-terminal/ssh/id_rsa"
+    key: |
+      -----BEGIN OPENSSH PRIVATE KEY-----
+      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
+      -----END OPENSSH PRIVATE KEY-----
+
+    existingSecret:
+
+  service:
+    type: ClusterIP
+    clusterIP: ""
+    externalTrafficPolicy: Cluster
+    sessionAffinity: None
+    loadBalancerIP:
+    nodePorts:
+      guacd: ""
+    annotations: {}
+    extraPorts: []
+    ports:
+      http: 8088
+      sshd: 8089
+nfs:
+  enabled: true
+  existingClaim:
+  size: 8Gi
+  annotations:
+    helm.sh/resource-policy: "keep"
+  image:
+    repository: registry.lank8s.cn/sig-storage/nfs-subdir-external-provisioner
+  storageClass:
+    provisionerName: k8s-sigs.io/nfs-subdir-external-provisioner
+    accessModes: ReadWriteMany
+  nfs:
+    server: 192.168.88.82
+    path: "/root/nfs-data"
+
+mysql:
+  enabled: true
+  image:
+    registry: docker.io
+    repository: bitnami/mysql
+    tag: 8.0.35-debian-11-r2
+  auth:
+    rootPassword: next-terminal
+    username: next-terminal
+    password: next-terminal
+    database: next-terminal
+    defaultAuthenticationPlugin: caching_sha2_password
+  primary:
+    service:
+      ports:
+        mysql: 3306
+
+  existing:
+    auth:
+      username: existing-next-terminal
+      password: existing-next-terminal
+      database: existing-next-terminal
+      host: "existing.test.mysql"
+      ports: 3306

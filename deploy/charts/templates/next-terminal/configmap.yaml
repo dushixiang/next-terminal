@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+    name: {{ include "next-terminal.fullname" . }}-cm
+    namespace: {{ .Release.Namespace | quote }}
+data: 
+  config.yml: | 
+    debug: false
+    demo: false
+    db: mysql
+    {{- if .Values.mysql.enabled }}
+    mysql:
+      hostname: {{ include "next-terminal.mysql.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+      port: {{ .Values.mysql.primary.service.ports.mysql }}
+      username: {{ .Values.mysql.auth.username |  quote }}
+      password: {{ .Values.mysql.auth.password | quote  }}
+      database: {{ .Values.mysql.auth.database | quote }}
+    {{- else }}
+    mysql:
+      hostname: {{ .Values.mysql.existing.auth.host | quote }}
+      port: {{ .Values.mysql.existing.auth.ports }}
+      username: {{ .Values.mysql.existing.auth.username |  quote }}
+      password: {{ .Values.mysql.existing.auth.password | quote  }}
+      database: {{ .Values.mysql.existing.auth.database | quote }}
+    {{- end }}
+   
+    sqlite:
+      file: '{{ .Values.web.dataPath }}/sqlite/next-terminal.db'
+    server:
+      addr: 0.0.0.0:{{ .Values.web.containerPorts.http }}
+    guacd:
+      hostname: {{ include "next-terminal.guacd.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
+      port: {{ .Values.guacd.servicePort}}
+      # 此路径需要为绝对路径，并且next-terminal和guacd都能访问到
+      recording: '{{ .Values.web.dataPath }}/recording'
+      # 此路径需要为绝对路径，并且next-terminal和guacd都能访问到
+      drive: '{{ .Values.web.dataPath }}/drive'
+
+    sshd:
+      enable: {{ .Values.web.sshd.enabled }}
+      addr: 0.0.0.0:{{ .Values.web.containerPorts.sshd }}
+      key: {{ .Values.web.sshd.keyPath | quote }}
