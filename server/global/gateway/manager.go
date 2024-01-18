@@ -27,6 +27,7 @@ func (m *manager) Add(model *model.AccessGateway) *Gateway {
 		Password:    model.Password,
 		PrivateKey:  model.PrivateKey,
 		Passphrase:  model.Passphrase,
+		Command:     model.Command,
 		Connected:   false,
 		SshClient:   nil,
 		Message:     "暂未使用",

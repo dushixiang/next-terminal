@@ -93,19 +93,24 @@ const AccessGatewayModal = ({
                     <Select onChange={handleGatewayTypeChange}>
                         <Select.Option key='ssh' value='ssh'>SSH</Select.Option>
                         <Select.Option key='rdp' value='rdp'>RDP</Select.Option>
+                        <Select.Option key='sshProxyCommand' value='sshProxyCommand'>SSH ProxyCommand</Select.Option>
                     </Select>
                 </Form.Item>
                 <Form.Item label="网关名称" name='name' rules={[{required: true, message: "请输入网关名称"}]}>
                     <Input placeholder="网关名称"/>
                 </Form.Item>
 
-                <Form.Item label="主机" name='ip' rules={[{required: true, message: '请输入网关的主机名称或者IP地址'}]}>
-                    <Input placeholder="网关的主机名称或者IP地址"/>
-                </Form.Item>
+                {gatewayType !== 'sshProxyCommand' &&
+                    <>
+                    <Form.Item label="主机" name='ip' rules={[{required: true, message: '请输入网关的主机名称或者IP地址'}]}>
+                        <Input placeholder="网关的主机名称或者IP地址"/>
+                    </Form.Item>
 
-                <Form.Item label="端口号" name='port' rules={[{required: true, message: '请输入端口'}]}>
-                    <InputNumber min={1} max={65535} placeholder='TCP端口'/>
-                </Form.Item>
+                    <Form.Item label="端口号" name='port' rules={[{required: true, message: '请输入端口'}]}>
+                        <InputNumber min={1} max={65535} placeholder='TCP端口'/>
+                    </Form.Item>
+                    </>
+                }
                 {gatewayType === 'ssh' &&
                 <>
                     <Form.Item label="账户类型" name='accountType'
@@ -146,6 +151,13 @@ const AccessGatewayModal = ({
                             </>
                     }
                 </>
+            }
+
+            {gatewayType === 'sshProxyCommand' &&
+                <Form.Item label="命令" name='command'
+                    rules={[{ required: true }]}>
+                    <TextArea placeholder="command" rows={4} />
+                </Form.Item>
             }
             </Form>
         </Modal>

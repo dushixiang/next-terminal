@@ -1,9 +1,11 @@
 package gateway
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"net"
+	"os/exec"
 
 	"golang.org/x/crypto/ssh"
 )
@@ -17,9 +19,10 @@ type Tunnel struct {
 	listener          net.Listener
 	localConnections  []net.Conn
 	remoteConnections []net.Conn
+	cmd               *exec.Cmd
 }
 
-func (r *Tunnel) Open(sshClient *ssh.Client) {
+func (r *Tunnel) OpenSSHClient(sshClient *ssh.Client) {
 
 	for {
 		localConn, err := r.listener.Accept()
@@ -40,6 +43,25 @@ func (r *Tunnel) Open(sshClient *ssh.Client) {
 	}
 }
 
+func (r *Tunnel) OpenCommand(args []string) {
+	cmd := exec.CommandContext(context.TODO(), args[0], args[1:]...)
+	stdin, _ := cmd.StdinPipe()
+	stdout, _ := cmd.StdoutPipe()
+	if err := cmd.Start(); err != nil {
+		panic(err)
+	}
+	r.cmd = cmd
+	for {
+		localConn, err := r.listener.Accept()
+		if err != nil {
+			return
+		}
+		r.localConnections = append(r.localConnections, localConn)
+		go io.Copy(localConn, stdout)
+		go io.Copy(stdin, localConn)
+	}
+}
+
 func (r *Tunnel) Close() {
 	for i := range r.localConnections {
 		_ = r.localConnections[i].Close()
@@ -50,6 +72,10 @@ func (r *Tunnel) Close() {
 	}
 	r.remoteConnections = nil
 	_ = r.listener.Close()
+	if r.cmd != nil {
+		r.cmd.Process.Kill()
+		r.cmd = nil
+	}
 }
 
 func copyConn(writer, reader net.Conn) {
