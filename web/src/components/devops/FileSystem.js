@@ -370,16 +370,10 @@ class FileSystem extends Component {
     showEditor = async (name, key) => {
         message.loading({key: key, content: 'Loading'})
         let fileContent = await request.get(`${server}/${this.state.storageType}/${this.state.storageId}/download?file=${window.encodeURIComponent(key)}&t=${new Date().getTime()}`);
-        let content = ""
-        try {
-            content = JSON.stringify(fileContent);
-        }catch (e) {
-            content = fileContent+"";
-        }
         this.setState({
             currentFileKey: key,
             fileName: name,
-            fileContent: content,
+            fileContent: fileContent,
             editorVisible: true
         })
         message.destroy(key);
