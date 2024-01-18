@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": ".",
+			"name": "server"
+		},
+		{
+			"path": "web",
+			"name": "web"
+		}
+	],
+	"settings": {}
+}
