@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "next-terminal.guacd.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  {{- $versionLabel := dict "app.kubernetes.io/version" ( include "common.images.version" ( dict "imageRoot" .Values.guacd.image "chart" .Chart ) ) }}  
+  {{- $labels := include "common.tplvalues.merge" ( dict "values" ( list .Values.commonLabels $versionLabel ) "context" . ) }}
+  labels: {{- include "common.labels.standard" ( dict "customLabels" $labels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: next-terminal
+    app.kubernetes.io/component: guacd
+  {{- $annotations := include "common.tplvalues.merge" ( dict "values" ( list .Values.guacd.service.annotations .Values.commonAnnotations ) "context" . ) }}
+  annotations: {{- include "common.tplvalues.render" ( dict "value" $annotations "context" $) | nindent 4 }}
+spec:
+  type: {{ .Values.guacd.service.type }}
+  {{- if .Values.guacd.service.sessionAffinity }}
+  sessionAffinity: {{ .Values.guacd.service.sessionAffinity }}
+  {{- end }}
+  {{- if .Values.guacd.service.sessionAffinityConfig }}
+  sessionAffinityConfig: {{- include "common.tplvalues.render" (dict "value" .Values.guacd.service.sessionAffinityConfig "context" $) | nindent 4 }}
+  {{- end }}
+  {{- if and .Values.guacd.service.clusterIP (eq .Values.guacd.service.type "ClusterIP") }}
+  clusterIP: {{ .Values.guacd.service.clusterIP }}
+  {{- end }}
+  {{- if (or (eq .Values.guacd.service.type "LoadBalancer") (eq .Values.guacd.service.type "NodePort")) }}
+  externalTrafficPolicy: {{ .Values.guacd.service.externalTrafficPolicy | quote }}
+  {{- end }}
+  {{- if (and (eq .Values.guacd.service.type "LoadBalancer") .Values.guacd.service.loadBalancerSourceRanges) }}
+  {{- with .Values.guacd.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges: {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- if (and (eq .Values.guacd.service.type "LoadBalancer") (not (empty .Values.guacd.service.loadBalancerIP))) }}
+  loadBalancerIP: {{ .Values.guacd.service.loadBalancerIP }}
+  {{- end }}
+  ports:
+    - name: guacd
+      port: {{ .Values.guacd.service.ports.guacd }}
+      targetPort: guacd
+      {{- if and (or (eq .Values.guacd.service.type "NodePort") (eq .Values.guacd.service.type "LoadBalancer")) (not (empty .Values.guacd.service.nodePorts.guacd)) }}
+      nodePort: {{ .Values.guacd.service.nodePorts.guacd }}
+      {{- else if eq .Values.guacd.service.type "ClusterIP" }}
+      {{- end }}
+    {{- if .Values.guacd.service.extraPorts }}
+    {{- include "common.tplvalues.render" (dict "value" .Values.guacd.service.extraPorts "context" $) | nindent 4 }}
+    {{- end }}
+  {{- $podLabels := include "common.tplvalues.merge" ( dict "values" ( list .Values.guacd.podLabels .Values.commonLabels ) "context" . ) }}
+  selector: {{- include "common.labels.matchLabels" ( dict "customLabels" $podLabels "context" $ ) | nindent 4 }}
+    app.kubernetes.io/part-of: next-terminal
+    app.kubernetes.io/component: guacd
