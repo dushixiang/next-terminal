@@ -8,10 +8,18 @@
 --- 
 [ENGLISH](https://github.com/dushixiang/next-terminal/blob/add-helm-charts/deploy/charts/README_en.md)
 
+[source](https://github.com/NeverTeaser/next-terminal-charts)
+
 ## 默认安装组件
 - [nfs-subdir-external-provisioner](https://artifacthub.io/packages/helm/nfs-subdir-external-provisioner/nfs-subdir-external-provisioner/4.0.18)
 - [mysql](https://artifacthub.io/packages/helm/bitnami/mysql/9.17.0)
 
+
+## 安装
+```
+helm repo add next-terminal https://1mtrue.com/next-terminal-charts/
+helm install my-next-terminal next-terminal/next-terminal --version 0.1.0
+```
 ## nfs 
 
 当前版本(1.3.9) next-terminal 需要guacd 和web 后端之间共享目录，所以使用了nfs pvc 来实现pod 间文件共享， 你也可以使用已有的支持ReadWriteMany 的PVC 来替换，需要修改`value.yaml` 里的下列内容
@@ -55,7 +63,7 @@ mysql:
       ports: 3306
 ```
 
-## 安装
+## 本地安装
 
 ```
 helm install my-release -f value.yaml  ./
