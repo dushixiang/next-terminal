@@ -8,16 +8,18 @@ function env() {
         }
     } else {
         // 生产环境
-        let wsPrefix;
+        let apiUrl = new URL('api', window.location.href).href;
+        let wsPrefix, server = apiUrl.substring(window.location.protocol.length, apiUrl.indexOf('/api'));
+        
         if (window.location.protocol === 'https:') {
             wsPrefix = 'wss:'
         } else {
             wsPrefix = 'ws:'
         }
         return {
-            server: '',
-            wsServer: wsPrefix + window.location.host,
-            prefix: window.location.protocol + '//' + window.location.host,
+            server: server,
+            wsServer: wsPrefix + server,
+            prefix: window.location.protocol + '//' + server,
         }
     }
 }
