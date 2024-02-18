@@ -26,7 +26,7 @@ func (cli Cli) ResetPassword(username string) error {
 	if err != nil {
 		return err
 	}
-	password := "next-terminal"
+	password := "admin"
 	passwd, err := utils.Encoder.Encode([]byte(password))
 	if err != nil {
 		return err
