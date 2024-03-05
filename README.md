@@ -70,4 +70,4 @@ https://next.typesafe.cn/ 账号：test  密码：test
 
 ## License 
 
-Next Terminal 使用 [AGPL-3.0](./LICENSE) 开源协议，请自觉遵守。
+Apache 2.0
