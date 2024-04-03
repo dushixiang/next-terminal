@@ -71,3 +71,7 @@ https://next.typesafe.cn/ 账号：test  密码：test
 ## License 
 
 Apache 2.0
+
+## 优秀软件推荐
+
+- [go-ldap-admin：基于Go+Vue实现的openLDAP后台管理项目](https://github.com/eryajf/go-ldap-admin)
