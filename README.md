@@ -24,17 +24,18 @@ Next Terminal是一个简单好用安全的开源交互审计系统，支持RDP�
 - 登录策略
 - 系统监控
 
-## 在线体验
+## 专业版/企业版限时优惠
 
-**web**
+**购买链接**
 
-https://next.typesafe.cn/ 账号：test  密码：test
+https://license.typesafe.cn/pricing
 
-**ssh server**
+**演示环境**
 
-主机：next.typesafe.cn
-端口：2022
-账号：test  密码：test
+https://next.typesafe.cn/ 
+
+- 管理用户 manager/manager
+- 普通用户 test/test
 
 ## 协议与条款
 
