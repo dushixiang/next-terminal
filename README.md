@@ -63,7 +63,6 @@ https://next.typesafe.cn/
 <img src="wx.png" width="300"  height="auto"/>
 
 - QQ群 938145268
-- Telegram https://t.me/next_terminal
 
 ## 安全问题
 
