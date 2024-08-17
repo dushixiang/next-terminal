@@ -1,3 +1,7 @@
+# ⚠️ 提示
+
+本项目暂停开发，等待重构后提供 v2.0 版本。
+
 # Next Terminal
 
 [![Docker guacd build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml)
