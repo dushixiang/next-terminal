@@ -7,7 +7,7 @@
 [![Docker guacd build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml)
 [![Docker next-terminal build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml)
 
-[<img src="https://api.gitsponsors.com/api/badge/img?id=323076240" height="20">](https://api.gitsponsors.com/api/badge/link?p=bQQ+JQSOSkDQixi5tV+HUC+Ds0ngJqK4w/B/zF1kbNs0bMUwJCVRoYpR03vp4IuN)
+[<img src="https://api.gitsponsors.com/api/badge/img?id=323076240" height="20">](https://api.gitsponsors.com/api/badge/link?p=bQQ+JQSOSkDQixi5tV+HUNJGTdLSR7fhncGsX5OS2/0HXGl5Ur0FV7F9Q0rrWGG5fYSVGF81vyWT5iab62f91KqwMLC4JnDkf2w7wDgKP3N9WKskoYIQtCbN9DrW/N6B)
 
 ## 快速了解
 
