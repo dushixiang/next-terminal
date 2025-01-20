@@ -7,6 +7,8 @@
 [![Docker guacd build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml)
 [![Docker next-terminal build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml)
 
+[<img src="https://api.gitsponsors.com/api/badge/img?id=323076240" height="20">](https://api.gitsponsors.com/api/badge/link?p=bQQ+JQSOSkDQixi5tV+HUC+Ds0ngJqK4w/B/zF1kbNs0bMUwJCVRoYpR03vp4IuN)
+
 ## 快速了解
 
 Next Terminal是一个简单好用安全的开源交互审计系统，支持RDP、SSH、VNC、Telnet、Kubernetes协议。
