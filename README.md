@@ -7,8 +7,6 @@
 [![Docker guacd build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml)
 [![Docker next-terminal build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml)
 
-[<img src="https://api.gitsponsors.com/api/badge/img?id=323076240" height="20">](https://api.gitsponsors.com/api/badge/link?p=bQQ+JQSOSkDQixi5tV+HUNJGTdLSR7fhncGsX5OS2/0HXGl5Ur0FV7F9Q0rrWGG5fYSVGF81vyWT5iab62f91KqwMLC4JnDkf2w7wDgKP3N9WKskoYIQtCbN9DrW/N6B)
-
 ## 快速了解
 
 Next Terminal是一个简单好用安全的开源交互审计系统，支持RDP、SSH、VNC、Telnet、Kubernetes协议。
@@ -64,7 +62,8 @@ https://next.typesafe.cn/
 ## 问题反馈
 
 - Issues
-- QQ群 938145268
+- ~QQ群 938145268 无了，不要加了~
+- 加我微信 type-safe 备注 NT 
 
 ## 安全问题
 
