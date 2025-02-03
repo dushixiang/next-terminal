@@ -8,6 +8,7 @@ import (
 	"next-terminal/server/common/nt"
 	"path"
 	"strconv"
+	"time"
 
 	"next-terminal/server/config"
 	"next-terminal/server/global/session"
@@ -51,6 +52,8 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 		log.Warn("升级为WebSocket协议失败", log.NamedError("err", err))
 		return err
 	}
+	defer ws.Close()
+
 	ctx := context.TODO()
 	width := c.QueryParam("width")
 	height := c.QueryParam("height")
@@ -167,7 +170,24 @@ func (api GuacamoleApi) Guacamole(c echo.Context) error {
 	guacamoleHandler.Start()
 	defer guacamoleHandler.Stop()
 
+	// WebSocket Ping/Pong handler to keep connection alive
+	go func() {
+		ticker := time.NewTicker(30 * time.Second)
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ticker.C:
+				if err := ws.WriteMessage(websocket.PingMessage, nil); err != nil {
+					log.Debug("WebSocket Ping failed", log.String("sessionId", sessionId), log.NamedError("err", err))
+					_ = ws.Close()
+					return
+				}
+			}
+		}
+	}()
+
 	for {
+		ws.SetReadDeadline(time.Now().Add(60 * time.Second))
 		_, message, err := ws.ReadMessage()
 		if err != nil {
 			log.Debug("WebSocket已关闭", log.String("sessionId", sessionId), log.NamedError("err", err))
