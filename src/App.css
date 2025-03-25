@@ -1,0 +1,106 @@
+.ant-menu-light.ant-menu-root.ant-menu-inline,
+.ant-menu-light.ant-menu-root.ant-menu-vertical {
+    border-inline-end: unset !important;
+}
+
+.x-side {
+    box-shadow: 1px 0 14px rgba(0, 21, 41, .08);
+    border-inline-end: 1px solid rgba(255, 255, 255, 0.06)
+}
+
+.page-herder {
+    margin: 16px 16px 0 16px;
+}
+
+.page-search {
+    background-color: white;
+}
+
+.page-search label {
+    font-weight: bold;
+}
+
+.page-search .ant-form-item {
+    margin-bottom: 0;
+}
+
+.page-card {
+    margin: 16px;
+}
+
+.modal-no-padding .ant-modal-body {
+    padding: 0;
+}
+
+.modal-no-padding-bg-xterm .ant-modal-body {
+    background-color: #121314;
+}
+
+.disabled-icon {
+    cursor: not-allowed;
+    color: #ccc;
+}
+
+.disabled-icon:hover {
+    color: #ccc;
+}
+
+.ant-page-header {
+    padding: 0 !important;
+}
+
+.danger {
+    color: red;
+}
+
+.danger:hover {
+    color: red !important;
+}
+
+.app-page-container {
+    background-color: white;
+    padding: 16px;
+}
+
+.site-layout {
+    width: 80%;
+    margin: 20px auto;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-icon {
+    animation: spin 1s linear infinite;
+}
+
+/* 整体滚动条样式 */
+.xterm-viewport::-webkit-scrollbar {
+    width: 12px;
+    cursor: pointer;
+    z-index: 10 !important;
+}
+
+/* 滚动条滑块样式 */
+.xterm-viewport::-webkit-scrollbar-thumb {
+    background-color: #000;
+    border-radius: 8px;
+    background-clip: content-box;
+    border: 2px solid transparent;
+    cursor: pointer;
+    z-index: 10 !important;
+}
+
+.xterm-viewport[scroll]::-webkit-scrollbar-thumb,
+.xterm-viewport::-webkit-scrollbar-thumb:hover {
+    background-color: #111;
+}
+
+.ant-table-container .ant-table-body,
+.ant-table-container .ant-table-content {
+    scrollbar-width: thin;
+    scrollbar-color: #eaeaea transparent;
+    scrollbar-gutter: stable;
+}

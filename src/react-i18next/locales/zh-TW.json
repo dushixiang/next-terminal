@@ -1,0 +1,955 @@
+{
+  "general": {
+    "created_at": "創建時間",
+    "updated_at": "更新時間",
+    "creator": "創建人",
+    "enabled": "啟用",
+    "disabled": "禁用",
+    "yes": "是",
+    "less-zero-tip": "小於0時無限制",
+    "success": "成功",
+    "failed": "失敗",
+    "default": "預設",
+    "home": "首頁",
+    "copy-success": "複製成功",
+    "delete_confirm": "您確定要刪除此行嗎？",
+    "clear_confirm": "您確認要清除資料嗎？",
+    "unbound": "未綁定",
+    "bound": "已綁定",
+    "name": "名稱",
+    "days": "天",
+    "no": "否",
+    "tips": "提示"
+  },
+  "actions": {
+    "option": "操作",
+    "new": "新建",
+    "edit": "編輯",
+    "delete": "刪除",
+    "clear": "清空",
+    "detail": "詳細",
+    "binding": "綁定",
+    "unbind": "取綁",
+    "authorized": "授權",
+    "decrypt": "解密",
+    "copy": "複製",
+    "add": "添加",
+    "export": "出口",
+    "sync": "同步",
+    "view_private_key": "查閱私鑰"
+  },
+  "dashboard": {
+    "name": "數據概觀",
+    "login-times": "登錄次數",
+    "active-users": "活躍用戶",
+    "active-assets": "活躍資產",
+    "login-failed-times": "登錄失敗次數",
+    "user-online-count": "在線用戶",
+    "session-online-count": "在線會話",
+    "gateway-active-count": "在線網關",
+    "asset-active-count": "存活資產",
+    "website-active-count": "存活網站",
+    "date-counter": "活躍統計",
+    "asset-type": "資產類型",
+    "latest-session": "最近會話"
+  },
+  "stat": {
+    "days": "天",
+    "info": {
+      "system": "系統",
+      "hostname": "主機名稱",
+      "uptime": "運行時長",
+      "os": "操作系統",
+      "arch": "系統架構",
+      "load": "系統負載",
+      "cpu": "CPU"
+    },
+    "memory": {
+      "label": "內存",
+      "used": "已使用",
+      "free": "剩下",
+      "cache": "緩存"
+    },
+    "disk": {
+      "label": "磁盤",
+      "mount_point": "掛載路徑",
+      "total": "總計大小",
+      "free": "剩餘空間",
+      "percent": "使用占比"
+    },
+    "network": {
+      "label": "網絡",
+      "interface": "網卡",
+      "rx": "接收",
+      "tx": "發送"
+    }
+  },
+  "facade": {
+    "asset_placeholder": "資產名稱、協議、標籤",
+    "accessing": "接入中"
+  },
+  "menus": {
+    "dashboard": {
+      "label": "數據概觀"
+    },
+    "resource": {
+      "label": "資源管理",
+      "submenus": {
+        "asset": "資產",
+        "credential": "授權憑證",
+        "snippet": "命令片段",
+        "storage": "儲存",
+        "website": "網站"
+      }
+    },
+    "gateway": {
+      "label": "接入網關",
+      "submenus": {
+        "ssh_gateway": "SSH網關",
+        "agent_gateway": "安全網關"
+      }
+    },
+    "log_audit": {
+      "label": "日誌稽核",
+      "submenus": {
+        "online_session": "在線會話",
+        "offline_session": "離線會話",
+        "filesystem_log": "文件日誌",
+        "login_log": "登入日誌",
+        "operation_log": "操作日誌"
+      }
+    },
+    "sysops": {
+      "label": "系統維運",
+      "submenus": {
+        "scheduled_task": "定時任務",
+        "monitoring": "系統監控"
+      }
+    },
+    "identity": {
+      "label": "身分認證",
+      "submenus": {
+        "user": "用戶",
+        "user_group": "用戶組",
+        "role": "角色",
+        "login_policy": "登錄策略",
+        "login_locked": "登錄鎖定"
+      }
+    },
+    "authorised": {
+      "label": "資源授權",
+      "submenus": {
+        "command_filter": "命令拦截器",
+        "strategy": "授權策略"
+      }
+    },
+    "setting": {
+      "label": "系統設置"
+    },
+    "dev": {
+      "label": "除錯資訊"
+    }
+  },
+  "fs": {
+    "operations": {
+      "upload": "上傳",
+      "download": "下載",
+      "rename": "重命名",
+      "copy": "複製",
+      "edit": "編輯",
+      "remove": "刪除",
+      "create_file": "創建檔案",
+      "create_dir": "創建資料夾",
+      "upload_file": "上傳檔案",
+      "upload_dir": "上傳目錄",
+      "paste": "粘貼",
+      "batch_download": "批量下載"
+    },
+    "attributes": {
+      "path": "路徑",
+      "type": "類型",
+      "size": "大小",
+      "last": {
+        "modified": "最後修改",
+        "accessed": "最後訪問",
+        "changed": "最後變更"
+      },
+      "permissions": {
+        "label": "權限",
+        "owner": "擁有者",
+        "group": "組"
+      }
+    },
+    "file_types": {
+      "file": "文件",
+      "directory": "目錄",
+      "link": "鏈接"
+    },
+    "delete_confirm": {
+      "title": "當您確定要刪除該檔案嗎？",
+      "content": "這是一個危險的操作。"
+    },
+    "navigation": {
+      "back_to_prev": "返回上一級",
+      "refresh": "刷新",
+      "show_hidden_file": "顯示隱藏檔案",
+      "hide_hidden_file": "不顯示隱藏檔案",
+      "file_tran": "檔案進度"
+    },
+    "editor": {
+      "label": "編輯器",
+      "save": "保存",
+      "refetch": "重新載入"
+    },
+    "transmission": {
+      "filename": "檔案名稱",
+      "size": "檔案大小",
+      "status": "狀態",
+      "progress": "進度",
+      "speed": "速度",
+      "options": {
+        "uploading": "上傳中",
+        "transmitting": "傳輸中",
+        "upload_failed": "上傳失敗",
+        "upload_success": "上載成功"
+      }
+    }
+  },
+  "guacamole": {
+    "state": {
+      "idle": "正在初始化中...",
+      "connecting": "正在努力連接中...",
+      "waiting": "正在等待伺服器回應...",
+      "connected": "連接成功",
+      "disconnecting": "會話關閉中...",
+      "disconnected": "會話已關閉",
+      "closed": "會話已關閉"
+    }
+  },
+  "identity": {
+    "setup": {
+      "go_to_login": "去登錄",
+      "user": "初始化用戶"
+    },
+    "policy": {
+      "label": "登錄策略",
+      "name": "名稱",
+      "ip_group": "IP 組",
+      "ip_group_extra": "格式為逗號分隔的字串，0.0.0.0/0 規範所有。例如：192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20",
+      "action": {
+        "label": "動作",
+        "options": {
+          "allow": "允許",
+          "reject": "拒絕"
+        }
+      },
+      "status": "狀態",
+      "priority": "優先級",
+      "priority_extra": "數字越小，優先級越高。",
+      "time_period": "時間區間",
+      "type": "類型"
+    },
+    "role": {
+      "type": "角色類型",
+      "types": {
+        "default": "內建角色",
+        "new": "新增角色"
+      },
+      "permission": "權限"
+    },
+    "user_group": {
+      "members": "會員"
+    },
+    "user": {
+      "username": "帳號",
+      "locked_at": "鎖定時間",
+      "otp": "雙因素認證",
+      "expiration_at": "失效時間",
+      "type": "用戶類別",
+      "types": {
+        "super_admin": "超級管理員",
+        "admin": "管理員",
+        "normal": "普通人員"
+      },
+      "nickname": "姓名",
+      "mail": "電子信箱",
+      "status": "帳號狀態",
+      "login": "登錄狀態",
+      "logins": {
+        "online": "在線",
+        "offline": "離線"
+      },
+      "recording": "錄屏狀態",
+      "watermark": "水印狀態",
+      "public_key": "公鑰",
+      "password": "密碼",
+      "role": "角色",
+      "options": {
+        "reset": {
+          "password": {
+            "action": "重置密碼",
+            "success": "重置密碼密碼",
+            "new": "新密碼",
+            "confirm": {
+              "title": "您確定要重置用戶的密碼嗎？",
+              "content": "如無輸入密碼，則會隨機產生，並透過郵件發送給對方。"
+            }
+          },
+          "otp": {
+            "action": "重置雙因子認證",
+            "confirm": {
+              "content": "重置後用戶無需雙因素認證即可登入系統。",
+              "title": "您確定要重新設定用戶的雙因子驗證資訊嗎？"
+            }
+          }
+        }
+      },
+      "client_ip": "客戶端IP",
+      "reason": "原因",
+      "user_agent": "瀏覽器",
+      "login_at": "登錄時間",
+      "no_spaces_allowed": "禁止輸入空格將",
+      "new_user_result": "創建使用者成功",
+      "locked_type": "鎖定類型",
+      "locked_type_username": "帳戶鎖定",
+      "locked_type_ip": "IP封鎖"
+    },
+    "options": {
+      "authorized_asset": "授權資產",
+      "login_policy": "登錄策略"
+    }
+  },
+  "dw": {
+    "selected": "已選擇時間段",
+    "select": "可拖動鼠標選取時間段",
+    "clear": "清空選擇",
+    "version": "版本",
+    "select_all": "全選",
+    "week": {
+      "label": "星期",
+      "days": {
+        "sunday": "星期日",
+        "monday": "星期一",
+        "tuesday": "星期二",
+        "thursday": "星期四",
+        "friday": "星期五",
+        "saturday": "星期六",
+        "wednesday": "星期三"
+      }
+    },
+    "time": "時間"
+  },
+  "authorised": {
+    "strategy": {
+      "name": "名稱",
+      "upload": "上傳",
+      "download": "下載",
+      "edit": "編輯",
+      "remove": "刪除",
+      "rename": "重命名",
+      "copy": "複製",
+      "create_dir": "創建目錄",
+      "create_file": "創建文件",
+      "paste": "粘貼"
+    },
+    "command_filter": {
+      "name": "名稱",
+      "options": {
+        "rule": "規則"
+      },
+      "rule": {
+        "priority": "優先級",
+        "priority_extra": "數值越小優先級越高",
+        "ip_group": "IP組",
+        "expiration_at": "失效時間",
+        "type": {
+          "label": "匹配方式",
+          "options": {
+            "command": "完全匹配",
+            "regexp": "正則表達式匹配"
+          }
+        },
+        "match_content": "匹配內容",
+        "action": {
+          "label": "動作",
+          "options": {
+            "allow": "允許",
+            "reject": "拒絕"
+          }
+        },
+        "status": "狀態",
+        "authorised_at": "授權時間",
+        "authorised_user": "授權使用者",
+        "expired_at": "過期時間",
+        "never_expired": "永遠不過期"
+      }
+    },
+    "label": {
+      "authorised": "授權",
+      "user": "用戶",
+      "user_group": "用戶組",
+      "asset": "資產",
+      "command_filter": "命令攔截器",
+      "strategy": "戰略",
+      "expired_at": "失效時間",
+      "authorised_at": "授權時間",
+      "never_expired": "永不失效"
+    }
+  },
+  "sysops": {
+    "status": "狀態",
+    "spec": "cron 表達式",
+    "last_exec_at": "最後執行時間",
+    "asset": "資產",
+    "command": "命令",
+    "options": {
+      "exec": "即刻執行",
+      "logs": "查閱日誌"
+    },
+    "logs": {
+      "label": "日誌",
+      "exec_at": "執行時間",
+      "messages": "訊息"
+    },
+    "type": {
+      "label": "類型",
+      "options": {
+        "check_status": "狀態檢查",
+        "exec_command": "命令執行",
+        "delete_log": "曰誌清釐"
+      }
+    },
+    "mode": {
+      "label": "模式",
+      "options": {
+        "all_asset": "全部資產",
+        "custom_asset": "自定義資產"
+      }
+    }
+  },
+  "audit": {
+    "client_ip": "客戶端IP",
+    "user": "用戶",
+    "protocol": "協議",
+    "asset": "資產",
+    "connected_at": "接入時間",
+    "disconnected_at": "斷開時間",
+    "connection_duration": "持續時間",
+    "recording_size": "錄屏大小",
+    "command": "命令",
+    "network": "網址",
+    "filename": "檔案名稱",
+    "executed_at": "執行時間",
+    "username": "帳號",
+    "login_at": "登錄時間",
+    "action": "操作類型",
+    "login_status": "登錄狀態",
+    "login_reason": "失敗原因",
+    "user_agent": "客戶端",
+    "operation": {
+      "label": "類型",
+      "account": "帳戶",
+      "content": "細節",
+      "status": "狀態",
+      "at": "操作時間",
+      "options": {
+        "user_reset_password": "重置用戶密碼",
+        "asset_authorised": "資產授權",
+        "user_add": "創建使用者",
+        "user_update": "修改用戶",
+        "user_delete": "刪除用戶",
+        "user_enable": "啟用用戶",
+        "user_disable": "禁止用戶",
+        "user_reset_otp": "重置用戶雙因素認證"
+      }
+    },
+    "risk_level": {
+      "label": "風險等級",
+      "options": {
+        "high_risk": "高危命令",
+        "normal": "普通命令"
+      }
+    },
+    "options": {
+      "monitor": "監控",
+      "playback": "迴放",
+      "disconnect": {
+        "action": "斷開",
+        "confirm": "您確認要斷開此會話嗎？"
+      }
+    }
+  },
+  "access": {
+    "settings": {
+      "theme": "主題設置",
+      "system": "系統設定",
+      "font": "字體設定",
+      "terminal": {
+        "font": {
+          "size": "字體大小",
+          "family": "字體"
+        },
+        "line_height": "行高"
+      }
+    },
+    "batch": {
+      "exec": "批量執行",
+      "choose_asset": "選擇資產"
+    },
+    "session": {
+      "share": {
+        "action": "會話分享",
+        "cancel": "取消分享"
+      }
+    },
+    "combination_key": "組合鍵",
+    "required_auth": "登錄參數",
+    "reconnect": "重新連接",
+    "filesystem": "檔案系統",
+    "clipboard": "剪貼板",
+    "toggle_full_screen": "切換全螢幕"
+  },
+  "account": {
+    "my_asset": "我的資產",
+    "profile": "個人中心",
+    "nickname": "姓名",
+    "logout": "登出",
+    "language": "語言",
+    "public_key": "公鑰",
+    "change": {
+      "info": "修訂個人資訊",
+      "password": "修改密碼"
+    },
+    "access_token": "授權證券",
+    "old_password": "舊的密碼",
+    "new_password": "新的密碼",
+    "confirm_password": "確認密碼",
+    "submit": "提交",
+    "username": "帳號",
+    "password": "密碼",
+    "captcha": "驗證碼",
+    "login": {
+      "action": "登錄",
+      "methods": {
+        "passkey": "通過通行密鑰驗證",
+        "password": "通過密碼認證",
+        "otp": "通過OTP認證"
+      }
+    },
+    "next": "下一步",
+    "retry": "重試",
+    "passkey": "通行密鑰",
+    "enter": "請輸入",
+    "auth_failed": "證認失敗",
+    "otp_bind_title": "您已成功開啟雙因素認證",
+    "otp_bind_sub_title": "多因素認證－二次認證－登錄身份鑒別，訪問控制更安全。",
+    "otp_unbind": "解除多重因素認證",
+    "otp_unbind_title": "您確定要解除雙因子認證嗎？",
+    "otp_unbind_subtitle": "解鎖之後可能存在系統帳號被暴力度破解的風險。",
+    "passkey_add": "新增通行密鑰",
+    "passkey_add_time": "添加時間",
+    "passkey_used_time": "上次使用",
+    "passkey_delete_title": "您確定要移除您的通行密鑰嗎？",
+    "passkey_delete_content": "通行密鑰可為您的帳戶和資產提供更好的保護，建議予保留。",
+    "mfa": "多重身份認證",
+    "mfa_authing": "正在認證...",
+    "mfa_retry": "重生",
+    "mfa_auth_failed": "證認失敗",
+    "mfa_change_way": "切換驗證方式",
+    "regen": "重新生成",
+    "otp": "二因素認證",
+    "otp_required": "您必須開啟二次驗證後才能繼續操作。",
+    "password_expired": "您的密碼已過期，請修改密碼。"
+  },
+  "assets": {
+    "name": "名稱",
+    "type": "類型",
+    "content": "內容",
+    "status": "狀態",
+    "group": "分組",
+    "width": "寬度",
+    "height": "高度",
+    "passphrase": "私人鑰密碼",
+    "logo": "圖標",
+    "protocol": "協議",
+    "network": "網絡",
+    "tags": "標籤",
+    "owner": "所有人",
+    "last_access_at": "最後訪問時間",
+    "addr": "網址",
+    "account_type": "帳號類型",
+    "private_key": "私人鑰匙",
+    "ip": "IP",
+    "port": "端口",
+    "username": "用戶",
+    "password": "密碼",
+    "credential": "授權憑證",
+    "agent_gateway": "安全網關",
+    "ssh_gateway": "SSH網關",
+    "gateway_tip": "安全網關和SSH網關只能二者選其一，同時選取時以SSH網關為準。",
+    "description": "備註",
+    "advanced_setting": "高級設定",
+    "socks5_proxy": " SOCKS5代理",
+    "socks5_proxy_enabled": "襪子5代理",
+    "socks5_proxy_host": "代理伺服器",
+    "socks5_proxy_port": "代理端口",
+    "socks5_proxy_username": "代理帳戶",
+    "socks5_proxy_password": "代理密碼",
+    "display_settings": "顯示設定",
+    "color_depth": "色彩深度",
+    "force_lossless": "無損壓縮",
+    "audio_settings": "音頻設定",
+    "disable_audio": "禁用音頻",
+    "enable_audio_input": "啟用音頻輸入",
+    "rdp_domain": "區",
+    "preconnection_id": "預連接ID",
+    "preconnection_blob": "預連接資料",
+    "remote_app": "遠程應用",
+    "remote_app_dir": "遠程應用目錄",
+    "remote_app_args": "遠程應用參數",
+    "rdp_drive": "網路上載驅動器",
+    "rdp_enable_drive": "網絡驅動器",
+    "rdp_drive_path": "本地儲存",
+    "rdp_drive_path_extra": "未選擇時將使用操作者預設的儲存空間",
+    "is_share": "共享",
+    "is_default": "默認",
+    "limit_size": "大小限製",
+    "used_size": "已使用大小",
+    "domain": "網域名稱",
+    "domain_tip": "您所使用的網域名稱來存取受保護的資產，例如：www.example.com，需將該網域名稱解析至本系統的IP地址。",
+    "scheme": "資產協議",
+    "forward_host_or_ip": "資產的IP或網域名稱",
+    "forward_port": "資產端口",
+    "change_group": "修改分組",
+    "general": "常規",
+    "header": "請求頭",
+    "custom_header": "自定義請求頭",
+    "header_key": "鍵",
+    "header_value": "值",
+    "basic_auth": "基本認證",
+    "basic_auth_enabled": "資產需要基本認證",
+    "basic_auth_username": "用名稱",
+    "basic_auth_password": "密碼",
+    "website_tip": "使用此功能前，請確保您在系統設置頁面上已開啟反向代理功能。",
+    "active": "活動",
+    "inactive": "離線",
+    "access": "接入",
+    "import": "導入資產",
+    "copy": "複製資產",
+    "download_sample": "下載範例",
+    "import_asset_tip": "導入資產時，帳號、密碼和鑰匙、密碼屬於二選一，均填寫時優先選擇私鑰和密碼。",
+    "import_asset_success": "導入資產成功",
+    "import_asset_error": "導入資產失敗",
+    "bind_user": "-bind 用户",
+    "bind_user_group": "綁定用戶組",
+    "up": " POLITICS",
+    "down": "下移",
+    "copy_public_key": "複製公鑰",
+    "filesystem": "檔案系統",
+    "conn_test": "網絡狀態檢測",
+    "entrance": "入口路徑",
+    "entrance_tip": "入口路徑是首次訪問自動打開的地址",
+    "import_asset_error_title": "請檢查所導入的檔案，以下資產導入失敗：",
+    "website_entrance": "入口是用戶進入網站的路徑。",
+    "generate_private_key": "產生私鑰"
+  },
+  "gateways": {
+    "name": "名稱",
+    "port": "埠口",
+    "os": "操作系統",
+    "arch": "系統架構",
+    "status": "狀態",
+    "version": "版本",
+    "connected": "已連接",
+    "disconnected": "已經斷開",
+    "register-agent-gateway": "註冊安全網關",
+    "rpc-addr": "通訊地址",
+    "download-addr": "下載地址",
+    "username": "帳號",
+    "account_type": {}
+  },
+  "settings": {
+    "system": {
+      "setting": "系統設定",
+      "name": "系統名稱",
+      "logo": "系統圖標",
+      "copyright": "系統著作權",
+      "icp": "備案號",
+      "login": {
+        "background_color": " 登錄背景顏色",
+        "background_image": "登錄背景圖片"
+      },
+      "ip": {
+        "extractor": "IP地址獲取方式",
+        "extractor_direct": "網址",
+        "trust_list": "信賴的IP地址（CIDR格式）",
+        "trust_placeholder": "輸入後請按enter確認",
+        "trust_error": "請輸入有效的CIDR格式。例如：192.168.1.0/24"
+      },
+      "watermark": {
+        "setting": "接入水印",
+        "content": "水印內容",
+        "append": {
+          "user": "水印追加用戶",
+          "asset": "水印追加資產"
+        },
+        "font": {
+          "color": "水印字體顏色",
+          "size": "水印字體大小"
+        },
+        "status": "水印狀態"
+      },
+      "access": {
+        "max_idle_second": "終端訪問最大空閒時長",
+        "second": "秒"
+      }
+    },
+    "security": {
+      "protection": "登錄保護",
+      "captcha": "圖形驗碼",
+      "access_require_mfa": "接入資產需要多重因素認證",
+      "devices": "設備",
+      "minute": "分鐘",
+      "session": {
+        "duration": "登錄會話有效時長",
+        "count_custom": "自定義 登錄 會話有效數量",
+        "count_limit": "登錄會話有效數量"
+      },
+      "password": {
+        "complexity": "密碼複雜度",
+        "recommend": "推薦",
+        "customize": "自定義",
+        "expiration_period": "密碼有效期限",
+        "too_short": "密碼長度不得小於",
+        "too_simple": "密碼必須包含大寫字母、小寫字母、數字、特殊符號中的？種",
+        "cannot_contain_username": "密碼不能包含用戶名",
+        "cannot_be_palindrome": "密碼不能是回文",
+        "cannot_be_weak": "禁止弱密碼",
+        "character": "字符",
+        "type": "類型"
+      },
+      "login_lock": {
+        "setting": "登錄鎖定",
+        "tip": "開啟後，在指定時間內連續 登入失敗時，帳號或IP將會被限制 登入，解除限制請訪問",
+        "enabled": "登錄失敗鎖定",
+        "failed_duration": "登錄失敗統計時長",
+        "failed_times": "登錄失敗統計次數",
+        "account_duration": "帳號鎖定持續時間",
+        "ip_duration": "IP地址鎖定時間"
+      },
+      "passkey": {
+        "setting": "通行令牌登入設置",
+        "enabled": "通行令牌 登陸",
+        "domain": "外部訪問網域",
+        "origins": "允許使用通行令牌之來源",
+        "origins_tip": "結尾不要包含 /",
+        "origins_error": "請輸入正確的網址。"
+      },
+      "setting": "安全設置",
+      "force_otp": "強制多重因素認證"
+    },
+    "sshd": {
+      "setting": "SSH 代理伺服器",
+      "tip": "啟動後，將會在本地監聽一個埠號，可使用SSH客戶端進行訪問授權的SSH資產，帳號密碼與本系統一致。",
+      "enabled": "SSH服務",
+      "addr": "监听页面地址",
+      "private_key": "認證私鑰",
+      "generate_private_key": "產生私人鑰匙",
+      "port_forwarding": {
+        "enabled": "啟動隧道",
+        "host_port": "允許隧道轉發的IP端口"
+      }
+    },
+    "rp": {
+      "setting": "反向代理伺服器",
+      "tip": "開啟後，將會在本地監聽一個端口，可以將http/https服務映射到本機。",
+      "enabled": "反向代理服務",
+      "addr": "監聽地址",
+      "redirect_to_https": "自動重轉換到HTTPS",
+      "auto_tls": "自動申請HTTPS憑證",
+      "cert": "證書",
+      "self_proxy": "代理自身系統",
+      "domain": "域名",
+      "system_root_extra": "訪問反向代理的網站時，需驗證當前登入的用戶是否具權限，會重新导向至系統的授權頁面，此配置項內容為您當前登入的URL根路徑。",
+      "system_root": "系統根路徑",
+      "cert_key": "證書-private key"
+    },
+    "rdp": {
+      "setting": "RDP 設置",
+      "enable": {
+        "theming": "啟用主題",
+        "full_window_drag": "啟用窗口拖曳",
+        "desktop_composition": "啟用桌面合成",
+        "menu_animations": "啟用菜單動畫",
+        "font_smoothing": "啟用字體柔化",
+        "wallpaper": "啟用 Wallpaper"
+      },
+      "disable": {
+        "bitmap_caching": "禁用位圖緩存",
+        "offscreen_caching": "禁用離屏緩存"
+      }
+    },
+    "vnc": {
+      "setting": "VNC 設置",
+      "cursor": {
+        "setting": "光標設定",
+        "local": "當地",
+        "remote": "遠程"
+      },
+      "swap_red_blue": "交換紅藍",
+      "color_depth": "色彩深淺"
+    },
+    "mail": {
+      "setting": "電子信箱設定",
+      "enabled": "郵件服務",
+      "host": "郵箱伺服器",
+      "port": "郵箱端口",
+      "username": "郵箱帳戶",
+      "from": "郵箱發信者",
+      "password": "郵箱密碼",
+      "tip": "您需要開啟郵箱後才可發送測試郵件。",
+      "mail": "電子郵箱地址",
+      "title": "郵箱標題",
+      "content": "郵箱正文",
+      "send": "發送郵件"
+    },
+    "ldap": {
+      "setting": "LDAP 認證",
+      "tip": "啟動後，將會使用LDAP進行用戶身分驗證。",
+      "url": "LDAP地址",
+      "user": "LDAP用戶",
+      "password": "LDAP密碼",
+      "base_dn": "LDAP基礎DN",
+      "filter": "LDAP過濾器",
+      "user_search": {
+        "size_limit": "LDAP最大查詢結果",
+        "size_limit_tooltip": "LDAP最大搜尋結果，0表示不限制。",
+        "filter": "LDAP用戶搜尋過濾器",
+        "filter_tooltip": "LDAP用戶搜尋過濾器，例如：(objectClass=person)。"
+      },
+      "user_property_mapping": "LDAP用戶屬性映射"
+    },
+    "log": {
+      "setting": "日誌設置",
+      "recording": {
+        "enabled": "錄屏狀態"
+      },
+      "session": {
+        "saved_limit_days": "會話保存限制"
+      },
+      "login_log": {
+        "saved_limit_days": "登錄日誌保存限制"
+      },
+      "cron_log": {
+        "saved_limit_days": "定時任務日誌保存限制"
+      }
+    },
+    "backup": {
+      "setting": "備份與恢復",
+      "tip": "恢復資料時，若存有登入帳號相同的使用者時，會保留在原始系統中的資料。此外，由於登入密碼加密後不可逆，恢復的帳戶密碼將隨機產生。",
+      "recovery": "恢復備份"
+    },
+    "license": {
+      "setting": "授權許可",
+      "device": "設備資訊",
+      "machine_id": "機器碼",
+      "import": "導入授權",
+      "request": "更新授權",
+      "binding": "綁定授權",
+      "info": "證件資訊",
+      "max": {
+        "asset_count": "最大資產數",
+        "concurrent_count": "最大並發數",
+        "user_count": "最大用戶數"
+      },
+      "expired_at": "許可到限期間",
+      "no_limit": "無限制",
+      "type": {
+        "label": "許可類型",
+        "options": {
+          "test": "試用版",
+          "premium": "專業版",
+          "enterprise": "企業版",
+          "free": "免費版"
+        }
+      },
+      "func_disabled": "該功能不對您目前的授權碼啟用。",
+      "restricted": {
+        "label": "訪問受限",
+        "content": "您的許可證不支援該功能。",
+        "pay": "立即購買"
+      },
+      "test_warning": "您正在試用專業版，到期時間是"
+    },
+    "logo": {
+      "setting": "資產Logo",
+      "preset": "系統預設",
+      "custom": "自定義 Logo"
+    },
+    "about": {
+      "setting": "關於",
+      "current_version": "當前版本",
+      "latest_version": "最新型號",
+      "update_content": "更新內容",
+      "upgrade": {
+        "action": "即時更新",
+        "title": "升級系統",
+        "content": "您確定要升級系統版本嗎？",
+        "success": "更新成功",
+        "success_content": "更新成功，是否即時刷新頁面？",
+        "failed": "更新失敗"
+      }
+    },
+    "identity": {
+      "setting": "身分認證"
+    },
+    "webauthn": {
+      "setting": "WebAuthn"
+    }
+  },
+  "errors": {
+    "1000": "無效的令牌",
+    "1001": "需要進行設置",
+    "10000": "記錄未找到",
+    "10002": "無效的參數",
+    "10003": "您不能操作自己的帳戶",
+    "10004": "帳戶或密碼不正確",
+    "10005": "帳號已停用",
+    "10006": "驗證碼不正確",
+    "10007": "登錄失敗次數過多",
+    "10008": "需要雙因素授權碼",
+    "10009": "雙因素授權碼不正確",
+    "10010": "您的 IP 地址不允許 登錄",
+    "10011": "當前時間段不允許登陸",
+    "10012": "郵箱配罝不完整",
+    "10013": "默認數據不能刪除",
+    "10014": "權限被拒絕",
+    "10015": "不是 SSH 設格",
+    "10016": "不支援的協議",
+    "10017": "會話已關閉",
+    "10018": "檔案系統已禁用",
+    "10019": "網頁未找到",
+    "10020": "網站已禁用",
+    "20000": "獲取許可證失敗",
+    "20001": "當前系統與您的綁定機碼不匹配，請及時更換。",
+    "20002": "您的許可證已過期，請續費。",
+    "20003": "您的在線會話超過許可限制。",
+    "20004": "您的用戶數量超過授權限制。",
+    "20005": "您的資產數量超過授權限制。",
+    "30000": "網關未線上",
+    "30001": "隧道不存在",
+    "40000": "反向代理已禁用",
+    "40001": "導入資產失敗",
+    "50000": "系統正遭受攻擊。",
+    "50001": "系統通行賜予已停用",
+    "50002": "用戶雙因素驗證已停用",
+    "50003": "圖片過大",
+    "60001": "密碼長度太短",
+    "60002": "密碼複雜度過低",
+    "60003": "密碼不得包含用戶名。",
+    "60004": "不允許弱密碼",
+    "60005": "密碼不能是迴文",
+    "10001": "名稱已被人使用。",
+    "10021": "原密碼不正確"
+  }
+}

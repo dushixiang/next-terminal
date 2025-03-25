@@ -1,13 +1,10 @@
-# ⚠️ 提示
-
-本项目暂停开发，等待重构后提供 v2.0 版本。
-
 # Next Terminal
 
-[![Docker guacd build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-guacd.yml)
-[![Docker next-terminal build](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml/badge.svg)](https://github.com/dushixiang/next-terminal/actions/workflows/docker-next-terminal.yml)
+## 提示
 
-[<img src="https://api.gitsponsors.com/api/badge/img?id=323076240" height="20">](https://api.gitsponsors.com/api/badge/link?p=bQQ+JQSOSkDQixi5tV+HUNJGTdLSR7fhncGsX5OS2/0HXGl5Ur0FV7F9Q0rrWGG5fYSVGF81vyWT5iab62f91KqwMLC4JnDkf2w7wDgKP3N9WKskoYIQtCbN9DrW/N6B)
+2.x 版本版本与 1.x 版本不兼容，请注意！！！
+
+1.x 升级 2.x 请先使用备份功能导出数据，在 2.x 版本中导入数据。
 
 ## 快速了解
 
@@ -51,15 +48,6 @@ https://next.typesafe.cn/
 
 - [安装文档](https://next-terminal.typesafe.cn)
 
-默认账号密码为 admin/admin 。
-
-## 手动编译
-
-1. 找一台Linux 机器或者Mac
-2. 安装 go 1.18 或以上版本
-3. 安装 nodejs 16，安装 npm 或 yarn
-4. 进入 web 目录 执行 yarn 或 npm install
-5. 返回上级目录，也就是项目根目录，执行 sh build.sh
 
 ## 问题反馈
 

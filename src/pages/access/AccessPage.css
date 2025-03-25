@@ -1,0 +1,28 @@
+.access-container .ant-tabs-nav{
+    margin: 0 !important;
+}
+
+.access-container .ant-tabs-nav-list .ant-tabs-tab{
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    background-color: transparent !important;
+    /*padding-left: 4px !important;*/
+    /*padding-right: 8px !important;*/
+    border-bottom: 2px solid transparent !important;
+}
+
+.access-container .ant-tabs-nav-list .ant-tabs-tab-active {
+    background-color: transparent !important;
+    /*border-bottom-color: '#3C82F6' !important;*/
+    border-bottom: 2px solid #3C82F6 !important;
+
+}
+
+.access-container .ant-tabs-nav-list .ant-tabs-tab-active .ant-tabs-tab-btn{
+    color: #3C82F6 !important;
+}
+
+.access-container .ant-tabs-nav-list .ant-tabs-tab-btn{
+    color: #6B7280 !important;
+}

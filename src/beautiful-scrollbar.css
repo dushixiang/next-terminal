@@ -1,0 +1,39 @@
+/* 定义滚动条整体样式 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+/* 定义滚动条轨道样式 */
+::-webkit-scrollbar-track {
+    /* 使用内阴影模拟轨道样式 */
+    /*-webkit-box-shadow: 0 0 3px rgba(0, 0, 0, 0.3) inset;*/
+    /* 注释掉的背景颜色，可根据需求启用 */
+    /* background-color: #F5F5F5; */
+}
+
+/* 定义滚动条滑块样式 */
+::-webkit-scrollbar-thumb {
+    /* 滑块圆角 */
+    border-radius: 3px;
+    /* 移除默认的内阴影 */
+    -webkit-box-shadow: none !important;
+    /* 滑块默认背景颜色 */
+    background-color: #90A2B9 !important;
+    /* 移除默认的背景图像 */
+    background-image: none !important;
+}
+
+/* 定义滚动条滑块悬停时的样式 */
+::-webkit-scrollbar-thumb:hover {
+    /* 悬停时滑块背景颜色 */
+    background-color: #45556C !important;
+}
+
+/* 定义文本选中时的样式，适用于 Mozilla 内核浏览器 */
+::-moz-selection {
+    /* 选中背景透明 */
+    background: transparent;
+    /* 选中文字颜色 */
+    color: #E2E8F1;
+}

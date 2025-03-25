@@ -1,0 +1,15 @@
+{
+  "llm": {
+    "provider": "custom",
+    "base_url": "http://localhost:1234/v1",
+    "api_key": "",
+    "model": "gemma-3-12b-it"
+  },
+  "input": "zh-CN.json",
+  "from": "zh-CN",
+  "to": [
+    "zh-TW",
+    "en-US",
+    "ja-JP"
+  ]
+}
