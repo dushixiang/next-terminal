@@ -52,11 +52,11 @@ https://next.typesafe.cn/
 ## 问题反馈
 
 - Issues
-- QQ群 938145268
+- 加我微信 type-safe 备注 NT
 
 ## 安全问题
 
-如果您在使用过程中发现了安全问题，请发送邮件至 helloworld1024@foxmail.com 联系我，谢谢。
+如果您在使用过程中发现了安全问题，请发送邮件至 dushixiang@typesafe.cn 联系我，谢谢。
 
 ## License 
 
