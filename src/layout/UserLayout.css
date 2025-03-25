@@ -1,0 +1,30 @@
+/*.header-shadow {*/
+/*    box-shadow: 0 1px 2px 0 rgba(0,0,0,.03),*/
+/*    0 1px 6px -1px rgba(0,0,0,.02),*/
+/*    0 2px 4px 0 rgba(0,0,0,.02);*/
+/*}*/
+
+.header-shadow {
+    /*border: 2px solid #fff;*/
+    /*border-bottom: none;*/
+    /*box-shadow: -1px 1px 15px rgba(0, 21, 41, .15);*/
+    /*border-inline-end: 1px solid rgba(255, 255, 255, 0.06)*/
+}
+
+.header-menu-selected {
+    color: white;
+    font-weight: bold;
+}
+
+.header-menu-selected:after {
+    content: " ";
+    border: none;
+    /*border-radius: 2px;*/
+    border-bottom: 3px solid #FF5722;
+
+    position: absolute;
+    left: 0;
+    width: 100%;
+    bottom: 0; /* Adjust this value to position the underline correctly */
+    height: 3px; /* This should match the border-bottom thickness */
+}

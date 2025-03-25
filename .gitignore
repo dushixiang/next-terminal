@@ -1,33 +1,10 @@
-yarn.lock
-web/build
-*.log
-*.db
-.DS_Store
-.eslintcache
-.env
+### Example user template template
+### Example user template
 
-# Binaries for programs and plugins
-*.exe
-*.exe~
-*.dll
-*.so
-*.dylib
-
-# ignore ide config
+# IntelliJ project files
 .idea
-.vscode
-
-# vim
-*.swp
-
-
-# next terminal
-/data/
-/logs/
-
-/web/build/*
-/server/resource/build/*
-/server/resource/static/
-/server/resource/*.html
-/server/resource/*.json
-/server/resource/*.ico
+*.iml
+out
+gen
+node_modules
+dist

@@ -1,0 +1,955 @@
+{
+  "general": {
+    "created_at": "Created At",
+    "updated_at": "Updated At",
+    "creator": "Creator",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "yes": "Yes",
+    "no": "No",
+    "less-zero-tip": "Unlimited when less than 0",
+    "success": "Success",
+    "failed": "Failed",
+    "default": "Default",
+    "home": "Home",
+    "copy-success": "Copy Successful",
+    "delete_confirm": "Are you sure you want to delete this row?",
+    "clear_confirm": "Are you sure you want to clear the data?",
+    "unbound": "Unbound",
+    "bound": "Bound",
+    "name": "Name",
+    "days": "Days",
+    "tips": "Prompt"
+  },
+  "actions": {
+    "option": "Operation",
+    "new": "New",
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "clear": "Clear",
+    "detail": "Details",
+    "binding": "Bind",
+    "unbind": "Unbind",
+    "authorized": "Authorize",
+    "decrypt": "Decrypt",
+    "copy": "Copy",
+    "export": "Export",
+    "sync": "Synchronize",
+    "view_private_key": "View private key"
+  },
+  "dashboard": {
+    "name": "Dashboard",
+    "login-times": "Login Times",
+    "active-users": "Active Users",
+    "active-assets": "Active Assets",
+    "login-failed-times": "Login Failed Times",
+    "user-online-count": "Online Users",
+    "session-online-count": "Online Sessions",
+    "gateway-active-count": "Online Gateways",
+    "asset-active-count": "Live Assets",
+    "website-active-count": "Live Websites",
+    "date-counter": "Activity Statistics",
+    "asset-type": "Asset Type",
+    "latest-session": "Latest Sessions"
+  },
+  "stat": {
+    "days": "Days",
+    "info": {
+      "system": "System",
+      "hostname": "Hostname",
+      "uptime": "Uptime",
+      "os": "Operating System",
+      "arch": "System Architecture",
+      "load": "System Load",
+      "cpu": "CPU"
+    },
+    "memory": {
+      "label": "Memory",
+      "used": "Used",
+      "free": "Free",
+      "cache": "Cache"
+    },
+    "disk": {
+      "label": "Disk",
+      "mount_point": "Mount Point",
+      "total": "Total Size",
+      "free": "Free Space",
+      "percent": "Usage Percentage"
+    },
+    "network": {
+      "label": "Network",
+      "interface": "Interface",
+      "rx": "Received",
+      "tx": "Sent"
+    }
+  },
+  "facade": {
+    "asset_placeholder": "Asset Name, Protocol, Tags",
+    "accessing": "Accessing"
+  },
+  "menus": {
+    "dashboard": {
+      "label": "Dashboard"
+    },
+    "resource": {
+      "label": "Resource",
+      "submenus": {
+        "asset": "Assets",
+        "credential": "Credentials",
+        "snippet": "Snippets",
+        "storage": "Storage",
+        "website": "Websites"
+      }
+    },
+    "gateway": {
+      "label": "Gateway",
+      "submenus": {
+        "ssh_gateway": "SSH Gateway",
+        "agent_gateway": "Sec Gateway"
+      }
+    },
+    "log_audit": {
+      "label": "Log Audit",
+      "submenus": {
+        "online_session": "Online Sessions",
+        "offline_session": "Offline Sessions",
+        "filesystem_log": "File Logs",
+        "login_log": "Login Logs",
+        "operation_log": "Operation Logs"
+      }
+    },
+    "sysops": {
+      "label": "Operations",
+      "submenus": {
+        "scheduled_task": "Scheduled Tasks",
+        "monitoring": "System Monitoring"
+      }
+    },
+    "identity": {
+      "label": "Identity",
+      "submenus": {
+        "user": "Users",
+        "user_group": "User Groups",
+        "role": "Roles",
+        "login_policy": "Login Policies",
+        "login_locked": "Login Locks"
+      }
+    },
+    "authorised": {
+      "label": "Authorization",
+      "submenus": {
+        "command_filter": "Command Filters",
+        "strategy": "Strategies"
+      }
+    },
+    "setting": {
+      "label": "System Settings"
+    },
+    "dev": {
+      "label": "Debug Information"
+    }
+  },
+  "fs": {
+    "operations": {
+      "upload": "Upload",
+      "download": "Download",
+      "rename": "Rename",
+      "copy": "Copy",
+      "paste": "Paste",
+      "edit": "Edit",
+      "remove": "Remove",
+      "create_file": "Create File",
+      "create_dir": "Create Directory",
+      "upload_file": "Upload File",
+      "upload_dir": "Upload Directory",
+      "batch_download": "Bulk download"
+    },
+    "attributes": {
+      "path": "Path",
+      "type": "Type",
+      "size": "Size",
+      "last": {
+        "modified": "Last Modified",
+        "accessed": "Last Accessed",
+        "changed": "Last Changed"
+      },
+      "permissions": {
+        "label": "Permissions",
+        "owner": "Owner",
+        "group": "Group"
+      }
+    },
+    "file_types": {
+      "file": "File",
+      "directory": "Directory",
+      "link": "Link"
+    },
+    "delete_confirm": {
+      "title": "Are you sure you want to delete this file?",
+      "content": "This is a dangerous operation."
+    },
+    "navigation": {
+      "back_to_prev": "Back to Previous",
+      "refresh": "Refresh",
+      "show_hidden_file": "Show Hidden Files",
+      "hide_hidden_file": "Hide Hidden Files",
+      "file_tran": "File Transfers"
+    },
+    "editor": {
+      "label": "Editor",
+      "save": "Save",
+      "refetch": "Reload"
+    },
+    "transmission": {
+      "filename": "File Name",
+      "size": "File Size",
+      "status": "Status",
+      "progress": "Progress",
+      "speed": "Speed",
+      "options": {
+        "uploading": "Uploading",
+        "transmitting": "Transmitting",
+        "upload_failed": "Upload Failed",
+        "upload_success": "Upload Successful"
+      }
+    }
+  },
+  "guacamole": {
+    "state": {
+      "idle": "Initializing...",
+      "connecting": "Connecting...",
+      "waiting": "Waiting for server response...",
+      "connected": "Connected",
+      "disconnecting": "Disconnecting...",
+      "disconnected": "Disconnected",
+      "closed": "Closed"
+    }
+  },
+  "identity": {
+    "setup": {
+      "user": "Initialize User",
+      "go_to_login": "Go to Login"
+    },
+    "policy": {
+      "label": "Login Policy",
+      "name": "Name",
+      "ip_group": "IP Group",
+      "ip_group_extra": "Format: comma-separated strings, 0.0.0.0/0 matches all. For example: 192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20",
+      "action": {
+        "label": "Action",
+        "options": {
+          "allow": "Allow",
+          "reject": "Reject"
+        }
+      },
+      "status": "Status",
+      "priority": "Priority",
+      "priority_extra": "Smaller number means higher priority",
+      "time_period": "Time Period",
+      "type": "Type"
+    },
+    "role": {
+      "type": "Role Type",
+      "types": {
+        "default": "Built-in Role",
+        "new": "New Role"
+      },
+      "permission": "Permission"
+    },
+    "user_group": {
+      "members": "Members"
+    },
+    "user": {
+      "username": "Username",
+      "locked_at": "Locked At",
+      "otp": "Two-Factor Authentication",
+      "expiration_at": "Expiration Time",
+      "type": "User Type",
+      "types": {
+        "super_admin": "Super Administrator",
+        "admin": "Administrator",
+        "normal": "Normal User"
+      },
+      "nickname": "Nickname",
+      "mail": "Email",
+      "status": "Account Status",
+      "login": "Login Status",
+      "logins": {
+        "online": "Online",
+        "offline": "Offline"
+      },
+      "recording": "Recording Status",
+      "watermark": "Watermark Status",
+      "public_key": "Public Key",
+      "password": "Password",
+      "role": "Role",
+      "options": {
+        "reset": {
+          "password": {
+            "action": "Reset Password",
+            "success": "Password Reset Successful",
+            "new": "New Password",
+            "confirm": {
+              "title": "Are you sure you want to reset the user's password?",
+              "content": "If no password is entered, a random one will be generated and sent to the user via email."
+            }
+          },
+          "otp": {
+            "action": "Reset Two-Factor Authentication",
+            "confirm": {
+              "title": "Are you sure you want to reset the user's two-factor authentication information?",
+              "content": "After resetting, the user can log in without two-factor authentication."
+            }
+          }
+        }
+      },
+      "client_ip": "Client IP",
+      "reason": "Reason",
+      "user_agent": "User Agent",
+      "login_at": "Login Time",
+      "no_spaces_allowed": "Spaces are not allowed",
+      "new_user_result": "User created successfully",
+      "locked_type": "Lock type",
+      "locked_type_username": "Account locked",
+      "locked_type_ip": "IP lock"
+    },
+    "options": {
+      "authorized_asset": "Authorized Assets",
+      "login_policy": "Login Policy"
+    }
+  },
+  "dw": {
+    "selected": "Selected Time Period",
+    "select": "Drag to select time period",
+    "clear": "Clear Selection",
+    "version": "Version",
+    "select_all": "Select All",
+    "week": {
+      "label": "Week",
+      "days": {
+        "sunday": "Sunday",
+        "monday": "Monday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday",
+        "thursday": "Thursday",
+        "friday": "Friday",
+        "saturday": "Saturday"
+      }
+    },
+    "time": "Time"
+  },
+  "authorised": {
+    "strategy": {
+      "name": "Name",
+      "upload": "Upload",
+      "download": "Download",
+      "edit": "Edit",
+      "remove": "Remove",
+      "rename": "Rename",
+      "copy": "Copy",
+      "paste": "Paste",
+      "create_dir": "Create Directory",
+      "create_file": "Create File"
+    },
+    "command_filter": {
+      "name": "Name",
+      "options": {
+        "rule": "Rule"
+      },
+      "rule": {
+        "priority": "Priority",
+        "priority_extra": "Smaller number means higher priority",
+        "ip_group": "IP Group",
+        "expiration_at": "Expiration Time",
+        "type": {
+          "label": "Match Type",
+          "options": {
+            "command": "Exact Match",
+            "regexp": "Regular Expression Match"
+          }
+        },
+        "match_content": "Match Content",
+        "action": {
+          "label": "Action",
+          "options": {
+            "allow": "Allow",
+            "reject": "Reject"
+          }
+        },
+        "status": "Status",
+        "authorised_at": "Authorized At",
+        "authorised_user": "Authorized User",
+        "expired_at": "Expired At",
+        "never_expired": "Never Expires"
+      }
+    },
+    "label": {
+      "authorised": "Authorized",
+      "user": "User",
+      "user_group": "User Group",
+      "asset": "Asset",
+      "command_filter": "Command Filter",
+      "strategy": "Strategy",
+      "expired_at": "Expiration Time",
+      "authorised_at": "Authorized Time",
+      "never_expired": "Never Expires"
+    }
+  },
+  "sysops": {
+    "status": "Status",
+    "spec": "Cron Expression",
+    "last_exec_at": "Last Execution Time",
+    "asset": "Asset",
+    "command": "Command",
+    "options": {
+      "exec": "Execute Now",
+      "logs": "View Logs"
+    },
+    "logs": {
+      "label": "Logs",
+      "exec_at": "Execution Time",
+      "messages": "Messages"
+    },
+    "type": {
+      "label": "Type",
+      "options": {
+        "check_status": "Status Check",
+        "exec_command": "Command Execution",
+        "delete_log": "Log Cleanup"
+      }
+    },
+    "mode": {
+      "label": "Mode",
+      "options": {
+        "all_asset": "All Assets",
+        "custom_asset": "Custom Assets"
+      }
+    }
+  },
+  "audit": {
+    "client_ip": "Client IP",
+    "user": "User",
+    "protocol": "Protocol",
+    "asset": "Asset",
+    "connected_at": "Connected At",
+    "disconnected_at": "Disconnected At",
+    "connection_duration": "Connection Duration",
+    "recording_size": "Recording Size",
+    "command": "Command",
+    "network": "Network Address",
+    "filename": "File Name",
+    "executed_at": "Executed At",
+    "username": "Username",
+    "login_at": "Login Time",
+    "action": "Action Type",
+    "login_status": "Login Status",
+    "login_reason": "Failure Reason",
+    "user_agent": "User Agent",
+    "operation": {
+      "label": "Type",
+      "account": "Account",
+      "content": "Details",
+      "status": "Status",
+      "at": "Operation Time",
+      "options": {
+        "user_reset_password": "Reset User Password",
+        "asset_authorised": "Asset Authorization",
+        "user_add": "Create User",
+        "user_update": "Update User",
+        "user_delete": "Delete User",
+        "user_enable": "Enable User",
+        "user_disable": "Disable User",
+        "user_reset_otp": "Reset User Two-Factor Authentication"
+      }
+    },
+    "risk_level": {
+      "label": "Risk Level",
+      "options": {
+        "normal": "Normal Command",
+        "high_risk": "High-Risk Command"
+      }
+    },
+    "options": {
+      "monitor": "Monitor",
+      "playback": "Playback",
+      "disconnect": {
+        "action": "Disconnect",
+        "confirm": "Are you sure you want to disconnect this session?"
+      }
+    }
+  },
+  "access": {
+    "settings": {
+      "theme": "Theme Settings",
+      "system": "System Settings",
+      "font": "Font Settings",
+      "terminal": {
+        "font": {
+          "size": "Font Size",
+          "family": "Font Family"
+        },
+        "line_height": "Line Height"
+      }
+    },
+    "batch": {
+      "exec": "Batch Execution",
+      "choose_asset": "Choose Assets"
+    },
+    "session": {
+      "share": {
+        "action": "Share Session",
+        "cancel": "Cancel Sharing"
+      }
+    },
+    "clipboard": "Clipboard",
+    "combination_key": "Combination Key",
+    "toggle_full_screen": "Toggle Full Screen",
+    "required_auth": "Login Parameters",
+    "reconnect": "Reconnect",
+    "filesystem": "File System"
+  },
+  "account": {
+    "my_asset": "My Assets",
+    "profile": "Profile",
+    "nickname": "Nickname",
+    "logout": "Logout",
+    "language": "Language",
+    "public_key": "Public Key",
+    "change": {
+      "info": "Change Personal Information",
+      "password": "Change Password"
+    },
+    "access_token": "Access Token",
+    "old_password": "Old Password",
+    "new_password": "New Password",
+    "confirm_password": "Confirm Password",
+    "submit": "Submit",
+    "regen": "Regenerate",
+    "username": "Username",
+    "password": "Password",
+    "captcha": "Captcha",
+    "login": {
+      "action": "Login",
+      "methods": {
+        "passkey": "Authenticate with Passkey",
+        "password": "Authenticate with Password",
+        "otp": "Authenticate with OTP"
+      }
+    },
+    "otp": "Two-Factor Authentication",
+    "next": "Next",
+    "retry": "Retry",
+    "passkey": "Passkey",
+    "enter": "Please enter",
+    "auth_failed": "Authentication Failed",
+    "otp_bind_title": "You have successfully enabled two-factor authentication",
+    "otp_bind_sub_title": "Multi-factor authentication - secondary authentication - login identity verification, more secure access control.",
+    "otp_unbind": "Disable Multi-Factor Authentication",
+    "otp_unbind_title": "Are you sure you want to disable two-factor authentication?",
+    "otp_unbind_subtitle": "Disabling it may expose your system account to brute-force attacks.",
+    "passkey_add": "Add Passkey",
+    "passkey_add_time": "Add Time",
+    "passkey_used_time": "Last Used",
+    "passkey_delete_title": "Are you sure you want to remove your passkey?",
+    "passkey_delete_content": "Passkeys provide better protection for your account and assets. It is recommended to keep them.",
+    "mfa": "Multi-Factor Authentication",
+    "mfa_authing": "Authenticating...",
+    "mfa_retry": "Retry",
+    "mfa_auth_failed": "Authentication Failed",
+    "mfa_change_way": "Change Authentication Method",
+    "otp_required": "You must enable two-factor authentication before continuing.",
+    "password_expired": "Your password has expired, please change your password."
+  },
+  "assets": {
+    "name": "Name",
+    "type": "Type",
+    "content": "Content",
+    "status": "Status",
+    "group": "Group",
+    "width": "Width",
+    "height": "Height",
+    "passphrase": "Private Key Passphrase",
+    "logo": "Logo",
+    "protocol": "Protocol",
+    "network": "Network",
+    "tags": "Tags",
+    "owner": "Owner",
+    "last_access_at": "Last Access Time",
+    "addr": "Network Address",
+    "account_type": "Account Type",
+    "private_key": "Private Key",
+    "ip": "IP",
+    "port": "Port",
+    "username": "Username",
+    "password": "Password",
+    "credential": "Credential",
+    "agent_gateway": "Security Gateway",
+    "ssh_gateway": "SSH Gateway",
+    "gateway_tip": "Only one of Security Gateway and SSH Gateway can be selected. If both are selected, SSH Gateway will be used.",
+    "description": "Description",
+    "advanced_setting": "Advanced Settings",
+    "socks5_proxy": "Socks5 Proxy",
+    "socks5_proxy_enabled": "Socks5 Proxy",
+    "socks5_proxy_host": "Proxy Server",
+    "socks5_proxy_port": "Proxy Port",
+    "socks5_proxy_username": "Proxy Username",
+    "socks5_proxy_password": "Proxy Password",
+    "display_settings": "Display Settings",
+    "color_depth": "Color Depth",
+    "force_lossless": "Force Lossless Compression",
+    "audio_settings": "Audio Settings",
+    "disable_audio": "Disable Audio",
+    "enable_audio_input": "Enable Audio Input",
+    "rdp_domain": "Domain",
+    "preconnection_id": "Preconnection ID",
+    "preconnection_blob": "Preconnection Blob",
+    "remote_app": "Remote App",
+    "remote_app_dir": "Remote App Directory",
+    "remote_app_args": "Remote App Arguments",
+    "rdp_drive": "Network Drive",
+    "rdp_enable_drive": "Enable Network Drive",
+    "rdp_drive_path": "Local Storage",
+    "rdp_drive_path_extra": "If not selected, the operator's default storage space will be used",
+    "is_share": "Shared",
+    "is_default": "Default",
+    "limit_size": "Size Limit",
+    "used_size": "Used Size",
+    "domain": "Domain",
+    "domain_tip": "The domain you use to access protected assets, for example: www.example.com, needs to be resolved to the IP address of this system.",
+    "scheme": "Asset Protocol",
+    "forward_host_or_ip": "Asset's IP or Domain",
+    "forward_port": "Asset Port",
+    "entrance": "Entrance Path",
+    "entrance_tip": "The entrance path is the address that is automatically opened on first access",
+    "change_group": "Change Group",
+    "general": "General",
+    "header": "Header",
+    "custom_header": "Custom Header",
+    "header_key": "Key",
+    "header_value": "Value",
+    "basic_auth": "Basic Authentication",
+    "basic_auth_enabled": "Asset requires basic authentication",
+    "basic_auth_username": "Username",
+    "basic_auth_password": "Password",
+    "website_tip": "Before using this feature, please ensure that you have enabled the reverse proxy function on the system settings page.",
+    "active": "Active",
+    "inactive": "Inactive",
+    "access": "Access",
+    "import": "Import Assets",
+    "copy": "Copy Assets",
+    "download_sample": "Download Sample",
+    "import_asset_tip": "When importing assets, either account and password or private key and passphrase can be provided. If both are provided, private key and passphrase will be preferred.",
+    "import_asset_success": "Import Assets Successful",
+    "import_asset_error": "Import Assets Failed",
+    "import_asset_error_title": "Please check the imported file. The following assets failed to import:",
+    "bind_user": "Bind User",
+    "bind_user_group": "Bind User Group",
+    "up": "Move Up",
+    "down": "Move Down",
+    "copy_public_key": "Copy Public Key",
+    "filesystem": "File System",
+    "website_entrance": "The entrance is the path where users enter the website.",
+    "conn_test": "Connection Test",
+    "generate_private_key": "Generate private key"
+  },
+  "gateways": {
+    "name": "Name",
+    "port": "Port",
+    "os": "Operating System",
+    "arch": "System Architecture",
+    "status": "Status",
+    "version": "Version",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "register-agent-gateway": "Register Security Gateway",
+    "rpc-addr": "RPC Address",
+    "download-addr": "Download Address",
+    "username": "Username",
+    "account_type": {}
+  },
+  "settings": {
+    "system": {
+      "setting": "System Settings",
+      "name": "System Name",
+      "logo": "System Logo",
+      "copyright": "System Copyright",
+      "icp": "ICP License",
+      "login": {
+        "background_color": "Login Background Color",
+        "background_image": "Login Background Image"
+      },
+      "ip": {
+        "extractor": "IP Address Extraction Method",
+        "extractor_direct": "Network Address",
+        "trust_list": "Trusted IP Addresses (CIDR format)",
+        "trust_placeholder": "Press Enter to confirm after input",
+        "trust_error": "Please enter a valid CIDR format. For example: 192.168.1.0/24"
+      },
+      "watermark": {
+        "setting": "Watermark Settings",
+        "status": "Watermark Status",
+        "content": "Watermark Content",
+        "append": {
+          "user": "Append User to Watermark",
+          "asset": "Append Asset to Watermark"
+        },
+        "font": {
+          "color": "Watermark Font Color",
+          "size": "Watermark Font Size"
+        }
+      },
+      "access": {
+        "max_idle_second": "Maximum Idle Time for Terminal Access",
+        "second": "Seconds"
+      }
+    },
+    "security": {
+      "setting": "Security Settings",
+      "protection": "Login Protection",
+      "captcha": "Captcha",
+      "force_otp": "Force Multi-Factor Authentication",
+      "access_require_mfa": "Access to Assets Requires Multi-Factor Authentication",
+      "devices": "Devices",
+      "minute": "Minutes",
+      "session": {
+        "duration": "Session Duration",
+        "count_custom": "Custom Session Count",
+        "count_limit": "Session Count Limit"
+      },
+      "password": {
+        "complexity": "Password Complexity",
+        "recommend": "Recommended",
+        "customize": "Customize",
+        "expiration_period": "Password Expiration Period",
+        "too_short": "Password length cannot be less than",
+        "too_simple": "Password must contain at least ? types of characters: uppercase letters, lowercase letters, numbers, special characters",
+        "cannot_contain_username": "Password cannot contain username",
+        "cannot_be_palindrome": "Password cannot be a palindrome",
+        "cannot_be_weak": "Weak passwords are not allowed",
+        "character": "Characters",
+        "type": "Type"
+      },
+      "login_lock": {
+        "setting": "Login Lock",
+        "tip": "When enabled, after consecutive login failures within a specified time, the account or IP will be locked. To unlock, please visit",
+        "enabled": "Login Failure Lock",
+        "failed_duration": "Login Failure Statistics Duration",
+        "failed_times": "Login Failure Statistics Count",
+        "account_duration": "Account Lock Duration",
+        "ip_duration": "IP Lock Duration"
+      },
+      "passkey": {
+        "setting": "Passkey Login Settings",
+        "enabled": "Passkey Login",
+        "domain": "External Access Domain",
+        "origins": "Allowed Origins for Passkey",
+        "origins_tip": "Do not include trailing /",
+        "origins_error": "Please enter a valid URL"
+      }
+    },
+    "sshd": {
+      "setting": "SSH Proxy Server",
+      "tip": "When enabled, a local port will be listened on, allowing access to authorized SSH assets using an SSH client with the same account and password as this system.",
+      "enabled": "SSH Service",
+      "addr": "Listen Address",
+      "private_key": "Authentication Private Key",
+      "generate_private_key": "Generate Private Key",
+      "port_forwarding": {
+        "enabled": "Enable Tunneling",
+        "host_port": "Allowed Tunnel Forwarding IP and Port"
+      }
+    },
+    "rp": {
+      "setting": "Reverse Proxy Server",
+      "tip": "When enabled, a local port will be listened on, allowing mapping of http/https services to this machine.",
+      "enabled": "Reverse Proxy Service",
+      "addr": "Listen Address",
+      "redirect_to_https": "Automatically Redirect to HTTPS",
+      "auto_tls": "Automatically Apply for HTTPS Certificate",
+      "cert": "Certificate",
+      "cert_key": "Certificate Private Key",
+      "self_proxy": "Proxy Self System",
+      "domain": "Domain",
+      "system_root": "System Root Path",
+      "system_root_extra": "When accessing the reverse proxy website, it needs to verify if the current logged-in user has permission, and will redirect to the system's authorization page. This configuration item is the root URL path of your current login."
+    },
+    "rdp": {
+      "setting": "RDP Settings",
+      "enable": {
+        "wallpaper": "Enable Wallpaper",
+        "theming": "Enable Theming",
+        "font_smoothing": "Enable Font Smoothing",
+        "full_window_drag": "Enable Full Window Drag",
+        "desktop_composition": "Enable Desktop Composition",
+        "menu_animations": "Enable Menu Animations"
+      },
+      "disable": {
+        "bitmap_caching": "Disable Bitmap Caching",
+        "offscreen_caching": "Disable Offscreen Caching"
+      }
+    },
+    "vnc": {
+      "setting": "VNC Settings",
+      "cursor": {
+        "setting": "Cursor Settings",
+        "local": "Local",
+        "remote": "Remote"
+      },
+      "swap_red_blue": "Swap Red and Blue",
+      "color_depth": "Color Depth"
+    },
+    "mail": {
+      "setting": "Email Settings",
+      "enabled": "Email Service",
+      "host": "Email Server",
+      "port": "Email Port",
+      "username": "Email Account",
+      "from": "Email Sender",
+      "password": "Email Password",
+      "tip": "You need to enable email service to send test emails.",
+      "mail": "Email Address",
+      "title": "Email Title",
+      "content": "Email Content",
+      "send": "Send Email"
+    },
+    "ldap": {
+      "setting": "LDAP Authentication",
+      "tip": "When enabled, LDAP will be used for user authentication.",
+      "url": "LDAP URL",
+      "user": "LDAP User",
+      "password": "LDAP Password",
+      "base_dn": "LDAP Base DN",
+      "filter": "LDAP Filter",
+      "user_search": {
+        "size_limit": "LDAP Maximum Search Results",
+        "size_limit_tooltip": "LDAP maximum search results, 0 means no limit.",
+        "filter": "LDAP User Search Filter",
+        "filter_tooltip": "LDAP user search filter, for example: (objectClass=person)."
+      },
+      "user_property_mapping": "LDAP User Property Mapping"
+    },
+    "log": {
+      "setting": "Log Settings",
+      "recording": {
+        "enabled": "Recording Status"
+      },
+      "session": {
+        "saved_limit_days": "Session Save Limit"
+      },
+      "login_log": {
+        "saved_limit_days": "Login Log Save Limit"
+      },
+      "cron_log": {
+        "saved_limit_days": "Scheduled Task Log Save Limit"
+      }
+    },
+    "backup": {
+      "setting": "Backup and Recovery",
+      "tip": "When recovering data, if there are users with the same login account, the data in the original system will be retained. Additionally, since login passwords are irreversibly encrypted, the recovered account passwords will be randomly generated.",
+      "recovery": "Recover Backup"
+    },
+    "license": {
+      "setting": "License",
+      "device": "Device Information",
+      "machine_id": "Machine ID",
+      "import": "Import License",
+      "request": "Update License",
+      "binding": "Bind License",
+      "info": "License Information",
+      "max": {
+        "asset_count": "Maximum Asset Count",
+        "concurrent_count": "Maximum Concurrent Count",
+        "user_count": "Maximum User Count"
+      },
+      "expired_at": "License Expiration Time",
+      "no_limit": "No Limit",
+      "type": {
+        "label": "License Type",
+        "options": {
+          "test": "Trial Version",
+          "premium": "Premium Version",
+          "enterprise": "Enterprise Version",
+          "free": "Free version"
+        }
+      },
+      "func_disabled": "This function is not enabled for your current license.",
+      "restricted": {
+        "label": "Access restricted",
+        "content": "Your license does not support this feature.",
+        "pay": "Buy now"
+      },
+      "test_warning": "You are trying out the professional version, which expires on"
+    },
+    "logo": {
+      "setting": "Asset Logo",
+      "preset": "System Preset",
+      "custom": "Custom Logo"
+    },
+    "about": {
+      "setting": "About",
+      "current_version": "Current Version",
+      "latest_version": "Latest Version",
+      "update_content": "Update Content",
+      "upgrade": {
+        "action": "Update Now",
+        "title": "Upgrade System",
+        "content": "Are you sure you want to upgrade the system version?",
+        "success": "Update Successful",
+        "success_content": "Update successful. Do you want to refresh the page now?",
+        "failed": "Update failed"
+      }
+    },
+    "identity": {
+      "setting": "Identity"
+    },
+    "webauthn": {
+      "setting": "WebAuthn"
+    }
+  },
+  "errors": {
+    "1000": "Invalid token",
+    "1001": "Setup required",
+    "10000": "Record not found",
+    "10001": "Name already in use",
+    "10002": "Invalid parameter",
+    "10003": "You cannot operate on your own account",
+    "10004": "Incorrect account or password",
+    "10005": "Account is disabled",
+    "10006": "Incorrect captcha",
+    "10007": "Too many login failures",
+    "10008": "Two-factor authentication code required",
+    "10009": "Incorrect two-factor authentication code",
+    "10010": "Your IP address is not allowed to log in",
+    "10011": "Login not allowed at this time",
+    "10012": "Email configuration is incomplete",
+    "10013": "Default data cannot be deleted",
+    "10014": "Permission denied",
+    "10015": "Not SSH protocol",
+    "10016": "Unsupported protocol",
+    "10017": "Session closed",
+    "10018": "File system disabled",
+    "10019": "Website not found",
+    "10020": "Website disabled",
+    "10021": "Incorrect original password",
+    "20000": "Failed to obtain license",
+    "20001": "The current system does not match your bound machine code. Please replace it promptly.",
+    "20002": "Your license has expired. Please renew.",
+    "20003": "Your online sessions exceed the license limit.",
+    "20004": "Your user count exceeds the license limit.",
+    "20005": "Your asset count exceeds the license limit.",
+    "30000": "Gateway is not online",
+    "30001": "Tunnel does not exist",
+    "40000": "Reverse proxy is disabled",
+    "40001": "Failed to import assets",
+    "50000": "System is under attack",
+    "50001": "System passkey is disabled",
+    "50002": "User two-factor authentication is disabled",
+    "50003": "Image is too large",
+    "60001": "Password is too short",
+    "60002": "Password complexity is too low",
+    "60003": "Password cannot contain username",
+    "60004": "Weak passwords are not allowed",
+    "60005": "Password cannot be a palindrome"
+  }
+}
