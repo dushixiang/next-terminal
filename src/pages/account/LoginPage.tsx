@@ -174,7 +174,7 @@ const LoginPage = () => {
 
                     {strings.hasText(error) &&
                         <div className={'space-y-2 mb-4 text-red-500'}>
-                            <div className={'font-medium text-base'}>{t('account.auth-failed')}</div>
+                            <div className={'font-medium text-base'}>{t('account.auth_failed')}</div>
                             <div className={''}>{error}</div>
                         </div>
                     }
@@ -245,7 +245,7 @@ const LoginPage = () => {
                 </div>
             case LoginStep.OTP:
                 return <div>
-                    <Title level={3}>{t('account.method.otp')}</Title>
+                    <Title level={3}>{t('account.login.methods.otp')}</Title>
 
                     <Form form={optForm} onFinish={validateTOTP.mutate} className="login-form" layout="vertical">
                         <Form.Item label={t('account.otp')} name='totp'

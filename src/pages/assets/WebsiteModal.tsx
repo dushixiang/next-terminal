@@ -292,7 +292,7 @@ const WebsiteModal = ({
                         <Form.Item name={'logo'} label={t('assets.logo')}>
                             <Popover placement="rightTop" content={logoPopover()}>
                                 <div
-                                    className={'w-10 h-10 border border-dashed rounded-lg p-2 flex items-center justify-center cursor-pointer hover:border-blue-500'}>
+                                    className={'w-10 h-10 border border-dashed rounded-lg p-2 flex items-center justify-center cursor-pointer border-blue-200 dark:border-blue-700 hover:border-blue-500'}>
                                     {logo ? <img className={''} src={logo} alt="logo"/> : ''}
                                 </div>
                             </Popover>

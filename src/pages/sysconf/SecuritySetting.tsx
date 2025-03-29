@@ -163,16 +163,16 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                 </Disabled>
 
                 <Divider orientation="left">{t('settings.security.login_lock.setting')}</Divider>
-                <Alert
-                    message={
-                        <div>{t('settings.security.login_lock.tip')}
-                            [<NLink to={'/login-locked'}>{t('menus.identity.submenus.login_locked')}</NLink>]
-                        </div>
-                    }
-                    type="info"
-                    style={{marginBottom: 10}}
-                />
                 <Disabled disabled={license.isFree()}>
+                    <Alert
+                        message={
+                            <div>{t('settings.security.login_lock.tip')}
+                                [<NLink to={'/login-locked'}>{t('menus.identity.submenus.login_locked')}</NLink>]
+                            </div>
+                        }
+                        type="info"
+                        style={{marginBottom: 10}}
+                    />
                     <ProFormSwitch name="login-lock-enabled"
                                    label={t("settings.security.login_lock.enabled")}
                                    rules={[{required: true}]}
