@@ -228,23 +228,6 @@ const SystemSetting = ({get, set}: SettingProps) => {
                             <ProFormSelect name="ip-trust-list"
                                            label={t('settings.system.ip.trust_list')}
                                            placeholder={t('settings.system.ip.trust_placeholder')}
-                                           rules={[
-                                               ({getFieldValue}) => ({
-                                                   validator(_, value) {
-                                                       // console.log(`value`, value)
-                                                       for (let i = 0; i < value.length; i++) {
-                                                           let val = value[i];
-                                                           if ((cidrRegex.test(val) || val === '0.0.0.0/0')) {
-                                                               // console.log(`success`, val)
-                                                           } else {
-                                                               // console.log(`error`, val)
-                                                               return Promise.reject(new Error(t('settings.system.ip.trust_error')));
-                                                           }
-                                                       }
-                                                       return Promise.resolve();
-                                                   },
-                                               }),
-                                           ]}
                                            fieldProps={{
                                                mode: 'tags',
                                                value: ipTrustList,
