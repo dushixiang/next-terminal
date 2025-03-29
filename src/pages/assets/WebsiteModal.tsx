@@ -8,7 +8,7 @@ import {
     ProFormList,
     ProFormSelect,
     ProFormSwitch,
-    ProFormText
+    ProFormText, ProFormTextArea
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import websiteApi from "@/src/api/website-api";
@@ -236,6 +236,19 @@ const WebsiteModal = ({
         </>
     }
 
+    const CertView = () => {
+        return <>
+            <ProFormSwitch label={t('general.enabled')} name={['cert','enabled']}
+                           fieldProps={{
+                               checkedChildren: t('general.yes'),
+                               unCheckedChildren: t('general.no'),
+                           }}
+            />
+            <ProFormTextArea label={t('settings.rp.cert')} name={['cert','cert']}/>
+            <ProFormTextArea label={t('settings.rp.cert_key')} name={['cert','key']}/>
+        </>
+    }
+
     const items = [
         {
             key: 'general',
@@ -251,6 +264,11 @@ const WebsiteModal = ({
             key: 'basic-auth',
             label: t('assets.basic_auth'),
             children: <BasicAuthView/>,
+        },
+        {
+            key: 'cert',
+            label: t('assets.cert'),
+            children: <CertView/>,
         },
     ]
 
