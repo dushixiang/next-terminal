@@ -25,7 +25,7 @@ const UserLayout = () => {
             if (!href.includes(mustAt)) {
                 modal.warning({
                     title: t('general.tips'),
-                    content: t('general.otp_required'),
+                    content: t('account.otp_required'),
                     onOk: () => {
                         window.location.href = mustAt;
                     }

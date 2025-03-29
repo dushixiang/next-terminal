@@ -61,9 +61,32 @@ const ScheduledTaskLogPage = ({open, jobId, handleCancel}: Props) => {
                         success = maybe(success, 0)
                         let failed = results2?.filter(item => !item.success)?.length;
                         failed = maybe(failed, 0)
-                        return <div className={''}>
-                            {success > 0 && '✅'}
-                            {failed > 0 && '❌'}
+                        return <div className={'flex items-center gap-2'}>
+                            {success > 0 && <div>
+                                <Progress
+                                    type="circle"
+                                    trailColor="#e6f4ff"
+                                    percent={100}
+                                    strokeWidth={20}
+                                    size={14}
+                                    format={(number) => `Success`}
+                                />
+                                <span style={{marginLeft: 8}}>{t('general.success')}: </span>
+                                <span>{success}</span>
+                            </div>}
+                            {failed > 0 && <div>
+                                <Progress
+                                    status="exception"
+                                    type="circle"
+                                    trailColor="#e6f4ff"
+                                    percent={90}
+                                    strokeWidth={20}
+                                    size={14}
+                                    format={(number) => `Success`}
+                                />
+                                <span style={{marginLeft: 8}}>{t('general.failed')}</span>
+                                <span>{failed}</span>
+                            </div>}
                             {/*{`✅${success}, ❌: ${failed}`}*/}
                         </div>;
                 }
