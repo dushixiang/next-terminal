@@ -24,8 +24,8 @@ const Disabled = ({disabled, children, classNames, style}: Props) => {
     return (
         <div className={'z-10 relative'}>
             {disabled &&
-                <div className={'z-10 absolute flex items-center justify-center w-full h-full'}>
-                    <div className={'p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md text-center'}>
+                <div className={'z-10 flex items-center justify-center w-full h-full'}>
+                    <div className={'p-4 bg-red-100 border-l-4 border-red-500 text-red-700 rounded-md w-full mb-4'}>
                         <strong>⚠ {t('settings.license.restricted.label')}: </strong>
                         {t('settings.license.restricted.content')}
                         <a className={'text-blue-500 hover:text-blue-600'}
@@ -36,7 +36,7 @@ const Disabled = ({disabled, children, classNames, style}: Props) => {
                     </div>
                 </div>
             }
-            <div className={disabled && 'blur-sm'} ref={ref}>
+            <div className={disabled && 'grayscale'} ref={ref}>
                 {children}
             </div>
         </div>
