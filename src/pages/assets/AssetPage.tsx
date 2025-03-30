@@ -20,6 +20,7 @@ import {cn} from "@/lib/utils";
 import {ImperativePanelHandle} from "react-resizable-panels";
 import {useWindowSize} from "react-use";
 import {ArrowLeftToLineIcon, ArrowRightToLineIcon} from "lucide-react";
+import {safeEncode} from "@/src/utils/codec";
 
 const api = assetsApi;
 
@@ -250,7 +251,7 @@ const AssetPage = () => {
                                 name: record['name'],
                                 protocol: record['protocol'],
                             }
-                            const url = `/access?asset=${JSON.stringify(msg)}`;
+                            const url = `/access?asset=${safeEncode(msg)}`;
                             openOrSwitchToPage(url, 'NT_Access');
                             accessAsset(msg);
                         }}

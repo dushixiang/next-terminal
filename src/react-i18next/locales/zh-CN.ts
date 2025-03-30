@@ -123,6 +123,7 @@ let o = {
             "label": "系统运维",
             "submenus": {
                 "scheduled_task": "定时任务",
+                "tools": "实用工具",
                 "monitoring": "系统监控"
             }
         },
@@ -508,6 +509,8 @@ let o = {
         "required_auth": "登录参数",
         "reconnect": "重新连接",
         "filesystem": "文件系统",
+        "use": "使用",
+        "search": "搜索",
     },
     "account": {
         "my_asset": "我的资产",
@@ -652,6 +655,7 @@ let o = {
         "website_entrance": "入口是用户进入网站的路径。",
         "conn_test": "网络状态检测",
         "generate_private_key": "生成私钥",
+        "cert": "证书",
     },
     "gateways": {
         "name": "名称",

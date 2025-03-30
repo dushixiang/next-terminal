@@ -123,7 +123,8 @@
       "label": "システム運用",
       "submenus": {
         "scheduled_task": "スケジュールタスク",
-        "monitoring": "システム監視"
+        "monitoring": "システム監視",
+        "tools": "実用ツール"
       }
     },
     "identity": {
@@ -507,7 +508,9 @@
     "toggle_full_screen": "フルスクリーン切り替え",
     "required_auth": "ログイン参数",
     "reconnect": "再接続",
-    "filesystem": "ファイルシステム"
+    "filesystem": "ファイルシステム",
+    "use": "使用する",
+    "search": "検索"
   },
   "account": {
     "my_asset": "私の資産",
@@ -651,7 +654,8 @@
     "filesystem": "ファイルシステム",
     "website_entrance": "入口はユーザーがウェブサイトに入るパスです。",
     "conn_test": "ネットワーク状態の検出",
-    "generate_private_key": "鍵の生成"
+    "generate_private_key": "鍵の生成",
+    "cert": "証明書"
   },
   "gateways": {
     "name": "名前",

@@ -21,7 +21,7 @@ import {
     MonitorOutlined,
     SettingOutlined,
     SolutionOutlined,
-    TeamOutlined,
+    TeamOutlined, ToolOutlined,
     UserOutlined,
     UserSwitchOutlined,
     WarningOutlined,
@@ -125,6 +125,11 @@ export const getMenus = (t: any) => {
                     key: 'scheduled-task',
                     label: t('menus.sysops.submenus.scheduled_task'),
                     icon: <BlockOutlined/>,
+                },
+                {
+                    key: 'tools',
+                    label: t('menus.sysops.submenus.tools'),
+                    icon: <ToolOutlined />,
                 },
                 {
                     key: 'monitoring',

@@ -123,7 +123,8 @@
       "label": "系統維運",
       "submenus": {
         "scheduled_task": "定時任務",
-        "monitoring": "系統監控"
+        "monitoring": "系統監控",
+        "tools": "實用工具"
       }
     },
     "identity": {
@@ -507,7 +508,9 @@
     "reconnect": "重新連接",
     "filesystem": "檔案系統",
     "clipboard": "剪貼板",
-    "toggle_full_screen": "切換全螢幕"
+    "toggle_full_screen": "切換全螢幕",
+    "use": "使用",
+    "search": "搜尋"
   },
   "account": {
     "my_asset": "我的資產",
@@ -651,7 +654,8 @@
     "entrance_tip": "入口路徑是首次訪問自動打開的地址",
     "import_asset_error_title": "請檢查所導入的檔案，以下資產導入失敗：",
     "website_entrance": "入口是用戶進入網站的路徑。",
-    "generate_private_key": "產生私鑰"
+    "generate_private_key": "產生私鑰",
+    "cert": "證書"
   },
   "gateways": {
     "name": "名稱",
