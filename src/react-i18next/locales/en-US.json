@@ -562,7 +562,11 @@
     "mfa_auth_failed": "Authentication Failed",
     "mfa_change_way": "Change Authentication Method",
     "otp_required": "You must enable two-factor authentication before continuing.",
-    "password_expired": "Your password has expired, please change your password."
+    "password_expired": "Your password has expired, please change your password.",
+    "no_mfa_title": "Please bind your security verification method first.",
+    "no_mfa_subtitle": "You have not bound any security verification methods, and therefore cannot view sensitive data.",
+    "enable_otp": "Enable OTP Authentication",
+    "enable_passkey": "Enable passkey authentication"
   },
   "assets": {
     "name": "Name",

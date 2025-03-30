@@ -1,4 +1,5 @@
 import {Api} from "@/src/api/core/api";
+import requests from "@/src/api/core/requests";
 
 export interface FileSystemLog {
     id: string;
@@ -15,6 +16,10 @@ export interface FileSystemLog {
 class FileSystemLogApi extends Api<FileSystemLog> {
     constructor() {
         super("admin/filesystem-logs");
+    }
+
+    clear = async () => {
+        await requests.post(`/${this.group}/clear`);
     }
 }
 

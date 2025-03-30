@@ -467,8 +467,13 @@ const AssetPage = () => {
                                     <NButton
                                         danger={true}
                                         onClick={async () => {
-                                            await api.deleteById(selectedRowKeys.join(','));
-                                            actionRef.current?.reload();
+                                            modal.confirm({
+                                                title: t('general.delete_confirm'),
+                                                onOk: async () => {
+                                                    await api.deleteById(selectedRowKeys.join(','));
+                                                    actionRef.current?.reload();
+                                                }
+                                            })
                                         }}
                                     >{t('actions.delete')}
                                     </NButton>

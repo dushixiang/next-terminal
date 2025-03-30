@@ -3,12 +3,22 @@ import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
 import fileSystemLogApi, {FileSystemLog} from "@/src/api/fileystem-log-api";
+import {App, Button} from "antd";
+import {useMutation} from "@tanstack/react-query";
 
 
 const FileSystemLogPage = () => {
 
     const {t} = useTranslation();
     const actionRef = useRef<ActionType>();
+    let {modal} = App.useApp();
+
+    let clearMutation = useMutation({
+        mutationFn: fileSystemLogApi.clear,
+        onSuccess: () => {
+            actionRef.current?.reload();
+        }
+    });
 
     const columns: ProColumns<FileSystemLog>[] = [
         {
@@ -77,7 +87,6 @@ const FileSystemLogPage = () => {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
                         sort: JSON.stringify(sort),
-                        status: 'connected',
                         username: params.username,
                         clientIp: params.clientIp,
                     }
@@ -98,7 +107,21 @@ const FileSystemLogPage = () => {
                 }}
                 dateFormatter="string"
                 headerTitle={t('menus.log_audit.submenus.filesystem_log')}
-                toolBarRender={() => []}
+                toolBarRender={() => [
+                    <Button key="clear"
+                            type="primary"
+                            danger
+                            onClick={() => {
+                                modal.confirm({
+                                    title: t('general.clear_confirm'),
+                                    onOk: async () => {
+                                        return clearMutation.mutate();
+                                    }
+                                })
+                            }}>
+                        {t('actions.clear')}
+                    </Button>,
+                ]}
             />
         </div>
     );
