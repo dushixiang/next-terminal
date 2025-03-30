@@ -563,6 +563,10 @@ let o = {
         "mfa_change_way": "切换验证方式",
         "otp_required": '您必须开启二次验证后才能继续操作',
         "password_expired": '您的密码已过期，请修改密码。',
+        'no_mfa_title': '请先绑定安全认证方式',
+        'no_mfa_subtitle': '您尚未绑定任何安全认证方式，无法查看敏感数据。',
+        'enable_otp': '启用OTP认证',
+        'enable_passkey': '启用通行密钥认证',
     },
     "assets": {
         "name": "名称",

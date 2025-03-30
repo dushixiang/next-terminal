@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Modal, Result, Spin} from "antd";
+import {Button, Modal, Result, Space, Spin} from "antd";
 import accountApi from "@/src/api/account-api";
 import {startAuthentication} from "@simplewebauthn/browser";
 import {REGEXP_ONLY_DIGITS} from "input-otp";
@@ -27,6 +27,11 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
         setError('');
         setLoading(true);
         let data = await accountApi.generateSecurityTokenByWebauthnStart();
+        if (data.type === '') {
+            setAuthType('none');
+            setLoading(false);
+            return;
+        }
         if (data.type === 'mfa') {
             setAuthType('mfa');
             setLoading(false);
@@ -93,6 +98,32 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
             <Spin tip={t('account.mfa_authing')} spinning={loading}>
                 <div className={'h-72 w-full flex items-center justify-center'}>
                     <div className={'space-y-4'}>
+                        {authType === 'none' &&
+                            <div>
+                                <Result
+                                    title={t('account.no_mfa_title')}
+                                    subTitle={t('account.no_mfa_subtitle')}
+                                    extra={
+                                        <Space>
+                                            <Button color="geekblue" variant={'filled'} key="otp"
+                                                    onClick={() => {
+                                                        window.location.href = '/info?activeKey=otp';
+                                                    }}
+                                            >
+                                                {t('account.enable_otp')}
+                                            </Button>
+                                            <Button color="green" variant={'filled'} key="webauthn"
+                                                    onClick={() => {
+                                                        window.location.href = '/info?activeKey=passkey';
+                                                    }}
+                                            >
+                                                {t('account.enable_passkey')}
+                                            </Button>
+                                        </Space>
+                                    }
+                                />
+                            </div>
+                        }
                         {authType === 'mfa' &&
                             <div className={'space-y-2'}>
                                 <div className={'text-gray-600'}>OTP Code:</div>
@@ -101,7 +132,9 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
                                           onComplete={handleOTPChange}
                                           autoFocus={true}
                                           value={otpValue}
-                                          onChange={(value) => {setOtpValue(value)}}
+                                          onChange={(value) => {
+                                              setOtpValue(value)
+                                          }}
                                 >
                                     <InputOTPGroup>
                                         <InputOTPSlot index={0}/>
@@ -119,14 +152,14 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
                             </div>
                         }
 
-
                         {authType === 'passkey' && strings.hasText(error) && <div>
                             <Result
                                 status="error"
                                 title={t('account.mfa_auth_failed')}
                                 subTitle={error}
                                 extra={<div className={'flex items-center justify-center gap-2'}>
-                                    <Button color="primary" variant={'solid'} onClick={requestSecurityToken}>{t('account.mfa_retry')}</Button>
+                                    <Button color="primary" variant={'solid'}
+                                            onClick={requestSecurityToken}>{t('account.mfa_retry')}</Button>
                                     <Button color="primary"
                                             variant={'dashed'}
                                             onClick={() => {

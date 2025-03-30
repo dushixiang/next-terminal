@@ -562,7 +562,11 @@
     "mfa_auth_failed": "認証失敗",
     "mfa_change_way": "認証方法の切り替え",
     "otp_required": "二段階認証を有効にすると、操作を続行できます。",
-    "password_expired": "パスワードが期限切れです。パスワードを変更してください。"
+    "password_expired": "パスワードが期限切れです。パスワードを変更してください。",
+    "no_mfa_title": "まず、セキュリティ認証方法に紐付けてください。",
+    "no_mfa_subtitle": "まだセキュリティ認証方法が設定されていません。機密データは確認できません。",
+    "enable_otp": "二段階認証を有効にする",
+    "enable_passkey": "認証キーを使用する"
   },
   "assets": {
     "name": "名前",

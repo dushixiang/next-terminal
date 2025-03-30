@@ -562,7 +562,11 @@
     "regen": "重新生成",
     "otp": "二因素認證",
     "otp_required": "您必須開啟二次驗證後才能繼續操作。",
-    "password_expired": "您的密碼已過期，請修改密碼。"
+    "password_expired": "您的密碼已過期，請修改密碼。",
+    "no_mfa_title": "請先綁定安全認證方式",
+    "no_mfa_subtitle": "您尚未綁定任何安全認證方式，無法查看敏感數據。",
+    "enable_otp": "啟用OTP認證",
+    "enable_passkey": "啟用通行密鑰認證"
   },
   "assets": {
     "name": "名稱",
