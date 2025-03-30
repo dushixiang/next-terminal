@@ -33,6 +33,7 @@ import {getImgColor} from "@/src/helper/asset-helper";
 import {useTranslation} from "react-i18next";
 import {useLicense} from "@/src/hook/use-license";
 import licenseApi from "@/src/api/license-api";
+import {safeDecode} from "@/src/utils/codec";
 
 
 interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -94,7 +95,7 @@ const AccessPage = () => {
 
     useEffect(() => {
         if (defaultAsset) {
-            let msg = JSON.parse(defaultAsset) as AccessTabSyncMessage;
+            let msg = safeDecode(defaultAsset) as AccessTabSyncMessage;
             if (msg) {
                 openAssetTab(msg);
             }
@@ -335,7 +336,7 @@ const AccessPage = () => {
                                     >
                                         <div className={'px-2 pb-2 flex items-center gap-2'}>
                                             {!isCollapsed &&
-                                                <Input.Search placeholder="Search" onChange={handleSearchTree}/>}
+                                                <Input.Search placeholder={t('access.search')} onChange={handleSearchTree}/>}
                                             <div>
                                                 <div
                                                     className={'flex items-center justify-center h-8 w-8 rounded border bg-border cursor-pointer'}

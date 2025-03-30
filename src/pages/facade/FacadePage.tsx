@@ -9,7 +9,8 @@ import {Badge, Popover, Tooltip, Typography} from "antd";
 import {useTranslation} from "react-i18next";
 import {accessAsset} from "@/src/helper/access-tab-channel";
 import {getImgColor, getProtocolColor} from "@/src/helper/asset-helper";
-import {isMobileByMediaQuery} from "@/src/utils/utils";
+import {isMobileByMediaQuery, openOrSwitchToPage} from "@/src/utils/utils";
+import {safeEncode} from "@/src/utils/codec";
 
 const FacadePage = () => {
 
@@ -55,17 +56,6 @@ const FacadePage = () => {
             </Tooltip>
         }
         return '';
-    }
-
-    function openOrSwitchToPage(url: string, windowName: string) {
-        // 尝试切换到已打开的窗口
-        const win = window.open('', windowName);
-        if (win.location.href === 'about:blank') {
-            win.location.href = url;
-            win.focus();
-        } else {
-            win.focus();
-        }
     }
 
     return (
@@ -139,7 +129,7 @@ const FacadePage = () => {
                                                     name: item['name'],
                                                     protocol: item['protocol'],
                                                 }
-                                                const url = `/access?asset=${JSON.stringify(msg)}`;
+                                                const url = `/access?asset=${safeEncode(msg)}`;
                                                 openOrSwitchToPage(url, 'NT_Access');
                                                 accessAsset(msg);
                                             }

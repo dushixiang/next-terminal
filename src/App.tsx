@@ -36,6 +36,7 @@ const StrategyPage = lazy(() => import("@/src/pages/authorised/StrategyPage"));
 const CommandFilterPage = lazy(() => import("@/src/pages/authorised/CommandFilterPage"));
 const CommandFilterDetail = lazy(() => import("@/src/pages/authorised/CommandFilterDetail"));
 const ScheduledTaskPage = lazy(() => import("@/src/pages/sysops/ScheduledTaskPage"));
+const ToolsPage = lazy(() => import("@/src/pages/sysops/ToolsPage"));
 const LoginLogPage = lazy(() => import("@/src/pages/audit/LoginLogPage"));
 const OperationLogPage = lazy(() => import("@/src/pages/audit/OperationLogPage"));
 const OfflineSessionPage = lazy(() => import("@/src/pages/audit/OfflineSessionPage"));
@@ -113,6 +114,7 @@ const router = createBrowserRouter([
             {path: "/command-filter/:commandFilterId", element: <CommandFilterDetail/>},
 
             {path: "/scheduled-task", element: <ScheduledTaskPage/>},
+            {path: "/tools", element: <ToolsPage/>},
             {path: "/monitoring", element: <SystemMonitorPage/>},
 
             {path: "/offline-session", element: <OfflineSessionPage/>},

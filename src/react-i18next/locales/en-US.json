@@ -123,7 +123,8 @@
       "label": "Operations",
       "submenus": {
         "scheduled_task": "Scheduled Tasks",
-        "monitoring": "System Monitoring"
+        "monitoring": "System Monitoring",
+        "tools": "Practical tools"
       }
     },
     "identity": {
@@ -507,7 +508,9 @@
     "toggle_full_screen": "Toggle Full Screen",
     "required_auth": "Login Parameters",
     "reconnect": "Reconnect",
-    "filesystem": "File System"
+    "filesystem": "File System",
+    "use": "Use",
+    "search": "Search"
   },
   "account": {
     "my_asset": "My Assets",
@@ -651,7 +654,8 @@
     "filesystem": "File System",
     "website_entrance": "The entrance is the path where users enter the website.",
     "conn_test": "Connection Test",
-    "generate_private_key": "Generate private key"
+    "generate_private_key": "Generate private key",
+    "cert": "certificate"
   },
   "gateways": {
     "name": "Name",

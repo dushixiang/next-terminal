@@ -56,8 +56,9 @@ const SnippetSheet = ({open, onClose, onUse, placement, mask, maskClosable}: Pro
                 maskClosable={maskClosable}
                 push={false}
                 extra={<Button type={'link'} icon={<ReloadOutlined/>} onClick={() => query.refetch()}/>}
+                getContainer={false}
         >
-            <Input.Search placeholder="Searching"
+            <Input.Search placeholder={t('access.search')}
                           onSearch={handleSearch}
                           loading={searching}
                           style={{marginBottom: 16}}/>
@@ -70,7 +71,7 @@ const SnippetSheet = ({open, onClose, onUse, placement, mask, maskClosable}: Pro
                                 <ProCard
                                     title={item.name}
                                     extra={
-                                        <Button type={'link'} size={'small'} onClick={() => {onUse(item.content)}}>USE</Button>
+                                        <Button type={'link'} size={'small'} onClick={() => {onUse(item.content)}}>{t('access.use')}</Button>
                                     }
                                     bordered={true}
                                 >
