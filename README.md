@@ -6,6 +6,8 @@
 
 1.x 升级 2.x 请先使用备份功能导出数据，在 2.x 版本中导入数据。
 
+> 如果在 1.x 导出时出现了 {"code":403,"message":"permission denied"} 的问题，可以使用独立的备份导出工具：https://github.com/dushixiang/next-terminal-export
+
 ## 快速了解
 
 Next Terminal是一个简单好用安全的开源交互审计系统，支持RDP、SSH、VNC、Telnet、Kubernetes协议。
