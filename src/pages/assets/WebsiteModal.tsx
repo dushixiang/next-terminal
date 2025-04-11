@@ -2,13 +2,17 @@ import React, {useRef, useState} from 'react';
 import {Alert, Form, message, Modal, Popover, Tabs, Upload} from "antd";
 import {
     ProForm,
+    ProFormCheckbox,
+    ProFormDateTimePicker,
+    ProFormDependency,
     ProFormDigit,
     ProFormGroup,
     ProFormInstance,
     ProFormList,
     ProFormSelect,
     ProFormSwitch,
-    ProFormText, ProFormTextArea
+    ProFormText,
+    ProFormTextArea
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import websiteApi from "@/src/api/website-api";
@@ -17,6 +21,7 @@ import {TrashIcon, UploadIcon} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import assetsApi from "@/src/api/asset-api";
 import {RcFile} from "antd/es/upload";
+import dayjs from "dayjs";
 
 const api = websiteApi;
 
@@ -45,7 +50,11 @@ const WebsiteModal = ({
                           confirmLoading,
                           id,
                       }: SnippetProps) => {
+
     let {t} = useTranslation();
+    let [timeLimit, setTimeLimit] = useState(false);
+    let [expiredAt, setExpiredAt] = useState<dayjs.Dayjs>();
+
     const formRef = useRef<ProFormInstance>();
     let logosQuery = useQuery({
         queryKey: ['get-logos'],
@@ -53,7 +62,6 @@ const WebsiteModal = ({
     });
 
     let [logo, setLogo] = useState<string>();
-
 
     const get = async () => {
         if (id) {
@@ -63,11 +71,25 @@ const WebsiteModal = ({
             website.host = host;
             website.port = parseInt(port, 10);
             setLogo(website.logo);
+
+            if (website.public.expiredAt > 0) {
+                let d = dayjs(website.public.expiredAt);
+                setExpiredAt(d);
+            }
+
+            setTimeLimit(website.public.expiredAt > 0);
             return website;
         }
         return {
             enabled: true,
-            scheme: 'http'
+            scheme: 'http',
+            cert: {
+                enabled: false,
+            },
+            public: {
+                enabled: false,
+                expiredAt: 0,
+            }
         };
     }
 
@@ -216,8 +238,8 @@ const WebsiteModal = ({
                 tooltip={''}
             >
                 <ProFormGroup key="group">
-                    <ProFormText name="name" label={t('assets.header-key')}/>
-                    <ProFormText name="value" label={t('assets.header-value')}/>
+                    <ProFormText name="name" label={t('assets.header_key')}/>
+                    <ProFormText name="value" label={t('assets.header_value')}/>
                 </ProFormGroup>
             </ProFormList>
         </div>
@@ -225,27 +247,93 @@ const WebsiteModal = ({
 
     const BasicAuthView = () => {
         return <>
-            <ProFormSwitch label={t('assets.basic_auth_enabled')} name={['basicAuth','enabled']}
+            <ProFormSwitch label={t('assets.basic_auth_enabled')} name={['basicAuth', 'enabled']}
                            fieldProps={{
                                checkedChildren: t('general.yes'),
                                unCheckedChildren: t('general.no'),
                            }}
             />
-            <ProFormText label={t('assets.basic_auth_username')} name={['basicAuth','username']}/>
-            <ProFormText label={t('assets.basic_auth_password')} name={['basicAuth','password']}/>
+            <ProFormText label={t('assets.basic_auth_username')} name={['basicAuth', 'username']}/>
+            <ProFormText label={t('assets.basic_auth_password')} name={['basicAuth', 'password']}/>
         </>
     }
 
     const CertView = () => {
         return <>
-            <ProFormSwitch label={t('general.enabled')} name={['cert','enabled']}
+            <ProFormSwitch label={t('general.enabled')} name={['cert', 'enabled']}
                            fieldProps={{
                                checkedChildren: t('general.yes'),
                                unCheckedChildren: t('general.no'),
                            }}
             />
-            <ProFormTextArea label={t('settings.rp.cert')} name={['cert','cert']}/>
-            <ProFormTextArea label={t('settings.rp.cert_key')} name={['cert','key']}/>
+            <ProFormDependency name={['cert', 'enabled']}>
+                {({cert}) => {
+                    return <>
+                        <ProFormTextArea label={t('settings.rp.cert')} name={['cert', 'cert']}
+                                         disabled={!cert['enabled']}/>
+                        <ProFormTextArea label={t('settings.rp.cert_key')} name={['cert', 'key']}
+                                         disabled={!cert['enabled']}/>
+                    </>
+                }}
+            </ProFormDependency>
+        </>
+    }
+
+    const PublicView = () => {
+        return <>
+            <ProFormSwitch label={t('general.enabled')} name={['public', 'enabled']}
+                           fieldProps={{
+                               checkedChildren: t('general.yes'),
+                               unCheckedChildren: t('general.no'),
+                           }}
+            />
+
+            <ProFormDependency name={['public', 'enabled']}>
+                {(values) => {
+                    return <>
+                        <ProFormTextArea label={t('assets.limit_ip')} name={['public', 'ip']}
+                                         extra={t('assets.limit_ip_tip')}
+                                         disabled={!values['public']['enabled']}
+                        />
+
+                        <div className={'flex items-center gap-4'}>
+                            <ProFormCheckbox
+                                label={t('assets.limit_time_enabled')}
+                                name={['public', 'timeLimit']}
+                                valuePropName="checked"
+                                fieldProps={{
+                                    checked: timeLimit,
+                                    onChange: (e) => {
+                                        setTimeLimit(e.target.checked);
+                                    }
+                                }}
+                                disabled={!values['public']['enabled']}
+                            />
+                            {timeLimit && <ProFormDateTimePicker
+                                label={t('assets.limit_time')}
+                                name={['public', 'expiredAt']}
+                                fieldProps={{
+                                    allowClear: true,
+                                    disabledDate: (current) => {
+                                        return current && current < dayjs();
+                                    },
+                                    value: expiredAt,
+                                    onChange: (date, dateString) => {
+                                        setExpiredAt(date);
+                                    }
+                                }}
+                                disabled={!values['public']['enabled']}
+                            />}
+                        </div>
+
+                        <ProFormText label={t('assets.limit_password')} name={['public', 'password']}
+                                     extra={t('assets.limit_password_tip')}
+                                     disabled={!values['public']['enabled']}
+                        />
+                    </>
+                }}
+            </ProFormDependency>
+
         </>
     }
 
@@ -254,21 +342,31 @@ const WebsiteModal = ({
             key: 'general',
             label: t('assets.general'),
             children: <BasicView/>,
+            forceRender: true,
         },
         {
             key: 'headers',
             label: t('assets.header'),
             children: <HeaderView/>,
+            forceRender: true,
         },
         {
             key: 'basic-auth',
             label: t('assets.basic_auth'),
             children: <BasicAuthView/>,
+            forceRender: true,
         },
         {
             key: 'cert',
             label: t('assets.cert'),
             children: <CertView/>,
+            forceRender: true,
+        },
+        {
+            key: 'public',
+            label: t('assets.public'),
+            children: <PublicView/>,
+            forceRender: true,
         },
     ]
 
@@ -284,6 +382,9 @@ const WebsiteModal = ({
                     .then(async values => {
                         values['targetUrl'] = `${values['scheme']}://${values['host']}:${values['port']}`;
                         values['logo'] = logo;
+                        if (timeLimit) {
+                            values['public']['expiredAt'] = expiredAt?.valueOf();
+                        }
                         handleOk(values);
                         formRef.current?.resetFields();
                     });
@@ -299,7 +400,7 @@ const WebsiteModal = ({
             </div>
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <div className={'flex gap-4'}>
-                    <div className={'w-[90px] border p-4 rounded-lg'}>
+                    <div className={'w-[90px] flex-shrink-0 border p-4 rounded-lg'}>
                         <ProFormText hidden={true} name={'id'}/>
                         <ProFormSwitch label={t('general.enabled')} name={'enabled'} rules={[{required: true}]}
                                        fieldProps={{

@@ -2,14 +2,14 @@ import eventEmitter from "@/src/api/core/event-emitter";
 
 export const baseUrl = () => {
     if (import.meta.env.DEV) {
-        return 'https://localhost/api';
+        return 'http://localhost/api';
     }
     return window.location.protocol + '//' + window.location.host + '/api';
 }
 
 export const baseWebSocketUrl = () => {
     if (import.meta.env.DEV) {
-        return 'wss://localhost/api';
+        return 'ws://localhost/api';
     }
     let https = 'https:' == document.location.protocol;
     if (https) {

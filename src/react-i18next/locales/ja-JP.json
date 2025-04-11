@@ -230,7 +230,9 @@
   "identity": {
     "setup": {
       "user": "ユーザーの初期化",
-      "go_to_login": "ログインへ"
+      "go_to_login": "ログインへ",
+      "success": "ユーザー初期化に成功しました。",
+      "password_not_same": "パスワードが一致しません。"
     },
     "policy": {
       "label": "ログインポリシー",
@@ -491,6 +493,11 @@
           "family": "フォント"
         },
         "line_height": "行の高さ"
+      },
+      "mouse": {
+        "label": "マウス設定",
+        "selection_copy": "選択してコピー",
+        "right_click_paste": "右クリックして貼り付け"
       }
     },
     "batch": {
@@ -659,7 +666,14 @@
     "website_entrance": "入口はユーザーがウェブサイトに入るパスです。",
     "conn_test": "ネットワーク状態の検出",
     "generate_private_key": "鍵の生成",
-    "cert": "証明書"
+    "cert": "証明書",
+    "public": "公開アクセス",
+    "limit_ip": "IPアクセス制限",
+    "limit_ip_tip": "ユーザーは指定されたIPアドレスからのみ資産にアクセスできるように制限します。CIDR形式のIPアドレス（例：192.168.1.0/24）およびハイフンで区切られたIPアドレス（例：192.168.1.0-192.168.1.255）をサポートします。複数のIPアドレスはカンマで区切ってください。",
+    "limit_time_enabled": "有効期限",
+    "limit_time": "有効期限",
+    "limit_password": "パスワードアクセス制限",
+    "limit_password_tip": "資産にアクセスするには、正しいパスワードを使用してください。"
   },
   "gateways": {
     "name": "名前",

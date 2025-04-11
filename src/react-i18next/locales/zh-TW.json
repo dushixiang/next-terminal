@@ -230,7 +230,9 @@
   "identity": {
     "setup": {
       "go_to_login": "去登錄",
-      "user": "初始化用戶"
+      "user": "初始化用戶",
+      "success": "初始化用戶成功",
+      "password_not_same": "密碼不一致"
     },
     "policy": {
       "label": "登錄策略",
@@ -491,6 +493,11 @@
           "family": "字體"
         },
         "line_height": "行高"
+      },
+      "mouse": {
+        "label": "滑鼠設定",
+        "selection_copy": "選中複製",
+        "right_click_paste": "右鍵貼上"
       }
     },
     "batch": {
@@ -659,7 +666,14 @@
     "import_asset_error_title": "請檢查所導入的檔案，以下資產導入失敗：",
     "website_entrance": "入口是用戶進入網站的路徑。",
     "generate_private_key": "產生私鑰",
-    "cert": "證書"
+    "cert": "證書",
+    "public": "公開訪問",
+    "limit_ip": "IP 訪問限制",
+    "limit_ip_tip": "限制用戶只能從指定的 IP 位址訪問資產。支援 CIDR 格式的 IP 位址，例如：192.168.1.0/24。支援-號分隔的 IP 位址，例如：192.168.1.0-192.168.1.255。多個 IP 位址請用逗號分隔。",
+    "limit_time_enabled": "失效時間限制",
+    "limit_time": "失效時間",
+    "limit_password": "口令訪問限制",
+    "limit_password_tip": "使用正確的密碼才能訪問資產。"
   },
   "gateways": {
     "name": "名稱",

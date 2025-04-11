@@ -6,18 +6,43 @@ export interface Website {
     name: string;
     enabled: boolean;
     targetUrl: string;
-    mode: string;
+    targetHost: string;
+    targetPort: number;
     domain: string;
-    LocalAddr: number;
-    LocalProto: string;
-    localCertPem: string;
-    localKeyPem: string;
-    gatewayId: string;
+    asciiDomain: string;
+    entrance: string;
+    description: string;
+    status: string;
+    statusText: string;
+    agentGatewayId: string;
+    basicAuth: BasicAuth;
+    headers?: any;
+    cert: Cert;
+    public: Public;
     createdAt: number;
 
     scheme: string;
     host: string;
     port: number;
+}
+
+interface Public {
+    enabled: boolean;
+    ip: string;
+    expiredAt: number;
+    password: string;
+}
+
+interface Cert {
+    enabled: boolean;
+    cert: string;
+    key: string;
+}
+
+interface BasicAuth {
+    enabled: boolean;
+    username: string;
+    password: string;
 }
 
 class WebsiteApi extends Api<Website> {

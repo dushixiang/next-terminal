@@ -19,7 +19,7 @@ import {useWindowSize} from "react-use";
 import {useAccessTab} from "@/src/hook/use-access-tab";
 import AccessGuacamole from "@/src/pages/access/AccessGuacamole";
 import {StyleProvider} from '@ant-design/cssinjs';
-import {beforeUnload, generateRandomId} from "@/src/utils/utils";
+import {beforeUnload, generateRandomId, handleKeyDown} from "@/src/utils/utils";
 import {useAccessContentSize} from "@/src/hook/use-access-size";
 import {AccessTabSyncMessage} from "@/src/helper/access-tab-channel";
 import {cn} from "@/lib/utils";
@@ -88,8 +88,10 @@ const AccessPage = () => {
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         window.addEventListener("beforeunload", beforeUnload, true);
+        document.addEventListener("keydown", handleKeyDown);
         return () => {
             window.removeEventListener("beforeunload", beforeUnload, true);
+            document.removeEventListener("keydown", handleKeyDown);
         }
     }, []);
 
@@ -336,7 +338,8 @@ const AccessPage = () => {
                                     >
                                         <div className={'px-2 pb-2 flex items-center gap-2'}>
                                             {!isCollapsed &&
-                                                <Input.Search placeholder={t('access.search')} onChange={handleSearchTree}/>}
+                                                <Input.Search placeholder={t('access.search')}
+                                                              onChange={handleSearchTree}/>}
                                             <div>
                                                 <div
                                                     className={'flex items-center justify-center h-8 w-8 rounded border bg-border cursor-pointer'}

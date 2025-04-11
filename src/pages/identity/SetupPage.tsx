@@ -68,7 +68,7 @@ const SetupPage = () => {
         }
         return {
             status: 'error' as ValidateStatus,
-            error: '密码不一致',
+            error: t('identity.setup.password_not_same'),
         };
     }
 
@@ -85,7 +85,7 @@ const SetupPage = () => {
                         <div>
                             <Result
                                 status="success"
-                                title={t('identity.setup-user') + t('general.success')}
+                                title={t('identity.setup.success')}
                                 extra={[
                                     <Button type="link" key="go-login" href="/login">
                                         {t('identity.setup.go_to_login')}

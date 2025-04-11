@@ -154,7 +154,6 @@ const ReverseProxySetting = ({get, set}: SettingProps) => {
                                             return <>
                                                 <Col span={6}>
                                                     <ProFormTextArea name="reverse-proxy-server-cert" label={t('settings.rp.cert')}
-                                                                     rules={[{required: enabled}]}
                                                                      disabled={!enabled}
                                                                      fieldProps={{rows: 4}}
                                                     />
@@ -162,7 +161,6 @@ const ReverseProxySetting = ({get, set}: SettingProps) => {
                                                 <Col span={6}>
                                                     <ProFormTextArea name="reverse-proxy-server-private-key"
                                                                      label={t('settings.rp.cert_key')}
-                                                                     rules={[{required: enabled}]}
                                                                      disabled={!enabled}
                                                                      fieldProps={{rows: 4}}
                                                     />

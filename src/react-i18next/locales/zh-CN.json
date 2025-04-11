@@ -48,7 +48,7 @@
     "session-online-count": "在线会话",
     "gateway-active-count": "在线网关",
     "asset-active-count": "存活资产",
-    "website-active-count": "存活网站",
+    "website-active-count": "存活Web资产",
     "date-counter": "活跃统计",
     "asset-type": "资产类型",
     "latest-session": "最新会话"
@@ -99,7 +99,7 @@
         "credential": "授权凭证",
         "snippet": "命令片段",
         "storage": "存储",
-        "website": "网站"
+        "website": "Web资产"
       }
     },
     "gateway": {
@@ -230,7 +230,9 @@
   "identity": {
     "setup": {
       "user": "初始化用户",
-      "go_to_login": "去登录"
+      "go_to_login": "去登录",
+      "success": "初始化用户成功",
+      "password_not_same": "密码不一致"
     },
     "policy": {
       "label": "登录策略",
@@ -491,6 +493,11 @@
           "family": "字体"
         },
         "line_height": "行高"
+      },
+      "mouse": {
+        "label": "鼠标设置",
+        "selection_copy": "选中复制",
+        "right_click_paste": "右键粘贴"
       }
     },
     "batch": {
@@ -656,10 +663,17 @@
     "down": "下移",
     "copy_public_key": "复制公钥",
     "filesystem": "文件系统",
-    "website_entrance": "入口是用户进入网站的路径。",
+    "website_entrance": "入口是用户进入Web资产的路径。",
     "conn_test": "网络状态检测",
     "generate_private_key": "生成私钥",
-    "cert": "证书"
+    "cert": "证书",
+    "public": "公开访问",
+    "limit_ip": "IP访问限制",
+    "limit_ip_tip": "限制用户只能从指定的IP地址访问资产。支持CIDR格式的IP地址，例如：192.168.1.0/24。支持-号分隔的IP地址，例如：192.168.1.0-192.168.1.255。多个IP地址请用逗号分隔。",
+    "limit_time_enabled": "失效时间限制",
+    "limit_time": "失效时间",
+    "limit_password": "口令访问限制",
+    "limit_password_tip": "使用正确的口令才能访问资产。"
   },
   "gateways": {
     "name": "名称",
@@ -780,7 +794,7 @@
       "self_proxy": "代理自身系统",
       "domain": "域名",
       "system_root": "系统根路径",
-      "system_root_extra": "访问反向代理的网站时，需要验证当前登录的用户是否有权限，会重定向到系统的授权页面，此配置项内容为您当前登录的URL根路径。"
+      "system_root_extra": "访问反向代理的Web资产时，需要验证当前登录的用户是否有权限，会重定向到系统的授权页面，此配置项内容为您当前登录的URL根路径。"
     },
     "rdp": {
       "setting": "RDP 设置",
@@ -936,8 +950,8 @@
     "10016": "不支持的协议",
     "10017": "会话已关闭",
     "10018": "文件系统已禁用",
-    "10019": "网站未找到",
-    "10020": "网站已禁用",
+    "10019": "Web资产未找到",
+    "10020": "Web资产已禁用",
     "10021": "原密码不正确",
     "20000": "获取许可证失败",
     "20001": "当前系统与您的绑定机器码不匹配，请及时更换。",
