@@ -33,6 +33,8 @@ import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentica
 import {isMobileByMediaQuery} from "@/src/utils/utils";
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
+import {useQuery} from "@tanstack/react-query";
+import accessSettingApi from "@/src/api/access-setting-api";
 
 interface Props {
     assetId: string;
@@ -73,6 +75,11 @@ const AccessTerminal = ({assetId}: Props) => {
         timeoutRef.current?.reset();
         // console.log(`reset timer`, timeoutRef.current);
     }
+
+    let settingQuery = useQuery({
+        queryKey: ['access-setting'],
+        queryFn: accessSettingApi.get,
+    });
 
     useEffect(() => {
         let current = accessTab.split('_')[1];
@@ -116,7 +123,7 @@ const AccessTerminal = ({assetId}: Props) => {
             return !(domEvent.ctrlKey && domEvent.key === 'v');
         })
         term.onSelectionChange(async () => {
-            if (term.hasSelection()) {
+            if (settingQuery.data?.selectionCopy && term.hasSelection()) {
                 let selection = term.getSelection();
                 copy(selection)
                 message.success(t('general.copy-success'));
@@ -264,18 +271,18 @@ const AccessTerminal = ({assetId}: Props) => {
         });
 
         // 右键粘贴
-        // if(terminal?.element){
-        //     terminal.element.oncontextmenu = (e) => {
-        //         try {
-        //             navigator.clipboard?.readText().then((text) => {
-        //                 websocket?.send(new Message(MessageTypeData, text).toString());
-        //             })
-        //         } catch (e) {
-        //             console.error(`copy error`, e);
-        //         }
-        //         e.preventDefault();
-        //     }
-        // }
+        if (settingQuery.data?.rightClickPaste && terminal?.element) {
+            terminal.element.oncontextmenu = (e) => {
+                try {
+                    navigator.clipboard?.readText().then((text) => {
+                        websocket?.send(new Message(MessageTypeData, text).toString());
+                    })
+                } catch (e) {
+                    console.error(`copy error`, e);
+                }
+                e.preventDefault();
+            }
+        }
 
         return () => {
             sizeListener?.dispose();

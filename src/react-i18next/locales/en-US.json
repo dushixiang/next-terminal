@@ -230,7 +230,9 @@
   "identity": {
     "setup": {
       "user": "Initialize User",
-      "go_to_login": "Go to Login"
+      "go_to_login": "Go to Login",
+      "success": "Initialization of user successful",
+      "password_not_same": "Passwords do not match"
     },
     "policy": {
       "label": "Login Policy",
@@ -491,6 +493,11 @@
           "family": "Font Family"
         },
         "line_height": "Line Height"
+      },
+      "mouse": {
+        "label": "Mouse settings",
+        "selection_copy": "Select Copy",
+        "right_click_paste": "Right-click paste"
       }
     },
     "batch": {
@@ -659,7 +666,14 @@
     "website_entrance": "The entrance is the path where users enter the website.",
     "conn_test": "Connection Test",
     "generate_private_key": "Generate private key",
-    "cert": "certificate"
+    "cert": "certificate",
+    "public": "Public access",
+    "limit_ip": "IP Access Restrictions",
+    "limit_ip_tip": "Restrict users to access assets only from specified IP addresses. Supports CIDR format IP addresses, such as: 192.168.1.0/24. Supports hyphen-separated IP addresses, such as: 192.168.1.0-192.168.1.255. Separate multiple IP addresses with commas.",
+    "limit_time_enabled": "Expiration limit",
+    "limit_time": "Expiration time",
+    "limit_password": "Password access restriction",
+    "limit_password_tip": "Only the correct password grants access to assets."
   },
   "gateways": {
     "name": "Name",

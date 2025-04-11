@@ -1,5 +1,5 @@
-import '@/src/App.css';
 import '@/src/beautiful-scrollbar.css';
+import '@/src/App.css';
 import React, {lazy, useEffect} from "react";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import '@/src/react-i18next/i18n'

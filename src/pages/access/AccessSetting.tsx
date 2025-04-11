@@ -1,9 +1,10 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {ProForm, ProFormDigit, ProFormInstance, ProFormSelect} from "@ant-design/pro-components";
+import {ProForm, ProFormCheckbox, ProFormDigit, ProFormInstance, ProFormSelect} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {CleanTheme, DefaultTerminalTheme, useTerminalTheme} from "@/src/hook/use-terminal-theme";
 import {isFontAvailable} from "@/src/utils/utils";
 import {message} from "antd";
+import accessSettingApi from "@/src/api/access-setting-api";
 
 const fontList = [
     // Windows 上常见的终端字体
@@ -22,13 +23,12 @@ const fontList = [
     'Monospace'
 ];
 
+
 const AccessSetting = () => {
     let {t} = useTranslation();
     const formRef = useRef<ProFormInstance>();
 
     let [terminalTheme, setTerminalTheme] = useTerminalTheme();
-
-    const [fontNames, setFontNames] = useState<string[]>([]);
 
     const [availableFonts, setAvailableFonts] = useState([]);
 
@@ -44,50 +44,24 @@ const AccessSetting = () => {
         checkFonts();
     }, []);
 
-    // useEffect(() => {
-    //     let fontNames: String[] = [];
-    //     document.fonts.ready.then(() => {
-    //         console.log(`ready`, fontNames)
-    //         document.fonts.forEach((font) => {
-    //             fontNames.push(font.family);
-    //             console.log(`push`, font.family)
-    //         })
-    //
-    //         console.log(`fontNames`, fontNames)
-    //     })
-    //
-    //     async function logFontData() {
-    //         try {
-    //             let fonts = [];
-    //             const availableFonts = await window.queryLocalFonts();
-    //             for (const fontData of availableFonts) {
-    //                 console.log(fontData.postscriptName);
-    //                 console.log(fontData.fullName);
-    //                 console.log(fontData.family);
-    //                 console.log(fontData.style);
-    //                 console.log('---------------------');
-    //                 fonts.push(fontData.family);
-    //             }
-    //             setFontNames(fonts);
-    //         } catch (err) {
-    //             console.error(err.name, err.message);
-    //         }
-    //     }
-    //
-    //     logFontData()
-    // }, []);
-
     const get = async () => {
+        let setting = await accessSettingApi.get();
         let cleanTheme = CleanTheme(terminalTheme);
         let fontFamily = cleanTheme.fontFamily
-        if (fontFamily == DefaultTerminalTheme.fontFamily) {
-            fontFamily = 'default';
+        if (!setting.fontFamily) {
+            setting.fontFamily = fontFamily;
         }
-        return {
-            fontFamily: fontFamily,
-            fontSize: cleanTheme.fontSize,
-            lineHeight: cleanTheme.lineHeight,
+        if (!setting.fontSize) {
+            setting.fontSize = cleanTheme.fontSize;
         }
+        if (!setting.lineHeight) {
+            setting.lineHeight = cleanTheme.lineHeight;
+        }
+
+        if (setting.fontFamily == DefaultTerminalTheme.fontFamily) {
+            setting.fontFamily = 'default';
+        }
+        return setting
     }
 
     return (
@@ -104,7 +78,13 @@ const AccessSetting = () => {
                             ...terminalTheme,
                             ...values
                         })
-                        message.success(t('general.success'))
+
+                        let record: Record<string, string> = {};
+                        Object.keys(values).forEach(key => {
+                            record[key] = String(values[key]);
+                        })
+                        await accessSettingApi.set(record);
+                        message.success(t('general.success'));
                     }}>
                         <div>{t('access.settings.font')}</div>
 
@@ -188,6 +168,18 @@ const AccessSetting = () => {
                                 rules={[{required: true}]}
                             />
 
+                        </div>
+
+                        <div>{t('access.settings.mouse.label')}</div>
+                        <div className={'my-4 flex p-4 border gap-2 rounded'}>
+                            <ProFormCheckbox
+                                label={t('access.settings.mouse.selection_copy')}
+                                name={'selectionCopy'}
+                            />
+                            <ProFormCheckbox
+                                label={t('access.settings.mouse.right_click_paste')}
+                                name={'rightClickPaste'}
+                            />
                         </div>
                     </ProForm>
                 </div>

@@ -127,3 +127,26 @@ export const browserDownload = (url: string) => {
     a.remove();
     window.addEventListener('beforeunload', beforeUnload, true);
 }
+
+export const handleKeyDown = (e) => {
+    // 禁用 F12
+    if (e.key === 'F12' || e.keyCode === 123) {
+        e.preventDefault();
+        return false;
+    }
+    // 禁用 Ctrl+Shift+I（开发者工具）
+    if (e.ctrlKey && e.shiftKey && e.key === 'I') {
+        e.preventDefault();
+        return false;
+    }
+    // 禁用 Ctrl+Shift+J（控制台）
+    if (e.ctrlKey && e.shiftKey && e.key === 'J') {
+        e.preventDefault();
+        return false;
+    }
+    // 禁用 Ctrl+U（查看源码）
+    if (e.ctrlKey && e.key === 'u') {
+        e.preventDefault();
+        return false;
+    }
+}

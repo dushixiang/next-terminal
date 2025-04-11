@@ -190,6 +190,14 @@ class AccountApi {
         return await requests.post(`/webauthn-login-finish?token=${token}`, val) as LoginResult;
     }
 
+    webauthnLoginStartV2 = async () => {
+        return await requests.post(`/v2/webauthn-login-start`,) as WebauthnCredentialRequest;
+    }
+
+    webauthnLoginFinishV2 = async (token: string, val: any) => {
+        return await requests.post(`/v2/webauthn-login-finish?token=${token}`, val) as LoginResult;
+    }
+
     generateSecurityTokenByWebauthnStart = async () => {
         return await requests.post(`/${this.group}/security-token/webauthn-start`) as WebauthnCredentialRequest;
     }

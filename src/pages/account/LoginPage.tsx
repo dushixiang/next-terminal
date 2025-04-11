@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Form, Input, Spin, Typography} from "antd";
+import {Button, Divider, Form, Input, message, Spin, Typography} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
@@ -11,15 +11,12 @@ import {useTranslation} from "react-i18next";
 import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {startAuthentication} from "@simplewebauthn/browser";
-import strings from "@/src/utils/strings";
 
 const {Title} = Typography;
 
 // 定义状态枚举
 export enum LoginStep {
-    Username = "username",
-    Passkey = "passkey",
-    Password = "password",
+    Default = "default",
     OTP = "otp",
 }
 
@@ -27,9 +24,8 @@ const LoginPage = () => {
     const [optForm] = Form.useForm();
     let {t} = useTranslation();
 
-    const [step, setStep] = useState<LoginStep>(LoginStep.Username);
-    let [username, setUsername] = useState<string>('');
-    let [error, setError] = useState<string>('');
+    const [step, setStep] = useState<LoginStep>(LoginStep.Default);
+    let [loading, setLoading] = useState<boolean>(false);
 
     const navigate = useNavigate();
     let [searchParams] = useSearchParams();
@@ -107,7 +103,6 @@ const LoginPage = () => {
 
     const handleSubmit = async (params: any) => {
         params['key'] = queryCaptcha.data?.key;
-        params['username'] = username;
         mutation.mutate(params);
     };
 
@@ -119,89 +114,35 @@ const LoginPage = () => {
         }
     }
 
-    const nextStep = (params: any) => {
-        setUsername(params['username']);
-        setStep(LoginStep.Passkey)
-    }
-
-    const loginByPasskey = async () => {
-        setError('');
-
+    const loginByPasskeyV2 = async () => {
+        setLoading(true);
         try {
-            let data = await accountApi.webauthnLoginStart(username);
+            let data = await accountApi.webauthnLoginStartV2();
             if (data.type === 'mfa') {
-                setStep(LoginStep.Password);
                 return;
             }
             let authentication = await startAuthentication({
                 optionsJSON: data.publicKey,
             });
-            let data2 = await accountApi.webauthnLoginFinish(data.token, authentication);
+            let data2 = await accountApi.webauthnLoginFinishV2(data.token, authentication);
             afterLoginSuccess(data2, false);
         } catch (e) {
-            setError(e.message);
+            message.error(e.message);
+        } finally {
+            setLoading(false)
         }
     }
 
-    useEffect(() => {
-        if (step === LoginStep.Passkey && strings.hasText(username)) {
-            loginByPasskey();
-        }
-    }, [username, step]);
-
     const renderLoginForm = () => {
         switch (step) {
-            case LoginStep.Username:
+            case LoginStep.Default:
                 return <div>
                     <Title level={3}>{t('account.login.action')}</Title>
-                    <Form onFinish={nextStep} className="login-form" layout="vertical">
+                    <Form onFinish={handleSubmit} className="login-form" layout="vertical">
                         <Form.Item label={t('account.username')} name='username'
                                    rules={[{required: true}]}>
                             <Input size={'large'} prefix={<UserOutlined/>} placeholder={t('account.enter')}/>
                         </Form.Item>
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit"
-                                    size={'large'}
-                                    className="w-full">
-                                {t('account.next')}
-                            </Button>
-                        </Form.Item>
-                    </Form>
-                </div>;
-            case LoginStep.Passkey:
-                return <div>
-                    <Title level={3}>{t('account.login.methods.passkey')}</Title>
-
-                    {strings.hasText(error) &&
-                        <div className={'space-y-2 mb-4 text-red-500'}>
-                            <div className={'font-medium text-base'}>{t('account.auth_failed')}</div>
-                            <div className={''}>{error}</div>
-                        </div>
-                    }
-
-                    <Form onFinish={loginByPasskey} className="login-form" layout="vertical">
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit"
-                                    size={'large'}
-                                    className="w-full">
-                                {t('account.retry')}
-                            </Button>
-                        </Form.Item>
-
-                        <div className={'cursor-pointer text-blue-500'}
-                             onClick={() => {
-                                 setStep(LoginStep.Password)
-                             }}
-                        >
-                            {t('account.login.methods.password')}
-                        </div>
-                    </Form>
-                </div>
-            case LoginStep.Password:
-                return <div>
-                    <Title level={3}>{t('account.login.methods.password')}</Title>
-
-                    <Form onFinish={handleSubmit} className="login-form" layout="vertical">
                         <Form.Item label={t('account.password')}
                                    name='password'
                                    rules={[{required: true}]}>
@@ -232,17 +173,29 @@ const LoginPage = () => {
                                 </Form.Item>
                                 : undefined
                         }
-
                         <Form.Item>
                             <Button type="primary" htmlType="submit"
                                     size={'large'}
                                     className="w-full"
-                                    loading={mutation.isPending}>
+                                    loading={mutation.isPending}
+                            >
                                 {t('account.login.action')}
                             </Button>
                         </Form.Item>
+                        <Divider className="my-4" plain>
+                            Or
+                        </Divider>
+                        <Button variant={'filled'}
+                                color={'default'}
+                                size={'large'}
+                                className="w-full"
+                                onClick={loginByPasskeyV2}
+                                loading={loading}
+                        >
+                            {t('account.login.methods.passkey')}
+                        </Button>
                     </Form>
-                </div>
+                </div>;
             case LoginStep.OTP:
                 return <div>
                     <Title level={3}>{t('account.login.methods.otp')}</Title>
