@@ -12,7 +12,7 @@
     "failed": "失敗",
     "default": "デフォルト",
     "home": "ホーム",
-    "copy-success": "コピー成功",
+    "copy_success": "コピー成功",
     "delete_confirm": "この行を削除してもよろしいですか？",
     "clear_confirm": "データをクリアしてもよろしいですか？",
     "unbound": "未バインド",

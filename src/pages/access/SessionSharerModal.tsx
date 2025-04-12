@@ -68,7 +68,7 @@ const SessionSharerModal = ({open, onClose, sessionId}: Props) => {
 
     const handleCopy = () => {
         copy(renderURL());
-        message.success(t('general.copy-success'));
+        message.success(t('general.copy_success'));
         onClose();
     }
 

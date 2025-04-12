@@ -259,7 +259,12 @@ const AccessPage = () => {
             return <img className={'h-4 w-4'} src={node.extra?.logo} alt={'logo'}/>
         }
         return <div
-            className={clsx(`w-4 h-4 rounded flex items-center justify-center font-bold text-white text-xs`, getImgColor(node.extra?.protocol))}>
+            className={clsx(`w-4 h-4 rounded flex items-center justify-center text-white`, getImgColor(node.extra?.protocol))}
+            style={{
+                fontSize: 9,
+            }}
+        >
+            {node.title[0]}
         </div>
     }
 

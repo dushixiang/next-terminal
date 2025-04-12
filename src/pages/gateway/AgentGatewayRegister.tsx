@@ -49,7 +49,7 @@ const AgentGatewayRegister = ({
             destroyOnClose={true}
             onOk={() => {
                 copy(bash);
-                message.success(t('actions.copy-success'));
+                message.success(t('general.copy_success'));
                 handleCancel();
             }}
             onCancel={() => {

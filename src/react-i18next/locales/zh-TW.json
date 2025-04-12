@@ -11,7 +11,7 @@
     "failed": "失敗",
     "default": "預設",
     "home": "首頁",
-    "copy-success": "複製成功",
+    "copy_success": "複製成功",
     "delete_confirm": "您確定要刪除此行嗎？",
     "clear_confirm": "您確認要清除資料嗎？",
     "unbound": "未綁定",

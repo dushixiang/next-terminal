@@ -126,7 +126,7 @@ const AccessTerminal = ({assetId}: Props) => {
             if (settingQuery.data?.selectionCopy && term.hasSelection()) {
                 let selection = term.getSelection();
                 copy(selection)
-                message.success(t('general.copy-success'));
+                message.success(t('general.copy_success'));
             }
         });
 

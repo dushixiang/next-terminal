@@ -198,7 +198,7 @@ const AccessGuacamole = ({assetId}: Props) => {
             reader.onend = async () => {
                 setClipboardText(data);
                 copy(data);
-                message.success(t('copy-success'));
+                message.success(t('copy_success'));
             };
             console.log(`0`)
         } else {

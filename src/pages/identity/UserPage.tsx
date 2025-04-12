@@ -42,18 +42,18 @@ const UserPage = () => {
             let result = await api.create(values) as unknown as CreateUserResult;
             console.log(result);
             modal.success({
-                title: t('identity.new-user-result'),
+                title: t('identity.user.new_user_result'),
                 content: <div>
-                    <div>{t('identity.nickname')}: {result.nickname}</div>
-                    <div>{t('identity.username')}: {result.username}</div>
-                    <div>{t('identity.password')}: {result.password}</div>
+                    <div>{t('identity.user.nickname')}: {result.nickname}</div>
+                    <div>{t('identity.user.username')}: {result.username}</div>
+                    <div>{t('identity.user.password')}: {result.password}</div>
                 </div>,
-                okText: t('actions.copy-and-close'),
+                okText: t('actions.copy'),
                 onOk: () => {
-                    copy(`${t('identity.nickname')}: ${result.nickname}
-${t('identity.username')}: ${result.username}
-${t('identity.password')}: ${result.password}`)
-                    message.success(t('copy-success'));
+                    copy(`${t('identity.user.nickname')}: ${result.nickname}
+${t('identity.user.username')}: ${result.username}
+${t('identity.user.password')}: ${result.password}`)
+                    message.success(t('general.copy_success'));
                 }
             })
         }
@@ -83,7 +83,7 @@ ${t('identity.password')}: ${result.password}`)
                 okText: t('actions.copy'),
                 onOk: () => {
                     copy(newPassword)
-                    message.success(t('general.copy-success'));
+                    message.success(t('general.copy_success'));
                 }
             })
         }

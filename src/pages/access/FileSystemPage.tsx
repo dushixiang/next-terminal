@@ -1252,7 +1252,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
 
                             <div className={'cursor-pointer text-green-500'} onClick={() => {
                                 copy(openFiles[activeFileIndex]?.key);
-                                message.success(t('general.copy-success'));
+                                message.success(t('general.copy_success'));
                             }}>
                                 {openFiles[activeFileIndex]?.key}
                             </div>

@@ -12,7 +12,7 @@ let o = {
         "failed": "失败",
         "default": "默认",
         "home": "首页",
-        "copy-success": "复制成功",
+        "copy_success": "复制成功",
         "delete_confirm": "您确认要删除此行吗？",
         "clear_confirm": "您确认要清空数据吗？",
         "unbound": "未绑定",
