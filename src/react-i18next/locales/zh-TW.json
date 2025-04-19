@@ -428,14 +428,6 @@
         "all_asset": "全部資產",
         "custom_asset": "自定義資產"
       }
-    },
-    "tools": {
-      "target": "目標地址",
-      "target_placeholder": "請輸入IP地址或域名",
-      "attempts": "次數",
-      "attempts_tips": "設置請求發送的次數",
-      "port": "埠口",
-      "testing": "開始檢測"
     }
   },
   "audit": {
