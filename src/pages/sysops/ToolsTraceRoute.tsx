@@ -1,9 +1,11 @@
-import {Button, Input, Space} from 'antd';
+import {Button, Form, Input} from 'antd';
 import React, {useState} from 'react';
 import {baseUrl, getToken} from "@/src/api/core/requests";
+import {useTranslation} from "react-i18next";
 
 const ToolsTraceRoute = () => {
 
+    let {t} = useTranslation();
     const [host, setHost] = useState("");
     const [logs, setLogs] = useState<string[]>([]);
     const [running, setRunning] = useState(false);
@@ -29,22 +31,29 @@ const ToolsTraceRoute = () => {
 
     return (
         <div className={'space-y-4 flex flex-col min-h-[75vh]'}>
-            <Space.Compact className={'w-full flex-shrink-0'}>
-                <Input value={host}
-                       onChange={(e) => setHost(e.target.value)}
-                       size={'large'}
-                       // style={{width: '90%'}}
-                       placeholder="Enter IP address"
-                />
-                <Button size={'large'} type={'primary'}
-                        disabled={!host || running}
-                        onClick={() => {
-                            onSearch(host)
-                        }}
+            <Form layout="inline" className="w-full">
+                <Form.Item
+                    label={t('sysops.tools.target')}
                 >
-                    Trace
-                </Button>
-            </Space.Compact>
+                    <Input
+                        value={host}
+                        onChange={(e) => setHost(e.target.value)}
+                        placeholder={t('sysops.tools.target_placeholder')}
+                        style={{
+                            width: '200px'
+                        }}
+                    />
+                </Form.Item>
+                <Form.Item>
+                    <Button
+                        type={'primary'}
+                        disabled={!host || running}
+                        onClick={() => onSearch(host)}
+                    >
+                        {t('sysops.tools.testing')}
+                    </Button>
+                </Form.Item>
+            </Form>
 
             <div className='border rounded-lg p-4 flex-grow'>
                 <pre>{logs.join("\n")}</pre>

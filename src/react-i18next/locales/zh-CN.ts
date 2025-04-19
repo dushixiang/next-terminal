@@ -429,6 +429,14 @@ let o = {
                 "custom_asset": "自定义资产"
             }
         },
+        "tools": {
+            "target": "目标地址",
+            "target_placeholder": "请输入IP地址或域名",
+            "attempts": "次数",
+            "attempts_tips": "设置请求发送的次数",
+            "port": "端口",
+            "testing": "开始检测",
+        },
     },
     "audit": {
         "client_ip": "客户端IP",

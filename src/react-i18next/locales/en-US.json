@@ -428,6 +428,14 @@
         "all_asset": "All Assets",
         "custom_asset": "Custom Assets"
       }
+    },
+    "tools": {
+      "target": "目标地址",
+      "target_placeholder": "请键入 IP 地址或域名",
+      "attempts": "次数",
+      "attempts_tips": "Set the number of request attempts",
+      "port": "Port",
+      "testing": "Start detection"
     }
   },
   "audit": {
