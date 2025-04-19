@@ -16,8 +16,6 @@ export interface AgentGateway {
 export interface RegisterParam {
     endpoint: string;
     token: string;
-    tls: boolean;
-    download: string;
 }
 
 class AgentGatewayApi extends Api<AgentGateway> {
@@ -29,8 +27,8 @@ class AgentGatewayApi extends Api<AgentGateway> {
         return await requests.get(`/${this.group}/get-register-param`) as RegisterParam;
     }
 
-    setRegisterAddr = async (endpoint: string, download: string) => {
-        return await requests.post(`/${this.group}/set-register-addr?endpoint=${endpoint}&download=${download}`);
+    setRegisterAddr = async (endpoint: string) => {
+        return await requests.post(`/${this.group}/set-register-addr?endpoint=${endpoint}`);
     }
 }
 

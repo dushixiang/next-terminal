@@ -22,7 +22,7 @@ const AgentGatewayRegister = ({
     let {t} = useTranslation();
 
     let [param, setParam] = useState<RegisterParam>({
-        endpoint: "", token: "", tls: false, download: "",
+        endpoint: "", token: ""
     });
     let [bash, setBash] = useState('');
 
@@ -38,7 +38,7 @@ const AgentGatewayRegister = ({
     }, [open]);
 
     useEffect(() => {
-        setBash(`curl -k ${param.download}/api/agent-gateway/install.sh | bash -s ${param.endpoint} ${param.tls} ${param.token}`);
+        setBash(`curl -k ${param.endpoint}/api/agent-gateway/install.sh | bash ${param.token}`);
     }, [param]);
 
     return (
@@ -67,20 +67,7 @@ const AgentGatewayRegister = ({
                         setParam({...param, endpoint: e.target.value});
                     }}
                     onBlur={() => {
-                        agentGatewayApi.setRegisterAddr(param.endpoint, param.download);
-                    }}
-                />
-            </div>
-
-            <div className={'mb-2 flex flex-col gap-2'}>
-                <div>{t('gateways.download-addr')}</div>
-                <Input
-                    value={param.download}
-                    onChange={(e) => {
-                        setParam({...param, download: e.target.value});
-                    }}
-                    onBlur={() => {
-                        agentGatewayApi.setRegisterAddr(param.endpoint, param.download);
+                        agentGatewayApi.setRegisterAddr(param.endpoint);
                     }}
                 />
             </div>
