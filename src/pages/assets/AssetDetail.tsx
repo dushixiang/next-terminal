@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {useParams, useSearchParams} from "react-router-dom";
 import {Tabs} from "antd";
 import {maybe} from "@/src/utils/maybe";
-import AssetsPost from "@/src/pages/assets/AssetPostPage";
+import AssetsPost from "@/src/pages/assets/AssetPost";
 import AssetAuthorised from "@/src/pages/authorised/AssetAuthorised";
 import {useTranslation} from "react-i18next";
 
@@ -29,7 +29,7 @@ const AssetDetail = () => {
                       {
                           key: 'info',
                           label: t('actions.detail'),
-                          children: <AssetsPost assetsId={id}/>
+                          children: <AssetsPost assetId={id}/>
                       },
                       {
                           key: 'bind-user',

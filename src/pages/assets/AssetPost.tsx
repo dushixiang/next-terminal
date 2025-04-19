@@ -1,17 +1,16 @@
 import React, {useRef, useState} from 'react';
 import {
+    App,
     Button,
     Collapse,
     Form,
     Input,
     InputNumber,
-    message,
     Popover,
     Space,
     Tabs,
     theme,
     TreeDataNode,
-    Typography,
     Upload,
 } from "antd";
 import {
@@ -30,10 +29,8 @@ import {
 import {CaretRightOutlined, EyeInvisibleOutlined, EyeTwoTone} from '@ant-design/icons';
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
-import {useNavigate, useSearchParams} from "react-router-dom";
 import credentialApi from "../../api/credential-api";
 import assetsApi, {Asset} from "../../api/asset-api";
-import {maybe} from "@/src/utils/maybe";
 import agentGatewayApi from "@/src/api/agent-gateway-api";
 import {RcFile} from "antd/es/upload";
 import strings from "@/src/utils/strings";
@@ -48,19 +45,16 @@ const formItemLayout = {
 }
 
 interface AssetsInfoProps {
-    assetsId?: string
+    assetId?: string
+    groupId?: string
+    copy?: boolean
+    onClose?: () => void
 }
 
-const AssetsPost = function ({assetsId}: AssetsInfoProps) {
+const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps) {
 
-    const [searchParams, setSearchParams] = useSearchParams();
-    let id = maybe(searchParams.get('assetsId'), assetsId as string);
-    let groupId = maybe(searchParams.get('groupId'), '');
-    let copy = maybe(searchParams.get('copy'), false);
-
-    const formRef = useRef<ProFormInstance>();
     let {t} = useTranslation();
-    let navigate = useNavigate();
+    const formRef = useRef<ProFormInstance>();
 
     let logosQuery = useQuery({
         queryKey: ['get-logos'],
@@ -71,9 +65,11 @@ const AssetsPost = function ({assetsId}: AssetsInfoProps) {
     let [decrypted, setDecrypted] = useState(false);
     let [mfaOpen, setMfaOpen] = useState(false);
 
+    let {message} = App.useApp();
+
     const get = async () => {
-        if (id) {
-            let asset = await assetsApi.getById(id);
+        if (assetId) {
+            let asset = await assetsApi.getById(assetId);
             if (strings.hasText(asset.logo)) {
                 setLogo(asset.logo);
             }
@@ -104,7 +100,10 @@ const AssetsPost = function ({assetsId}: AssetsInfoProps) {
     let mutation = useMutation({
         mutationFn: postOrUpdate,
         onSuccess: () => {
-            navigate(-1)
+            message.success(t('general.success'));
+            if (onClose) {
+                onClose();
+            }
         }
     });
 
@@ -146,7 +145,7 @@ const AssetsPost = function ({assetsId}: AssetsInfoProps) {
                                               visibilityToggle: {
                                                   // visible: !decrypted,
                                                   onVisibleChange: (visible) => {
-                                                      if (id && visible && !decrypted) {
+                                                      if (assetId && visible && !decrypted) {
                                                           setMfaOpen(true)
                                                       }
                                                   }
@@ -165,7 +164,7 @@ const AssetsPost = function ({assetsId}: AssetsInfoProps) {
                                          allowClear: true,
                                      }}
                     />
-                    <Form.Item label={null} >
+                    <Form.Item label={null}>
                         <div className={'-mt-2'}>
                             <Button color={'purple'}
                                     variant={'filled'}
@@ -504,9 +503,6 @@ const AssetsPost = function ({assetsId}: AssetsInfoProps) {
 
     return (
         <div className="px-4">
-            <Typography.Title level={5} style={{marginTop: 0}}>
-                {id ? t('actions.edit') : t('actions.new')}
-            </Typography.Title>
             <ProForm {...formItemLayout}
                      formRef={formRef} layout={'horizontal'}
                      request={get} onFinish={wrapSet}
@@ -667,7 +663,7 @@ const AssetsPost = function ({assetsId}: AssetsInfoProps) {
             <MultiFactorAuthentication
                 open={mfaOpen}
                 handleOk={async (securityToken) => {
-                    const res = await assetsApi.decrypt(id, securityToken);
+                    const res = await assetsApi.decrypt(assetId, securityToken);
                     formRef.current?.setFieldsValue({
                         'password': res.password,
                         'privateKey': res.privateKey,

@@ -28,7 +28,6 @@ const LoginPolicyPage = lazy(() => import("@/src/pages/identity/LoginPolicyPage"
 const LoginPolicyPostPage = lazy(() => import("@/src/pages/identity/LoginPolicyPostPage"));
 const LoginPolicyDetailPage = lazy(() => import("@/src/pages/identity/LoginPolicyDetailPage"));
 const AssetsPage = lazy(() => import("@/src/pages/assets/AssetPage"));
-const AssetsPostPage = lazy(() => import("@/src/pages/assets/AssetPostPage"));
 const CredentialPage = lazy(() => import("@/src/pages/assets/CredentialPage"));
 const SnippetPage = lazy(() => import("@/src/pages/assets/SnippetPage"));
 const AssetDetail = lazy(() => import("@/src/pages/assets/AssetDetail"));
@@ -101,7 +100,6 @@ const router = createBrowserRouter([
             {path: "/operation-log", element: <OperationLogPage/>},
 
             {path: "/asset", element: <AssetsPage/>},
-            {path: "/asset/post", element: <AssetsPostPage/>},
             {path: "/asset/:assetId", element: <AssetDetail/>},
             {path: "/credential", element: <CredentialPage/>},
             {path: "/snippet", element: <SnippetPage/>},

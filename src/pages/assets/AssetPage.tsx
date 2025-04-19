@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 
 import {App, Badge, Button, Popover, Select, Space, Table, Tag, Tooltip, Upload} from "antd";
-import {Link, useNavigate, useSearchParams} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
@@ -21,6 +21,7 @@ import {ImperativePanelHandle} from "react-resizable-panels";
 import {useWindowSize} from "react-use";
 import {ArrowLeftToLineIcon, ArrowRightToLineIcon} from "lucide-react";
 import {safeEncode} from "@/src/utils/codec";
+import AssetPostDrawer from "@/src/pages/assets/AssetPostDrawer";
 
 const api = assetsApi;
 
@@ -34,6 +35,13 @@ function downloadImportExampleCsv() {
     a.click();
 }
 
+interface PostParams {
+    open: boolean;
+    assetId?: string;
+    groupId?: string;
+    copy?: boolean;
+}
+
 const AssetPage = () => {
 
     const actionRef = useRef<ActionType>();
@@ -42,7 +50,13 @@ const AssetPage = () => {
     let [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
     let [groupId, setGroupId] = useState(maybe(searchParams.get('groupId'), ''));
 
-    let [open, setOpen] = useState(false);
+    let [groupChooserOpen, setGroupChooserOpen] = useState(false);
+    let [params, setParams] = useState<PostParams>({
+        open: false,
+        assetId: undefined,
+        groupId: undefined,
+        copy: false,
+    });
 
     let navigate = useNavigate();
     let {t} = useTranslation();
@@ -119,7 +133,7 @@ const AssetPage = () => {
             render: (text, record) => {
                 return <div className={'cursor-pointer hover:text-blue-500 underline'}
                             onClick={() => {
-                                setOpen(true);
+                                setGroupChooserOpen(true);
                                 setSelectedRowKeys([record.id]);
                             }}
                 >
@@ -261,10 +275,20 @@ const AssetPage = () => {
                         onSelect={(key) => {
                             switch (key) {
                                 case "copy":
-                                    navigate(`/asset/post?assetsId=${record.id}&copy=true`);
+                                    setParams({
+                                        open: true,
+                                        assetId: record.id,
+                                        groupId: '',
+                                        copy: true,
+                                    })
                                     break;
                                 case "edit":
-                                    navigate(`/asset/post?assetsId=${record.id}`);
+                                    setParams({
+                                        open: true,
+                                        assetId: record.id,
+                                        groupId: '',
+                                        copy: false,
+                                    })
                                     break;
                                 case 'asset-detail':
                                     navigate(`/asset/${record['id']}?activeKey=info`);
@@ -450,7 +474,7 @@ const AssetPage = () => {
                                     <NButton
                                         onClick={() => {
                                             setSelectedRowKeys(selectedRowKeys as string[]);
-                                            setOpen(true);
+                                            setGroupChooserOpen(true);
                                         }}
                                     >
                                         {t('assets.change_group')}
@@ -479,10 +503,6 @@ const AssetPage = () => {
                             );
                         }}
                         rowKey="id"
-                        // search={{
-                        //     labelWidth: 'auto',
-                        // }}
-                        // search={false}
                         pagination={{
                             defaultPageSize: 10,
                             showSizeChanger: true
@@ -491,11 +511,19 @@ const AssetPage = () => {
                         headerTitle={t('menus.resource.submenus.asset')}
                         toolBarRender={() => {
                             return [
-                                <Link to={`/asset/post?groupId=${groupId}`}>
-                                    <Button key="add" type="primary">
-                                        {t('actions.new')}
-                                    </Button>
-                                </Link>,
+                                <Button key="add"
+                                        type="primary"
+                                        onClick={() => {
+                                            setParams({
+                                                open: true,
+                                                assetId: undefined,
+                                                groupId: groupId,
+                                                copy: false,
+                                            })
+                                        }}
+                                >
+                                    {t('actions.new')}
+                                </Button>,
                                 <Popover content={importExampleContent}>
                                     <Upload
                                         maxCount={1}
@@ -516,12 +544,28 @@ const AssetPage = () => {
 
         <AssetTreeChoose
             assetIds={selectedRowKeys}
-            open={open}
+            open={groupChooserOpen}
             onClose={() => {
-                setOpen(false);
+                setGroupChooserOpen(false);
                 setSelectedRowKeys([]);
                 actionRef.current?.reload();
             }}
+        />
+
+        <AssetPostDrawer
+            open={params.open}
+            onClose={() => {
+                setParams({
+                    open: false,
+                    assetId: undefined,
+                    groupId: undefined,
+                    copy: false,
+                })
+                actionRef.current?.reload();
+            }}
+            assetId={params.assetId}
+            groupId={params.groupId}
+            copy={params.copy}
         />
     </div>);
 }
