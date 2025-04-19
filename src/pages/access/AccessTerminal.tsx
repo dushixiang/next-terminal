@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
@@ -33,8 +33,7 @@ import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentica
 import {isMobileByMediaQuery} from "@/src/utils/utils";
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
-import {useQuery} from "@tanstack/react-query";
-import accessSettingApi from "@/src/api/access-setting-api";
+import {useAccessSetting} from "@/src/hook/use-access-setting";
 
 interface Props {
     assetId: string;
@@ -42,17 +41,19 @@ interface Props {
 
 const AccessTerminal = ({assetId}: Props) => {
 
-    const terminalRef = React.useRef<HTMLDivElement>();
     let {t} = useTranslation();
 
-    let [terminal, setTerminal] = useState<Terminal>();
-    let [fit, setFit] = useState<FitAddon>();
+    const terminalRef = React.useRef<HTMLDivElement>(null);
+    const terminal = useRef<Terminal>();
+    const fit = useRef<FitAddon>();
+
     let [websocket, setWebsocket] = useState<WebSocket>();
     let [session, setSession] = useState<ExportSession>();
 
     let [accessTheme] = useTerminalTheme();
     let [accessTab] = useAccessTab();
     let {width, height} = useWindowSize();
+    let [accessSetting] = useAccessSetting();
 
     let [fileSystemOpen, setFileSystemOpen] = useState(false);
     let [preFileSystemOpen, setPreFileSystemOpen] = useState(false);
@@ -71,21 +72,22 @@ const AccessTerminal = ({assetId}: Props) => {
     const timeoutRef = useRef<TimeoutHandle>();
     let [mfaOpen, setMfaOpen] = useState(false);
 
+    useInterval(() => {
+        if (websocket?.readyState === WebSocket.OPEN) {
+            websocket?.send(new Message(MessageTypeKeepAlive, "").toString());
+        }
+    }, 5000);
+
     const resetTimer = () => {
         timeoutRef.current?.reset();
         // console.log(`reset timer`, timeoutRef.current);
     }
 
-    let settingQuery = useQuery({
-        queryKey: ['access-setting'],
-        queryFn: accessSettingApi.get,
-    });
-
     useEffect(() => {
         let current = accessTab.split('_')[1];
         if (current === assetId) {
             setTimeout(() => {
-                terminal?.focus();
+                terminal.current?.focus();
             }, 100);
             fitFit();
             setFileSystemOpen(preFileSystemOpen)
@@ -96,7 +98,7 @@ const AccessTerminal = ({assetId}: Props) => {
 
     useEffect(() => {
         if (accessTheme && terminal) {
-            let options = terminal.options;
+            let options = terminal.current?.options;
             if (options) {
                 let cleanTheme = CleanTheme(accessTheme);
                 options.theme = cleanTheme?.theme?.value;
@@ -106,7 +108,41 @@ const AccessTerminal = ({assetId}: Props) => {
             }
         }
     }, [accessTheme]);
+
     useEffect(() => {
+        let selectionChange = terminal.current?.onSelectionChange(async () => {
+            // console.log(`on selection change`, accessSetting)
+            if (accessSetting?.selectionCopy === false) {
+                return
+            }
+            if (terminal.current?.hasSelection()) {
+                let selection = terminal.current?.getSelection();
+                copy(selection)
+                message.success(t('general.copy_success'));
+            }
+        });
+
+        const handleContextMenu = async (e: MouseEvent) => {
+            // console.log(`on context menu`, accessSetting)
+            if (accessSetting?.rightClickPaste === false) {
+                return
+            }
+            e.preventDefault();
+            const clipboardText = await navigator.clipboard.readText();
+            websocket?.send(new Message(MessageTypeData, clipboardText).toString());
+        }
+
+        terminalRef?.current?.addEventListener("contextmenu", handleContextMenu);
+
+        return () => {
+            selectionChange?.dispose();
+            terminalRef?.current?.removeEventListener("contextmenu", handleContextMenu);
+        };
+    }, [accessSetting, websocket]);
+
+    useEffect(() => {
+        if (terminal.current || !terminalRef.current) return;
+
         let cleanTheme = CleanTheme(accessTheme);
         let term = new Terminal({
             theme: cleanTheme?.theme?.value,
@@ -116,33 +152,29 @@ const AccessTerminal = ({assetId}: Props) => {
             allowProposedApi: true,
             cursorBlink: true,
         });
+
         term.attachCustomKeyEventHandler((domEvent) => {
             if (domEvent.ctrlKey && domEvent.key === 'c' && term.hasSelection()) {
                 return false;
             }
             return !(domEvent.ctrlKey && domEvent.key === 'v');
         })
-        term.onSelectionChange(async () => {
-            if (settingQuery.data?.selectionCopy && term.hasSelection()) {
-                let selection = term.getSelection();
-                copy(selection)
-                message.success(t('general.copy_success'));
-            }
-        });
 
         term.open(terminalRef.current);
         let fitAddon = new FitAddon();
         term.loadAddon(fitAddon);
+
+        terminal.current = term;
+        fit.current = fitAddon;
+
         fitAddon.fit();
         term.focus();
 
-        setFit(fitAddon);
-        setTerminal(term);
         return () => {
             term.dispose();
-            setTerminal(undefined);
+            fitAddon.dispose();
         }
-    }, [terminalRef]);
+    }, []);
 
     useEffect(() => {
         fitFit();
@@ -154,10 +186,6 @@ const AccessTerminal = ({assetId}: Props) => {
         fsRef.current?.changeDir(dir);
     };
 
-    useInterval(() => {
-        websocket?.send(new Message(MessageTypeKeepAlive, "").toString());
-    }, 5000);
-
     const connect = async (securityToken?: string) => {
         if (loading === true) {
             return;
@@ -168,12 +196,12 @@ const AccessTerminal = ({assetId}: Props) => {
             session = await portalApi.createSessionByAssetsId(assetId, securityToken);
             setSession(session);
         } catch (e) {
-            terminal?.writeln(`\x1b[41m ERROR \x1b[0m : ${e.message}`);
+            terminal.current?.writeln(`\x1b[41m ERROR \x1b[0m : ${e.message}`);
             return;
         }
 
-        let cols = terminal.cols;
-        let rows = terminal.rows;
+        let cols = terminal.current.cols;
+        let rows = terminal.current.rows;
         let authToken = getToken();
         let params = {
             'cols': cols,
@@ -185,29 +213,29 @@ const AccessTerminal = ({assetId}: Props) => {
         let paramStr = qs.stringify(params);
         let websocket = new WebSocket(`${baseWebSocketUrl()}/access/terminal?${paramStr}`);
 
-        terminal?.writeln('trying to connect to the server...');
+        terminal.current?.writeln('trying to connect to the server...');
         websocket.onopen = (e => {
             setLoading(false);
-            terminal?.clear();
+            terminal.current?.clear();
         });
 
         websocket.onerror = (e) => {
             console.error(`websocket error`, e);
-            terminal?.writeln(`websocket error`);
+            terminal.current?.writeln(`websocket error`);
         }
 
         websocket.onclose = (e) => {
             if (e.code === 3886) {
-                terminal?.writeln('');
-                terminal?.writeln('');
-                terminal?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session timeout.`);
+                terminal.current?.writeln('');
+                terminal.current?.writeln('');
+                terminal.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session timeout.`);
             } else {
-                terminal?.writeln('');
-                terminal?.writeln('');
-                terminal?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session closed.`);
+                terminal.current?.writeln('');
+                terminal.current?.writeln('');
+                terminal.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session closed.`);
             }
             setLoading(false);
-            terminal?.writeln('Press any key to reconnect');
+            terminal.current?.writeln('Press any key to reconnect');
 
             setWebsocket(null);
         }
@@ -216,7 +244,7 @@ const AccessTerminal = ({assetId}: Props) => {
             let msg = Message.parse(e.data);
             switch (msg.type) {
                 case MessageTypeData:
-                    terminal.write(msg.content);
+                    terminal.current.write(msg.content);
                     break;
                 case MessageTypeJoin:
                     notification.success({
@@ -250,18 +278,18 @@ const AccessTerminal = ({assetId}: Props) => {
     }
 
     useEffect(() => {
-        if (!terminal) {
+        if (!terminal.current) {
             return;
         }
         connectWrap();
-    }, [terminal, reconnected]);
+    }, [terminal.current, reconnected]);
 
     useEffect(() => {
-        let sizeListener = terminal?.onResize(function (evt) {
-            console.log(`term resize`, evt.cols, evt.rows);
+        let sizeListener = terminal.current?.onResize(function (evt) {
+            // console.log(`term resize`, evt.cols, evt.rows);
             websocket?.send(new Message(MessageTypeResize, `${evt.cols},${evt.rows}`).toString());
         });
-        let dataListener = terminal?.onData(data => {
+        let dataListener = terminal.current?.onData(data => {
             if (!websocket) {
                 setReconnected(new Date().toString());
             } else {
@@ -270,20 +298,6 @@ const AccessTerminal = ({assetId}: Props) => {
             resetTimer();
         });
 
-        // 右键粘贴
-        if (settingQuery.data?.rightClickPaste && terminal?.element) {
-            terminal.element.oncontextmenu = (e) => {
-                try {
-                    navigator.clipboard?.readText().then((text) => {
-                        websocket?.send(new Message(MessageTypeData, text).toString());
-                    })
-                } catch (e) {
-                    console.error(`copy error`, e);
-                }
-                e.preventDefault();
-            }
-        }
-
         return () => {
             sizeListener?.dispose();
             dataListener?.dispose();
@@ -291,9 +305,11 @@ const AccessTerminal = ({assetId}: Props) => {
         }
     }, [websocket]);
 
-    const fitFit = debounce(() => {
-        fit?.fit();
-    }, 500);
+    const fitFit = useMemo(() => debounce(() => {
+        if (terminal.current && fit.current) {
+            fit.current.fit();
+        }
+    }, 300), []);
 
     let isMobile = isMobileByMediaQuery();
 
@@ -336,38 +352,38 @@ const AccessTerminal = ({assetId}: Props) => {
                                         className={'h-[40px] bg-[#1b1b1b] grid grid-cols-6 text-white text-center items-center'}>
                                         <div onClick={() => {
                                             websocket?.send(new Message(MessageTypeData, '\x1b').toString());
-                                            terminal?.focus();
+                                            terminal.current?.focus();
                                         }}>
                                             ESC
                                         </div>
                                         <div onClick={() => {
                                             websocket?.send(new Message(MessageTypeData, '\x09').toString());
-                                            terminal?.focus();
+                                            terminal.current?.focus();
                                         }}>
                                             ⇥
                                         </div>
                                         <div onClick={() => {
                                             websocket?.send(new Message(MessageTypeData, '\x02').toString());
-                                            terminal?.focus();
+                                            terminal.current?.focus();
                                         }}>
                                             CTRL+B
                                         </div>
                                         <div onClick={() => {
                                             websocket.send(new Message(MessageTypeData, '\x03').toString());
-                                            terminal?.focus();
+                                            terminal.current?.focus();
                                         }}>
                                             CTRL+C
                                         </div>
 
                                         <div onClick={() => {
                                             websocket.send(new Message(MessageTypeData, '\x1b[A').toString());
-                                            terminal?.focus();
+                                            terminal.current?.focus();
                                         }}>
                                             ↑
                                         </div>
                                         <div onClick={() => {
                                             websocket.send(new Message(MessageTypeData, '\x1b[B').toString());
-                                            terminal?.focus();
+                                            terminal.current?.focus();
                                         }}>
                                             ↓
                                         </div>

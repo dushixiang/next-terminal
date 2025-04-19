@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Terminal} from "@xterm/xterm";
 import {CleanTheme, useTerminalTheme} from "@/src/hook/use-terminal-theme";
 import {FitAddon} from "@xterm/addon-fit";
@@ -20,10 +20,10 @@ interface Props {
 
 const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Props) => {
 
-    const terminalRef = React.useRef<HTMLDivElement>();
+    const terminalRef = React.useRef<HTMLDivElement>(null);
+    const terminal = useRef<Terminal>();
+    const fit = useRef<FitAddon>();
 
-    let [terminal, setTerminal] = useState<Terminal>();
-    let [fit, setFit] = useState<FitAddon>();
     let [websocket, setWebsocket] = useState<WebSocket>();
     let {width, height} = useWindowSize();
     let [contentSize] = useAccessContentSize();
@@ -35,12 +35,21 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
     let [isFocus, setIsFocus] = useState(false);
     let [session, setSession] = useState<ExportSession>();
 
+    useInterval(() => {
+        if (websocket?.readyState === WebSocket.OPEN) {
+            websocket?.send(new Message(MessageTypeKeepAlive, "").toString());
+        }
+    }, 5000);
+
     useEffect(() => {
+        if (!fit.current) {
+            return;
+        }
         fitFit();
     }, [width, height, contentSize]);
 
     const fitFit = debounce(() => {
-        fit?.fit();
+        fit.current?.fit();
     }, 500)
 
     useEffect(() => {
@@ -54,8 +63,8 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
     }, [websocket]);
 
     useEffect(() => {
-        if (accessTheme && terminal) {
-            let options = terminal.options;
+        if (accessTheme && terminal.current) {
+            let options = terminal.current?.options;
             if (options) {
                 let cleanTheme = CleanTheme(accessTheme);
                 options.theme = cleanTheme?.theme?.value;
@@ -74,6 +83,7 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
             fontSize: cleanTheme.fontSize,
             lineHeight: cleanTheme.lineHeight,
         });
+        terminal.current = term;
         term.attachCustomKeyEventHandler((domEvent) => {
             if (domEvent.ctrlKey && domEvent.key === 'c' && term.hasSelection()) {
                 return false;
@@ -84,11 +94,9 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
         term.open(terminalRef.current);
         term.textarea.addEventListener('focus', () => {
             setIsFocus(true);
-            console.log(`isFocus: ${isFocus}`, true);
         });
         term.textarea.addEventListener('blur', () => {
             setIsFocus(false);
-            console.log(`isFocus: ${isFocus}`, false);
         })
 
         let fitAddon = new FitAddon();
@@ -96,12 +104,10 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
         fitAddon.fit();
         term.focus();
 
-        setFit(fitAddon);
-        setTerminal(term);
+        fit.current = fitAddon;
 
         return () => {
             term.dispose();
-            setTerminal(undefined);
         }
     }, [])
 
@@ -117,12 +123,13 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
             session = await portalApi.createSessionByAssetsId(assetId, securityToken);
             setSession(session);
         } catch (e) {
-            terminal?.writeln(`\x1b[41m ERROR \x1b[0m : ${e.message}`);
+            terminal.current?.writeln(`\x1b[41m ERROR \x1b[0m : ${e.message}`);
+            setLoading(false);
             return;
         }
 
-        let cols = terminal.cols;
-        let rows = terminal.rows;
+        let cols = terminal.current?.cols;
+        let rows = terminal.current?.rows;
         let authToken = getToken();
         let params = {
             'cols': cols,
@@ -138,22 +145,22 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
         });
 
         websocket.onerror = (e) => {
-            // console.error(`websocket error`, e);
-            terminal?.writeln(`websocket error`);
+            terminal.current?.writeln(`websocket error`);
+            setLoading(false);
         }
 
         websocket.onclose = (e) => {
             if (e.code === 3886) {
-                terminal?.writeln('');
-                terminal?.writeln('');
-                terminal?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session timeout.`);
+                terminal.current?.writeln('');
+                terminal.current?.writeln('');
+                terminal.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session timeout.`);
             } else {
-                terminal?.writeln('');
-                terminal?.writeln('');
-                terminal?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session closed.`);
+                terminal.current?.writeln('');
+                terminal.current?.writeln('');
+                terminal.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session closed.`);
             }
             setLoading(false);
-            terminal?.writeln('Press any key to reconnect');
+            terminal.current?.writeln('Press any key to reconnect');
 
             setWebsocket(null);
         }
@@ -162,7 +169,7 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
             let msg = Message.parse(e.data);
             switch (msg.type) {
                 case MessageTypeData:
-                    terminal.write(msg.content);
+                    terminal.current.write(msg.content);
                     break;
             }
         }
@@ -170,18 +177,18 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
     }
 
     useEffect(() => {
-        if (!terminal) {
+        if (!terminal.current) {
             return;
         }
         connect(securityToken)
-    }, [terminal, reconnected]);
+    }, [reconnected]);
 
     useEffect(() => {
-        let sizeListener = terminal?.onResize(function (evt) {
+        let sizeListener = terminal.current?.onResize(function (evt) {
             // console.log(`term resize`, evt.cols, evt.rows);
             websocket?.send(new Message(MessageTypeResize, `${evt.cols},${evt.rows}`).toString());
         });
-        let dataListener = terminal?.onData(data => {
+        let dataListener = terminal.current?.onData(data => {
             if (!websocket) {
                 setReconnected(new Date().toString());
             } else {
@@ -189,7 +196,7 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
             }
         });
         if (websocket) {
-            terminal?.writeln('trying to connect to the server ...');
+            terminal.current?.writeln('trying to connect to the server ...');
         }
 
         return () => {
@@ -198,10 +205,6 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
             websocket?.close();
         }
     }, [websocket]);
-
-    useInterval(() => {
-        websocket?.send(new Message(MessageTypeKeepAlive, "").toString());
-    }, 5000);
 
     return (
         <div className={clsx(

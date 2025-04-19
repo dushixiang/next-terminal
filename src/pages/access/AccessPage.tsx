@@ -34,6 +34,8 @@ import {useTranslation} from "react-i18next";
 import {useLicense} from "@/src/hook/use-license";
 import licenseApi from "@/src/api/license-api";
 import {safeDecode} from "@/src/utils/codec";
+import {useAccessSetting} from "@/src/hook/use-access-setting";
+import accessSettingApi from "@/src/api/access-setting-api";
 
 
 interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -73,17 +75,29 @@ const AccessPage = () => {
     let [mfaOpen, setMfaOpen] = useState(false);
     let [chooseAssetIds, setChooseAssetIds] = useState<string[]>([]);
     let [licence, setLicense] = useLicense();
+    let [accessSetting, setAccessSetting] = useAccessSetting();
 
     let licenseQuery = useQuery({
         queryKey: ['simpleLicense'],
         queryFn: licenseApi.getSimpleLicense,
     })
 
+    let settingQuery = useQuery({
+        queryKey: ['access-setting'],
+        queryFn: accessSettingApi.get,
+    });
+
     useEffect(() => {
         if (licenseQuery.data) {
             setLicense(licenseQuery.data);
         }
     }, [licenseQuery.data]);
+
+    useEffect(() => {
+        if (settingQuery.data) {
+            setAccessSetting(settingQuery.data);
+        }
+    }, [settingQuery.data]);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';

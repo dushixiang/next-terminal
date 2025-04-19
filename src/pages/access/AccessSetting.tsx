@@ -3,8 +3,10 @@ import {ProForm, ProFormCheckbox, ProFormDigit, ProFormInstance, ProFormSelect} 
 import {useTranslation} from "react-i18next";
 import {CleanTheme, DefaultTerminalTheme, useTerminalTheme} from "@/src/hook/use-terminal-theme";
 import {isFontAvailable} from "@/src/utils/utils";
-import {message} from "antd";
+import {App} from "antd";
 import accessSettingApi from "@/src/api/access-setting-api";
+import {useAccessSetting} from "@/src/hook/use-access-setting";
+import {useQuery} from "@tanstack/react-query";
 
 const fontList = [
     // Windows 上常见的终端字体
@@ -29,8 +31,22 @@ const AccessSetting = () => {
     const formRef = useRef<ProFormInstance>();
 
     let [terminalTheme, setTerminalTheme] = useTerminalTheme();
+    let [_, setAccessSetting] = useAccessSetting();
+    let {message} = App.useApp();
 
     const [availableFonts, setAvailableFonts] = useState([]);
+
+    let settingQuery = useQuery({
+        queryKey: ['access-setting'],
+        queryFn: accessSettingApi.get,
+        enabled: false,
+    });
+
+    useEffect(() => {
+        if (settingQuery.data) {
+            setAccessSetting(settingQuery.data);
+        }
+    }, [settingQuery.data]);
 
     useEffect(() => {
         const checkFonts = async () => {
@@ -85,6 +101,8 @@ const AccessSetting = () => {
                         })
                         await accessSettingApi.set(record);
                         message.success(t('general.success'));
+
+                        settingQuery.refetch();
                     }}>
                         <div>{t('access.settings.font')}</div>
 
