@@ -428,6 +428,14 @@
         "all_asset": "All Assets",
         "custom_asset": "Custom Assets"
       }
+    },
+    "tools": {
+      "target": "Target address",
+      "target_placeholder": "Please enter the IP address or domain name.",
+      "attempts": "Times",
+      "attempts_tips": "Set the number of times the request is sent",
+      "port": "Port",
+      "testing": "Start Detection"
     }
   },
   "audit": {

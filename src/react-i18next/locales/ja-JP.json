@@ -428,6 +428,14 @@
         "all_asset": "すべての資産",
         "custom_asset": "カスタム資産"
       }
+    },
+    "tools": {
+      "target": "目標アドレス",
+      "target_placeholder": "IPアドレスまたはドメイン名を入力してください。",
+      "attempts": "回数",
+      "attempts_tips": "リクエストを送信する回数を設定する",
+      "port": "ポート",
+      "testing": "検査を开始します"
     }
   },
   "audit": {
