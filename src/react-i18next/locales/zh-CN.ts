@@ -682,6 +682,7 @@ let o = {
         "limit_time": "失效时间",
         "limit_password": "口令访问限制",
         "limit_password_tip": "使用正确的口令才能访问资产。",
+        "ungrouped": "未分组",
     },
     "gateways": {
         "name": "名称",

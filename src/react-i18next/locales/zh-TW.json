@@ -681,7 +681,8 @@
     "limit_time_enabled": "失效時間限制",
     "limit_time": "失效時間",
     "limit_password": "口令訪問限制",
-    "limit_password_tip": "使用正確的密碼才能訪問資產。"
+    "limit_password_tip": "使用正確的密碼才能訪問資產。",
+    "ungrouped": "未分組"
   },
   "gateways": {
     "name": "名稱",

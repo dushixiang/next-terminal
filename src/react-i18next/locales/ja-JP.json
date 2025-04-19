@@ -681,7 +681,8 @@
     "limit_time_enabled": "有効期限",
     "limit_time": "有効期限",
     "limit_password": "パスワードアクセス制限",
-    "limit_password_tip": "資産にアクセスするには、正しいパスワードを使用してください。"
+    "limit_password_tip": "資産にアクセスするには、正しいパスワードを使用してください。",
+    "ungrouped": "未グループ化"
   },
   "gateways": {
     "name": "名前",

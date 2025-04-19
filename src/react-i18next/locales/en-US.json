@@ -681,7 +681,8 @@
     "limit_time_enabled": "Expiration limit",
     "limit_time": "Expiration time",
     "limit_password": "Password access restriction",
-    "limit_password_tip": "Only the correct password grants access to assets."
+    "limit_password_tip": "Only the correct password grants access to assets.",
+    "ungrouped": "Ungrouped"
   },
   "gateways": {
     "name": "Name",

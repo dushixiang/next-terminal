@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
+import {Checkbox, Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
 import AssetTreeModal, {OP} from "@/src/pages/assets/AssetTreeModal";
 import {generateRandomId} from "@/src/utils/utils";
 import {useQuery} from "@tanstack/react-query";
@@ -30,6 +30,15 @@ const AssetTree = ({selected, onSelect}: Props) => {
     let [expandedKeys, setExpandedKeys] = useState([]);
 
     let [selectedKeys, setSelectedKeys] = useState<React.Key[]>([selected]);
+    let [ungrouped, setUngrouped] = useState(false);
+
+    useEffect(() => {
+        if (ungrouped) {
+            onSelect('ungrouped');
+        } else {
+            onSelect('');
+        }
+    }, [ungrouped]);
 
     let query = useQuery({
         queryKey: ['assets/tree'],
@@ -227,29 +236,39 @@ const AssetTree = ({selected, onSelect}: Props) => {
                 </div>
             </div>
 
-            <Tree
-                draggable
-                blockNode
-                onDrop={onDrop}
-                treeData={treeData}
-                expandedKeys={expandedKeys}
-                onExpand={setExpandedKeys}
-                style={{
-                    // backgroundColor: '#FFF',
-                    padding: 8,
-                }}
-                selectedKeys={selectedKeys}
-                onSelect={(keys) => {
-                    setSelectedKeys(keys);
-                    if (keys.length > 0) {
-                        onSelect(keys[0] as string)
-                    } else {
-                        onSelect('');
-                    }
-                }}
-                onRightClick={handleRightClick}
-                // showLine={true}
-            />
+            <div className={'px-6 py-2'}>
+                <Checkbox onChange={(e) => {
+                    setUngrouped(e.target.checked);
+                }}>
+                    {t('assets.ungrouped')}
+                </Checkbox>
+            </div>
+
+            {!ungrouped &&
+                <Tree
+                    draggable
+                    blockNode
+                    onDrop={onDrop}
+                    treeData={treeData}
+                    expandedKeys={expandedKeys}
+                    onExpand={setExpandedKeys}
+                    style={{
+                        // backgroundColor: '#FFF',
+                        padding: 8,
+                    }}
+                    selectedKeys={selectedKeys}
+                    onSelect={(keys) => {
+                        setSelectedKeys(keys);
+                        if (keys.length > 0) {
+                            onSelect(keys[0] as string)
+                        } else {
+                            onSelect('');
+                        }
+                    }}
+                    onRightClick={handleRightClick}
+                    // showLine={true}
+                />
+            }
 
             {contextMenu && (
                 <Dropdown
