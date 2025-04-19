@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Badge, Button, Popconfirm, Tooltip} from "antd";
+import {App, Badge, Button, Popconfirm} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
 import agentGatewayApi, {AgentGateway} from "@/src/api/agent-gateway-api";
@@ -9,6 +9,7 @@ import AgentGatewayRegister from "@/src/pages/gateway/AgentGatewayRegister";
 import NButton from "@/src/components/NButton";
 import {useLicense} from "@/src/hook/use-license";
 import Disabled from "@/src/components/Disabled";
+import AgentGatewayTokenDrawer from "@/src/pages/gateway/AgentGatewayTokenDrawer";
 
 const api = agentGatewayApi;
 
@@ -21,6 +22,8 @@ const AgentGatewayPage = () => {
     let [registerOpen, setRegisterOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
     let [license] = useLicense();
+
+    let [tokenManageOpen, setTokenManageOpen] = useState<boolean>(false);
 
     const {message} = App.useApp();
 
@@ -84,20 +87,10 @@ const AgentGatewayPage = () => {
             key: 'status',
             hideInSearch: true,
             render: (text, record) => {
-                switch (text) {
-                    case "connected":
-                        return (
-                            <Tooltip title={record.statusMessage}>
-                                <Badge status="success" text={t('gateways.connected')}/>
-                            </Tooltip>
-                        )
-                    case "disconnected":
-                        return (
-                            <Tooltip title={record.statusMessage}>
-                                <Badge status="default" text={t('gateways.disconnected')}/>
-                            </Tooltip>
-                        )
+                if (record.online) {
+                    return <Badge status="success" text={t('gateways.online')}/>
                 }
+                return <Badge status="default" text={t('gateways.offline')}/>
             }
         },
         {
@@ -105,13 +98,6 @@ const AgentGatewayPage = () => {
             key: 'version',
             dataIndex: 'version',
             hideInSearch: true,
-        },
-        {
-            title: t('general.created_at'),
-            key: 'createdAt',
-            dataIndex: 'createdAt',
-            hideInSearch: true,
-            valueType: 'dateTime'
         },
         {
             title: t('general.updated_at'),
@@ -124,6 +110,7 @@ const AgentGatewayPage = () => {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
+            width: 160,
             render: (text, record, _, action) => [
                 <NButton
                     key="edit"
@@ -184,6 +171,11 @@ const AgentGatewayPage = () => {
                             setRegisterOpen(true)
                         }}>
                             {t('actions.new')}
+                        </Button>,
+                        <Button key="button" color={'geekblue'} variant={'filled'} onClick={() => {
+                            setTokenManageOpen(true)
+                        }}>
+                            {t('gateways.token_manage')}
                         </Button>
                     ]}
                 />
@@ -203,6 +195,13 @@ const AgentGatewayPage = () => {
                     open={registerOpen}
                     handleCancel={() => {
                         setRegisterOpen(false);
+                    }}
+                />
+
+                <AgentGatewayTokenDrawer
+                    open={tokenManageOpen}
+                    onClose={() => {
+                        setTokenManageOpen(false);
                     }}
                 />
             </Disabled>

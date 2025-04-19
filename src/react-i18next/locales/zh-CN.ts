@@ -694,10 +694,13 @@ let o = {
         "connected": "已连接",
         "disconnected": "已断开",
         "register-agent-gateway": "注册安全网关",
-        "rpc-addr": "通信地址",
-        "download-addr": "下载地址",
         "username": "账号",
         "account_type": {},
+        "endpoint": "通信地址",
+        "token": "通信令牌",
+        "token_manage": "通信令牌管理",
+        "online": "在线",
+        "offline": "离线",
     },
     "settings": {
         "system": {

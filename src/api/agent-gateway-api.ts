@@ -7,8 +7,7 @@ export interface AgentGateway {
     ip: string;
     os: string;
     arch: string;
-    status: string;
-    statusMessage: string;
+    online: boolean;
     createdAt: number;
     updatedAt: number;
 }

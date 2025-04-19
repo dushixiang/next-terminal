@@ -140,6 +140,7 @@ const AssetPage = () => {
                     {text}
                 </div>
             },
+            hideInSearch: true,
         },
         {
             title: t('assets.protocol'),
