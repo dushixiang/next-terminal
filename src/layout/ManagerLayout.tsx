@@ -235,7 +235,7 @@ const ManagerLayout = () => {
             }
         });
 
-        const breadcrumbItems = [{title: <Link to={'/'}>{t('general.home')}</Link>}].concat(extraBreadcrumbItems);
+        const breadcrumbItems = [{title: <Link to={'/dashboard'}>{t('general.home')}</Link>}].concat(extraBreadcrumbItems);
         setBreakItems(breadcrumbItems);
     }, [location.pathname]);
 
