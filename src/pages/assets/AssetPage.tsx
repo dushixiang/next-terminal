@@ -103,14 +103,12 @@ const AssetPage = () => {
             sorter: true,
             width: 200,
             render: (text, record) => {
-                if (record['description'] === '-') {
-                    record['description'] = '';
-                }
-
                 let view = <NLink to={`/asset/${record['id']}`}>{text}</NLink>;
                 return <div className={'flex flex-col'}>
                     {view}
-                    <div className={'text-gray-500 line-clamp-1'}>{record['description']}</div>
+                    <Tooltip title={record.description}>
+                        <div className={'text-gray-500 line-clamp-1'}>{record.description}</div>
+                    </Tooltip>
                 </div>
             },
         },
