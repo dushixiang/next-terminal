@@ -52,12 +52,11 @@ const TerminalMonitor = () => {
         });
 
         websocket.onerror = (e) => {
-            console.error(`websocket error`, e)
             writeErrorMessage(term, `websocket error`);
         }
 
         websocket.onclose = (e) => {
-            writeErrorMessage(term, `\nconnection is closed.`);
+            writeErrorMessage(term, `connection is closed.`);
         }
 
         websocket.onmessage = (e) => {
