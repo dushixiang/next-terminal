@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Checkbox, DatePicker, Form, Modal, Space} from "antd";
-import {ProForm, ProFormInstance, ProFormSelect} from '@ant-design/pro-components';
+import {ProForm, ProFormInstance, ProFormSelect, ProFormTreeSelect} from '@ant-design/pro-components';
 import {useTranslation} from "react-i18next";
 import assetApi from "@/src/api/asset-api";
 import commandFilterApi from "@/src/api/command-filter-api";
@@ -68,19 +68,34 @@ const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel,
         if(strings.hasText(id)){
             return undefined;
         }
-        return <ProFormSelect
-            label={t('authorised.label.asset')} name='assetIds' rules={[{required: true}]}
-            fieldProps={{mode: 'multiple', showSearch: true}}
+        return <ProFormTreeSelect
+            label={t('authorised.label.asset')}
+            name='assetIds'
+            rules={[{required: true}]}
+            fieldProps={{
+                multiple: true,
+                showSearch: true,
+                treeDefaultExpandAll: true,
+            }}
             request={async () => {
-                let items = await assetApi.getAll();
-                let selected = await authorisedAssetApi.selected('assetId', userId, userGroupId);
-                return items.map(item => {
-                    return {
-                        label: item.name,
-                        value: item.id,
-                        disabled: selected.includes(item.id)
+                let items = await assetApi.tree();
+
+                // 递归把 key 字段设置为 value，并且非叶子节点全部 disabled
+                function setKeyAndDisabled(item: any) {
+                    item.value = item.key;
+                    if (!item.isLeaf) {
+                        item.disabled = true;
+                        // 递归处理子节点
+                        if (item.children) {
+                            item.children.forEach(setKeyAndDisabled);
+                        }
                     }
+                }
+                // 对获取到的所有节点进行处理
+                items.forEach((item: any) => {
+                    setKeyAndDisabled(item);
                 });
+                return items;
             }}
         />
     }

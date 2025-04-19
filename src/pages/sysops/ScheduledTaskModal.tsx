@@ -132,7 +132,6 @@ const ScheduledTaskModal = ({
                                         items.forEach((item: any) => {
                                             setKeyAndDisabled(item);
                                         });
-                                        console.log(items)
                                         return items;
                                     }}
                                 />
