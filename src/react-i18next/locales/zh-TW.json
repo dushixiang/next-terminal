@@ -85,8 +85,8 @@
     }
   },
   "facade": {
-    "asset_placeholder": "資產名稱、協議、標籤",
-    "accessing": "接入中"
+    "accessing": "接入中",
+    "asset_placeholder": "資產名稱、協議、標籤、網絡地址"
   },
   "menus": {
     "dashboard": {

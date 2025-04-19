@@ -85,8 +85,8 @@
     }
   },
   "facade": {
-    "asset_placeholder": "資産名、プロトコル、タグ",
-    "accessing": "アクセス中"
+    "accessing": "アクセス中",
+    "asset_placeholder": "資産名、プロトコル、タグ、ネットワークアドレス"
   },
   "menus": {
     "dashboard": {

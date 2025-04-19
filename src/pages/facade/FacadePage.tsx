@@ -91,6 +91,9 @@ const FacadePage = () => {
                             if (item.name.toLowerCase().includes(search)) {
                                 return true;
                             }
+                            if (item.address.toLowerCase().includes(search)) {
+                                return true;
+                            }
                             if (item.protocol.toLowerCase().includes(search)) {
                                 return true;
                             }
@@ -147,18 +150,26 @@ const FacadePage = () => {
                                     , item.status === 'inactive' && 'filter grayscale'
                                 )}>
                                     <div
-                                        className={clsx('flex-grow bg-white flex gap-2 items-center px-4 py-3 rounded-md relative')}>
+                                        className={clsx('flex-grow bg-white flex gap-2 items-center px-4 py-3 rounded-md relative h-[84px]')}>
                                         <div className={'flex-grow-0'}>
                                             {renderImg(item)}
                                         </div>
                                         <div className={'flex-grow flex flex-col gap-1 text-xs'}>
-                                            <div className={'font-medium'}>{item.name}</div>
+                                            <div className={'flex items-center gap-2'}>
+                                                <div className={'font-medium'}>{item.name}</div>
+                                                <Tooltip title={item.address}>
+                                                    <div className={'text-gray-400 line-clamp-1 overflow-hidden text-ellipsis break-all'}>
+                                                        {item.address}
+                                                    </div>
+                                                </Tooltip>
+                                            </div>
                                             <Popover content={<div
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     return false;
                                                 }}>
-                                                <Typography.Paragraph copyable style={{marginBottom: 0}}>{item.description}</Typography.Paragraph>
+                                                <Typography.Paragraph copyable
+                                                                      style={{marginBottom: 0}}>{item.description}</Typography.Paragraph>
                                             </div>}>
                                                 <div className={'text-gray-400 line-clamp-1'}>{item.description}</div>
                                             </Popover>
@@ -166,8 +177,8 @@ const FacadePage = () => {
                                                 {item.tags?.map(tag => {
                                                     return <span key={tag}
                                                                  className={'inline-flex items-center justify-center rounded-full bg-gray-100 px-1.5 py-0.5 text-[10px] text-gray-700'}>
-                              {tag}
-                            </span>
+                                                              {tag}
+                                                            </span>
                                                 })}
                                             </div>
                                         </div>

@@ -85,7 +85,7 @@ let o = {
         },
     },
     "facade": {
-        "asset_placeholder": "资产名称、协议、标签",
+        "asset_placeholder": "资产名称、协议、标签、网络地址",
         "accessing": "接入中",
     },
     "menus": {

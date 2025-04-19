@@ -2,7 +2,7 @@
   "llm": {
     "provider": "custom",
     "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-    "model": "qwen-max"
+    "model": "qwen2.5-72b-instruct"
   },
   "input": "zh-CN.json",
   "from": "zh-CN",

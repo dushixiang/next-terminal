@@ -85,8 +85,8 @@
     }
   },
   "facade": {
-    "asset_placeholder": "Asset Name, Protocol, Tags",
-    "accessing": "Accessing"
+    "accessing": "Accessing",
+    "asset_placeholder": "Asset name, protocol, labels, network address"
   },
   "menus": {
     "dashboard": {

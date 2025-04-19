@@ -21,6 +21,7 @@ export interface AssetUser {
     id: string;
     logo: string;
     name: string;
+    address: string;
     protocol: string;
     tags: string[];
     description: string;
