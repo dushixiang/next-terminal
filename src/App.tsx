@@ -29,6 +29,7 @@ const LoginPolicyPostPage = lazy(() => import("@/src/pages/identity/LoginPolicyP
 const LoginPolicyDetailPage = lazy(() => import("@/src/pages/identity/LoginPolicyDetailPage"));
 const AssetsPage = lazy(() => import("@/src/pages/assets/AssetPage"));
 const CredentialPage = lazy(() => import("@/src/pages/assets/CredentialPage"));
+const CertificatePage = lazy(() => import("@/src/pages/assets/CertificatePage"));
 const SnippetPage = lazy(() => import("@/src/pages/assets/SnippetPage"));
 const AssetDetail = lazy(() => import("@/src/pages/assets/AssetDetail"));
 const StrategyPage = lazy(() => import("@/src/pages/authorised/StrategyPage"));
@@ -106,6 +107,7 @@ const router = createBrowserRouter([
             {path: "/storage", element: <StoragePage/>},
             {path: "/website", element: <WebsitePage/>},
             {path: "/website/:websiteId", element: <WebsiteDetail/>},
+            {path: "/certificate", element: <CertificatePage/>},
 
             {path: "/strategy", element: <StrategyPage/>},
             {path: "/command-filter", element: <CommandFilterPage/>},

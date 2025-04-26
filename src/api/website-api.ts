@@ -24,6 +24,8 @@ export interface Website {
     scheme: string;
     host: string;
     port: number;
+
+    outerUrl: string;
 }
 
 interface Public {

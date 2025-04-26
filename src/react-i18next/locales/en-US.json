@@ -51,7 +51,20 @@
     "website-active-count": "Live Websites",
     "date-counter": "Activity Statistics",
     "asset-type": "Asset Type",
-    "latest-session": "Latest Sessions"
+    "latest-session": "Latest Sessions",
+    "login_times": "Login times",
+    "active_users": "Active user",
+    "active_assets": "Active assets",
+    "login_failed_times": "Number of failed login attempts",
+    "user_online_count": "Online users",
+    "session_online_count": "Online conversation",
+    "gateway_active_count": "Online Gateway",
+    "asset_active_count": "Surviving Assets",
+    "website_active_count": "Surviving Web Assets",
+    "date_counter": "Active Statistics",
+    "asset_type": "Asset Type",
+    "latest_session": "Latest Conversation",
+    "website_count": "Web assets"
   },
   "stat": {
     "days": "Days",
@@ -99,7 +112,8 @@
         "credential": "Credentials",
         "snippet": "Snippets",
         "storage": "Storage",
-        "website": "Websites"
+        "website": "Websites",
+        "certificate": "Certificate Management"
       }
     },
     "gateway": {
@@ -682,7 +696,42 @@
     "limit_time": "Expiration time",
     "limit_password": "Password access restriction",
     "limit_password_tip": "Only the correct password grants access to assets.",
-    "ungrouped": "Ungrouped"
+    "ungrouped": "Ungrouped",
+    "preserve_host": "Retain hostname",
+    "custom_certificate": "Custom Certificate",
+    "certificates": {
+      "common_name": "Domain name",
+      "certificate": "certificate",
+      "private_key": "Private key",
+      "type": "Certificate Type",
+      "self_signed": "self-issuance",
+      "issued": "Online Application",
+      "imported": "Local Import",
+      "not_after": "Expiration time",
+      "issuer": "Issuing Authority",
+      "issuedStatus": "Issuance Status",
+      "issuedPending": "Issuing in progress",
+      "issuedSuccess": "Issued successfully",
+      "issuedFailed": "Issuance failed",
+      "is_default": "Default certificate",
+      "is_default_tooltip": "The default certificate refers to the certificate used when no other certificates match.",
+      "set_as_default": "Set as Default",
+      "issued_log": "Certificate application log"
+    },
+    "dns_providers": {
+      "label": "DNS provider",
+      "set": "Set DNS provider",
+      "remove": "Remove DNS provider",
+      "remove_confirm_title": "Remove DNS service provider settings",
+      "remove_confirm_content": "Once removed, it will no longer be possible to apply for a certificate.",
+      "type": "Supplier Type",
+      "tencentcloud": "Tencent Cloud",
+      "alidns": "Alibaba Cloud",
+      "huaweicloud": "Huawei Cloud",
+      "cloudflare": "Cloudflare"
+    },
+    "dns_provider_config": "DNS provider configuration",
+    "dns_provider_config_tip": "Please fill in the configuration information according to the supplier's requirements."
   },
   "gateways": {
     "name": "Name",
@@ -697,7 +746,36 @@
     "rpc-addr": "RPC Address",
     "download-addr": "Download Address",
     "username": "Username",
-    "account_type": {}
+    "account_type": {},
+    "endpoint": "Endpoint",
+    "token": "Token",
+    "token_manage": "Token Management",
+    "online": "Online",
+    "offline": "Offline",
+    "register": "Register",
+    "stat": {
+      "label": "statistical data",
+      "uptime": "Run time",
+      "cpu": "Processor",
+      "memory": "Memory",
+      "disk": "disk",
+      "disk_io": "Disk I/O",
+      "network": "network",
+      "network_io": "Network I/O",
+      "load": "Load",
+      "host": "Host machine",
+      "process": "process",
+      "system": "System",
+      "model": "model number",
+      "logical_cores": "Logical core",
+      "physical_cores": "Physical core",
+      "percent": "Usage Rate",
+      "total": "Total size",
+      "used": "Used",
+      "connections": "Network connection",
+      "tcp_states": "TCP connection status"
+    },
+    "install_shell": "Installation script"
   },
   "settings": {
     "system": {
@@ -789,7 +867,10 @@
       "port_forwarding": {
         "enabled": "Enable Tunneling",
         "host_port": "Allowed Tunnel Forwarding IP and Port"
-      }
+      },
+      "usage": "Usage",
+      "mode_proxy": "Proxy",
+      "mode_direct": "Direct"
     },
     "rp": {
       "setting": "Reverse Proxy Server",

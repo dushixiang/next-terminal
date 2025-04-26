@@ -126,51 +126,6 @@ const ReverseProxySetting = ({get, set}: SettingProps) => {
                                              rules={[{required: enabled}]}
                                              disabled={!enabled}/>
                             </Col>
-                            <Col>
-                                <ProFormDependency name={['reverse-proxy-server-https-enabled']}>
-                                    {
-                                        (values, form) => {
-                                            let https = values['reverse-proxy-server-https-enabled'];
-                                            if (https) {
-                                                return <ProFormCheckbox
-                                                    name="reverse-proxy-server-auto-tls"
-                                                    label={t('settings.rp.auto_tls')}
-                                                    disabled={!enabled}
-                                                />;
-                                            }
-                                            return undefined;
-                                        }
-                                    }
-                                </ProFormDependency>
-                            </Col>
-
-                            <ProFormDependency
-                                name={['reverse-proxy-server-https-enabled', 'reverse-proxy-server-auto-tls']}>
-                                {
-                                    (values, form) => {
-                                        let https = values['reverse-proxy-server-https-enabled'];
-                                        let autoTls = values['reverse-proxy-server-auto-tls'];
-                                        if (https && !autoTls) {
-                                            return <>
-                                                <Col span={6}>
-                                                    <ProFormTextArea name="reverse-proxy-server-cert" label={t('settings.rp.cert')}
-                                                                     disabled={!enabled}
-                                                                     fieldProps={{rows: 4}}
-                                                    />
-                                                </Col>
-                                                <Col span={6}>
-                                                    <ProFormTextArea name="reverse-proxy-server-private-key"
-                                                                     label={t('settings.rp.cert_key')}
-                                                                     disabled={!enabled}
-                                                                     fieldProps={{rows: 4}}
-                                                    />
-                                                </Col>
-                                            </>
-                                        }
-                                        return undefined;
-                                    }
-                                }
-                            </ProFormDependency>
                         </Row>
                     </div>
 

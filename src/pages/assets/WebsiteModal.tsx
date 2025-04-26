@@ -22,6 +22,7 @@ import {useQuery} from "@tanstack/react-query";
 import assetsApi from "@/src/api/asset-api";
 import {RcFile} from "antd/es/upload";
 import dayjs from "dayjs";
+import certificateApi from "@/src/api/certificate-api";
 
 const api = websiteApi;
 
@@ -231,6 +232,11 @@ const WebsiteModal = ({
 
     const HeaderView = () => {
         return <div>
+            <ProFormCheckbox
+                name={'preserveHost'}
+                label={t('assets.preserve_host')}
+
+            />
             <ProFormList
                 name="headers"
                 label={t('assets.custom_header')}
@@ -268,11 +274,22 @@ const WebsiteModal = ({
             />
             <ProFormDependency name={['cert', 'enabled']}>
                 {({cert}) => {
+                    if (!cert.enabled) {
+                        return undefined;
+                    }
                     return <>
-                        <ProFormTextArea label={t('settings.rp.cert')} name={['cert', 'cert']}
-                                         disabled={!cert['enabled']}/>
-                        <ProFormTextArea label={t('settings.rp.cert_key')} name={['cert', 'key']}
-                                         disabled={!cert['enabled']}/>
+                        <ProFormSelect
+                            label={t('assets.cert')} name={['cert', 'certId']} rules={[{required: true}]}
+                            request={async () => {
+                                let certificates = await certificateApi.getAll();
+                                return certificates.map(item => {
+                                    return {
+                                        label: item.commonName,
+                                        value: item.id,
+                                    }
+                                })
+                            }}
+                        />
                     </>
                 }}
             </ProFormDependency>
@@ -346,7 +363,7 @@ const WebsiteModal = ({
         },
         {
             key: 'headers',
-            label: t('assets.header'),
+            label: t('assets.custom_header'),
             children: <HeaderView/>,
             forceRender: true,
         },
@@ -358,7 +375,7 @@ const WebsiteModal = ({
         },
         {
             key: 'cert',
-            label: t('assets.cert'),
+            label: t('assets.custom_certificate'),
             children: <CertView/>,
             forceRender: true,
         },

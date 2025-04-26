@@ -63,9 +63,9 @@ const StoragePage = () => {
             hideInSearch: true,
             render: (text) => {
                 if (text === true) {
-                    return <Tag color={'green'} bordered={false}>{t('general.yes')}</Tag>
+                    return <Tag color={'green-inverse'} bordered={false}>{t('general.yes')}</Tag>
                 } else {
-                    return <Tag color={'red'} bordered={false}>{t('general.no')}</Tag>
+                    return <Tag color={'gray'} bordered={false}>{t('general.no')}</Tag>
                 }
             },
         },
@@ -76,9 +76,9 @@ const StoragePage = () => {
             hideInSearch: true,
             render: (text) => {
                 if (text === true) {
-                    return <Tag color={'green'} bordered={false}>{t('general.yes')}</Tag>
+                    return <Tag color={'green-inverse'} bordered={false}>{t('general.yes')}</Tag>
                 } else {
-                    return <Tag color={'red'} bordered={false}>{t('general.no')}</Tag>
+                    return <Tag color={'gray'} bordered={false}>{t('general.no')}</Tag>
                 }
             }
         },

@@ -76,9 +76,9 @@ const WebsitePage = () => {
             hideInSearch: true,
             render: (text) => {
                 if (text === true) {
-                    return <Tag color={'green'} bordered={false}>{t('general.yes')}</Tag>
+                    return <Tag color={'green-inverse'} bordered={false}>{t('general.yes')}</Tag>
                 } else {
-                    return <Tag color={'red'} bordered={false}>{t('general.no')}</Tag>
+                    return <Tag color={'gray'} bordered={false}>{t('general.no')}</Tag>
                 }
             }
         },
@@ -87,7 +87,9 @@ const WebsitePage = () => {
             dataIndex: 'domain',
             key: 'domain',
             render: (text, record) => {
-                return <Tag color={'blue'}>{record.domain + ' -> ' + record.targetUrl}</Tag>
+                return <div>
+                    <Tag bordered={false} color={'blue'}>{record.outerUrl + ' -> ' + record.targetUrl}</Tag>
+                </div>
             }
         },
         {

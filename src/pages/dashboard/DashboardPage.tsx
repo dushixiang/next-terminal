@@ -65,15 +65,15 @@ const DashboardPage = () => {
 
     const chartConfig = {
         login: {
-            label: t('dashboard.login-times'),
+            label: t('dashboard.login_times'),
             color: "hsl(var(--chart-1))",
         },
         user: {
-            label: t('dashboard.active-users'),
+            label: t('dashboard.active_users'),
             color: "hsl(var(--chart-2))",
         },
         asset: {
-            label: t('dashboard.active-assets'),
+            label: t('dashboard.active_assets'),
             color: "hsl(var(--chart-3))",
         },
     } satisfies ChartConfig
@@ -106,33 +106,33 @@ const DashboardPage = () => {
 
     const counters = [
         {
-            title: t('dashboard.login-failed-times'),
+            title: t('dashboard.login_failed_times'),
             value: timeCounterQuery.data?.loginFailedTimes,
             icon: <ShieldBanIcon className={'h-4 w-4'}/>,
         },
         {
-            title: t('dashboard.user-online-count'),
+            title: t('dashboard.user_online_count'),
             value: timeCounterQuery.data?.userOnlineCount,
             icon: <UsersIcon className={'h-4 w-4'}/>,
         },
         {
-            title: t('dashboard.session-online-count'),
+            title: t('dashboard.session_online_count'),
             value: timeCounterQuery.data?.sessionOnlineCount,
             icon: <TerminalIcon className={'h-4 w-4'}/>,
         },
         {
-            title: t('dashboard.gateway-active-count'),
+            title: t('dashboard.gateway_active_count'),
             value: timeCounterQuery.data?.gatewayActiveCount,
             icon: <RouteIcon className={'h-4 w-4'}/>,
         },
         {
-            title: t('dashboard.asset-active-count'),
+            title: t('dashboard.asset_active_count'),
             value: timeCounterQuery.data?.assetActiveCount,
             icon: <ServerIcon className={'h-4 w-4'}/>,
         },
         {
-            title: t('dashboard.website-active-count'),
-            value: timeCounterQuery.data?.websiteActiveCount,
+            title: t('dashboard.website_count'),
+            value: timeCounterQuery.data?.websiteTotalCount,
             icon: <GlobeIcon className={'h-4 w-4'}/>,
         },
     ];
@@ -156,7 +156,7 @@ const DashboardPage = () => {
                 })}
             </div>
 
-            <div className={'font-medium'}>{t('dashboard.date-counter')}</div>
+            <div className={'font-medium'}>{t('dashboard.date_counter')}</div>
             <div className={'rounded-xl p-4 border'}>
                 <ChartContainer
                     config={chartConfig}
@@ -258,7 +258,7 @@ const DashboardPage = () => {
 
             <div className={'grid grid-cols-3 gap-4'}>
                 <div className={'col-span-2 space-y-4'}>
-                    <div className={'font-medium'}>{t('dashboard.latest-session')}</div>
+                    <div className={'font-medium'}>{t('dashboard.latest_session')}</div>
                     <div className={'p-4 border rounded-xl'}>
                         <Table
                             className={'min-h-[250px]'}
@@ -294,7 +294,7 @@ const DashboardPage = () => {
                     </div>
                 </div>
                 <div className={'space-y-4'}>
-                    <div className={'font-medium'}>{t('dashboard.asset-type')}</div>
+                    <div className={'font-medium'}>{t('dashboard.asset_type')}</div>
                     <div className={'p-4 rounded-xl border'}>
                         <ChartContainer
                             config={chartConfig2}

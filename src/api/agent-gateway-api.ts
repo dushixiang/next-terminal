@@ -10,6 +10,82 @@ export interface AgentGateway {
     online: boolean;
     createdAt: number;
     updatedAt: number;
+    stat?: Stat;
+}
+
+interface Stat {
+    cpu: CPU;
+    memory: Memory;
+    disk: Disk;
+    disk_io: DiskIO;
+    network: Network;
+    load: Load;
+    host: Host;
+    process: Process;
+    connections: any;
+    tcp_states: any[];
+    security_alerts?: any;
+    errors: Errors;
+}
+
+interface Errors {
+}
+
+interface Process {
+    total: number;
+}
+
+interface Host {
+    hostname: string;
+    os: string;
+    arch: string;
+    version: string;
+    uptime: number;
+}
+
+interface Load {
+    load_1: number;
+    load_5: number;
+    load_15: number;
+}
+
+interface Network {
+    rx: number;
+    tx: number;
+    rx_sec: number;
+    tx_sec: number;
+    history: any[];
+}
+
+interface DiskIO {
+    read_bytes: number;
+    write_bytes: number;
+    history: any[];
+}
+
+interface Disk {
+    total: number;
+    used: number;
+    percent: number;
+    history: any[];
+}
+
+interface Memory {
+    total: number;
+    used: number;
+    free: number;
+    percent: number;
+    swap_total: number;
+    swap_free: number;
+    history: any[];
+}
+
+interface CPU {
+    model: string;
+    physical_cores: number;
+    logical_cores: number;
+    percent: number;
+    history: any[];
 }
 
 export interface RegisterParam {
@@ -28,6 +104,10 @@ class AgentGatewayApi extends Api<AgentGateway> {
 
     setRegisterAddr = async (endpoint: string) => {
         return await requests.post(`/${this.group}/set-register-addr?endpoint=${endpoint}`);
+    }
+
+    getStat = async (id: string) => {
+        return await requests.get(`/${this.group}/${id}/stat`) as Stat;
     }
 }
 

@@ -74,8 +74,8 @@ const CommandFilterRuleModal = ({
                 <ProFormRadio.Group
                     label={t('authorised.command_filter.rule.type.label')} name='type' rules={[{required: true}]}
                     options={[
-                        {value: 'command', label: t('authorised.command_filter.rule.type.options.regexp')},
-                        {value: 'regexp', label: t('authorised.command_filter.rule.type.options.command')},
+                        {value: 'command', label: t('authorised.command_filter.rule.type.options.command')},
+                        {value: 'regexp', label: t('authorised.command_filter.rule.type.options.regexp')},
                     ]}
                 />
                 <ProFormText label={t('authorised.command_filter.rule.match_content')} name='command' rules={[{required: true}]}/>

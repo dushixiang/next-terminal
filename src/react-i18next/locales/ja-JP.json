@@ -51,7 +51,20 @@
     "website-active-count": "アクティブウェブサイト",
     "date-counter": "アクティブ統計",
     "asset-type": "資産タイプ",
-    "latest-session": "最新セッション"
+    "latest-session": "最新セッション",
+    "login_times": "ログイン回数",
+    "active_users": "アクティブユーザー",
+    "active_assets": "活性資産",
+    "login_failed_times": "ログイン失敗回数",
+    "user_online_count": "オンラインユーザー",
+    "session_online_count": "オンライン会話",
+    "gateway_active_count": "オンラインゲートウェイ",
+    "asset_active_count": "生存資産",
+    "website_active_count": "生存するWeb資産",
+    "date_counter": "活発な統計",
+    "asset_type": "資産タイプ",
+    "latest_session": "最新会話",
+    "website_count": "ウェブ資産"
   },
   "stat": {
     "days": "日",
@@ -99,7 +112,8 @@
         "credential": "認証情報",
         "snippet": "コマンドスニペット",
         "storage": "ストレージ",
-        "website": "ウェブサイト"
+        "website": "ウェブサイト",
+        "certificate": "証明書管理"
       }
     },
     "gateway": {
@@ -682,7 +696,42 @@
     "limit_time": "有効期限",
     "limit_password": "パスワードアクセス制限",
     "limit_password_tip": "資産にアクセスするには、正しいパスワードを使用してください。",
-    "ungrouped": "未グループ化"
+    "ungrouped": "未グループ化",
+    "preserve_host": "ホスト名を保留する",
+    "custom_certificate": "カスタム証明書",
+    "certificates": {
+      "common_name": "ドメイン名",
+      "certificate": "証明書",
+      "private_key": "プライベートキー",
+      "type": "証明書の種類",
+      "self_signed": "自己発行",
+      "issued": "オンライン申請",
+      "imported": "ローカルインポート",
+      "not_after": "有効期限",
+      "issuer": "発行機関",
+      "issuedStatus": "発行状態",
+      "issuedPending": "発行中",
+      "issuedSuccess": "発行成功",
+      "issuedFailed": "発行失敗",
+      "is_default": "デフォルトの証明書",
+      "is_default_tooltip": "デフォルトの証明書とは、他の証明書が一致しない場合に使用される証明書を指します。",
+      "set_as_default": "デフォルトに設定",
+      "issued_log": "証明書申請ログ"
+    },
+    "dns_providers": {
+      "label": "DNSサプライヤー",
+      "set": "DNSプロバイダーの設定",
+      "remove": "DNSプロバイダーの削除",
+      "remove_confirm_title": "DNSプロバイダー設定の削除",
+      "remove_confirm_content": "削除後、証明書の申請ができなくなります。",
+      "type": "サプライヤータイプ",
+      "tencentcloud": "テンセントクラウド",
+      "alidns": "アリババクラウド",
+      "huaweicloud": "華為クラウド",
+      "cloudflare": "クラウドフレア"
+    },
+    "dns_provider_config": "DNSサプライヤー設定",
+    "dns_provider_config_tip": "サプライヤの要件に従って構成情報を入力してください。"
   },
   "gateways": {
     "name": "名前",
@@ -697,7 +746,36 @@
     "rpc-addr": "通信アドレス",
     "download-addr": "ダウンロードアドレス",
     "username": "アカウント",
-    "account_type": {}
+    "account_type": {},
+    "endpoint": "連絡先住所",
+    "token": "通信トークン",
+    "token_manage": "通信トークン管理",
+    "online": "オンライン",
+    "offline": "オフライン",
+    "register": "登録",
+    "stat": {
+      "label": "統計データ",
+      "uptime": "実行時間",
+      "cpu": "プロセッサ",
+      "memory": "メモリ",
+      "disk": "ディスク",
+      "disk_io": "ディスクIO",
+      "network": "ネットワーク",
+      "network_io": "ネットワークIO",
+      "load": "負荷",
+      "host": "ホスト",
+      "process": "プロセス",
+      "system": "システム",
+      "model": "型番",
+      "logical_cores": "論理コア",
+      "physical_cores": "物理コア",
+      "percent": "使用率",
+      "total": "総サイズ",
+      "used": "既に使用済み",
+      "connections": "ネットワーク接続",
+      "tcp_states": "TCP 接続状態"
+    },
+    "install_shell": "スクリプトのインストール"
   },
   "settings": {
     "system": {
@@ -789,7 +867,10 @@
       "port_forwarding": {
         "enabled": "トンネルを有効にする",
         "host_port": "トンネル転送を許可するIPポート"
-      }
+      },
+      "usage": "使用例",
+      "mode_proxy": "プロキシパターン",
+      "mode_direct": "ダイレクト接続モード"
     },
     "rp": {
       "setting": "リバースプロキシサーバー",

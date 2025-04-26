@@ -129,8 +129,9 @@ export const browserDownload = (url: string) => {
 }
 
 export const handleKeyDown = (e) => {
-    // 禁用 F12
-    if (e.key === 'F12' || e.keyCode === 123) {
+    // 禁用所有 F1-F12 功能键
+    if ((e.key && e.key.startsWith('F') && parseInt(e.key.substring(1)) >= 1 && parseInt(e.key.substring(1)) <= 12) ||
+        (e.keyCode >= 112 && e.keyCode <= 123)) {
         e.preventDefault();
         return false;
     }
@@ -149,4 +150,25 @@ export const handleKeyDown = (e) => {
         e.preventDefault();
         return false;
     }
+}
+
+// 将秒数转换为天、小时、分钟、秒
+export function formatUptime(seconds?: number) {
+    if (!seconds) {
+        return '0s';
+    }
+    const days = Math.floor(seconds / (24 * 60 * 60));
+    seconds %= 24 * 60 * 60;
+    const hours = Math.floor(seconds / (60 * 60));
+    seconds %= 60 * 60;
+    const minutes = Math.floor(seconds / 60);
+    seconds %= 60;
+
+    return `${days}d ${hours}h ${minutes}m`;
+}
+
+export function getColor(percent: number): string {
+    if (percent < 60) return "#06DF73";
+    if (percent < 85) return "#FF8905";
+    return "#FF6467";
 }

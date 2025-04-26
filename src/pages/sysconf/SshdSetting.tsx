@@ -6,7 +6,7 @@ import {useMutation} from "@tanstack/react-query";
 import propertyApi from "../../api/property-api";
 import {useTranslation} from "react-i18next";
 
-const {Title} = Typography;
+const {Title, Paragraph} = Typography;
 
 const SshdSetting = ({get, set}: SettingProps) => {
 
@@ -47,22 +47,17 @@ const SshdSetting = ({get, set}: SettingProps) => {
                 style={{marginBottom: 10}}
             />
 
-            <Alert
-                message={
-                    <div>
-                        <div className={'flex items-center gap-2'}>
-                            <div className={'font-medium'}>Proxy</div>
-                            <span className={'text-green-500'}>ssh username@host -p port</span>
-                        </div>
-                        <div className={'flex items-center gap-2'}>
-                            <div className={'font-medium'}>Direct</div>
-                            <span className={'text-green-500'}>ssh username:asset-name@host -p port</span>
-                        </div>
-                    </div>
-                }
-                type="success"
-                style={{marginBottom: 10}}
-            />
+            <div className={'space-y-1 mb-4 border rounded-lg p-4'}>
+                <div className={'font-medium'}>{t('settings.sshd.usage')}</div>
+                <div className={'flex items-center gap-2'}>
+                    <div>{t('settings.sshd.mode_proxy')}</div>
+                    <div><Paragraph style={{marginBottom:0}} copyable={true}>ssh username@host -p port</Paragraph></div>
+                </div>
+                <div className={'flex items-center gap-2'}>
+                    <div>{t('settings.sshd.direct_proxy')}</div>
+                    <div><Paragraph style={{marginBottom:0}} copyable={true}>ssh username:asset-name@host -p port</Paragraph></div>
+                </div>
+            </div>
 
             <ProForm formRef={formRef} onFinish={wrapSet} request={wrapGet}
                      submitter={{

@@ -40,18 +40,19 @@
   },
   "dashboard": {
     "name": "数据概览",
-    "login-times": "登录次数",
-    "active-users": "活跃用户",
-    "active-assets": "活跃资产",
-    "login-failed-times": "登录失败次数",
-    "user-online-count": "在线用户",
-    "session-online-count": "在线会话",
-    "gateway-active-count": "在线网关",
-    "asset-active-count": "存活资产",
-    "website-active-count": "存活Web资产",
-    "date-counter": "活跃统计",
-    "asset-type": "资产类型",
-    "latest-session": "最新会话"
+    "login_times": "登录次数",
+    "active_users": "活跃用户",
+    "active_assets": "活跃资产",
+    "login_failed_times": "登录失败次数",
+    "user_online_count": "在线用户",
+    "session_online_count": "在线会话",
+    "gateway_active_count": "在线网关",
+    "asset_active_count": "存活资产",
+    "website_active_count": "存活Web资产",
+    "date_counter": "活跃统计",
+    "asset_type": "资产类型",
+    "latest_session": "最新会话",
+    "website_count": "Web资产"
   },
   "stat": {
     "days": "天",
@@ -99,7 +100,8 @@
         "credential": "授权凭证",
         "snippet": "命令片段",
         "storage": "存储",
-        "website": "Web资产"
+        "website": "Web资产",
+        "certificate": "证书管理"
       }
     },
     "gateway": {
@@ -550,9 +552,9 @@
     "login": {
       "action": "登录",
       "methods": {
-        "passkey": "通过通行密钥认证",
-        "password": "通过密码认证",
-        "otp": "通过OTP认证"
+        "passkey": "使用通行密钥认证",
+        "password": "使用密码认证",
+        "otp": "使用OTP认证"
       }
     },
     "otp": "双因素认证",
@@ -647,7 +649,9 @@
     "change_group": "修改分组",
     "general": "常规",
     "header": "请求头",
+    "preserve_host": "保留主机名",
     "custom_header": "自定义请求头",
+    "custom_certificate": "自定义证书",
     "header_key": "键",
     "header_value": "值",
     "basic_auth": "基本认证",
@@ -682,7 +686,40 @@
     "limit_time": "失效时间",
     "limit_password": "口令访问限制",
     "limit_password_tip": "使用正确的口令才能访问资产。",
-    "ungrouped": "未分组"
+    "ungrouped": "未分组",
+    "certificates": {
+      "common_name": "域名",
+      "certificate": "证书",
+      "private_key": "私钥",
+      "type": "证书类型",
+      "self_signed": "自签发",
+      "issued": "在线申请",
+      "imported": "本地导入",
+      "not_after": "过期时间",
+      "issuer": "签发机构",
+      "issuedStatus": "签发状态",
+      "issuedPending": "签发中",
+      "issuedSuccess": "签发成功",
+      "issuedFailed": "签发失败",
+      "is_default": "默认证书",
+      "is_default_tooltip": "默认证书指的是在匹配不到其他证书的时候使用的证书。",
+      "set_as_default": "设为默认",
+      "issued_log": "证书申请日志"
+    },
+    "dns_providers": {
+      "label": "DNS 供应商",
+      "set": "设置 DNS 供应商",
+      "remove": "移除 DNS 供应商",
+      "remove_confirm_title": "移除 DNS 服务商设置",
+      "remove_confirm_content": "移除后，将无法申请证书",
+      "type": "供应商类型",
+      "tencentcloud": "腾讯云",
+      "alidns": "阿里云",
+      "huaweicloud": "华为云",
+      "cloudflare": "Cloudflare"
+    },
+    "dns_provider_config": "DNS 供应商配置",
+    "dns_provider_config_tip": "请根据供应商的要求填写配置信息。"
   },
   "gateways": {
     "name": "名称",
@@ -693,11 +730,37 @@
     "version": "版本",
     "connected": "已连接",
     "disconnected": "已断开",
-    "register-agent-gateway": "注册安全网关",
-    "rpc-addr": "通信地址",
-    "download-addr": "下载地址",
     "username": "账号",
-    "account_type": {}
+    "account_type": {},
+    "register": "注册",
+    "endpoint": "通信地址",
+    "token": "通信令牌",
+    "token_manage": "通信令牌管理",
+    "install_shell": "安装脚本",
+    "online": "在线",
+    "offline": "离线",
+    "stat": {
+      "label": "统计数据",
+      "uptime": "运行时间",
+      "cpu": "处理器",
+      "memory": "内存",
+      "disk": "磁盘",
+      "disk_io": "磁盘 I/O",
+      "network": "网络",
+      "network_io": "网络 I/O",
+      "load": "负载",
+      "host": "主机",
+      "process": "进程",
+      "system": "系统",
+      "model": "型号",
+      "logical_cores": "逻辑核心",
+      "physical_cores": "物理核心",
+      "percent": "使用率",
+      "total": "总大小",
+      "used": "已使用",
+      "connections": "网络连接",
+      "tcp_states": "TCP 连接状态"
+    }
   },
   "settings": {
     "system": {
@@ -789,7 +852,10 @@
       "port_forwarding": {
         "enabled": "开启隧道",
         "host_port": "允许隧道转发的IP端口"
-      }
+      },
+      "usage": "使用示例",
+      "mode_proxy": "代理模式",
+      "mode_direct": "直连模式"
     },
     "rp": {
       "setting": "反向代理服务器",

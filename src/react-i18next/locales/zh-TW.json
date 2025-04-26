@@ -51,7 +51,20 @@
     "website-active-count": "存活網站",
     "date-counter": "活躍統計",
     "asset-type": "資產類型",
-    "latest-session": "最近會話"
+    "latest-session": "最近會話",
+    "login_times": "登錄次數",
+    "active_users": "活躍用戶",
+    "active_assets": "活躍資產",
+    "login_failed_times": "登錄失敗次數",
+    "user_online_count": "在線用戶",
+    "session_online_count": "在線會話",
+    "gateway_active_count": "在線網關",
+    "asset_active_count": "存活資產",
+    "website_active_count": "存活Web資產",
+    "date_counter": "活躍統計",
+    "asset_type": "資產類型",
+    "latest_session": "最新對話",
+    "website_count": "Web資產"
   },
   "stat": {
     "days": "天",
@@ -99,7 +112,8 @@
         "credential": "授權憑證",
         "snippet": "命令片段",
         "storage": "儲存",
-        "website": "網站"
+        "website": "網站",
+        "certificate": "證書管理"
       }
     },
     "gateway": {
@@ -682,7 +696,42 @@
     "limit_time": "失效時間",
     "limit_password": "口令訪問限制",
     "limit_password_tip": "使用正確的密碼才能訪問資產。",
-    "ungrouped": "未分組"
+    "ungrouped": "未分組",
+    "preserve_host": "保留主機名",
+    "custom_certificate": "自定義證書",
+    "certificates": {
+      "common_name": "域名",
+      "certificate": "證書",
+      "private_key": "私鑰",
+      "type": "證書類型",
+      "self_signed": "自簽發",
+      "issued": "在線申請",
+      "imported": "本地導入",
+      "not_after": "過期時間",
+      "issuer": "簽發機構",
+      "issuedStatus": "簽發狀態",
+      "issuedPending": "簽發中",
+      "issuedSuccess": "簽發成功",
+      "issuedFailed": "簽發失敗",
+      "is_default": "預設憑證",
+      "is_default_tooltip": "預設憑證是指在找不到其他憑證時所使用的憑證。",
+      "set_as_default": "設為預設",
+      "issued_log": "證書申請日誌"
+    },
+    "dns_providers": {
+      "label": "DNS 供應商",
+      "set": "設置 DNS 供應商",
+      "remove": "移除 DNS 供應商",
+      "remove_confirm_title": "移除 DNS 服務提供商設置",
+      "remove_confirm_content": "移除後，將無法申請證書",
+      "type": "供應商類型",
+      "tencentcloud": "騰訊雲",
+      "alidns": "阿里雲",
+      "huaweicloud": "華為雲",
+      "cloudflare": "Cloudflare"
+    },
+    "dns_provider_config": "DNS 供應商配置",
+    "dns_provider_config_tip": "請根據供應商的要求填寫配置信息。"
   },
   "gateways": {
     "name": "名稱",
@@ -697,7 +746,36 @@
     "rpc-addr": "通訊地址",
     "download-addr": "下載地址",
     "username": "帳號",
-    "account_type": {}
+    "account_type": {},
+    "endpoint": "通訊地址",
+    "token": "通訊令牌",
+    "token_manage": "通訊令牌管理",
+    "online": "在線",
+    "offline": "離線",
+    "register": "註冊",
+    "stat": {
+      "label": "統計數據",
+      "uptime": "運行時間",
+      "cpu": "處理器",
+      "memory": "內存",
+      "disk": "磁碟",
+      "disk_io": "磁碟 IO",
+      "network": "網絡",
+      "network_io": "網絡 IO",
+      "load": "負載",
+      "host": "主機",
+      "process": "進程",
+      "system": "系統",
+      "model": "型號",
+      "logical_cores": "邏輯核心",
+      "physical_cores": "物理核心",
+      "percent": "使用率",
+      "total": "總大小",
+      "used": "已使用",
+      "connections": "網絡連接",
+      "tcp_states": "TCP 連接狀態"
+    },
+    "install_shell": "安裝腳本"
   },
   "settings": {
     "system": {
@@ -789,7 +867,10 @@
       "port_forwarding": {
         "enabled": "啟動隧道",
         "host_port": "允許隧道轉發的IP端口"
-      }
+      },
+      "usage": "使用範例",
+      "mode_proxy": "代理模式",
+      "mode_direct": "直連模式"
     },
     "rp": {
       "setting": "反向代理伺服器",

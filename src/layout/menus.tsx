@@ -25,6 +25,7 @@ import {
     UserOutlined,
     UserSwitchOutlined,
     WarningOutlined,
+    SafetyCertificateOutlined,
 } from "@ant-design/icons";
 import React from "react";
 
@@ -64,6 +65,11 @@ export const getMenus = (t: any) => {
                     key: 'website',
                     label: t('menus.resource.submenus.website'),
                     icon: <GlobalOutlined/>,
+                },
+                {
+                    key: 'certificate',
+                    label: t('menus.resource.submenus.certificate'),
+                    icon: <SafetyCertificateOutlined />,
                 },
             ]
         },

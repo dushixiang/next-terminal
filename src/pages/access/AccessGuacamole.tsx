@@ -200,7 +200,6 @@ const AccessGuacamole = ({assetId}: Props) => {
                 copy(data);
                 message.success(t('copy_success'));
             };
-            console.log(`0`)
         } else {
             let reader = new Guacamole.BlobReader(stream, mimetype);
             reader.onend = () => {

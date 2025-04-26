@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Badge, Button, Popconfirm} from "antd";
+import {App, Badge, Button, Popconfirm, Progress} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
 import agentGatewayApi, {AgentGateway} from "@/src/api/agent-gateway-api";
@@ -10,6 +10,9 @@ import NButton from "@/src/components/NButton";
 import {useLicense} from "@/src/hook/use-license";
 import Disabled from "@/src/components/Disabled";
 import AgentGatewayTokenDrawer from "@/src/pages/gateway/AgentGatewayTokenDrawer";
+import {ArrowDownIcon, ArrowUpIcon} from "lucide-react";
+import {formatUptime, getColor, renderSize} from "@/src/utils/utils";
+import AgentGatewayStat from "@/src/pages/gateway/AgentGatewayStat";
 
 const api = agentGatewayApi;
 
@@ -24,6 +27,7 @@ const AgentGatewayPage = () => {
     let [license] = useLicense();
 
     let [tokenManageOpen, setTokenManageOpen] = useState<boolean>(false);
+    let [statOpen, setStatOpen] = useState<boolean>(false);
 
     const {message} = App.useApp();
 
@@ -52,45 +56,155 @@ const AgentGatewayPage = () => {
         });
     }
 
+    const JudgeLoadBusy = (load: number, cores: number) => {
+        const ratio = load / cores;
+
+        if (ratio < 0.7) return <div className={'text-green-400'}>负载正常</div>;      // 负载正常
+        if (ratio < 1.0) return <div className={'text-orange-400'}>轻度繁忙</div>;     // 轻度繁忙
+        return <div className={'text-red-400'}>系统繁忙</div>;                         // 系统繁忙
+    }
+
     let columns: ProColumns<AgentGateway>[] = [
-        {
-            dataIndex: 'index',
-            valueType: 'indexBorder',
-            width: 48,
-        },
         {
             title: t('gateways.name'),
             dataIndex: 'name',
-        },
-        {
-            title: 'IP',
-            dataIndex: 'ip',
-            key: 'ip',
-            sorter: true,
-            hideInSearch: true
+            render: (text, record) => {
+                if (record.online) {
+                    return <Badge status="success" text={record.name}/>
+                }
+                return <Badge status="error" text={record.name}/>
+            }
         },
         {
             title: t('gateways.os'),
             dataIndex: 'os',
             key: 'os',
-            hideInSearch: true
+            hideInSearch: true,
+            // width: 120,
+            render: (text, record) => {
+                return <div className={''}>
+                    {record.os}
+                </div>
+            }
         },
         {
-            title: t('gateways.arch'),
-            dataIndex: 'arch',
-            key: 'arch',
-            hideInSearch: true
-        },
-        {
-            title: t('gateways.status'),
-            dataIndex: 'status',
-            key: 'status',
+            title: t('gateways.stat.uptime'),
+            dataIndex: 'stat.cpu',
+            key: 'stat.cpu',
             hideInSearch: true,
             render: (text, record) => {
-                if (record.online) {
-                    return <Badge status="success" text={t('gateways.online')}/>
+                return <div>
+                    {formatUptime(record.stat?.host.uptime)}
+                </div>
+            }
+        },
+        {
+            title: t('gateways.stat.load'),
+            dataIndex: 'stat.load',
+            key: 'stat.load',
+            hideInSearch: true,
+            render: (text, record) => {
+                if (record.online === false) {
+                    return '-';
                 }
-                return <Badge status="default" text={t('gateways.offline')}/>
+                return <div>
+                    {JudgeLoadBusy(record.stat?.load.load_1, record.stat?.cpu.logical_cores)}
+                </div>
+            }
+        },
+        {
+            title: t('gateways.stat.cpu'),
+            dataIndex: 'stat.cpu',
+            key: 'stat.cpu',
+            hideInSearch: true,
+            width: 120,
+            render: (text, record) => {
+                return <div className={'text-xs'}>
+                    <Progress size="small"
+                              style={{
+                                  width: '100px',
+                              }}
+                              strokeColor={getColor(record.stat?.cpu.percent)}
+                              percent={record.stat?.cpu.percent}
+                              format={(percent, successPercent) => `${percent.toFixed(2)}%`}
+                    />
+                </div>
+            }
+        },
+        {
+            title: t('gateways.stat.memory'),
+            dataIndex: 'stat.memory',
+            key: 'stat.memory',
+            hideInSearch: true,
+            width: 120,
+            render: (text, record) => {
+                return <div className={'text-xs'}>
+                    <Progress size="small"
+                              style={{
+                                  width: '100px',
+                              }}
+                              strokeColor={getColor(record.stat?.memory.percent)}
+                              percent={record.stat?.memory.percent}
+                              format={(percent, successPercent) => `${percent.toFixed(2)}%`}
+                    />
+                </div>
+            }
+        },
+        {
+            title: t('gateways.stat.disk'),
+            dataIndex: 'stat.disk',
+            key: 'stat.disk',
+            hideInSearch: true,
+            width: 120,
+            render: (text, record) => {
+                return <div className={'text-xs'}>
+                    <Progress size="small"
+                              style={{
+                                  width: '100px',
+                              }}
+                              strokeColor={getColor(record.stat?.disk.percent)}
+                              percent={record.stat?.disk.percent}
+                              format={(percent, successPercent) => `${percent.toFixed(2)}%`}
+                    />
+                </div>
+            }
+        },
+        {
+            title: t('gateways.stat.network_io'),
+            dataIndex: 'stat.network_io',
+            key: 'stat.network_io',
+            hideInSearch: true,
+            width: 120,
+            render: (text, record) => {
+                return <div className="flex flex-col gap-1 text-xs">
+                    <div className={'flex items-center gap-1 text-green-500'}>
+                        <ArrowUpIcon className={'h-4 w-4 '}/>
+                        <div>{renderSize(record.stat?.network.rx_sec)}/s</div>
+                    </div>
+                    <div className={'flex items-center gap-1 text-red-500'}>
+                        <ArrowDownIcon className={'h-4 w-4 '}/>
+                        <div>{renderSize(record.stat?.network.tx_sec)}/s</div>
+                    </div>
+                </div>
+            }
+        },
+        {
+            title: t('gateways.stat.disk_io'),
+            dataIndex: 'stat.disk_io',
+            key: 'stat.disk_io',
+            hideInSearch: true,
+            width: 120,
+            render: (text, record) => {
+                return <div className="flex flex-col gap-1 text-xs">
+                    <div className={'flex items-center gap-1 '}>
+                        读
+                        <div>{renderSize(record.stat?.disk_io.read_bytes)}/s</div>
+                    </div>
+                    <div className={'flex items-center gap-1 '}>
+                        写
+                        <div>{renderSize(record.stat?.disk_io.write_bytes)}/s</div>
+                    </div>
+                </div>
             }
         },
         {
@@ -110,8 +224,17 @@ const AgentGatewayPage = () => {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
-            width: 160,
+            width: 120,
             render: (text, record, _, action) => [
+                <NButton
+                    key="edit"
+                    onClick={() => {
+                        setStatOpen(true);
+                        setSelectedRowKey(record.id);
+                    }}
+                >
+                    {t('gateways.stat.label')}
+                </NButton>,
                 <NButton
                     key="edit"
                     onClick={() => {
@@ -142,7 +265,6 @@ const AgentGatewayPage = () => {
                     columns={columns}
                     actionRef={actionRef}
                     request={async (params = {}, sort, filter) => {
-
                         let queryParams = {
                             pageIndex: params.current,
                             pageSize: params.pageSize,
@@ -164,20 +286,26 @@ const AgentGatewayPage = () => {
                         defaultPageSize: 10,
                         showSizeChanger: true
                     }}
+                    rowClassName={(record) => {
+                        if (record.online == false) {
+                            return 'grayscale';
+                        }
+                    }}
                     dateFormatter="string"
                     headerTitle={t('menus.gateway.submenus.agent_gateway')}
                     toolBarRender={() => [
                         <Button key="button" type="primary" onClick={() => {
                             setRegisterOpen(true)
                         }}>
-                            {t('actions.new')}
+                            {t('gateways.register')}
                         </Button>,
-                        <Button key="button" color={'geekblue'} variant={'filled'} onClick={() => {
+                        <Button key="button" color={'purple'} variant={'filled'} onClick={() => {
                             setTokenManageOpen(true)
                         }}>
                             {t('gateways.token_manage')}
                         </Button>
                     ]}
+                    polling={1000}
                 />
 
                 <AgentGatewayModal
@@ -202,6 +330,14 @@ const AgentGatewayPage = () => {
                     open={tokenManageOpen}
                     onClose={() => {
                         setTokenManageOpen(false);
+                    }}
+                />
+
+                <AgentGatewayStat
+                    open={statOpen}
+                    id={selectedRowKey}
+                    onClose={() => {
+                        setStatOpen(false);
                     }}
                 />
             </Disabled>
