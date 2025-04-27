@@ -422,6 +422,7 @@ let o = {
                 "check_status": "状态检查",
                 "exec_command": "命令执行",
                 "delete_log": "日志清理",
+                "renew_certificate": "续签证书",
             },
         },
         "mode": {
@@ -555,7 +556,8 @@ let o = {
                 "passkey": "使用通行密钥认证",
                 "password": "使用密码认证",
                 "otp": "使用OTP认证"
-            }
+            },
+            "back": "返回上一步",
         },
         "otp": "双因素认证",
         "next": "下一步",
@@ -693,6 +695,9 @@ let o = {
             "private_key": "私钥",
             "type": "证书类型",
             "self_signed": "自签发",
+            "self_signed_tip_title": "提示: 可自行替换根证书，替换后重启生效。",
+            "self_signed_root_ca_cert_path": "根证书文件路径",
+            "self_signed_root_ca_key_path": "根证书私钥路径",
             "issued": "在线申请",
             "imported": "本地导入",
             "not_after": "过期时间",
@@ -705,6 +710,8 @@ let o = {
             "is_default_tooltip": "默认证书指的是在匹配不到其他证书的时候使用的证书。",
             "set_as_default": "设为默认",
             "issued_log": "证书申请日志",
+            "renew_before": "续签提前时间",
+
         },
         "dns_providers": {
             "label": "DNS 供应商",
@@ -856,7 +863,7 @@ let o = {
             },
             "usage": "使用示例",
             "mode_proxy": "代理模式",
-            "mode_direct": "直连模式",
+            "disable_password_auth": "禁用密码认证",
         },
         "rp": {
             "setting": "反向代理服务器",

@@ -16,6 +16,7 @@ const booleanKeys = [
     'login-session-count-custom',
     'ssh-server-port-forwarding-enabled',
     'access-require-mfa',
+    'ssh-server-disable-password-auth',
 ]
 
 export interface UpgradeStatus {

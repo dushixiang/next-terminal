@@ -113,6 +113,11 @@ const SshdSetting = ({get, set}: SettingProps) => {
                                  disabled={!portForwardEnabled}
                                  placeholder={'172.16.0.1:3306,10.10.0.3:5432'} fieldProps={{rows: 4}}
                 />
+                <ProFormSwitch name="ssh-server-disable-password-auth"
+                               label={t("settings.sshd.disable_password_auth")}
+                               checkedChildren={t('general.yes')}
+                               unCheckedChildren={t('general.no')}
+                />
             </ProForm>
         </div>
     );

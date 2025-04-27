@@ -29,6 +29,10 @@ export const setToken = (token: string) => {
     localStorage.setItem(Token, token);
 }
 
+export const removeToken = () => {
+    localStorage.removeItem(Token);
+}
+
 const handleError = async (error: any, url?: string) => {
     if (error instanceof TypeError) {
         switch (error.message) {

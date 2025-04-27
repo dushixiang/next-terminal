@@ -160,7 +160,7 @@ const CertificatePage = () => {
                         setOpen(true);
                         setSelectedRowKey(record.id);
                     }}
-                    disabled={record.type !== 'imported'}
+                    disabled={record.type === 'self-signed'}
                 >
                     {t('actions.edit')}
                 </NButton>,

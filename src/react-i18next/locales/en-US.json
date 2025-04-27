@@ -433,7 +433,8 @@
       "options": {
         "check_status": "Status Check",
         "exec_command": "Command Execution",
-        "delete_log": "Log Cleanup"
+        "delete_log": "Log Cleanup",
+        "renew_certificate": "Renewal of Certificate"
       }
     },
     "mode": {
@@ -567,7 +568,8 @@
         "passkey": "Authenticate with Passkey",
         "password": "Authenticate with Password",
         "otp": "Authenticate with OTP"
-      }
+      },
+      "back": "Go back to the previous step"
     },
     "otp": "Two-Factor Authentication",
     "next": "Next",
@@ -716,7 +718,11 @@
       "is_default": "Default certificate",
       "is_default_tooltip": "The default certificate refers to the certificate used when no other certificates match.",
       "set_as_default": "Set as Default",
-      "issued_log": "Certificate application log"
+      "issued_log": "Certificate application log",
+      "self_signed_tip_title": "Tip: You can replace the root certificate yourself, and the change will take effect after a restart.",
+      "self_signed_root_ca_cert_path": "Root certificate file path",
+      "self_signed_root_ca_key_path": "Root certificate private key path",
+      "renew_before": "Renewal lead time"
     },
     "dns_providers": {
       "label": "DNS provider",
@@ -870,7 +876,8 @@
       },
       "usage": "Usage",
       "mode_proxy": "Proxy",
-      "mode_direct": "Direct"
+      "mode_direct": "Direct",
+      "disable_password_auth": "Disable password authentication"
     },
     "rp": {
       "setting": "Reverse Proxy Server",

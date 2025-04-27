@@ -433,7 +433,8 @@
       "options": {
         "check_status": "ステータスチェック",
         "exec_command": "コマンド実行",
-        "delete_log": "ログクリア"
+        "delete_log": "ログクリア",
+        "renew_certificate": "証明書の更新"
       }
     },
     "mode": {
@@ -567,7 +568,8 @@
         "passkey": "パスキー認証",
         "password": "パスワード認証",
         "otp": "OTP認証"
-      }
+      },
+      "back": "前のステップに戻る"
     },
     "otp": "二要素認証",
     "next": "次へ",
@@ -716,7 +718,11 @@
       "is_default": "デフォルトの証明書",
       "is_default_tooltip": "デフォルトの証明書とは、他の証明書が一致しない場合に使用される証明書を指します。",
       "set_as_default": "デフォルトに設定",
-      "issued_log": "証明書申請ログ"
+      "issued_log": "証明書申請ログ",
+      "self_signed_tip_title": "ヒント: ルート証明書を自分で交換できます。交換後、再起動してください。",
+      "self_signed_root_ca_cert_path": "ルート証明書ファイルのパス",
+      "self_signed_root_ca_key_path": "ルート証明書の秘密鍵のパス",
+      "renew_before": "更新の前もっての時間"
     },
     "dns_providers": {
       "label": "DNSサプライヤー",
@@ -870,7 +876,8 @@
       },
       "usage": "使用例",
       "mode_proxy": "プロキシパターン",
-      "mode_direct": "ダイレクト接続モード"
+      "mode_direct": "ダイレクト接続モード",
+      "disable_password_auth": "パスワード認証の禁止"
     },
     "rp": {
       "setting": "リバースプロキシサーバー",

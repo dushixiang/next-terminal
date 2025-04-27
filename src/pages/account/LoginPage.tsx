@@ -4,7 +4,7 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {setToken} from "../../api/core/requests";
+import {removeToken, setToken} from "../../api/core/requests";
 import {StyleProvider} from '@ant-design/cssinjs';
 import brandingApi from "@/src/api/branding-api";
 import {useTranslation} from "react-i18next";
@@ -226,6 +226,17 @@ const LoginPage = () => {
                                     loading={mutation.isPending}>
                                 {t('account.login.action')}
                             </Button>
+
+                            <div className={'mt-2'}>
+                                <div className={'text-blue-500 cursor-pointer'}
+                                     onClick={()=>{
+                                         removeToken();
+                                         setStep(LoginStep.Default);
+                                     }}
+                                >
+                                    {t('account.login.back')}
+                                </div>
+                            </div>
                         </Form.Item>
                     </Form>
                 </div>

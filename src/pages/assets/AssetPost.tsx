@@ -73,6 +73,11 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
             if (strings.hasText(asset.logo)) {
                 setLogo(asset.logo);
             }
+            if (copy === true) {
+                asset.password = '';
+                asset.privateKey = '';
+                asset.passphrase = '';
+            }
             return asset;
         }
         return {
@@ -143,9 +148,8 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                                               iconRender: (visible) => (visible ? <EyeTwoTone/> :
                                                   <EyeInvisibleOutlined/>),
                                               visibilityToggle: {
-                                                  // visible: !decrypted,
                                                   onVisibleChange: (visible) => {
-                                                      if (assetId && visible && !decrypted) {
+                                                      if (assetId && !copy && visible && !decrypted) {
                                                           setMfaOpen(true)
                                                       }
                                                   }

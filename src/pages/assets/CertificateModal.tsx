@@ -1,8 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import {Modal} from "antd";
 import {
     ProForm,
     ProFormDependency,
+    ProFormDigit,
     ProFormInstance,
     ProFormRadio,
     ProFormText,
@@ -38,7 +39,8 @@ const CertificateModal = ({
             return await api.getById(id);
         }
         return {
-            type: 'self-signed'
+            type: 'self-signed',
+            renewBefore: 30,
         };
     }
 
@@ -78,6 +80,27 @@ const CertificateModal = ({
                 <ProFormDependency name={['type']}>
                     {({type}) => {
                         switch (type) {
+                            case 'self-signed':
+                                return <>
+                                    <div className={'p-4 border rounded-lg space-y-1'}>
+                                        <div className={'font-medium'}>{t('assets.certificates.self_signed_tip_title')}</div>
+                                        <div>{t('assets.certificates.self_signed_root_ca_cert_path')} ./data/root_ca_cert.pem</div>
+                                        <div>{t('assets.certificates.self_signed_root_ca_key_path')} ./data/root_ca_key.pem</div>
+                                    </div>
+                                </>
+                            case 'issued':
+                                return <>
+                                    <ProFormDigit label={t("assets.certificates.renew_before")}
+                                                  name='renewBefore'
+                                                  rules={[{required: true}]}
+                                                  fieldProps={{
+                                                      addonAfter: t('general.days'),
+                                                      min: 0,
+                                                      max: 3650,
+                                                      step: 1,
+                                                  }}
+                                    />
+                                </>
                             case 'imported':
                                 return <>
                                     <ProFormTextArea label={t("assets.certificates.certificate")}

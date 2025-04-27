@@ -88,6 +88,8 @@ const ScheduledTaskPage = () => {
                         return <Tag color="red" bordered={false}>{t('sysops.type.options.exec_command')}</Tag>;
                     case "delete-history-log":
                         return <Tag color="green" bordered={false}>{t('sysops.type.options.delete_log')}</Tag>;
+                    case "renew-certificate":
+                        return <Tag color="orange" bordered={false}>{t('sysops.type.options.renew_certificate')}</Tag>;
                     default:
                         return '';
                 }

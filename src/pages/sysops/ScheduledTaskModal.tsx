@@ -72,6 +72,7 @@ const ScheduledTaskModal = ({
                                            {label: t('sysops.type.options.exec_command'), value: 'asset-exec-command'},
                                            {label: t('sysops.type.options.check_status'), value: 'asset-check-status'},
                                            {label: t('sysops.type.options.delete_log'), value: 'delete-history-log'},
+                                           {label: t('sysops.type.options.renew_certificate'), value: 'renew-certificate'},
                                        ]}
                         />
                     </Col>
@@ -82,7 +83,7 @@ const ScheduledTaskModal = ({
 
                 <ProFormDependency name={['type']}>
                     {({type}) => {
-                        if (type === 'delete-history-log') {
+                        if (type === 'delete-history-log' || type === 'renew-certificate') {
                             return <></>
                         }
                         return <ProFormSelect

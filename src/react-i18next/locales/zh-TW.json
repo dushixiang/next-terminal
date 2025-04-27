@@ -433,7 +433,8 @@
       "options": {
         "check_status": "狀態檢查",
         "exec_command": "命令執行",
-        "delete_log": "曰誌清釐"
+        "delete_log": "曰誌清釐",
+        "renew_certificate": "續簽證書"
       }
     },
     "mode": {
@@ -566,7 +567,8 @@
         "passkey": "通過通行密鑰驗證",
         "password": "通過密碼認證",
         "otp": "通過OTP認證"
-      }
+      },
+      "back": "返回上一步"
     },
     "next": "下一步",
     "retry": "重試",
@@ -716,7 +718,11 @@
       "is_default": "預設憑證",
       "is_default_tooltip": "預設憑證是指在找不到其他憑證時所使用的憑證。",
       "set_as_default": "設為預設",
-      "issued_log": "證書申請日誌"
+      "issued_log": "證書申請日誌",
+      "self_signed_tip_title": "提示: 可自行替換根證書，替換後重啟生效。",
+      "self_signed_root_ca_cert_path": "根證書文件路徑",
+      "self_signed_root_ca_key_path": "根證書私鑰路徑",
+      "renew_before": "續簽提前時間"
     },
     "dns_providers": {
       "label": "DNS 供應商",
@@ -870,7 +876,8 @@
       },
       "usage": "使用範例",
       "mode_proxy": "代理模式",
-      "mode_direct": "直連模式"
+      "mode_direct": "直連模式",
+      "disable_password_auth": "禁用密碼認證"
     },
     "rp": {
       "setting": "反向代理伺服器",
