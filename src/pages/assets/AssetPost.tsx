@@ -153,6 +153,14 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                                                           setMfaOpen(true)
                                                       }
                                                   }
+                                              },
+                                              onChange: (e) => {
+                                                  let val = e.target.value;
+                                                  if(val.startsWith("******")){
+                                                      val = val.substring(6);
+                                                      formRef.current?.setFieldValue('password', val);
+                                                      setDecrypted(true);
+                                                  }
                                               }
                                           }}
                     />

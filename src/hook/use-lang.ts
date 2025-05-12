@@ -1,27 +1,25 @@
-import {Locale} from "antd/lib/locale";
 import {atomWithLocalStorage} from "@/src/hook/atom";
-import {useAtom} from "jotai/index";
+import {useAtom} from "jotai";
 import enUS from "antd/locale/en_US";
 import zhCN from "antd/locale/zh_CN";
 import zhTW from "antd/locale/zh_TW";
 import jaJP from "antd/locale/ja_JP";
+import i18n from "i18next";
 
-const defaultI18n = 'zh-CN'
+const defaultLanguage = 'en-US';
 
-type ConfigLang = {
-    antdLocale: Locale,
-    i18n: string;
-}
-
-export const DefaultLang: ConfigLang = {
-    antdLocale: enUS,
-    i18n: defaultI18n
-}
-
-const configAtom = atomWithLocalStorage<ConfigLang>('nt-lang', DefaultLang);
+const configAtom = atomWithLocalStorage<string>('nt-language', defaultLanguage);
 
 export function useLang() {
-    return useAtom(configAtom)
+    const [lang, setLang] = useAtom(configAtom);
+
+    const wrapSetLang = (v: string) => {
+        i18n.changeLanguage(v)
+            .then(() => setLang(v))
+            .catch(error => console.error('Language change failed:', error));
+    }
+
+    return [lang, wrapSetLang] as [string, (v: string) => void];
 }
 
 export const translateI18nToAntdLocale = (key: string) => {
@@ -45,5 +43,5 @@ export const translateI18nToESLocale = (key: string) => {
     if (VALID_LOCALES.includes(key)) {
         return key;
     }
-    return defaultI18n;
+    return defaultLanguage;
 }

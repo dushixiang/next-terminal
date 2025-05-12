@@ -91,7 +91,11 @@ const SystemSetting = ({get, set}: SettingProps) => {
     return (
         <div>
             <Title level={5} style={{marginTop: 0}}>{t('settings.system.setting')}</Title>
-            <ProForm onFinish={wrapSet} request={wrapGet}>
+            <ProForm onFinish={wrapSet} request={wrapGet} submitter={{
+                resetButtonProps: {
+                    style: {display: 'none'}
+                }
+            }}>
                 <Divider orientation="left">System</Divider>
 
                 <Disabled disabled={license.isFree()}>

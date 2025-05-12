@@ -971,6 +971,16 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         }
     }, [activeFileIndex, openFiles]);
 
+    let uploadDirLabel = t('fs.operations.upload_dir');
+    if (license.isFree()) {
+        uploadDirLabel += ` (${t('settings.license.type.options.premium')})`;
+    }
+
+    let batchDownloadLabel = t('fs.operations.batch_download');
+    if (license.isFree()) {
+        batchDownloadLabel += ` (${t('settings.license.type.options.premium')})`;
+    }
+
     return (
         <div>
             <Drawer title="FileSystem"
@@ -1002,9 +1012,14 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                            multiple/>
                                 </Tooltip>
 
-                                <Tooltip title={t('fs.operations.upload_dir')}>
+                                <Tooltip title={uploadDirLabel}>
                                     {strategy?.upload &&
-                                        <FolderUpIcon className={'h-4 w-4 cursor-pointer'} onClick={() => {
+                                        <FolderUpIcon className={cn(
+                                            'h-4 w-4 cursor-pointer', license.isFree() && 'text-gray-400 cursor-no-drop'
+                                        )} onClick={() => {
+                                            if (license.isFree()) {
+                                                return
+                                            }
                                             dirUploadRef.current?.click();
                                         }}/>
                                     }
@@ -1043,7 +1058,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                 </Tooltip>
 
                                 <Tooltip
-                                    title={`${t('fs.operations.batch_download')}${license.isFree() && (` (` + t('settings.license.type.options.premium') + `)`)}`}>
+                                    title={batchDownloadLabel}>
                                     {strategy?.download &&
                                         <DownloadIcon
                                             className={cn('h-4 w-4 cursor-pointer', license.isFree() && 'text-gray-400 cursor-no-drop')}

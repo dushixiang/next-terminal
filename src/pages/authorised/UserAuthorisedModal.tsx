@@ -105,7 +105,7 @@ const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel,
             title={t('actions.authorized')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
@@ -116,11 +116,11 @@ const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel,
                             values['expiredAt'] = expiredAtDayjs.valueOf();
                         }
                         handleOk(values);
-                        formRef.current?.resetFields();
+                        
                     });
             }}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
             confirmLoading={confirmLoading}

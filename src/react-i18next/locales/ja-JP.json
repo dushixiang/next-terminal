@@ -275,7 +275,8 @@
       "permission": "権限"
     },
     "user_group": {
-      "members": "メンバー"
+      "members": "メンバー",
+      "members_count": "メンバー数"
     },
     "user": {
       "username": "アカウント",
@@ -392,13 +393,29 @@
           "options": {
             "allow": "許可",
             "reject": "拒否"
-          }
+          },
+          "status": "状態",
+          "authorised_at": "認証時間",
+          "authorised_user": "認証ユーザー",
+          "expired_at": "有効期限",
+          "never_expired": "期限切れにならない"
         },
         "status": "ステータス",
         "authorised_at": "承認時間",
         "authorised_user": "承認ユーザー",
         "expired_at": "有効期限",
         "never_expired": "無期限"
+      },
+      "label": {
+        "authorised": "認証",
+        "user": "ユーザー",
+        "user_group": "ユーザー・グループ",
+        "asset": "資産",
+        "command_filter": "命令インターセプター",
+        "strategy": "戦略",
+        "expired_at": "有効期限",
+        "authorised_at": "認証時間",
+        "never_expired": "永久に有効"
       }
     },
     "label": {
@@ -451,7 +468,8 @@
       "attempts_tips": "リクエストを送信する回数を設定する",
       "port": "ポート",
       "testing": "検査を开始します"
-    }
+    },
+    "spec_tooltip": "秒単位のスケジューリングタスクをサポートし、標準的なcron式とは異なり、最初のフィールドは秒を表します（Quartz式仕様と互換性あり）、ただし年フィールドはサポートしていません。"
   },
   "audit": {
     "client_ip": "クライアントIP",
@@ -737,7 +755,20 @@
       "cloudflare": "クラウドフレア"
     },
     "dns_provider_config": "DNSサプライヤー設定",
-    "dns_provider_config_tip": "サプライヤの要件に従って構成情報を入力してください。"
+    "dns_provider_config_tip": "サプライヤの要件に従って構成情報を入力してください。",
+    "modify_response": "レスポンスを修正する",
+    "modify_response_enabled": "レスポンスボディの変更を有効にする",
+    "response_match_url": "マッチングレスポンスURL（オプション）",
+    "response_match_url_tip": "応答URLがこのルールに一致する場合にのみ有効です。正規表現をサポートしています。",
+    "response_match_content_type": "Content-Type（オプション）",
+    "response_match_content_type_tip": "例えば：text/html、application/json など。",
+    "add_rule": "ルールを追加する",
+    "modify_rules": "ルールリストの修正",
+    "modify_type": "修正タイプ",
+    "pattern": "マッチング内容",
+    "replacement": "置き換える",
+    "modify_response_tip": "複数の変更ルールを設定でき、順番に適用されます。",
+    "modify_response_compression_support": "gzip、deflate、brなどの圧縮形式の展開と再圧縮を自動でサポートします。"
   },
   "gateways": {
     "name": "名前",
@@ -781,7 +812,13 @@
       "connections": "ネットワーク接続",
       "tcp_states": "TCP 接続状態"
     },
-    "install_shell": "スクリプトのインストール"
+    "install_shell": "スクリプトのインストール",
+    "ssh_status": {
+      "disconnected": "未接続",
+      "connecting": "接続中",
+      "connected": "接続済み",
+      "error": "接続失敗"
+    }
   },
   "settings": {
     "system": {
@@ -877,7 +914,8 @@
       "usage": "使用例",
       "mode_proxy": "プロキシパターン",
       "mode_direct": "ダイレクト接続モード",
-      "disable_password_auth": "パスワード認証の禁止"
+      "disable_password_auth": "パスワード認証の禁止",
+      "direct_proxy": "ダイレクト接続モード"
     },
     "rp": {
       "setting": "リバースプロキシサーバー",

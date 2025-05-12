@@ -17,6 +17,7 @@ import About from "@/src/pages/sysconf/About";
 import BackupSetting from "@/src/pages/sysconf/BackupSetting";
 import LogoSetting from "@/src/pages/sysconf/LogoSetting";
 import IdentitySetting from "@/src/pages/sysconf/IdentitySetting";
+import {useLicense} from "@/src/hook/use-license";
 
 export interface SettingProps {
     get: () => any
@@ -27,6 +28,8 @@ const SettingPage = () => {
 
     const [messageApi, contextHolder] = message.useMessage();
     const [searchParams, setSearchParams] = useSearchParams();
+    let [license] = useLicense();
+
     let key = maybe(searchParams.get('activeKey'), 'system-setting');
 
     let [activeKey, setActiveKey] = useState(key);
@@ -107,12 +110,16 @@ const SettingPage = () => {
             key: 'logo',
             children: <LogoSetting/>
         },
-        {
+
+    ]
+
+    if (!license.isOEM()) {
+        items.push({
             label: t('settings.about.setting'),
             key: 'about',
             children: <About/>
-        },
-    ]
+        },)
+    }
 
     return (
         <div className="px-4">

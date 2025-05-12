@@ -143,12 +143,14 @@ const LicenseSetting = () => {
                                 <input type="file" id="import-license" style={{display: 'none'}}
                                        onChange={handleImportLicense}/>
 
-                                <Button color="primary" variant="filled"
-                                        href={'https://license.typesafe.cn/'}
-                                        target={'_blank'}>
-                                    {t('settings.license.binding')}
-                                </Button>
-
+                                {!licence.isOEM() &&
+                                    <Button color="primary" variant="filled"
+                                            href={'https://license.typesafe.cn/'}
+                                            target={'_blank'}>
+                                        {t('settings.license.binding')}
+                                    </Button>
+                                }
+                                
                                 <Button color="purple" variant="filled" loading={requestLicense.isPending}
                                         onClick={() => requestLicense.mutate()}
                                 >

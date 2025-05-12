@@ -47,16 +47,16 @@ const ScheduledTaskModal = ({
             title={id ? t('actions.edit') : t('actions.new')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
                         handleOk(values);
-                        formRef.current?.resetFields();
+                        
                     });
             }}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
             confirmLoading={confirmLoading}
@@ -77,7 +77,11 @@ const ScheduledTaskModal = ({
                         />
                     </Col>
                     <Col span={12}>
-                        <ProFormText label={t('sysops.spec')} name={'spec'} rules={[{required: true}]}/>
+                        <ProFormText label={t('sysops.spec')}
+                                     name={'spec'}
+                                     rules={[{required: true}]}
+                                     tooltip={t('sysops.spec_tooltip')}
+                        />
                     </Col>
                 </Row>
 

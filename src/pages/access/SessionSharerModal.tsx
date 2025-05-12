@@ -44,7 +44,7 @@ const SessionSharerModal = ({open, onClose, sessionId}: Props) => {
             .then(async values => {
                 await portalApi.createShare(sessionId, values['securityToken']);
                 await getSharer.refetch();
-                formRef.current?.resetFields();
+                
             });
     }
 
@@ -77,7 +77,7 @@ const SessionSharerModal = ({open, onClose, sessionId}: Props) => {
             title={t('access.session.share.action')}
             open={open}
             // maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onCancel={onClose}
             footer={false}
         >

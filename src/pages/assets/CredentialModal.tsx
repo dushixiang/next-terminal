@@ -57,16 +57,16 @@ const CredentialModal = ({
             title={id ? t('actions.edit') : t('actions.new')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
                         handleOk(values);
-                        formRef.current?.resetFields();
+                        
                     });
             }}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
             confirmLoading={confirmLoading}
@@ -113,7 +113,21 @@ const CredentialModal = ({
                                             </Button>
                                         }
                                     </div>
-                                    <ProFormText.Password label={t('assets.passphrase')} name='passphrase'/>
+                                    <ProFormText.Password
+                                        label={t('assets.passphrase')}
+                                        name='passphrase'
+                                        fieldProps={{
+                                            iconRender: (visible) => (visible ? <EyeTwoTone/> :
+                                                <EyeInvisibleOutlined/>),
+                                            visibilityToggle: {
+                                                onVisibleChange: (visible) => {
+                                                    if (id && visible && !decrypted) {
+                                                        setMfaOpen(true)
+                                                    }
+                                                }
+                                            }
+                                        }}
+                                    />
                                 </>;
                             case 'password':
                                 return <>
@@ -124,7 +138,6 @@ const CredentialModal = ({
                                             iconRender: (visible) => (visible ? <EyeTwoTone/> :
                                                 <EyeInvisibleOutlined/>),
                                             visibilityToggle: {
-                                                // visible: !decrypted,
                                                 onVisibleChange: (visible) => {
                                                     if (id && visible && !decrypted) {
                                                         setMfaOpen(true)

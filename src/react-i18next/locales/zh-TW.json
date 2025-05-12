@@ -275,7 +275,8 @@
       "permission": "權限"
     },
     "user_group": {
-      "members": "會員"
+      "members": "會員",
+      "members_count": "成員數量"
     },
     "user": {
       "username": "帳號",
@@ -392,13 +393,29 @@
           "options": {
             "allow": "允許",
             "reject": "拒絕"
-          }
+          },
+          "status": "狀態",
+          "authorised_at": "授權時間",
+          "authorised_user": "授權用戶",
+          "expired_at": "過期時間",
+          "never_expired": "永不逾期"
         },
         "status": "狀態",
         "authorised_at": "授權時間",
         "authorised_user": "授權使用者",
         "expired_at": "過期時間",
         "never_expired": "永遠不過期"
+      },
+      "label": {
+        "authorised": "授權",
+        "user": "使用者",
+        "user_group": "用戶組",
+        "asset": "資產",
+        "command_filter": "命令攔截器",
+        "strategy": "策略",
+        "expired_at": "失效時間",
+        "authorised_at": "授權時間",
+        "never_expired": "永不失效"
       }
     },
     "label": {
@@ -451,7 +468,8 @@
       "attempts_tips": "設置請求發送的次數",
       "port": "埠口",
       "testing": "開始檢測"
-    }
+    },
+    "spec_tooltip": "支持秒級定時任務，與標準cron表達式不同，首字段表示秒（兼容Quartz表達式規範），但不支持年份字段。"
   },
   "audit": {
     "client_ip": "客戶端IP",
@@ -737,7 +755,20 @@
       "cloudflare": "Cloudflare"
     },
     "dns_provider_config": "DNS 供應商配置",
-    "dns_provider_config_tip": "請根據供應商的要求填寫配置信息。"
+    "dns_provider_config_tip": "請根據供應商的要求填寫配置信息。",
+    "modify_response": "修改響應",
+    "modify_response_enabled": "啟用響應體修改",
+    "response_match_url": "匹配響應 URL（可選）",
+    "response_match_url_tip": "僅當響應 URL 匹配該規則時生效，支持正則表達式。",
+    "response_match_content_type": "匹配 Content-Type（可選）",
+    "response_match_content_type_tip": "例如：text/html、application/json 等。",
+    "add_rule": "添加一條規則",
+    "modify_rules": "修改規則清單",
+    "modify_type": "修改類型",
+    "pattern": "匹配內容",
+    "replacement": "替換為",
+    "modify_response_tip": "可配置多個修改規則，按順序依次生效。",
+    "modify_response_compression_support": "自動支援 gzip、deflate、br 等壓縮格式的解壓與重新壓縮。"
   },
   "gateways": {
     "name": "名稱",
@@ -781,7 +812,13 @@
       "connections": "網絡連接",
       "tcp_states": "TCP 連接狀態"
     },
-    "install_shell": "安裝腳本"
+    "install_shell": "安裝腳本",
+    "ssh_status": {
+      "disconnected": "未連接",
+      "connecting": "正在連接",
+      "connected": "已連接",
+      "error": "連接失敗"
+    }
   },
   "settings": {
     "system": {
@@ -877,7 +914,8 @@
       "usage": "使用範例",
       "mode_proxy": "代理模式",
       "mode_direct": "直連模式",
-      "disable_password_auth": "禁用密碼認證"
+      "disable_password_auth": "禁用密碼認證",
+      "direct_proxy": "直連模式"
     },
     "rp": {
       "setting": "反向代理伺服器",

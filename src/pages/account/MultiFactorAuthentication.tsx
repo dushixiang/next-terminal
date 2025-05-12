@@ -85,7 +85,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
             title={t('account.mfa')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             footer={false}
             onOk={() => {
 

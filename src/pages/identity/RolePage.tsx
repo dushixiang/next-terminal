@@ -79,11 +79,13 @@ const RolePage = () => {
             dataIndex: 'createdAt',
             valueType: 'dateTime',
             hideInSearch: true,
+            width: 191,
         },
         {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
+            width: 160,
             render: (text, record, _, action) => [
                 <NButton key="info">
                     <Link key="get" to={`/role/${record['id']}`}>{t('actions.detail')}</Link>

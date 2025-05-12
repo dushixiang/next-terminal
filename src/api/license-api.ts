@@ -13,10 +13,12 @@ export interface License {
 export class SimpleLicense {
     type: string | '' | 'free' | 'test' | 'premium' | 'enterprise';
     expired?: number;
+    oem?: boolean;
 
-    constructor(type: string, expired?: number) {
+    constructor(type: string, expired?: number, oem?: boolean) {
         this.type = type;
         this.expired = expired;
+        this.oem = oem;
     }
 
     // 添加方法
@@ -39,6 +41,11 @@ export class SimpleLicense {
     isExpired(): boolean {
         return this.expired !== undefined && this.expired > 0 && this.expired < new Date().getTime();
     }
+
+    isOEM(): boolean {
+        console.log("isOEM", this.oem)
+        return this.oem === true;
+    }
 }
 
 class LicenseApi {
@@ -55,7 +62,7 @@ class LicenseApi {
 
     getSimpleLicense = async () => {
         let data = await requests.get(`/license`);
-        return new SimpleLicense(data.type, data.expired);
+        return new SimpleLicense(data.type, data.expired, data.oem);
     }
 
     setLicense = async (values: any) => {

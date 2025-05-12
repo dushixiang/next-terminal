@@ -201,20 +201,20 @@ const AccessStats = ({sessionId, open}: Props) => {
                             if (!ready()) {
                                 return <Skeleton className="h-6"/>;
                             }
-                            // user: green
-                            // system: red
-                            // nice blue
-                            let colors = [];
-                            let g = Math.floor(cpu.user / 2);
-                            let r = Math.floor(cpu.system / 2);
+                            // 最大指示器数量
+                            const maxIndicators = 20;
+                            // 计算绿色和红色指示器的数量
+                            const greenCount = Math.floor((cpu.user / 100) * maxIndicators);
+                            const redCount = Math.floor((cpu.system / 100) * maxIndicators);
 
-                            for (let i = 0; i < g; i++) {
+                            let colors = [];
+                            for (let i = 0; i < greenCount; i++) {
                                 colors.push(green[5])
                             }
-                            for (let i = 0; i < r; i++) {
+                            for (let i = 0; i < redCount; i++) {
                                 colors.push(red[4])
                             }
-                            // console.log(`colors`, colors)
+
                             return (
                                 <div key={index} className={'flex gap-2 items-center'}>
                                     <span className={'w-4 text-right'}>{index + 1}</span>

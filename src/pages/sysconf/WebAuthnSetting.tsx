@@ -31,7 +31,11 @@ const WebAuthnSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <ProForm onFinish={wrapSet} request={wrapGet} autoFocus={false}>
+            <ProForm onFinish={wrapSet} request={wrapGet} autoFocus={false} submitter={{
+                resetButtonProps: {
+                    style: {display: 'none'}
+                }
+            }}>
                 <ProFormSwitch name="passkey-enabled"
                                label={t("settings.security.passkey.enabled")}
                                checkedChildren={t('general.enabled')}

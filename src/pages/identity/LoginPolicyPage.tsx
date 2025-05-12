@@ -81,12 +81,14 @@ const LoginPolicyPage = () => {
             dataIndex: 'expirationAt',
             hideInSearch: true,
             sorter: true,
-            valueType: 'dateTime'
+            valueType: 'dateTime',
+            width: 191,
         },
         {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
+            width: 160,
             render: (text, record, _, action) => [
                 <Link to={`/login-policy/new?loginPolicyId=${record.id}`}>
                     <NButton key="edit">

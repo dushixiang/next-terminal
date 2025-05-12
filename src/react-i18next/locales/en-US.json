@@ -52,18 +52,18 @@
     "date-counter": "Activity Statistics",
     "asset-type": "Asset Type",
     "latest-session": "Latest Sessions",
-    "login_times": "Login times",
-    "active_users": "Active user",
-    "active_assets": "Active assets",
+    "login_times": "Login Times",
+    "active_users": "Active User",
+    "active_assets": "Active Assets",
     "login_failed_times": "Number of failed login attempts",
-    "user_online_count": "Online users",
-    "session_online_count": "Online conversation",
+    "user_online_count": "Online Users",
+    "session_online_count": "Online Sessions",
     "gateway_active_count": "Online Gateway",
     "asset_active_count": "Surviving Assets",
     "website_active_count": "Surviving Web Assets",
     "date_counter": "Active Statistics",
     "asset_type": "Asset Type",
-    "latest_session": "Latest Conversation",
+    "latest_session": "Latest Sessions",
     "website_count": "Web assets"
   },
   "stat": {
@@ -138,7 +138,7 @@
       "submenus": {
         "scheduled_task": "Scheduled Tasks",
         "monitoring": "System Monitoring",
-        "tools": "Practical tools"
+        "tools": "Utilities"
       }
     },
     "identity": {
@@ -252,7 +252,7 @@
       "label": "Login Policy",
       "name": "Name",
       "ip_group": "IP Group",
-      "ip_group_extra": "Format: comma-separated strings, 0.0.0.0/0 matches all. For example: 192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20",
+      "ip_group_extra": "Format: comma-separated strings (e.g. 192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20), 0.0.0.0/0 matches all IPs",
       "action": {
         "label": "Action",
         "options": {
@@ -275,7 +275,8 @@
       "permission": "Permission"
     },
     "user_group": {
-      "members": "Members"
+      "members": "Members",
+      "members_count": "Number of members"
     },
     "user": {
       "username": "Username",
@@ -309,7 +310,7 @@
             "new": "New Password",
             "confirm": {
               "title": "Are you sure you want to reset the user's password?",
-              "content": "If no password is entered, a random one will be generated and sent to the user via email."
+              "content": "If no password is entered, a random one will be generated and sent via email."
             }
           },
           "otp": {
@@ -392,13 +393,29 @@
           "options": {
             "allow": "Allow",
             "reject": "Reject"
-          }
+          },
+          "status": "state",
+          "authorised_at": "Authorization Time",
+          "authorised_user": "Authorized User",
+          "expired_at": "Expiration time",
+          "never_expired": "Never expires"
         },
         "status": "Status",
         "authorised_at": "Authorized At",
         "authorised_user": "Authorized User",
         "expired_at": "Expired At",
         "never_expired": "Never Expires"
+      },
+      "label": {
+        "authorised": "Authorization",
+        "user": "user",
+        "user_group": "User Group",
+        "asset": "asset",
+        "command_filter": "Command Interceptor",
+        "strategy": "Strategy",
+        "expired_at": "Expiration Time",
+        "authorised_at": "Authorization Time",
+        "never_expired": "Never expires"
       }
     },
     "label": {
@@ -451,7 +468,8 @@
       "attempts_tips": "Set the number of times the request is sent",
       "port": "Port",
       "testing": "Start Detection"
-    }
+    },
+    "spec_tooltip": "Supports second-level scheduled tasks, different from standard cron expressions, the first field represents seconds (compatible with Quartz expression specifications), but does not support the year field."
   },
   "audit": {
     "client_ip": "Client IP",
@@ -699,6 +717,17 @@
     "limit_password": "Password access restriction",
     "limit_password_tip": "Only the correct password grants access to assets.",
     "ungrouped": "Ungrouped",
+    "modify_response_enabled": "Enable response modification",
+    "response_match_url": "Match URL (optional)",
+    "response_match_url_tip": "Only apply modification when response URL matches (supports regex).",
+    "response_match_content_type": "Match Content-Type (optional)",
+    "response_match_content_type_tip": "E.g., text/html, application/json",
+    "modify_rules": "Modification Rules",
+    "modify_type": "Type",
+    "pattern": "Match Pattern",
+    "replacement": "Replacement",
+    "modify_response_tip": "You can define multiple modification rules, applied in order.",
+    "modify_response_compression_support": "Supports automatic decompression and recompression (e.g. gzip, deflate, br).",
     "preserve_host": "Retain hostname",
     "custom_certificate": "Custom Certificate",
     "certificates": {
@@ -737,7 +766,9 @@
       "cloudflare": "Cloudflare"
     },
     "dns_provider_config": "DNS provider configuration",
-    "dns_provider_config_tip": "Please fill in the configuration information according to the supplier's requirements."
+    "dns_provider_config_tip": "Please fill in the configuration information according to the supplier's requirements.",
+    "modify_response": "Modify Response",
+    "add_rule": "Add a rule"
   },
   "gateways": {
     "name": "Name",
@@ -781,7 +812,13 @@
       "connections": "Network connection",
       "tcp_states": "TCP connection status"
     },
-    "install_shell": "Installation script"
+    "install_shell": "Installation script",
+    "ssh_status": {
+      "disconnected": "Not Connected",
+      "connecting": "Connecting",
+      "connected": "Connected",
+      "error": "Connection failed"
+    }
   },
   "settings": {
     "system": {
@@ -877,7 +914,8 @@
       "usage": "Usage",
       "mode_proxy": "Proxy",
       "mode_direct": "Direct",
-      "disable_password_auth": "Disable password authentication"
+      "disable_password_auth": "Disable password authentication",
+      "direct_proxy": "Direct Connection Mode"
     },
     "rp": {
       "setting": "Reverse Proxy Server",
@@ -1030,7 +1068,7 @@
     "1000": "Invalid token",
     "1001": "Setup required",
     "10000": "Record not found",
-    "10001": "Name already in use",
+    "10001": "Name already exists",
     "10002": "Invalid parameter",
     "10003": "You cannot operate on your own account",
     "10004": "Incorrect account or password",
@@ -1066,7 +1104,7 @@
     "50002": "User two-factor authentication is disabled",
     "50003": "Image is too large",
     "60001": "Password is too short",
-    "60002": "Password complexity is too low",
+    "60002": "Password complexity too low",
     "60003": "Password cannot contain username",
     "60004": "Weak passwords are not allowed",
     "60005": "Password cannot be a palindrome"

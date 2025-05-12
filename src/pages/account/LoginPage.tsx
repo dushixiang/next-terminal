@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Divider, Form, Input, message, Spin, Typography} from "antd";
+import {Button, Divider, Form, Input, message, Select, Spin, Typography} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
@@ -11,6 +11,8 @@ import {useTranslation} from "react-i18next";
 import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {startAuthentication} from "@simplewebauthn/browser";
+import {LanguagesIcon} from "lucide-react";
+import {useLang} from "@/src/hook/use-lang";
 
 const {Title} = Typography;
 
@@ -23,6 +25,7 @@ export enum LoginStep {
 const LoginPage = () => {
     const [optForm] = Form.useForm();
     let {t} = useTranslation();
+    let [lang, setLang] = useLang();
 
     const [step, setStep] = useState<LoginStep>(LoginStep.Default);
     let [loading, setLoading] = useState<boolean>(false);
@@ -229,7 +232,7 @@ const LoginPage = () => {
 
                             <div className={'mt-2'}>
                                 <div className={'text-blue-500 cursor-pointer'}
-                                     onClick={()=>{
+                                     onClick={() => {
                                          removeToken();
                                          setStep(LoginStep.Default);
                                      }}
@@ -249,6 +252,27 @@ const LoginPage = () => {
                 <div className={'w-96 md:border rounded-lg p-8'}>
                     <div className={'font-medium mb-4 text-lg'}>{brandingQuery.data?.name}</div>
                     {renderLoginForm()}
+                </div>
+
+                <div className={'absolute top-8 right-8 cursor-pointer'}>
+                    <Select
+                        placeholder="Language"
+                        variant="borderless"
+                        style={{
+                            width: 120,
+                        }}
+                        prefix={<LanguagesIcon className={'w-4 h-4'}/>}
+                        options={[
+                            {value: 'en-US', label: 'English'},
+                            {value: 'zh-CN', label: '简体中文'},
+                            {value: 'zh-TW', label: '繁体中文'},
+                            {value: 'ja-JP', label: '日本語'},
+                        ]}
+                        value={lang}
+                        onChange={(value) => {
+                            setLang(value);
+                        }}
+                    />
                 </div>
 
                 <div className={'absolute bottom-12 text-blue-500'}>

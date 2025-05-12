@@ -118,7 +118,7 @@ class AccountApi {
             eventEmitter.emit("API:NEED_CHANGE_PASSWORD");
             return data;
         }
-        eventEmitter.emit("API:CHANGE_LANG", data.language)
+        // eventEmitter.emit("API:CHANGE_LANG", data.language)
         return data;
     }
 

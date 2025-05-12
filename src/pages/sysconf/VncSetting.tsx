@@ -26,7 +26,11 @@ const VncSetting = ({get, set}: SettingProps) => {
     return (
         <div>
             <Title level={5} style={{marginTop: 0}}>{t('settings.vnc.setting')}</Title>
-            <ProForm onFinish={set} request={get}>
+            <ProForm onFinish={set} request={get} submitter={{
+                resetButtonProps: {
+                    style: {display: 'none'}
+                }
+            }}>
                 <ProFormSelect name="color-depth"
                                label={t("settings.vnc.color_depth")}
                                fieldProps={{

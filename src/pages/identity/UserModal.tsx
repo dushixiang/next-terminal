@@ -7,10 +7,12 @@ import {
     ProFormDependency,
     ProFormInstance,
     ProFormRadio,
-    ProFormSelect, ProFormSwitch,
-    ProFormText, ProFormTextArea
+    ProFormSelect,
+    ProFormText,
+    ProFormTextArea
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
+import userGroupApi from "@/src/api/user-group-api";
 
 export interface UserModalProps {
     open: boolean
@@ -41,16 +43,15 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
             title={id ? t('actions.edit') : t('actions.new')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
                         handleOk(values);
-                        formRef.current?.resetFields();
                     });
             }}
             onCancel={() => {
-                formRef.current?.resetFields();
+
                 handleCancel();
             }}
             confirmLoading={confirmLoading}
@@ -127,6 +128,29 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                 <ProFormTextArea label={t('identity.user.public_key')} name='publicKey'
                                  placeholder='Public Key'
                                  fieldProps={{rows: 4}}/>
+
+                {!id &&
+                    <ProFormText.Password
+                        name={'password'}
+                        label={t('identity.user.password')}
+                    />
+                }
+
+                {!id &&
+                    <ProFormSelect
+                        label={t('menus.identity.submenus.user_group')} name='groups'
+                        fieldProps={{mode: 'multiple', showSearch: true}}
+                        request={async () => {
+                            let items = await userGroupApi.getAll();
+                            return items.map(item => {
+                                return {
+                                    label: item.name,
+                                    value: item.id,
+                                }
+                            });
+                        }}
+                    />
+                }
             </ProForm>
         </Modal>
     )

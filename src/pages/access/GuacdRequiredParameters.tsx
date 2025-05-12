@@ -24,12 +24,12 @@ const GuacdRequiredParameters = ({open, parameters, confirmLoading, handleCancel
                 formRef.current?.validateFields()
                     .then(async values => {
                         handleOk(values);
-                        formRef.current?.resetFields();
+                        
                     });
             }}
             confirmLoading={confirmLoading}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
         >

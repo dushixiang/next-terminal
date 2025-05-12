@@ -124,16 +124,16 @@ const SshGatewayModal = ({
             title={id ? t('actions.edit') : t('actions.new')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
                         handleOk(values);
-                        formRef.current?.resetFields();
+                        
                     });
             }}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
             confirmLoading={confirmLoading}

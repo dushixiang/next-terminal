@@ -25,7 +25,7 @@ const AssetPostDrawer = ({open, onClose, assetId, groupId, copy}: Props) => {
                     onClose={onClose}
                     open={open}
                     width={window.innerWidth - 200}
-                    destroyOnClose={true}
+                    destroyOnHidden={true}
             >
                 <AssetsPost
                     assetId={assetId}

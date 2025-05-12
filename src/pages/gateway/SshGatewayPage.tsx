@@ -93,16 +93,16 @@ const SshGatewayPage = () => {
             hideInSearch: true,
             render: (text, record) => {
                 switch (text) {
-                    case "connected":
-                        return (
-                            <Tooltip title={record.statusMessage}>
-                                <Badge status="success" text={t('gateways.connected')}/>
-                            </Tooltip>
-                        )
                     case "disconnected":
+                        return <Badge status="default" text={t('gateways.ssh_status.disconnected')}/>
+                    case "connecting":
+                        return <Badge status="processing" text={t('gateways.ssh_status.connecting')}/>
+                    case "connected":
+                        return <Badge status="success" text={t('gateways.ssh_status.connected')}/>
+                    case "error":
                         return (
                             <Tooltip title={record.statusMessage}>
-                                <Badge status="default" text={t('gateways.disconnected')}/>
+                                <Badge status="error" text={t('gateways.ssh_status.error')}/>
                             </Tooltip>
                         )
                 }

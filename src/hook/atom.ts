@@ -29,7 +29,7 @@ export const atomLicenseWithLocalStorage = <T>(key: string, initialValue: T) => 
             const parsed = JSON.parse(item);
             // 如果 T 是 License 类型，手动转换为 License 实例
             if (initialValue instanceof SimpleLicense) {
-                return new SimpleLicense(parsed.type, parsed.expired) as T;
+                return new SimpleLicense(parsed.type, parsed.expired, parsed.oem) as T;
             }
             return parsed as T;
         }

@@ -103,6 +103,8 @@ export interface TreeDataNodeWithExtra {
 interface Extra {
     protocol: string;
     logo: string;
+    status: string;
+    network: string;
 }
 
 class PortalApi {

@@ -5,7 +5,7 @@ import {
     ProForm,
     ProFormCheckbox,
     ProFormDependency,
-    ProFormInstance,
+    ProFormInstance, ProFormSelect,
     ProFormSwitch,
     ProFormText,
     ProFormTextArea
@@ -19,6 +19,7 @@ const ReverseProxySetting = ({get, set}: SettingProps) => {
     let {t} = useTranslation();
     const formRef = useRef<ProFormInstance>();
     let [enabled, setEnabled] = useState(false);
+    let [ipTrustList, setIpTrustList] = useState<string[]>([]);
 
     const wrapSet = async (values: any) => {
         formRef.current?.validateFields()
@@ -47,7 +48,11 @@ const ReverseProxySetting = ({get, set}: SettingProps) => {
                 type="info"
                 style={{marginBottom: 10}}
             />
-            <ProForm formRef={formRef} onFinish={wrapSet} request={wrapGet} autoFocus={false}>
+            <ProForm formRef={formRef} onFinish={wrapSet} request={wrapGet} autoFocus={false} submitter={{
+                resetButtonProps: {
+                    style: {display: 'none'}
+                }
+            }}>
                 <ProFormSwitch name="reverse-proxy-server-enabled"
                                label={t('settings.rp.enabled')}
                                rules={[{required: true}]}
@@ -168,6 +173,40 @@ const ReverseProxySetting = ({get, set}: SettingProps) => {
                     {/*    Custom Header*/}
 
                     {/*</div>*/}
+
+                    <div className={'p-6 border rounded-md flex items-center gap-2'}>
+                        <ProFormSelect
+                            name="reverse-proxy-server-ip-extractor"
+                            label={t('settings.system.ip.extractor')}
+                            rules={[{required: true}]}
+                            options={[
+                                {label: t('settings.system.ip.extractor_direct'), value: 'direct'},
+                                {label: 'Header(X-Real-IP)', value: 'x-real-ip'},
+                                {label: 'Header(X-Forwarded-For)', value: 'x-forwarded-for'},
+                            ]}
+                            width={'sm'}
+                        />
+
+                        <ProFormDependency name={['reverse-proxy-server-ip-extractor']}>
+                            {(record) => {
+                                if (record['reverse-proxy-server-ip-extractor'] === 'direct') {
+                                    return <></>;
+                                }
+                                return <div className={'flex-grow'}>
+                                    <ProFormSelect name="reverse-proxy-server-ip-trust-list"
+                                                   label={t('settings.system.ip.trust_list')}
+                                                   placeholder={t('settings.system.ip.trust_placeholder')}
+                                                   fieldProps={{
+                                                       mode: 'tags',
+                                                       value: ipTrustList,
+                                                       onChange: setIpTrustList,
+                                                   }}
+                                                   style={{width: '100%'}}
+                                    />
+                                </div>
+                            }}
+                        </ProFormDependency>
+                    </div>
 
                     <div className={'mb-6'}></div>
 

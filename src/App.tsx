@@ -4,9 +4,7 @@ import React, {lazy, useEffect} from "react";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import '@/src/react-i18next/i18n'
 import ManagerLayout from '@/src/layout/ManagerLayout';
-import i18n from "i18next";
 import AccessPage from "@/src/pages/access/AccessPage";
-import {useLang} from "@/src/hook/use-lang";
 import eventEmitter from "@/src/api/core/event-emitter";
 import {baseUrl} from "@/src/api/core/requests";
 import {useTranslation} from "react-i18next";
@@ -132,12 +130,7 @@ const router = createBrowserRouter([
 
 
 function App() {
-    let [lang] = useLang();
     let {t} = useTranslation();
-
-    useEffect(() => {
-        i18n.changeLanguage(lang.i18n);
-    }, [lang]);
 
     useEffect(() => {
         let link = document.querySelector("link[rel~='icon']") as HTMLLinkElement;

@@ -12,7 +12,11 @@ const RdpSetting = ({get, set}: SettingProps) => {
     return (
         <div>
             <Title level={5} style={{marginTop: 0}}>{t('settings.rdp.setting')}</Title>
-            <ProForm onFinish={set} request={get} autoFocus={false}>
+            <ProForm onFinish={set} request={get} autoFocus={false} submitter={{
+                resetButtonProps: {
+                    style: {display: 'none'}
+                }
+            }}>
                 <ProFormSwitch name="enable-wallpaper"
                                label={t('settings.rdp.enable.wallpaper')}
                                rules={[{required: true}]}

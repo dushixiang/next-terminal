@@ -43,17 +43,17 @@ const StorageModal = ({
             title={id ? t('actions.edit') : t('actions.new')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
                         values['limitSize'] = values['limitSize'] * 1024 * 1024 * 1024;
                         handleOk(values);
-                        formRef.current?.resetFields();
+                        
                     });
             }}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
             confirmLoading={confirmLoading}

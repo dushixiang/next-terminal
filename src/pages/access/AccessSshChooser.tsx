@@ -17,16 +17,19 @@ const AccessSshChooser = ({handleOk, handleCancel, open}: Props) => {
     let {t} = useTranslation();
     let [keyword, setKeyword] = useState('');
     let treeQuery = useQuery({
-        queryKey: ['assets/ssh/tree/portal'],
+        queryKey: ['ssh', 'chooser'],
         queryFn: () => {
             return portalApi.getAssetsTree('ssh', keyword)
         },
-        enabled: open,
+        enabled: open === true,
     });
 
     useEffect(() => {
+        if (open === false) {
+            return;
+        }
         treeQuery.refetch();
-    }, [keyword]);
+    }, [open, keyword]);
 
     const [treeData, setTreeData] = useState([]);
     let [expandedKeys, setExpandedKeys] = useState([]);
@@ -67,12 +70,12 @@ const AccessSshChooser = ({handleOk, handleCancel, open}: Props) => {
                 title={t('access.batch.choose_asset')}
                 open={open}
                 maskClosable={false}
-                destroyOnClose={true}
+                destroyOnHidden={true}
                 onOk={() => {
                     handleOk(sshAssetKeys);
                 }}
                 onCancel={() => {
-                    // formRef.current?.resetFields();
+                    // 
                     handleCancel();
                 }}
             >

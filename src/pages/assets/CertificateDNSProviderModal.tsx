@@ -37,7 +37,7 @@ const CertificateDNSProviderModal = ({
             title={t('assets.dns_provider_config')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {

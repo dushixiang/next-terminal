@@ -2,15 +2,17 @@ import React from 'react';
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import brandingApi from "@/src/api/branding-api";
-import {Dropdown, Spin} from "antd";
+import {Dropdown, Select, Spin} from "antd";
 import accountApi from "@/src/api/account-api";
 import {isMobileByMediaQuery, openOrSwitchToPage} from "@/src/utils/utils";
-import {ChevronDownIcon, LaptopIcon} from "lucide-react";
+import {ChevronDownIcon, LanguagesIcon, LaptopIcon} from "lucide-react";
 import {useTranslation} from "react-i18next";
+import {useLang} from "@/src/hook/use-lang";
 
 const UserHeader = () => {
 
     let {t} = useTranslation();
+    let [lang, setLang] = useLang();
 
     let location = useLocation();
     let navigate = useNavigate();
@@ -94,14 +96,37 @@ const UserHeader = () => {
                     </div>
                 </div>
 
+
+
                 {!isMobileByMediaQuery() &&
-                    <div className={'cursor-pointer'}
-                         onClick={() => {
-                             const url = `/access`;
-                             openOrSwitchToPage(url, 'NT_Access');
-                         }}
-                    >
-                        <LaptopIcon className={'w-5 h-5 text-white'}/>
+                    <div className={'flex items-center gap-1'}>
+                        <Select
+                            placeholder="Language"
+                            variant="borderless"
+                            style={{
+                                width: 120,
+                            }}
+                            prefix={<LanguagesIcon className={'w-4 h-4'}/>}
+                            options={[
+                                {value: 'en-US', label: 'English'},
+                                {value: 'zh-CN', label: '简体中文'},
+                                {value: 'zh-TW', label: '繁体中文'},
+                                {value: 'ja-JP', label: '日本語'},
+                            ]}
+                            value={lang}
+                            onChange={(value) => {
+                                setLang(value);
+                            }}
+                        />
+                        
+                        <div className={'cursor-pointer'}
+                             onClick={() => {
+                                 const url = `/access`;
+                                 openOrSwitchToPage(url, 'NT_Access');
+                             }}
+                        >
+                            <LaptopIcon className={'w-5 h-5 text-white'}/>
+                        </div>
                     </div>
                 }
 

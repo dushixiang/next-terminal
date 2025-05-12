@@ -38,7 +38,11 @@ const SecuritySetting = ({get, set}: SettingProps) => {
         <div>
             <Title level={5} style={{marginTop: 0}}>{t('settings.security.setting')}</Title>
 
-            <ProForm onFinish={wrapSet} request={wrapGet} autoFocus={false}>
+            <ProForm onFinish={wrapSet} request={wrapGet} autoFocus={false} submitter={{
+                resetButtonProps: {
+                    style: {display: 'none'}
+                }
+            }}>
                 <Divider orientation="left">{t('settings.security.protection')}</Divider>
                 <Disabled disabled={license.isFree()}>
                     <div className={'flex items-center gap-4'}>

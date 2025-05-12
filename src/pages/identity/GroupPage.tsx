@@ -63,17 +63,26 @@ const GroupPage = () => {
             },
         },
         {
+            title: t('identity.user_group.members_count'),
+            dataIndex: 'members',
+            hideInSearch: true,
+            render: (text, record) => {
+                return record['members']?.length ?? 0;
+            },
+        },
+        {
             title: t('general.created_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',
             valueType: 'dateTime',
             hideInSearch: true,
+            width: 191,
         },
         {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
-            width: 120,
+            width: 160,
             render: (text, record, _, action) => [
                 <NButton
                     key="edit"

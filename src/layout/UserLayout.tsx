@@ -8,7 +8,7 @@ import FooterComponent from "@/src/layout/FooterComponent";
 import UserHeader from "@/src/layout/UserHeader";
 import eventEmitter from "@/src/api/core/event-emitter";
 import {debounce} from "@/src/utils/debounce";
-import {useLang} from "@/src/hook/use-lang";
+import {translateI18nToAntdLocale, useLang} from "@/src/hook/use-lang";
 import {useTranslation} from "react-i18next";
 
 const UserLayout = () => {
@@ -62,7 +62,7 @@ const UserLayout = () => {
                 theme={{
                     // algorithm: getAlgorithmKey(themeKey),
                 }}
-                locale={lang.antdLocale}
+                locale={translateI18nToAntdLocale(lang)}
             >
                 <AntdApp>
                     <div className={'flex flex-col min-h-screen bg-[#F0F4F8]'}>

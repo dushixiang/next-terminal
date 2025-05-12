@@ -210,7 +210,7 @@ const DashboardPage = () => {
                             minTickGap={32}
                             tickFormatter={(value) => {
                                 const date = new Date(value)
-                                return date.toLocaleDateString(translateI18nToESLocale(lang.i18n), {
+                                return date.toLocaleDateString(translateI18nToESLocale(lang), {
                                     month: "short",
                                     day: "numeric",
                                 })
@@ -221,7 +221,7 @@ const DashboardPage = () => {
                             content={
                                 <ChartTooltipContent
                                     labelFormatter={(value) => {
-                                        return new Date(value).toLocaleDateString(translateI18nToESLocale(lang.i18n), {
+                                        return new Date(value).toLocaleDateString(translateI18nToESLocale(lang), {
                                             month: "short",
                                             day: "numeric",
                                         })

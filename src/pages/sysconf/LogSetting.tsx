@@ -13,7 +13,11 @@ const LogSetting = ({get, set}: SettingProps) => {
     return (
         <div>
             <Title level={5} style={{marginTop: 0}}>{t('settings.log.setting')}</Title>
-            <ProForm onFinish={set} request={get}>
+            <ProForm onFinish={set} request={get} submitter={{
+                resetButtonProps: {
+                    style: {display: 'none'}
+                }
+            }}>
                 <ProFormSwitch name="recording-enabled"
                                label={t('settings.log.recording.enabled')}
                                rules={[{required: true}]}

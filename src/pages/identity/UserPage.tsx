@@ -145,11 +145,13 @@ ${t('identity.user.password')}: ${result.password}`)
             valueType: 'dateTime',
             hideInSearch: true,
             sorter: true,
+            width: 191,
         },
         {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
+            width: 160,
             render: (text, record, _, action) => [
                 <NButton
                     key="edit"

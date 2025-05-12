@@ -7,14 +7,14 @@ let o = {
         "disabled": "禁用",
         "yes": "是",
         "no": "否",
-        "less-zero-tip": "小于0时无限制",
+        "less-zero-tip": "小于0表示无限制",
         "success": "成功",
         "failed": "失败",
         "default": "默认",
         "home": "首页",
         "copy_success": "复制成功",
-        "delete_confirm": "您确认要删除此行吗？",
-        "clear_confirm": "您确认要清空数据吗？",
+        "delete_confirm": "确认删除此项？",
+        "clear_confirm": "确认清空数据？",
         "unbound": "未绑定",
         "bound": "已绑定",
         "name": "名称",
@@ -30,7 +30,7 @@ let o = {
         "clear": "清空",
         "detail": "详情",
         "binding": "绑定",
-        "unbind": "取绑",
+        "unbind": "解绑",
         "authorized": "授权",
         "decrypt": "解密",
         "copy": "复制",
@@ -190,13 +190,13 @@ let o = {
         },
         "delete_confirm": {
             "title": "您确定要删除该文件吗？",
-            "content": "这是一个危险的操作。"
+            "content": "此操作将永久删除文件，确认执行？"
         },
         "navigation": {
             "back_to_prev": "返回上一级",
             "refresh": "刷新",
-            "show_hidden_file": "展示隐藏文件",
-            "hide_hidden_file": "不展示隐藏文件",
+            "show_hidden_file": "显示隐藏文件",
+            "hide_hidden_file": "隐藏隐藏文件",
             "file_tran": "文件进度"
         },
         "editor": {
@@ -240,7 +240,7 @@ let o = {
             "label": "登录策略",
             "name": "名称",
             "ip_group": "IP 组",
-            "ip_group_extra": "格式为逗号分隔的字符串, 0.0.0.0/0 匹配所有。例如: 192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20",
+            "ip_group_extra": "格式为逗号分隔的字符串（如：192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20），0.0.0.0/0表示匹配所有IP。",
             "action": {
                 "label": "动作",
                 "options": {
@@ -264,6 +264,7 @@ let o = {
         },
         "user_group": {
             "members": "成员",
+            "members_count": "成员数量",
         },
         "user": {
             "username": "账号",
@@ -277,7 +278,7 @@ let o = {
             "types": {
                 "super_admin": "超级管理员",
                 "admin": "管理员",
-                "normal": "普通人员"
+                "normal": "普通用户"
             },
             "nickname": "姓名",
             "mail": "邮箱",
@@ -299,15 +300,15 @@ let o = {
                         "success": "重置密码成功",
                         "new": "新的密码",
                         "confirm": {
-                            "title": "您确定要重置用户的密码吗？",
-                            "content": "未输入密码时将随机生成，并通过邮件发送给对方。"
+                            "title": "确认重置用户密码？",
+                            "content": "未输入密码时将随机生成并通过邮件发送。"
                         }
                     },
                     "otp": {
                         "action": "重置双因素认证",
                         "confirm": {
-                            "title": "您确定要重置用户的双因素认证信息吗？",
-                            "content": "重置后用户无需双因素认证即可登录系统。"
+                            "title": "确认重置用户双因素认证？",
+                            "content": "重置后用户无需双因素认证即可登录。"
                         }
                     }
                 },
@@ -317,7 +318,7 @@ let o = {
             "user_agent": "浏览器",
             "login_at": "登录时间",
             "no_spaces_allowed": "禁止输入空格",
-            "new_user_result": "创建用户成功"
+            "new_user_result": "用户创建成功"
         },
         "options": {
             "authorized_asset": "授权资产",
@@ -379,31 +380,32 @@ let o = {
                     "label": "动作",
                     "options": {
                         "allow": "允许",
-                        "reject": "拒绝"
+                        "reject": "拒绝",
                     },
+                    "status": "状态",
+                    "authorised_at": "授权时间",
+                    "authorised_user": "授权用户",
+                    "expired_at": "过期时间",
+                    "never_expired": "永不过期"
                 },
-                "status": "状态",
-                "authorised_at": "授权时间",
-                "authorised_user": "授权用户",
-                "expired_at": "过期时间",
-                "never_expired": "永不过期"
             },
-        },
-        "label": {
-            "authorised": "授权",
-            "user": "用户",
-            "user_group": "用户组",
-            "asset": "资产",
-            "command_filter": "命令拦截器",
-            "strategy": "策略",
-            "expired_at": "失效时间",
-            "authorised_at": "授权时间",
-            "never_expired": "永不失效",
+            "label": {
+                "authorised": "授权",
+                "user": "用户",
+                "user_group": "用户组",
+                "asset": "资产",
+                "command_filter": "命令拦截器",
+                "strategy": "策略",
+                "expired_at": "失效时间",
+                "authorised_at": "授权时间",
+                "never_expired": "永不失效",
+            },
         },
     },
     "sysops": {
         "status": "状态",
         "spec": "cron 表达式",
+        "spec_tooltip": "支持秒级定时任务，与标准cron表达式不同，首字段表示秒（兼容Quartz表达式规范），但不支持年份字段。",
         "last_exec_at": "最后执行时间",
         "asset": "资产",
         "command": "命令",
@@ -642,7 +644,7 @@ let o = {
         "limit_size": "大小限制",
         "used_size": "已使用大小",
         "domain": "域名",
-        "domain_tip": "您使用的域名来访问受保护的资产，例如：www.example.com，需要将该域名解析到本系统的IP地址。",
+        "domain_tip": "您用于访问受保护资产的域名（例如：www.example.com）需解析至本系统IP地址。",
         "scheme": "资产协议",
         "forward_host_or_ip": "资产的IP或域名",
         "forward_port": "资产端口",
@@ -689,6 +691,19 @@ let o = {
         "limit_password": "口令访问限制",
         "limit_password_tip": "使用正确的口令才能访问资产。",
         "ungrouped": "未分组",
+        "modify_response": "修改响应",
+        "modify_response_enabled": "启用响应体修改",
+        "response_match_url": "匹配响应 URL（可选）",
+        "response_match_url_tip": "仅当响应 URL 匹配该规则时生效，支持正则表达式。",
+        "response_match_content_type": "匹配 Content-Type（可选）",
+        "response_match_content_type_tip": "例如：text/html、application/json 等。",
+        "add_rule": "添加一条规则",
+        "modify_rules": "修改规则列表",
+        "modify_type": "修改类型",
+        "pattern": "匹配内容",
+        "replacement": "替换为",
+        "modify_response_tip": "可配置多个修改规则，按顺序依次生效。",
+        "modify_response_compression_support": "自动支持 gzip、deflate、br 等压缩格式的解压与重新压缩。",
         "certificates": {
             "common_name": "域名",
             "certificate": "证书",
@@ -711,7 +726,6 @@ let o = {
             "set_as_default": "设为默认",
             "issued_log": "证书申请日志",
             "renew_before": "续签提前时间",
-
         },
         "dns_providers": {
             "label": "DNS 供应商",
@@ -735,8 +749,12 @@ let o = {
         "arch": "系统架构",
         "status": "状态",
         "version": "版本",
-        "connected": "已连接",
-        "disconnected": "已断开",
+        "ssh_status": {
+            "disconnected": "未连接",
+            "connecting": "正在连接",
+            "connected": "已连接",
+            "error": "连接失败",
+        },
         "username": "账号",
         "account_type": {},
         "register": "注册",
@@ -823,9 +841,9 @@ let o = {
                 "complexity": "密码复杂度",
                 "recommend": "推荐",
                 "customize": "自定义",
-                "expiration_period": "密码有效期限",
+                "expiration_period": "密码有效期",
                 "too_short": "密码长度不能小于",
-                "too_simple": "密码必须包含大写字母、小写字母、数字、特殊字符中的 ? 种",
+                "too_simple": "密码需包含大写字母、小写字母、数字、特殊字符中的至少 ? 种",
                 "cannot_contain_username": "密码不能包含用户名",
                 "cannot_be_palindrome": "密码不能是回文",
                 "cannot_be_weak": "禁止弱密码",
@@ -863,6 +881,7 @@ let o = {
             },
             "usage": "使用示例",
             "mode_proxy": "代理模式",
+            "direct_proxy": "直连模式",
             "disable_password_auth": "禁用密码认证",
         },
         "rp": {
@@ -986,7 +1005,7 @@ let o = {
             },
             "restricted": {
                 "label": "访问受限",
-                "content": "您的许可证不支持该功能。",
+                "content": "当前许可证不支持此功能。",
                 "pay": "立即购买",
             },
             "test_warning": "您正在试用专业版，到期时间是",
@@ -1014,8 +1033,8 @@ let o = {
     "errors": {
         "1000": "无效的令牌",
         "1001": "需要进行设置",
-        "10000": "记录未找到",
-        "10001": "名称已被使用",
+        "10000": "记录不存在",
+        "10001": "名称已存在",
         "10002": "无效的参数",
         "10003": "您不能操作自己的账户",
         "10004": "账户或密码不正确",
@@ -1027,7 +1046,7 @@ let o = {
         "10010": "您的 IP 地址不允许登录",
         "10011": "当前时间段不允许登录",
         "10012": "邮箱配置不完整",
-        "10013": "默认数据不能删除",
+        "10013": "默认数据不可删除",
         "10014": "权限被拒绝",
         "10015": "不是 SSH 协议",
         "10016": "不支持的协议",

@@ -198,7 +198,7 @@ const AccessGuacamole = ({assetId}: Props) => {
             reader.onend = async () => {
                 setClipboardText(data);
                 copy(data);
-                message.success(t('copy_success'));
+                message.success(t('general.copy_success'));
             };
         } else {
             let reader = new Guacamole.BlobReader(stream, mimetype);

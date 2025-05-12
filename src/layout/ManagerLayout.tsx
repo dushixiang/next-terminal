@@ -8,7 +8,7 @@ import {
     Dropdown,
     Layout,
     Menu,
-    Modal,
+    Modal, Select,
     Spin,
     Switch
 } from "antd";
@@ -31,7 +31,7 @@ import {debounce} from "@/src/utils/debounce";
 import SimpleBar from "simplebar-react";
 import {DarkTheme, DefaultTheme, useNTTheme} from "@/src/hook/use-theme";
 import {translateI18nToAntdLocale, useLang} from "@/src/hook/use-lang";
-import {LaptopIcon, LogOutIcon, UserIcon} from "lucide-react";
+import {LanguagesIcon, LaptopIcon, LogOutIcon, UserIcon} from "lucide-react";
 import {openOrSwitchToPage} from "@/src/utils/utils";
 import licenseApi from "@/src/api/license-api";
 import {useLicense} from "@/src/hook/use-license";
@@ -82,12 +82,10 @@ const ManagerLayout = () => {
 
         })
 
-        eventEmitter.on("API:CHANGE_LANG", (lang: string) => {
-            setLang({
-                i18n: lang,
-                antdLocale: translateI18nToAntdLocale(lang)
-            })
-        })
+        // eventEmitter.on("API:CHANGE_LANG", (lang: string) => {
+        //     setLang(lang);
+        //     i18n.changeLanguage(lang);
+        // })
 
         let needEnableOPT = debounce(() => {
             let mustAt = '/info?activeKey=otp';
@@ -235,7 +233,9 @@ const ManagerLayout = () => {
             }
         });
 
-        const breadcrumbItems = [{title: <Link to={'/dashboard'}>{t('general.home')}</Link>}].concat(extraBreadcrumbItems);
+        const breadcrumbItems = [{
+            title: <Link to={'/dashboard'}>{t('general.home')}</Link>
+        }].concat(extraBreadcrumbItems);
         setBreakItems(breadcrumbItems);
     }, [location.pathname]);
 
@@ -320,7 +320,7 @@ const ManagerLayout = () => {
                     algorithm: ntTheme.algorithm,
                     components: {}
                 }}
-                locale={lang.antdLocale}
+                locale={translateI18nToAntdLocale(lang)}
             >
                 <AntdApp>
                     {renderBanner()}
@@ -407,6 +407,25 @@ const ManagerLayout = () => {
                             <div className={'flex items-center h-[60px] px-8 justify-between'}>
                                 <Breadcrumb items={breakItems}/>
                                 <div className={'flex items-center gap-4'}>
+
+                                    <Select
+                                        placeholder="Language"
+                                        variant="borderless"
+                                        style={{
+                                            width: 120,
+                                        }}
+                                        prefix={<LanguagesIcon className={'w-4 h-4'}/>}
+                                        options={[
+                                            {value: 'en-US', label: 'English'},
+                                            {value: 'zh-CN', label: '简体中文'},
+                                            {value: 'zh-TW', label: '繁体中文'},
+                                            {value: 'ja-JP', label: '日本語'},
+                                        ]}
+                                        value={lang}
+                                        onChange={(value) => {
+                                            setLang(value);
+                                        }}
+                                    />
 
                                     <div className={'cursor-pointer'}
                                          onClick={() => {

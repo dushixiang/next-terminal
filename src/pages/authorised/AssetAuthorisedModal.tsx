@@ -109,7 +109,7 @@ const AssetAuthorisedModal = ({assetId, open, handleOk, handleCancel, confirmLoa
             title={t('actions.authorized')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
@@ -119,11 +119,11 @@ const AssetAuthorisedModal = ({assetId, open, handleOk, handleCancel, confirmLoa
                             values['expiredAt'] = expiredAtDayjs.valueOf();
                         }
                         handleOk(values);
-                        formRef.current?.resetFields();
+                        
                     });
             }}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
             confirmLoading={confirmLoading}

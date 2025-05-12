@@ -40,7 +40,11 @@ const MailSetting = ({get, set}: SettingProps) => {
             <Row gutter={16}>
                 <Col span={12}>
                     <Card>
-                        <ProForm onFinish={set} request={get}>
+                        <ProForm onFinish={set} request={get} submitter={{
+                            resetButtonProps: {
+                                style: {display: 'none'}
+                            }
+                        }}>
                             <ProFormSwitch name="mail-enabled"
                                            label={t('settings.mail.enabled')}
                                            rules={[{required: true}]}

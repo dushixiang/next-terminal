@@ -43,6 +43,9 @@ const LdapSetting = ({get, set}: SettingProps) => {
                 <ProForm onFinish={set} request={wrapGet}
                          autoFocus={false}
                          submitter={{
+                             resetButtonProps: {
+                                 style: {display: 'none'}
+                             },
                              render: (props, doms) => [
                                  ...doms,
                                  <Button color={'geekblue'}

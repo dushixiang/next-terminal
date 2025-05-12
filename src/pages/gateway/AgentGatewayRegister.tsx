@@ -127,10 +127,10 @@ const AgentGatewayRegister = ({
             title={t('gateways.register')}
             open={open}
             maskClosable={false}
-            destroyOnClose={true}
+            destroyOnHidden={true}
             footer={false}
             onCancel={() => {
-                formRef.current?.resetFields();
+                
                 handleCancel();
             }}
         >

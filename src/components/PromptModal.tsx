@@ -33,11 +33,11 @@ const PromptModal = ({title, open, onOk, onCancel, label, placeholder, confirmLo
                     formRef.current?.validateFields()
                         .then(async values => {
                             onOk(values['prompt']);
-                            formRef.current?.resetFields();
+                            
                         });
                 }}
                 onCancel={() => {
-                    formRef.current?.resetFields();
+                    
                     onCancel();
                 }}
                 confirmLoading={confirmLoading}

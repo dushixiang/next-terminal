@@ -381,21 +381,26 @@ const AccessPage = () => {
                                         {!isCollapsed &&
                                             <Tree
                                                 titleRender={(node) => {
-                                                    return <span className={'flex items-center gap-1'}
-                                                                 onDoubleClick={() => {
-                                                                     if (!node.isLeaf) {
-                                                                         return
-                                                                     }
-                                                                     openAssetTab({
-                                                                         id: node.key,
-                                                                         name: node.title,
-                                                                         protocol: node.extra?.protocol,
-                                                                     })
-                                                                 }}
-                                                    >
+                                                    return <Tooltip title={node.extra?.network}>
+                                                        <span className={cn(
+                                                            'flex items-center gap-1',
+                                                            node.extra?.status === 'inactive' && 'filter grayscale'
+                                                        )}
+                                                              onDoubleClick={() => {
+                                                                  if (!node.isLeaf) {
+                                                                      return
+                                                                  }
+                                                                  openAssetTab({
+                                                                      id: node.key,
+                                                                      name: node.title,
+                                                                      protocol: node.extra?.protocol,
+                                                                  })
+                                                              }}
+                                                        >
                                                         {renderLogo(node)}
-                                                        <span>{node.title}</span>
+                                                            <span>{node.title}</span>
                                                     </span>
+                                                    </Tooltip>
                                                 }}
                                                 treeData={treeData}
                                                 onExpand={onExpand}
