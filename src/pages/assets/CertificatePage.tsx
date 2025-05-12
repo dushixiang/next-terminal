@@ -77,7 +77,7 @@ const CertificatePage = () => {
             dataIndex: 'type',
             key: 'type',
             hideInSearch: true,
-            width: 100,
+            width: 160,
             render: (type, record) => {
                 switch (record.type) {
                     case 'self-signed':
@@ -113,7 +113,7 @@ const CertificatePage = () => {
             dataIndex: 'issuedStatus',
             key: 'issuedStatus',
             hideInSearch: true,
-            width: 100,
+            width: 120,
             render: (issuedStatus, record) => {
                 switch (record.issuedStatus) {
                     case 'pending':
@@ -141,7 +141,7 @@ const CertificatePage = () => {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
-            width: 150,
+            width: 200,
             render: (text, record, _, action) => [
                 <NButton
                     key="set_as_default"

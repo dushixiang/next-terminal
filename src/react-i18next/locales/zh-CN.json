@@ -196,7 +196,7 @@
       "back_to_prev": "返回上一级",
       "refresh": "刷新",
       "show_hidden_file": "显示隐藏文件",
-      "hide_hidden_file": "隐藏隐藏文件",
+      "hide_hidden_file": "不显示隐藏文件",
       "file_tran": "文件进度"
     },
     "editor": {
