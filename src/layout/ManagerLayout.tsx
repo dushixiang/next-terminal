@@ -8,7 +8,8 @@ import {
     Dropdown,
     Layout,
     Menu,
-    Modal, Select,
+    Modal,
+    Select,
     Spin,
     Switch
 } from "antd";
@@ -318,7 +319,9 @@ const ManagerLayout = () => {
             <ConfigProvider
                 theme={{
                     algorithm: ntTheme.algorithm,
-                    components: {}
+                    components: {
+
+                    }
                 }}
                 locale={translateI18nToAntdLocale(lang)}
             >

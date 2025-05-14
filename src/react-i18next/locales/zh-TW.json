@@ -36,7 +36,9 @@
     "add": "添加",
     "export": "出口",
     "sync": "同步",
-    "view_private_key": "查閱私鑰"
+    "view_private_key": "查閱私鑰",
+    "import": "導入",
+    "download_import_sample": "下載匯入範例"
   },
   "dashboard": {
     "name": "數據概觀",
@@ -469,7 +471,9 @@
       "port": "埠口",
       "testing": "開始檢測"
     },
-    "spec_tooltip": "支持秒級定時任務，與標準cron表達式不同，首字段表示秒（兼容Quartz表達式規範），但不支持年份字段。"
+    "spec_tooltip": "支持秒級定時任務，與標準cron表達式不同，首字段表示秒（兼容Quartz表達式規範），但不支持年份字段。",
+    "spec_run": "模擬運行",
+    "spec_run_time": "最近十次運行時間"
   },
   "audit": {
     "client_ip": "客戶端IP",
@@ -768,7 +772,9 @@
     "pattern": "匹配內容",
     "replacement": "替換為",
     "modify_response_tip": "可配置多個修改規則，按順序依次生效。",
-    "modify_response_compression_support": "自動支援 gzip、deflate、br 等壓縮格式的解壓與重新壓縮。"
+    "modify_response_compression_support": "自動支援 gzip、deflate、br 等壓縮格式的解壓與重新壓縮。",
+    "public_tip": "限制只針對匿名用戶生效。",
+    "group_tip": "右鍵可編輯/刪除（Default 分組除外）"
   },
   "gateways": {
     "name": "名稱",

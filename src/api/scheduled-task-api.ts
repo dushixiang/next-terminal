@@ -57,6 +57,12 @@ class ScheduledTaskApi extends Api<ScheduledTask> {
         let paramsStr = qs.stringify(params);
         return await requests.get(`/${this.group}/${jobId}/logs/paging?${paramsStr}`);
     }
+
+    getNextTenRuns = async (spec: string) => {
+        return await requests.post(`/${this.group}/next-ten-runs`, {
+            'spec': spec
+        }) as string[];
+    }
 }
 
 let scheduledTaskApi = new ScheduledTaskApi();

@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 
-import {App, Button, Popconfirm, Space, Switch, Table} from "antd";
+import {App, Button, Popconfirm, Popover, Space, Switch, Table, Upload} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import userApi, {CreateUserResult, User} from "@/src/api/user-api";
@@ -14,6 +14,15 @@ import {maybe} from "@/src/utils/maybe";
 import UserResetPasswordModal from "@/src/pages/identity/UserResetPasswordModal";
 
 const api = userApi;
+
+function downloadImportExampleCsv() {
+    let csvString = `name, account, password, email, recording(true,false), watermark(true,false), group1|group2`;
+    const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
+    let a = document.createElement('a');
+    a.download = 'sample.csv';
+    a.href = URL.createObjectURL(blob);
+    a.click();
+}
 
 const UserPage = () => {
     const {t} = useTranslation();
@@ -228,6 +237,16 @@ ${t('identity.user.password')}: ${result.password}`)
         });
     }
 
+    const importExampleContent = <>
+        <NButton onClick={downloadImportExampleCsv}>{t('actions.download_import_sample')}</NButton>
+    </>
+
+    const handleImportUser = async (file: any) => {
+        await api.import(file);
+        actionRef.current?.reload();
+        return true;
+    }
+
     return (<div>
         <ProTable
             columns={columns}
@@ -259,7 +278,6 @@ ${t('identity.user.password')}: ${result.password}`)
                 );
             }}
             request={async (params = {}, sort, filter) => {
-
                 let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
@@ -306,7 +324,16 @@ ${t('identity.user.password')}: ${result.password}`)
                         setOpen(true)
                     }}>
                         {t('actions.new')}
-                    </Button>
+                    </Button>,
+                    <Popover content={importExampleContent}>
+                        <Upload
+                            maxCount={1}
+                            beforeUpload={handleImportUser}
+                            showUploadList={false}
+                        >
+                            <Button key='import'>{t('actions.import')}</Button>
+                        </Upload>
+                    </Popover>,
                 ]
             }}
         />

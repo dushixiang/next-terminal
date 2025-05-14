@@ -7,21 +7,19 @@ type ConfigTheme = {
     isDark: boolean
     algorithm: (token: SeedToken) => MapToken,
     backgroundColor?: string,
-    wrapBackgroundColor?: string,
 }
 
 export const DefaultTheme: ConfigTheme = {
     isDark: false,
     algorithm: theme.defaultAlgorithm,
     backgroundColor: '#fff',
-    wrapBackgroundColor: '#fff',
 }
 
 export const DarkTheme: ConfigTheme = {
     isDark: true,
     algorithm: theme.darkAlgorithm,
     backgroundColor: '#09090B',
-    wrapBackgroundColor: '#1D1D1D',
+    // backgroundColor: '#101217',
 }
 
 const configAtom = atomWithLocalStorage<ConfigTheme>('nt-theme', DefaultTheme);

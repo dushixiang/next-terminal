@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Checkbox, Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
+import {Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
 import AssetTreeModal, {OP} from "@/src/pages/assets/AssetTreeModal";
 import {generateRandomId} from "@/src/utils/utils";
 import {useQuery} from "@tanstack/react-query";
@@ -30,19 +30,10 @@ const AssetTree = ({selected, onSelect}: Props) => {
     let [expandedKeys, setExpandedKeys] = useState([]);
 
     let [selectedKeys, setSelectedKeys] = useState<React.Key[]>([selected]);
-    let [ungrouped, setUngrouped] = useState(false);
-
-    useEffect(() => {
-        if (ungrouped) {
-            onSelect('ungrouped');
-        } else {
-            onSelect('');
-        }
-    }, [ungrouped]);
 
     let query = useQuery({
         queryKey: ['assets/tree'],
-        queryFn: assetApi.getGroupTree,
+        queryFn: assetApi.getGroups,
     });
 
     useEffect(() => {
@@ -65,7 +56,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
     };
 
     const updateTreeData = (data: TreeDataNode[]) => {
-        assetApi.setGroup(data).then(() => {
+        assetApi.setGroups(data).then(() => {
             setTreeData(data);
         })
     }
@@ -73,6 +64,10 @@ const AssetTree = ({selected, onSelect}: Props) => {
     const onDrop: TreeProps['onDrop'] = (info) => {
         const dropKey = info.node.key;
         const dragKey = info.dragNode.key;
+        if (dragKey === 'default') {
+            return;
+        }
+
         const dropPos = info.node.pos.split('-');
         const dropPosition = info.dropPosition - Number(dropPos[dropPos.length - 1]); // the drop position relative to the drop node, inside 0, top -1, bottom 1
 
@@ -199,14 +194,17 @@ const AssetTree = ({selected, onSelect}: Props) => {
             danger: true,
             icon: <TrashIcon className={'h-4 w-4'}/>,
             onClick: () => {
-                console.log(`delete node`, contextMenu.node.key)
-                const newTreeData = deleteNode(contextMenu.node.key, treeData);
-                updateTreeData(newTreeData);
+                assetApi.deleteGroup(contextMenu.node.key as string).then(() => {
+                    query.refetch();
+                })
             },
         },
     ];
 
     const handleRightClick = ({event, node}) => {
+        if (node.key === 'default') {
+            return;
+        }
         // console.log(`handleRightClick`, event, node)
         event.preventDefault();
         setContextMenu({
@@ -218,11 +216,8 @@ const AssetTree = ({selected, onSelect}: Props) => {
 
     return (
         <div className={'rounded-lg border'}>
-            <div className={'px-6 pt-4 flex items-center justify-between'}>
+            <div className={'px-4 pt-4 flex items-center justify-between'}>
                 <div className={'font-medium text-[15px] flex items-center gap-2'}>
-                    <div>
-                        {t('assets.group')}
-                    </div>
                     <Tooltip title={t('actions.add')}>
                         <PackagePlusIcon className={'h-4 w-4 cursor-pointer'}
                                          onClick={() => {
@@ -233,42 +228,39 @@ const AssetTree = ({selected, onSelect}: Props) => {
                                          }}
                         />
                     </Tooltip>
+
+                    <Tooltip title={t('assets.group_tip')}>
+                        <div className={'cursor-pointer'}>
+                            {t('assets.group')}
+                        </div>
+                    </Tooltip>
+
                 </div>
             </div>
 
-            <div className={'px-6 py-2'}>
-                <Checkbox onChange={(e) => {
-                    setUngrouped(e.target.checked);
-                }}>
-                    {t('assets.ungrouped')}
-                </Checkbox>
-            </div>
-
-            {!ungrouped &&
-                <Tree
-                    draggable
-                    blockNode
-                    onDrop={onDrop}
-                    treeData={treeData}
-                    expandedKeys={expandedKeys}
-                    onExpand={setExpandedKeys}
-                    style={{
-                        // backgroundColor: '#FFF',
-                        padding: 8,
-                    }}
-                    selectedKeys={selectedKeys}
-                    onSelect={(keys) => {
-                        setSelectedKeys(keys);
-                        if (keys.length > 0) {
-                            onSelect(keys[0] as string)
-                        } else {
-                            onSelect('');
-                        }
-                    }}
-                    onRightClick={handleRightClick}
-                    // showLine={true}
-                />
-            }
+            <Tree
+                draggable
+                blockNode
+                onDrop={onDrop}
+                treeData={treeData}
+                expandedKeys={expandedKeys}
+                onExpand={setExpandedKeys}
+                style={{
+                    // backgroundColor: '#FFF',
+                    padding: 8,
+                }}
+                selectedKeys={selectedKeys}
+                onSelect={(keys) => {
+                    setSelectedKeys(keys);
+                    if (keys.length > 0) {
+                        onSelect(keys[0] as string)
+                    } else {
+                        onSelect('');
+                    }
+                }}
+                onRightClick={handleRightClick}
+                // showLine={true}
+            />
 
             {contextMenu && (
                 <Dropdown
@@ -308,7 +300,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
                     if (values['key']) {
                         newTreeData = updateNode(values['key'], treeData, values);
                     } else {
-                        values['key'] = generateRandomId();
+                        values['key'] = "AG_" + generateRandomId();
                         values['children'] = []
                         newTreeData = addNode(selectedRowKey, treeData, values);
                     }

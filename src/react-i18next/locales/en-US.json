@@ -36,19 +36,21 @@
     "copy": "Copy",
     "export": "Export",
     "sync": "Sync",
-    "view_private_key": "View Private Key"
+    "view_private_key": "View Private Key",
+    "import": "Import",
+    "download_import_sample": "Download Import Example"
   },
   "dashboard": {
     "name": "Dashboard",
     "login_times": "Login Times",
     "active_users": "Active Users",
-    "active_assets": "Active Assets",
+    "active_assets": "Online Assets",
     "login_failed_times": "Login Failure Count",
     "user_online_count": "Online Users",
     "session_online_count": "Online Sessions",
     "gateway_active_count": "Online Gateway",
-    "asset_active_count": "Live Assets",
-    "website_active_count": "Live Web Assets",
+    "asset_active_count": "Online Assets",
+    "website_active_count": "Online Web Assets",
     "date_counter": "Activity Statistics",
     "asset_type": "Asset Type",
     "latest_session": "Latest Sessions",
@@ -98,9 +100,9 @@
       "submenus": {
         "asset": "Assets",
         "credential": "Credentials",
-        "snippet": "Snippets",
+        "snippet": "Command Snippets",
         "storage": "Storage",
-        "website": "Websites",
+        "website": "Web Assets",
         "certificate": "Certificate"
       }
     },
@@ -108,7 +110,7 @@
       "label": "Gateway",
       "submenus": {
         "ssh_gateway": "SSH Gateway",
-        "agent_gateway": "Sec Gateway"
+        "agent_gateway": "Security Gateway"
       }
     },
     "log_audit": {
@@ -122,7 +124,7 @@
       }
     },
     "sysops": {
-      "label": "Operations",
+      "label": "System Operations",
       "submenus": {
         "scheduled_task": "Scheduled Tasks",
         "monitoring": "System Monitoring",
@@ -166,7 +168,7 @@
       "create_dir": "Create Directory",
       "upload_file": "Upload File",
       "upload_dir": "Upload Directory",
-      "batch_download": "Bulk download"
+      "batch_download": "Batch download"
     },
     "attributes": {
       "path": "Path",
@@ -197,7 +199,7 @@
       "refresh": "Refresh",
       "show_hidden_file": "Show Hidden Files",
       "hide_hidden_file": "Hide Hidden Files",
-      "file_tran": "File Transfers"
+      "file_tran": "Transfer Progress"
     },
     "editor": {
       "label": "Editor",
@@ -382,7 +384,7 @@
             "allow": "Allow",
             "reject": "Reject"
           },
-          "status": "state",
+          "status": "Status",
           "authorised_at": "Authorization Time",
           "authorised_user": "Authorized User",
           "expired_at": "Expiration time",
@@ -457,7 +459,9 @@
       "port": "Port",
       "testing": "Start Detection"
     },
-    "spec_tooltip": "Supports second-level scheduled tasks, different from standard cron expressions, the first field represents seconds (compatible with Quartz expression specifications), but does not support the year field."
+    "spec_tooltip": "Supports second-level scheduled tasks, different from standard cron expressions, the first field represents seconds (compatible with Quartz expression specifications), but does not support the year field.",
+    "spec_run": "Simulation run",
+    "spec_run_time": "Last ten run times"
   },
   "audit": {
     "client_ip": "Client IP",
@@ -693,7 +697,7 @@
     "down": "Move Down",
     "copy_public_key": "Copy Public Key",
     "filesystem": "File System",
-    "website_entrance": "The entrance is the path where users enter the website.",
+    "website_entrance": "The entrance is the path where users enter the Web Asset.",
     "conn_test": "Connection Test",
     "generate_private_key": "Generate private key",
     "cert": "certificate",
@@ -723,7 +727,7 @@
       "certificate": "certificate",
       "private_key": "Private key",
       "type": "Certificate Type",
-      "self_signed": "self-issuance",
+      "self_signed": "Self-signed",
       "issued": "Online Application",
       "imported": "Local Import",
       "not_after": "Expiration Time",
@@ -745,7 +749,7 @@
       "label": "DNS provider",
       "set": "Set DNS provider",
       "remove": "Remove DNS provider",
-      "remove_confirm_title": "Remove DNS service provider settings",
+      "remove_confirm_title": "Remove DNS Provider Settings",
       "remove_confirm_content": "Once removed, it will no longer be possible to apply for a certificate.",
       "type": "Supplier Type",
       "tencentcloud": "Tencent Cloud",
@@ -756,7 +760,9 @@
     "dns_provider_config": "DNS provider configuration",
     "dns_provider_config_tip": "Please fill in the configuration information according to the supplier's requirements.",
     "modify_response": "Modify Response",
-    "add_rule": "Add a rule"
+    "add_rule": "Add Rule",
+    "public_tip": "The restriction only applies to anonymous users.",
+    "group_tip": "Right-click to edit/delete (except for the Default group)"
   },
   "gateways": {
     "name": "Name",
@@ -1024,7 +1030,7 @@
         "content": "Your license does not support this feature.",
         "pay": "Buy now"
       },
-      "test_warning": "You are trying out the professional version, which expires on"
+      "test_warning": "You are currently on a Professional version trial, which expires on"
     },
     "logo": {
       "setting": "Asset Logo",

@@ -36,7 +36,9 @@
     "copy": "コピー",
     "export": "エクスポート",
     "sync": "同期",
-    "view_private_key": "秘密鍵を表示する"
+    "view_private_key": "秘密鍵を表示する",
+    "import": "インポート",
+    "download_import_sample": "ダウンロードインポートサンプル"
   },
   "dashboard": {
     "name": "データ概要",
@@ -469,7 +471,9 @@
       "port": "ポート",
       "testing": "検査を开始します"
     },
-    "spec_tooltip": "秒単位のスケジューリングタスクをサポートし、標準的なcron式とは異なり、最初のフィールドは秒を表します（Quartz式仕様と互換性あり）、ただし年フィールドはサポートしていません。"
+    "spec_tooltip": "秒単位のスケジューリングタスクをサポートし、標準的なcron式とは異なり、最初のフィールドは秒を表します（Quartz式仕様と互換性あり）、ただし年フィールドはサポートしていません。",
+    "spec_run": "シミュレーション実行",
+    "spec_run_time": "最近10回の実行時間"
   },
   "audit": {
     "client_ip": "クライアントIP",
@@ -768,7 +772,9 @@
     "pattern": "マッチング内容",
     "replacement": "置き換える",
     "modify_response_tip": "複数の変更ルールを設定でき、順番に適用されます。",
-    "modify_response_compression_support": "gzip、deflate、brなどの圧縮形式の展開と再圧縮を自動でサポートします。"
+    "modify_response_compression_support": "gzip、deflate、brなどの圧縮形式の展開と再圧縮を自動でサポートします。",
+    "public_tip": "制限は匿名ユーザーのみに適用されます。",
+    "group_tip": "右クリックで編集/削除（Default グループを除く）"
   },
   "gateways": {
     "name": "名前",

@@ -382,6 +382,9 @@ const WebsiteModal = ({
 
     const PublicView = () => {
         return <>
+            <div className={'mb-2'}>
+                <Alert type={'info'} message={t('assets.public_tip')}/>
+            </div>
             <ProFormSwitch label={t('general.enabled')} name={['public', 'enabled']}
                            fieldProps={{
                                checkedChildren: t('general.yes'),

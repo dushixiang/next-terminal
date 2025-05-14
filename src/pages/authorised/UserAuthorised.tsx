@@ -22,6 +22,7 @@ const UserAuthorised = ({active, userId, userGroupId}: Props) => {
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
 
     const {t} = useTranslation();
+
     const actionRef = useRef<ActionType>();
 
     const {message} = App.useApp();
@@ -69,7 +70,11 @@ const UserAuthorised = ({active, userId, userGroupId}: Props) => {
         {
             title: t('authorised.label.asset'),
             dataIndex: 'assetName',
+            hideInSearch: true,
             render: ((text, record) => {
+                if (strings.hasText(record.assetGroupName)) {
+                    return `${record.assetGroupName} (${t('assets.group')})`;
+                }
                 return <NLink to={`/asset/${record['assetId']}`}>{text}</NLink>
             })
         },
@@ -161,7 +166,6 @@ const UserAuthorised = ({active, userId, userGroupId}: Props) => {
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
-
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
@@ -177,9 +181,7 @@ const UserAuthorised = ({active, userId, userGroupId}: Props) => {
                     };
                 }}
                 rowKey="id"
-                search={{
-                    labelWidth: 'auto',
-                }}
+                search={false}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true

@@ -639,7 +639,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                     allowClear
                     // secondary
                     request={async () => {
-                        let tree = await assetsApi.getGroupTree();
+                        let tree = await assetsApi.getGroups();
                         return transformData(tree)
                     }}
                     fieldProps={{

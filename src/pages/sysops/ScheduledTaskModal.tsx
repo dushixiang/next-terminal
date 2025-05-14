@@ -1,4 +1,4 @@
-import React, {useRef} from 'react';
+import React, {useRef, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import {
     ProForm,
@@ -9,17 +9,10 @@ import {
     ProFormTextArea,
     ProFormTreeSelect
 } from "@ant-design/pro-components";
-import {Col, Modal, Row} from "antd";
+import {Col, Modal, Popover, Row} from "antd";
 import scheduledTaskApi, {ScheduledTask} from "@/src/api/scheduled-task-api";
 import assetApi from "@/src/api/asset-api";
-
-export interface Props {
-    open: boolean
-    handleOk: (values: any) => void
-    handleCancel: () => void
-    confirmLoading: boolean
-    id: string | undefined
-}
+import ScheduledTaskRuntime from "@/src/pages/sysops/ScheduledTaskRuntime";
 
 const ScheduledTaskModal = ({
                                 open,
@@ -30,10 +23,14 @@ const ScheduledTaskModal = ({
                             }: Props) => {
     let {t} = useTranslation();
     const formRef = useRef<ProFormInstance>();
+    let [spec, setSpec] = useState('');
+    let [runtimeOpen, setRuntimeOpen] = useState(false);
 
     const get = async () => {
         if (id) {
-            return await scheduledTaskApi.getById(id);
+            let data = await scheduledTaskApi.getById(id);
+            setSpec(data.spec);
+            return data
         }
         return {
             'type': 'asset-exec-command',
@@ -52,11 +49,11 @@ const ScheduledTaskModal = ({
                 formRef.current?.validateFields()
                     .then(async values => {
                         handleOk(values);
-                        
+
                     });
             }}
             onCancel={() => {
-                
+
                 handleCancel();
             }}
             confirmLoading={confirmLoading}
@@ -72,7 +69,10 @@ const ScheduledTaskModal = ({
                                            {label: t('sysops.type.options.exec_command'), value: 'asset-exec-command'},
                                            {label: t('sysops.type.options.check_status'), value: 'asset-check-status'},
                                            {label: t('sysops.type.options.delete_log'), value: 'delete-history-log'},
-                                           {label: t('sysops.type.options.renew_certificate'), value: 'renew-certificate'},
+                                           {
+                                               label: t('sysops.type.options.renew_certificate'),
+                                               value: 'renew-certificate'
+                                           },
                                        ]}
                         />
                     </Col>
@@ -81,6 +81,26 @@ const ScheduledTaskModal = ({
                                      name={'spec'}
                                      rules={[{required: true}]}
                                      tooltip={t('sysops.spec_tooltip')}
+                                     fieldProps={{
+                                         value: spec,
+                                         onChange: (e) => {
+                                             setSpec(e.target.value);
+                                         },
+                                         addonAfter: <div className={'cursor-pointer'}>
+                                             <Popover
+                                                 content={<ScheduledTaskRuntime open={runtimeOpen} spec={spec}/>}
+                                                 title={t('sysops.spec_run_time')}
+                                                 trigger="click"
+                                                 placement="rightTop"
+                                                 open={runtimeOpen}
+                                                 onOpenChange={(open) => {
+                                                     setRuntimeOpen(open);
+                                                 }}
+                                             >
+                                                 {t('sysops.spec_run')}
+                                             </Popover>
+                                         </div>,
+                                     }}
                         />
                     </Col>
                 </Row>
@@ -118,21 +138,25 @@ const ScheduledTaskModal = ({
                                         multiple: true,
                                         showSearch: true,
                                         treeDefaultExpandAll: true,
+                                        treeNodeFilterProp: "title",
                                     }}
                                     request={async () => {
-                                        let items = await assetApi.tree();
+                                        let items = await assetApi.tree('ssh');
 
                                         // 递归把 key 字段设置为 value，并且非叶子节点全部 disabled
                                         function setKeyAndDisabled(item: any) {
                                             item.value = item.key;
                                             if (!item.isLeaf) {
-                                                item.disabled = true;
+                                                // item.disabled = true;
                                                 // 递归处理子节点
                                                 if (item.children) {
                                                     item.children.forEach(setKeyAndDisabled);
                                                 }
+                                            } else {
+                                                item.title = item.title + ' (' + item.extra?.network + ')';
                                             }
                                         }
+
                                         // 对获取到的所有节点进行处理
                                         items.forEach((item: any) => {
                                             setKeyAndDisabled(item);
@@ -161,5 +185,13 @@ const ScheduledTaskModal = ({
         </Modal>
     )
 };
+
+export interface Props {
+    open: boolean
+    handleOk: (values: any) => void
+    handleCancel: () => void
+    confirmLoading: boolean
+    id: string | undefined
+}
 
 export default ScheduledTaskModal;

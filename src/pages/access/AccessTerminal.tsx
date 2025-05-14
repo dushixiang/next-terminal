@@ -216,7 +216,6 @@ const AccessTerminal = ({assetId}: Props) => {
         terminal.current?.writeln('trying to connect to the server...');
         websocket.onopen = (e => {
             setLoading(false);
-            terminal.current?.clear();
         });
 
         websocket.onerror = (e) => {

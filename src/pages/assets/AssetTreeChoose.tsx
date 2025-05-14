@@ -18,8 +18,8 @@ const AssetTreeChoose = ({assetIds, open, onClose}: Props) => {
     let [selectedKey, setSelectedKey] = useState('');
 
     let query = useQuery({
-        queryKey: ['assets/tree'],
-        queryFn: assetApi.getGroupTree,
+        queryKey: ['assets/groups'],
+        queryFn: assetApi.getGroups,
     });
 
     useEffect(() => {

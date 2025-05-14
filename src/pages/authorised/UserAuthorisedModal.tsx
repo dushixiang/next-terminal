@@ -20,7 +20,7 @@ interface Props {
     id?: string
 }
 
-const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel, confirmLoading,id}: Props) => {
+const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel, confirmLoading, id}: Props) => {
 
     const formRef = useRef<ProFormInstance>();
     let {t} = useTranslation();
@@ -29,7 +29,7 @@ const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel,
     const [expiredAtNoLimit, setExpiredAtNoLimit] = useState<boolean>(true);
 
     const get = async () => {
-        if(strings.hasText(id)){
+        if (strings.hasText(id)) {
             let data = await authorisedAssetApi.getById(id);
             setExpiredAtNoLimit(data.expiredAt === 0);
             setExpiredAtDayjs(dayjs(data.expiredAt));
@@ -65,7 +65,7 @@ const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel,
     };
 
     const renderAsset = () => {
-        if(strings.hasText(id)){
+        if (strings.hasText(id)) {
             return undefined;
         }
         return <ProFormTreeSelect
@@ -76,21 +76,29 @@ const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel,
                 multiple: true,
                 showSearch: true,
                 treeDefaultExpandAll: true,
+                treeNodeFilterProp: "title",
             }}
             request={async () => {
                 let items = await assetApi.tree();
+                let selected = await authorisedAssetApi.selected('assetId', userId, userGroupId, '');
 
                 // 递归把 key 字段设置为 value，并且非叶子节点全部 disabled
                 function setKeyAndDisabled(item: any) {
                     item.value = item.key;
                     if (!item.isLeaf) {
-                        item.disabled = true;
+                        // item.disabled = true;
                         // 递归处理子节点
                         if (item.children) {
                             item.children.forEach(setKeyAndDisabled);
                         }
+                    } else {
+                        item.title = item.title + ' (' + item.extra?.network + ')';
+                    }
+                    if (selected.includes(item.key)) {
+                        item.disabled = true;
                     }
                 }
+
                 // 对获取到的所有节点进行处理
                 items.forEach((item: any) => {
                     setKeyAndDisabled(item);
@@ -116,11 +124,11 @@ const UserAuthorisedModal = ({userId, userGroupId, open, handleOk, handleCancel,
                             values['expiredAt'] = expiredAtDayjs.valueOf();
                         }
                         handleOk(values);
-                        
+
                     });
             }}
             onCancel={() => {
-                
+
                 handleCancel();
             }}
             confirmLoading={confirmLoading}

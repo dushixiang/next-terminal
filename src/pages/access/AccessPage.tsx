@@ -397,8 +397,12 @@ const AccessPage = () => {
                                                                   })
                                                               }}
                                                         >
-                                                        {renderLogo(node)}
-                                                            <span>{node.title}</span>
+                                                            {renderLogo(node)}
+                                                            <div className={cn(
+                                                                node.extra?.status === 'inactive' && 'text-gray-500'
+                                                            )}>
+                                                                {node.title}
+                                                            </div>
                                                     </span>
                                                     </Tooltip>
                                                 }}

@@ -15,6 +15,7 @@ export interface Authorised {
     userGroupName: string;
     expiredAt: number;
     createdAt: number;
+    assetGroupName: string;
 }
 
 class AuthorisedAssetApi {
@@ -40,7 +41,7 @@ class AuthorisedAssetApi {
 
     selected = async (expect: string, userId?: string, userGroupId?: string, assetId?: string) => {
         let paramsStr = qs.stringify({expect, userId, userGroupId, assetId});
-        return await requests.get(`/${this.group}/selected?${paramsStr}`);
+        return await requests.get(`/${this.group}/selected?${paramsStr}`) as String[];
     }
 
     deleteById = async (id: string) => {
@@ -51,7 +52,7 @@ class AuthorisedAssetApi {
         return await requests.get(`/${this.group}/${id}`)
     }
 
-    update = async (id: string,values: any) => {
+    update = async (id: string, values: any) => {
         await requests.put(`/${this.group}/${id}`, values)
     }
 }

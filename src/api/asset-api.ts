@@ -67,12 +67,16 @@ class AssetApi extends Api<Asset> {
         return await requests.get(`/${this.group}/tags`) as string[]
     }
 
-    getGroupTree = async () => {
+    getGroups = async () => {
         return await requests.get(`/${this.group}/groups`) as TreeDataNode[]
     }
 
-    setGroup = async (data: any) => {
+    setGroups = async (data: any) => {
         return await requests.put(`/${this.group}/groups`, data);
+    }
+
+    deleteGroup = async (groupId: string) => {
+        return await requests.delete(`/${this.group}/groups/${groupId}`);
     }
 
     getLogos = async () => {

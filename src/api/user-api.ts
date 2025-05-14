@@ -82,6 +82,12 @@ class UserApi extends Api<User> {
     syncLdapUser = async () => {
         await requests.post(`/${this.group}/sync-from-ldap`);
     }
+
+    import = async (file: File) => {
+        let formData = new FormData();
+        formData.append("file", file);
+        await requests.post(`/${this.group}/import`, formData);
+    }
 }
 
 const userApi = new UserApi();
