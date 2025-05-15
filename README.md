@@ -2,33 +2,35 @@
 
 English | [简体中文](./README-zh_CN.md)
 
-## 简介
 
-Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多种远程访问协议，包括 RDP、SSH、VNC、Telnet、HTTP 等，适用于企业级运维场景。它可以记录和回放会话，协助安全审计与合规追踪。
+## Introduction
 
-## 快速安装
+Next Terminal is a simple, secure, and user-friendly interactive auditing system that supports multiple remote access protocols including RDP, SSH, VNC, Telnet, and HTTP. It is designed for enterprise IT environments and helps facilitate session recording, audit tracking, and compliance reporting.
 
-[👉 安装文档](https://docs.next-terminal.typesafe.cn)
+### Quick Start
 
-## 屏幕截图
-
-![](screenshots/zh/dashboard.png)
-![](screenshots/zh/access.png)
-
-## 协议与条款
-
-如您需要在企业网络中使用 next-terminal，建议先征求 IT 管理员的同意。下载、使用或分发 next-terminal 前，您必须同意 [协议](./LICENSE) 条款与限制。本项目不提供任何担保，亦不承担任何责任。
+Refer to the installation guide here:
+👉 [Installation Documentation](https://docs.next-terminal.typesafe.cn)
 
 
-## 安全问题
+## Screenshots
 
-如果您在使用过程中发现安全漏洞或潜在风险，请通过以下方式联系我们：
+![](screenshots/en/dashboard.png)
+![](screenshots/en/access.png)
 
-📧dushixiang@typesafe.cn
+### License & Terms
 
-## 社群
-- QQ 群：938145268
+Before downloading, using, or distributing Next Terminal, please read and agree to the [LICENSE](./LICENSE).
+This project is provided "as is" without any warranties or guarantees. Use at your own risk.
 
-## 优秀项目推荐
+⚠️ It is recommended to consult your **IT administrator** before deploying Next Terminal within a corporate network.
 
-- [go-ldap-admin：基于Go+Vue实现的openLDAP后台管理项目](https://github.com/eryajf/go-ldap-admin)
+### Security Issues
+
+If you discover any security vulnerabilities, please contact the maintainer:
+
+📧 [dushixiang@typesafe.cn](mailto:dushixiang@typesafe.cn)
+
+### Recommended Projects
+
+* [go-ldap-admin](https://github.com/eryajf/go-ldap-admin): A web-based OpenLDAP management tool built with Go and Vue
