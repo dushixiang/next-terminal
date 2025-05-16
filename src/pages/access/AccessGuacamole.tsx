@@ -6,7 +6,6 @@ import Guacamole from '@dushixiang/guacamole-common-js';
 import {useTranslation} from "react-i18next";
 import {useWindowSize} from "react-use";
 import portalApi, {ExportSession} from "@/src/api/portal-api";
-import {HashLoader} from "react-spinners";
 import {useAccessContentSize} from "@/src/hook/use-access-size";
 import {useAccessTab} from "@/src/hook/use-access-tab";
 import FileSystemPage from "@/src/pages/access/FileSystemPage";
@@ -14,21 +13,15 @@ import SessionSharerModal from "@/src/pages/access/SessionSharerModal";
 import GuacClipboard from "@/src/pages/access/GuacClipboard";
 import GuacdRequiredParameters from "@/src/pages/access/GuacdRequiredParameters";
 import {useMutation} from "@tanstack/react-query";
-import {Dropdown, FloatButton, message, Watermark} from "antd";
-import {
-    CopyOutlined,
-    ExpandOutlined,
-    FolderOutlined,
-    ShareAltOutlined,
-    ToolOutlined,
-    WindowsOutlined
-} from "@ant-design/icons";
+import {message, Watermark} from "antd";
 import copy from "copy-to-clipboard";
 import useWindowFocus from "@/src/hook/use-window-focus";
 import {isFullScreen, requestFullScreen} from "@/src/utils/utils";
 import Timeout, {TimeoutHandle} from "@/src/components/Timeout";
 import {debounce} from "@/src/utils/debounce";
 import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
+import RenderState from "@/src/pages/access/guacamole/RenderState";
+import ControlButtons from "@/src/pages/access/guacamole/ControlButtons";
 
 interface Props {
     assetId: string;
@@ -363,67 +356,6 @@ const AccessGuacamole = ({assetId}: Props) => {
         }
     }, [tiger]);
 
-    function renderState(state: Guacamole.Client.State, status: Guacamole.Status) {
-        let loading = true;
-        let error = false;
-        let stateText = '';
-        switch (state) {
-            case Guacamole.Client.State.IDLE:
-                stateText = t('guacamole.state.idle');
-                break;
-            case Guacamole.Client.State.CONNECTING:
-                stateText = t('guacamole.state.connecting');
-                break;
-            case Guacamole.Client.State.WAITING:
-                stateText = t('guacamole.state.waiting')
-                break;
-            case Guacamole.Client.State.CONNECTED:
-                return undefined;
-            case Guacamole.Client.State.DISCONNECTING:
-                error = true;
-                break;
-            case Guacamole.Client.State.DISCONNECTED:
-                stateText = t('guacamole.state.disconnected');
-                loading = false;
-                error = true;
-                break;
-            default:
-                break;
-        }
-        return <div className="flex items-center justify-center h-full">
-            <div className="flex flex-col items-center gap-4">
-                {loading && (
-                    <div className="flex flex-col gap-4 p-4 text-center items-center justify-center">
-                        <HashLoader color="#1568DB" />
-                        <div>{stateText}</div>
-                    </div>
-                )}
-                {error && (
-                    <div className="flex flex-col gap-2 text-red-400 bg-gray-800/90 border border-red-500 rounded-lg p-6 min-w-[400px] shadow-lg">
-                        <div className="flex items-center gap-2 text-lg font-bold">
-                            <span className="text-red-500">❌</span>
-                            <span>Error</span>
-                        </div>
-                        {status?.code && <div className="text-sm opacity-80">Code: {status?.code}</div>}
-                        {status?.message && <div className="text-sm opacity-80">Message: {status?.message}</div>}
-                        {stateText && <div className="font-bold text-base mb-4">State: {stateText}</div>}
-                        <button
-                            className="bg-blue-500 text-white text-center hover:bg-blue-600 transition-all duration-300 px-3 py-2 rounded-lg cursor-pointer"
-                            onClick={() => {
-                                setTiger(new Date().toString());
-                                setState(Guacamole.Client.State.IDLE);
-                                setStatus(undefined);
-                                resetTimer();
-                            }}
-                        >
-                            {t('access.reconnect')}
-                        </button>
-                    </div>
-                )}
-            </div>
-        </div>;
-    }
-
     const sendClipboard = (data: any) => {
         if (!client) {
             return;
@@ -502,7 +434,16 @@ const AccessGuacamole = ({assetId}: Props) => {
              }}
              ref={containerRef}
         >
-            {renderState(state, status)}
+            <RenderState
+                status={status}
+                state={state}
+                onReconnect={() => {
+                    setTiger(new Date().toString());
+                    setState(Guacamole.Client.State.IDLE);
+                    setStatus(undefined);
+                    resetTimer();
+                }}
+            />
             <div className={'flex items-center justify-center h-full w-full'}>
                 <Watermark content={session?.watermark?.content}
                            font={{
@@ -517,40 +458,24 @@ const AccessGuacamole = ({assetId}: Props) => {
                 </Watermark>
             </div>
 
-            <FloatButton.Group shape="circle"
-                               open={floatButtonOpen}
-                               trigger="click"
-                               onClick={() => {
-                                   setFloatButtonOpen(!floatButtonOpen)
-                               }}
-                               icon={<ToolOutlined/>}
-            >
-                {session?.fileSystem ?
-                    <FloatButton icon={<FolderOutlined/>} tooltip={t('access.filesystem')}
-                                 onClick={() => {
-                                     setFileSystemOpen(true);
-                                     setPreFileSystemOpen(true);
-                                 }}/>
-                    : undefined
-                }
-
-                <FloatButton icon={<ShareAltOutlined/>} tooltip={t('access.session.share.action')}
-                             onClick={() => setSharerOpen(true)}/>
-                <FloatButton icon={<CopyOutlined/>} tooltip={t('access.clipboard')}
-                             onClick={() => setClipboardVisible(true)}/>
-                <Dropdown
-                    menu={{
-                        items: menuItems,
-                        onClick: handleMenuClick
-                    }}
-                    trigger={['click']}
-                    placement="bottomLeft">
-                    <FloatButton icon={<WindowsOutlined/>} tooltip={t('access.combination_key')}/>
-                </Dropdown>
-                <FloatButton icon={<ExpandOutlined/>} tooltip={t('access.toggle_full_screen')}
-                             onClick={() => fullScreen()}/>
-            </FloatButton.Group>
-
+            <ControlButtons
+                onOpenFS={() => {
+                    setFileSystemOpen(true);
+                    setPreFileSystemOpen(true);
+                }}
+                onShare={() => {
+                    setSharerOpen(true);
+                }}
+                onClipboard={() => {
+                    setClipboardVisible(true);
+                }}
+                onFull={() => {
+                    fullScreen();
+                }}
+                onSendKeys={(keys) => {
+                    sendCombinationKey(keys);
+                }}
+            />
 
             <FileSystemPage fsId={session?.id}
                             strategy={session?.strategy}

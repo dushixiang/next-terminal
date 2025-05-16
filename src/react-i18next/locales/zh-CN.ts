@@ -535,6 +535,13 @@ let o = {
         "filesystem": "文件系统",
         "use": "使用",
         "search": "搜索",
+        "guacamole": {
+            "error_title": "连接失败",
+            "code": "错误代码",
+            "message": "错误信息",
+            "clipboard_required": "请输入剪贴板内容",
+            "clipboard_placeholder": "粘贴到此处...",
+        },
     },
     "account": {
         "my_asset": "我的资产",

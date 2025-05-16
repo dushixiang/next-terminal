@@ -130,7 +130,7 @@ const LoginPage = () => {
             let data2 = await accountApi.webauthnLoginFinishV2(data.token, authentication);
             afterLoginSuccess(data2, false);
         } catch (e) {
-            message.error(e.message);
+            console.log(`error: ${e}`)
         } finally {
             setLoading(false)
         }

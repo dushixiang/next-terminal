@@ -21,21 +21,17 @@ const Passkey = () => {
     });
 
     const register = async () => {
-        try {
-            let options = await accountApi.webauthnCredentialStart();
-            const attestationResponse = await startRegistration({
-                optionsJSON: options.publicKey,
-            });
-            if (!attestationResponse) {
-                alert("Credential creation failed");
-                return;
-            }
-            await accountApi.webauthnCredentialFinish(attestationResponse);
-            webauthnCredentialsQuery.refetch();
-            message.success(t('general.success'));
-        } catch (e) {
-            message.error(e.message);
+        let options = await accountApi.webauthnCredentialStart();
+        const attestationResponse = await startRegistration({
+            optionsJSON: options.publicKey,
+        });
+        if (!attestationResponse) {
+            alert("Credential creation failed");
+            return;
         }
+        await accountApi.webauthnCredentialFinish(attestationResponse);
+        webauthnCredentialsQuery.refetch();
+        message.success(t('general.success'));
     }
 
     const renderUsedTime = (usedAt: number) => {

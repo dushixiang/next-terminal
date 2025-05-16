@@ -62,8 +62,8 @@
       "system": "System",
       "hostname": "Hostname",
       "uptime": "Uptime",
-      "os": "Operating System",
-      "arch": "System Architecture",
+      "os": "OS",
+      "arch": "Arch",
       "load": "System Load",
       "cpu": "CPU"
     },
@@ -76,9 +76,9 @@
     "disk": {
       "label": "Disk",
       "mount_point": "Mount Point",
-      "total": "Total Size",
-      "free": "Free Space",
-      "percent": "Usage Percentage"
+      "total": "Total",
+      "free": "Free",
+      "percent": "Usage"
     },
     "network": {
       "label": "Network",
@@ -767,8 +767,8 @@
   "gateways": {
     "name": "Name",
     "port": "Port",
-    "os": "Operating System",
-    "arch": "System Architecture",
+    "os": "OS",
+    "arch": "Arch",
     "status": "Status",
     "version": "Version",
     "connected": "Connected",
