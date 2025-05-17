@@ -43,9 +43,9 @@ const AccessTerminal = ({assetId}: Props) => {
 
     let {t} = useTranslation();
 
-    const terminalRef = React.useRef<HTMLDivElement>(null);
-    const terminal = useRef<Terminal>();
-    const fit = useRef<FitAddon>();
+    const divRef = React.useRef<HTMLDivElement>(null);
+    const terminalRef = useRef<Terminal>();
+    const fitRef = useRef<FitAddon>();
 
     let [websocket, setWebsocket] = useState<WebSocket>();
     let [session, setSession] = useState<ExportSession>();
@@ -87,7 +87,7 @@ const AccessTerminal = ({assetId}: Props) => {
         let current = accessTab.split('_')[1];
         if (current === assetId) {
             setTimeout(() => {
-                terminal.current?.focus();
+                terminalRef.current?.focus();
             }, 100);
             fitFit();
             setFileSystemOpen(preFileSystemOpen)
@@ -97,8 +97,8 @@ const AccessTerminal = ({assetId}: Props) => {
     }, [accessTab]);
 
     useEffect(() => {
-        if (accessTheme && terminal) {
-            let options = terminal.current?.options;
+        if (accessTheme && terminalRef) {
+            let options = terminalRef.current?.options;
             if (options) {
                 let cleanTheme = CleanTheme(accessTheme);
                 options.theme = cleanTheme?.theme?.value;
@@ -110,13 +110,13 @@ const AccessTerminal = ({assetId}: Props) => {
     }, [accessTheme]);
 
     useEffect(() => {
-        let selectionChange = terminal.current?.onSelectionChange(async () => {
+        let selectionChange = terminalRef.current?.onSelectionChange(async () => {
             // console.log(`on selection change`, accessSetting)
             if (accessSetting?.selectionCopy === false) {
                 return
             }
-            if (terminal.current?.hasSelection()) {
-                let selection = terminal.current?.getSelection();
+            if (terminalRef.current?.hasSelection()) {
+                let selection = terminalRef.current?.getSelection();
                 copy(selection)
                 message.success(t('general.copy_success'));
             }
@@ -132,16 +132,16 @@ const AccessTerminal = ({assetId}: Props) => {
             websocket?.send(new Message(MessageTypeData, clipboardText).toString());
         }
 
-        terminalRef?.current?.addEventListener("contextmenu", handleContextMenu);
+        divRef?.current?.addEventListener("contextmenu", handleContextMenu);
 
         return () => {
             selectionChange?.dispose();
-            terminalRef?.current?.removeEventListener("contextmenu", handleContextMenu);
+            divRef?.current?.removeEventListener("contextmenu", handleContextMenu);
         };
     }, [accessSetting, websocket]);
 
     useEffect(() => {
-        if (terminal.current || !terminalRef.current) return;
+        if (terminalRef.current || !divRef.current) return;
 
         let cleanTheme = CleanTheme(accessTheme);
         let term = new Terminal({
@@ -160,12 +160,12 @@ const AccessTerminal = ({assetId}: Props) => {
             return !(domEvent.ctrlKey && domEvent.key === 'v');
         })
 
-        term.open(terminalRef.current);
+        term.open(divRef.current);
         let fitAddon = new FitAddon();
         term.loadAddon(fitAddon);
 
-        terminal.current = term;
-        fit.current = fitAddon;
+        terminalRef.current = term;
+        fitRef.current = fitAddon;
 
         fitAddon.fit();
         term.focus();
@@ -196,12 +196,12 @@ const AccessTerminal = ({assetId}: Props) => {
             session = await portalApi.createSessionByAssetsId(assetId, securityToken);
             setSession(session);
         } catch (e) {
-            terminal.current?.writeln(`\x1b[41m ERROR \x1b[0m : ${e.message}`);
+            terminalRef.current?.writeln(`\x1b[41m ERROR \x1b[0m : ${e.message}`);
             return;
         }
 
-        let cols = terminal.current.cols;
-        let rows = terminal.current.rows;
+        let cols = terminalRef.current.cols;
+        let rows = terminalRef.current.rows;
         let authToken = getToken();
         let params = {
             'cols': cols,
@@ -213,28 +213,28 @@ const AccessTerminal = ({assetId}: Props) => {
         let paramStr = qs.stringify(params);
         let websocket = new WebSocket(`${baseWebSocketUrl()}/access/terminal?${paramStr}`);
 
-        terminal.current?.writeln('trying to connect to the server...');
+        terminalRef.current?.writeln('trying to connect to the server...');
         websocket.onopen = (e => {
             setLoading(false);
         });
 
         websocket.onerror = (e) => {
             console.error(`websocket error`, e);
-            terminal.current?.writeln(`websocket error`);
+            terminalRef.current?.writeln(`websocket error`);
         }
 
         websocket.onclose = (e) => {
             if (e.code === 3886) {
-                terminal.current?.writeln('');
-                terminal.current?.writeln('');
-                terminal.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session timeout.`);
+                terminalRef.current?.writeln('');
+                terminalRef.current?.writeln('');
+                terminalRef.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session timeout.`);
             } else {
-                terminal.current?.writeln('');
-                terminal.current?.writeln('');
-                terminal.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session closed.`);
+                terminalRef.current?.writeln('');
+                terminalRef.current?.writeln('');
+                terminalRef.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session closed.`);
             }
             setLoading(false);
-            terminal.current?.writeln('Press any key to reconnect');
+            terminalRef.current?.writeln('Press any key to reconnect');
 
             setWebsocket(null);
         }
@@ -243,7 +243,7 @@ const AccessTerminal = ({assetId}: Props) => {
             let msg = Message.parse(e.data);
             switch (msg.type) {
                 case MessageTypeData:
-                    terminal.current.write(msg.content);
+                    terminalRef.current.write(msg.content);
                     break;
                 case MessageTypeJoin:
                     notification.success({
@@ -277,18 +277,18 @@ const AccessTerminal = ({assetId}: Props) => {
     }
 
     useEffect(() => {
-        if (!terminal.current) {
+        if (!terminalRef.current) {
             return;
         }
         connectWrap();
-    }, [terminal.current, reconnected]);
+    }, [terminalRef.current, reconnected]);
 
     useEffect(() => {
-        let sizeListener = terminal.current?.onResize(function (evt) {
+        let sizeListener = terminalRef.current?.onResize(function (evt) {
             // console.log(`term resize`, evt.cols, evt.rows);
             websocket?.send(new Message(MessageTypeResize, `${evt.cols},${evt.rows}`).toString());
         });
-        let dataListener = terminal.current?.onData(data => {
+        let dataListener = terminalRef.current?.onData(data => {
             if (!websocket) {
                 setReconnected(new Date().toString());
             } else {
@@ -305,8 +305,8 @@ const AccessTerminal = ({assetId}: Props) => {
     }, [websocket]);
 
     const fitFit = useMemo(() => debounce(() => {
-        if (terminal.current && fit.current) {
-            fit.current.fit();
+        if (terminalRef.current && fitRef.current) {
+            fitRef.current.fit();
         }
     }, 300), []);
 
@@ -351,38 +351,38 @@ const AccessTerminal = ({assetId}: Props) => {
                                         className={'h-[40px] bg-[#1b1b1b] grid grid-cols-6 text-white text-center items-center'}>
                                         <div onClick={() => {
                                             websocket?.send(new Message(MessageTypeData, '\x1b').toString());
-                                            terminal.current?.focus();
+                                            terminalRef.current?.focus();
                                         }}>
                                             ESC
                                         </div>
                                         <div onClick={() => {
                                             websocket?.send(new Message(MessageTypeData, '\x09').toString());
-                                            terminal.current?.focus();
+                                            terminalRef.current?.focus();
                                         }}>
                                             ⇥
                                         </div>
                                         <div onClick={() => {
                                             websocket?.send(new Message(MessageTypeData, '\x02').toString());
-                                            terminal.current?.focus();
+                                            terminalRef.current?.focus();
                                         }}>
                                             CTRL+B
                                         </div>
                                         <div onClick={() => {
                                             websocket.send(new Message(MessageTypeData, '\x03').toString());
-                                            terminal.current?.focus();
+                                            terminalRef.current?.focus();
                                         }}>
                                             CTRL+C
                                         </div>
 
                                         <div onClick={() => {
                                             websocket.send(new Message(MessageTypeData, '\x1b[A').toString());
-                                            terminal.current?.focus();
+                                            terminalRef.current?.focus();
                                         }}>
                                             ↑
                                         </div>
                                         <div onClick={() => {
                                             websocket.send(new Message(MessageTypeData, '\x1b[B').toString());
-                                            terminal.current?.focus();
+                                            terminalRef.current?.focus();
                                         }}>
                                             ↓
                                         </div>
@@ -394,7 +394,7 @@ const AccessTerminal = ({assetId}: Props) => {
                                          backgroundColor: accessTheme?.theme?.value['background'],
                                      }}
                                 >
-                                    <div className={'h-full'} ref={terminalRef}/>
+                                    <div className={'h-full'} ref={divRef}/>
                                 </div>
                             </div>
 

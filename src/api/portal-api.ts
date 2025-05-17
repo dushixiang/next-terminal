@@ -130,6 +130,9 @@ class PortalApi {
     }
 
     createSessionByAssetsId = async (assetId: string, securityToken?: string) => {
+        if(!securityToken) {
+            securityToken = '';
+        }
         return await requests.post(`/${this.group}/sessions?securityToken=${securityToken}`, {"assetId": assetId}) as ExportSession;
     }
 

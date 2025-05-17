@@ -35,10 +35,11 @@ const AccessGuacamole = ({assetId}: Props) => {
     let {t} = useTranslation();
 
     let [tiger, setTiger] = useState(new Date().toString());
-    const terminalRef = React.useRef<HTMLDivElement>();
-    const containerRef = React.useRef<HTMLDivElement>();
-    let [client, setClient] = useState<Guacamole.Client>();
-    let [sink, setSink] = useState<Guacamole.InputSink>();
+    const terminalRef = useRef<HTMLDivElement>();
+    const containerRef = useRef<HTMLDivElement>();
+    let clientRef = useRef<Guacamole.Client>();
+    let sinkRef = useRef<Guacamole.InputSink>();
+
     let [state, setState] = useState<Guacamole.Client.State>();
     let [status, setStatus] = useState<Guacamole.Status>();
 
@@ -49,7 +50,6 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     let [clipboardText, setClipboardText] = useState('');
     let [clipboardVisible, setClipboardVisible] = useState(false);
-    let [floatButtonOpen, setFloatButtonOpen] = useState(false);
 
     let {width, height} = useWindowSize();
     let [contentSize] = useAccessContentSize();
@@ -63,7 +63,7 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     const resetTimer = () => {
         timeoutRef.current?.reset();
-        console.log(`reset timer`, timeoutRef.current);
+        // console.log(`reset timer`, timeoutRef.current);
     }
 
     let windowFocus = useWindowFocus();
@@ -74,23 +74,10 @@ const AccessGuacamole = ({assetId}: Props) => {
     }, [accessTab]);
 
     useEffect(() => {
-
-        const handleKeyDown = (event) => {
-            if (event.ctrlKey) {
-                event.preventDefault(); // 阻止默认行为
-            }
-            if (event.metaKey) {
-                event.preventDefault(); // 阻止默认行为
-            }
-        }
         if (active === true) {
-            sink?.focus();
+            sinkRef.current?.focus();
             fitFit();
             setFileSystemOpen(preFileSystemOpen);
-            document.addEventListener("keydown", handleKeyDown);
-            return () => {
-                document.removeEventListener("keydown", handleKeyDown);
-            }
         } else {
             setFileSystemOpen(false);
         }
@@ -104,14 +91,14 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     let sendRequiredMutation = useMutation({
         mutationFn: (values: any) => {
-            return new Promise<void>((resolve, reject) => {
+            return new Promise<void>((resolve) => {
                 console.log(`send args to server`, values)
                 for (let name in values) {
                     let value = values[name];
                     if (!value) {
                         value = '';
                     }
-                    const stream = client?.createArgumentValueStream("text/plain", name);
+                    const stream = clientRef.current?.createArgumentValueStream("text/plain", name);
                     const writer = new Guacamole.StringWriter(stream);
                     writer.sendText(value);
                     writer.sendEnd();
@@ -126,7 +113,7 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     useEffect(() => {
         fitFit()
-    }, [client, width, height, contentSize]);
+    }, [width, height, contentSize]);
 
     const fitFit = debounce(() => {
         let container = getContainerSize();
@@ -136,13 +123,13 @@ const AccessGuacamole = ({assetId}: Props) => {
         // const pixelDensity = window.devicePixelRatio || 1;
         let w = container.width;
         let h = container.height;
-        let display = client?.getDisplay();
+        let display = clientRef.current?.getDisplay();
         let dw = display?.getWidth();
         let dh = display?.getHeight();
         if (dw !== w || dh !== h) {
             if (!fixedSize) {
                 // 向服务端发送窗口大小
-                client?.sendSize(w, h);
+                clientRef.current?.sendSize(w, h);
                 // console.log(`send size`, "container", w, h, "display", dw, dh)
             }
             display?.onresize(w, h);
@@ -153,7 +140,7 @@ const AccessGuacamole = ({assetId}: Props) => {
         let container = getContainerSize();
         let w = container.width;
         let h = container.height;
-        let display = client?.getDisplay();
+        let display = clientRef.current?.getDisplay();
         let dw = display?.getWidth();
         let dh = display?.getHeight();
         let scale = 1;
@@ -164,8 +151,8 @@ const AccessGuacamole = ({assetId}: Props) => {
             );
         }
         // console.log(`resize`, "container", w, h, "display", dw, dh, "scale", scale);
-        client?.getDisplay().scale(scale);
-    }, [client, displaySize])
+        clientRef.current?.getDisplay().scale(scale);
+    }, [displaySize])
 
     const getContainerSize = () => {
         if (isFullScreen()) {
@@ -182,7 +169,6 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     const handleClipboardReceived = (stream: Guacamole.InputStream, mimetype: any) => {
         if (/^text\//.exec(mimetype)) {
-            console.log(`1`)
             let reader = new Guacamole.StringReader(stream);
             let data = '';
             reader.ontext = function textReceived(text: string) {
@@ -225,6 +211,7 @@ const AccessGuacamole = ({assetId}: Props) => {
             session = await portalApi.createSessionByAssetsId(assetId, securityToken);
             setSession(session);
         } catch (e) {
+            console.error('create session err', e);
             return
         }
 
@@ -246,7 +233,7 @@ const AccessGuacamole = ({assetId}: Props) => {
         // 处理从虚拟机收到的剪贴板内容
         client.onclipboard = (stream: Guacamole.InputStream, mimetype: any) => {
             if (!session?.strategy?.copy) {
-                message.info(t('copy-disabled'))
+                message.info(t('general.clipboard_disabled'))
                 return
             }
             handleClipboardReceived(stream, mimetype)
@@ -335,8 +322,10 @@ const AccessGuacamole = ({assetId}: Props) => {
         let paramStr = qs.stringify(params);
         client.connect(paramStr);
 
-        setClient(client);
-        setSink(sink);
+        clientRef.current = client;
+        sinkRef.current = sink;
+
+        console.log(`init client success`)
     }
 
     const connectWrap = async () => {
@@ -349,18 +338,22 @@ const AccessGuacamole = ({assetId}: Props) => {
     }
 
     useEffect(() => {
+        if (!terminalRef.current) {
+            return
+        }
+        console.log(`client connect`);
         connectWrap();
         return () => {
-            client?.disconnect();
-            console.log(`client disconnect`)
+            clientRef.current?.disconnect();
+            console.log(`client disconnect`);
         }
     }, [tiger]);
 
     const sendClipboard = (data: any) => {
-        if (!client) {
+        if (!clientRef.current) {
             return;
         }
-        const stream = client?.createClipboardStream(data.type);
+        const stream = clientRef.current?.createClipboardStream(data.type);
         if (typeof data.data === 'string') {
             let writer = new Guacamole.StringWriter(stream);
             writer.sendText(data.data);
@@ -372,59 +365,20 @@ const AccessGuacamole = ({assetId}: Props) => {
             };
             writer.sendBlob(data.data);
         }
-
-        // if (data.data && data.data.length > 0) {
-        //     message.success('您输入的内容已复制到远程服务器上');
-        // }
-    }
-
-    const menuItems = [
-        {
-            key: '65507+65513+65535',
-            label: 'Ctrl+Alt+Delete'
-        },
-        {
-            key: '65507+65513+65228',
-            label: 'Ctrl+Alt+Backspace'
-        },
-        {
-            key: '65515+100',
-            label: 'Window+D'
-        },
-        {
-            key: '65515+101',
-            label: 'Window+E'
-        },
-        {
-            key: '65515+114',
-            label: 'Window+R'
-        },
-        {
-            key: '65515+120',
-            label: 'Window+X'
-        },
-        {
-            key: '65515',
-            label: 'Window'
-        },
-    ];
-
-    const handleMenuClick = (e: any) => {
-        sendCombinationKey(e.key.split('+'));
     }
 
     const sendCombinationKey = (keys: string[]) => {
         for (let i = 0; i < keys.length; i++) {
-            client?.sendKeyEvent(1, Number(keys[i]));
+            clientRef.current?.sendKeyEvent(1, Number(keys[i]));
         }
         for (let j = 0; j < keys.length; j++) {
-            client?.sendKeyEvent(0, Number(keys[j]));
+            clientRef.current?.sendKeyEvent(0, Number(keys[j]));
         }
     }
 
     const fullScreen = () => {
         requestFullScreen(terminalRef.current);
-        sink?.focus();
+        sinkRef.current?.focus();
     }
 
     return (
@@ -498,11 +452,11 @@ const AccessGuacamole = ({assetId}: Props) => {
                                });
                                setClipboardText(text);
                                setClipboardVisible(false);
-                               sink?.focus();
+                               sinkRef.current?.focus();
                            }}
                            handleCancel={() => {
                                setClipboardVisible(false);
-                               sink?.focus();
+                               sinkRef.current?.focus();
                            }}
             />
 
@@ -513,14 +467,14 @@ const AccessGuacamole = ({assetId}: Props) => {
                 handleOk={sendRequiredMutation.mutate}
                 handleCancel={() => {
                     setRequiredOpen(false);
-                    client?.disconnect();
+                    clientRef.current?.disconnect();
                 }}
             />
 
             <Timeout
                 ref={timeoutRef}
                 fn={() => {
-                    client?.disconnect();
+                    clientRef.current?.disconnect();
                     console.log(`client disconnect by timeout`, session?.idle)
                 }}
                 ms={session?.idle * 1000}

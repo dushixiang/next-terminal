@@ -12,6 +12,7 @@ let o = {
         "failed": "失败",
         "default": "默认",
         "home": "首页",
+        "clipboard_disabled": "剪贴板功能被禁用。",
         "copy_success": "复制成功",
         "delete_confirm": "确认删除此项？",
         "clear_confirm": "确认清空数据？",
