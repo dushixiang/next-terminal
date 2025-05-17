@@ -19,7 +19,8 @@
     "bound": "バインド済み",
     "name": "名前",
     "days": "日",
-    "tips": "提案"
+    "tips": "提案",
+    "clipboard_disabled": "クリップボード機能が無効になっています。"
   },
   "actions": {
     "option": "操作",
@@ -562,7 +563,14 @@
     "reconnect": "再接続",
     "filesystem": "ファイルシステム",
     "use": "使用する",
-    "search": "検索"
+    "search": "検索",
+    "guacamole": {
+      "error_title": "接続失敗",
+      "code": "エラーコード",
+      "message": "エラーメッセージ",
+      "clipboard_required": "クリップボードの内容を入力してください",
+      "clipboard_placeholder": "ここに貼り付け..."
+    }
   },
   "account": {
     "my_asset": "私の資産",

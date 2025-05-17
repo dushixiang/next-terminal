@@ -19,7 +19,8 @@
     "name": "名稱",
     "days": "天",
     "no": "否",
-    "tips": "提示"
+    "tips": "提示",
+    "clipboard_disabled": "剪貼板功能被禁用。"
   },
   "actions": {
     "option": "操作",
@@ -562,7 +563,14 @@
     "clipboard": "剪貼板",
     "toggle_full_screen": "切換全螢幕",
     "use": "使用",
-    "search": "搜尋"
+    "search": "搜尋",
+    "guacamole": {
+      "error_title": "連接失敗",
+      "code": "錯誤代碼",
+      "message": "錯誤信息",
+      "clipboard_required": "請輸入剪貼板內容",
+      "clipboard_placeholder": "粘貼到此處..."
+    }
   },
   "account": {
     "my_asset": "我的資產",

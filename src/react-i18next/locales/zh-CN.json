@@ -12,6 +12,7 @@
     "failed": "失败",
     "default": "默认",
     "home": "首页",
+    "clipboard_disabled": "剪贴板功能被禁用。",
     "copy_success": "复制成功",
     "delete_confirm": "确认删除此项？",
     "clear_confirm": "确认清空数据？",
@@ -534,7 +535,14 @@
     "reconnect": "重新连接",
     "filesystem": "文件系统",
     "use": "使用",
-    "search": "搜索"
+    "search": "搜索",
+    "guacamole": {
+      "error_title": "连接失败",
+      "code": "错误代码",
+      "message": "错误信息",
+      "clipboard_required": "请输入剪贴板内容",
+      "clipboard_placeholder": "粘贴到此处..."
+    }
   },
   "account": {
     "my_asset": "我的资产",

@@ -19,7 +19,8 @@
     "bound": "Bound",
     "name": "Name",
     "days": "Days",
-    "tips": "Tips"
+    "tips": "Tips",
+    "clipboard_disabled": "The clipboard function is disabled."
   },
   "actions": {
     "option": "Actions",
@@ -550,7 +551,14 @@
     "reconnect": "Reconnect",
     "filesystem": "File System",
     "use": "Use",
-    "search": "Search"
+    "search": "Search",
+    "guacamole": {
+      "error_title": "Connection failed",
+      "code": "Error code",
+      "message": "Error message",
+      "clipboard_required": "Please enter the clipboard content",
+      "clipboard_placeholder": "Paste here..."
+    }
   },
   "account": {
     "my_asset": "My Assets",
