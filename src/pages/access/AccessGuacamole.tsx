@@ -92,7 +92,7 @@ const AccessGuacamole = ({assetId}: Props) => {
     let sendRequiredMutation = useMutation({
         mutationFn: (values: any) => {
             return new Promise<void>((resolve) => {
-                console.log(`send args to server`, values)
+                // console.log(`send args to server`, values)
                 for (let name in values) {
                     let value = values[name];
                     if (!value) {
@@ -325,7 +325,7 @@ const AccessGuacamole = ({assetId}: Props) => {
         clientRef.current = client;
         sinkRef.current = sink;
 
-        console.log(`init client success`)
+        // console.log(`init client success`)
     }
 
     const connectWrap = async () => {
@@ -341,11 +341,11 @@ const AccessGuacamole = ({assetId}: Props) => {
         if (!terminalRef.current) {
             return
         }
-        console.log(`client connect`);
+        // console.log(`client connect`);
         connectWrap();
         return () => {
             clientRef.current?.disconnect();
-            console.log(`client disconnect`);
+            // console.log(`client disconnect`);
         }
     }, [tiger]);
 
@@ -413,6 +413,8 @@ const AccessGuacamole = ({assetId}: Props) => {
             </div>
 
             <ControlButtons
+                sessionId={session?.id}
+                hasFileSystem={session?.fileSystem}
                 onOpenFS={() => {
                     setFileSystemOpen(true);
                     setPreFileSystemOpen(true);
@@ -475,7 +477,7 @@ const AccessGuacamole = ({assetId}: Props) => {
                 ref={timeoutRef}
                 fn={() => {
                     clientRef.current?.disconnect();
-                    console.log(`client disconnect by timeout`, session?.idle)
+                    // console.log(`client disconnect by timeout`, session?.idle)
                 }}
                 ms={session?.idle * 1000}
             />
