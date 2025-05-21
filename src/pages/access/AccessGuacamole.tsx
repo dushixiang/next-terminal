@@ -42,14 +42,9 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     let [state, setState] = useState<Guacamole.Client.State>();
     let [status, setStatus] = useState<Guacamole.Status>();
-
     let [session, setSession] = useState<ExportSession>();
-    let [sharerOpen, setSharerOpen] = useState(false);
-    let [fileSystemOpen, setFileSystemOpen] = useState(false);
-    let [preFileSystemOpen, setPreFileSystemOpen] = useState(false);
-
+    const [modals, setModals] = useState({sharer: false, fs: false, clipboard: false, mfa: false});
     let [clipboardText, setClipboardText] = useState('');
-    let [clipboardVisible, setClipboardVisible] = useState(false);
 
     let {width, height} = useWindowSize();
     let [contentSize] = useAccessContentSize();
@@ -74,11 +69,10 @@ const AccessGuacamole = ({assetId}: Props) => {
         if (active) {
             sinkRef.current?.focus();
             debouncedResize();
-            setFileSystemOpen(preFileSystemOpen);
         } else {
-            setFileSystemOpen(false);
+
         }
-    }, [active, preFileSystemOpen]);
+    }, [active]);
 
     useEffect(() => {
         if (windowFocus && active) {
@@ -368,14 +362,22 @@ const AccessGuacamole = ({assetId}: Props) => {
                 sessionId={session?.id}
                 hasFileSystem={session?.fileSystem}
                 onOpenFS={() => {
-                    setFileSystemOpen(true);
-                    setPreFileSystemOpen(true);
+                    setModals({
+                        ...modals,
+                        fs: true
+                    })
                 }}
                 onShare={() => {
-                    setSharerOpen(true);
+                    setModals({
+                        ...modals,
+                        sharer: true
+                    })
                 }}
                 onClipboard={() => {
-                    setClipboardVisible(true);
+                    setModals({
+                        ...modals,
+                        clipboard: true
+                    })
                 }}
                 onFull={() => {
                     fullScreen();
@@ -387,30 +389,38 @@ const AccessGuacamole = ({assetId}: Props) => {
 
             <FileSystemPage fsId={session?.id}
                             strategy={session?.strategy}
-                            open={fileSystemOpen}
+                            open={modals.fs}
                             mask={false}
                             maskClosable={false}
                             onClose={() => {
-                                setFileSystemOpen(false);
-                                setPreFileSystemOpen(false);
+                                setModals({
+                                    ...modals,
+                                    fs: false
+                                })
                             }}/>
 
-            <SessionSharerModal sessionId={session?.id} open={sharerOpen}
-                                onClose={() => setSharerOpen(false)}/>
+            <SessionSharerModal sessionId={session?.id} open={modals.sharer}
+                                onClose={() => setModals({...modals, sharer: false})}/>
             <GuacClipboard clipboardText={clipboardText}
-                           open={clipboardVisible}
+                           open={modals.clipboard}
                            handleOk={(text) => {
                                sendClipboard({
                                    'data': text,
                                    'type': 'text/plain'
                                });
                                setClipboardText(text);
-                               setClipboardVisible(false);
                                sinkRef.current?.focus();
+                               setModals({
+                                   ...modals,
+                                   clipboard: false
+                               })
                            }}
                            handleCancel={() => {
-                               setClipboardVisible(false);
                                sinkRef.current?.focus();
+                               setModals({
+                                   ...modals,
+                                   clipboard: false
+                               })
                            }}
             />
 
