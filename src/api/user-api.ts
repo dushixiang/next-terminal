@@ -86,7 +86,7 @@ class UserApi extends Api<User> {
     import = async (file: File) => {
         let formData = new FormData();
         formData.append("file", file);
-        await requests.post(`/${this.group}/import`, formData);
+        await requests.postForm(`/${this.group}/import`, formData);
     }
 }
 

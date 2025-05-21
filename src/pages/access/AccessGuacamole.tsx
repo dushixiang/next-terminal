@@ -18,10 +18,10 @@ import copy from "copy-to-clipboard";
 import useWindowFocus from "@/src/hook/use-window-focus";
 import {isFullScreen, requestFullScreen} from "@/src/utils/utils";
 import Timeout, {TimeoutHandle} from "@/src/components/Timeout";
-import {debounce} from "@/src/utils/debounce";
 import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
 import RenderState from "@/src/pages/access/guacamole/RenderState";
 import ControlButtons from "@/src/pages/access/guacamole/ControlButtons";
+import _ from "lodash";
 
 interface Props {
     assetId: string;
@@ -35,10 +35,10 @@ const AccessGuacamole = ({assetId}: Props) => {
     let {t} = useTranslation();
 
     let [tiger, setTiger] = useState(new Date().toString());
-    const terminalRef = useRef<HTMLDivElement>();
-    const containerRef = useRef<HTMLDivElement>();
-    let clientRef = useRef<Guacamole.Client>();
-    let sinkRef = useRef<Guacamole.InputSink>();
+    const terminalRef = useRef<HTMLDivElement>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    let clientRef = useRef<Guacamole.Client>(null);
+    let sinkRef = useRef<Guacamole.InputSink>(null);
 
     let [state, setState] = useState<Guacamole.Client.State>();
     let [status, setStatus] = useState<Guacamole.Status>();
@@ -55,153 +55,114 @@ const AccessGuacamole = ({assetId}: Props) => {
     let [contentSize] = useAccessContentSize();
     let [accessTab] = useAccessTab();
     let [active, setActive] = useState(true);
-    let [fixedSize, setFixedSize] = useState(false);
     let [displaySize, setDisplaySize] = useState([0, 0]);
     let [mfaOpen, setMfaOpen] = useState(false);
 
     const timeoutRef = useRef<TimeoutHandle>();
 
-    const resetTimer = () => {
-        timeoutRef.current?.reset();
-        // console.log(`reset timer`, timeoutRef.current);
-    }
-
     let windowFocus = useWindowFocus();
 
+    const resetTimer = () => timeoutRef.current?.reset();
+
+    // 判断当前 tab
     useEffect(() => {
-        let current = accessTab.split('_')[1];
-        setActive(current === assetId)
-    }, [accessTab]);
+        const current = accessTab.split('_')[1];
+        setActive(current === assetId);
+    }, [accessTab, assetId]);
 
     useEffect(() => {
-        if (active === true) {
+        if (active) {
             sinkRef.current?.focus();
-            fitFit();
+            debouncedResize();
             setFileSystemOpen(preFileSystemOpen);
         } else {
             setFileSystemOpen(false);
         }
-    }, [active]);
+    }, [active, preFileSystemOpen]);
 
     useEffect(() => {
-        if (windowFocus === true && active === true) {
+        if (windowFocus && active) {
             handleWindowFocus();
         }
-    }, [active, windowFocus]);
+    }, [windowFocus, active]);
 
     let sendRequiredMutation = useMutation({
         mutationFn: (values: any) => {
             return new Promise<void>((resolve) => {
-                // console.log(`send args to server`, values)
-                for (let name in values) {
-                    let value = values[name];
-                    if (!value) {
-                        value = '';
-                    }
+                for (const [name, raw] of Object.entries(values)) {
+                    const value = raw ?? '';
                     const stream = clientRef.current?.createArgumentValueStream("text/plain", name);
-                    const writer = new Guacamole.StringWriter(stream);
-                    writer.sendText(value);
-                    writer.sendEnd();
-                    resolve();
+                    if (stream) {
+                        const writer = new Guacamole.StringWriter(stream);
+                        writer.sendText(value);
+                        writer.sendEnd();
+                    }
                 }
+                resolve();
             });
         },
-        onSuccess: () => {
-            setRequiredOpen(false);
-        }
+        onSuccess: () => setRequiredOpen(false)
     });
 
-    useEffect(() => {
-        fitFit()
-    }, [width, height, contentSize]);
+    // 集中处理 resize + scale
+    const handleResize = () => {
+        const container = isFullScreen()
+            ? {width: window.innerWidth, height: window.innerHeight}
+            : {width: containerRef.current?.offsetWidth ?? 0, height: containerRef.current?.offsetHeight ?? 0};
+        if (!active || container.width === 0 || container.height === 0) return;
 
-    const fitFit = debounce(() => {
-        let container = getContainerSize();
-        if (active === false || container.width === 0 || container.height === 0) {
-            return
+        const display = clientRef.current?.getDisplay();
+        const dw = display?.getWidth();
+        const dh = display?.getHeight();
+
+        if (dw !== container.width || dh !== container.height) {
+            display?.onresize(container.width, container.height);
         }
-        // const pixelDensity = window.devicePixelRatio || 1;
-        let w = container.width;
-        let h = container.height;
-        let display = clientRef.current?.getDisplay();
-        let dw = display?.getWidth();
-        let dh = display?.getHeight();
-        if (dw !== w || dh !== h) {
-            if (!fixedSize) {
-                // 向服务端发送窗口大小
-                clientRef.current?.sendSize(w, h);
-                // console.log(`send size`, "container", w, h, "display", dw, dh)
-            }
-            display?.onresize(w, h);
+
+        if (dw && dh) {
+            const scale = Math.min(container.width / dw, container.height / dh);
+            display.scale(scale);
         }
-    }, 500)
+    };
+
+    const debouncedResize = _.debounce(handleResize, 500);
 
     useEffect(() => {
-        let container = getContainerSize();
-        let w = container.width;
-        let h = container.height;
-        let display = clientRef.current?.getDisplay();
-        let dw = display?.getWidth();
-        let dh = display?.getHeight();
-        let scale = 1;
-        if (dw && dw != 0 && dh && dh != 0) {
-            scale = Math.min(
-                w / dw,
-                h / dh,
-            );
-        }
-        // console.log(`resize`, "container", w, h, "display", dw, dh, "scale", scale);
-        clientRef.current?.getDisplay().scale(scale);
-    }, [displaySize])
+        debouncedResize();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [width, height, contentSize, displaySize]);
 
-    const getContainerSize = () => {
-        if (isFullScreen()) {
-            return {
-                width: window.innerWidth,
-                height: window.innerHeight,
-            }
-        }
-        return {
-            width: containerRef.current?.offsetWidth,
-            height: containerRef.current?.offsetHeight,
-        }
-    }
+    const getContainerSize = () => (
+        isFullScreen()
+            ? {width: window.innerWidth, height: window.innerHeight}
+            : {width: containerRef.current?.offsetWidth ?? 0, height: containerRef.current?.offsetHeight ?? 0}
+    );
 
-    const handleClipboardReceived = (stream: Guacamole.InputStream, mimetype: any) => {
-        if (/^text\//.exec(mimetype)) {
-            let reader = new Guacamole.StringReader(stream);
+    const handleClipboardReceived = (stream: Guacamole.InputStream, mimetype: string) => {
+        if (/^text\//.test(mimetype)) {
+            const reader = new Guacamole.StringReader(stream);
             let data = '';
-            reader.ontext = function textReceived(text: string) {
-                data += text;
-            };
-            reader.onend = async () => {
+            reader.ontext = (text) => data += text;
+            reader.onend = () => {
                 setClipboardText(data);
                 copy(data);
                 message.success(t('general.copy_success'));
             };
         } else {
-            let reader = new Guacamole.BlobReader(stream, mimetype);
-            reader.onend = () => {
-                reader.getBlob().text().then(text => {
-                    setClipboardText(text);
-                    copy(text);
-                })
-            }
+            const reader = new Guacamole.BlobReader(stream, mimetype);
+            reader.onend = () => reader.getBlob().text().then(text => {
+                setClipboardText(text);
+                copy(text);
+                message.success(t('general.copy_success'));
+            });
         }
     };
 
     const handleWindowFocus = () => {
         if (navigator.clipboard) {
-            try {
-                navigator.clipboard.readText().then((text) => {
-                    sendClipboard({
-                        'data': text,
-                        'type': 'text/plain'
-                    });
-                })
-            } catch (e) {
-                console.error('read clipboard err', e);
-            }
+            navigator.clipboard.readText().then(text => {
+                sendClipboard({data: text, type: 'text/plain'});
+            }).catch(console.error);
         }
     };
 
@@ -218,14 +179,8 @@ const AccessGuacamole = ({assetId}: Props) => {
         let tunnel = new Guacamole.WebSocketTunnel(`${baseWebSocketUrl()}/access/graphics`);
         let client = new Guacamole.Client(tunnel);
 
-        // 处理客户端的状态变化事件
-        client.onstatechange = (state: Guacamole.Client.State) => {
-            setState(state);
-        };
-        client.onerror = (status: Guacamole.Status) => {
-            setStatus(status);
-        }
-
+        client.onstatechange = setState;
+        client.onerror = setStatus
         client.onrequired = function (parameters) {
             setRequiredParameters([...parameters]);
             setRequiredOpen(true);
@@ -234,14 +189,16 @@ const AccessGuacamole = ({assetId}: Props) => {
         client.onclipboard = (stream: Guacamole.InputStream, mimetype: any) => {
             if (!session?.strategy?.copy) {
                 message.info(t('general.clipboard_disabled'))
-                return
+            } else {
+                handleClipboardReceived(stream, mimetype)
             }
-            handleClipboardReceived(stream, mimetype)
         };
 
         const displayEle = terminalRef.current;
-        while (displayEle?.firstChild) {
-            displayEle.removeChild(displayEle.firstChild);
+        if (displayEle) {
+            while (displayEle.firstChild) {
+                displayEle.removeChild(displayEle.firstChild);
+            }
         }
         const element = client.getDisplay().getElement();
         displayEle?.appendChild(element);
@@ -313,11 +270,6 @@ const AccessGuacamole = ({assetId}: Props) => {
             'sessionId': session.id,
             'X-Auth-Token': authToken
         };
-        if (session.width > 0 && session.height > 0) {
-            params['width'] = session.width;
-            params['height'] = session.height;
-            setFixedSize(true);
-        }
 
         let paramStr = qs.stringify(params);
         client.connect(paramStr);

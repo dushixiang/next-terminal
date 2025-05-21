@@ -243,6 +243,7 @@ ${t('identity.user.password')}: ${result.password}`)
 
     const handleImportUser = async (file: any) => {
         await api.import(file);
+        message.success(t('general.success'));
         actionRef.current?.reload();
         return true;
     }
