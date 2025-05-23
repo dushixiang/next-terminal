@@ -58,12 +58,7 @@ const SessionSharerModal = ({open, onClose, sessionId}: Props) => {
         if (url == '') {
             return ''
         }
-        // http://127.0.0.1:8088/terminal?sessionId=SN_maX4dVgCL77j18eFUGiQLvHuywgAzSvA1ne1XsycuyoSwotsu&token=temporary_4K7nnuXtucL7PQwCiYrcDTY8CzSfNtdfwPeJYMpG1btE&sharer=true
-        // 解析url，替换系统根路径为当前地址
-        if (import.meta.env.DEV) {
-            return url.replaceAll('127.0.0.1:8088', 'localhost:5173')
-        }
-        return url;
+        return window.location.origin + url;
     }
 
     const handleCopy = () => {

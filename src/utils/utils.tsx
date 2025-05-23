@@ -152,6 +152,79 @@ export const handleKeyDown = (e) => {
     }
 }
 
+
+const BLOCKED_CTRL_KEYS = [
+    'F', // Find
+    'S', // Save
+    'P', // Print
+    'R', // Refresh
+    'T', // New Tab
+    'N', // New Window
+    'W', // Close Tab
+    'U', // View Source
+    'H', // History
+    'J', // Downloads
+    'D', // Bookmark
+    'L', // Focus Address Bar
+];
+
+const BLOCKED_FUNCTION_KEYS = [
+    'F5', // Refresh
+    'F11', // Fullscreen
+    'F6', // Focus Address Bar (alternative)
+];
+
+// For combinations like Ctrl + Shift + I
+const BLOCKED_CTRL_SHIFT_KEYS = [
+    'I', // Developer Tools
+    'J', // Developer Tools
+    'K', // Developer Tools
+];
+
+export const dropKeydown = (e) => {
+    // Block Ctrl + specific keys
+    if (e.ctrlKey && !e.shiftKey && !e.altKey && BLOCKED_CTRL_KEYS.includes(e.key.toUpperCase())) {
+        console.log(`Blocked: Ctrl + ${e.key}`);
+        e.preventDefault();
+        return false;
+    }
+
+    // Block Ctrl + Shift + specific keys
+    if (e.ctrlKey && e.shiftKey && !e.altKey && BLOCKED_CTRL_SHIFT_KEYS.includes(e.key.toUpperCase())) {
+        console.log(`Blocked: Ctrl + Shift + ${e.key}`);
+        e.preventDefault();
+        return false;
+    }
+
+    // Block specific Function keys
+    if (BLOCKED_FUNCTION_KEYS.includes(e.key.toUpperCase())) {
+        console.log(`Blocked: ${e.key}`);
+        e.preventDefault();
+        return false;
+    }
+
+    // Block Meta key (Windows key / Command key)
+    // Note: On macOS, Cmd+W, Cmd+N, Cmd+T are common and might already be covered by BLOCKED_CTRL_KEYS
+    // if you intend for Ctrl to also mean Cmd on Mac. If not, you need separate handling or
+    // ensure your BLOCKED_CTRL_KEYS logic correctly interprets e.ctrlKey vs e.metaKey based on OS.
+    // For simplicity here, we just block the Meta key itself if pressed without other modifiers (usually not useful alone).
+    // If you want to block Cmd+C, Cmd+V, etc., you'd add them to a list similar to BLOCKED_CTRL_KEYS but check e.metaKey.
+    if (e.metaKey && !e.ctrlKey && !e.altKey && !e.shiftKey) { // Block if *only* Meta is pressed
+        console.log(`Blocked: Meta key`);
+        e.preventDefault();
+        return false;
+    }
+
+    // Example: Block Alt + Left/Right Arrow
+    if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+        console.log(`Blocked: Alt + ${e.key}`);
+        e.preventDefault();
+        return false;
+    }
+
+    return true; // Allow other events
+};
+
 // 将秒数转换为天、小时、分钟、秒
 export function formatUptime(seconds?: number) {
     if (!seconds) {

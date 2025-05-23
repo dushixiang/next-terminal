@@ -16,7 +16,6 @@ import {renderSize} from "@/src/utils/utils";
 import times from "@/src/components/time/times";
 import {useTranslation} from "react-i18next";
 import strings from "@/src/utils/strings";
-import {useWindowSize} from "react-use";
 import './TerminalPlayback.css';
 
 const TerminalPlayback = () => {
@@ -32,7 +31,6 @@ const TerminalPlayback = () => {
     let [session, setSession] = useState<Session>();
 
     let [player, setPlayer] = useState();
-    let {width, height} = useWindowSize();
 
     useEffect(() => {
         let authToken = getToken();

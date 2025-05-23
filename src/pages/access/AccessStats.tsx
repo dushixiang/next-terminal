@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {ComponentType, useEffect, useState} from 'react';
 import {
     ArrowUpDownIcon,
     CpuIcon,
@@ -9,20 +9,22 @@ import {
     MonitorCogIcon,
     MonitorPlayIcon
 } from "lucide-react";
-import {Progress, Tooltip} from "antd";
+import {FixedSizeList as _FixedSizeList, FixedSizeListProps} from 'react-window';
+import {Tooltip} from "antd";
 import {ChartConfig, ChartContainer} from "@/components/ui/chart";
 import {Pie, PieChart} from "recharts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {useTranslation} from "react-i18next";
-import portalApi, {Stats} from "@/src/api/portal-api";
+import portalApi, {CPUUsage, Stats} from "@/src/api/portal-api";
 import {useQuery} from "@tanstack/react-query";
 import strings from "@/src/utils/strings";
-import {green, red} from "@ant-design/colors";
 import {renderSize} from "@/src/utils/utils";
 import SimpleBar from "simplebar-react";
 import {Skeleton} from "@/components/ui/skeleton";
 import {cn} from "@/lib/utils";
-import {useLicense} from "@/src/hook/use-license";
+import {CpuProgressBar} from '@/src/components/CpuProgressBar';
+
+const List = _FixedSizeList as unknown as ComponentType<FixedSizeListProps>;
 
 const defaultStats = {
     "info": {
@@ -62,6 +64,26 @@ const defaultStats = {
     ]
 }
 
+const CpuList = ({cpus}: { cpus: CPUUsage[] }) => {
+    const Row = ({index, style}: { index: number; style: React.CSSProperties }) => (
+        <div style={style} className="flex gap-2 items-center px-2 py-1">
+            <span className="w-6 text-right text-xs text-gray-400">{index + 1}</span>
+            <CpuProgressBar cpu={cpus[index]} index={index}/>
+        </div>
+    );
+
+    return (
+        <List
+            height={cpus.length > 16 ? 384 : cpus.length * 24}
+            itemCount={cpus.length}
+            itemSize={24}
+            width="100%"
+        >
+            {Row}
+        </List>
+    );
+};
+
 interface Props {
     sessionId: string;
     open: boolean;
@@ -73,7 +95,6 @@ const AccessStats = ({sessionId, open}: Props) => {
 
     let [stats, setStats] = useState<Stats>(defaultStats);
     let [hideVNic, setHideVNic] = useState(true);
-    let [license] = useLicense();
 
     let statsQuery = useQuery({
         queryKey: ['stats', sessionId],
@@ -194,43 +215,8 @@ const AccessStats = ({sessionId, open}: Props) => {
                         <CpuIcon className={'w-4 h-4 text-blue-500'}/>
                         <div className={'font-medium'}>{t('stat.info.cpu')}</div>
                     </div>
-                    <div className={cn(
-                        'mt-2 grid',
-                    )}>
-                        {stats.cpu?.map((cpu, index) => {
-                            if (!ready()) {
-                                return <Skeleton className="h-6"/>;
-                            }
-                            // 最大指示器数量
-                            const maxIndicators = 20;
-                            // 计算绿色和红色指示器的数量
-                            const greenCount = Math.floor((cpu.user / 100) * maxIndicators);
-                            const redCount = Math.floor((cpu.system / 100) * maxIndicators);
-
-                            let colors = [];
-                            for (let i = 0; i < greenCount; i++) {
-                                colors.push(green[5])
-                            }
-                            for (let i = 0; i < redCount; i++) {
-                                colors.push(red[4])
-                            }
-
-                            return (
-                                <div key={index} className={'flex gap-2 items-center'}>
-                                    <span className={'w-4 text-right'}>{index + 1}</span>
-                                    <Progress percent={cpu.user + cpu.nice + cpu.system} steps={50}
-                                              strokeColor={colors}
-                                              size={'small'}
-                                              format={(percent) => {
-                                                  return <span className={'text-xs'}>
-                                                      {percent.toFixed(1)}%
-                                                  </span>
-                                              }}
-                                              className={'w-full'}
-                                    />
-                                </div>
-                            )
-                        })}
+                    <div className={cn('mt-2 grid gap-1')}>
+                        {ready() ? <CpuList cpus={stats.cpu}/> : <Skeleton className="h-[300px]"/>}
                     </div>
                 </div>
 

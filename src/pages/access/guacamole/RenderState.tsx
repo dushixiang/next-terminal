@@ -1,25 +1,33 @@
 import React from 'react';
-import Guacamole from '@dushixiang/guacamole-common-js';
 import {HashLoader} from 'react-spinners';
-import {ErrorAlert} from '@/src/pages/access/guacamole/ErrorAlert';
+import {ErrorAlert, GuacamoleStatus} from '@/src/pages/access/guacamole/ErrorAlert';
 import {useTranslation} from 'react-i18next';
 
 interface Props {
-    state?: Guacamole.Client.State;
-    status?: Guacamole.Status;
-    onReconnect: () => void;
+    state?: number;
+    status?: GuacamoleStatus;
+    onReconnect?: () => void;
 }
+
+export const GUACAMOLE_STATE_IDLE = 0;
+export const GUACAMOLE_STATE_CONNECTING = 1;
+export const GUACAMOLE_STATE_WAITING = 2;
+export const GUACAMOLE_STATE_CONNECTED = 3;
+export const GUACAMOLE_STATE_DISCONNECTING = 4;
+export const GUACAMOLE_STATE_DISCONNECTED = 5;
 
 const RenderState: React.FC<Props> = ({state, status, onReconnect}) => {
     const {t} = useTranslation();
-    if (state === Guacamole.Client.State.CONNECTED) return null;
+    if (state === GUACAMOLE_STATE_CONNECTED) return null;
 
-    const loading = state !== Guacamole.Client.State.DISCONNECTED;
+    const loading = state !== GUACAMOLE_STATE_DISCONNECTED;
     const labels = {
-        [Guacamole.Client.State.IDLE]: t('guacamole.state.idle'),
-        [Guacamole.Client.State.CONNECTING]: t('guacamole.state.connecting'),
-        [Guacamole.Client.State.WAITING]: t('guacamole.state.waiting'),
-        [Guacamole.Client.State.DISCONNECTED]: t('guacamole.state.disconnected'),
+        STATE_IDLE: t('guacamole.state.idle'),
+        STATE_CONNECTING: t('guacamole.state.connecting'),
+        STATE_WAITING: t('guacamole.state.waiting'),
+        STATE_CONNECTED: t('guacamole.state.connected'),
+        STATE_DISCONNECTING: t('guacamole.state.disconnecting'),
+        STATE_DISCONNECTED: t('guacamole.state.disconnected'),
     };
 
     return (
@@ -31,7 +39,7 @@ const RenderState: React.FC<Props> = ({state, status, onReconnect}) => {
                         <div>{labels[state!]}</div>
                     </div>
                 ) : (
-                    <ErrorAlert status={status} onReconnect={onReconnect} />
+                    <ErrorAlert status={status} onReconnect={onReconnect}/>
                 )}
             </div>
         </div>

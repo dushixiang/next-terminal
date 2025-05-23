@@ -10,6 +10,7 @@ import {baseUrl} from "@/src/api/core/requests";
 import {useTranslation} from "react-i18next";
 import {message} from "antd";
 import TerminalPage from "@/src/pages/access/TerminalPage";
+import GuacamolePage from "@/src/pages/access/GuacamolePage";
 
 const LoginPage = lazy(() => import("@/src/pages/account/LoginPage"));
 const MobileAccessTerminal = lazy(() => import("@/src/pages/access/MobileAccessTerminal"));
@@ -70,7 +71,7 @@ const router = createBrowserRouter([
     {path: "/graphics-monitor", element: <GuacdMonitor/>},
     {path: "/terminal", element: <TerminalPage/>,},
     {path: "/mobile-terminal", element: <MobileAccessTerminal/>,},
-    // {path: "/graphics", element: <GuacdPage/>,},
+    {path: "/graphics", element: <GuacamolePage/>,},
     {path: "/browser", element: <BrowserPage/>,},
     {path: "/", element: <RedirectPage/>, errorElement: <ErrorPage/>,},
     {

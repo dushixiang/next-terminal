@@ -6,11 +6,9 @@ import {FitAddon} from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import {useSearchParams} from "react-router-dom";
 import {maybe} from "@/src/utils/maybe";
-import {Watermark} from "antd";
 import portalApi, {ExportSession} from "@/src/api/portal-api";
 import strings from "@/src/utils/strings";
 import {Message, MessageTypeData, MessageTypeKeepAlive, MessageTypeResize} from './Terminal';
-import {useTranslation} from "react-i18next";
 import {useInterval} from "react-use";
 
 export interface TerminalProps {
@@ -23,8 +21,6 @@ const TerminalPage = ({}: TerminalProps) => {
 
     const terminalRef = React.useRef<HTMLDivElement>();
     let websocket = useRef<WebSocket>();
-
-    let {t} = useTranslation();
 
     const [searchParams] = useSearchParams();
     let token = maybe(searchParams.get('token'), '');

@@ -13,15 +13,16 @@ import SessionSharerModal from "@/src/pages/access/SessionSharerModal";
 import GuacClipboard from "@/src/pages/access/GuacClipboard";
 import GuacdRequiredParameters from "@/src/pages/access/GuacdRequiredParameters";
 import {useMutation} from "@tanstack/react-query";
-import {message, Watermark} from "antd";
+import {App, Watermark} from "antd";
 import copy from "copy-to-clipboard";
 import useWindowFocus from "@/src/hook/use-window-focus";
-import {isFullScreen, requestFullScreen} from "@/src/utils/utils";
+import {dropKeydown, isFullScreen, requestFullScreen} from "@/src/utils/utils";
 import Timeout, {TimeoutHandle} from "@/src/components/Timeout";
 import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
-import RenderState from "@/src/pages/access/guacamole/RenderState";
+import RenderState, {GUACAMOLE_STATE_IDLE} from "@/src/pages/access/guacamole/RenderState";
 import ControlButtons from "@/src/pages/access/guacamole/ControlButtons";
-import _ from "lodash";
+import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
+import {debounce} from "@/src/utils/debounce";
 
 interface Props {
     assetId: string;
@@ -33,15 +34,17 @@ const AccessGuacamole = ({assetId}: Props) => {
     let [requiredParameters, setRequiredParameters] = useState<string[]>();
 
     let {t} = useTranslation();
+    let {message} = App.useApp();
 
     let [tiger, setTiger] = useState(new Date().toString());
     const terminalRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     let clientRef = useRef<Guacamole.Client>(null);
     let sinkRef = useRef<Guacamole.InputSink>(null);
+    let keyboardRef = useRef<Guacamole.Keyboard>(null);
 
-    let [state, setState] = useState<Guacamole.Client.State>();
-    let [status, setStatus] = useState<Guacamole.Status>();
+    let [state, setState] = useState<number>();
+    let [status, setStatus] = useState<GuacamoleStatus>();
     let [session, setSession] = useState<ExportSession>();
     const [modals, setModals] = useState({sharer: false, fs: false, clipboard: false, mfa: false});
     let [clipboardText, setClipboardText] = useState('');
@@ -66,17 +69,17 @@ const AccessGuacamole = ({assetId}: Props) => {
     }, [accessTab, assetId]);
 
     useEffect(() => {
-        if (active) {
-            sinkRef.current?.focus();
-            debouncedResize();
-        } else {
-
-        }
-    }, [active]);
-
-    useEffect(() => {
         if (windowFocus && active) {
-            handleWindowFocus();
+            handleWindowFocus(); // 你处理剪贴板的函数
+            debouncedResize(); // 处理窗口大小变化
+            keyboardRef.current?.reset(); // 重置键盘状态
+            sinkRef.current?.focus();     // 确保 Guacamole 输入区域获得焦点
+            window.addEventListener('keydown', dropKeydown);
+            return () => {
+                window.removeEventListener('keydown', dropKeydown);
+            }
+        } else if (active) { // 窗口未聚焦但标签页仍活动
+            keyboardRef.current?.reset();
         }
     }, [windowFocus, active]);
 
@@ -119,7 +122,7 @@ const AccessGuacamole = ({assetId}: Props) => {
         }
     };
 
-    const debouncedResize = _.debounce(handleResize, 500);
+    const debouncedResize = debounce(handleResize, 500);
 
     useEffect(() => {
         debouncedResize();
@@ -203,14 +206,17 @@ const AccessGuacamole = ({assetId}: Props) => {
         }
 
         const sink = new Guacamole.InputSink();
-        element.appendChild(sink.getElement());
-
-        const keyboard = new Guacamole.Keyboard(sink.getElement());
-        sink.getElement().addEventListener("keypress", function (e) {
+        let sinkElement = sink.getElement();
+        // 修复粘贴问题
+        sinkElement.addEventListener("paste", function (e) {
+            // 阻止浏览器默认的按键拆分
             e.preventDefault();
         })
+        element.appendChild(sinkElement);
+
+        const keyboard = new Guacamole.Keyboard(sinkElement);
         keyboard.onkeydown = (keysym: number) => {
-            // console.log('keydown', keysym, accessTab, keyboard, JSON.stringify(keyboard.pressed))
+            console.log('keydown', keysym, JSON.stringify(keyboard.pressed))
             client.sendKeyEvent(1, keysym);
             if (keysym === 65288) {
                 return false;
@@ -219,9 +225,10 @@ const AccessGuacamole = ({assetId}: Props) => {
             return true;
         };
         keyboard.onkeyup = (keysym: number) => {
-            // console.log('keyup', keysym, accessTab)
+            console.log('keyup', keysym, JSON.stringify(keyboard.pressed))
             client.sendKeyEvent(0, keysym);
         };
+        keyboardRef.current = keyboard;
 
         const mouse = new Guacamole.Mouse(element);
 
@@ -239,13 +246,13 @@ const AccessGuacamole = ({assetId}: Props) => {
             client.sendMouseState(mouseState);
         };
 
-        mouse.on('mouseout', function hideCursor() {
-            client.getDisplay().showCursor(false);
-        });
-        display.showCursor(false);
-        display.oncursor = (canvas, x, y) => {
-            mouse.setCursor(canvas, x, y);
-        }
+        // mouse.on('mouseout', function hideCursor() {
+        //     client.getDisplay().showCursor(false);
+        // });
+        // display.showCursor(false);
+        // display.oncursor = (canvas, x, y) => {
+        //     mouse.setCursor(canvas, x, y);
+        // }
 
         const touch = new Guacamole.Mouse.Touchpad(element); // or Guacamole.Touchscreen
         // @ts-ignore
@@ -335,12 +342,12 @@ const AccessGuacamole = ({assetId}: Props) => {
              ref={containerRef}
         >
             <RenderState
-                status={status}
                 state={state}
+                status={status}
                 onReconnect={() => {
                     setTiger(new Date().toString());
-                    setState(Guacamole.Client.State.IDLE);
-                    setStatus(undefined);
+                    setState(GUACAMOLE_STATE_IDLE);
+                    setStatus({});
                     resetTimer();
                 }}
             />

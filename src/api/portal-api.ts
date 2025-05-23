@@ -68,7 +68,7 @@ interface Info {
     upDays: number;
 }
 
-interface CPUUsage {
+export interface CPUUsage {
     user: number;
     nice: number;
     system: number;
