@@ -228,8 +228,7 @@
       "waiting": "正在等待服务器响应...",
       "connected": "连接成功",
       "disconnecting": "会话关闭中...",
-      "disconnected": "会话已关闭",
-      "closed": "会话已关闭"
+      "disconnected": "会话已关闭"
     }
   },
   "identity": {
