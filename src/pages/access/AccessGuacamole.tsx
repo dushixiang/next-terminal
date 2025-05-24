@@ -53,7 +53,7 @@ const AccessGuacamole = ({assetId}: Props) => {
     let [contentSize] = useAccessContentSize();
     let [accessTab] = useAccessTab();
     let [active, setActive] = useState(true);
-    let [displaySize, setDisplaySize] = useState([0, 0]);
+
     let [mfaOpen, setMfaOpen] = useState(false);
 
     const timeoutRef = useRef<TimeoutHandle>();
@@ -72,14 +72,16 @@ const AccessGuacamole = ({assetId}: Props) => {
         if (windowFocus && active) {
             handleWindowFocus(); // 你处理剪贴板的函数
             debouncedResize(); // 处理窗口大小变化
-            keyboardRef.current?.reset(); // 重置键盘状态
             sinkRef.current?.focus();     // 确保 Guacamole 输入区域获得焦点
             window.addEventListener('keydown', dropKeydown);
             return () => {
                 window.removeEventListener('keydown', dropKeydown);
             }
-        } else if (active) { // 窗口未聚焦但标签页仍活动
+        }
+
+        if (!windowFocus || !active) {
             keyboardRef.current?.reset();
+            console.log(`keyboard reset `)
         }
     }, [windowFocus, active]);
 
@@ -103,17 +105,17 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     // 集中处理 resize + scale
     const handleResize = () => {
-        const container = isFullScreen()
-            ? {width: window.innerWidth, height: window.innerHeight}
-            : {width: containerRef.current?.offsetWidth ?? 0, height: containerRef.current?.offsetHeight ?? 0};
+        const container = getContainerSize();
         if (!active || container.width === 0 || container.height === 0) return;
 
         const display = clientRef.current?.getDisplay();
         const dw = display?.getWidth();
         const dh = display?.getHeight();
 
-        if (dw !== container.width || dh !== container.height) {
-            display?.onresize(container.width, container.height);
+        const dpi = computeDPI();
+
+        if (dw !== container.width * dpi  || dh !== container.height * dpi) {
+            clientRef.current?.sendSize(container.width * dpi, container.height * dpi);
         }
 
         if (dw && dh) {
@@ -122,12 +124,16 @@ const AccessGuacamole = ({assetId}: Props) => {
         }
     };
 
-    const debouncedResize = debounce(handleResize, 500);
+    const computeDPI = () => {
+        return 1;
+        // return window.devicePixelRatio || 1;
+    }
+
+    const debouncedResize = debounce(handleResize, 250);
 
     useEffect(() => {
         debouncedResize();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [width, height, contentSize, displaySize]);
+    }, [width, height, contentSize]);
 
     const getContainerSize = () => (
         isFullScreen()
@@ -202,7 +208,7 @@ const AccessGuacamole = ({assetId}: Props) => {
 
         let display = client.getDisplay();
         display.onresize = function (w: number, h: number) {
-            setDisplaySize([w, h]);
+            debouncedResize();
         }
 
         const sink = new Guacamole.InputSink();
@@ -213,9 +219,41 @@ const AccessGuacamole = ({assetId}: Props) => {
             e.preventDefault();
         })
         element.appendChild(sinkElement);
+        sinkRef.current = sink;
+
+        // 在组件外或者初始化时准备好这张映射表
+        const duplicateKeys = new Map<number, number>([
+            // [主键盘 KeySym, 小键盘 KeySym]
+            [42,  65450], // '*'  → KP_Multiply
+            [47,  65455], // '/'  → KP_Divide
+            [43,  65451], // '+'  → KP_Add
+            [45,  65453], // '-'  → KP_Subtract
+            [48,  65456], // '0'  → KP_0
+            [49,  65457], // '1'  → KP_1
+            [50,  65458], // '2'  → KP_2
+            [51,  65459], // '3'  → KP_3
+            [52,  65460], // '4'  → KP_4
+            [53,  65461], // '5'  → KP_5
+            [54,  65462], // '6'  → KP_6
+            [55,  65463], // '7'  → KP_7
+            [56,  65464], // '8'  → KP_8
+            [57,  65465], // '9'  → KP_9
+
+            // 为了处理无论先按主键盘还是先按小键盘，都能过滤重复
+            [65450, 42], [65455, 47], [65451, 43], [65453, 45],
+            [65456, 48], [65457, 49], [65458, 50], [65459, 51],
+            [65460, 52], [65461, 53], [65462, 54], [65463, 55],
+            [65464, 56], [65465, 57],
+        ]);
 
         const keyboard = new Guacamole.Keyboard(sinkElement);
         keyboard.onkeydown = (keysym: number) => {
+            // 如果当前按下的是“重复键”之一，且对端已按下了它的另一半，就直接吞掉
+            const twin = duplicateKeys.get(keysym);
+            if (twin !== undefined && keyboard.pressed[twin]) {
+                return false;
+            }
+
             console.log('keydown', keysym, JSON.stringify(keyboard.pressed))
             client.sendKeyEvent(1, keysym);
             if (keysym === 65288) {
@@ -225,6 +263,11 @@ const AccessGuacamole = ({assetId}: Props) => {
             return true;
         };
         keyboard.onkeyup = (keysym: number) => {
+            // 如果当前按下的是“重复键”之一，且对端已按下了它的另一半，就直接吞掉
+            const twin = duplicateKeys.get(keysym);
+            if (twin !== undefined && keyboard.pressed[twin]) {
+                return false;
+            }
             console.log('keyup', keysym, JSON.stringify(keyboard.pressed))
             client.sendKeyEvent(0, keysym);
         };
@@ -262,12 +305,12 @@ const AccessGuacamole = ({assetId}: Props) => {
         };
 
         let authToken = getToken();
-        let dpi = 96 * 2;
+        const dpi = computeDPI();
         let {width, height} = getContainerSize();
         let params = {
-            'width': width,
-            'height': height,
-            'dpi': dpi,
+            'width': width * dpi,
+            'height': height * dpi,
+            'dpi': dpi * 96,
             'sessionId': session.id,
             'X-Auth-Token': authToken
         };
@@ -276,7 +319,6 @@ const AccessGuacamole = ({assetId}: Props) => {
         client.connect(paramStr);
 
         clientRef.current = client;
-        sinkRef.current = sink;
 
         // console.log(`init client success`)
     }

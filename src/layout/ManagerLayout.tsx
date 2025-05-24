@@ -460,7 +460,7 @@ const ManagerLayout = () => {
                             </div>
 
                             <Suspense fallback={<Landing/>}>
-                                <div className={'flex-grow m-4'}>
+                                <div className={'flex-grow mx-4'}>
                                     <Outlet/>
                                 </div>
                             </Suspense>

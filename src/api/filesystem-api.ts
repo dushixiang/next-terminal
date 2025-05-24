@@ -47,8 +47,8 @@ class FileSystemApi {
         });
     }
 
-    uploadProgress = async (sessionId: string, filename: string) => {
-        let data = await requests.get(`/${this.group}/${sessionId}/upload/progress?filename=${filename}`);
+    uploadProgress = async (id: string) => {
+        let data = await requests.get(`/${this.group}/upload/progress?id=${id}`);
         return data as Progress;
     }
 }

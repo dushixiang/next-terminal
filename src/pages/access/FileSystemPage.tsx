@@ -507,7 +507,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         return new Promise((resolve, reject) => {
             let {size} = file;
             let name = getFileName(file);
-            let url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/upload?X-Auth-Token=${getToken()}&dir=${dir}`
+            let url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/upload?X-Auth-Token=${getToken()}&dir=${dir}&id=${id}`
 
             const xhr = new XMLHttpRequest();
 
@@ -518,10 +518,6 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 if (!event.lengthComputable) {
                     return;
                 }
-                const currentTime = Date.now();
-                const elapsedTime = (currentTime - prevTime) / 1000; // 转换为秒
-                const loaded = event.loaded;
-                const speed = (loaded - prevLoaded) / elapsedTime; // 每秒传输的字节数
 
                 if (event.loaded === event.total) {
                     setTransmissionRecords((prevState) => {
@@ -537,51 +533,53 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                         });
                     });
 
-                    // 启动轮询获取上传进度
-                    let filename = dir + '/' + name;
-                    const intervalId = setInterval(async () => {
-                        const progress = await fileSystemApi.uploadProgress(fsId, filename);
-                        let transmissionRecord = transmissionRecords.find((item) => item.id === id);
-                        if (!transmissionRecord) {
-                            clearInterval(intervalId);
-                            return;
-                        }
-                        if (transmissionRecord.status == "error") {
-                            clearInterval(intervalId);
-                            return;
-                        }
-                        setTransmissionRecords((prevState) => {
-                            return prevState.map((item) => {
-                                if (item.id === id) {
-                                    item.loaded = progress.written;
-                                    item.percent = progress.percent;
-                                    item.speed = progress.speed;
-                                    return item;
-                                }
-                                return item;
-                            });
-                        });
-
-                        if (progress.percent === 100) {
-                            clearInterval(intervalId);
+                    setTimeout(()=>{
+                        // 启动轮询获取上传进度
+                        const intervalId = setInterval(async () => {
+                            const progress = await fileSystemApi.uploadProgress(id);
+                            if(progress.total === 0){
+                                clearInterval(intervalId);
+                                return;
+                            }
                             setTransmissionRecords((prevState) => {
                                 return prevState.map((item) => {
                                     if (item.id === id) {
-                                        item.loaded = size;
-                                        item.size = size;
-                                        item.percent = 100;
-                                        item.status = "success";
-                                        item.error = "";
-                                        item.speed = 0;
+                                        item.loaded = progress.written;
+                                        item.percent = progress.percent;
+                                        item.speed = progress.speed;
                                         return item;
                                     }
                                     return item;
                                 });
-                            })
-                        }
-                    }, 1000)
+                            });
+
+                            if (progress.percent === 100) {
+                                setTransmissionRecords((prevState) => {
+                                    return prevState.map((item) => {
+                                        if (item.id === id) {
+                                            item.loaded = size;
+                                            item.size = size;
+                                            item.percent = 100;
+                                            item.status = "success";
+                                            item.error = "";
+                                            item.speed = 0;
+                                            return item;
+                                        }
+                                        return item;
+                                    });
+                                });
+                                clearInterval(intervalId);
+                            }
+                        }, 500);
+                    }, 1000);
                     return;
                 }
+
+                const currentTime = Date.now();
+                const elapsedTime = (currentTime - prevTime) / 1000; // 转换为秒
+                const loaded = event.loaded;
+                const speed = (loaded - prevLoaded) / elapsedTime; // 每秒传输的字节数
+
                 let percent = event.loaded * 100 / event.total;
                 percent = Math.min(Number(percent.toFixed(2)), 99.99);
 

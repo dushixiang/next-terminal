@@ -154,6 +154,7 @@ export const handleKeyDown = (e) => {
 
 
 const BLOCKED_CTRL_KEYS = [
+    'A', // Select All
     'F', // Find
     'S', // Save
     'P', // Print
