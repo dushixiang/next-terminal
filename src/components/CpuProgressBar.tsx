@@ -2,11 +2,13 @@ import {useMemo} from 'react';
 import {Progress} from "antd";
 
 const getStrokeColors = (user: number, system: number, steps: number) => {
-    const greenSteps = Math.round((user / 100) * steps);
-    const redSteps = Math.round((system / 100) * steps);
+    const greenSteps = Math.floor((user / 100) * steps);
+    const redSteps = Math.floor((system / 100) * steps);
+    const remainder  = Math.max(steps - greenSteps - redSteps, 0);
+
     return Array(greenSteps).fill('#52c41a').concat(
         Array(redSteps).fill('#ff4d4f'),
-        Array(steps - greenSteps - redSteps).fill('#d9d9d9')
+        Array(remainder).fill('#d9d9d9')
     );
 };
 
