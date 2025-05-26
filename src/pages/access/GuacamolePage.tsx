@@ -13,6 +13,7 @@ import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
 import {useSearchParams} from "react-router-dom";
 import {maybe} from "@/src/utils/maybe";
 import RenderState, {GUACAMOLE_STATE_DISCONNECTED} from "@/src/pages/access/guacamole/RenderState";
+import {duplicateKeys} from "@/src/pages/access/guacamole/keys";
 
 const GuacamolePage = () => {
 
@@ -109,19 +110,25 @@ const GuacamolePage = () => {
         })
         element.appendChild(sinkElement);
 
-        const keyboard = new Guacamole.Keyboard(sinkElement);
-        keyboard.onkeydown = (keysym: number) => {
-            // console.log('keydown', keysym, accessTab, keyboard, JSON.stringify(keyboard.pressed))
-            client.sendKeyEvent(1, keysym);
-            if (keysym === 65288) {
-                return false;
-            }
+        const keyboard = new Guacamole.Keyboard(document);
+        function shouldFilterRepeat(keysym: number): boolean {
+            const twin = duplicateKeys.get(keysym);
+            return twin !== undefined && keyboard.pressed[twin];
+        }
+
+        function handleKeyEvent(pressed: boolean, keysym: number): boolean {
+            if (shouldFilterRepeat(keysym)) return false;
+
+            // console.log(pressed ? 'keydown' : 'keyup', keysym, JSON.stringify(keyboard.pressed));
+            client.sendKeyEvent(pressed ? 1 : 0, keysym);
+
+            if (keysym === 65288) return false; // 65288 = Backspace
+
             return true;
-        };
-        keyboard.onkeyup = (keysym: number) => {
-            // console.log('keyup', keysym, accessTab)
-            client.sendKeyEvent(0, keysym);
-        };
+        }
+
+        keyboard.onkeydown = keysym => handleKeyEvent(true, keysym);
+        keyboard.onkeyup = keysym => handleKeyEvent(false, keysym);
         keyboardRef.current = keyboard;
 
         const mouse = new Guacamole.Mouse(element);
@@ -180,7 +187,7 @@ const GuacamolePage = () => {
     }, []);
 
     return (
-        <div className={'bg-[#1b1b1b]'}
+        <div className={'bg-[#1b1b1b] overflow-hidden'}
              style={{
                  width: width,
                  height: height,

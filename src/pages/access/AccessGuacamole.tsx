@@ -23,6 +23,7 @@ import RenderState, {GUACAMOLE_STATE_IDLE} from "@/src/pages/access/guacamole/Re
 import ControlButtons from "@/src/pages/access/guacamole/ControlButtons";
 import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
 import {debounce} from "@/src/utils/debounce";
+import {duplicateKeys} from "@/src/pages/access/guacamole/keys";
 
 interface Props {
     assetId: string;
@@ -221,56 +222,28 @@ const AccessGuacamole = ({assetId}: Props) => {
         element.appendChild(sinkElement);
         sinkRef.current = sink;
 
-        // 在组件外或者初始化时准备好这张映射表
-        const duplicateKeys = new Map<number, number>([
-            // [主键盘 KeySym, 小键盘 KeySym]
-            [42,  65450], // '*'  → KP_Multiply
-            [47,  65455], // '/'  → KP_Divide
-            [43,  65451], // '+'  → KP_Add
-            [45,  65453], // '-'  → KP_Subtract
-            [48,  65456], // '0'  → KP_0
-            [49,  65457], // '1'  → KP_1
-            [50,  65458], // '2'  → KP_2
-            [51,  65459], // '3'  → KP_3
-            [52,  65460], // '4'  → KP_4
-            [53,  65461], // '5'  → KP_5
-            [54,  65462], // '6'  → KP_6
-            [55,  65463], // '7'  → KP_7
-            [56,  65464], // '8'  → KP_8
-            [57,  65465], // '9'  → KP_9
-
-            // 为了处理无论先按主键盘还是先按小键盘，都能过滤重复
-            [65450, 42], [65455, 47], [65451, 43], [65453, 45],
-            [65456, 48], [65457, 49], [65458, 50], [65459, 51],
-            [65460, 52], [65461, 53], [65462, 54], [65463, 55],
-            [65464, 56], [65465, 57],
-        ]);
-
         const keyboard = new Guacamole.Keyboard(sinkElement);
-        keyboard.onkeydown = (keysym: number) => {
-            // 如果当前按下的是“重复键”之一，且对端已按下了它的另一半，就直接吞掉
-            const twin = duplicateKeys.get(keysym);
-            if (twin !== undefined && keyboard.pressed[twin]) {
-                return false;
-            }
 
-            console.log('keydown', keysym, JSON.stringify(keyboard.pressed))
-            client.sendKeyEvent(1, keysym);
-            if (keysym === 65288) {
-                return false;
-            }
-            resetTimer();
-            return true;
-        };
-        keyboard.onkeyup = (keysym: number) => {
-            // 如果当前按下的是“重复键”之一，且对端已按下了它的另一半，就直接吞掉
+        function shouldFilterRepeat(keysym: number): boolean {
             const twin = duplicateKeys.get(keysym);
-            if (twin !== undefined && keyboard.pressed[twin]) {
-                return false;
-            }
-            console.log('keyup', keysym, JSON.stringify(keyboard.pressed))
-            client.sendKeyEvent(0, keysym);
-        };
+            return twin !== undefined && keyboard.pressed[twin];
+        }
+
+        function handleKeyEvent(pressed: boolean, keysym: number): boolean {
+            if (shouldFilterRepeat(keysym)) return false;
+
+            // console.log(pressed ? 'keydown' : 'keyup', keysym, JSON.stringify(keyboard.pressed));
+            client.sendKeyEvent(pressed ? 1 : 0, keysym);
+
+            if (pressed && keysym === 65288) return false; // 65288 = Backspace
+            if (pressed) resetTimer();
+
+            return true;
+        }
+
+        keyboard.onkeydown = keysym => handleKeyEvent(true, keysym);
+        keyboard.onkeyup = keysym => handleKeyEvent(false, keysym);
+
         keyboardRef.current = keyboard;
 
         const mouse = new Guacamole.Mouse(element);
