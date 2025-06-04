@@ -8,16 +8,13 @@ import {isFullScreen} from "@/src/utils/utils";
 import portalApi, {ExportSession} from "@/src/api/portal-api";
 import {baseWebSocketUrl} from "@/src/api/core/requests";
 import qs from "qs";
-import {useTranslation} from "react-i18next";
 import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
 import {useSearchParams} from "react-router-dom";
 import {maybe} from "@/src/utils/maybe";
-import RenderState, {GUACAMOLE_STATE_DISCONNECTED} from "@/src/pages/access/guacamole/RenderState";
+import RenderState from "@/src/pages/access/guacamole/RenderState";
 import {duplicateKeys} from "@/src/pages/access/guacamole/keys";
 
 const GuacamolePage = () => {
-
-    let {t} = useTranslation();
 
     const [searchParams] = useSearchParams();
     let token = maybe(searchParams.get('token'), '');
@@ -32,8 +29,10 @@ const GuacamolePage = () => {
 
     let {width, height} = useWindowSize();
     let [displaySize, setDisplaySize] = useState([0, 0]);
+
     let [state, setState] = useState<number>();
     let [status, setStatus] = useState<GuacamoleStatus>();
+    let [tunnelState, setTunnelState] = useState<number>();
 
     let windowFocus = useWindowFocus();
 
@@ -84,6 +83,7 @@ const GuacamolePage = () => {
         let tunnel = new Guacamole.WebSocketTunnel(`${baseWebSocketUrl()}/access/graphics`);
         let client = new Guacamole.Client(tunnel);
 
+        tunnel.onstatechange = setTunnelState;
         client.onstatechange = setState;
         client.onerror = setStatus
 
@@ -111,6 +111,7 @@ const GuacamolePage = () => {
         element.appendChild(sinkElement);
 
         const keyboard = new Guacamole.Keyboard(document);
+
         function shouldFilterRepeat(keysym: number): boolean {
             const twin = duplicateKeys.get(keysym);
             return twin !== undefined && keyboard.pressed[twin];
@@ -178,7 +179,6 @@ const GuacamolePage = () => {
                 connect(session);
             })
             .catch((e) => {
-                setState(GUACAMOLE_STATE_DISCONNECTED)
                 setStatus({
                     code: e.code,
                     message: e.message
@@ -196,6 +196,7 @@ const GuacamolePage = () => {
             <RenderState
                 state={state}
                 status={status}
+                tunnelState={tunnelState}
             />
             <div className={'flex items-center justify-center'}>
                 <div className={''}

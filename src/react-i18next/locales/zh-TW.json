@@ -242,6 +242,12 @@
       "disconnecting": "會話關閉中...",
       "disconnected": "會話已關閉",
       "closed": "會話已關閉"
+    },
+    "tunnel": {
+      "connecting": "隧道正在連接中...",
+      "open": "隧道連接成功",
+      "closed": "隧道連接已關閉",
+      "unstable": "隧道連接不穩定"
     }
   },
   "identity": {

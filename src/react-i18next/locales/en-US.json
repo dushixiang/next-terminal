@@ -230,6 +230,12 @@
       "disconnecting": "Disconnecting...",
       "disconnected": "Disconnected",
       "closed": "Closed"
+    },
+    "tunnel": {
+      "connecting": "The tunnel is being connected...",
+      "open": "Tunnel connection successful",
+      "closed": "The tunnel connection has been closed.",
+      "unstable": "Tunnel connection is unstable"
     }
   },
   "identity": {

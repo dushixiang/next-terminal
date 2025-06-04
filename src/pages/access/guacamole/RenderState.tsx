@@ -2,45 +2,69 @@ import React from 'react';
 import {HashLoader} from 'react-spinners';
 import {ErrorAlert, GuacamoleStatus} from '@/src/pages/access/guacamole/ErrorAlert';
 import {useTranslation} from 'react-i18next';
+// @ts-ignore
+import Guacamole from '@dushixiang/guacamole-common-js';
+
+export enum GuacamoleState {
+    IDLE = 0,
+    CONNECTING = 1,
+    WAITING = 2,
+    CONNECTED = 3,
+    DISCONNECTING = 4,
+    DISCONNECTED = 5,
+}
 
 interface Props {
-    state?: number;
+    state?: GuacamoleState;
     status?: GuacamoleStatus;
+    tunnelState: Guacamole.Tunnel.State;
     onReconnect?: () => void;
 }
 
-export const GUACAMOLE_STATE_IDLE = 0;
-export const GUACAMOLE_STATE_CONNECTING = 1;
-export const GUACAMOLE_STATE_WAITING = 2;
-export const GUACAMOLE_STATE_CONNECTED = 3;
-export const GUACAMOLE_STATE_DISCONNECTING = 4;
-export const GUACAMOLE_STATE_DISCONNECTED = 5;
-
-const RenderState: React.FC<Props> = ({state, status, onReconnect}) => {
+const RenderState: React.FC<Props> = ({state, status, tunnelState, onReconnect}) => {
     const {t} = useTranslation();
-    if (state === GUACAMOLE_STATE_CONNECTED) return null;
 
-    const loading = state !== GUACAMOLE_STATE_DISCONNECTED;
-    const labels = {
-        STATE_IDLE: t('guacamole.state.idle'),
-        STATE_CONNECTING: t('guacamole.state.connecting'),
-        STATE_WAITING: t('guacamole.state.waiting'),
-        STATE_CONNECTED: t('guacamole.state.connected'),
-        STATE_DISCONNECTING: t('guacamole.state.disconnecting'),
-        STATE_DISCONNECTED: t('guacamole.state.disconnected'),
+    const stateLabels: Record<GuacamoleState, string> = {
+        [GuacamoleState.IDLE]: t('guacamole.state.idle'),
+        [GuacamoleState.CONNECTING]: t('guacamole.state.connecting'),
+        [GuacamoleState.WAITING]: t('guacamole.state.waiting'),
+        [GuacamoleState.CONNECTED]: t('guacamole.state.connected'),
+        [GuacamoleState.DISCONNECTING]: t('guacamole.state.disconnecting'),
+        [GuacamoleState.DISCONNECTED]: t('guacamole.state.disconnected'),
     };
 
+    const tunnelLabels: Record<Guacamole.Tunnel.State, string> = {
+        [Guacamole.Tunnel.State.CONNECTING]: t('guacamole.tunnel.connecting'),
+        [Guacamole.Tunnel.State.OPEN]: t('guacamole.tunnel.open'),
+        [Guacamole.Tunnel.State.CLOSED]: t('guacamole.tunnel.closed'),
+        [Guacamole.Tunnel.State.UNSTABLE]: t('guacamole.tunnel.unstable'),
+    };
+
+    if (state === GuacamoleState.CONNECTED && tunnelState === Guacamole.Tunnel.State.OPEN) {
+        return null;
+    }
+
+    const render = () => {
+        if (state === GuacamoleState.DISCONNECTED || tunnelState === Guacamole.Tunnel.State.CLOSED) {
+            if(!status){
+                status = {
+                    code: -1,
+                    message: t('guacamole.state.disconnected'),
+                }
+            }
+            return <ErrorAlert status={status} onReconnect={onReconnect}/>;
+        }
+        return <div className="flex flex-col gap-4 p-4 text-center items-center">
+            <HashLoader color="#1568DB"/>
+            <div>{state !== undefined ? stateLabels[state] : t('guacamole.state.unknown')}</div>
+            <div className="text-sm text-gray-500">{tunnelLabels[tunnelState]}</div>
+        </div>;
+    }
+
     return (
-        <div className="flex items-center justify-center h-full">
+        <div className="flex items-center justify-center h-full w-full absolute z-50">
             <div className="flex flex-col items-center gap-4">
-                {loading ? (
-                    <div className="flex flex-col gap-4 p-4 text-center items-center">
-                        <HashLoader color={'#1568DB'}/>
-                        <div>{labels[state!]}</div>
-                    </div>
-                ) : (
-                    <ErrorAlert status={status} onReconnect={onReconnect}/>
-                )}
+                {render()}
             </div>
         </div>
     );

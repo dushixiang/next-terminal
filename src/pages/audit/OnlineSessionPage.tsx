@@ -159,6 +159,7 @@ const OnlineSessionPage = () => {
                     defaultPageSize: 10,
                     showSizeChanger: true
                 }}
+                polling={1000}
                 dateFormatter="string"
                 headerTitle={t('menus.log_audit.submenus.online_session')}
                 toolBarRender={() => []}

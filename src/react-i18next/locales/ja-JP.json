@@ -242,6 +242,12 @@
       "disconnecting": "セッション終了中...",
       "disconnected": "セッションが閉じられました",
       "closed": "セッションが閉じられました"
+    },
+    "tunnel": {
+      "connecting": "トンネルが接続中です...",
+      "open": "トンネル接続に成功しました。",
+      "closed": "トンネル接続が閉じられました",
+      "unstable": "トンネル接続が不安定です"
     }
   },
   "identity": {

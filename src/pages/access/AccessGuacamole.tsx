@@ -19,7 +19,7 @@ import useWindowFocus from "@/src/hook/use-window-focus";
 import {dropKeydown, isFullScreen, requestFullScreen} from "@/src/utils/utils";
 import Timeout, {TimeoutHandle} from "@/src/components/Timeout";
 import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
-import RenderState, {GUACAMOLE_STATE_IDLE} from "@/src/pages/access/guacamole/RenderState";
+import RenderState from "@/src/pages/access/guacamole/RenderState";
 import ControlButtons from "@/src/pages/access/guacamole/ControlButtons";
 import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
 import {debounce} from "@/src/utils/debounce";
@@ -46,6 +46,8 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     let [state, setState] = useState<number>();
     let [status, setStatus] = useState<GuacamoleStatus>();
+    let [tunnelState, setTunnelState] = useState<number>();
+
     let [session, setSession] = useState<ExportSession>();
     const [modals, setModals] = useState({sharer: false, fs: false, clipboard: false, mfa: false});
     let [clipboardText, setClipboardText] = useState('');
@@ -56,6 +58,7 @@ const AccessGuacamole = ({assetId}: Props) => {
     let [active, setActive] = useState(true);
 
     let [mfaOpen, setMfaOpen] = useState(false);
+    let [fixedSize, setFixedSize] = useState(false);
 
     const timeoutRef = useRef<TimeoutHandle>();
 
@@ -115,8 +118,10 @@ const AccessGuacamole = ({assetId}: Props) => {
 
         const dpi = computeDPI();
 
-        if (dw !== container.width * dpi  || dh !== container.height * dpi) {
-            clientRef.current?.sendSize(container.width * dpi, container.height * dpi);
+        if (dw !== container.width * dpi || dh !== container.height * dpi) {
+            if (!fixedSize) {
+                clientRef.current?.sendSize(container.width * dpi, container.height * dpi);
+            }
         }
 
         if (dw && dh) {
@@ -183,8 +188,10 @@ const AccessGuacamole = ({assetId}: Props) => {
         let tunnel = new Guacamole.WebSocketTunnel(`${baseWebSocketUrl()}/access/graphics`);
         let client = new Guacamole.Client(tunnel);
 
+        tunnel.onstatechange = setTunnelState;
         client.onstatechange = setState;
-        client.onerror = setStatus
+        client.onerror = setStatus;
+
         client.onrequired = function (parameters) {
             setRequiredParameters([...parameters]);
             setRequiredOpen(true);
@@ -277,6 +284,7 @@ const AccessGuacamole = ({assetId}: Props) => {
             resetTimer();
         };
 
+
         let authToken = getToken();
         const dpi = computeDPI();
         let {width, height} = getContainerSize();
@@ -287,6 +295,11 @@ const AccessGuacamole = ({assetId}: Props) => {
             'sessionId': session.id,
             'X-Auth-Token': authToken
         };
+        if (session.width > 0 && session.height > 0) {
+            params['width'] = session.width;
+            params['height'] = session.height;
+            setFixedSize(true);
+        }
 
         let paramStr = qs.stringify(params);
         client.connect(paramStr);
@@ -359,9 +372,9 @@ const AccessGuacamole = ({assetId}: Props) => {
             <RenderState
                 state={state}
                 status={status}
+                tunnelState={tunnelState}
                 onReconnect={() => {
                     setTiger(new Date().toString());
-                    setState(GUACAMOLE_STATE_IDLE);
                     setStatus({});
                     resetTimer();
                 }}

@@ -224,11 +224,17 @@ let o = {
     "guacamole": {
         "state": {
             "idle": "正在初始化中...",
-            "connecting": "正在努力连接中...",
+            "connecting": "正在连接服务器中...",
             "waiting": "正在等待服务器响应...",
-            "connected": "连接成功",
+            "connected": "连接服务器成功",
             "disconnecting": "会话关闭中...",
             "disconnected": "会话已关闭"
+        },
+        "tunnel": {
+            "connecting": "隧道正在连接中...",
+            "open": "隧道连接成功",
+            "closed": "隧道连接已关闭",
+            "unstable": "隧道连接不稳定",
         }
     },
     "identity": {
