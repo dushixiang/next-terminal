@@ -83,10 +83,16 @@ const AgentGatewayRegister = ({
                     <div>
                         <a href={`${baseUrl()}/agent-gateway/binary?os=windows&arch=amd64`}>amd64</a>
                     </div>
-                    <div>2. 前台启动</div>
+                    <div>2. 启动服务 （使用管理员权限打开 CMD）</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
-                            {`nt-tunnel.exe run --endpoint ${param.endpoint} --token ${param.token} `}
+                            {`nt-tunnel.exe install --endpoint ${param.endpoint} --token ${param.token} `}
+                        </Paragraph>
+                    </div>
+                    <div>3. 启动服务</div>
+                    <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
+                        <Paragraph copyable={true} style={{margin: 0}}>
+                            {`nt-tunnel.exe start`}
                         </Paragraph>
                     </div>
                 </div>;
