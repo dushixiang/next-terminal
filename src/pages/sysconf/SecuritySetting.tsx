@@ -64,6 +64,12 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                                        checkedChildren={t('general.enabled')}
                                        unCheckedChildren={t('general.disabled')}
                         />
+                        <ProFormSwitch name="disable-password-login"
+                                       label={t("settings.security.disable_password_login")}
+                                       rules={[{required: true}]}
+                                       checkedChildren={t('general.enabled')}
+                                       unCheckedChildren={t('general.disabled')}
+                        />
                     </div>
 
                     <div className={'flex items-center gap-4'}>

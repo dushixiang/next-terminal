@@ -38,6 +38,7 @@ import licenseApi from "@/src/api/license-api";
 import {useLicense} from "@/src/hook/use-license";
 import Marquee from 'react-fast-marquee';
 import dayjs from "dayjs";
+import {baseUrl} from "@/src/api/core/requests";
 
 const breadcrumbNameMap = new Map<string, string>;
 
@@ -270,12 +271,12 @@ const ManagerLayout = () => {
             },
         ];
 
-        if (brandingQuery.data?.dev) {
+        if (infoQuery.data?.dev) {
             menus.push({
                 key: 'debug',
                 icon: <BugOutlined/>,
                 label: <a target='_blank'
-                          href={`/debug/pprof/`}>{t('menus.dev')}</a>
+                          href={`${baseUrl()}/debug/pprof/`}>Debug</a>,
             });
         }
 
@@ -320,7 +321,9 @@ const ManagerLayout = () => {
                 theme={{
                     algorithm: ntTheme.algorithm,
                     components: {
-
+                        Layout: {
+                            triggerBg: '#131313',
+                        }
                     }
                 }}
                 locale={translateI18nToAntdLocale(lang)}

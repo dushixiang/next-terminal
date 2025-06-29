@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ant-design/pro-components": "^2.8.7",
-    "@dushixiang/guacamole-common-js": "1.5.5-fixed",
+    "@dushixiang/guacamole-common-js": "1.6.0",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-scroll-area": "^1.2.0",
     "@radix-ui/react-separator": "^1.1.0",

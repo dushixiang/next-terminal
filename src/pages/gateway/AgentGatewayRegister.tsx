@@ -1,6 +1,5 @@
 import {App, Input, Modal, Select, Typography} from 'antd';
-import React, {useEffect, useRef, useState} from 'react';
-import {ProFormInstance} from "@ant-design/pro-components";
+import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import agentGatewayApi, {RegisterParam} from "@/src/api/agent-gateway-api";
 import clsx from "clsx";
@@ -25,7 +24,6 @@ const AgentGatewayRegister = ({
                                   handleCancel,
                               }: Props) => {
 
-    const formRef = useRef<ProFormInstance>();
     let {t} = useTranslation();
     let {message} = App.useApp();
 
@@ -48,7 +46,11 @@ const AgentGatewayRegister = ({
 
     useEffect(() => {
         if (query.data) {
-            setParam(query.data);
+            let data = query.data;
+            if(data.endpoint === ''){
+                data.endpoint = window.location.origin;
+            }
+            setParam(data);
         }
     }, [query.data]);
 
@@ -136,7 +138,7 @@ const AgentGatewayRegister = ({
             destroyOnHidden={true}
             footer={false}
             onCancel={() => {
-                
+
                 handleCancel();
             }}
         >

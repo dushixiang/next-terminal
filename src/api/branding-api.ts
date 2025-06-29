@@ -8,7 +8,6 @@ export interface Branding {
     name: string;
     root: string;
     version: string;
-    dev: boolean
     loginBackgroundColor: string
     icp: string
     hiddenUpgrade: boolean

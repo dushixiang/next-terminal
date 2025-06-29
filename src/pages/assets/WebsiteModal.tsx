@@ -23,6 +23,7 @@ import assetsApi from "@/src/api/asset-api";
 import {RcFile} from "antd/es/upload";
 import dayjs from "dayjs";
 import certificateApi from "@/src/api/certificate-api";
+import WebsiteModifyResponseView from "@/src/pages/assets/WebsiteModifyResponseView";
 
 const api = websiteApi;
 
@@ -302,84 +303,6 @@ const WebsiteModal = ({
         </>
     }
 
-    const ModifyResponseView = () => {
-        return (
-            <>
-                <ProFormSwitch
-                    label={t('assets.modify_response_enabled')}
-                    name={['modifyResponse', 'enabled']}
-                    fieldProps={{
-                        checkedChildren: t('general.yes'),
-                        unCheckedChildren: t('general.no'),
-                    }}
-                />
-
-                <ProFormDependency name={['modifyResponse', 'enabled']}>
-                    {({modifyResponse}) => {
-                        if (!modifyResponse?.enabled) return null;
-
-                        return (
-                            <>
-                                <ProFormText
-                                    label={t('assets.response_match_url')}
-                                    name={['modifyResponse', 'matchUrl']}
-                                    extra={t('assets.response_match_url_tip')}
-                                />
-
-                                <ProFormText
-                                    label={t('assets.response_match_content_type')}
-                                    name={['modifyResponse', 'contentType']}
-                                    extra={t('assets.response_match_content_type_tip')}
-                                />
-
-                                <ProFormList
-                                    name={['modifyResponse', 'rules']}
-                                    label={t('assets.modify_rules')}
-                                    creatorButtonProps={{
-                                        position: 'bottom',
-                                        creatorButtonText: t('assets.add_rule'),
-                                    }}
-                                >
-                                    <ProFormGroup>
-                                        <ProFormSelect
-                                            name="type"
-                                            label={t('assets.modify_type')}
-                                            options={[
-                                                {label: 'Replace', value: 'replace'},
-                                                {label: 'Regex Replace', value: 'regex'},
-                                            ]}
-                                            width="sm"
-                                            rules={[{required: true}]}
-                                        />
-                                        <ProFormText
-                                            name="pattern"
-                                            label={t('assets.pattern')}
-                                            rules={[{required: true}]}
-                                        />
-                                        <ProFormText
-                                            name="replacement"
-                                            label={t('assets.replacement')}
-                                            rules={[{required: true}]}
-                                        />
-                                    </ProFormGroup>
-                                </ProFormList>
-
-                                <Alert
-                                    className="mt-2"
-                                    type="info"
-                                    message={t('assets.modify_response_tip')}
-                                    description={t('assets.modify_response_compression_support')}
-                                    showIcon
-                                />
-                            </>
-                        );
-                    }}
-                </ProFormDependency>
-            </>
-        );
-    };
-
-
     const PublicView = () => {
         return <>
             <div className={'mb-2'}>
@@ -469,7 +392,7 @@ const WebsiteModal = ({
         // {
         //     key: 'modify-response',
         //     label: t('assets.modify_response'),
-        //     children: <ModifyResponseView/>,
+        //     children: <WebsiteModifyResponseView onSubmit={null}/>,
         //     forceRender: true,
         // },
         {

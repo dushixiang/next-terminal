@@ -40,13 +40,16 @@ const RenderState: React.FC<Props> = ({state, status, tunnelState, onReconnect})
         [Guacamole.Tunnel.State.UNSTABLE]: t('guacamole.tunnel.unstable'),
     };
 
-    if (state === GuacamoleState.CONNECTED && tunnelState === Guacamole.Tunnel.State.OPEN) {
+    if (state === GuacamoleState.CONNECTED && (
+        tunnelState === Guacamole.Tunnel.State.OPEN ||
+        tunnelState === Guacamole.Tunnel.State.UNSTABLE
+    )) {
         return null;
     }
 
     const render = () => {
         if (state === GuacamoleState.DISCONNECTED || tunnelState === Guacamole.Tunnel.State.CLOSED) {
-            if(!status){
+            if (!status) {
                 status = {
                     code: -1,
                     message: t('guacamole.state.disconnected'),

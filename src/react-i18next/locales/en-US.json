@@ -906,7 +906,8 @@
         "origins": "Allowed Origins for Passkey",
         "origins_tip": "Do not include trailing /",
         "origins_error": "Please enter a valid URL"
-      }
+      },
+      "disable_password_login": "Disable password login"
     },
     "sshd": {
       "setting": "SSH Proxy Server",
@@ -1115,6 +1116,7 @@
     "60002": "Password complexity too low",
     "60003": "Password cannot contain username",
     "60004": "Weak passwords are not allowed",
-    "60005": "Password cannot be a palindrome"
+    "60005": "Password cannot be a palindrome",
+    "10022": "Password login has been disabled."
   }
 }

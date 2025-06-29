@@ -56,6 +56,7 @@ export type AccountInfo = {
     language: string;
     forceTotpEnabled: boolean
     needChangePassword: boolean
+    dev: boolean
 }
 
 export type Menu = {

@@ -519,10 +519,10 @@
   dependencies:
     tslib "^2.0.0"
 
-"@dushixiang/guacamole-common-js@1.5.5-fixed":
-  version "1.5.5-fixed"
-  resolved "https://registry.yarnpkg.com/@dushixiang/guacamole-common-js/-/guacamole-common-js-1.5.5-fixed.tgz#17139c9f7218565bc4265d09e426e198ac1580fa"
-  integrity sha512-xaeIKquzCF4v5O9QE+5dWQcOaqHvCd+mdQjjAzl3jMtvSyKLtkvPbyP6+FUU1Nsd80ajSgC4ROwXHam9hcy+Ew==
+"@dushixiang/guacamole-common-js@1.6.0":
+  version "1.6.0"
+  resolved "https://registry.yarnpkg.com/@dushixiang/guacamole-common-js/-/guacamole-common-js-1.6.0.tgz#437add3be40a688feea6c6689cf3e112f443ba11"
+  integrity sha512-O80QAUqT1ifIDlvEv32ck8LZavUzSr+tO/7yLzOWraKXYX/EXAQyxkMIwdTefHEAlgYpmQ4hP7po4G43VcLTyw==
 
 "@emotion/hash@^0.8.0":
   version "0.8.0"

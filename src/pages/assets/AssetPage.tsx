@@ -14,7 +14,7 @@ import {maybe} from "@/src/utils/maybe";
 import clsx from "clsx";
 import {getImgColor, getProtocolColor} from "@/src/helper/asset-helper";
 import AssetTreeChoose from "@/src/pages/assets/AssetTreeChoose";
-import {openOrSwitchToPage} from "@/src/utils/utils";
+import {browserDownload, openOrSwitchToPage} from "@/src/utils/utils";
 import {ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import {cn} from "@/lib/utils";
 import {ImperativePanelHandle} from "react-resizable-panels";
@@ -22,17 +22,12 @@ import {useWindowSize} from "react-use";
 import {ArrowLeftToLineIcon, ArrowRightToLineIcon} from "lucide-react";
 import {safeEncode} from "@/src/utils/codec";
 import AssetPostDrawer from "@/src/pages/assets/AssetPostDrawer";
+import {baseUrl} from "@/src/api/core/requests";
 
 const api = assetsApi;
 
 function downloadImportExampleCsv() {
-    let csvString = 'name,ssh,127.0.0.1,22,username,password,privateKey,passphrase,description,tag1|tag2|tag3';
-    //前置的"\uFEFF"为“零宽不换行空格”，可处理中文乱码问题
-    const blob = new Blob(["\uFEFF" + csvString], {type: 'text/csv;charset=gb2312;'});
-    let a = document.createElement('a');
-    a.download = 'sample.csv';
-    a.href = URL.createObjectURL(blob);
-    a.click();
+    browserDownload(`${baseUrl()}/admin/assets/sample`)
 }
 
 interface PostParams {
@@ -165,7 +160,7 @@ const AssetPage = () => {
                         <Select.Option value="ssh">SSH</Select.Option>
                         <Select.Option value="telnet">Telnet</Select.Option>
                         <Select.Option value="vnc">VNC</Select.Option>
-                        <Select.Option value="kubernetes">Kubernetes</Select.Option>
+                        {/*<Select.Option value="kubernetes">Kubernetes</Select.Option>*/}
                     </Select>
                 );
             },
@@ -351,6 +346,7 @@ const AssetPage = () => {
                 title: t('assets.import_asset_error'),
                 content: <div>
                     <p>{t('assets.import_asset_error_title')}</p>
+                    <hr className="h-px my-2 bg-gray-200 border-0 dark:bg-gray-700"/>
                     <ul>
                         {
                             errorAssets.map((item: any) => {
