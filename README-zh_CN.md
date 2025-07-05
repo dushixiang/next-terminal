@@ -28,6 +28,12 @@ Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多
 
 📧dushixiang@typesafe.cn
 
+## 社群
+- QQ 群：938145268
+- 微信群：加我微信备注「next-terminal」，拉你进群
+  
+<img src="screenshots/zh/wx1.png" width="300" height="auto"/>
+
 ## 优秀项目推荐
 
 - [go-ldap-admin：基于Go+Vue实现的openLDAP后台管理项目](https://github.com/eryajf/go-ldap-admin)
