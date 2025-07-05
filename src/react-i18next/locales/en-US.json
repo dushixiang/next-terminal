@@ -39,7 +39,9 @@
     "sync": "Sync",
     "view_private_key": "View Private Key",
     "import": "Import",
-    "download_import_sample": "Download Import Example"
+    "download_import_sample": "Download Import Example",
+    "cancel": "Cancel",
+    "save": "Save"
   },
   "dashboard": {
     "name": "Dashboard",
@@ -781,7 +783,11 @@
     "disable_alive_check": "Disable keepalive checks when connecting",
     "disable_alive_check_extra": "The front-end will periodically send heartbeat packets to maintain an active connection, while the back-end will send requests to the target server and request a response.",
     "env": "environment variable",
-    "env_placeholder": "Format: name=value, one per line."
+    "env_placeholder": "Format: name=value, one per line.",
+    "basic_settings": "Basic Settings",
+    "target_server": "Target server",
+    "preserve_host_tip": "It will retain the hostname in the request header as the hostname of the original request, rather than the hostname of the proxy server.",
+    "custom_header_tip": "Multiple custom request headers can be added, in the format: key: value."
   },
   "gateways": {
     "name": "Name",
@@ -823,7 +829,10 @@
       "total": "Total size",
       "used": "Used",
       "connections": "Network connection",
-      "tcp_states": "TCP connection status"
+      "tcp_states": "TCP connection status",
+      "ping": "Network latency",
+      "external_ip": "External IP",
+      "internal_ips": "Internal network IP"
     },
     "install_shell": "Installation script",
     "ssh_status": {
@@ -831,6 +840,11 @@
       "connecting": "Connecting",
       "connected": "Connected",
       "error": "Connection failed"
+    },
+    "load": {
+      "normal": "System idle",
+      "moderate": "Lightly busy",
+      "busy": "Resource紧张\" should be translated as \"Resource strain\" or \"Tight resources\". However, the most accurate and commonly used translation is:\n\n\"Tight resources"
     }
   },
   "settings": {

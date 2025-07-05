@@ -14,8 +14,8 @@ i18n
             // 可配置的语言检测顺序和缓存方式
             order: ['localStorage', 'cookie', 'navigator', 'htmlTag'],
             caches: ['localStorage', 'cookie'],
-            lookupLocalStorage: 'nt-language',
-            lookupCookie: 'nt-language',
+            lookupLocalStorage: 'nt-lang',
+            lookupCookie: 'nt-lang',
         },
         interpolation: {
             escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape

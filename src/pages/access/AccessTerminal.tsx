@@ -447,7 +447,7 @@ const AccessTerminal = ({assetId}: Props) => {
             <SnippetSheet
                 onClose={() => setSnippetOpen(false)}
                 onUse={(content: string) => {
-                    websocket?.send(new Message(MessageTypeData, content).toString());
+                    terminalRef.current?.paste(content);
                 }}
                 open={snippetOpen}
                 mask={false}

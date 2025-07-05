@@ -39,7 +39,9 @@
     "sync": "同期",
     "view_private_key": "秘密鍵を表示する",
     "import": "インポート",
-    "download_import_sample": "ダウンロードインポートサンプル"
+    "download_import_sample": "ダウンロードインポートサンプル",
+    "cancel": "キャンセル",
+    "save": "保存"
   },
   "dashboard": {
     "name": "データ概要",
@@ -793,7 +795,11 @@
     "disable_alive_check": "接続時に生存確認を無効にする",
     "disable_alive_check_extra": "フロントエンドは定期的にハートビートパケットを送信し、接続のアクティブ状態を維持します。同時に、バックエンドはターゲットサーバーにリクエストを送信し、応答を要求します。",
     "env": "環境変数",
-    "env_placeholder": "フォーマット：name=value 一行ずつ。"
+    "env_placeholder": "フォーマット：name=value 一行ずつ。",
+    "basic_settings": "基本設定",
+    "target_server": "目標サーバー",
+    "preserve_host_tip": "リクエストヘッダー内のホスト名は、プロキシサーバーのホスト名ではなく、元のリクエストのホスト名のままになります。",
+    "custom_header_tip": "複数のカスタムリクエストヘッダーを追加できます。形式は以下の通りです：キー: 値。"
   },
   "gateways": {
     "name": "名前",
@@ -835,7 +841,10 @@
       "total": "総サイズ",
       "used": "既に使用済み",
       "connections": "ネットワーク接続",
-      "tcp_states": "TCP 接続状態"
+      "tcp_states": "TCP 接続状態",
+      "ping": "ネットワーク遅延",
+      "external_ip": "外部IP",
+      "internal_ips": "内部IP"
     },
     "install_shell": "スクリプトのインストール",
     "ssh_status": {
@@ -843,6 +852,11 @@
       "connecting": "接続中",
       "connected": "接続済み",
       "error": "接続失敗"
+    },
+    "load": {
+      "normal": "システムが空いている",
+      "moderate": "軽度の忙しさ",
+      "busy": "資源が逼迫している"
     }
   },
   "settings": {

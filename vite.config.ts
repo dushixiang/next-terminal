@@ -16,6 +16,13 @@ export default defineConfig({
             },
             workbox: {
                 maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB
+                navigateFallbackDenylist: [/^\/api\//], // 阻止 /api 被 fallback 到 index.html
+                runtimeCaching: [
+                    {
+                        urlPattern: ({url}) => !url.pathname.startsWith('/api/'),
+                        handler: 'NetworkOnly', // 不缓存，直接请求网络
+                    },
+                ],
             },
             includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
             manifest: {

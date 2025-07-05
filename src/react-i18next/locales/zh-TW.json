@@ -39,7 +39,9 @@
     "sync": "同步",
     "view_private_key": "查閱私鑰",
     "import": "導入",
-    "download_import_sample": "下載匯入範例"
+    "download_import_sample": "下載匯入範例",
+    "cancel": "取消",
+    "save": "保存"
   },
   "dashboard": {
     "name": "數據概觀",
@@ -793,7 +795,11 @@
     "disable_alive_check": "連接時禁用存活性檢查",
     "disable_alive_check_extra": "前段會定時發送心跳包，以保持連接的活躍狀態，同時後端會向目標伺服器發送請求並要求回覆。",
     "env": "環境變數",
-    "env_placeholder": "格式：name=value 每行一個。"
+    "env_placeholder": "格式：name=value 每行一個。",
+    "basic_settings": "基礎設置",
+    "target_server": "目標伺服器",
+    "preserve_host_tip": "會將請求頭中的主機名保留為原始請求的主機名，而不是代理伺服器的主機名。",
+    "custom_header_tip": "可以添加多個自定義請求頭，格式為：鍵: 值。"
   },
   "gateways": {
     "name": "名稱",
@@ -835,7 +841,10 @@
       "total": "總大小",
       "used": "已使用",
       "connections": "網絡連接",
-      "tcp_states": "TCP 連接狀態"
+      "tcp_states": "TCP 連接狀態",
+      "ping": "網絡延遲",
+      "external_ip": "外網IP",
+      "internal_ips": "內網IP"
     },
     "install_shell": "安裝腳本",
     "ssh_status": {
@@ -843,6 +852,11 @@
       "connecting": "正在連接",
       "connected": "已連接",
       "error": "連接失敗"
+    },
+    "load": {
+      "normal": "系統空閒",
+      "moderate": "輕度繁忙",
+      "busy": "資源緊張"
     }
   },
   "settings": {
