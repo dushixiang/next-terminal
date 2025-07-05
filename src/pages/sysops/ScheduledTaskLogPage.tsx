@@ -1,5 +1,5 @@
 import React, {useEffect, useRef} from 'react';
-import {Drawer, Progress, Tag} from "antd";
+import {App, Button, Drawer, Progress, Tag} from "antd";
 import {ActionType, ProColumns, ProTable} from '@ant-design/pro-components';
 import scheduledTaskApi, {CheckStatusResult, ExecScriptResult, ScheduledTaskLog} from "@/src/api/scheduled-task-api";
 import NButton from "@/src/components/NButton";
@@ -16,6 +16,7 @@ const ScheduledTaskLogPage = ({open, jobId, handleCancel}: Props) => {
 
     let {t} = useTranslation();
     const actionRef = useRef<ActionType>();
+    let {modal} = App.useApp();
 
     useEffect(() => {
         if (!open) {
@@ -192,6 +193,23 @@ const ScheduledTaskLogPage = ({open, jobId, handleCancel}: Props) => {
             maskClosable={true}
             onClose={handleCancel}
             open={open}
+            extra={<div>
+                <Button
+                    type={'primary'}
+                    danger={true}
+                    onClick={async () => {
+                        modal.confirm({
+                            title: t('general.clear_confirm'),
+                            onOk: async () => {
+                                await scheduledTaskApi.clearLog(jobId);
+                                actionRef.current?.reload();
+                            }
+                        })
+                    }}
+                >
+                    {t('actions.clear')}
+                </Button>
+            </div>}
         >
             <ProTable
                 columns={columns}

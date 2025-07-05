@@ -632,7 +632,7 @@
     "credential": "授权凭证",
     "agent_gateway": "安全网关",
     "ssh_gateway": "SSH网关",
-    "gateway_tip": "安全网关和SSH网关只能二选一，同时选择时以SSH网关为准。",
+    "gateway_tip": "安全网关和SSH网关仅能二选一，同时选择时则使用SSH网关。",
     "description": "备注",
     "advanced_setting": "高级设置",
     "socks5_proxy": "Socks5代理",
@@ -759,7 +759,12 @@
       "cloudflare": "Cloudflare"
     },
     "dns_provider_config": "DNS 供应商配置",
-    "dns_provider_config_tip": "请根据供应商的要求填写配置信息。"
+    "dns_provider_config_tip": "请根据供应商的要求填写配置信息。",
+    "terminal_settings": "终端设置",
+    "disable_alive_check": "连接时禁用存活检查",
+    "disable_alive_check_extra": "前端会定时发送心跳包，以保持连接的活跃状态，同时后端会向目标服务器发送请求并要求回复。",
+    "env": "环境变量",
+    "env_placeholder": "格式：name=value 每行一个。"
   },
   "gateways": {
     "name": "名称",

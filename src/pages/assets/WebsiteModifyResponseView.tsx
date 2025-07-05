@@ -1,298 +1,388 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
-  Form,
-  Input,
-  Button,
-  Select,
-  Card,
-  Space,
-  InputNumber,
-  Switch,
-  Typography,
-  Tooltip,
-  Modal,
-  notification
+    Button,
+    Card,
+    Col,
+    Divider,
+    Form,
+    Input,
+    InputNumber,
+    message,
+    notification,
+    Row,
+    Select,
+    Space,
+    Switch,
+    Tooltip,
+    Typography
 } from 'antd';
-import { PlusOutlined, MinusCircleOutlined, QuestionCircleOutlined } from '@ant-design/icons';
+import {MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
 
-const { Option } = Select;
-const { Text } = Typography;
+const {Option} = Select;
+const {Text} = Typography;
+
+interface BodyReplaceRule {
+    search: string;
+    is_regex: boolean;
+    replace: string;
+}
+
+interface ModifyRule {
+    name: string;
+    match: {
+        path?: string;
+        method?: string;
+        status?: number;
+    };
+    actions: {
+        set_headers?: Record<string, string>;
+        add_headers?: Record<string, string>;
+        remove_headers?: string[];
+        body_replace?: BodyReplaceRule[];
+    };
+}
+
+interface FormData {
+    modifyRules: ModifyRule[];
+}
 
 const WebsiteModifyResponseView = () => {
-  const [form] = Form.useForm();
+    const [loading, setLoading] = useState(false);
 
-  const onFinish = (values) => {
-    console.log('Received values of form:', JSON.stringify(values, null, 2));
-    // Here you would typically send the 'values' to your backend.
-    notification.success({
-      message: 'Rules Saved',
-      description: 'HTTP response modification rules have been successfully saved (console logged).',
-      placement: 'topRight',
-    });
-  };
+    const onFinish = async (values: FormData) => {
+        setLoading(true);
+        try {
+            // 这里转换数据格式以匹配后端需求
+            const formattedRules = values.modifyRules.map(rule => ({
+                ...rule,
+                actions: {
+                    ...rule.actions,
+                    // 将键值对数组转换为对象
+                    set_headers: rule.actions.set_headers || {},
+                    add_headers: rule.actions.add_headers || {},
+                    remove_headers: rule.actions.remove_headers || [],
+                    body_replace: rule.actions.body_replace || []
+                }
+            }));
 
-  const handleValuesChange = (changedValues, allValues) => {
-    // Optional: You can add logic here to react to form changes.
-    // console.log('Changed values:', changedValues);
-    // console.log('All values:', allValues);
-  };
+            const payload = {
+                modifyRules: formattedRules
+            };
 
-  // Helper function to render key-value pairs for headers
-  const renderKeyValueFields = (fieldName, label, tooltip) => (
-    <Form.List name={fieldName}>
-      {(fields, { add, remove }) => (
-        <>
-          <Text strong>{label}</Text>
-          <Tooltip title={tooltip}>
-            <QuestionCircleOutlined style={{ marginLeft: 8, cursor: 'pointer' }} />
-          </Tooltip>
-          {fields.map(({ key, name, fieldKey, ...restField }) => (
-            <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-              <Form.Item
-                {...restField}
-                name={[name, 'key']}
-                fieldKey={[fieldKey, 'key']}
-                rules={[{ required: true, message: 'Missing key' }]}
-              >
-                <Input placeholder="Key" />
-              </Form.Item>
-              <Form.Item
-                {...restField}
-                name={[name, 'value']}
-                fieldKey={[fieldKey, 'value']}
-                rules={[{ required: true, message: 'Missing value' }]}
-              >
-                <Input placeholder="Value" />
-              </Form.Item>
-              <MinusCircleOutlined onClick={() => remove(name)} />
-            </Space>
-          ))}
-          <Form.Item>
-            <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-              Add {label.toLowerCase().slice(0, -1)}
-            </Button>
-          </Form.Item>
-        </>
-      )}
-    </Form.List>
-  );
+            console.log('提交的数据:', JSON.stringify(payload, null, 2));
 
-  return (
-    <Card title="Modify HTTP Response Rules" style={{ maxWidth: 1200, margin: '20px auto' }}>
-      <Form
-        form={form}
-        name="http_response_modifier"
-        onFinish={onFinish}
-        onValuesChange={handleValuesChange}
-        layout="vertical"
-        initialValues={{
-          modifyRules: [
-            {
-              name: 'Example Rule',
-              match: {
-                method: 'GET',
-                status: 200,
-              },
-            },
-          ],
-        }}
-      >
-        <Form.List name="modifyRules">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, fieldKey, ...restField }) => (
-                <Card
-                  key={key}
-                  title={
-                    <Input
-                      placeholder="Rule Name"
-                      style={{ width: 'calc(100% - 60px)' }}
-                      defaultValue={form.getFieldValue(['modifyRules', name, 'name'])}
-                      onChange={(e) => {
-                        const newRules = form.getFieldValue('modifyRules');
-                        newRules[name].name = e.target.value;
-                        form.setFieldsValue({ modifyRules: newRules });
-                      }}
-                    />
-                  }
-                  extra={
-                    fields.length > 1 ? (
-                      <MinusCircleOutlined
-                        onClick={() => remove(name)}
-                        style={{ fontSize: '20px', color: 'red' }}
-                      />
-                    ) : null
-                  }
-                  style={{ marginBottom: 24 }}
-                >
-                  <Form.Item
-                    {...restField}
-                    name={[name, 'name']}
-                    fieldKey={[fieldKey, 'name']}
-                    rules={[{ required: true, message: 'Please enter a rule name' }]}
-                    noStyle // Hide the default Antd Form.Item label and wrapper
-                  >
-                    {/* Input is rendered in the Card title, so this Form.Item is mostly for data binding */}
-                    <Input type="hidden" />
-                  </Form.Item>
+            // 这里应该调用您的 API
+            // await saveModifyRules(payload);
 
-                  <h3>Match Conditions</h3>
-                  <Form.Item
-                    {...restField}
-                    name={[name, 'match', 'path']}
-                    fieldKey={[fieldKey, 'match', 'path']}
-                    label="Path"
-                    tooltip="Path to match, e.g., /api/data"
-                  >
-                    <Input placeholder="/hello" />
-                  </Form.Item>
+            notification.success({
+                message: '保存成功',
+                description: 'HTTP 响应修改规则已成功保存',
+                placement: 'topRight',
+            });
+        } catch (error) {
+            message.error('保存失败，请重试');
+            console.error('保存失败:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-                  <Form.Item
-                    {...restField}
-                    name={[name, 'match', 'method']}
-                    fieldKey={[fieldKey, 'match', 'method']}
-                    label="Method"
-                    tooltip="HTTP method to match"
-                  >
-                    <Select placeholder="Select a method" allowClear>
-                      <Option value="GET">GET</Option>
-                      <Option value="POST">POST</Option>
-                      <Option value="PUT">PUT</Option>
-                      <Option value="DELETE">DELETE</Option>
-                      <Option value="PATCH">PATCH</Option>
-                      <Option value="HEAD">HEAD</Option>
-                      <Option value="OPTIONS">OPTIONS</Option>
-                    </Select>
-                  </Form.Item>
-
-                  {renderKeyValueFields(
-                    [name, 'match', 'headers'],
-                    'Match Headers',
-                    'Headers that must be present in the request for the rule to apply (key-value pairs).'
-                  )}
-
-                  <Form.Item
-                    {...restField}
-                    name={[name, 'match', 'status']}
-                    fieldKey={[fieldKey, 'match', 'status']}
-                    label="Status Code"
-                    tooltip="HTTP status code to match, e.g., 200, 404"
-                  >
-                    <InputNumber min={100} max={599} placeholder="200" style={{ width: '100%' }} />
-                  </Form.Item>
-
-                  <h3>Actions</h3>
-                  {renderKeyValueFields(
-                    [name, 'actions', 'set_headers'],
-                    'Set Headers',
-                    'Headers to set/override in the response.'
-                  )}
-                  {renderKeyValueFields(
-                    [name, 'actions', 'add_headers'],
-                    'Add Headers',
-                    'Headers to add to the response if not already present.'
-                  )}
-                  <Form.List name={[name, 'actions', 'remove_headers']}>
-                    {(fields, { add, remove }) => (
-                      <>
-                        <Text strong>Remove Headers</Text>
-                        <Tooltip title="Headers to remove from the response (specify only the header key).">
-                          <QuestionCircleOutlined style={{ marginLeft: 8, cursor: 'pointer' }} />
-                        </Tooltip>
-                        {fields.map(({ key, name: subName, fieldKey, ...restField }) => (
-                          <Space key={key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                            <Form.Item
-                              {...restField}
-                              name={[subName]}
-                              fieldKey={[fieldKey]}
-                              rules={[{ required: true, message: 'Missing header key' }]}
-                            >
-                              <Input placeholder="Header Key to Remove" />
-                            </Form.Item>
-                            <MinusCircleOutlined onClick={() => remove(subName)} />
-                          </Space>
-                        ))}
-                        <Form.Item>
-                          <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                            Add Header to Remove
-                          </Button>
-                        </Form.Item>
-                      </>
-                    )}
-                  </Form.List>
-
-                  <Form.List name={[name, 'actions', 'body_replace']}>
-                    {(fields, { add, remove }) => (
-                      <>
-                        <Text strong>Body Replace Rules</Text>
-                        <Tooltip title="Define rules to search and replace text within the response body.">
-                          <QuestionCircleOutlined style={{ marginLeft: 8, cursor: 'pointer' }} />
-                        </Tooltip>
-                        {fields.map(({ key, name: subName, fieldKey, ...restField }) => (
-                          <Card
-                            key={key}
-                            size="small"
-                            title={`Replacement Rule ${subName + 1}`}
-                            extra={<MinusCircleOutlined onClick={() => remove(subName)} />}
-                            style={{ marginBottom: 16 }}
-                          >
-                            <Form.Item
-                              {...restField}
-                              name={[subName, 'search']}
-                              fieldKey={[fieldKey, 'search']}
-                              label="Search"
-                              rules={[{ required: true, message: 'Please enter search text' }]}
-                            >
-                              <Input placeholder="Text to search for" />
-                            </Form.Item>
-                            <Form.Item
-                              {...restField}
-                              name={[subName, 'replace']}
-                              fieldKey={[fieldKey, 'replace']}
-                              label="Replace"
-                              rules={[{ required: true, message: 'Please enter replacement text' }]}
-                            >
-                              <Input placeholder="Text to replace with" />
-                            </Form.Item>
-                            <Form.Item
-                              {...restField}
-                              name={[subName, 'is_regex']}
-                              fieldKey={[fieldKey, 'is_regex']}
-                              label="Is Regex?"
-                              valuePropName="checked"
-                              tooltip="Check if the search text should be treated as a regular expression."
-                            >
-                              <Switch />
-                            </Form.Item>
-                          </Card>
-                        ))}
-                        <Form.Item>
-                          <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                            Add Body Replace Rule
-                          </Button>
-                        </Form.Item>
-                      </>
-                    )}
-                  </Form.List>
-                </Card>
-              ))}
-              <Form.Item>
-                <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                  Add Response Modification Rule
-                </Button>
-              </Form.Item>
-            </>
-          )}
+    // 渲染键值对字段
+    const renderKeyValueFields = (fieldName: any[], label: string, tooltip: string) => (
+        <Form.List name={fieldName}>
+            {(fields, {add, remove}) => (
+                <>
+                    <Row align="middle" style={{marginBottom: 8}}>
+                        <Col>
+                            <Text strong>{label}</Text>
+                            <Tooltip title={tooltip}>
+                                <QuestionCircleOutlined style={{marginLeft: 8, cursor: 'pointer'}}/>
+                            </Tooltip>
+                        </Col>
+                    </Row>
+                    {fields.map(({key, name, ...restField}) => (
+                        <Row gutter={8} key={key} style={{marginBottom: 8}}>
+                            <Col flex="1">
+                                <Form.Item
+                                    {...restField}
+                                    name={[name, 'key']}
+                                    rules={[{required: true, message: '请输入键'}]}
+                                    style={{marginBottom: 0}}
+                                >
+                                    <Input placeholder="键"/>
+                                </Form.Item>
+                            </Col>
+                            <Col flex="1">
+                                <Form.Item
+                                    {...restField}
+                                    name={[name, 'value']}
+                                    rules={[{required: true, message: '请输入值'}]}
+                                    style={{marginBottom: 0}}
+                                >
+                                    <Input placeholder="值"/>
+                                </Form.Item>
+                            </Col>
+                            <Col>
+                                <MinusCircleOutlined
+                                    onClick={() => remove(name)}
+                                    style={{color: '#ff4d4f', fontSize: '16px'}}
+                                />
+                            </Col>
+                        </Row>
+                    ))}
+                    <Form.Item>
+                        <Button
+                            type="dashed"
+                            onClick={() => add()}
+                            block
+                            icon={<PlusOutlined/>}
+                            style={{marginTop: 8}}
+                        >
+                            添加{label.replace('Headers', '头部').replace('Set ', '设置').replace('Add ', '添加')}
+                        </Button>
+                    </Form.Item>
+                </>
+            )}
         </Form.List>
+    );
 
-        <Form.Item>
-          <Button type="primary" htmlType="submit">
-            Submit All Rules
-          </Button>
-        </Form.Item>
-      </Form>
-    </Card>
-  );
+    return (
+        <div style={{}}>
+            <Form.List name="modifyRules">
+                {(fields, {add, remove}) => (
+                    <>
+                        {fields.map(({key, name, ...restField}) => (
+                            <Card
+                                key={key}
+                                type="inner"
+                                title={
+                                    <Form.Item
+                                        {...restField}
+                                        name={[name, 'name']}
+                                        rules={[{required: true, message: '请输入规则名称'}]}
+                                        style={{marginBottom: 0}}
+                                    >
+                                        <Input placeholder="规则名称"/>
+                                    </Form.Item>
+                                }
+                                extra={
+                                    fields.length > 0 ? (
+                                        <MinusCircleOutlined
+                                            onClick={() => remove(name)}
+                                            style={{fontSize: '16px', color: '#ff4d4f',marginLeft: 8, cursor: 'pointer'}}
+                                        />
+                                    ) : null
+                                }
+                                style={{marginBottom: 24}}
+                            >
+                                <Row gutter={24}>
+                                    <Col span={12}>
+                                        <Card title="匹配条件" size="small" style={{marginBottom: 16}}>
+                                            <Form.Item
+                                                {...restField}
+                                                name={[name, 'match', 'path']}
+                                                label="请求路径"
+                                                tooltip="要匹配的请求路径，例如: /api/data"
+                                            >
+                                                <Input placeholder="/hello"/>
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                {...restField}
+                                                name={[name, 'match', 'method']}
+                                                label="请求方法"
+                                                tooltip="要匹配的 HTTP 方法"
+                                            >
+                                                <Select placeholder="选择请求方法" allowClear>
+                                                    <Option value="GET">GET</Option>
+                                                    <Option value="POST">POST</Option>
+                                                    <Option value="PUT">PUT</Option>
+                                                    <Option value="DELETE">DELETE</Option>
+                                                    <Option value="PATCH">PATCH</Option>
+                                                    <Option value="HEAD">HEAD</Option>
+                                                    <Option value="OPTIONS">OPTIONS</Option>
+                                                </Select>
+                                            </Form.Item>
+
+                                            <Form.Item
+                                                {...restField}
+                                                name={[name, 'match', 'status']}
+                                                label="响应状态码"
+                                                tooltip="要匹配的 HTTP 状态码，例如: 200, 404"
+                                            >
+                                                <InputNumber
+                                                    min={100}
+                                                    max={599}
+                                                    placeholder="200"
+                                                    style={{width: '100%'}}
+                                                />
+                                            </Form.Item>
+                                        </Card>
+                                    </Col>
+
+                                    <Col span={12}>
+                                        <Card title="修改动作" size="small">
+                                            <Divider orientation="left" style={{margin: '12px 0'}}>
+                                                <Text strong>头部操作</Text>
+                                            </Divider>
+
+                                            {renderKeyValueFields(
+                                                [name, 'actions', 'set_headers'],
+                                                'Set Headers',
+                                                '设置或覆盖响应头部'
+                                            )}
+
+                                            {renderKeyValueFields(
+                                                [name, 'actions', 'add_headers'],
+                                                'Add Headers',
+                                                '添加响应头部（如果不存在）'
+                                            )}
+
+                                            <Form.List name={[name, 'actions', 'remove_headers']}>
+                                                {(fields, {add, remove}) => (
+                                                    <>
+                                                        <Row align="middle" style={{marginBottom: 8}}>
+                                                            <Col>
+                                                                <Text strong>Remove Headers</Text>
+                                                                <Tooltip
+                                                                    title="要移除的响应头部（只需要指定头部名称）">
+                                                                    <QuestionCircleOutlined style={{
+                                                                        marginLeft: 8,
+                                                                        cursor: 'pointer'
+                                                                    }}/>
+                                                                </Tooltip>
+                                                            </Col>
+                                                        </Row>
+                                                        {fields.map(({key, name: subName, ...restField}) => (
+                                                            <Row gutter={8} key={key} style={{marginBottom: 8}}>
+                                                                <Col flex="1">
+                                                                    <Form.Item
+                                                                        {...restField}
+                                                                        name={[subName]}
+                                                                        rules={[{
+                                                                            required: true,
+                                                                            message: '请输入头部名称'
+                                                                        }]}
+                                                                        style={{marginBottom: 0}}
+                                                                    >
+                                                                        <Input placeholder="要移除的头部名称"/>
+                                                                    </Form.Item>
+                                                                </Col>
+                                                                <Col>
+                                                                    <MinusCircleOutlined
+                                                                        onClick={() => remove(subName)}
+                                                                        style={{
+                                                                            color: '#ff4d4f',
+                                                                            fontSize: '16px'
+                                                                        }}
+                                                                    />
+                                                                </Col>
+                                                            </Row>
+                                                        ))}
+                                                        <Form.Item>
+                                                            <Button
+                                                                type="dashed"
+                                                                onClick={() => add()}
+                                                                block
+                                                                icon={<PlusOutlined/>}
+                                                                style={{marginTop: 8}}
+                                                            >
+                                                                添加要移除的头部
+                                                            </Button>
+                                                        </Form.Item>
+                                                    </>
+                                                )}
+                                            </Form.List>
+
+                                            <Divider orientation="left" style={{margin: '12px 0'}}>
+                                                <Text strong>响应体替换</Text>
+                                            </Divider>
+
+                                            <Form.List name={[name, 'actions', 'body_replace']}>
+                                                {(fields, {add, remove}) => (
+                                                    <>
+                                                        {fields.map(({key, name: subName, ...restField}) => (
+                                                            <Card
+                                                                key={key}
+                                                                size="small"
+                                                                title={`替换规则 ${subName + 1}`}
+                                                                extra={
+                                                                    <MinusCircleOutlined
+                                                                        onClick={() => remove(subName)}
+                                                                        style={{color: '#ff4d4f'}}
+                                                                    />
+                                                                }
+                                                                style={{marginBottom: 12}}
+                                                            >
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[subName, 'search']}
+                                                                    label="搜索文本"
+                                                                    rules={[{
+                                                                        required: true,
+                                                                        message: '请输入搜索文本'
+                                                                    }]}
+                                                                >
+                                                                    <Input placeholder="要搜索的文本"/>
+                                                                </Form.Item>
+
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[subName, 'is_regex']}
+                                                                    label="使用正则表达式"
+                                                                    valuePropName="checked"
+                                                                    tooltip="是否将搜索文本视为正则表达式"
+                                                                >
+                                                                    <Switch/>
+                                                                </Form.Item>
+
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[subName, 'replace']}
+                                                                    label="替换文本"
+                                                                    rules={[{
+                                                                        required: true,
+                                                                        message: '请输入替换文本'
+                                                                    }]}
+                                                                >
+                                                                    <Input placeholder="替换为此文本"/>
+                                                                </Form.Item>
+                                                            </Card>
+                                                        ))}
+                                                        <Form.Item>
+                                                            <Button
+                                                                type="dashed"
+                                                                onClick={() => add()}
+                                                                block
+                                                                icon={<PlusOutlined/>}
+                                                            >
+                                                                添加替换规则
+                                                            </Button>
+                                                        </Form.Item>
+                                                    </>
+                                                )}
+                                            </Form.List>
+                                        </Card>
+                                    </Col>
+                                </Row>
+                            </Card>
+                        ))}
+                        <Form.Item>
+                            <Button
+                                type="dashed"
+                                onClick={() => add()}
+                                block
+                                icon={<PlusOutlined/>}
+                                size="large"
+                            >
+                                添加修改规则
+                            </Button>
+                        </Form.Item>
+                    </>
+                )}
+            </Form.List>
+        </div>
+    );
 };
 
 export default WebsiteModifyResponseView;

@@ -58,6 +58,10 @@ class ScheduledTaskApi extends Api<ScheduledTask> {
         return await requests.get(`/${this.group}/${jobId}/logs/paging?${paramsStr}`);
     }
 
+    clearLog = async (jobId: string) => {
+        await requests.delete(`/${this.group}/${jobId}/logs`);
+    }
+
     getNextTenRuns = async (spec: string) => {
         return await requests.post(`/${this.group}/next-ten-runs`, {
             'spec': spec

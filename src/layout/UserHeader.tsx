@@ -7,12 +7,11 @@ import accountApi from "@/src/api/account-api";
 import {isMobileByMediaQuery, openOrSwitchToPage} from "@/src/utils/utils";
 import {ChevronDownIcon, LanguagesIcon, LaptopIcon} from "lucide-react";
 import {useTranslation} from "react-i18next";
-import {useLang} from "@/src/hook/use-lang";
+import i18n from "i18next";
 
 const UserHeader = () => {
 
     let {t} = useTranslation();
-    let [lang, setLang] = useLang();
 
     let location = useLocation();
     let navigate = useNavigate();
@@ -97,7 +96,6 @@ const UserHeader = () => {
                 </div>
 
 
-
                 {!isMobileByMediaQuery() &&
                     <div className={'flex items-center gap-1'}>
                         <Select
@@ -113,12 +111,12 @@ const UserHeader = () => {
                                 {value: 'zh-TW', label: '繁体中文'},
                                 {value: 'ja-JP', label: '日本語'},
                             ]}
-                            value={lang}
+                            value={i18n.language}
                             onChange={(value) => {
-                                setLang(value);
+                                i18n.changeLanguage(value);
                             }}
                         />
-                        
+
                         <div className={'cursor-pointer'}
                              onClick={() => {
                                  const url = `/access`;

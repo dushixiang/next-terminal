@@ -31,7 +31,7 @@ import eventEmitter from "@/src/api/core/event-emitter";
 import {debounce} from "@/src/utils/debounce";
 import SimpleBar from "simplebar-react";
 import {DarkTheme, DefaultTheme, useNTTheme} from "@/src/hook/use-theme";
-import {translateI18nToAntdLocale, useLang} from "@/src/hook/use-lang";
+import {translateI18nToAntdLocale} from "@/src/helper/lang";
 import {LanguagesIcon, LaptopIcon, LogOutIcon, UserIcon} from "lucide-react";
 import {openOrSwitchToPage} from "@/src/utils/utils";
 import licenseApi from "@/src/api/license-api";
@@ -39,6 +39,7 @@ import {useLicense} from "@/src/hook/use-license";
 import Marquee from 'react-fast-marquee';
 import dayjs from "dayjs";
 import {baseUrl} from "@/src/api/core/requests";
+import i18n from "i18next";
 
 const breadcrumbNameMap = new Map<string, string>;
 
@@ -48,7 +49,6 @@ const ManagerLayout = () => {
     const [breakItems, setBreakItems] = useState<any[]>([]);
 
     let [ntTheme, setNTTheme] = useNTTheme();
-    let [lang, setLang] = useLang();
     let [licence, setLicense] = useLicense();
 
     let location = useLocation();
@@ -326,7 +326,7 @@ const ManagerLayout = () => {
                         }
                     }
                 }}
-                locale={translateI18nToAntdLocale(lang)}
+                locale={translateI18nToAntdLocale(i18n.language)}
             >
                 <AntdApp>
                     {renderBanner()}
@@ -427,9 +427,9 @@ const ManagerLayout = () => {
                                             {value: 'zh-TW', label: '繁体中文'},
                                             {value: 'ja-JP', label: '日本語'},
                                         ]}
-                                        value={lang}
+                                        value={i18n.language}
                                         onChange={(value) => {
-                                            setLang(value);
+                                            i18n.changeLanguage(value);
                                         }}
                                     />
 

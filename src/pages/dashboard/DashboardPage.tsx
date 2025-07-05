@@ -16,7 +16,6 @@ import {
 import {Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis} from "recharts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import dayjs from "dayjs";
-import {translateI18nToESLocale, useLang} from "@/src/hook/use-lang";
 
 const chartConfig2 = {
     rdp: {
@@ -44,7 +43,6 @@ const chartConfig2 = {
 const DashboardPage = () => {
 
     let {t} = useTranslation();
-    let [lang] = useLang();
 
     let [pieData, setPidData] = useState([]);
 
@@ -210,10 +208,7 @@ const DashboardPage = () => {
                             minTickGap={32}
                             tickFormatter={(value) => {
                                 const date = new Date(value)
-                                return date.toLocaleDateString(translateI18nToESLocale(lang), {
-                                    month: "short",
-                                    day: "numeric",
-                                })
+                                return date.toLocaleDateString()
                             }}
                         />
                         <ChartTooltip
@@ -221,10 +216,7 @@ const DashboardPage = () => {
                             content={
                                 <ChartTooltipContent
                                     labelFormatter={(value) => {
-                                        return new Date(value).toLocaleDateString(translateI18nToESLocale(lang), {
-                                            month: "short",
-                                            day: "numeric",
-                                        })
+                                        return new Date(value).toLocaleDateString()
                                     }}
                                     indicator="dot"
                                 />

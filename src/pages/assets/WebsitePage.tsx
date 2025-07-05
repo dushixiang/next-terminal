@@ -2,14 +2,13 @@ import React, {useRef, useState} from 'react';
 import {App, Button, Popconfirm, Tag} from "antd";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {useMutation} from "@tanstack/react-query";
 import websiteApi, {Website} from "@/src/api/website-api";
-import WebsiteModal from "@/src/pages/assets/WebsiteModal";
 import NButton from "@/src/components/NButton";
 import NLink from "@/src/components/NLink";
 import clsx from "clsx";
 import {getImgColor} from "@/src/helper/asset-helper";
 import {useNavigate} from "react-router-dom";
+import WebsiteDrawer from "@/src/pages/assets/WebsiteDrawer";
 
 const api = websiteApi;
 
@@ -20,33 +19,7 @@ const WebsitePage = () => {
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
 
-    const {message} = App.useApp();
     let navigate = useNavigate();
-
-    const postOrUpdate = async (values: any) => {
-        if (values['id']) {
-            await api.updateById(values['id'], values);
-        } else {
-            await api.create(values);
-        }
-    }
-
-    let mutation = useMutation({
-        mutationFn: postOrUpdate,
-        onSuccess: () => {
-            actionRef.current?.reload();
-            setOpen(false);
-            setSelectedRowKey(undefined);
-            showSuccess();
-        }
-    });
-
-    function showSuccess() {
-        message.open({
-            type: 'success',
-            content: t('general.success'),
-        });
-    }
 
     const columns: ProColumns<Website>[] = [
         {
@@ -197,15 +170,18 @@ const WebsitePage = () => {
             ]}
         />
 
-        <WebsiteModal
+        <WebsiteDrawer
             id={selectedRowKey}
             open={open}
-            confirmLoading={mutation.isPending}
-            handleCancel={() => {
+            onClose={() => {
                 setOpen(false);
                 setSelectedRowKey(undefined);
             }}
-            handleOk={mutation.mutate}
+            onSuccess={() => {
+                // 刷新列表等操作
+                actionRef.current?.reload();
+            }}
+
         />
     </div>);
 };

@@ -15,10 +15,11 @@ import {clsx} from "clsx";
 interface Props {
     assetId: string;
     securityToken?: string;
+    tabId: string;
     onClose?: () => void;
 }
 
-const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Props) => {
+const AccessTerminalBulkItem = React.memo(({assetId, securityToken, tabId, onClose}: Props) => {
 
     const terminalRef = React.useRef<HTMLDivElement>(null);
     const terminal = useRef<Terminal>();
@@ -53,12 +54,18 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, onClose}: Pr
     }, 500)
 
     useEffect(() => {
-        const a = (message: string) => {
-            websocket?.send(new Message(MessageTypeData, message + '\n').toString());
+        // 2. 根据 tabId 构建唯一的事件名
+        const eventName = `WS:MESSAGE:${tabId}`;
+
+        const handleMessage = (message: string) => {
+            // 检查 websocket 是否存在且已连接
+            if (websocket?.readyState === WebSocket.OPEN) {
+                websocket?.send(new Message(MessageTypeData, message + '\n').toString());
+            }
         }
-        eventEmitter.on("WS:MESSAGE", a);
+        eventEmitter.on(eventName, handleMessage);
         return () => {
-            eventEmitter.off("WS:MESSAGE", a);
+            eventEmitter.off(eventName, handleMessage);
         }
     }, [websocket]);
 

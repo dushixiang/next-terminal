@@ -11,9 +11,11 @@ export interface AgentGateway {
     createdAt: number;
     updatedAt: number;
     stat?: Stat;
+    version: string;
 }
 
 interface Stat {
+    ping: number;
     cpu: CPU;
     memory: Memory;
     disk: Disk;
@@ -55,6 +57,9 @@ interface Network {
     rx_sec: number;
     tx_sec: number;
     history: any[];
+
+    external_ip: string;
+    internal_ips: string[];
 }
 
 interface DiskIO {

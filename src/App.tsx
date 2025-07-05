@@ -9,6 +9,7 @@ import eventEmitter from "@/src/api/core/event-emitter";
 import {baseUrl} from "@/src/api/core/requests";
 import {useTranslation} from "react-i18next";
 import {message} from "antd";
+
 import TerminalPage from "@/src/pages/access/TerminalPage";
 import GuacamolePage from "@/src/pages/access/GuacamolePage";
 

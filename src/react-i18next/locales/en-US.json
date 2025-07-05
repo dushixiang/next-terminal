@@ -776,7 +776,12 @@
     "modify_response": "Modify Response",
     "add_rule": "Add Rule",
     "public_tip": "The restriction only applies to anonymous users.",
-    "group_tip": "Right-click to edit/delete (except for the Default group)"
+    "group_tip": "Right-click to edit/delete (except for the Default group)",
+    "terminal_settings": "Terminal Settings",
+    "disable_alive_check": "Disable keepalive checks when connecting",
+    "disable_alive_check_extra": "The front-end will periodically send heartbeat packets to maintain an active connection, while the back-end will send requests to the target server and request a response.",
+    "env": "environment variable",
+    "env_placeholder": "Format: name=value, one per line."
   },
   "gateways": {
     "name": "Name",

@@ -788,7 +788,12 @@
     "modify_response_tip": "可配置多個修改規則，按順序依次生效。",
     "modify_response_compression_support": "自動支援 gzip、deflate、br 等壓縮格式的解壓與重新壓縮。",
     "public_tip": "限制只針對匿名用戶生效。",
-    "group_tip": "右鍵可編輯/刪除（Default 分組除外）"
+    "group_tip": "右鍵可編輯/刪除（Default 分組除外）",
+    "terminal_settings": "終端設定",
+    "disable_alive_check": "連接時禁用存活性檢查",
+    "disable_alive_check_extra": "前段會定時發送心跳包，以保持連接的活躍狀態，同時後端會向目標伺服器發送請求並要求回覆。",
+    "env": "環境變數",
+    "env_placeholder": "格式：name=value 每行一個。"
   },
   "gateways": {
     "name": "名稱",

@@ -788,7 +788,12 @@
     "modify_response_tip": "複数の変更ルールを設定でき、順番に適用されます。",
     "modify_response_compression_support": "gzip、deflate、brなどの圧縮形式の展開と再圧縮を自動でサポートします。",
     "public_tip": "制限は匿名ユーザーのみに適用されます。",
-    "group_tip": "右クリックで編集/削除（Default グループを除く）"
+    "group_tip": "右クリックで編集/削除（Default グループを除く）",
+    "terminal_settings": "端末設定",
+    "disable_alive_check": "接続時に生存確認を無効にする",
+    "disable_alive_check_extra": "フロントエンドは定期的にハートビートパケットを送信し、接続のアクティブ状態を維持します。同時に、バックエンドはターゲットサーバーにリクエストを送信し、応答を要求します。",
+    "env": "環境変数",
+    "env_placeholder": "フォーマット：name=value 一行ずつ。"
   },
   "gateways": {
     "name": "名前",

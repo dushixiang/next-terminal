@@ -9,7 +9,9 @@ import {
     ArrowUpIcon,
     CpuIcon,
     EthernetPortIcon,
+    HardDriveDownloadIcon,
     HardDriveIcon,
+    HardDriveUploadIcon,
     MemoryStickIcon,
     ServerIcon
 } from 'lucide-react';
@@ -99,12 +101,30 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                             <div>{t('gateways.stat.total')}: {renderSize(query.data?.disk.total)}</div>
                             <div>{t('gateways.stat.used')}: {renderSize(query.data?.disk.used)}</div>
                             <div>{t('gateways.stat.percent')}: {query.data?.disk.percent.toFixed(2)}%</div>
+
+                            <div className={'flex items-center gap-1'}>
+                                <div>I/O</div>
+                                <div className="flex items-center gap-1 text-sm">
+                                    <div className={'flex items-center gap-1 text-green-500'}>
+                                        <HardDriveUploadIcon className={'h-4 w-4 '}/>
+                                        <div>{renderSize(query.data?.disk_io.read_bytes)}/s</div>
+                                    </div>
+                                    <div className={'flex items-center gap-1 text-red-500'}>
+                                        <HardDriveDownloadIcon className={'h-4 w-4 '}/>
+                                        <div>{renderSize(query.data?.disk_io.write_bytes)}/s</div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div className={'flex items-center gap-2 text-sm'}>
                             <EthernetPortIcon className={'h-4 w-4'}/>
                             <div className={'font-medium'}>
                                 {t('gateways.stat.network')}
                             </div>
+                            <div>{t('gateways.stat.external_ip')}: {query.data?.network.external_ip}</div>
+                            <div>{t('gateways.stat.internal_ips')}: {query.data?.network.internal_ips?.join(',')}</div>
+
+                            <div>I/O</div>
                             <div className="flex items-center gap-1 text-sm">
                                 <div className={'flex items-center gap-1 text-green-500'}>
                                     <ArrowUpIcon className={'h-4 w-4 '}/>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useId, useState} from 'react';
 import AccessTerminalBulkItem from "@/src/pages/access/AccessTerminalBulkItem";
 import {FolderCodeIcon, TerminalIcon} from "lucide-react";
 import eventEmitter from "@/src/api/core/event-emitter";
@@ -13,6 +13,7 @@ interface Props {
 
 const AccessTerminalBulk = ({assetIds, securityToken}: Props) => {
 
+    const tabId = useId();
     let [inputValue, setInputValue] = useState('');
 
     let {height} = useWindowSize();
@@ -23,11 +24,11 @@ const AccessTerminalBulk = ({assetIds, securityToken}: Props) => {
     const handleCommand = () => {
         // alert(`qqq-[${inputValue}]`)
         if (inputValue === '') {
-            eventEmitter.emit("WS:MESSAGE", '\n');
+            eventEmitter.emit(`WS:MESSAGE:${tabId}`, '\n');
             return
         }
         setInputValue('');
-        eventEmitter.emit("WS:MESSAGE", inputValue)
+        eventEmitter.emit(`WS:MESSAGE:${tabId}`, inputValue)
     }
 
     const handleClose = React.useCallback((assetId: string) => {
@@ -70,6 +71,7 @@ const AccessTerminalBulk = ({assetIds, securityToken}: Props) => {
                         return <div>
                             <AccessTerminalBulkItem assetId={assetId}
                                                     securityToken={securityToken}
+                                                    tabId={tabId}
                                                     onClose={() => {
                                                         // console.log(`close`, assetId)
                                                         // handleClose(assetId)

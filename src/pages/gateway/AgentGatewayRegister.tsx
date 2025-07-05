@@ -85,7 +85,7 @@ const AgentGatewayRegister = ({
                     <div>
                         <a href={`${baseUrl()}/agent-gateway/binary?os=windows&arch=amd64`}>amd64</a>
                     </div>
-                    <div>2. 启动服务 （使用管理员权限打开 CMD）</div>
+                    <div>2. 安装服务 （使用管理员权限打开 CMD）</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
                             {`nt-tunnel.exe install --endpoint ${param.endpoint} --token ${param.token} `}
@@ -105,7 +105,7 @@ const AgentGatewayRegister = ({
                         <a href={`${baseUrl()}/agent-gateway/binary?os=darwin&arch=arm64`}>arm64</a>
                         <a href={`${baseUrl()}/agent-gateway/binary?os=darwin&arch=amd64`}>amd64</a>
                     </div>
-                    <div>2. 安装为系统服务</div>
+                    <div>2. 安装服务</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
                             {`sudo nt-tunnel install --endpoint ${param.endpoint} --token ${param.token} `}

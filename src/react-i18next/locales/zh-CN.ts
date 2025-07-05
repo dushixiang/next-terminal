@@ -40,6 +40,8 @@ let o = {
         "view_private_key": "查看私钥",
         "import": "导入",
         "download_import_sample": "下载导入示例",
+        "cancel": "取消",
+        "save": "保存",
     },
     "dashboard": {
         "name": "数据概览",
@@ -661,6 +663,8 @@ let o = {
         "is_default": "默认",
         "limit_size": "大小限制",
         "used_size": "已使用大小",
+        "basic_settings": "基础设置",
+        "target_server": "目标服务器",
         "domain": "域名",
         "domain_tip": "您用于访问受保护资产的域名（例如：www.example.com）需解析至本系统IP地址。",
         "scheme": "资产协议",
@@ -672,7 +676,9 @@ let o = {
         "general": "常规",
         "header": "请求头",
         "preserve_host": "保留主机名",
+        "preserve_host_tip": "会将请求头中的主机名保留为原始请求的主机名，而不是代理服务器的主机名。",
         "custom_header": "自定义请求头",
+        "custom_header_tip": "可以添加多个自定义请求头，格式为：键: 值。",
         "custom_certificate": "自定义证书",
         "header_key": "键",
         "header_value": "值",
@@ -760,6 +766,11 @@ let o = {
         },
         "dns_provider_config": "DNS 供应商配置",
         "dns_provider_config_tip": "请根据供应商的要求填写配置信息。",
+        "terminal_settings": "终端设置",
+        "disable_alive_check": "连接时禁用存活检查",
+        "disable_alive_check_extra": "前端会定时发送心跳包，以保持连接的活跃状态，同时后端会向目标服务器发送请求并要求回复。",
+        "env": "环境变量",
+        "env_placeholder": "格式：name=value 每行一个。",
     },
     "gateways": {
         "name": "名称",
@@ -804,7 +815,15 @@ let o = {
             "used": "已使用",
             "connections": "网络连接",
             "tcp_states": "TCP 连接状态",
+            "ping": "网络延迟",
+            "external_ip": "外网IP",
+            "internal_ips": "内网IP",
         },
+        "load": {
+            "normal": "系统空闲",
+            "moderate": "轻度繁忙",
+            "busy": "资源紧张",
+        }
     },
     "settings": {
         "system": {

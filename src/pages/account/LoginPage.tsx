@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Divider, Form, Input, message, Select, Spin, Typography} from "antd";
+import {Button, Divider, Form, Input, Select, Spin, Typography} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
@@ -12,7 +12,7 @@ import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {startAuthentication} from "@simplewebauthn/browser";
 import {LanguagesIcon} from "lucide-react";
-import {useLang} from "@/src/hook/use-lang";
+import i18n from "i18next";
 
 const {Title} = Typography;
 
@@ -25,7 +25,6 @@ export enum LoginStep {
 const LoginPage = () => {
     const [optForm] = Form.useForm();
     let {t} = useTranslation();
-    let [lang, setLang] = useLang();
 
     const [step, setStep] = useState<LoginStep>(LoginStep.Default);
     let [loading, setLoading] = useState<boolean>(false);
@@ -268,9 +267,9 @@ const LoginPage = () => {
                             {value: 'zh-TW', label: '繁体中文'},
                             {value: 'ja-JP', label: '日本語'},
                         ]}
-                        value={lang}
+                        value={i18n.language}
                         onChange={(value) => {
-                            setLang(value);
+                            i18n.changeLanguage(value);
                         }}
                     />
                 </div>

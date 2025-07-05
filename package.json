@@ -1,5 +1,5 @@
 {
-  "name": "next-terminal-web",
+  "name": "next-terminal",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -26,6 +26,7 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.12.1",
     "i18next": "^23.6.0",
+    "i18next-browser-languagedetector": "^8.2.0",
     "input-otp": "^1.4.1",
     "jotai": "^2.9.0",
     "js-base64": "^3.7.7",
@@ -54,6 +55,7 @@
     "@vitejs/plugin-react": "^4.2.1",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
+    "rollup-plugin-visualizer": "^6.0.3",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.3.3",
     "vite": "6.3.4"

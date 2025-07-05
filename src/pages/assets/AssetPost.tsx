@@ -15,6 +15,7 @@ import {
 } from "antd";
 import {
     ProForm,
+    ProFormCheckbox,
     ProFormDependency,
     ProFormDigit,
     ProFormInstance,
@@ -156,7 +157,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                                               },
                                               onChange: (e) => {
                                                   let val = e.target.value;
-                                                  if(val.startsWith("******")){
+                                                  if (val.startsWith("******")) {
                                                       val = val.substring(6);
                                                       formRef.current?.setFieldValue('password', val);
                                                       setDecrypted(true);
@@ -368,47 +369,67 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
         return <>
             <Tabs
                 items={[
+                    // {
+                    //     label: t('assets.socks5-proxy'),
+                    //     key: 'socks5-proxy',
+                    //     forceRender: true,
+                    //     children: <>
+                    //         <ProFormSwitch
+                    //             name={["attrs", "socks5-proxy-enabled"]}
+                    //             label={t('assets.socks5-proxy-enabled')}
+                    //             checkedChildren={t('general.enabled')}
+                    //             unCheckedChildren={t('general.disabled')}
+                    //         />
+                    //
+                    //         <ProFormDependency name={['attrs', 'socks5-proxy-enabled']}>
+                    //             {({attrs}) => {
+                    //                 if (!attrs) {
+                    //                     attrs = {};
+                    //                 }
+                    //                 return <>
+                    //                     <ProFormText name={['attrs', 'socks5-proxy-host']}
+                    //                                  label={t('assets.socks5-proxy-host')}
+                    //                                  rules={[{required: attrs['socks5-proxy-enabled']}]}
+                    //                     />
+                    //                     <ProFormDigit name={['attrs', 'socks5-proxy-port']}
+                    //                                   label={t('assets.socks5-proxy-port')}
+                    //                                   rules={[{required: attrs['socks5-proxy-enabled']}]}
+                    //                                   fieldProps={{
+                    //                                       min: 1,
+                    //                                       max: 65535,
+                    //                                       precision: 0 // 只允许整数
+                    //                                   }}
+                    //                     />
+                    //                     <ProFormText name={['attrs', 'socks5-proxy-username']}
+                    //                                  label={t('assets.socks5-proxy-username')}
+                    //                     />
+                    //                     <ProFormText name={['attrs', 'socks5-proxy-password']}
+                    //                                  label={t('assets.socks5-proxy-password')}
+                    //                     />
+                    //                 </>
+                    //             }}
+                    //         </ProFormDependency>
+                    //     </>
+                    // }
                     {
-                        label: t('assets.socks5-proxy'),
-                        key: 'socks5-proxy',
+                        label: t('assets.terminal_settings'),
+                        key: 'terminal_settings',
                         forceRender: true,
-                        children: <>
-                            <ProFormSwitch
-                                name={["attrs", "socks5-proxy-enabled"]}
-                                label={t('assets.socks5-proxy-enabled')}
-                                checkedChildren={t('general.enabled')}
-                                unCheckedChildren={t('general.disabled')}
+                        children: <div>
+                            <ProFormCheckbox
+                                name={['attrs', 'disableAliveCheck']}
+                                label={t('assets.disable_alive_check')}
+                                extra={t('assets.disable_alive_check_extra')}
                             />
-
-                            <ProFormDependency name={['attrs', 'socks5-proxy-enabled']}>
-                                {({attrs}) => {
-                                    if (!attrs) {
-                                        attrs = {};
-                                    }
-                                    return <>
-                                        <ProFormText name={['attrs', 'socks5-proxy-host']}
-                                                     label={t('assets.socks5-proxy-host')}
-                                                     rules={[{required: attrs['socks5-proxy-enabled']}]}
-                                        />
-                                        <ProFormDigit name={['attrs', 'socks5-proxy-port']}
-                                                      label={t('assets.socks5-proxy-port')}
-                                                      rules={[{required: attrs['socks5-proxy-enabled']}]}
-                                                      fieldProps={{
-                                                          min: 1,
-                                                          max: 65535,
-                                                          precision: 0 // 只允许整数
-                                                      }}
-                                        />
-                                        <ProFormText name={['attrs', 'socks5-proxy-username']}
-                                                     label={t('assets.socks5-proxy-username')}
-                                        />
-                                        <ProFormText name={['attrs', 'socks5-proxy-password']}
-                                                     label={t('assets.socks5-proxy-password')}
-                                        />
-                                    </>
-                                }}
-                            </ProFormDependency>
-                        </>
+                            <ProFormTextArea label={t('assets.env')}
+                                             name={['attrs', 'env']}
+                                             placeholder={t('assets.env_placeholder')}
+                                             fieldProps={{
+                                                 rows: 4,
+                                                 allowClear: true,
+                                             }}
+                            />
+                        </div>
                     }
                 ]}
             >
@@ -420,8 +441,8 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
         switch (protocol) {
             case 'rdp':
                 return renderRDPAdvanceView();
-            // case 'ssh':
-            //     return renderSSHAdvanceView();
+            case 'ssh':
+                return renderSSHAdvanceView();
             case 'vnc':
                 return renderVNCAdvanceView();
         }

@@ -1,23 +1,22 @@
 import i18n from 'i18next';
+import LanguageDetector from 'i18next-browser-languagedetector';
 import {initReactI18next} from 'react-i18next';
 import {resources} from "./locales/resources";
 
-let savedLang = localStorage.getItem('nt-language');
-if (savedLang) {
-    savedLang = savedLang.replaceAll(`"`, "");
-}
-console.log(`get lang: ${savedLang}`);
-
 i18n
-    // 将 i18n 实例传递给 react-i18next
-    .use(initReactI18next)
-    // 初始化 i18next
-    // 所有配置选项: https://www.i18next.com/overview/configuration-options
+    .use(LanguageDetector) // 使用语言检测插件
+    .use(initReactI18next) // 绑定 react-i18next 实例到 react
     .init({
         resources,
         fallbackLng: "en-US",
-        lng: savedLang,
         debug: true,
+        detection: {
+            // 可配置的语言检测顺序和缓存方式
+            order: ['localStorage', 'cookie', 'navigator', 'htmlTag'],
+            caches: ['localStorage', 'cookie'],
+            lookupLocalStorage: 'nt-language',
+            lookupCookie: 'nt-language',
+        },
         interpolation: {
             escapeValue: false // react already safes from xss => https://www.i18next.com/translation-function/interpolation#unescape
         }

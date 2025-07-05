@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Badge, Button, Popconfirm, Progress} from "antd";
+import {App, Button, Popconfirm, Progress} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
 import agentGatewayApi, {AgentGateway} from "@/src/api/agent-gateway-api";
@@ -10,11 +10,15 @@ import NButton from "@/src/components/NButton";
 import {useLicense} from "@/src/hook/use-license";
 import Disabled from "@/src/components/Disabled";
 import AgentGatewayTokenDrawer from "@/src/pages/gateway/AgentGatewayTokenDrawer";
-import {ArrowDownIcon, ArrowUpIcon} from "lucide-react";
-import {formatUptime, getColor, renderSize} from "@/src/utils/utils";
+import {ArrowDownIcon, ArrowUpIcon, HardDriveDownloadIcon, HardDriveUploadIcon} from "lucide-react";
+import {formatUptimeEn, getColor, renderSize} from "@/src/utils/utils";
 import AgentGatewayStat from "@/src/pages/gateway/AgentGatewayStat";
 
 const api = agentGatewayApi;
+
+const linuxImg = new URL('@/src/assets/images/linux.png', import.meta.url).href;
+const windowsImg = new URL('@/src/assets/images/windows.png', import.meta.url).href;
+const macosImg = new URL('@/src/assets/images/macos.png', import.meta.url).href;
 
 const AgentGatewayPage = () => {
 
@@ -59,9 +63,9 @@ const AgentGatewayPage = () => {
     const JudgeLoadBusy = (load: number, cores: number) => {
         const ratio = load / cores;
 
-        if (ratio < 0.7) return <div className={'text-green-400'}>负载正常</div>;      // 负载正常
-        if (ratio < 1.0) return <div className={'text-orange-400'}>轻度繁忙</div>;     // 轻度繁忙
-        return <div className={'text-red-400'}>系统繁忙</div>;                         // 系统繁忙
+        if (ratio < 0.7) return <div className={'text-green-400'}>{t('gateways.load.normal')}</div>;      // 系统空闲
+        if (ratio < 1.0) return <div className={'text-orange-400'}>{t('gateways.load.moderate')}</div>;     // 轻度繁忙
+        return <div className={'text-red-400'}>{t('gateways.load.busy')}</div>;                         // 资源紧张
     }
 
     let columns: ProColumns<AgentGateway>[] = [
@@ -69,21 +73,27 @@ const AgentGatewayPage = () => {
             title: t('gateways.name'),
             dataIndex: 'name',
             render: (text, record) => {
-                if (record.online) {
-                    return <Badge status="success" text={record.name}/>
+                let osImg = '';
+                switch (record.os) {
+                    case 'linux':
+                        osImg = linuxImg;
+                        break;
+                    case 'windows':
+                        osImg = windowsImg;
+                        break;
+                    case 'darwin':
+                        osImg = macosImg;
+                        break;
                 }
-                return <Badge status="error" text={record.name}/>
-            }
-        },
-        {
-            title: t('gateways.os'),
-            dataIndex: 'os',
-            key: 'os',
-            hideInSearch: true,
-            // width: 120,
-            render: (text, record) => {
-                return <div className={''}>
-                    {record.os}
+                if (record.online) {
+                    return <div className={'flex items-center gap-1'}>
+                        <img src={osImg} className={'w-4 h-4 mr-1'} alt={'os'}/>
+                        <span>{record.name}</span>
+                    </div>
+                }
+                return <div className={'flex items-center gap-1'}>
+                    <img src={osImg} className={'w-4 h-4 mr-1'} alt={'os'}/>
+                    <span>{record.name}</span>
                 </div>
             }
         },
@@ -94,7 +104,7 @@ const AgentGatewayPage = () => {
             hideInSearch: true,
             render: (text, record) => {
                 return <div>
-                    {formatUptime(record.stat?.host.uptime)}
+                    {formatUptimeEn(record.stat?.host.uptime)}
                 </div>
             }
         },
@@ -196,12 +206,12 @@ const AgentGatewayPage = () => {
             width: 120,
             render: (text, record) => {
                 return <div className="flex flex-col gap-1 text-xs">
-                    <div className={'flex items-center gap-1 '}>
-                        读
+                    <div className={'flex items-center gap-1 text-green-500'}>
+                        <HardDriveUploadIcon className={'h-4 w-4 '}/>
                         <div>{renderSize(record.stat?.disk_io.read_bytes)}/s</div>
                     </div>
-                    <div className={'flex items-center gap-1 '}>
-                        写
+                    <div className={'flex items-center gap-1 text-red-500'}>
+                        <HardDriveDownloadIcon className={'h-4 w-4 '}/>
                         <div>{renderSize(record.stat?.disk_io.write_bytes)}/s</div>
                     </div>
                 </div>
@@ -212,6 +222,17 @@ const AgentGatewayPage = () => {
             key: 'version',
             dataIndex: 'version',
             hideInSearch: true,
+        },
+        {
+            title: t('gateways.stat.ping'),
+            key: 'ping',
+            dataIndex: 'ping',
+            hideInSearch: true,
+            render: (text, record) => {
+                return <div>
+                    {record.stat?.ping} ms
+                </div>
+            }
         },
         {
             title: t('general.updated_at'),
