@@ -7,6 +7,7 @@ export type Setting = {
     fontFamily: string;
     selectionCopy: boolean;
     rightClickPaste: boolean;
+    treeExpandedKeys: string[];
 }
 
 class AccessSettingApi {
@@ -18,6 +19,7 @@ class AccessSettingApi {
             fontFamily: record['fontFamily'],
             selectionCopy: strings.isTrue(record['selectionCopy']),
             rightClickPaste: strings.isTrue(record['rightClickPaste']),
+            treeExpandedKeys: record['treeExpandedKeys']?.split(','),
         }
         return setting;
     }

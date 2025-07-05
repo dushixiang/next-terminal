@@ -17,13 +17,15 @@ import {
 import {useTranslation} from "react-i18next";
 import websiteApi from "@/src/api/website-api";
 import agentGatewayApi from "@/src/api/agent-gateway-api";
-import {EyeIcon, GlobeIcon, KeyIcon, LinkIcon, ServerIcon, ShieldIcon, TrashIcon, UploadIcon} from "lucide-react";
+import {EyeIcon, GlobeIcon, LinkIcon, ServerIcon, ShieldIcon, TrashIcon, UploadIcon} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import assetsApi from "@/src/api/asset-api";
 import {RcFile} from "antd/es/upload";
 import dayjs from "dayjs";
 import certificateApi from "@/src/api/certificate-api";
 import WebsiteModifyResponseView from "@/src/pages/assets/WebsiteModifyResponseView";
+import {useLicense} from "@/src/hook/use-license";
+import Disabled from "@/src/components/Disabled";
 
 const api = websiteApi;
 
@@ -55,6 +57,7 @@ const WebsiteDrawer = ({
     let [timeLimit, setTimeLimit] = useState(false);
     let [expiredAt, setExpiredAt] = useState<dayjs.Dayjs>();
     let [confirmLoading, setConfirmLoading] = useState(false);
+    let [license] = useLicense();
 
     const formRef = useRef<ProFormInstance>();
     let logosQuery = useQuery({
@@ -526,7 +529,9 @@ const WebsiteDrawer = ({
                     <span>{t('assets.modify_response')}</span>
                 </div>
             ),
-            children: <WebsiteModifyResponseView/>,
+            children: <Disabled disabled={license.isFree()}>
+                <WebsiteModifyResponseView/>
+            </Disabled>,
             forceRender: true,
         },
         {

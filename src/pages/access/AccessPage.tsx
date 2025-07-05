@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {Key, useEffect, useRef, useState} from 'react';
 import {App, ConfigProvider, Input, Tabs, theme, Tooltip, Tree, TreeDataNode} from "antd";
 import './AccessPage.css'
 import brandingApi from "@/src/api/branding-api";
@@ -100,6 +100,10 @@ const AccessPage = () => {
     }, [settingQuery.data]);
 
     useEffect(() => {
+        setExpandedKeys(accessSetting?.treeExpandedKeys);
+    }, [accessSetting]);
+
+    useEffect(() => {
         document.body.style.overflow = 'hidden';
         window.addEventListener("beforeunload", beforeUnload, true);
         document.addEventListener("keydown", handleKeyDown);
@@ -138,7 +142,7 @@ const AccessPage = () => {
     };
 
     const [treeData, setTreeData] = useState<TreeDataNodeWithExtra[]>([]);
-    let [expandedKeys, setExpandedKeys] = useState([]);
+    let [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
     const [searchValue, setSearchValue] = useState('');
 
     let leftRef = useRef<ImperativePanelHandle>();
@@ -155,25 +159,12 @@ const AccessPage = () => {
     useEffect(() => {
         if (treeQuery.data) {
             setTreeData(treeQuery.data);
-            let keys1 = getAllKeys(treeQuery.data);
-            setExpandedKeys(keys1);
         }
     }, [treeQuery.data]);
 
     useEffect(() => {
         treeQuery.refetch();
     }, [searchValue]);
-
-    const getAllKeys = (data: TreeDataNode[]) => {
-        let keys = [];
-        data.forEach((item) => {
-            keys.push(item.key);
-            if (item.children) {
-                keys = keys.concat(getAllKeys(item.children));
-            }
-        });
-        return keys;
-    };
 
     const addTab = (key: string, label: string, children: React.ReactNode) => {
         let find = items.filter((item) => item.key === key);
@@ -262,6 +253,9 @@ const AccessPage = () => {
 
     const onExpand = (newExpandedKeys: React.Key[]) => {
         setExpandedKeys(newExpandedKeys);
+        accessSettingApi.set({
+            'treeExpandedKeys': newExpandedKeys.join(',')
+        })
         // setAutoExpandParent(false);
     };
 
