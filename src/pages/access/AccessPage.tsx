@@ -36,6 +36,7 @@ import licenseApi from "@/src/api/license-api";
 import {safeDecode} from "@/src/utils/codec";
 import {useAccessSetting} from "@/src/hook/use-access-setting";
 import accessSettingApi from "@/src/api/access-setting-api";
+import {setThemeColor} from "@/src/utils/theme";
 
 
 interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -121,6 +122,8 @@ const AccessPage = () => {
             }
         }
         setSearchParams({}, {replace: true});
+
+        setThemeColor('#313131');
     }, []);
 
     let brandingQuery = useQuery({

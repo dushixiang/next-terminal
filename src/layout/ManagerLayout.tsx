@@ -40,6 +40,7 @@ import Marquee from 'react-fast-marquee';
 import dayjs from "dayjs";
 import {baseUrl} from "@/src/api/core/requests";
 import i18n from "i18next";
+import {setThemeColor} from "@/src/utils/theme";
 
 const breadcrumbNameMap = new Map<string, string>;
 
@@ -177,8 +178,10 @@ const ManagerLayout = () => {
     useEffect(() => {
         if (isDarkMode) {
             document.documentElement.classList.add('dark');
+            setThemeColor('#09090B');
         } else {
             document.documentElement.classList.remove('dark');
+            setThemeColor('#fff');
         }
 
         if (isDarkMode) {
