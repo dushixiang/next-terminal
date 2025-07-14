@@ -148,6 +148,14 @@ ${t('identity.user.password')}: ${result.password}`)
             hideInSearch: true,
         },
         {
+            title: t('identity.user.last_login_at'),
+            key: 'lastLoginAt',
+            dataIndex: 'lastLoginAt',
+            valueType: 'dateTime',
+            hideInSearch: true,
+            width: 191,
+        },
+        {
             title: t('general.created_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',

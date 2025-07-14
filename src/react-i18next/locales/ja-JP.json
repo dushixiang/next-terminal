@@ -20,7 +20,11 @@
     "name": "名前",
     "days": "日",
     "tips": "提案",
-    "clipboard_disabled": "クリップボード機能が無効になっています。"
+    "clipboard_disabled": "クリップボード機能が無効になっています。",
+    "remark": "備考",
+    "enter_remark": "備考を入力してください",
+    "required": "必須",
+    "error": "操作に失敗しました"
   },
   "actions": {
     "option": "操作",
@@ -341,7 +345,8 @@
       "new_user_result": "ユーザーの作成成功",
       "locked_type": "ロックタイプ",
       "locked_type_username": "アカウントロック",
-      "locked_type_ip": "IPロック"
+      "locked_type_ip": "IPロック",
+      "last_login_at": "最終ログイン時間"
     },
     "options": {
       "authorized_asset": "承認された資産",
@@ -857,7 +862,11 @@
       "normal": "システムが空いている",
       "moderate": "軽度の忙しさ",
       "busy": "資源が逼迫している"
-    }
+    },
+    "sort": "ソート",
+    "sort_success": "ソートが成功しました",
+    "add_token": "トークンを追加",
+    "edit_token_remark": "トークン備考を編集"
   },
   "settings": {
     "system": {

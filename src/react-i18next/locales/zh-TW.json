@@ -20,7 +20,11 @@
     "days": "天",
     "no": "否",
     "tips": "提示",
-    "clipboard_disabled": "剪貼板功能被禁用。"
+    "clipboard_disabled": "剪貼板功能被禁用。",
+    "remark": "備註",
+    "enter_remark": "請輸入備註",
+    "required": "必填項",
+    "error": "操作失敗"
   },
   "actions": {
     "option": "操作",
@@ -341,7 +345,8 @@
       "new_user_result": "創建使用者成功",
       "locked_type": "鎖定類型",
       "locked_type_username": "帳戶鎖定",
-      "locked_type_ip": "IP封鎖"
+      "locked_type_ip": "IP封鎖",
+      "last_login_at": "最後登錄時間"
     },
     "options": {
       "authorized_asset": "授權資產",
@@ -857,7 +862,11 @@
       "normal": "系統空閒",
       "moderate": "輕度繁忙",
       "busy": "資源緊張"
-    }
+    },
+    "sort": "排序",
+    "sort_success": "排序成功",
+    "add_token": "新增令牌",
+    "edit_token_remark": "修改令牌備註"
   },
   "settings": {
     "system": {

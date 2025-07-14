@@ -1,9 +1,9 @@
-import React, {useRef, useState} from 'react';
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import React, {useState, useRef} from 'react';
+import {ProColumns, DragSortTable, ActionType} from "@ant-design/pro-components";
 import {App, Button, Popconfirm, Progress} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
-import agentGatewayApi, {AgentGateway} from "@/src/api/agent-gateway-api";
+import agentGatewayApi, {AgentGateway, SortItem} from "@/src/api/agent-gateway-api";
 import AgentGatewayModal from "@/src/pages/gateway/AgentGatewayModal";
 import AgentGatewayRegister from "@/src/pages/gateway/AgentGatewayRegister";
 import NButton from "@/src/components/NButton";
@@ -29,6 +29,7 @@ const AgentGatewayPage = () => {
     let [registerOpen, setRegisterOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
     let [license] = useLicense();
+    let [dataSource, setDataSource] = useState<AgentGateway[]>([]);
 
     let [tokenManageOpen, setTokenManageOpen] = useState<boolean>(false);
     let [statOpen, setStatOpen] = useState<boolean>(false);
@@ -46,10 +47,19 @@ const AgentGatewayPage = () => {
     let mutation = useMutation({
         mutationFn: postOrUpdate,
         onSuccess: () => {
+            // 重新获取数据
             actionRef.current?.reload();
             setOpen(false);
             setSelectedRowKey(undefined);
             showSuccess();
+        }
+    });
+
+    const updateSortMutation = useMutation({
+        mutationFn: (items: SortItem[]) => api.updateSort(items),
+        onSuccess: () => {
+            // 不立即重新加载，让 polling 自然更新数据
+            message.success(t('gateways.sort_success'));
         }
     });
 
@@ -59,6 +69,22 @@ const AgentGatewayPage = () => {
             content: t('general.success'),
         });
     }
+
+    const handleDragSortEnd = (beforeIndex: number, afterIndex: number, newDataSource: AgentGateway[]) => {
+        console.log('排序后的数据', newDataSource);
+        
+        // 立即更新本地状态，避免闪烁
+        setDataSource(newDataSource);
+        
+        // 更新排序 - 后端使用倒序排列，越大的在前面
+        const sortItems: SortItem[] = newDataSource.map((item, index) => ({
+            id: item.id,
+            sortOrder: newDataSource.length - index  // 倒序：第一个位置的sortOrder最大
+        }));
+
+        // 服务器更新
+        updateSortMutation.mutate(sortItems);
+    };
 
     const JudgeLoadBusy = (load: number, cores: number) => {
         const ratio = load / cores;
@@ -70,8 +96,16 @@ const AgentGatewayPage = () => {
 
     let columns: ProColumns<AgentGateway>[] = [
         {
+            title: t('gateways.sort'),
+            dataIndex: 'sortOrder',
+            width: 60,
+            className: 'drag-visible',
+            hideInSearch: true,
+        },
+        {
             title: t('gateways.name'),
             dataIndex: 'name',
+            className: 'drag-visible',
             render: (text, record) => {
                 let osImg = '';
                 switch (record.os) {
@@ -282,23 +316,10 @@ const AgentGatewayPage = () => {
     return (
         <div>
             <Disabled disabled={license.isFree()}>
-                <ProTable
+                <DragSortTable
+                    headerTitle={t('menus.gateway.submenus.agent_gateway')}
                     columns={columns}
                     actionRef={actionRef}
-                    request={async (params = {}, sort, filter) => {
-                        let queryParams = {
-                            pageIndex: params.current,
-                            pageSize: params.pageSize,
-                            sort: JSON.stringify(sort),
-                            name: params.name,
-                        }
-                        let result = await api.getPaging(queryParams);
-                        return {
-                            data: result['items'],
-                            success: true,
-                            total: result['total']
-                        };
-                    }}
                     rowKey="id"
                     search={{
                         labelWidth: 'auto',
@@ -307,13 +328,31 @@ const AgentGatewayPage = () => {
                         defaultPageSize: 10,
                         showSizeChanger: true
                     }}
+                    request={async (params = {}, sort, filter) => {
+                        let queryParams = {
+                            pageIndex: params.current,
+                            pageSize: params.pageSize,
+                            sort: JSON.stringify(sort),
+                            name: params.name,
+                        }
+                        let result = await api.getPaging(queryParams);
+                        // 直接使用后端返回的数据，包含 sortOrder 字段
+                        setDataSource(result['items']);
+                        return {
+                            data: result['items'],
+                            success: true,
+                            total: result['total']
+                        };
+                    }}
+                    dataSource={dataSource}
+                    dragSortKey="sortOrder"
+                    onDragSortEnd={handleDragSortEnd}
                     rowClassName={(record) => {
                         if (record.online == false) {
                             return 'grayscale';
                         }
                     }}
                     dateFormatter="string"
-                    headerTitle={t('menus.gateway.submenus.agent_gateway')}
                     toolBarRender={() => [
                         <Button key="button" type="primary" onClick={() => {
                             setRegisterOpen(true)
@@ -326,7 +365,7 @@ const AgentGatewayPage = () => {
                             {t('gateways.token_manage')}
                         </Button>
                     ]}
-                    polling={1000}
+                    polling={5000}
                 />
 
                 <AgentGatewayModal

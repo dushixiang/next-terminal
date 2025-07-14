@@ -58,6 +58,7 @@ import {cn} from "@/lib/utils";
 import {Strategy} from "@/src/api/strategy-api";
 import {Base64} from 'js-base64';
 import {useLicense} from "@/src/hook/use-license";
+import { log } from 'console';
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -395,7 +396,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             key: 'modTime',
             width: 180,
             sorter: (a, b) => {
-                return a.modTime?.localeCompare(b.modTime);
+                return a.modTime - b.modTime;
             },
             sortDirections: ['descend', 'ascend'],
             render: (value, item) => {

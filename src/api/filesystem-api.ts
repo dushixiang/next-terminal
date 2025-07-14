@@ -3,7 +3,7 @@ import requests from "@/src/api/core/requests";
 export interface FileInfo {
     name: string
     size: number
-    modTime: string
+    modTime: number;
     path: string
     mode: string
     isDir: boolean

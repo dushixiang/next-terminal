@@ -20,7 +20,11 @@
     "bound": "已绑定",
     "name": "名称",
     "days": "天",
-    "tips": "提示"
+    "tips": "提示",
+    "remark": "备注",
+    "enter_remark": "请输入备注",
+    "required": "必填项",
+    "error": "操作失败"
   },
   "actions": {
     "option": "操作",
@@ -328,7 +332,8 @@
       "user_agent": "浏览器",
       "login_at": "登录时间",
       "no_spaces_allowed": "禁止输入空格",
-      "new_user_result": "用户创建成功"
+      "new_user_result": "用户创建成功",
+      "last_login_at": "最后登录时间"
     },
     "options": {
       "authorized_asset": "授权资产",
@@ -823,7 +828,11 @@
       "normal": "系统空闲",
       "moderate": "轻度繁忙",
       "busy": "资源紧张"
-    }
+    },
+    "sort": "排序",
+    "sort_success": "排序成功",
+    "add_token": "新增令牌",
+    "edit_token_remark": "修改令牌备注"
   },
   "settings": {
     "system": {

@@ -11,6 +11,7 @@ export interface User {
     source: string;
     createdAt: number;
     roles: string[];
+    lastLoginAt: number;
 }
 
 export interface LoginLog {

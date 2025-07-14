@@ -20,7 +20,11 @@
     "name": "Name",
     "days": "Days",
     "tips": "Tips",
-    "clipboard_disabled": "The clipboard function is disabled."
+    "clipboard_disabled": "The clipboard function is disabled.",
+    "remark": "Remark",
+    "enter_remark": "Please enter remark",
+    "required": "Required",
+    "error": "Operation failed"
   },
   "actions": {
     "option": "Actions",
@@ -329,7 +333,8 @@
       "new_user_result": "User created successfully",
       "locked_type": "Lock type",
       "locked_type_username": "Account locked",
-      "locked_type_ip": "IP lock"
+      "locked_type_ip": "IP lock",
+      "last_login_at": "Last login time"
     },
     "options": {
       "authorized_asset": "Authorized Assets",
@@ -845,7 +850,11 @@
       "normal": "System idle",
       "moderate": "Lightly busy",
       "busy": "Resource紧张\" should be translated as \"Resource strain\" or \"Tight resources\". However, the most accurate and commonly used translation is:\n\n\"Tight resources"
-    }
+    },
+    "sort": "Sorting",
+    "sort_success": "Sorting successful",
+    "add_token": "Add Token",
+    "edit_token_remark": "Edit Token Remark"
   },
   "settings": {
     "system": {

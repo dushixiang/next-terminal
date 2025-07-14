@@ -10,6 +10,7 @@ export interface AgentGateway {
     online: boolean;
     createdAt: number;
     updatedAt: number;
+    sortOrder: number;
     stat?: Stat;
     version: string;
 }
@@ -98,6 +99,11 @@ export interface RegisterParam {
     token: string;
 }
 
+export interface SortItem {
+    id: string;
+    sortOrder: number;
+}
+
 class AgentGatewayApi extends Api<AgentGateway> {
     constructor() {
         super("admin/agent-gateways");
@@ -113,6 +119,10 @@ class AgentGatewayApi extends Api<AgentGateway> {
 
     getStat = async (id: string) => {
         return await requests.get(`/${this.group}/${id}/stat`) as Stat;
+    }
+
+    updateSort = async (items: SortItem[]) => {
+        return await requests.post(`/${this.group}/sort`, items);
     }
 }
 
