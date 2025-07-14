@@ -2,7 +2,7 @@ import eventEmitter from "@/src/api/core/event-emitter";
 
 export const baseUrl = () => {
     if (import.meta.env.DEV) {
-        return 'http://localhost/api';
+        return 'http://localhost:8888/api';
     }
     return window.location.protocol + '//' + window.location.host + '/api';
 }

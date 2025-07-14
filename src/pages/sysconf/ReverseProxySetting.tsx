@@ -11,6 +11,7 @@ import {
     ProFormTextArea
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
+import { log } from 'node:console';
 
 const {Title} = Typography;
 
@@ -24,12 +25,22 @@ const ReverseProxySetting = ({get, set}: SettingProps) => {
     const wrapSet = async (values: any) => {
         formRef.current?.validateFields()
             .then(() => {
+                // 使用 ipTrustList 状态值，确保它是数组
+                if(ipTrustList && ipTrustList.length > 0){
+                    values['reverse-proxy-server-ip-trust-list'] = ipTrustList.join(',');
+                } else {
+                    values['reverse-proxy-server-ip-trust-list'] = '';
+                }
+                
                 set(values);
             })
     }
 
     const wrapGet = async () => {
         let values = await get();
+        if(values['reverse-proxy-server-ip-trust-list']){
+            setIpTrustList(values['reverse-proxy-server-ip-trust-list'].split(','));
+        }
         setEnabled(values['reverse-proxy-server-enabled']);
         return values;
     }
