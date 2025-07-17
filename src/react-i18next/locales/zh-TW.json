@@ -45,7 +45,9 @@
     "import": "導入",
     "download_import_sample": "下載匯入範例",
     "cancel": "取消",
-    "save": "保存"
+    "save": "保存",
+    "remove": "移除",
+    "label": "操作"
   },
   "dashboard": {
     "name": "數據概觀",
@@ -139,7 +141,9 @@
         "offline_session": "離線會話",
         "filesystem_log": "文件日誌",
         "login_log": "登入日誌",
-        "operation_log": "操作日誌"
+        "operation_log": "操作日誌",
+        "access_log": "訪問日誌",
+        "access_log_stats": "訪問日誌統計"
       }
     },
     "sysops": {
@@ -232,10 +236,12 @@
       "progress": "進度",
       "speed": "速度",
       "options": {
+        "preparing": "準備中",
         "uploading": "上傳中",
         "transmitting": "傳輸中",
         "upload_failed": "上傳失敗",
-        "upload_success": "上載成功"
+        "upload_success": "上載成功",
+        "cancelled": "已取消"
       }
     }
   },
@@ -539,6 +545,78 @@
         "action": "斷開",
         "confirm": "您確認要斷開此會話嗎？"
       }
+    },
+    "accessLog": {
+      "title": "訪問日誌",
+      "domain": "域名",
+      "user": "用戶",
+      "method": "請求方法",
+      "uri": "請求URI",
+      "statusCode": "狀態碼",
+      "responseSize": "響應大小",
+      "clientIp": "客戶端IP",
+      "responseTime": "響應時間",
+      "userAgent": "User-Agent",
+      "createdAt": "請求時間",
+      "anonymous": "匿名",
+      "whitelist": "IP白名單",
+      "tempPass": "臨時密碼",
+      "deletedUser": "已刪除用戶",
+      "clearConfirmTitle": "確認清空",
+      "clearConfirmContent": "確定要清空所有訪問日誌嗎？此操作不可恢復。",
+      "stats": {
+        "title": "網站訪問統計",
+        "selectWebsite": "選擇網站",
+        "allWebsites": "全部網站",
+        "periods": {
+          "today": "今日",
+          "yesterday": "昨日",
+          "7days": "近7天",
+          "30days": "近30天"
+        },
+        "metrics": {
+          "pv": "PV 瀏覽量",
+          "uv": "UV 訪客數",
+          "ip": "獨立IP數",
+          "traffic": "流量大小",
+          "requests": "請求数量",
+          "avgResponseTime": "平均響應時間"
+        },
+        "realtime": {
+          "title": "實時指標",
+          "currentOnline": "當前在線",
+          "requestsPerSecond": "每秒請求",
+          "realtimeTraffic": "實時流量",
+          "errorRate": "錯誤率"
+        },
+        "charts": {
+          "trafficTrend": "流量趨勢",
+          "hourlyDistribution": "小時訪問分佈",
+          "statusCodeDistribution": "狀態碼分佈",
+          "topPages": "熱門頁面",
+          "topReferers": "熱門來源"
+        },
+        "table": {
+          "pagePath": "頁面路徑",
+          "pv": "PV",
+          "uv": "UV",
+          "avgResponseTime": "平均響應時間",
+          "referer": "來源",
+          "visitCount": "訪問次數",
+          "directAccess": "直接訪問"
+        },
+        "tooltip": {
+          "time": "時間",
+          "visitCount": "訪問次數",
+          "statusCode": "狀態碼"
+        },
+        "statusCodes": {
+          "success": "成功 (2xx)",
+          "redirect": "重定向 (3xx)",
+          "clientError": "客戶端錯誤 (4xx)",
+          "serverError": "伺服器錯誤 (5xx)"
+        }
+      }
     }
   },
   "access": {
@@ -640,7 +718,55 @@
     "no_mfa_title": "請先綁定安全認證方式",
     "no_mfa_subtitle": "您尚未綁定任何安全認證方式，無法查看敏感數據。",
     "enable_otp": "啟用OTP認證",
-    "enable_passkey": "啟用通行密鑰認證"
+    "enable_passkey": "啟用通行密鑰認證",
+    "otp_description": "雙因素認證 (OTP) 為您的帳戶提供額外的安全保護。即使您的密碼被洩露，攻擊者也無法在沒有您的移動設備的情況下訪問您的帳戶。",
+    "otp_features": {
+      "title": "功能特點",
+      "enhanced_security": "增強安全性：為登錄過程增加額外的安全層",
+      "offline_access": "離線訪問：無需網絡連接即可生成驗證碼",
+      "time_based": "時效性：驗證碼每30秒自動更新，確保安全性",
+      "widely_supported": "廣泛支持：兼容各種主流身份驗證應用"
+    },
+    "otp_setup_guide": {
+      "title": "設置指南",
+      "step1": {
+        "title": "第1步：安裝身份驗證應用",
+        "description": "在您的手機上安裝以下任一身份驗證應用："
+      },
+      "step2": {
+        "title": "第2步：掃描二維碼",
+        "description": "使用身份驗證應用掃描下方的二維碼，或手動輸入密鑰"
+      },
+      "step3": {
+        "title": "第3步：輸入驗證碼",
+        "description": "輸入身份驗證應用顯示的6位數字驗證碼完成綁定"
+      }
+    },
+    "otp_apps": {
+      "google_authenticator": "Google Authenticator",
+      "microsoft_authenticator": "Microsoft Authenticator",
+      "1password": "1Password",
+      "lastpass": "LastPass Authenticator",
+      "authy": "Authy"
+    },
+    "otp_manual_setup": "手動設置",
+    "otp_manual_setup_desc": "如果無法掃描二維碼，請在身份驗證應用中手動輸入以下密鑰：",
+    "otp_verification_code": "驗證碼",
+    "otp_verification_placeholder": "請輸入6位驗證碼",
+    "otp_backup_codes": {
+      "title": "備用恢復碼",
+      "description": "請保存這些備用恢復碼，當您無法使用身份驗證器時可以使用它們登錄。",
+      "warning": "每個恢復碼只能使用一次，請妥善保管。"
+    },
+    "otp_binding_title": "綁定雙因素認證",
+    "otp_scan_qr": "掃描二維碼",
+    "otp_scan_instruction": "請使用身份驗證應用掃描上方二維碼",
+    "otp_verification_title": "驗證綁定",
+    "otp_verification_instruction": "請輸入身份驗證應用顯示的6位驗證碼",
+    "otp_security_tip": "安全提示",
+    "otp_security_description": "綁定成功後，您的帳戶將受到雙因素認證保護。請確保妥善保管您的身份驗證設備。",
+    "otp_step2_description": "使用身份驗證應用掃描二維碼",
+    "otp_step3_description": "輸入驗證碼完成綁定"
   },
   "assets": {
     "name": "名稱",
@@ -822,6 +948,7 @@
     "account_type": {},
     "endpoint": "通訊地址",
     "token": "通訊令牌",
+    "select_token": "請選擇通訊令牌",
     "token_manage": "通訊令牌管理",
     "online": "在線",
     "offline": "離線",
@@ -852,6 +979,10 @@
       "internal_ips": "內網IP"
     },
     "install_shell": "安裝腳本",
+    "download_binary": "下載二進制文件",
+    "install_service": "安裝服務",
+    "install_service_admin": "安裝服務（使用管理員權限開啟 CMD）",
+    "start_service": "啟動服務",
     "ssh_status": {
       "disconnected": "未連接",
       "connecting": "正在連接",
@@ -1048,6 +1179,9 @@
       },
       "cron_log": {
         "saved_limit_days": "定時任務日誌保存限制"
+      },
+      "access_log": {
+        "saved_limit_days": "訪問日誌保存限制"
       }
     },
     "backup": {

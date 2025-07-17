@@ -1,4 +1,4 @@
-import {App, Input, Modal, Select, Typography} from 'antd';
+import {Input, Modal, Select, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import agentGatewayApi, {RegisterParam} from "@/src/api/agent-gateway-api";
@@ -25,7 +25,6 @@ const AgentGatewayRegister = ({
                               }: Props) => {
 
     let {t} = useTranslation();
-    let {message} = App.useApp();
 
     let [param, setParam] = useState<RegisterParam>({
         endpoint: "", token: ""
@@ -47,10 +46,14 @@ const AgentGatewayRegister = ({
     useEffect(() => {
         if (query.data) {
             let data = query.data;
-            if(data.endpoint === ''){
+            if (data.endpoint === '') {
                 data.endpoint = window.location.origin;
+                agentGatewayApi.setRegisterAddr(data.endpoint).then(r => {
+                    setParam(data);
+                });
+            } else {
+                setParam(data);
             }
-            setParam(data);
         }
     }, [query.data]);
 
@@ -81,17 +84,17 @@ const AgentGatewayRegister = ({
                 </div>;
             case 'windows':
                 return <div className={'space-y-2'}>
-                    <div>1. 下载二进制文件</div>
+                    <div>1. {t('gateways.download_binary')}</div>
                     <div>
                         <a href={`${baseUrl()}/agent-gateway/binary?os=windows&arch=amd64`}>amd64</a>
                     </div>
-                    <div>2. 安装服务 （使用管理员权限打开 CMD）</div>
+                    <div>2. {t('gateways.install_service_admin')}</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
                             {`nt-tunnel.exe install --endpoint ${param.endpoint} --token ${param.token} `}
                         </Paragraph>
                     </div>
-                    <div>3. 启动服务</div>
+                    <div>3. {t('gateways.start_service')}</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
                             {`nt-tunnel.exe start`}
@@ -100,18 +103,18 @@ const AgentGatewayRegister = ({
                 </div>;
             case 'macos':
                 return <div className={'space-y-2'}>
-                    <div>1. 下载二进制文件</div>
+                    <div>1. {t('gateways.download_binary')}</div>
                     <div className={'flex items-center gap-2'}>
                         <a href={`${baseUrl()}/agent-gateway/binary?os=darwin&arch=arm64`}>arm64</a>
                         <a href={`${baseUrl()}/agent-gateway/binary?os=darwin&arch=amd64`}>amd64</a>
                     </div>
-                    <div>2. 安装服务</div>
+                    <div>2. {t('gateways.install_service')}</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
                             {`sudo nt-tunnel install --endpoint ${param.endpoint} --token ${param.token} `}
                         </Paragraph>
                     </div>
-                    <div>3. 启动服务</div>
+                    <div>3. {t('gateways.start_service')}</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
                             {`sudo nt-tunnel start`}
@@ -152,8 +155,7 @@ const AgentGatewayRegister = ({
                     onBlur={async () => {
                         let endpoint = sanitizeBaseUrl(param.endpoint);
                         if (!strings.hasText(endpoint)) {
-                            message.error('Invalid URL');
-                            endpoint = `${location.protocol}//${location.host}`;
+                            endpoint = window.location.origin;
                         }
                         setParam({...param, endpoint: endpoint});
                         await agentGatewayApi.setRegisterAddr(endpoint);
@@ -163,15 +165,32 @@ const AgentGatewayRegister = ({
                 <div>{t('gateways.token')}</div>
                 <Select
                     showSearch
-                    filterOption={(input, option) =>
-                        (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-                    }
+                    placeholder={t('gateways.select_token')}
+                    filterOption={(input, option) => {
+                        const searchText = input.toLowerCase();
+                        const optionText = option?.label?.toLowerCase() || '';
+                        const optionValue = option?.value?.toLowerCase() || '';
+                        return optionText.includes(searchText) || optionValue.includes(searchText);
+                    }}
                     options={tokenQuery.data?.map((item) => {
                         return {
                             label: item.id,
                             value: item.id,
+                            remark: item.remark,
                         }
                     })}
+                    optionRender={(option) => (
+                        <div className="flex flex-col py-1">
+                            <div className="font-mono text-sm text-gray-800 dark:text-gray-200">
+                                {option.data.value}
+                            </div>
+                            {option.data.remark && (
+                                <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                    {option.data.remark}
+                                </div>
+                            )}
+                        </div>
+                    )}
                     value={param.token}
                     onChange={(value) => {
                         setParam({...param, token: value});

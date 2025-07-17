@@ -1,8 +1,19 @@
+### SharonNetworks
+
+亚太数据中心提供顶级的中国优化网络接入 · 低延时&高带宽&提供Tbps级本地清洗高防服务, 为您的业务保驾护航, 为您的客户提供极致体验.
+
+加入社区 Telegram群组 https://t.me/SharonNetwork 可参与公益募捐或群内抽奖免费使用。
+
+---
+
 # Next Terminal
 
 [English](./README.md) | 简体中文
 
 
+## 免费企业版授权，助您运维审计无忧！
+
+https://license.typesafe.cn/request-quote
 
 ## 简介
 
@@ -29,6 +40,7 @@ Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多
 📧dushixiang@typesafe.cn
 
 ## 社群
+- telegram https://t.me/next_terminal
 - QQ 群：938145268
 - 微信群：加我微信备注「next-terminal」，拉你进群
   

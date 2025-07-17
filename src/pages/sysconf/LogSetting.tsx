@@ -66,6 +66,20 @@ const LogSetting = ({get, set}: SettingProps) => {
                                }}
                                addonAfter={t('general.days')}
                 />
+                <ProFormSelect name="access-log-saved-limit-days"
+                               label={t('settings.log.access_log.saved_limit_days')}
+                               fieldProps={{
+                                   options: [
+                                       {value: '', label: '♾'},
+                                       {value: '7', label: '7'},
+                                       {value: '15', label: '15'},
+                                       {value: '30', label: '30'},
+                                       {value: '60', label: '60'},
+                                       {value: '180', label: '180'},
+                                   ]
+                               }}
+                               addonAfter={t('general.days')}
+                />
             </ProForm>
         </div>
     );

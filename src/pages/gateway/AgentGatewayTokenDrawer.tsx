@@ -85,12 +85,17 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
             key: 'id',
             render: (text, record) => {
                 return (
-                    <div>
-                        <Paragraph copyable style={{marginBottom: 0}}>
+                    <div className="flex flex-col gap-2">
+                        <Paragraph 
+                            copyable 
+                            style={{marginBottom: 0}} 
+                            className="font-mono text-sm"
+                        >
                             {text}
                         </Paragraph>
                         {record.remark && (
-                            <div style={{color: '#999', fontSize: '12px', marginTop: '4px'}}>
+                            <div className="px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded text-xs text-gray-600 dark:text-gray-400 border-l-2 border-blue-200 dark:border-blue-700">
+                                <span className="font-medium text-gray-700 dark:text-gray-300">备注：</span>
                                 {record.remark}
                             </div>
                         )}

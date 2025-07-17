@@ -43,6 +43,8 @@ let o = {
         "download_import_sample": "下载导入示例",
         "cancel": "取消",
         "save": "保存",
+        "remove": "移除",
+        "label": "操作",
     },
     "dashboard": {
         "name": "数据概览",
@@ -123,6 +125,8 @@ let o = {
                 "online_session": "在线会话",
                 "offline_session": "离线会话",
                 "filesystem_log": "文件日志",
+                "access_log": "访问日志",
+                "access_log_stats": "访问日志统计",
                 "login_log": "登录日志",
                 "operation_log": "操作日志"
             }
@@ -217,10 +221,12 @@ let o = {
             "progress": "进度",
             "speed": "速度",
             "options": {
+                "preparing": "准备中",
                 "uploading": "上传中",
                 "transmitting": "传输中",
                 "upload_failed": "上传失败",
-                "upload_success": "上传成功"
+                "upload_success": "上传成功",
+                "cancelled": "已取消"
             }
         }
     },
@@ -476,6 +482,78 @@ let o = {
         "login_status": "登陆状态",
         "login_reason": "失败原因",
         "user_agent": "客户端",
+        "accessLog": {
+            "title": "访问日志",
+            "domain": "域名",
+            "user": "用户",
+            "method": "请求方法",
+            "uri": "请求URI",
+            "statusCode": "状态码",
+            "responseSize": "响应大小",
+            "clientIp": "客户端IP",
+            "responseTime": "响应时间",
+            "userAgent": "User-Agent",
+            "createdAt": "请求时间",
+            "anonymous": "匿名",
+            "whitelist": "IP白名单",
+            "tempPass": "临时密码",
+            "deletedUser": "已删除用户",
+            "clearConfirmTitle": "确认清空",
+            "clearConfirmContent": "确定要清空所有访问日志吗？此操作不可恢复。",
+            "stats": {
+                "title": "网站访问统计",
+                "selectWebsite": "选择网站",
+                "allWebsites": "全部网站",
+                "periods": {
+                    "today": "今日",
+                    "yesterday": "昨日",
+                    "7days": "近7天",
+                    "30days": "近30天"
+                },
+                "metrics": {
+                    "pv": "PV 浏览量",
+                    "uv": "UV 访客数",
+                    "ip": "独立IP数",
+                    "traffic": "流量大小",
+                    "requests": "请求数量",
+                    "avgResponseTime": "平均响应时间"
+                },
+                "realtime": {
+                    "title": "实时指标",
+                    "currentOnline": "当前在线",
+                    "requestsPerSecond": "每秒请求",
+                    "realtimeTraffic": "实时流量",
+                    "errorRate": "错误率"
+                },
+                "charts": {
+                    "trafficTrend": "流量趋势",
+                    "hourlyDistribution": "小时访问分布",
+                    "statusCodeDistribution": "状态码分布",
+                    "topPages": "热门页面",
+                    "topReferers": "热门来源"
+                },
+                "table": {
+                    "pagePath": "页面路径",
+                    "pv": "PV",
+                    "uv": "UV",
+                    "avgResponseTime": "平均响应时间",
+                    "referer": "来源",
+                    "visitCount": "访问次数",
+                    "directAccess": "直接访问"
+                },
+                "tooltip": {
+                    "time": "时间",
+                    "visitCount": "访问次数",
+                    "statusCode": "状态码"
+                },
+                "statusCodes": {
+                    "success": "成功 (2xx)",
+                    "redirect": "重定向 (3xx)",
+                    "clientError": "客户端错误 (4xx)",
+                    "serverError": "服务器错误 (5xx)"
+                }
+            }
+        },
         "operation": {
             "label": "类型",
             "account": "账户",
@@ -593,6 +671,54 @@ let o = {
         "otp_unbind": "解除多因素认证",
         "otp_unbind_title": "您确认要解除双因素认证吗？",
         "otp_unbind_subtitle": "解除之后可能存在系统账号被暴力破解的风险。",
+        "otp_description": "双因素认证 (OTP) 为您的账户提供额外的安全保护。即使您的密码被泄露，攻击者也无法在没有您的移动设备的情况下访问您的账户。",
+        "otp_features": {
+            "title": "功能特点",
+            "enhanced_security": "增强安全性：为登录过程增加额外的安全层",
+            "offline_access": "离线访问：无需网络连接即可生成验证码",
+            "time_based": "时效性：验证码每30秒自动更新，确保安全性",
+            "widely_supported": "广泛支持：兼容各种主流身份验证应用"
+        },
+        "otp_setup_guide": {
+            "title": "设置指南",
+            "step1": {
+                "title": "第1步：安装身份验证应用",
+                "description": "在您的手机上安装以下任一身份验证应用："
+            },
+            "step2": {
+                "title": "第2步：扫描二维码",
+                "description": "使用身份验证应用扫描下方的二维码，或手动输入密钥"
+            },
+            "step3": {
+                "title": "第3步：输入验证码",
+                "description": "输入身份验证应用显示的6位数字验证码完成绑定"
+            }
+        },
+        "otp_apps": {
+            "google_authenticator": "Google Authenticator",
+            "microsoft_authenticator": "Microsoft Authenticator", 
+            "authy": "Authy",
+            "1password": "1Password",
+            "lastpass": "LastPass Authenticator"
+        },
+        "otp_manual_setup": "手动设置",
+        "otp_manual_setup_desc": "如果无法扫描二维码，请在身份验证应用中手动输入以下密钥：",
+        "otp_verification_code": "验证码",
+        "otp_verification_placeholder": "请输入6位验证码",
+        "otp_backup_codes": {
+            "title": "备用恢复码",
+            "description": "请保存这些备用恢复码，当您无法使用身份验证器时可以使用它们登录。",
+            "warning": "每个恢复码只能使用一次，请妥善保管。"
+        },
+        "otp_binding_title": "绑定双因素认证",
+        "otp_scan_qr": "扫描二维码",
+        "otp_scan_instruction": "请使用身份验证应用扫描上方二维码",
+        "otp_verification_title": "验证绑定",
+        "otp_verification_instruction": "请输入身份验证应用显示的6位验证码",
+        "otp_security_tip": "安全提示",
+        "otp_security_description": "绑定成功后，您的账户将受到双因素认证保护。请确保妥善保管您的身份验证设备。",
+        "otp_step2_description": "使用身份验证应用扫描二维码",
+        "otp_step3_description": "输入验证码完成绑定",
         "passkey_add": "添加通行密钥",
         "passkey_add_time": "添加时间",
         "passkey_used_time": "上次使用",
@@ -792,8 +918,13 @@ let o = {
         "register": "注册",
         "endpoint": "通信地址",
         "token": "通信令牌",
+        "select_token": "请选择通信令牌",
         "token_manage": "通信令牌管理",
         "install_shell": "安装脚本",
+        "download_binary": "下载二进制文件",
+        "install_service": "安装服务",
+        "install_service_admin": "安装服务 （使用管理员权限打开 CMD）",
+        "start_service": "启动服务",
         "online": "在线",
         "offline": "离线",
         "stat": {
@@ -1017,6 +1148,9 @@ let o = {
             },
             "cron_log": {
                 "saved_limit_days": "定时任务日志保存限制"
+            },
+            "access_log": {
+                "saved_limit_days": "访问日志保存限制"
             }
         },
         "backup": {

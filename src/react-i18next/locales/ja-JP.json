@@ -45,7 +45,9 @@
     "import": "インポート",
     "download_import_sample": "ダウンロードインポートサンプル",
     "cancel": "キャンセル",
-    "save": "保存"
+    "save": "保存",
+    "remove": "削除",
+    "label": "操作"
   },
   "dashboard": {
     "name": "データ概要",
@@ -139,7 +141,9 @@
         "offline_session": "オフラインセッション",
         "filesystem_log": "ファイルログ",
         "login_log": "ログインログ",
-        "operation_log": "操作ログ"
+        "operation_log": "操作ログ",
+        "access_log": "訪問ログ",
+        "access_log_stats": "訪問ログ統計"
       }
     },
     "sysops": {
@@ -232,10 +236,12 @@
       "progress": "進行状況",
       "speed": "速度",
       "options": {
+        "preparing": "準備中",
         "uploading": "アップロード中",
         "transmitting": "転送中",
         "upload_failed": "アップロード失敗",
-        "upload_success": "アップロード成功"
+        "upload_success": "アップロード成功",
+        "cancelled": "キャンセル済み"
       }
     }
   },
@@ -539,6 +545,78 @@
         "action": "切断",
         "confirm": "このセッションを切断してもよろしいですか？"
       }
+    },
+    "accessLog": {
+      "title": "訪問日誌",
+      "domain": "ドメイン名",
+      "user": "ユーザー",
+      "method": "リクエストメソッド",
+      "uri": "リクエストURI",
+      "statusCode": "ステータスコード",
+      "responseSize": "応答サイズ",
+      "clientIp": "クライアントIP",
+      "responseTime": "応答時間",
+      "userAgent": "ユーザーエージェント",
+      "createdAt": "要求時間",
+      "anonymous": "匿名",
+      "whitelist": "IPホワイトリスト",
+      "tempPass": "一時的なパスワード",
+      "deletedUser": "削除されたユーザー",
+      "clearConfirmTitle": "確認してクリアする",
+      "clearConfirmContent": "すべてのアクセスログを削除しますか？この操作は元に戻せません。",
+      "stats": {
+        "selectWebsite": "ウェブサイトを選択する",
+        "periods": {
+          "today": "今日",
+          "7days": "最近7日間",
+          "30days": "最近30日間",
+          "yesterday": "昨日"
+        },
+        "metrics": {
+          "pv": "PV ビューワー数",
+          "uv": "UV訪問者数",
+          "ip": "独立IP数",
+          "traffic": "流量の大きさ",
+          "requests": "数量要求",
+          "avgResponseTime": "平均応答時間"
+        },
+        "realtime": {
+          "title": "リアルタイム指標",
+          "currentOnline": "現在オンライン",
+          "requestsPerSecond": "毎秒リクエスト",
+          "realtimeTraffic": "リアルタイムトラフィック",
+          "errorRate": "誤り率"
+        },
+        "charts": {
+          "trafficTrend": "流量トレンド",
+          "hourlyDistribution": "時間帯別訪問分布",
+          "statusCodeDistribution": "ステータスコードの分布",
+          "topPages": "人気ページ",
+          "topReferers": "人気の出典"
+        },
+        "table": {
+          "pagePath": "ページパス",
+          "pv": "PV",
+          "uv": "UV",
+          "avgResponseTime": "平均応答時間",
+          "referer": "来源」は日本語で「ゆらい」または「出典」です。ただし、一般的には「出典」の方がよく使われます。",
+          "visitCount": "訪問回数",
+          "directAccess": "直接アクセス"
+        },
+        "tooltip": {
+          "time": "時間",
+          "visitCount": "訪問回数",
+          "statusCode": "ステータスコード"
+        },
+        "statusCodes": {
+          "success": "成功 (2xx)",
+          "redirect": "リダイレクト (3xx)",
+          "clientError": "クライアントエラー (4xx)",
+          "serverError": "サーバーエラー (5xx)"
+        },
+        "title": "ウェブサイト訪問統計",
+        "allWebsites": "すべてのウェブサイト"
+      }
     }
   },
   "access": {
@@ -640,7 +718,55 @@
     "no_mfa_title": "まず、セキュリティ認証方法に紐付けてください。",
     "no_mfa_subtitle": "まだセキュリティ認証方法が設定されていません。機密データは確認できません。",
     "enable_otp": "二段階認証を有効にする",
-    "enable_passkey": "認証キーを使用する"
+    "enable_passkey": "認証キーを使用する",
+    "otp_description": "二要素認証（OTP）は、アカウントに追加のセキュリティを提供します。パスワードが漏洩した場合でも、攻撃者はあなたのモバイルデバイスなしではアカウントにアクセスできません。",
+    "otp_features": {
+      "title": "機能特徴",
+      "enhanced_security": "セキュリティを強化する：ログインプロセスに追加のセキュリティ層を追加する",
+      "offline_access": "オフラインアクセス：ネットワーク接続なしで認証コードを生成できます。",
+      "time_based": "時効性：認証コードは30秒ごとに自動的に更新され、セキュリティを確保します。",
+      "widely_supported": "広範なサポート：主要な認証アプリケーションとの互換性"
+    },
+    "otp_setup_guide": {
+      "title": "設定ガイド",
+      "step1": {
+        "title": "第1ステップ：認証アプリをインストールする",
+        "description": "あなたの携帯電話に次のいずれかの認証アプリをインストールしてください。"
+      },
+      "step2": {
+        "title": "第2ステップ：QRコードをス캔する",
+        "description": "認証アプリで下のQRコードをスキャンするか、手動で秘密鍵を入力してください。"
+      },
+      "step3": {
+        "title": "第3ステップ：認証コードを入力してください。",
+        "description": "入力認証アプリが表示する6桁の数字の認証コードを入力してバインディングを完了してください。"
+      }
+    },
+    "otp_apps": {
+      "google_authenticator": "Google Authenticator",
+      "microsoft_authenticator": "Microsoft Authenticator",
+      "authy": "Authy",
+      "1password": "1Password",
+      "lastpass": "ラストパス アーセンティケーター"
+    },
+    "otp_manual_setup": "手動設定",
+    "otp_manual_setup_desc": "QRコードをス캔できない場合は、認証アプリケーションに以下の秘密鍵を手動で入力してください：",
+    "otp_verification_code": "認証コード",
+    "otp_verification_placeholder": "6桁の認証コードを入力してください。",
+    "otp_backup_codes": {
+      "title": "予備の復元コード",
+      "description": "これらのバックアップ復旧コードを保存してください。認証アプリケーションを使用できない場合、これらのコードでログインできます。",
+      "warning": "各復旧コードは一度しか使用できませんので、妥善に保管してください。"
+    },
+    "otp_binding_title": "二要素認証をバインドする",
+    "otp_scan_qr": "QRコードをス캔する",
+    "otp_scan_instruction": "認証アプリを使って上記のQRコードをスキャンしてください。",
+    "otp_verification_title": "バインドの確認",
+    "otp_verification_instruction": "認証アプリケーションで表示される6桁のコードを入力してください",
+    "otp_security_tip": "安全のヒント",
+    "otp_security_description": "バインドが成功すると、アカウントは2要素認証の保護を受けます。認証デバイスを適切に管理してください。",
+    "otp_step3_description": "認証コードを入力してバインディングを完了してください。",
+    "otp_step2_description": "認証アプリでQRコードをスキャンする"
   },
   "assets": {
     "name": "名前",
@@ -822,6 +948,7 @@
     "account_type": {},
     "endpoint": "連絡先住所",
     "token": "通信トークン",
+    "select_token": "通信トークンを選択してください",
     "token_manage": "通信トークン管理",
     "online": "オンライン",
     "offline": "オフライン",
@@ -852,6 +979,10 @@
       "internal_ips": "内部IP"
     },
     "install_shell": "スクリプトのインストール",
+    "download_binary": "バイナリファイルをダウンロード",
+    "install_service": "サービスをインストール",
+    "install_service_admin": "サービスをインストール（管理者権限でCMDを開く）",
+    "start_service": "サービスを開始",
     "ssh_status": {
       "disconnected": "未接続",
       "connecting": "接続中",
@@ -1048,6 +1179,9 @@
       },
       "cron_log": {
         "saved_limit_days": "スケジュールタスクログ保存制限"
+      },
+      "access_log": {
+        "saved_limit_days": "訪問ログ保存制限"
       }
     },
     "backup": {

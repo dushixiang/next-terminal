@@ -46,6 +46,8 @@ const TerminalMonitor = lazy(() => import("@/src/pages/access/TerminalMonitor"))
 const GuacdPlayback = lazy(() => import("@/src/pages/access/GuacdPlayback"));
 const GuacdMonitor = lazy(() => import("@/src/pages/access/GuacdMonitor"));
 const FileSystemLogPage = lazy(() => import("@/src/pages/audit/FileSystemLogPage"));
+const AccessLogPage = lazy(() => import("@/src/pages/audit/AccessLogPage"));
+const AccessLogStatsPage = lazy(() => import("@/src/pages/audit/AccessLogStatsPage"));
 const SshGatewayPage = lazy(() => import("@/src/pages/gateway/SshGatewayPage"));
 const AgentGatewayPage = lazy(() => import("@/src/pages/gateway/AgentGatewayPage"));
 const ErrorPage = lazy(() => import("@/src/components/ErrorPage"));
@@ -120,6 +122,8 @@ const router = createBrowserRouter([
             {path: "/offline-session", element: <OfflineSessionPage/>},
             {path: "/online-session", element: <OnlineSessionPage/>},
             {path: "/filesystem-log", element: <FileSystemLogPage/>},
+            {path: "/access-log", element: <AccessLogPage/>},
+            {path: "/access-log-stats", element: <AccessLogStatsPage/>},
 
             {path: "/ssh-gateway", element: <SshGatewayPage/>},
             {path: "/agent-gateway", element: <AgentGatewayPage/>},

@@ -15,6 +15,8 @@ export interface Progress {
     written: number
     percent: number
     speed: number
+    elapsedTime: number
+    isCompleted: boolean
 }
 
 class FileSystemApi {
@@ -47,8 +49,8 @@ class FileSystemApi {
         });
     }
 
-    uploadProgress = async (id: string) => {
-        let data = await requests.get(`/${this.group}/upload/progress?id=${id}`);
+    uploadProgress = async (sessionId: string, id: string) => {
+        let data = await requests.get(`/${this.group}/${sessionId}/upload/progress?id=${id}`);
         return data as Progress;
     }
 }

@@ -1,6 +1,7 @@
 import {
     ApiOutlined,
     AuditOutlined,
+    BarChartOutlined,
     BlockOutlined,
     CloudServerOutlined,
     ClusterOutlined,
@@ -109,6 +110,16 @@ export const getMenus = (t: any) => {
                     key: 'filesystem-log',
                     label: t('menus.log_audit.submenus.filesystem_log'),
                     icon: <FileTextOutlined/>,
+                },
+                {
+                    key: 'access-log',
+                    label: t('menus.log_audit.submenus.access_log'),
+                    icon: <GlobalOutlined/>,
+                },
+                {
+                    key: 'access-log-stats',
+                    label: t('menus.log_audit.submenus.access_log_stats'),
+                    icon: <BarChartOutlined/>,
                 },
                 {
                     key: 'login-log',

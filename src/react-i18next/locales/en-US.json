@@ -45,7 +45,9 @@
     "import": "Import",
     "download_import_sample": "Download Import Example",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "remove": "Remove",
+    "label": "Actions"
   },
   "dashboard": {
     "name": "Dashboard",
@@ -127,7 +129,9 @@
         "offline_session": "Offline Sessions",
         "filesystem_log": "File Logs",
         "login_log": "Login Logs",
-        "operation_log": "Operation Logs"
+        "operation_log": "Operation Logs",
+        "access_log": "Access Log",
+        "access_log_stats": "Visit Log Statistics"
       }
     },
     "sysops": {
@@ -220,10 +224,12 @@
       "progress": "Progress",
       "speed": "Speed",
       "options": {
+        "preparing": "Preparing",
         "uploading": "Uploading",
         "transmitting": "Transmitting",
         "upload_failed": "Upload Failed",
-        "upload_success": "Upload Successful"
+        "upload_success": "Upload Successful",
+        "cancelled": "Cancelled"
       }
     }
   },
@@ -527,6 +533,78 @@
         "action": "Disconnect",
         "confirm": "Are you sure you want to disconnect this session?"
       }
+    },
+    "accessLog": {
+      "title": "Access Log",
+      "domain": "Domain name",
+      "user": "user",
+      "method": "Request Method",
+      "uri": "Request URI",
+      "statusCode": "Status code",
+      "responseSize": "Response size",
+      "clientIp": "Client IP",
+      "responseTime": "Response time",
+      "userAgent": "User-Agent",
+      "createdAt": "Request Time",
+      "anonymous": "Anonymous",
+      "whitelist": "IP whitelist",
+      "tempPass": "Temporary password",
+      "deletedUser": "Deleted User",
+      "clearConfirmTitle": "Confirm Clear",
+      "clearConfirmContent": "Are you sure you want to clear all access logs? This action cannot be undone.",
+      "stats": {
+        "selectWebsite": "Choose Website",
+        "periods": {
+          "today": "Today",
+          "yesterday": "Yesterday",
+          "7days": "Last 7 days",
+          "30days": "Last 30 days"
+        },
+        "metrics": {
+          "pv": "PV page views",
+          "uv": "UV visitors",
+          "ip": "Unique IP count",
+          "traffic": "Traffic volume",
+          "requests": "Request Quantity",
+          "avgResponseTime": "Average Response Time"
+        },
+        "realtime": {
+          "title": "Real-time metrics",
+          "currentOnline": "Currently Online",
+          "requestsPerSecond": "requests per second",
+          "realtimeTraffic": "Real-time traffic",
+          "errorRate": "Error rate"
+        },
+        "charts": {
+          "trafficTrend": "Traffic Trends",
+          "hourlyDistribution": "Hourly Visit Distribution",
+          "statusCodeDistribution": "Status Code Distribution",
+          "topPages": "Popular Pages",
+          "topReferers": "Popular Sources"
+        },
+        "table": {
+          "pagePath": "Page Path",
+          "pv": "PV\" stands for \"PhotoVoltaic\" in English, which refers to the technology used to convert sunlight directly into electricity. However, without context, it could also mean different things such as \"Page View\" in web analytics. If you need a specific context, please provide more details.",
+          "uv": "UV",
+          "avgResponseTime": "Average response time",
+          "referer": "Source",
+          "visitCount": "Visit Count",
+          "directAccess": "Direct access"
+        },
+        "tooltip": {
+          "time": "time",
+          "visitCount": "Visit Count",
+          "statusCode": "Status Code"
+        },
+        "statusCodes": {
+          "success": "Success (2xx)",
+          "redirect": "Redirect (3xx)",
+          "clientError": "Client Error (4xx)",
+          "serverError": "Server Error (5xx)"
+        },
+        "title": "Website visit statistics",
+        "allWebsites": "Entire website"
+      }
     }
   },
   "access": {
@@ -628,7 +706,55 @@
     "no_mfa_title": "Please bind your security verification method first.",
     "no_mfa_subtitle": "You have not bound any security verification methods, and therefore cannot view sensitive data.",
     "enable_otp": "Enable OTP Authentication",
-    "enable_passkey": "Enable passkey authentication"
+    "enable_passkey": "Enable passkey authentication",
+    "otp_description": "Two-factor authentication (OTP) provides an extra layer of security for your account. Even if your password is compromised, an attacker cannot access your account without your mobile device.",
+    "otp_features": {
+      "title": "Function Features",
+      "enhanced_security": "Enhance Security: Add an Extra Layer of Security to the Login Process",
+      "offline_access": "Offline Access: Generate verification codes without an internet connection.",
+      "time_based": "Timeliness: The verification code automatically updates every 30 seconds to ensure security.",
+      "widely_supported": "Widespread support: compatible with various mainstream authentication applications"
+    },
+    "otp_setup_guide": {
+      "title": "Setup Guide",
+      "step1": {
+        "title": "Step 1: Install the authentication app",
+        "description": "Install any of the following authentication apps on your phone:"
+      },
+      "step2": {
+        "title": "Step 2: Scan the QR code",
+        "description": "Scan the QR code below with your authentication app, or manually enter the key"
+      },
+      "step3": {
+        "title": "Step 3: Enter the verification code",
+        "description": "Enter the 6-digit verification code displayed by the authentication app to complete the binding."
+      }
+    },
+    "otp_apps": {
+      "google_authenticator": "Google Authenticator",
+      "microsoft_authenticator": "Microsoft Authenticator",
+      "authy": "Authy",
+      "1password": "1Password",
+      "lastpass": "LastPass Authenticator"
+    },
+    "otp_manual_setup": "Manual settings",
+    "otp_manual_setup_desc": "If you are unable to scan the QR code, please manually enter the following key in your authentication app:",
+    "otp_verification_code": "Verification code",
+    "otp_verification_placeholder": "Please enter the 6-digit verification code",
+    "otp_backup_codes": {
+      "title": "Backup recovery code",
+      "description": "Please save these backup recovery codes, which you can use to log in when you cannot use your authenticator.",
+      "warning": "Each recovery code can only be used once, please keep it safe."
+    },
+    "otp_binding_title": "Bind two-factor authentication",
+    "otp_scan_qr": "Scan the QR code",
+    "otp_scan_instruction": "Please use the authentication app to scan the QR code above.",
+    "otp_verification_title": "Verify Binding",
+    "otp_verification_instruction": "Please enter the 6-digit verification code displayed by the authentication app.",
+    "otp_security_tip": "Safety Tips",
+    "otp_security_description": "After successful binding, your account will be protected by two-factor authentication. Please make sure to keep your authentication device safe.",
+    "otp_step3_description": "Enter the verification code to complete the binding",
+    "otp_step2_description": "Scan the QR code with an authentication app"
   },
   "assets": {
     "name": "Name",
@@ -810,6 +936,7 @@
     "account_type": {},
     "endpoint": "Endpoint",
     "token": "Token",
+    "select_token": "Please select a token",
     "token_manage": "Token Management",
     "online": "Online",
     "offline": "Offline",
@@ -840,6 +967,10 @@
       "internal_ips": "Internal network IP"
     },
     "install_shell": "Installation script",
+    "download_binary": "Download binary file",
+    "install_service": "Install service",
+    "install_service_admin": "Install service (Open CMD with administrator privileges)",
+    "start_service": "Start service",
     "ssh_status": {
       "disconnected": "Not Connected",
       "connecting": "Connecting",
@@ -1036,6 +1167,9 @@
       },
       "cron_log": {
         "saved_limit_days": "Scheduled Task Log Save Limit"
+      },
+      "access_log": {
+        "saved_limit_days": "Access log retention limit"
       }
     },
     "backup": {
