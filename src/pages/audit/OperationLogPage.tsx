@@ -2,6 +2,7 @@ import {App, Button, Tag, Tooltip} from 'antd';
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {useMutation} from "@tanstack/react-query";
 import operationLogApi, {OperationLog} from "@/src/api/operation-log-api";
 
@@ -104,11 +105,14 @@ const OperationLogPage = () => {
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let queryParams = {
+                    request={async (params = {}, sort, filter) => {
+                        let [sortOrder, sortField] = getSort(sort);
+                        
+                        let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         username: params.username,
                         clientIp: params.clientIp,
                     }

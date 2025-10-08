@@ -8,6 +8,7 @@ export type Setting = {
     selectionCopy: boolean;
     rightClickPaste: boolean;
     treeExpandedKeys: string[];
+    useSnippets: boolean;
 }
 
 class AccessSettingApi {
@@ -20,12 +21,18 @@ class AccessSettingApi {
             selectionCopy: strings.isTrue(record['selectionCopy']),
             rightClickPaste: strings.isTrue(record['rightClickPaste']),
             treeExpandedKeys: record['treeExpandedKeys']?.split(','),
+            useSnippets: strings.isTrue(record['useSnippets']),
         }
         return setting;
     }
 
     set = async (data: Record<string, string>) => {
         await requests.put('/access/settings', data);
+    }
+
+    getShellAssistantEnabled = async () => {
+        let data = await requests.get('/access/settings/shell-assistant-enabled');
+        return data as { enabled: boolean };
     }
 }
 

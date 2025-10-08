@@ -37,3 +37,28 @@
     /* 选中文字颜色 */
     color: #E2E8F1;
 }
+
+/* 深色主题自定义滚动条样式 */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.3); /* 深色轨道背景 */
+    border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.8); /* 深色滑块 */
+    border-radius: 4px;
+    border: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.9); /* 悬停时更亮的滑块 */
+}
+
+.custom-scrollbar::-webkit-scrollbar-corner {
+    background: rgba(31, 41, 55, 0.3); /* 角落背景 */
+}

@@ -13,14 +13,20 @@ import {message} from "antd";
 import TerminalPage from "@/src/pages/access/TerminalPage";
 import GuacamolePage from "@/src/pages/access/GuacamolePage";
 
+const AuthorisedAssetPage = lazy(() => import("@/src/pages/authorised/AuthorisedAssetPage"));
+const AuthorisedWebsitePage = lazy(() => import("@/src/pages/authorised/AuthorisedWebsitePage"));
+const AuthorisedAssetPost = lazy(() => import("@/src/pages/authorised/AuthorisedAssetPost"));
+const AuthorisedWebsitePost = lazy(() => import("@/src/pages/authorised/AuthorisedWebsitePost"));
 const LoginPage = lazy(() => import("@/src/pages/account/LoginPage"));
+const WechatWorkCallback = lazy(() => import("@/src/pages/account/WechatWorkCallback"));
+const OidcCallback = lazy(() => import("@/src/pages/account/OidcCallback"));
 const MobileAccessTerminal = lazy(() => import("@/src/pages/access/MobileAccessTerminal"));
 const UserPage = lazy(() => import("@/src/pages/identity/UserPage"));
 const UserDetailPage = lazy(() => import("@/src/pages/identity/UserDetailPage"));
 const SettingPage = lazy(() => import("@/src/pages/sysconf/SettingPage"));
 const InfoPage = lazy(() => import("@/src/pages/account/InfoPage"));
-const GroupPage = lazy(() => import("@/src/pages/identity/GroupPage"));
-const GroupDetail = lazy(() => import("@/src/pages/identity/GroupDetail"));
+const DepartmentPage = lazy(() => import("@/src/pages/identity/DepartmentPage"));
+const DepartmentDetail = lazy(() => import("@/src/pages/identity/DepartmentDetail"));
 const RolePage = lazy(() => import("@/src/pages/identity/RolePage"));
 const RoleDetail = lazy(() => import("@/src/pages/identity/RoleDetail"));
 const LoginLockedPage = lazy(() => import("@/src/pages/identity/LoginLockedPage"));
@@ -55,6 +61,7 @@ const StoragePage = lazy(() => import("@/src/pages/assets/StoragePage"));
 const WebsitePage = lazy(() => import("@/src/pages/assets/WebsitePage"));
 const BrowserPage = lazy(() => import("@/src/pages/access/BrowserPage"));
 const FacadePage = lazy(() => import("@/src/pages/facade/FacadePage"));
+const WebsiteFacadePage = lazy(() => import("@/src/pages/facade/WebsiteFacadePage"));
 const RedirectPage = lazy(() => import("@/src/layout/RedirectPage"));
 const UserLayout = lazy(() => import("@/src/layout/UserLayout"));
 const DashboardPage = lazy(() => import("@/src/pages/dashboard/DashboardPage"));
@@ -68,6 +75,8 @@ const router = createBrowserRouter([
     {path: "/setup", element: <SetupPage/>},
     {path: "/access", element: <AccessPage/>},
     {path: "/login", element: <LoginPage/>},
+    {path: "/wechat-work/callback", element: <WechatWorkCallback/>},
+    {path: "/oidc/callback", element: <OidcCallback/>},
     {path: "/terminal-playback", element: <TerminalPlayback/>},
     {path: "/terminal-monitor", element: <TerminalMonitor/>},
     {path: "/graphics-playback", element: <GuacdPlayback/>},
@@ -81,6 +90,7 @@ const router = createBrowserRouter([
         element: <UserLayout/>,
         children: [
             {path: "/x-asset", element: <FacadePage/>,},
+            {path: "/x-website", element: <WebsiteFacadePage/>,},
             {path: "/x-snippet", element: <SnippetUserPage/>,},
             {path: "/x-info", element: <UserInfoPage/>,},
         ]
@@ -91,8 +101,8 @@ const router = createBrowserRouter([
             {path: "/dashboard", element: <DashboardPage/>},
             {path: "/user", element: <UserPage/>},
             {path: "/user/:userId", element: <UserDetailPage/>},
-            {path: "/user-group", element: <GroupPage/>},
-            {path: "/user-group/:userGroupId", element: <GroupDetail/>},
+            {path: "/department", element: <DepartmentPage/>},
+            {path: "/department/:departmentId", element: <DepartmentDetail/>},
             {path: "/login-locked", element: <LoginLockedPage/>},
             {path: "/login-policy", element: <LoginPolicyPage/>},
             {path: "/login-policy/new", element: <LoginPolicyPostPage/>},
@@ -114,6 +124,10 @@ const router = createBrowserRouter([
             {path: "/strategy", element: <StrategyPage/>},
             {path: "/command-filter", element: <CommandFilterPage/>},
             {path: "/command-filter/:commandFilterId", element: <CommandFilterDetail/>},
+            {path: "/authorised-asset", element: <AuthorisedAssetPage/>},
+            {path: "/authorised-asset/post", element: <AuthorisedAssetPost/>},
+            {path: "/authorised-website", element: <AuthorisedWebsitePage/>},
+            {path: "/authorised-website/post", element: <AuthorisedWebsitePost/>},
 
             {path: "/scheduled-task", element: <ScheduledTaskPage/>},
             {path: "/tools", element: <ToolsPage/>},

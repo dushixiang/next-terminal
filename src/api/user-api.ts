@@ -12,6 +12,12 @@ export interface User {
     createdAt: number;
     roles: string[];
     lastLoginAt: number;
+    departments?: SimpleDepartment[];
+}
+
+interface SimpleDepartment {
+    id: string;
+    name: string;
 }
 
 export interface LoginLog {
@@ -88,6 +94,21 @@ class UserApi extends Api<User> {
         let formData = new FormData();
         formData.append("file", file);
         await requests.postForm(`/${this.group}/import`, formData);
+    }
+
+    // 获取用户的部门关联
+    getUserDepartments = async (userId: string) => {
+        return await requests.get(`/${this.group}/${userId}/departments`);
+    }
+
+    // 设置用户的部门关联
+    setUserDepartments = async (userId: string, departmentIds: string[]) => {
+        await requests.post(`/${this.group}/${userId}/departments`, { departmentIds });
+    }
+
+    // 批量设置用户部门
+    batchSetUserDepartments = async (userIds: string[], departmentIds: string[]) => {
+        await requests.post(`/${this.group}/batch-departments`, { userIds, departmentIds });
     }
 }
 

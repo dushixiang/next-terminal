@@ -4,22 +4,15 @@ import strings from "@/src/utils/strings";
 
 export interface Branding {
     copyright: string;
-    logo: string;
     name: string;
-    root: string;
     version: string;
-    loginBackgroundColor: string
-    icp: string
-    hiddenUpgrade: boolean
+    icp: string;
+    hiddenUpgrade: boolean;
+    debug: boolean;
 }
 
 class BrandingApi {
     getBranding = async () => {
-        if (strings.hasText(global.branding?.name)) {
-            return new Promise<Branding>((resolve, reject) => {
-                resolve(global.branding);
-            });
-        }
         return await requests.get(`/branding`) as Branding;
     }
 

@@ -6,11 +6,14 @@ import {ProForm, ProFormDigit, ProFormSwitch, ProFormText, ProFormTextArea} from
 import {useTranslation} from "react-i18next";
 import requests from "@/src/api/core/requests";
 import propertyApi from "@/src/api/property-api";
+import {useMobile} from "@/src/hook/use-mobile";
+import {cn} from "@/lib/utils";
 
 const {Title} = Typography;
 
 const MailSetting = ({get, set}: SettingProps) => {
 
+    const { isMobile } = useMobile();
     let {t} = useTranslation();
     const [form] = Form.useForm();
 
@@ -38,7 +41,7 @@ const MailSetting = ({get, set}: SettingProps) => {
         <div>
             <Title level={5} style={{marginTop: 0}}>{t('settings.mail.setting')}</Title>
             <Row gutter={16}>
-                <Col span={12}>
+                <Col span={isMobile ? 24 : 12}>
                     <Card>
                         <ProForm onFinish={set} request={get} submitter={{
                             resetButtonProps: {
@@ -100,7 +103,7 @@ const MailSetting = ({get, set}: SettingProps) => {
                         </ProForm>
                     </Card>
                 </Col>
-                <Col span={12}>
+                <Col span={isMobile ? 24 : 12}>
                     <Card>
                         <Alert
                             message={t('settings.mail.tip')}

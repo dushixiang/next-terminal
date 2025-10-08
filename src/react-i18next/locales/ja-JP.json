@@ -24,7 +24,8 @@
     "remark": "備考",
     "enter_remark": "備考を入力してください",
     "required": "必須",
-    "error": "操作に失敗しました"
+    "error": "操作に失敗しました",
+    "status": "状態"
   },
   "actions": {
     "option": "操作",
@@ -47,7 +48,8 @@
     "cancel": "キャンセル",
     "save": "保存",
     "remove": "削除",
-    "label": "操作"
+    "label": "操作",
+    "batch_delete": "一括削除"
   },
   "dashboard": {
     "name": "データ概要",
@@ -161,14 +163,17 @@
         "user_group": "ユーザーグループ",
         "role": "ロール",
         "login_policy": "ログインポリシー",
-        "login_locked": "ログイン制限"
+        "login_locked": "ログイン制限",
+        "department": "部門"
       }
     },
     "authorised": {
       "label": "リソース承認",
       "submenus": {
         "command_filter": "コマンドフィルタ",
-        "strategy": "承認戦略"
+        "strategy": "承認戦略",
+        "authorised_asset": "認証資産",
+        "authorised_website": "ウェブ資産の認証"
       }
     },
     "setting": {
@@ -352,11 +357,30 @@
       "locked_type": "ロックタイプ",
       "locked_type_username": "アカウントロック",
       "locked_type_ip": "IPロック",
-      "last_login_at": "最終ログイン時間"
+      "last_login_at": "最終ログイン時間",
+      "available": "オプションユーザー",
+      "selected": "選択されたユーザー"
     },
     "options": {
       "authorized_asset": "承認された資産",
       "login_policy": "ログインポリシー"
+    },
+    "department": {
+      "parent": "上級部門",
+      "root": "根部门\" は日本語で \"根部門\" になります。",
+      "weight": "並べ替え",
+      "weight_tooltip": "数字が大きいほど、順位が上になる。",
+      "weight_placeholder": "並べ替え値を入力してください。",
+      "leaders": "責任者",
+      "leaders_count": "責任者の数",
+      "leaders_placeholder": "責任者を選んでください。",
+      "name_placeholder": "部門名を入力してください。",
+      "parent_placeholder": "上位部門を選択してください。",
+      "table_view": "テーブルビュー",
+      "tree_view": "ツリービュー",
+      "tree_structure": "部門のツリー構造",
+      "sub_departments": "子部門",
+      "manage_users": "ユーザー管理"
     }
   },
   "dw": {
@@ -449,7 +473,11 @@
       "strategy": "戦略",
       "expired_at": "有効期限",
       "authorised_at": "承認時間",
-      "never_expired": "無期限"
+      "never_expired": "無期限",
+      "department": "部門",
+      "asset_group": "資産グループ",
+      "website": "ウェブ資産",
+      "website_group": "ウェブ資産グループ"
     }
   },
   "sysops": {
@@ -465,7 +493,20 @@
     "logs": {
       "label": "ログ",
       "exec_at": "実行時間",
-      "messages": "メッセージ"
+      "messages": "メッセージ",
+      "asset_status_check": "資産状態チェック",
+      "script_execution": "脚本の実行",
+      "certificate_renewal": "証明書の更新",
+      "no_certificates_to_renew": "証明書の更新は不要です。",
+      "asset_name": "資産名",
+      "used_time": "時間かかる",
+      "script": "脚本",
+      "result": "結果",
+      "certificate_name": "証明書の名称",
+      "renewed": "既に更新しました",
+      "skipped": "既にスキップしました",
+      "reason": "原因",
+      "clear_confirm_content": "ログをすべてクリアしますか？この操作は元に戻せません。"
     },
     "type": {
       "label": "タイプ",
@@ -661,6 +702,13 @@
       "message": "エラーメッセージ",
       "clipboard_required": "クリップボードの内容を入力してください",
       "clipboard_placeholder": "ここに貼り付け..."
+    },
+    "tabs": {
+      "closeLeft": "左側のタブを閉じる",
+      "closeRight": "右側のタブを閉じる",
+      "closeOthers": "他のタブを閉じる",
+      "closeAll": "すべてのタブを閉じる",
+      "reconnect": "再接続"
     }
   },
   "account": {
@@ -688,9 +736,15 @@
       "methods": {
         "passkey": "パスキー認証",
         "password": "パスワード認証",
-        "otp": "OTP認証"
+        "otp": "OTP認証",
+        "wechat_work": "企業微信でログイン",
+        "oidc": "OIDCでログインする"
       },
-      "back": "前のステップに戻る"
+      "back": "前のステップに戻る",
+      "processing": "ログインを処理中...",
+      "failed": "ログイン失敗",
+      "wechat_work_error": "企業微信ログインに失敗しました。再試行してください。",
+      "back_to_login": "ログインページに戻る"
     },
     "otp": "二要素認証",
     "next": "次へ",
@@ -891,7 +945,32 @@
       "self_signed_tip_title": "ヒント: ルート証明書を自分で交換できます。交換後、再起動してください。",
       "self_signed_root_ca_cert_path": "ルート証明書ファイルのパス",
       "self_signed_root_ca_key_path": "ルート証明書の秘密鍵のパス",
-      "renew_before": "更新の前もっての時間"
+      "renew_before": "更新の前もっての時間",
+      "log_viewer": {
+        "title": "証明書ログビューア",
+        "status": {
+          "realtime": "リアルタイムで受信",
+          "paused": "停止中",
+          "auto_scroll_disabled": "既に禁止されています"
+        },
+        "actions": {
+          "pause": "ログ受信の一時停止",
+          "resume": "ログの受信を続ける",
+          "download": "ダウンロードログ",
+          "clear": "ログをクリアする",
+          "scroll_to_bottom": "下までスクロールする"
+        },
+        "stats": {
+          "total_logs": "条日志\" は日本語で \"条の日記\" または \"条日誌\" と言います。",
+          "errors": "誤り",
+          "warnings": "警告",
+          "info": "情報",
+          "last_update": "最終更新",
+          "auto_scroll": "自動ローリング",
+          "no_data": "暫定的に日誌データなし",
+          "no_data_desc": "ログは証明書操作時にリアルタイムで表示されます。"
+        }
+      }
     },
     "dns_providers": {
       "label": "DNSサプライヤー",
@@ -930,7 +1009,57 @@
     "basic_settings": "基本設定",
     "target_server": "目標サーバー",
     "preserve_host_tip": "リクエストヘッダー内のホスト名は、プロキシサーバーのホスト名ではなく、元のリクエストのホスト名のままになります。",
-    "custom_header_tip": "複数のカスタムリクエストヘッダーを追加できます。形式は以下の通りです：キー: 値。"
+    "custom_header_tip": "複数のカスタムリクエストヘッダーを追加できます。形式は以下の通りです：キー: 値。",
+    "resize_method": "ウィンドウの調整方法",
+    "resize_method_extra": "RDPサーバーをクライアントディスプレイの幅または高さが変更されたときに更新する方法。",
+    "resize_methods": {
+      "display_update": "表示更新",
+      "display_update_desc": "RDP 8.1の「表示更新」チャネルを使用して、サーバーにクライアントの表示サイズが変更されたことを通知します。",
+      "reconnect": "再接続",
+      "reconnect_desc": "RDPセッションを自動的に切断し、新しいサイズで再接続します。"
+    },
+    "disable_detect_os": "オペレーティングシステムの自動認識を禁止する",
+    "disable_detect_os_extra": "アセットのロゴが空の場合、システムは自動的にアセットのOSタイプを識別し、適切なロゴを設定します。",
+    "wol": {
+      "settings": "WOL 起動設定",
+      "enabled": "WOL 起動を有効にする",
+      "mac_addr": "MAC アドレス",
+      "mac_addr_placeholder": "MACアドレスを入力してください。形式：AA:BB:CC:DD:EE:FF",
+      "mac_addr_invalid": "MACアドレスの形式が正しくありません。",
+      "broadcast": "ブロードキャストアドレス",
+      "broadcast_placeholder": "ブロードキャストアドレスを入力してください。デフォルト：255.255.255.255",
+      "wakeup_delay": "覚醒遅延",
+      "wakeup_delay_placeholder": "覚醒後の待機時間（秒）",
+      "wakeup_delay_tooltip": "ウェイクアップパケットを送信した後、デバイスの起動を待つ時間"
+    },
+    "security": {
+      "settings": "安全性認証",
+      "mode": "セーフモード",
+      "mode_extra": "RDP接続で使用されるセキュリティモードは、データの暗号化方法と認証タイプを決定します。",
+      "ignore_cert": "証明書の検証をスキップする",
+      "ignore_cert_extra": "サーバーが返す証明書を無視し、証明書が検証できない場合（例えば、自己署名証明書）も同じです。",
+      "cert_tofu": "初回の信頼証明書",
+      "cert_tofu_extra": "FreeRDPの「初回使用時トラスト」(TOFU)ポリシーを有効にし、初めて接続するときに未知の証明書を信頼します。",
+      "cert_fingerprints": "証明書の指紋",
+      "cert_fingerprints_extra": "コンマで区切られた証明書のフィンガープリントとハッシュの組み合わせリスト。接続時にサーバー証明書を検証します。",
+      "cert_fingerprints_placeholder": "例：sha256:1234567890abcdef...",
+      "disable_auth": "認証禁止",
+      "disable_auth_extra": "接続時の認証を無効にします（リモートデスクトップセッション内のログオン認証には影響しません）。",
+      "modes": {
+        "any": "自動選択",
+        "any_desc": "クライアントとサーバーのサポートに基づくセキュリティプロトコルを使用して、セキュリティモードを自動的に選択します（デフォルト）。",
+        "nla": "ネットワークレベルの認証（NLA）",
+        "nla_desc": "TLS暗号化を使用するには、事前にユーザー名とパスワードを提供する必要があります。",
+        "nla_ext": "ネットワークレベルの認証を拡張する",
+        "nla_ext_desc": "NLAと同様ですが、サーバーが追加の「早期ユーザ認証結果」を送信する必要があります。",
+        "tls": "TLS認証",
+        "tls_desc": "TLSを介したRDP認証と暗号化は、主にロードバランシング構成で使用されます。",
+        "vmconnect": "VMConnectモード",
+        "vmconnect_desc": "自動的にセキュリティモードを選択しますが、Hyper-V/VMConnectでサポートされているプロトコルにのみ限定されます。",
+        "rdp": "伝統的なRDP暗号化",
+        "rdp_desc": "伝統的なRDP暗号化モードは、通常、古いWindowsサーバーで使用されます。"
+      }
+    }
   },
   "gateways": {
     "name": "名前",
@@ -1245,6 +1374,36 @@
     },
     "webauthn": {
       "setting": "WebAuthn"
+    },
+    "wechat_work": {
+      "setting": "企業微信認証",
+      "tip": "起動後、ユーザーはエンタープライズWeChatのQRコードをスキャンしてシステムにログインできます。",
+      "enabled": "企業微信ログインを有効にする",
+      "corp_id": "企業ID",
+      "corp_id_placeholder": "企業WeChatの企業IDを入力してください",
+      "agent_id": "アプリケーションID",
+      "agent_id_placeholder": "企業微信アプリIDを入力してください",
+      "secret": "アプリケーションSecret",
+      "redirect_uri": "コールバックアドレス",
+      "redirect_uri_placeholder": "https://your-domain.com/wechat-work/callback",
+      "department": "デフォルトの部署",
+      "department_placeholder": "ユーザーのデフォルト部門を選択してください。"
+    },
+    "oidc": {
+      "setting": "OIDC認証",
+      "tip": "開始後、ユーザーはOIDCアイデンティティプロバイダーを使用してシステムにログインできます。",
+      "enabled": "OIDCログインを有効にする",
+      "issuer": "アイデンティティプロバイダーアドレス",
+      "issuer_placeholder": "OIDCアイデンティティプロバイダーのイシューURLを入力してください。",
+      "client_id": "クライアントID",
+      "client_id_placeholder": "OIDCクライアントIDを入力してください。",
+      "client_secret": "クライアントキー",
+      "redirect_uri": "コールバックアドレス",
+      "redirect_uri_placeholder": "https://your-domain.com/oidc/callback",
+      "scopes": "権限範囲",
+      "scopes_placeholder": "権限範囲を入力してください。複数ある場合はスペースで区切ってください。例：openid profile email",
+      "department": "デフォルトの部門",
+      "department_placeholder": "ユーザーのデフォルト部門を選択してください"
     }
   },
   "errors": {
@@ -1292,5 +1451,14 @@
     "60004": "弱いパスワードは許可されません",
     "60005": "パスワードは回文にできません",
     "10022": "パスワードログインは無効になっています。"
+  },
+  "websites": {
+    "group": "グループ分け",
+    "group_tip": "ドラッグして順序を調整できます。",
+    "add_group": "新しいグループ追加",
+    "edit_group": "編集グループ",
+    "group_name": "グループ名",
+    "group_name_placeholder": "グループ名を入力してください。",
+    "group_name_required": "グループ名は空にできません"
   }
 }

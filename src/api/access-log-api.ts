@@ -11,6 +11,7 @@ export interface AccessLog {
     statusCode: number;
     responseSize: number;
     clientIp: string;
+    region: string;
     userAgent: string;
     referer: string;
     requestTime: number;

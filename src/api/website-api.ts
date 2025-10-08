@@ -1,4 +1,6 @@
 import {Api} from "@/src/api/core/api";
+import requests from "@/src/api/core/requests";
+import type { TreeDataNode } from 'antd';
 
 export interface Website {
     id: string;
@@ -20,12 +22,11 @@ export interface Website {
     cert: Cert;
     public: Public;
     createdAt: number;
+    groupId?: string;
 
     scheme: string;
     host: string;
     port: number;
-
-    outerUrl: string;
 }
 
 interface Public {
@@ -50,6 +51,22 @@ interface BasicAuth {
 class WebsiteApi extends Api<Website> {
     constructor() {
         super("admin/websites");
+    }
+
+    getGroups = async () => {
+        return await requests.get(`/${this.group}/groups`) as TreeDataNode[]
+    }
+
+    setGroups = async (data: any) => {
+        return await requests.put(`/${this.group}/groups`, data);
+    }
+
+    deleteGroup = async (groupId: string) => {
+        return await requests.delete(`/${this.group}/groups/${groupId}`);
+    }
+
+    changeGroup = async (data: any) => {
+        return await requests.post(`/${this.group}/change-group`, data);
     }
 }
 

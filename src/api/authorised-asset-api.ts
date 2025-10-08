@@ -35,8 +35,8 @@ class AuthorisedAssetApi {
         return await requests.post(`/${this.group}/users`, data);
     }
 
-    authorisedUserGroups = async (data: any) => {
-        return await requests.post(`/${this.group}/user-groups`, data);
+    authorisedDepartments = async (data: any) => {
+        return await requests.post(`/${this.group}/departments`, data);
     }
 
     selected = async (expect: string, userId?: string, userGroupId?: string, assetId?: string) => {
@@ -54,6 +54,10 @@ class AuthorisedAssetApi {
 
     update = async (id: string, values: any) => {
         await requests.put(`/${this.group}/${id}`, values)
+    }
+
+    post = async (values: any) => {
+        await requests.post(`/${this.group}`, values)
     }
 }
 

@@ -22,6 +22,7 @@ let o = {
         "name": "名称",
         "days": "天",
         "tips": "提示",
+        "status": "状态",
     },
     "actions": {
         "option": "操作",
@@ -45,6 +46,7 @@ let o = {
         "save": "保存",
         "remove": "移除",
         "label": "操作",
+        "batch_delete": "批量删除",
     },
     "dashboard": {
         "name": "数据概览",
@@ -144,6 +146,7 @@ let o = {
             "submenus": {
                 "user": "用户",
                 "user_group": "用户组",
+                "department": "部门",
                 "role": "角色",
                 "login_policy": "登录策略",
                 "login_locked": "登录锁定",
@@ -153,7 +156,9 @@ let o = {
             "label": "资源授权",
             "submenus": {
                 "command_filter": "命令拦截器",
-                "strategy": "授权策略"
+                "strategy": "授权策略",
+                "authorised_asset": "授权资产",
+                "authorised_website": "授权Web资产",
             }
         },
         "setting": {
@@ -189,7 +194,6 @@ let o = {
             },
             "permissions": {
                 "label": "权限",
-                "owner": "拥有者",
                 "group": "组"
             }
         },
@@ -212,7 +216,8 @@ let o = {
         "editor": {
             "label": "编辑器",
             "save": "保存",
-            "refetch": "重新加载"
+            "refetch": "重新加载",
+            "copy_path": "复制路径",
         },
         "transmission": {
             "filename": "文件名称",
@@ -237,13 +242,15 @@ let o = {
             "waiting": "正在等待服务器响应...",
             "connected": "连接服务器成功",
             "disconnecting": "会话关闭中...",
-            "disconnected": "会话已关闭"
+            "disconnected": "会话已关闭",
+            "unknown": "未知状态"
         },
         "tunnel": {
             "connecting": "隧道正在连接中...",
             "open": "隧道连接成功",
             "closed": "隧道连接已关闭",
             "unstable": "隧道连接不稳定",
+            "unknown": "未知隧道状态"
         }
     },
     "identity": {
@@ -283,6 +290,24 @@ let o = {
             "members": "成员",
             "members_count": "成员数量",
         },
+        "department": {
+            "parent": "上级部门",
+            "root": "根部门",
+            "weight": "排序",
+            "weight_tooltip": "数字越大排序越靠前",
+            "weight_placeholder": "请输入排序值",
+            "leaders": "负责人",
+            "leaders_count": "负责人数量",
+            "leaders_placeholder": "请选择负责人",
+            "name_placeholder": "请输入部门名称",
+            "parent_placeholder": "请选择上级部门",
+            "table_view": "表格视图",
+            "tree_view": "树形视图",
+            "tree_structure": "部门树形结构",
+            "sub_departments": "子部门",
+            "manage_users": "成员管理",
+            "user_count": "成员数量",
+        },
         "user": {
             "username": "账号",
             "locked_at": "锁定时间",
@@ -299,6 +324,7 @@ let o = {
             },
             "nickname": "姓名",
             "mail": "邮箱",
+            "phone": "手机号",
             "status": "账号状态",
             "login": "登陆状态",
             "logins": {
@@ -337,9 +363,10 @@ let o = {
             "no_spaces_allowed": "禁止输入空格",
             "new_user_result": "用户创建成功",
             "last_login_at": "最后登录时间",
+            "available": "可选用户",
+            "selected": "已选择用户",
         },
         "options": {
-            "authorized_asset": "授权资产",
             "login_policy": "登陆策略",
         },
     },
@@ -411,8 +438,11 @@ let o = {
         "label": {
             "authorised": "授权",
             "user": "用户",
-            "user_group": "用户组",
+            "department": "部门",
             "asset": "资产",
+            "asset_group": "资产组",
+            "website": "Web资产",
+            "website_group": "Web资产组",
             "command_filter": "命令拦截器",
             "strategy": "策略",
             "expired_at": "失效时间",
@@ -436,7 +466,20 @@ let o = {
         "logs": {
             "label": "日志",
             "exec_at": "执行时间",
-            "messages": "消息"
+            "messages": "消息",
+            "asset_status_check": "资产状态检查",
+            "script_execution": "脚本执行",
+            "certificate_renewal": "证书续签",
+            "no_certificates_to_renew": "无需续签证书",
+            "asset_name": "资产名称",
+            "used_time": "耗时",
+            "script": "脚本",
+            "result": "结果",
+            "certificate_name": "证书名称",
+            "renewed": "已续签",
+            "skipped": "已跳过",
+            "reason": "原因",
+            "clear_confirm_content": "确认清空所有日志？此操作不可恢复。"
         },
         "type": {
             "label": "类型",
@@ -597,7 +640,8 @@ let o = {
                     "size": "字体大小",
                     "family": "字体"
                 },
-                "line_height": "行高"
+                "line_height": "行高",
+                "search_placeholder": "搜索终端内容..."
             },
             "mouse": {
                 "label": "鼠标设置",
@@ -630,6 +674,13 @@ let o = {
             "clipboard_required": "请输入剪贴板内容",
             "clipboard_placeholder": "粘贴到此处...",
         },
+        "tabs": {
+            "closeLeft": "关闭左侧标签页",
+            "closeRight": "关闭右侧标签页",
+            "closeOthers": "关闭其他标签页",
+            "closeAll": "关闭所有标签页",
+            "reconnect": "重新连接"
+        },
     },
     "account": {
         "my_asset": "我的资产",
@@ -656,9 +707,15 @@ let o = {
             "methods": {
                 "passkey": "使用通行密钥认证",
                 "password": "使用密码认证",
-                "otp": "使用OTP认证"
+                "otp": "使用OTP认证",
+                "wechat_work": "使用企业微信登录",
+                "oidc": "使用OIDC登录",
             },
             "back": "返回上一步",
+            "processing": "正在处理登录...",
+            "failed": "登录失败",
+            "wechat_work_error": "企业微信登录失败，请重试",
+            "back_to_login": "返回登录页面"
         },
         "otp": "双因素认证",
         "next": "下一步",
@@ -696,7 +753,7 @@ let o = {
         },
         "otp_apps": {
             "google_authenticator": "Google Authenticator",
-            "microsoft_authenticator": "Microsoft Authenticator", 
+            "microsoft_authenticator": "Microsoft Authenticator",
             "authy": "Authy",
             "1password": "1Password",
             "lastpass": "LastPass Authenticator"
@@ -774,6 +831,14 @@ let o = {
         "display_settings": "显示设置",
         "color_depth": "色彩深度",
         "force_lossless": "无损压缩",
+        "resize_method": "窗口调整方式",
+        "resize_method_extra": "当客户端显示器宽度或高度改变时更新RDP服务器的方法。",
+        "resize_methods": {
+            "display_update": "显示更新",
+            "display_update_desc": "使用RDP 8.1的\"显示更新\"通道来通知服务器客户端显示大小已改变",
+            "reconnect": "重新连接",
+            "reconnect_desc": "当客户端显示大小改变时自动断开RDP会话，并以新的大小重新连接"
+        },
         "audio_settings": "音频设置",
         "disable_audio": "禁用音频",
         "enable_audio_input": "启用音频输入",
@@ -825,8 +890,6 @@ let o = {
         "import_asset_success": "导入资产成功",
         "import_asset_error": "导入资产失败",
         "import_asset_error_title": "请检查导入的文件，以下资产导入失败：",
-        "bind_user": "绑定用户",
-        "bind_user_group": "绑定用户组",
         "up": "上移",
         "down": "下移",
         "copy_public_key": "复制公钥",
@@ -879,6 +942,31 @@ let o = {
             "set_as_default": "设为默认",
             "issued_log": "证书申请日志",
             "renew_before": "续签提前时间",
+            "log_viewer": {
+                "title": "证书日志查看器",
+                "status": {
+                    "realtime": "实时接收",
+                    "paused": "已暂停",
+                    "auto_scroll_disabled": "已禁用"
+                },
+                "actions": {
+                    "pause": "暂停接收日志",
+                    "resume": "继续接收日志",
+                    "download": "下载日志",
+                    "clear": "清空日志",
+                    "scroll_to_bottom": "滚动到底部"
+                },
+                "stats": {
+                    "total_logs": "条日志",
+                    "errors": "错误",
+                    "warnings": "警告",
+                    "info": "信息",
+                    "last_update": "最后更新",
+                    "auto_scroll": "自动滚动",
+                    "no_data": "暂无日志数据",
+                    "no_data_desc": "日志将在证书操作时实时显示"
+                }
+            },
         },
         "dns_providers": {
             "label": "DNS 供应商",
@@ -895,10 +983,61 @@ let o = {
         "dns_provider_config": "DNS 供应商配置",
         "dns_provider_config_tip": "请根据供应商的要求填写配置信息。",
         "terminal_settings": "终端设置",
-        "disable_alive_check": "连接时禁用存活检查",
+        "disable_alive_check": "禁用存活检查",
         "disable_alive_check_extra": "前端会定时发送心跳包，以保持连接的活跃状态，同时后端会向目标服务器发送请求并要求回复。",
+        "disable_detect_os": "禁用操作系统自动识别",
+        "disable_detect_os_extra": "当资产Logo为空时，系统会自动识别资产的操作系统类型，并设置合适的Logo。",
         "env": "环境变量",
         "env_placeholder": "格式：name=value 每行一个。",
+        "wol": {
+            "settings": "WOL 唤醒配置",
+            "enabled": "启用 WOL 唤醒",
+            "mac_addr": "MAC 地址",
+            "mac_addr_placeholder": "请输入 MAC 地址，格式：AA:BB:CC:DD:EE:FF",
+            "mac_addr_invalid": "MAC 地址格式不正确",
+            "broadcast": "广播地址",
+            "broadcast_placeholder": "请输入广播地址，默认：255.255.255.255",
+            "wakeup_delay": "唤醒延迟",
+            "wakeup_delay_placeholder": "唤醒后等待时间（秒）",
+            "wakeup_delay_tooltip": "发送唤醒包后等待设备启动的时间"
+        },
+        "security": {
+            "settings": "安全认证",
+            "mode": "安全模式",
+            "mode_extra": "RDP连接使用的安全模式，决定数据加密方式和认证类型。",
+            "ignore_cert": "忽略证书验证",
+            "ignore_cert_extra": "忽略服务器返回的证书，即使证书无法验证（如自签名证书）。",
+            "cert_tofu": "首次信任证书",
+            "cert_tofu_extra": "启用FreeRDP的\"首次使用时信任\"(TOFU)策略，第一次连接时信任未知证书。",
+            "cert_fingerprints": "证书指纹",
+            "cert_fingerprints_extra": "逗号分隔的证书指纹和哈希组合列表，连接时将验证服务器证书。",
+            "cert_fingerprints_placeholder": "例如：sha256:1234567890abcdef...",
+            "disable_auth": "禁用认证",
+            "disable_auth_extra": "禁用连接时的身份认证（不影响远程桌面会话中的登录认证）。",
+            "modes": {
+                "any": "自动选择",
+                "any_desc": "基于客户端和服务器支持的安全协议自动选择安全模式（默认）",
+                "nla": "网络级身份认证(NLA)",
+                "nla_desc": "使用TLS加密，需要预先提供用户名和密码",
+                "nla_ext": "扩展网络级身份认证",
+                "nla_ext_desc": "与NLA相同，但需要服务器发送额外的\"早期用户授权结果\"",
+                "tls": "TLS认证",
+                "tls_desc": "通过TLS实现RDP认证和加密，主要用于负载均衡配置",
+                "vmconnect": "VMConnect模式",
+                "vmconnect_desc": "自动选择安全模式，但仅限于Hyper-V/VMConnect支持的协议",
+                "rdp": "传统RDP加密",
+                "rdp_desc": "传统RDP加密模式，通常用于较旧的Windows服务器"
+            }
+        }
+    },
+    "websites": {
+        "group": "分组",
+        "group_tip": "拖拽可以调整顺序",
+        "add_group": "新增分组",
+        "edit_group": "编辑分组",
+        "group_name": "分组名称",
+        "group_name_placeholder": "请输入分组名称",
+        "group_name_required": "分组名称不能为空"
     },
     "gateways": {
         "name": "名称",
@@ -1060,20 +1199,6 @@ let o = {
             "direct_proxy": "直连模式",
             "disable_password_auth": "禁用密码认证",
         },
-        "rp": {
-            "setting": "反向代理服务器",
-            "tip": "开启后，将会在本地监听一个端口，可以将http/https服务映射到本机。",
-            "enabled": "反向代理服务",
-            "addr": "监听地址",
-            "redirect_to_https": "自动重定向到HTTPS",
-            "auto_tls": "自动申请HTTPS证书",
-            "cert": "证书",
-            "cert_key": "证书私钥",
-            "self_proxy": "代理自身系统",
-            "domain": "域名",
-            "system_root": "系统根路径",
-            "system_root_extra": "访问反向代理的Web资产时，需要验证当前登录的用户是否有权限，会重定向到系统的授权页面，此配置项内容为您当前登录的URL根路径。"
-        },
         "rdp": {
             "setting": "RDP 设置",
             "enable": {
@@ -1134,6 +1259,36 @@ let o = {
                 "filter_tooltip": "LDAP用户搜索过滤器，例如：(objectClass=person)。"
             },
             "user_property_mapping": "LDAP用户属性映射"
+        },
+        "wechat_work": {
+            "setting": "企业微信认证",
+            "tip": "开启后，用户可以使用企业微信扫码登录系统。",
+            "enabled": "启用企业微信登录",
+            "corp_id": "企业ID",
+            "corp_id_placeholder": "请输入企业微信企业ID",
+            "agent_id": "应用ID",
+            "agent_id_placeholder": "请输入企业微信应用ID",
+            "secret": "应用Secret",
+            "redirect_uri": "回调地址",
+            "redirect_uri_placeholder": "https://your-domain.com/wechat-work/callback",
+            "department": "默认部门",
+            "department_placeholder": "请选择用户默认部门"
+        },
+        "oidc": {
+            "setting": "OIDC认证",
+            "tip": "开启后，用户可以使用OIDC身份提供商登录系统。",
+            "enabled": "启用OIDC登录",
+            "issuer": "身份提供商地址",
+            "issuer_placeholder": "请输入OIDC身份提供商的Issuer URL",
+            "client_id": "客户端ID",
+            "client_id_placeholder": "请输入OIDC客户端ID",
+            "client_secret": "客户端密钥",
+            "redirect_uri": "回调地址",
+            "redirect_uri_placeholder": "https://your-domain.com/oidc/callback",
+            "scopes": "权限范围",
+            "scopes_placeholder": "请输入权限范围，多个用空格分隔，如：openid profile email",
+            "department": "默认部门",
+            "department_placeholder": "请选择用户默认部门"
         },
         "log": {
             "setting": "日志设置",

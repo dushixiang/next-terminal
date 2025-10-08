@@ -5,7 +5,12 @@ import brandingApi from "@/src/api/branding-api";
 import {Dropdown, Select, Spin} from "antd";
 import accountApi from "@/src/api/account-api";
 import {isMobileByMediaQuery, openOrSwitchToPage} from "@/src/utils/utils";
-import {ChevronDownIcon, LanguagesIcon, LaptopIcon} from "lucide-react";
+import {
+    ChevronDownIcon,
+    LanguagesIcon,
+    LaptopIcon,
+    LayoutDashboard, LogOutIcon, UserIcon
+} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
 
@@ -36,19 +41,38 @@ const UserHeader = () => {
     const dropItems = [
         {
             key: 'info-center',
+            icon: <UserIcon className={'w-4 h-4'}/>,
             label: <Link to={'/x-info'}>{t('account.profile')}</Link>,
+            danger: false,
         },
-        {
-            key: 'logout',
-            danger: true,
-            label: <div onClick={logout}>{t('account.logout')}</div>,
-        }
+
     ];
+
+    if (infoQuery.data?.type === 'admin' || infoQuery.data?.type === 'super-admin') {
+        dropItems.push({
+            key: 'admin',
+            icon: <LayoutDashboard className={'w-4 h-4'}/>,
+            label: <Link to={'/dashboard'}>{t('menus.dashboard.label')}</Link>,
+            danger: false,
+        });
+    }
+
+    dropItems.push({
+        key: 'logout',
+        icon: <LogOutIcon className={'w-4 h-4'}/>,
+        danger: true,
+        label: <div onClick={logout}>{t('account.logout')}</div>,
+    })
+
 
     const menus = [
         {
             key: '/x-asset',
             title: t('menus.resource.submenus.asset'),
+        },
+        {
+            key: '/x-website',
+            title: t('menus.resource.submenus.website'),
         },
         {
             key: '/x-snippet',

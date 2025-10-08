@@ -215,7 +215,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
     };
 
     return (
-        <div className={'rounded-lg border'}>
+        <div className={'rounded-lg border dark:bg-[#141414]'}>
             <div className={'px-4 pt-4 flex items-center justify-between'}>
                 <div className={'font-medium text-[15px] flex items-center gap-2'}>
                     <Tooltip title={t('actions.add')}>

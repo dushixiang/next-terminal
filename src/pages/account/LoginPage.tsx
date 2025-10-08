@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Divider, Form, Input, Select, Spin, Typography} from "antd";
+import {App, Button, Divider, Form, Input, message, Select, Spin, Typography} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
@@ -13,6 +13,8 @@ import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {startAuthentication} from "@simplewebauthn/browser";
 import {LanguagesIcon} from "lucide-react";
 import i18n from "i18next";
+import wechatWorkApi from "@/src/api/wechat-work-api";
+import oidcApi from "@/src/api/oidc-api";
 
 const {Title} = Typography;
 
@@ -49,7 +51,7 @@ const LoginPage = () => {
 
     useEffect(() => {
         if (queryLoginStatus.data) {
-            switch (queryLoginStatus.data) {
+            switch (queryLoginStatus.data?.status) {
                 case LoginStatus.LoggedIn:
                     redirect();
                     break;
@@ -129,9 +131,36 @@ const LoginPage = () => {
             let data2 = await accountApi.webauthnLoginFinishV2(data.token, authentication);
             afterLoginSuccess(data2, false);
         } catch (e) {
-            console.log(`error: ${e}`)
+            message.error(`${e}`)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const loginByWechatWork = async () => {
+        setLoading(true);
+        try {
+            const {authorizeUrl} = await wechatWorkApi.getAuthorizeUrl('login');
+            // 跳转到企业微信授权页面
+            window.location.href = authorizeUrl;
+        } catch (e) {
+            console.error('WeChat Work login error:', e);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    const loginByOidc = async () => {
+        setLoading(true);
+        try {
+            const {authorizeUrl} = await oidcApi.getAuthorizeUrl('login');
+            // 跳转到 OIDC 授权页面
+            window.location.href = authorizeUrl;
+        } catch (e) {
+            console.error('OIDC login error:', e);
+            message.error(`OIDC 登录失败: ${e}`);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -187,15 +216,39 @@ const LoginPage = () => {
                         <Divider className="my-4" plain>
                             Or
                         </Divider>
-                        <Button variant={'filled'}
-                                color={'default'}
-                                size={'large'}
-                                className="w-full"
-                                onClick={loginByPasskeyV2}
-                                loading={loading}
-                        >
-                            {t('account.login.methods.passkey')}
-                        </Button>
+                        {queryLoginStatus.data?.webauthnEnabled && (
+                            <Button variant={'filled'}
+                                    color={'default'}
+                                    size={'large'}
+                                    className="w-full mb-2"
+                                    onClick={loginByPasskeyV2}
+                                    loading={loading}
+                            >
+                                {t('account.login.methods.passkey')}
+                            </Button>
+                        )}
+                        {queryLoginStatus.data?.wechatWorkEnabled && (
+                            <Button variant={'filled'}
+                                    color={'geekblue'}
+                                    size={'large'}
+                                    className="w-full mb-2"
+                                    onClick={loginByWechatWork}
+                                    loading={loading}
+                            >
+                                {t('account.login.methods.wechat_work')}
+                            </Button>
+                        )}
+                        {queryLoginStatus.data?.oidcEnabled && (
+                            <Button variant={'filled'}
+                                    color={'primary'}
+                                    size={'large'}
+                                    className="w-full"
+                                    onClick={loginByOidc}
+                                    loading={loading}
+                            >
+                                {t('account.login.methods.oidc')}
+                            </Button>
+                        )}
                     </Form>
                 </div>;
             case LoginStep.OTP:
@@ -209,6 +262,7 @@ const LoginPage = () => {
                                       pattern={REGEXP_ONLY_DIGITS}
                                       onComplete={handleOTPChange}
                                       autoFocus={true}
+                                      autoComplete={'one-time-code'}
                             >
                                 <InputOTPGroup>
                                     <InputOTPSlot index={0}/>

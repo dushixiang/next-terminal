@@ -9,7 +9,7 @@ export const baseUrl = () => {
 
 export const baseWebSocketUrl = () => {
     if (import.meta.env.DEV) {
-        return 'ws://localhost/api';
+        return 'ws://localhost:8888/api';
     }
     let https = 'https:' == document.location.protocol;
     if (https) {

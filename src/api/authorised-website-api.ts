@@ -1,31 +1,32 @@
+import qs from "qs";
 import requests from "./core/requests";
+
+export interface AuthorisedWebsite {
+    id: string;
+    websiteId: string;
+    websiteName: string;
+    userId: string;
+    userName: string;
+    departmentId: string;
+    departmentName: string;
+    expiredAt: number;
+    createdAt: number;
+}
 
 class AuthorisedWebsiteApi {
 
     group = "admin/authorised-website";
 
-    bindingUser = async (websiteId: string, userIds: string[]) => {
-        return await requests.post(`/${this.group}/binding-user?websiteId=${websiteId}`, userIds);
+    paging = async (params: any) => {
+        return await requests.get(`/${this.group}/paging?${qs.stringify(params)}`);
     }
 
-    unboundUser = async (websiteId: string, userIds: string[]) => {
-        return await requests.post(`/${this.group}/unbound-user?websiteId=${websiteId}`, userIds);
+    deleteById = async (id: string) => {
+        return await requests.delete(`/${this.group}/${id}`);
     }
 
-    boundUser = async (websiteId: string) => {
-        return await requests.get(`/${this.group}/bound-user?websiteId=${websiteId}`) as string[];
-    }
-
-    bindingUserGroup = async (websiteId: string, userIds: string[]) => {
-        return await requests.post(`/${this.group}/binding-user-group?websiteId=${websiteId}`, userIds);
-    }
-
-    unboundUserGroup = async (websiteId: string, userIds: string[]) => {
-        return await requests.post(`/${this.group}/unbound-user-group?websiteId=${websiteId}`, userIds);
-    }
-
-    boundUserGroup = async (websiteId: string) => {
-        return await requests.get(`/${this.group}/bound-user-group?websiteId=${websiteId}`) as string[];
+    authorise = async (values: any) => {
+        return await requests.post(`/${this.group}`, values);
     }
 }
 

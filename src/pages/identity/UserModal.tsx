@@ -9,10 +9,9 @@ import {
     ProFormRadio,
     ProFormSelect,
     ProFormText,
-    ProFormTextArea
+    ProFormTextArea,
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import userGroupApi from "@/src/api/user-group-api";
 
 export interface UserModalProps {
     open: boolean
@@ -123,7 +122,14 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                     </Col>
                 </Row>
 
-                <ProFormText name={'mail'} label={t('identity.user.mail')} rules={[{type: "email"}]}/>
+                <Row gutter={8}>
+                    <Col span={12}>
+                        <ProFormText name={'mail'} label={t('identity.user.mail')} rules={[{type: "email"}]}/>
+                    </Col>
+                    <Col span={12}>
+                        <ProFormText name={'phone'} label={t('identity.user.phone')}/>
+                    </Col>
+                </Row>
 
                 <ProFormTextArea label={t('identity.user.public_key')} name='publicKey'
                                  placeholder='Public Key'
@@ -133,22 +139,6 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                     <ProFormText.Password
                         name={'password'}
                         label={t('identity.user.password')}
-                    />
-                }
-
-                {!id &&
-                    <ProFormSelect
-                        label={t('menus.identity.submenus.user_group')} name='groups'
-                        fieldProps={{mode: 'multiple', showSearch: true}}
-                        request={async () => {
-                            let items = await userGroupApi.getAll();
-                            return items.map(item => {
-                                return {
-                                    label: item.name,
-                                    value: item.id,
-                                }
-                            });
-                        }}
                     />
                 }
             </ProForm>

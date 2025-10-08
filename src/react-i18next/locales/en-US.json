@@ -24,7 +24,8 @@
     "remark": "Remark",
     "enter_remark": "Please enter remark",
     "required": "Required",
-    "error": "Operation failed"
+    "error": "Operation failed",
+    "status": "State"
   },
   "actions": {
     "option": "Actions",
@@ -47,7 +48,8 @@
     "cancel": "Cancel",
     "save": "Save",
     "remove": "Remove",
-    "label": "Actions"
+    "label": "Actions",
+    "batch_delete": "Batch Delete"
   },
   "dashboard": {
     "name": "Dashboard",
@@ -149,14 +151,17 @@
         "user_group": "User Groups",
         "role": "Roles",
         "login_policy": "Login Policies",
-        "login_locked": "Login Locks"
+        "login_locked": "Login Locks",
+        "department": "department"
       }
     },
     "authorised": {
       "label": "Authorization",
       "submenus": {
         "command_filter": "Command Filters",
-        "strategy": "Strategies"
+        "strategy": "Strategies",
+        "authorised_asset": "Authorized Assets",
+        "authorised_website": "Authorize Web Assets"
       }
     },
     "setting": {
@@ -340,11 +345,30 @@
       "locked_type": "Lock type",
       "locked_type_username": "Account locked",
       "locked_type_ip": "IP lock",
-      "last_login_at": "Last login time"
+      "last_login_at": "Last login time",
+      "available": "Optional User",
+      "selected": "Selected users"
     },
     "options": {
       "authorized_asset": "Authorized Assets",
       "login_policy": "Login Policy"
+    },
+    "department": {
+      "parent": "Superior department",
+      "root": "Root department",
+      "weight": "Sorting",
+      "weight_tooltip": "The larger the number, the more forward it is sorted.",
+      "weight_placeholder": "Please enter the sorting value",
+      "leaders": "Responsible person",
+      "leaders_count": "Number of persons in charge",
+      "leaders_placeholder": "Please select the person in charge",
+      "name_placeholder": "Please enter the department name",
+      "parent_placeholder": "Please select the superior department",
+      "table_view": "Table View",
+      "tree_view": "Tree view",
+      "tree_structure": "Department tree structure",
+      "sub_departments": "Sub-department",
+      "manage_users": "Manage Users"
     }
   },
   "dw": {
@@ -437,7 +461,11 @@
       "strategy": "Strategy",
       "expired_at": "Expiration Time",
       "authorised_at": "Authorized Time",
-      "never_expired": "Never Expires"
+      "never_expired": "Never Expires",
+      "department": "Department",
+      "asset_group": "Asset Group",
+      "website": "Web assets",
+      "website_group": "Web asset group"
     }
   },
   "sysops": {
@@ -453,7 +481,20 @@
     "logs": {
       "label": "Logs",
       "exec_at": "Execution Time",
-      "messages": "Messages"
+      "messages": "Messages",
+      "asset_status_check": "Asset status check",
+      "script_execution": "Script Execution",
+      "certificate_renewal": "Certificate Renewal",
+      "no_certificates_to_renew": "No need for certificate renewal",
+      "asset_name": "Asset Name",
+      "used_time": "time-consuming",
+      "script": "script",
+      "result": "Result",
+      "certificate_name": "Certificate Name",
+      "renewed": "Renewed",
+      "skipped": "Skipped",
+      "reason": "Reason",
+      "clear_confirm_content": "Confirm to clear all logs? This operation cannot be undone."
     },
     "type": {
       "label": "Type",
@@ -649,6 +690,13 @@
       "message": "Error message",
       "clipboard_required": "Please enter the clipboard content",
       "clipboard_placeholder": "Paste here..."
+    },
+    "tabs": {
+      "closeLeft": "Close the left tab",
+      "closeRight": "Close the tab on the right",
+      "closeOthers": "Close other tabs",
+      "closeAll": "Close all tabs",
+      "reconnect": "Reconnect"
     }
   },
   "account": {
@@ -676,9 +724,15 @@
       "methods": {
         "passkey": "Authenticate with Passkey",
         "password": "Authenticate with Password",
-        "otp": "Authenticate with OTP"
+        "otp": "Authenticate with OTP",
+        "wechat_work": "Log in using WeChat Work",
+        "oidc": "Log in using OIDC"
       },
-      "back": "Go back to the previous step"
+      "back": "Go back to the previous step",
+      "processing": "Processing login...",
+      "failed": "Login failed",
+      "wechat_work_error": "Enterprise WeChat login failed, please retry",
+      "back_to_login": "Return to the login page"
     },
     "otp": "Two-Factor Authentication",
     "next": "Next",
@@ -890,7 +944,32 @@
       "self_signed_tip_title": "Tip: You can replace the root certificate yourself, and the change will take effect after a restart.",
       "self_signed_root_ca_cert_path": "Root certificate file path",
       "self_signed_root_ca_key_path": "Root certificate private key path",
-      "renew_before": "Renewal lead time"
+      "renew_before": "Renewal lead time",
+      "log_viewer": {
+        "title": "Certificate Log Viewer",
+        "status": {
+          "realtime": "Real-time reception",
+          "paused": "Suspended",
+          "auto_scroll_disabled": "Disabled"
+        },
+        "actions": {
+          "pause": "Pause receiving logs",
+          "resume": "Continue receiving logs",
+          "download": "Download Logs",
+          "clear": "Clear Log",
+          "scroll_to_bottom": "Scroll to the bottom"
+        },
+        "stats": {
+          "total_logs": "Log entry",
+          "errors": "error",
+          "warnings": "Warning",
+          "info": "information",
+          "last_update": "Last Updated",
+          "auto_scroll": "Auto Scroll",
+          "no_data": "No log data available",
+          "no_data_desc": "The log will display in real-time during certificate operations."
+        }
+      }
     },
     "dns_providers": {
       "label": "DNS provider",
@@ -918,7 +997,57 @@
     "basic_settings": "Basic Settings",
     "target_server": "Target server",
     "preserve_host_tip": "It will retain the hostname in the request header as the hostname of the original request, rather than the hostname of the proxy server.",
-    "custom_header_tip": "Multiple custom request headers can be added, in the format: key: value."
+    "custom_header_tip": "Multiple custom request headers can be added, in the format: key: value.",
+    "resize_method": "Window adjustment method",
+    "resize_method_extra": "A method for updating the RDP server when the client display width or height changes.",
+    "resize_methods": {
+      "display_update": "Display Update",
+      "display_update_desc": "Use the 'Display Update' channel of RDP 8.1 to notify the server that the client display size has changed",
+      "reconnect": "Reconnect",
+      "reconnect_desc": "Automatically disconnect the RDP session when the client display size changes, and reconnect with the new size."
+    },
+    "disable_detect_os": "Disable operating system auto recognition",
+    "disable_detect_os_extra": "When the asset's Logo is empty, the system will automatically identify the type of operating system of the asset and set an appropriate Logo.",
+    "wol": {
+      "settings": "WOL Wake-up Configuration",
+      "enabled": "Enable WOL Wake-up",
+      "mac_addr": "MAC address",
+      "mac_addr_placeholder": "Please enter the MAC address in the format: AA:BB:CC:DD:EE:FF.",
+      "mac_addr_invalid": "MAC address format is incorrect",
+      "broadcast": "Broadcast Address",
+      "broadcast_placeholder": "Please enter the broadcast address, default: 255.255.255.255",
+      "wakeup_delay": "Wake-up delay",
+      "wakeup_delay_placeholder": "Wake-up wait time (seconds)",
+      "wakeup_delay_tooltip": "The time to wait for the device to start after sending the wake-up packet"
+    },
+    "security": {
+      "settings": "Safety Certification",
+      "mode": "Safe Mode",
+      "mode_extra": "The security mode used by RDP connections determines the data encryption method and authentication type.",
+      "ignore_cert": "Ignore certificate validation",
+      "ignore_cert_extra": "Ignore the certificate returned by the server, even if the certificate cannot be verified (such as a self-signed certificate).",
+      "cert_tofu": "First Trust Certificate",
+      "cert_tofu_extra": "Enable the \"Trust On First Use\" (TOFU) policy for FreeRDP, which trusts unknown certificates on the first connection.",
+      "cert_fingerprints": "Certificate Fingerprint",
+      "cert_fingerprints_extra": "A list of certificate fingerprints and hash combinations separated by commas, which will be used to verify the server's certificate upon connection.",
+      "cert_fingerprints_placeholder": "For example: sha256:1234567890abcdef...",
+      "disable_auth": "Disabled Authentication",
+      "disable_auth_extra": "Disable authentication when connecting (does not affect login authentication in Remote Desktop sessions).",
+      "modes": {
+        "any": "Auto Select",
+        "any_desc": "Automatically select a secure mode based on security protocols supported by the client and server (default)",
+        "nla": "Network Level Authentication (NLA)",
+        "nla_desc": "Using TLS encryption requires providing a username and password in advance.",
+        "nla_ext": "Expand network-level identity authentication",
+        "nla_ext_desc": "Same as NLA, but requires the server to send an additional 'early user authorization result'",
+        "tls": "TLS authentication",
+        "tls_desc": "RDP authentication and encryption through TLS, mainly used for load balancing configuration",
+        "vmconnect": "VMConnect mode",
+        "vmconnect_desc": "Automatically select safe mode, but only for protocols supported by Hyper-V/VMConnect",
+        "rdp": "Traditional RDP encryption",
+        "rdp_desc": "Traditional RDP encryption mode, commonly used for older Windows servers"
+      }
+    }
   },
   "gateways": {
     "name": "Name",
@@ -1233,6 +1362,36 @@
     },
     "webauthn": {
       "setting": "WebAuthn"
+    },
+    "wechat_work": {
+      "setting": "Enterprise WeChat Verification",
+      "tip": "After activation, users can scan the QR code with Enterprise WeChat to log in to the system.",
+      "enabled": "Enable WeChat Work Login",
+      "corp_id": "Enterprise ID",
+      "corp_id_placeholder": "Please enter the Enterprise WeChat Enterprise ID",
+      "agent_id": "Application ID",
+      "agent_id_placeholder": "Please enter the Enterprise WeChat application ID.",
+      "secret": "Apply Secret",
+      "redirect_uri": "Callback URL",
+      "redirect_uri_placeholder": "https://your-domain.com/wechat-work/callback",
+      "department": "Default Department",
+      "department_placeholder": "Please select the user's default department"
+    },
+    "oidc": {
+      "setting": "OIDC Authentication",
+      "tip": "After enabling, users can log in to the system using an OIDC identity provider.",
+      "enabled": "Enable OIDC Login",
+      "issuer": "Identity provider address",
+      "issuer_placeholder": "Please enter the Issuer URL of the OIDC identity provider",
+      "client_id": "Client ID",
+      "client_id_placeholder": "Please enter the OIDC client ID.",
+      "client_secret": "Client Key",
+      "redirect_uri": "Callback Address",
+      "redirect_uri_placeholder": "https://your-domain.com/oidc/callback",
+      "scopes": "Scope of authority",
+      "scopes_placeholder": "Please enter the scope of permissions, multiple ones separated by spaces, such as: openid profile email",
+      "department": "Default Department",
+      "department_placeholder": "Please select the user's default department"
     }
   },
   "errors": {
@@ -1280,5 +1439,14 @@
     "60004": "Weak passwords are not allowed",
     "60005": "Password cannot be a palindrome",
     "10022": "Password login has been disabled."
+  },
+  "websites": {
+    "group": "grouping",
+    "group_tip": "Drag and drop can adjust the order.",
+    "add_group": "New Group",
+    "edit_group": "Edit Group",
+    "group_name": "Group Name",
+    "group_name_placeholder": "Please enter the group name",
+    "group_name_required": "Group name cannot be empty"
   }
 }

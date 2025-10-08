@@ -27,6 +27,11 @@ interface BodyReplaceRule {
     replace: string;
 }
 
+interface KeyValuePair {
+    key: string;
+    value: string;
+}
+
 interface ModifyRule {
     name: string;
     match: {
@@ -35,8 +40,8 @@ interface ModifyRule {
         status?: number;
     };
     actions: {
-        set_headers?: Record<string, string>;
-        add_headers?: Record<string, string>;
+        set_headers?: KeyValuePair[];
+        add_headers?: KeyValuePair[];
         remove_headers?: string[];
         body_replace?: BodyReplaceRule[];
     };
@@ -58,8 +63,8 @@ const WebsiteModifyResponseView = () => {
                 actions: {
                     ...rule.actions,
                     // 将键值对数组转换为对象
-                    set_headers: rule.actions.set_headers || {},
-                    add_headers: rule.actions.add_headers || {},
+                    set_headers: rule.actions.set_headers || [],
+                    add_headers: rule.actions.add_headers || [],
                     remove_headers: rule.actions.remove_headers || [],
                     body_replace: rule.actions.body_replace || []
                 }
@@ -182,7 +187,7 @@ const WebsiteModifyResponseView = () => {
                                                 {...restField}
                                                 name={[name, 'match', 'path']}
                                                 label="请求路径"
-                                                tooltip="要匹配的请求路径，例如: /api/data"
+                                                tooltip="要匹配的请求路径，例如: /api/data（为空时匹配所有路径）"
                                             >
                                                 <Input placeholder="/hello"/>
                                             </Form.Item>
@@ -191,7 +196,7 @@ const WebsiteModifyResponseView = () => {
                                                 {...restField}
                                                 name={[name, 'match', 'method']}
                                                 label="请求方法"
-                                                tooltip="要匹配的 HTTP 方法"
+                                                tooltip="要匹配的 HTTP 方法（为空时匹配所有方法）"
                                             >
                                                 <Select placeholder="选择请求方法" allowClear>
                                                     <Option value="GET">GET</Option>
@@ -208,10 +213,10 @@ const WebsiteModifyResponseView = () => {
                                                 {...restField}
                                                 name={[name, 'match', 'status']}
                                                 label="响应状态码"
-                                                tooltip="要匹配的 HTTP 状态码，例如: 200, 404"
+                                                tooltip="要匹配的 HTTP 状态码，例如: 200, 404（为0时匹配所有状态码）"
                                             >
                                                 <InputNumber
-                                                    min={100}
+                                                    min={0}
                                                     max={599}
                                                     placeholder="200"
                                                     style={{width: '100%'}}

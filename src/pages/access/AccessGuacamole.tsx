@@ -17,9 +17,8 @@ import {App, Watermark} from "antd";
 import copy from "copy-to-clipboard";
 import useWindowFocus from "@/src/hook/use-window-focus";
 import {dropKeydown, isFullScreen, requestFullScreen} from "@/src/utils/utils";
-import Timeout, {TimeoutHandle} from "@/src/components/Timeout";
 import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
-import RenderState from "@/src/pages/access/guacamole/RenderState";
+import RenderState, {GuacamoleState} from "@/src/pages/access/guacamole/RenderState";
 import ControlButtons from "@/src/pages/access/guacamole/ControlButtons";
 import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
 import {debounce} from "@/src/utils/debounce";
@@ -37,7 +36,7 @@ const AccessGuacamole = ({assetId}: Props) => {
     let {t} = useTranslation();
     let {message} = App.useApp();
 
-    let [tiger, setTiger] = useState(new Date().toString());
+    let [tiger, setTiger] = useState(0);
     const terminalRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
     let clientRef = useRef<Guacamole.Client>(null);
@@ -60,11 +59,7 @@ const AccessGuacamole = ({assetId}: Props) => {
     let [mfaOpen, setMfaOpen] = useState(false);
     let [fixedSize, setFixedSize] = useState(false);
 
-    const timeoutRef = useRef<TimeoutHandle>();
-
     let windowFocus = useWindowFocus();
-
-    const resetTimer = () => timeoutRef.current?.reset();
 
     // 判断当前 tab
     useEffect(() => {
@@ -243,7 +238,6 @@ const AccessGuacamole = ({assetId}: Props) => {
             client.sendKeyEvent(pressed ? 1 : 0, keysym);
 
             if (pressed && keysym === 65288) return false; // 65288 = Backspace
-            if (pressed) resetTimer();
 
             return true;
         }
@@ -259,7 +253,6 @@ const AccessGuacamole = ({assetId}: Props) => {
         mouse.onmousedown = mouse.onmouseup = function (mouseState) {
             client.sendMouseState(mouseState);
             sink.focus();
-            resetTimer();
         }
 
         // @ts-ignore
@@ -281,7 +274,6 @@ const AccessGuacamole = ({assetId}: Props) => {
         // @ts-ignore
         touch.onmousedown = touch.onmousemove = touch.onmouseup = function (state: any) {
             client.sendMouseState(state);
-            resetTimer();
         };
 
 
@@ -374,10 +366,12 @@ const AccessGuacamole = ({assetId}: Props) => {
                 status={status}
                 tunnelState={tunnelState}
                 onReconnect={() => {
-                    setTiger(new Date().toString());
                     setStatus({});
-                    resetTimer();
+                    setState(GuacamoleState.IDLE);
+                    setTunnelState(Guacamole.Tunnel.State.CONNECTING);
+                    setTiger(prevState => prevState + 1);
                 }}
+                overlay={true}
             />
             <div className={'flex items-center justify-center h-full w-full'}>
                 <Watermark content={session?.watermark?.content}
@@ -468,15 +462,6 @@ const AccessGuacamole = ({assetId}: Props) => {
                     setRequiredOpen(false);
                     clientRef.current?.disconnect();
                 }}
-            />
-
-            <Timeout
-                ref={timeoutRef}
-                fn={() => {
-                    clientRef.current?.disconnect();
-                    // console.log(`client disconnect by timeout`, session?.idle)
-                }}
-                ms={session?.idle * 1000}
             />
 
             <MultiFactorAuthentication

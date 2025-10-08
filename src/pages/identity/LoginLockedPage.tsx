@@ -4,14 +4,12 @@ import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import loginLockedApi, {LoginLocked} from "../../api/login-locked-api";
 import {useTranslation} from "react-i18next";
 import NButton from "../../components/NButton";
-import {useLicense} from "@/src/hook/use-license";
-import Disabled from "@/src/components/Disabled";
+import {getSort} from "@/src/utils/sort";
 
 const LoginLockedPage = () => {
 
     const {t} = useTranslation();
     const actionRef = useRef<ActionType>();
-    let [license] = useLicense();
 
     const columns: ProColumns<LoginLocked>[] = [
         {
@@ -81,39 +79,39 @@ const LoginLockedPage = () => {
 
     return (
         <div>
-            <Disabled disabled={license.isFree()}>
-                <ProTable
-                    columns={columns}
-                    actionRef={actionRef}
-                    request={async (params = {}, sort, filter) => {
-
-                        let queryParams = {
-                            pageIndex: params.current,
-                            pageSize: params.pageSize,
-                            sort: JSON.stringify(sort),
-                            ip: params.ip,
-                            username: params.username,
-                        }
-                        let result = await loginLockedApi.getPaging(queryParams);
-                        return {
-                            data: result['items'],
-                            success: true,
-                            total: result['total']
-                        };
-                    }}
-                    rowKey="id"
-                    search={{
-                        labelWidth: 'auto',
-                    }}
-                    pagination={{
-                        defaultPageSize: 10,
-                        showSizeChanger: true
-                    }}
-                    dateFormatter="string"
-                    headerTitle={t('menus.identity.submenus.login_locked')}
-                    toolBarRender={() => []}
-                />
-            </Disabled>
+            <ProTable
+                columns={columns}
+                actionRef={actionRef}
+                request={async (params = {}, sort, filter) => {
+                    let [sortOrder, sortField] = getSort(sort);
+                    
+                    let queryParams = {
+                        pageIndex: params.current,
+                        pageSize: params.pageSize,
+                        sortOrder: sortOrder,
+                        sortField: sortField,
+                        ip: params.ip,
+                        username: params.username,
+                    }
+                    let result = await loginLockedApi.getPaging(queryParams);
+                    return {
+                        data: result['items'],
+                        success: true,
+                        total: result['total']
+                    };
+                }}
+                rowKey="id"
+                search={{
+                    labelWidth: 'auto',
+                }}
+                pagination={{
+                    defaultPageSize: 10,
+                    showSizeChanger: true
+                }}
+                dateFormatter="string"
+                headerTitle={t('menus.identity.submenus.login_locked')}
+                toolBarRender={() => []}
+            />
         </div>
     );
 };

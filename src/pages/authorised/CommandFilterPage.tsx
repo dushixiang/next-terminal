@@ -5,6 +5,7 @@ import {useNavigate} from "react-router-dom";
 import commandFilterApi, {CommandFilter} from '@/src/api/command-filter-api';
 import CommandFilterModal from "@/src/pages/authorised/CommandFilterModal";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {useMutation} from "@tanstack/react-query";
 import NLink from "@/src/components/NLink";
 import NButton from "@/src/components/NButton";
@@ -120,11 +121,13 @@ const CommandFilterPage = () => {
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
-
+                    let [sortOrder, sortField] = getSort(sort);
+                    
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         name: params.name,
                     }
                     let result = await api.getPaging(queryParams);

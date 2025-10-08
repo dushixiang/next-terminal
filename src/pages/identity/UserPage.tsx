@@ -5,6 +5,7 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import userApi, {CreateUserResult, User} from "@/src/api/user-api";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import UserModal from "./UserModal";
 import {useMutation} from "@tanstack/react-query";
 import NButton from "@/src/components/NButton";
@@ -103,7 +104,8 @@ ${t('identity.user.password')}: ${result.password}`)
             dataIndex: 'index',
             valueType: 'indexBorder',
             width: 48,
-        }, {
+        },
+        {
             title: t('identity.user.nickname'),
             dataIndex: 'nickname',
             key: 'nickname',
@@ -111,16 +113,29 @@ ${t('identity.user.password')}: ${result.password}`)
             render: (text, record) => {
                 return <NLink to={`/user/${record['id']}`}>{text}</NLink>;
             }
-        }, {
+        },
+        {
             title: t('identity.user.username'),
             dataIndex: 'username',
             key: 'username',
             sorter: true,
-        }, {
+        },
+        {
             title: t('identity.user.mail'),
             dataIndex: 'mail',
             key: 'mail',
-        }, {
+        },
+        {
+            title: t('menus.identity.submenus.department'),
+            dataIndex: 'departmentNames',
+            key: 'departmentNames',
+            hideInSearch: true,
+            render: (_, record) => {
+                let departmentNames = record.departments;
+                return departmentNames?.map(d => d.name)?.join(', ') || '-';
+            }
+        },
+        {
             title: t('identity.user.status'),
             dataIndex: 'status',
             key: 'status',
@@ -136,7 +151,8 @@ ${t('identity.user.password')}: ${result.password}`)
                                        });
                                }}/>
             }
-        }, {
+        },
+        {
             title: t('identity.user.login'),
             dataIndex: 'online',
             key: 'online',
@@ -203,9 +219,6 @@ ${t('identity.user.password')}: ${result.password}`)
                             case 'reset-totp':
                                 bulkResetTOTP([record['id']])
                                 break;
-                            case 'authorised-asset':
-                                navigate(`/user/${record['id']}?activeKey=asset`);
-                                break;
                             case 'login-policy':
                                 navigate(`/user/${record['id']}?activeKey=login-policy`);
                                 break;
@@ -215,7 +228,6 @@ ${t('identity.user.password')}: ${result.password}`)
                         {key: 'detail', name: t('actions.detail')},
                         {key: 'reset-password', name: t('identity.user.options.reset.password.action')},
                         {key: 'reset-totp', name: t('identity.user.options.reset.otp.action')},
-                        {key: 'authorised-asset', name: t('identity.options.authorized_asset')},
                         {key: 'login-policy', name: t('identity.options.login_policy')},
                     ]}
                 />,
@@ -286,11 +298,14 @@ ${t('identity.user.password')}: ${result.password}`)
                     </Space>
                 );
             }}
-            request={async (params = {}, sort, filter) => {
-                let queryParams = {
+                request={async (params = {}, sort, filter) => {
+                    let [sortOrder, sortField] = getSort(sort);
+                    
+                    let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
-                    sort: JSON.stringify(sort),
+                    sortOrder: sortOrder,
+                    sortField: sortField,
                     nickname: params.nickname,
                     username: params.username,
                     mail: params.mail,

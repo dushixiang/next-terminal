@@ -4,6 +4,7 @@ import {App, Button, Popconfirm, Tag} from "antd";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import strategyApi, {Strategy} from '@/src/api/strategy-api';
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import StrategyModal from "@/src/pages/authorised/StrategyModal";
 import {useMutation} from "@tanstack/react-query";
 import NButton from "@/src/components/NButton";
@@ -155,11 +156,13 @@ const StrategyPage = () => {
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
-
+                    let [sortOrder, sortField] = getSort(sort);
+                    
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         name: params.name,
                     }
                     let result = await api.getPaging(queryParams);

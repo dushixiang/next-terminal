@@ -1,8 +1,9 @@
-import {App, Button, Tag} from 'antd';
+import {App, Button, Tag, Typography} from 'antd';
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import loginLogApi from "@/src/api/login-log-api";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {useMutation} from "@tanstack/react-query";
 import {LoginLog} from "@/src/api/user-api";
 
@@ -36,7 +37,12 @@ const LoginLogPage = () => {
             dataIndex: 'clientIp',
             key: 'clientIp',
             render: (text, record) => {
-                return `${text} (${record.region})`;
+                let view = <div>{text}</div>;
+                const title = record.region;
+                return <div className={'flex items-center gap-2'}>
+                    {view}
+                    <Typography.Text type="secondary">{title}</Typography.Text>
+                </div>
             },
         }, {
             title: t('audit.login_status'),
@@ -83,11 +89,14 @@ const LoginLogPage = () => {
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let queryParams = {
+                    request={async (params = {}, sort, filter) => {
+                        let [sortOrder, sortField] = getSort(sort);
+                        
+                        let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         username: params.username,
                         clientIp: params.clientIp,
                     }

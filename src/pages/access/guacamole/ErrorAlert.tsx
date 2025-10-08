@@ -1,10 +1,9 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
 import {XCircle} from 'lucide-react';
-import {motion} from 'framer-motion';
 
 export interface GuacamoleStatus {
-    code?: number | string;
+    code?: number;
     message?: string;
 }
 
@@ -13,17 +12,29 @@ interface ErrorAlertProps {
     onReconnect?: () => void;
 }
 
-export const ErrorAlert: React.FC<ErrorAlertProps> = ({status, onReconnect}) => {
+/**
+ * 错误详情行组件
+ */
+const ErrorDetail: React.FC<{ label: string; value: string | number }> = ({label, value}) => (
+    <div className="text-sm text-gray-300">
+        <span className="font-semibold">{label}:</span>
+        <span className="ml-1">{value}</span>
+    </div>
+);
 
+/**
+ * Guacamole 连接错误提示组件
+ * 显示连接错误信息和重连按钮
+ */
+export const ErrorAlert: React.FC<ErrorAlertProps> = ({status, onReconnect}) => {
     const {t} = useTranslation();
 
+    const hasCode = status?.code !== undefined && status.code !== null;
+    const hasMessage = status?.message && status.message.trim() !== '';
+
     return (
-        <motion.div
-            initial={{opacity: 0, scale: 0.9}}
-            animate={{opacity: 1, scale: 1}}
-            transition={{duration: 0.25, ease: 'easeOut'}}
-            className="max-w-md w-[400px] bg-[#1E1E1E] border border-red-600 rounded-2xl p-6 shadow-2xl flex flex-col gap-3"
-        >
+        <div className="max-w-md w-[400px] bg-[#1E1E1E] border border-red-600 rounded-2xl p-6 shadow-2xl flex flex-col gap-3">
+            {/* 错误标题 */}
             <div className="flex items-center gap-2">
                 <XCircle className="text-red-500 w-7 h-7 animate-pulse"/>
                 <h2 className="text-red-400 text-2xl font-bold leading-snug">
@@ -31,29 +42,30 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({status, onReconnect}) => 
                 </h2>
             </div>
 
-            {status?.code && (
-                <div className="text-sm text-gray-300">
-                    <span className="font-semibold">{t('access.guacamole.code', 'Code')}:</span>
-                    <span className="ml-1">{status.code}</span>
-                </div>
+            {/* 错误详情 */}
+            {hasCode && (
+                <ErrorDetail
+                    label={t('access.guacamole.code', 'Code')}
+                    value={status.code!}
+                />
             )}
 
-            {status?.message && (
+            {hasMessage && (
                 <div className="text-sm text-gray-300 break-words">
                     <span className="font-semibold">{t('access.guacamole.message', 'Message')}:</span>
-                    <span className="ml-1">{status.message}</span>
+                    <span className="ml-1">{status.message!}</span>
                 </div>
             )}
 
-            {onReconnect &&
+            {/* 重连按钮 */}
+            {onReconnect && (
                 <button
                     onClick={onReconnect}
                     className="mt-4 self-end bg-gradient-to-tr from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium px-6 py-2 rounded-xl shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                 >
                     {t('access.reconnect', 'Reconnect')}
                 </button>
-            }
-
-        </motion.div>
+            )}
+        </div>
     );
 };

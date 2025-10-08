@@ -108,3 +108,238 @@
     scrollbar-color: #eaeaea transparent;
     scrollbar-gutter: stable;
 }
+
+/* 移动端全局样式优化 */
+@media (max-width: 768px) {
+    /* 页面容器优化 */
+    .page-card {
+        margin: 8px !important;
+        padding: 12px !important;
+    }
+    
+    .page-herder {
+        margin: 8px 8px 0 8px !important;
+        padding: 8px !important;
+    }
+    
+    .app-page-container {
+        padding: 12px !important;
+    }
+    
+    /* 表格移动端优化 */
+    .ant-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .ant-table {
+        min-width: 600px;
+    }
+    
+    .ant-table-thead > tr > th {
+        padding: 8px 4px !important;
+        font-size: 12px;
+    }
+    
+    .ant-table-tbody > tr > td {
+        padding: 8px 4px !important;
+        font-size: 12px;
+    }
+    
+    /* 按钮组移动端优化 */
+    .ant-btn-group {
+        flex-wrap: wrap !important;
+        gap: 4px !important;
+    }
+    
+    .ant-btn {
+        margin-bottom: 4px;
+    }
+    
+    /* 表单移动端优化 */
+    .ant-form-item {
+        margin-bottom: 12px !important;
+    }
+    
+    .ant-form-item-label {
+        padding-bottom: 4px !important;
+    }
+    
+    .ant-form-item-label > label {
+        font-size: 14px;
+    }
+    
+    /* 模态框移动端优化 */
+    .ant-modal {
+        margin: 16px !important;
+        max-width: calc(100vw - 32px) !important;
+    }
+    
+    .ant-modal-content {
+        border-radius: 8px;
+    }
+    
+    /* 抽屉移动端优化 */
+    .ant-drawer-content-wrapper {
+        max-width: 90vw !important;
+    }
+    
+    /* 选择器移动端优化 */
+    .ant-select-dropdown {
+        max-height: 200px;
+    }
+    
+    /* 分页移动端优化 */
+    .ant-pagination {
+        text-align: center;
+        margin-top: 16px;
+    }
+    
+    .ant-pagination-options {
+        display: none !important;
+    }
+    
+    /* 卡片移动端优化 */
+    .ant-card {
+        margin-bottom: 12px;
+    }
+    
+    .ant-card-head {
+        padding: 0 12px;
+        min-height: 40px;
+    }
+    
+    .ant-card-body {
+        padding: 12px;
+    }
+    
+    /* 标签页移动端优化 */
+    .ant-tabs-nav {
+        margin-bottom: 12px;
+    }
+    
+    .ant-tabs-tab {
+        padding: 8px 12px;
+        font-size: 14px;
+    }
+    
+    /* 输入框移动端优化 */
+    .ant-input, .ant-input-number {
+        font-size: 16px; /* 防止iOS缩放 */
+    }
+    
+    /* 搜索表单移动端优化 */
+    .page-search {
+        padding: 12px !important;
+        margin: 8px !important;
+    }
+    
+    .page-search .ant-form-item {
+        margin-bottom: 8px !important;
+    }
+    
+    /* 设置页面移动端优化 */
+    .mobile-setting-tabs .ant-tabs-nav {
+        margin-bottom: 16px;
+    }
+    
+    .mobile-setting-tabs .ant-tabs-tab {
+        padding: 8px 10px !important;
+        font-size: 12px;
+        min-width: 60px;
+        text-align: center;
+    }
+    
+    .mobile-setting-tabs .ant-tabs-nav-wrap {
+        padding: 0 8px;
+    }
+    
+    .mobile-setting-tabs .ant-tabs-content {
+        padding: 0 4px;
+    }
+    
+    /* 设置表单移动端优化 */
+    .mobile-setting-tabs .ant-form-item-label {
+        padding-bottom: 4px;
+    }
+    
+    .mobile-setting-tabs .ant-form-item {
+        margin-bottom: 16px;
+    }
+    
+    .mobile-setting-tabs .ant-form-item-label > label {
+        font-size: 14px;
+        font-weight: 500;
+    }
+    
+    /* 设置页面按钮优化 */
+    .mobile-setting-tabs .ant-btn {
+        min-width: 80px;
+        font-size: 14px;
+    }
+    
+    /* 设置页面分割线优化 */
+    .mobile-setting-tabs .ant-divider {
+        margin: 16px 0;
+    }
+    
+    /* 设置页面卡片优化 */
+    .mobile-setting-tabs .ant-card {
+        margin-bottom: 16px;
+    }
+    
+    .mobile-setting-tabs .ant-card-body {
+        padding: 16px 12px;
+    }
+    
+    /* 设置页面网格布局优化 */
+    .mobile-setting-tabs .grid-cols-4 {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+    
+    .mobile-setting-tabs .grid-cols-2 {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+    
+    /* 设置页面颜色选择器优化 */
+    .mobile-setting-tabs .ant-color-picker {
+        width: 100% !important;
+    }
+    
+    /* 设置页面滑块优化 */
+    .mobile-setting-tabs .ant-slider {
+        margin: 8px 0;
+    }
+    
+    /* 设置页面开关优化 */
+    .mobile-setting-tabs .ant-switch {
+        margin: 4px 0;
+    }
+    
+    /* 设置页面数字输入框优化 */
+    .mobile-setting-tabs .ant-input-number {
+        width: 100% !important;
+    }
+    
+    /* ReactMarkdown 内容优化 */
+    .markdown-content {
+        line-height: 1.6;
+    }
+    
+    .markdown-content * {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+}
+
+/* 平板端样式优化 */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .page-card {
+        margin: 12px !important;
+    }
+    
+    .ant-table-thead > tr > th,
+    .ant-table-tbody > tr > td {
+        padding: 10px 8px !important;
+    }
+}

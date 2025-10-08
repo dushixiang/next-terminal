@@ -40,6 +40,12 @@ export interface ExecScriptResult {
     result: string
 }
 
+export interface RenewCertificateResult {
+    name: string
+    success: boolean
+    error?: string
+}
+
 class ScheduledTaskApi extends Api<ScheduledTask> {
     constructor() {
         super("admin/scheduled-tasks");

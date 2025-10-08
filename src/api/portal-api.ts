@@ -27,6 +27,8 @@ export interface AssetUser {
     description: string;
     status: string;
     statusText: string;
+    type: string; // asset 或 website
+    groupId: string; // 分组ID
     users: string[];
 }
 
@@ -110,8 +112,9 @@ interface Extra {
 class PortalApi {
     group = "portal";
 
-    assets = async () => {
-        return await requests.get(`/${this.group}/assets`) as AssetUser[];
+    assets = async (type?: string) => {
+        const params = type ? `?type=${type}` : '';
+        return await requests.get(`/${this.group}/assets${params}`) as AssetUser[];
     }
 
     getAssetsTree = async (protocol?: string, keyword?: string) => {
@@ -122,6 +125,21 @@ class PortalApi {
             keyword = '';
         }
         return await requests.get(`/${this.group}/assets/tree?protocol=${protocol}&keyword=${keyword}`) as TreeDataNodeWithExtra[];
+    }
+
+    getWebsitesTree = async (keyword?: string) => {
+        if (!keyword) {
+            keyword = '';
+        }
+        return await requests.get(`/${this.group}/websites/tree?keyword=${keyword}`) as TreeDataNodeWithExtra[];
+    }
+
+    getAssetsGroupTree = async () => {
+        return await requests.get(`/${this.group}/assets/group-tree`) as TreeDataNodeWithExtra[];
+    }
+
+    getWebsitesGroupTree = async () => {
+        return await requests.get(`/${this.group}/websites/group-tree`) as TreeDataNodeWithExtra[];
     }
 
     getAccessRequireMFA = async () => {

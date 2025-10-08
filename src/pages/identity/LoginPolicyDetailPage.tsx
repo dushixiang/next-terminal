@@ -31,12 +31,6 @@ const LoginPolicyDetailPage = () => {
             key: 'bind-user',
             children: <LoginPolicyUser active={activeKey === 'bind-user'} id={loginPolicyId}/>
         },
-        // {
-        //     label: '绑定用户组',
-        //     key: 'bind-user-group',
-        //     disabled: !hasMenu('login-policy-bind-user-group'),
-        //     children: <LoginPolicyUser active={activeKey === 'bind-user'} loginPolicyId={loginPolicyId}/>
-        // }
     ];
 
     return (

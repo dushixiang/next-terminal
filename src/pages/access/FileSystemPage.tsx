@@ -50,12 +50,13 @@ import {useTranslation} from "react-i18next";
 import requests, {baseUrl, getToken} from "@/src/api/core/requests";
 import {useList} from "react-use";
 import PromptModal from "@/src/components/PromptModal";
-import {Editor as MonacoEditor} from '@monaco-editor/react';
+import FileEditor from "@/src/pages/access/FileEditor";
+import {useFileEditor} from "@/src/hook/use-file-editor";
 import fileSystemApi, {FileInfo} from "@/src/api/filesystem-api";
 import {EyeInvisibleOutlined, EyeOutlined, LineOutlined, ReloadOutlined, SyncOutlined} from "@ant-design/icons";
 import copy from "copy-to-clipboard";
 import clsx from "clsx";
-import SimpleBar from "simplebar-react";
+import {ScrollArea} from "@/components/ui/scroll-area";
 import {cn} from "@/lib/utils";
 import {Strategy} from "@/src/api/strategy-api";
 import {Base64} from 'js-base64';
@@ -96,13 +97,6 @@ interface TransmissionRecord {
     intervalId?: NodeJS.Timeout,
 }
 
-interface OpenFile {
-    key: string
-    title: string
-    content: string
-    changed: boolean
-    language: string
-}
 
 interface PromptState {
     type: "create-dir" | "create-file" | "rename" | undefined
@@ -204,61 +198,6 @@ function getFileIconFromFileName(fileName: string) {
     return icon;
 }
 
-function getLanguageFromFileName(fileName: string): string | undefined {
-    const extension = fileName.split('.').pop()?.toLowerCase();
-
-    if (extension) {
-        switch (extension) {
-            case 'html':
-                return 'html';
-            case 'js':
-            case 'jsx':
-                return 'javascript';
-            case 'ts':
-            case 'tsx':
-                return 'typescript';
-            case 'css':
-                return 'css';
-            case 'go':
-                return 'go';
-            case 'php':
-                return 'php';
-            case 'sh':
-            case 'bash':
-                return 'shell';
-            case 'java':
-                return 'java';
-            case 'py':
-                return 'python';
-            case 'rb':
-                return 'ruby';
-            case 'cpp':
-                return 'cpp';
-            case 'c':
-                return 'c';
-            case 'cs':
-                return 'csharp';
-            case 'swift':
-                return 'swift';
-            case 'kt':
-                return 'kotlin';
-            case 'json':
-                return 'json';
-            case 'xml':
-                return 'xml';
-            case 'yaml':
-            case 'yml':
-                return 'yaml';
-            case 'sql':
-                return 'sql';
-            // 添加更多的后缀名和对应的语言...
-            default:
-                return extension;
-        }
-    }
-
-    return undefined;
-}
 
 const FileSystemPage = forwardRef<FileSystem, Props>(({
                                                           fsId,
@@ -289,12 +228,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         loading: false, value: "", open: false, type: undefined
     });
 
-    let [openFiles, openFileAction] = useList<OpenFile>();
-
-    let [editorOpen, setEditorOpen] = useState<boolean>(false);
-    let [editorSaving, setEditorSaving] = useState<boolean>(false);
-    let [activeFileIndex, setActiveFileIndex] = useState<number>(-1);
-    let [activeFileKey, setActiveFileKey] = useState<string>('');
+    const fileEditor = useFileEditor(fsId);
 
     const [modal, contextHolder] = Modal.useModal();
     const [messageApi, messageContextHolder] = message.useMessage();
@@ -312,9 +246,13 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             key: 'edit',
             icon: <FileEdit className={iconClassName}/>,
             disabled: contextMenu?.file?.isDir || license.isFree(),
-            onClick: () => {
+            onClick: async () => {
                 let file = contextMenu.file;
-                showEditor(file);
+                try {
+                    await fileEditor.openFile(file);
+                } catch (error) {
+                    messageApi.error(`Failed to open file: ${error.message}`);
+                }
             },
         },
         {
@@ -1025,161 +963,6 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         }
     }
 
-    const showEditor = async (file: FileInfo) => {
-        let key = file.path;
-        let title = file.name;
-        await fetchFile(key, title);
-
-        setEditorOpen(true);
-    }
-
-    const hideEditor = () => {
-        setEditorOpen(false);
-    }
-
-    const fetchFile = async (key: string, title: string) => {
-        messageApi.loading({key: key, content: 'Loading'})
-        let language = getLanguageFromFileName(title);
-        let fileContent = await requests.get(`/${fileSystemApi.group}/${fsId}/download?filename=${key}&X-Auth-Token=${getToken()}&t=${new Date().getTime()}`);
-
-        let index = openFiles.findIndex((v, index) => {
-            return v.key === key;
-        })
-
-        if (index >= 0) {
-            let v = openFiles[index];
-            v.content = fileContent;
-            v.title = title;
-            v.language = language;
-            v.changed = false;
-            openFileAction.updateAt(index, v);
-        } else {
-            openFileAction.insertAt(openFiles.length, {
-                key: key,
-                content: fileContent,
-                title: title,
-                language: language,
-                changed: false,
-            })
-        }
-        messageApi.destroy(key);
-        setActiveFileKey(key);
-    }
-
-    const handleReFetchFile = async () => {
-        if (openFiles.length <= 0) {
-            return;
-        }
-        let openFile = openFiles[activeFileIndex];
-        fetchFile(openFile.key, openFile.title);
-    }
-
-    const fileitems = openFiles.map((item, index) => {
-        let prefix = '';
-        if (item.changed) {
-            prefix = '* ';
-        }
-        return {
-            key: item.key,
-            label: <div className={'flex gap-1 items-center'}>
-                <span>{prefix + item.title}</span>
-                <X className={'h-4 w-4'} onClick={() => {
-                    handleRemoveFileByKey(item.key, index)
-                }}/>
-            </div>,
-            children: <MonacoEditor
-                language={item.language}
-                height={window.innerHeight * 0.7}
-                theme="vs-dark"
-                value={item.content}
-                options={{
-                    selectOnLineNumbers: true
-                }}
-                loading={editorSaving}
-                onMount={(editor, monaco) => {
-                    editor.focus();
-                }}
-                onChange={(newValue, e) => {
-                    updateOpenFilesChanged(activeFileIndex, newValue);
-                }}
-            />
-        }
-    })
-
-    const handleRemoveFileByKey = (removeKey: string, index: number) => {
-        openFileAction.removeAt(index);
-
-        const oldLength = openFiles.length;
-        // let index = openFiles.findIndex(item => item.key === removeKey);
-        console.log(`oldLength`, oldLength, `index`, index)
-        if (index >= 0) {
-            if (oldLength === 1) {
-                // 只打开了一个文件，关闭之后肯定就没了
-                setActiveFileKey('');
-            } else {
-                if (index === 0) {
-                    // 如果关闭的是第一个，则重新打开的是新的第二个
-                    let openFile = openFiles[index + 1];
-                    setActiveFileKey(openFile.key);
-                } else {
-                    // 如果关闭的不是第一个，则重新打开的是它前面的那个
-                    let openFile = openFiles[index - 1];
-                    setActiveFileKey(openFile.key);
-                }
-            }
-
-        }
-    }
-
-    useEffect(() => {
-        let index = openFiles.findIndex((v, index) => {
-            return v.key === activeFileKey;
-        })
-        setActiveFileIndex(index);
-        // console.log(`activeFileKey changed`, activeFileKey, 'at index', index)
-    }, [activeFileKey, openFiles]);
-
-    const updateOpenFilesChanged = (index: number, content: string) => {
-        let openFile = openFiles[index];
-        openFile.changed = true;
-        openFile.content = content;
-        openFileAction.updateAt(index, openFile)
-    }
-
-    const handleEditFile = async () => {
-        if (openFiles.length <= 0) {
-            return;
-        }
-        setEditorSaving(true);
-        try {
-            let activeFile = openFiles[activeFileIndex];
-            await fileSystemApi.edit(fsId, activeFile.key, activeFile.content);
-            message.success(t('general.success'))
-            fetchFile(activeFile.key, activeFile.title);
-        } finally {
-            setEditorSaving(false);
-        }
-    }
-
-    useEffect(() => {
-        document.onkeydown = function (e) {
-            //按下ctrl+c
-            if (e.ctrlKey && e.key === 's') {
-                console.log(`other ctrl+s`)
-                handleEditFile();
-                return false;
-            }
-
-            if (e.metaKey && e.key === 's') {
-                console.log(`macOS command+s`)
-                handleEditFile();
-                return false;
-            }
-        }
-        return () => {
-            document.onkeydown = null;
-        }
-    }, [activeFileIndex, openFiles]);
 
     // 计算统计信息
     const transmissionStats = useMemo(() => {
@@ -1372,7 +1155,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     </Col>
                 </Row>
 
-                <SimpleBar style={{
+                <ScrollArea style={{
                     height: window.innerHeight - 240,
                 }}>
                     <Table
@@ -1419,7 +1202,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                             }
                         }}
                     />
-                </SimpleBar>
+                </ScrollArea>
 
                 <Drawer
                     title={
@@ -1481,53 +1264,6 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     confirmLoading={promptState.loading}
                 />
 
-                <ConfigProvider
-                    theme={{
-                        algorithm: theme.darkAlgorithm,
-                    }}
-                >
-                    <Modal
-                        title={t('fs.editor.label')}
-                        // className='modal-no-padding'
-                        open={editorOpen}
-                        width={window.innerWidth * 0.8}
-                        centered={true}
-                        onCancel={hideEditor}
-                        // mask={false}
-                        // maskClosable={false}
-                        footer={false}
-                        closeIcon={<LineOutlined/>}
-                    >
-                        <div className={'bg-gray-700 py-2 px-4 rounded text-xs flex gap-2'}>
-                            <div className={'cursor-pointer hover:underline'} onClick={handleEditFile}>
-                                {t('fs.editor.save')}
-                            </div>
-                            <div className={'cursor-pointer hover:underline'} onClick={handleReFetchFile}>
-                                {t('fs.editor.refetch')}
-                            </div>
-
-                            <div className={'cursor-pointer text-green-500'} onClick={() => {
-                                copy(openFiles[activeFileIndex]?.key);
-                                message.success(t('general.copy_success'));
-                            }}>
-                                {openFiles[activeFileIndex]?.key}
-                            </div>
-                        </div>
-                        <div className={''}>
-                            <Tabs
-                                activeKey={activeFileKey}
-                                items={fileitems}
-                                onChange={setActiveFileKey}
-                            />
-                            {((!fileitems || fileitems.length == 0) &&
-                                <div className={'flex items-center justify-center'}
-                                     style={{height: window.innerHeight * 0.7}}>
-                                    <Empty/>
-                                </div>
-                            )}
-                        </div>
-                    </Modal>
-                </ConfigProvider>
 
                 {contextHolder}
                 {messageContextHolder}
@@ -1556,11 +1292,24 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     </Dropdown>
                 )}
 
-                {(openFiles.length > 0 &&
-                    <FloatButton badge={{count: openFiles.length}} onClick={() => {
-                        setEditorOpen(true);
-                    }}/>
+                {fileEditor.hasOpenFiles && (
+                    <FloatButton 
+                        badge={{
+                            count: fileEditor.unsavedFilesCount
+                        }} 
+                        onClick={() => {
+                            fileEditor.openEditor();
+                        }}
+                    />
                 )}
+
+                <FileEditor
+                    fsId={fsId}
+                    open={fileEditor.isOpen}
+                    onClose={fileEditor.closeEditor}
+                    initialFiles={fileEditor.openFiles}
+                    onCloseFile={fileEditor.closeFile}
+                />
             </Drawer>
         </div>
     );

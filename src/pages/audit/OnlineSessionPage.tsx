@@ -1,5 +1,6 @@
 import React, {useRef} from 'react';
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {App, Popconfirm, Select, Typography} from "antd";
 import sessionApi, {Session} from "@/src/api/session-api";
@@ -15,9 +16,22 @@ const OnlineSessionPage = () => {
 
     const columns: ProColumns<Session>[] = [
         {
-            dataIndex: 'index',
-            valueType: 'indexBorder',
-            width: 48,
+            title: t('audit.user'),
+            dataIndex: 'userAccount',
+            key: 'userAccount',
+        },
+        {
+            title: t('audit.asset'),
+            dataIndex: 'assetName',
+            key: 'assetName',
+            render: (text, record) => {
+                let view = <div>{text}</div>;
+                const title = `${record['protocol']} ${record.username}@${record.ip}:${record.port}`;
+                return <div>
+                    {view}
+                    <Typography.Text type="secondary">{title}</Typography.Text>
+                </div>
+            },
         },
         {
             title: t('audit.client_ip'),
@@ -26,17 +40,13 @@ const OnlineSessionPage = () => {
             render: (text, record) => {
                 let view = <div>{text}</div>;
                 const title = record.region;
-                return <div>
+                return <div className={'flex items-center gap-2'}>
                     {view}
                     <Typography.Text type="secondary">{title}</Typography.Text>
                 </div>
             },
         },
-        {
-            title: t('audit.user'),
-            dataIndex: 'userAccount',
-            key: 'userAccount',
-        },
+
         {
             title: t('audit.protocol'),
             dataIndex: 'protocol',
@@ -63,19 +73,6 @@ const OnlineSessionPage = () => {
                         <Select.Option value="kubernetes">Kubernetes</Select.Option>
                     </Select>
                 );
-            },
-        },
-        {
-            title: t('audit.asset'),
-            dataIndex: 'assetName',
-            key: 'assetName',
-            render: (text, record) => {
-                let view = <div>{text}</div>;
-                const title = `${record['protocol']} ${record.username}@${record.ip}:${record.port}`;
-                return <div>
-                    {view}
-                    <Typography.Text type="secondary">{title}</Typography.Text>
-                </div>
             },
         },
         {
@@ -133,11 +130,14 @@ const OnlineSessionPage = () => {
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let queryParams = {
+                    request={async (params = {}, sort, filter) => {
+                        let [sortOrder, sortField] = getSort(sort);
+                        
+                        let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         status: 'connected',
                         clientIp: params.clientIp,
                         protocol: params.protocol,

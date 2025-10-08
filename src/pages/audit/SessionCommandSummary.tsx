@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {Tag} from "antd";
 import sessionCommandApi from "@/src/api/session-command-api";
@@ -61,13 +62,16 @@ const SessionCommandSummary = ({sessionId, onChange}: Props) => {
             <ProTable
                 columns={columns}
                 actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let queryParams = {
+                    request={async (params = {}, sort, filter) => {
+                        let [sortOrder, sortField] = getSort(sort);
+                        
+                        let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
                         command: params.keyword,
                         sessionId: sessionId,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                     }
                     let result = await sessionCommandApi.getPaging(queryParams);
                     return {

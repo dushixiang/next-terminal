@@ -88,6 +88,7 @@ const GuacdMonitor = () => {
                 state={state}
                 status={status}
                 tunnelState={tunnelState}
+                overlay={true}
             />
             <div id="display"/>
         </div>

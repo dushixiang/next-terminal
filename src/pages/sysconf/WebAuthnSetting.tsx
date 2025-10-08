@@ -2,9 +2,12 @@ import React, {useState} from 'react';
 import {useTranslation} from "react-i18next";
 import {ProForm, ProFormSelect, ProFormSwitch, ProFormText} from "@ant-design/pro-components";
 import {SettingProps} from "@/src/pages/sysconf/SettingPage";
+import {useMobile} from "@/src/hook/use-mobile";
+import {cn} from "@/lib/utils";
 
 const WebAuthnSetting = ({get, set}: SettingProps) => {
 
+    const { isMobile } = useMobile();
     let [passkeyEnabled, setPasskeyEnabled] = useState<boolean>();
     let {t} = useTranslation();
 
@@ -47,14 +50,18 @@ const WebAuthnSetting = ({get, set}: SettingProps) => {
                                }}
                 />
 
-                <div className={'flex items-center gap-2'}>
+                <div className={cn(
+                    'flex gap-2',
+                    isMobile ? 'flex-col' : 'items-center'
+                )}>
                     <ProFormText name="passkey-domain"
                                  label={t('settings.security.passkey.domain')}
                                  rules={[{required: passkeyEnabled}]}
                                  disabled={!passkeyEnabled}
+                                 width={isMobile ? 'xl' : undefined}
                     />
 
-                    <div className={'flex-grow'}>
+                    <div className={cn(isMobile ? 'w-full' : 'flex-grow')}>
                         <ProFormSelect
                             name={'passkey-origins'}
                             label={t('settings.security.passkey.origins')}

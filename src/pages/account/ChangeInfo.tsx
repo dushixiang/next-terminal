@@ -28,7 +28,7 @@ const ChangeInfo = () => {
             <ProForm request={get} onFinish={set}>
                 <ProFormText name={'nickname'} label={t('account.nickname')} rules={[{required: true}]}/>
                 <ProFormTextArea label={t('account.public_key')} name='publicKey'
-                                 placeholder='Public Key'
+                                 placeholder='Public Key, one per line'
                                  fieldProps={{rows: 8}}/>
             </ProForm>
         </div>

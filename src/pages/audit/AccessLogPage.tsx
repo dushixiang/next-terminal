@@ -1,12 +1,14 @@
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {Link} from "react-router-dom";
 import accessLogApi, {AccessLog} from "@/src/api/access-log-api";
-import {App, Button, Tag} from "antd";
+import {App, Button, Tag, Typography} from "antd";
 import {useMutation} from "@tanstack/react-query";
 import {renderSize} from "@/src/utils/utils";
 import {useWindowSize} from 'react-use';
+import {useMobile} from "@/src/hook/use-mobile";
 
 const AccessLogPage = () => {
     const {t} = useTranslation();
@@ -19,7 +21,7 @@ const AccessLogPage = () => {
             actionRef.current?.reload();
         }
     });
-    const {width} = useWindowSize();
+    let {isMobile} = useMobile();
 
     const getStatusColor = (statusCode: number) => {
         if (statusCode >= 200 && statusCode < 300) {
@@ -42,7 +44,7 @@ const AccessLogPage = () => {
             width: 150,
             ellipsis: true,
             render: (text) => <code>{text}</code>,
-            fixed: 'left',
+            fixed: !isMobile ? 'left' : undefined,
         },
         {
             title: t('audit.accessLog.user'),
@@ -53,41 +55,41 @@ const AccessLogPage = () => {
             ellipsis: true,
             render: (text, record) => {
                 const accountId = record.accountId;
-                
+
                 // 处理不同类型的用户ID
                 if (!accountId) {
                     return <Tag color="gray">{t('audit.accessLog.anonymous')}</Tag>;
                 }
-                
+
                 if (accountId === 'anonymous') {
                     return <Tag color="blue">{t('audit.accessLog.anonymous')}</Tag>;
                 }
-                
+
                 if (accountId.startsWith('whitelist-')) {
                     const ip = accountId.replace('whitelist-', '');
                     return <Tag color="green" title={ip}>
                         {t('audit.accessLog.whitelist')}
                     </Tag>;
                 }
-                
+
                 if (accountId.startsWith('temp-pass-')) {
                     const ip = accountId.replace('temp-pass-', '');
                     return <Tag color="orange" title={ip}>
                         {t('audit.accessLog.tempPass')}
                     </Tag>;
                 }
-                
+
                 // 真实用户ID，显示用户名和链接
                 if (text) {
                     return <Link to={`/user/${accountId}`}>{text}</Link>;
                 }
-                
+
                 // 有accountId但没有用户名（可能是已删除的用户）
                 return <Tag color="red" title={accountId}>
                     {t('audit.accessLog.deletedUser')}
                 </Tag>;
             },
-            fixed: 'left',
+            fixed: !isMobile ? 'left' : undefined,
         },
         {
             title: t('audit.accessLog.method'),
@@ -135,7 +137,14 @@ const AccessLogPage = () => {
             dataIndex: 'clientIp',
             width: 140,
             ellipsis: true,
-            render: (text) => <code>{text}</code>
+            render: (text, record) => {
+                let view = <div>{text}</div>;
+                const title = record.region;
+                return <div className={'flex items-center gap-2'}>
+                    {view}
+                    <Typography.Text type="secondary">{title}</Typography.Text>
+                </div>
+            },
         },
         {
             title: t('audit.accessLog.responseTime'),
@@ -165,19 +174,20 @@ const AccessLogPage = () => {
     ];
 
     return (
-        <div
-            style={{width: window.innerWidth - 240}}
-        >
+        <div>
             <ProTable
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
-                scroll={{x: 1600}}
+                scroll={{x: 'max-content'}}
                 request={async (params = {}, sort, filter) => {
+                    let [sortOrder, sortField] = getSort(sort);
+
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         domain: params.domain,
                         method: params.method,
                         statusCode: params.statusCode,

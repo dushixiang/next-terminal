@@ -2,6 +2,7 @@ import React, {useRef, useState} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {App, Badge, Button, Popconfirm, Tag, Tooltip} from "antd";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {useMutation} from "@tanstack/react-query";
 import sshGatewayApi, {SSHGateway} from "@/src/api/ssh-gateway-api";
 import SshGatewayModal from "@/src/pages/gateway/SshGatewayModal";
@@ -149,11 +150,13 @@ const SshGatewayPage = () => {
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
-
+                    let [sortOrder, sortField] = getSort(sort);
+                    
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         name: params.name,
                     }
                     let result = await api.getPaging(queryParams);

@@ -1,4 +1,5 @@
 import {
+    ApartmentOutlined,
     ApiOutlined,
     AuditOutlined,
     BarChartOutlined,
@@ -171,9 +172,9 @@ export const getMenus = (t: any) => {
                     icon: <SolutionOutlined/>,
                 },
                 {
-                    key: 'user-group',
-                    label: t('menus.identity.submenus.user_group'),
-                    icon: <TeamOutlined/>,
+                    key: 'department',
+                    label: t('menus.identity.submenus.department'),
+                    icon: <ApartmentOutlined/>,
                 },
                 {
                     key: 'login-policy',
@@ -201,6 +202,16 @@ export const getMenus = (t: any) => {
                     key: 'strategy',
                     label: t('menus.authorised.submenus.strategy'),
                     icon: <InsuranceOutlined/>,
+                },
+                {
+                    key: 'authorised-asset',
+                    label: t('menus.authorised.submenus.authorised_asset'),
+                    icon: <DesktopOutlined/>,
+                },
+                {
+                    key: 'authorised-website',
+                    label: t('menus.authorised.submenus.authorised_website'),
+                    icon: <GlobalOutlined/>,
                 },
             ]
         },

@@ -24,7 +24,8 @@
     "remark": "備註",
     "enter_remark": "請輸入備註",
     "required": "必填項",
-    "error": "操作失敗"
+    "error": "操作失敗",
+    "status": "狀態"
   },
   "actions": {
     "option": "操作",
@@ -47,7 +48,8 @@
     "cancel": "取消",
     "save": "保存",
     "remove": "移除",
-    "label": "操作"
+    "label": "操作",
+    "batch_delete": "批量刪除"
   },
   "dashboard": {
     "name": "數據概觀",
@@ -161,14 +163,17 @@
         "user_group": "用戶組",
         "role": "角色",
         "login_policy": "登錄策略",
-        "login_locked": "登錄鎖定"
+        "login_locked": "登錄鎖定",
+        "department": "部門"
       }
     },
     "authorised": {
       "label": "資源授權",
       "submenus": {
         "command_filter": "命令拦截器",
-        "strategy": "授權策略"
+        "strategy": "授權策略",
+        "authorised_asset": "授權資產",
+        "authorised_website": "授權Web資產"
       }
     },
     "setting": {
@@ -352,11 +357,30 @@
       "locked_type": "鎖定類型",
       "locked_type_username": "帳戶鎖定",
       "locked_type_ip": "IP封鎖",
-      "last_login_at": "最後登錄時間"
+      "last_login_at": "最後登錄時間",
+      "available": "可選用戶",
+      "selected": "已選擇用戶"
     },
     "options": {
       "authorized_asset": "授權資產",
       "login_policy": "登錄策略"
+    },
+    "department": {
+      "parent": "上級部門",
+      "root": "根部門",
+      "weight": "排序",
+      "weight_tooltip": "數字越大排序越靠前",
+      "weight_placeholder": "請輸入排序值",
+      "leaders": "負責人",
+      "leaders_count": "負責人數量",
+      "leaders_placeholder": "請選擇負責人",
+      "name_placeholder": "請輸入部門名稱",
+      "parent_placeholder": "請選擇上級部門",
+      "table_view": "表格視圖",
+      "tree_view": "樹形視圖",
+      "tree_structure": "部門樹形結構",
+      "sub_departments": "子部門",
+      "manage_users": "管理用戶"
     }
   },
   "dw": {
@@ -449,7 +473,11 @@
       "strategy": "戰略",
       "expired_at": "失效時間",
       "authorised_at": "授權時間",
-      "never_expired": "永不失效"
+      "never_expired": "永不失效",
+      "department": "部門",
+      "asset_group": "資產組",
+      "website": "Web資產",
+      "website_group": "Web 資產組"
     }
   },
   "sysops": {
@@ -465,7 +493,20 @@
     "logs": {
       "label": "日誌",
       "exec_at": "執行時間",
-      "messages": "訊息"
+      "messages": "訊息",
+      "asset_status_check": "資產狀態檢查",
+      "script_execution": "腳本執行",
+      "certificate_renewal": "證書續簽",
+      "no_certificates_to_renew": "無需續簽證書",
+      "asset_name": "資產名稱",
+      "used_time": "耗時",
+      "script": "腳本",
+      "result": "結果",
+      "certificate_name": "證書名稱",
+      "renewed": "已續簽",
+      "skipped": "已跳過",
+      "reason": "原因",
+      "clear_confirm_content": "確認清空所有日誌？此操作不可恢復。"
     },
     "type": {
       "label": "類型",
@@ -661,6 +702,13 @@
       "message": "錯誤信息",
       "clipboard_required": "請輸入剪貼板內容",
       "clipboard_placeholder": "粘貼到此處..."
+    },
+    "tabs": {
+      "closeLeft": "關閉左側標籤頁",
+      "closeRight": "關閉右側標籤頁",
+      "closeOthers": "關閉其他標籤頁",
+      "closeAll": "關閉所有標籤頁",
+      "reconnect": "重新連接"
     }
   },
   "account": {
@@ -687,9 +735,15 @@
       "methods": {
         "passkey": "通過通行密鑰驗證",
         "password": "通過密碼認證",
-        "otp": "通過OTP認證"
+        "otp": "通過OTP認證",
+        "wechat_work": "使用企業微信登錄",
+        "oidc": "使用OIDC登錄"
       },
-      "back": "返回上一步"
+      "back": "返回上一步",
+      "processing": "正在處理登錄...",
+      "failed": "登錄失敗",
+      "wechat_work_error": "企業微信登錄失敗，請重試",
+      "back_to_login": "返回登錄頁面"
     },
     "next": "下一步",
     "retry": "重試",
@@ -891,7 +945,32 @@
       "self_signed_tip_title": "提示: 可自行替換根證書，替換後重啟生效。",
       "self_signed_root_ca_cert_path": "根證書文件路徑",
       "self_signed_root_ca_key_path": "根證書私鑰路徑",
-      "renew_before": "續簽提前時間"
+      "renew_before": "續簽提前時間",
+      "log_viewer": {
+        "title": "證書日誌查看器",
+        "status": {
+          "realtime": "實時接收",
+          "paused": "已暫停",
+          "auto_scroll_disabled": "已禁用"
+        },
+        "actions": {
+          "pause": "暫停接收日誌",
+          "resume": "繼續接收日誌",
+          "download": "下載日誌",
+          "clear": "清除日誌",
+          "scroll_to_bottom": "滾動到底部"
+        },
+        "stats": {
+          "total_logs": "條日誌",
+          "errors": "錯誤",
+          "warnings": "警告",
+          "info": "資訊",
+          "last_update": "最後更新",
+          "auto_scroll": "自動滾動",
+          "no_data": "暫無日誌資料",
+          "no_data_desc": "日誌將在證書操作時即時顯示"
+        }
+      }
     },
     "dns_providers": {
       "label": "DNS 供應商",
@@ -930,7 +1009,57 @@
     "basic_settings": "基礎設置",
     "target_server": "目標伺服器",
     "preserve_host_tip": "會將請求頭中的主機名保留為原始請求的主機名，而不是代理伺服器的主機名。",
-    "custom_header_tip": "可以添加多個自定義請求頭，格式為：鍵: 值。"
+    "custom_header_tip": "可以添加多個自定義請求頭，格式為：鍵: 值。",
+    "resize_method": "視窗調整方式",
+    "resize_method_extra": "當客戶端顯示器寬度或高度改變時更新RDP伺服器的方法。",
+    "resize_methods": {
+      "display_update": "顯示更新",
+      "display_update_desc": "使用RDP 8.1的\"顯示更新\"通道來通知伺服器客戶端顯示大小已改變",
+      "reconnect": "重新連接",
+      "reconnect_desc": "當客戶端顯示大小改變時自動斷開RDP會話，並以新的大小重新連接"
+    },
+    "disable_detect_os": "禁用作業系統自動識別",
+    "disable_detect_os_extra": "當資產Logo為空時，系統會自動識別資產的操作系統類型，並設置合適的Logo。",
+    "wol": {
+      "settings": "WOL 啟用設定",
+      "enabled": "啟用 WOL 唤醒",
+      "mac_addr": "MAC 地址",
+      "mac_addr_placeholder": "請輸入 MAC 位址，格式：AA:BB:CC:DD:EE:FF",
+      "mac_addr_invalid": "MAC 地址格式不正確",
+      "broadcast": "廣播地址",
+      "broadcast_placeholder": "請輸入廣播地址，預設：255.255.255.255",
+      "wakeup_delay": "喚醒延遲",
+      "wakeup_delay_placeholder": "喚醒後等待時間（秒）",
+      "wakeup_delay_tooltip": "發送喚醒包後等待設備啟動的時間"
+    },
+    "security": {
+      "settings": "安全認證",
+      "mode": "安全模式",
+      "mode_extra": "RDP 連接使用的安全模式，決定數據加密方式和認證類型。",
+      "ignore_cert": "忽略證書驗證",
+      "ignore_cert_extra": "忽略伺服器返回的憑證，即使憑證無法驗證（如自簽名憑證）。",
+      "cert_tofu": "首次信任證書",
+      "cert_tofu_extra": "啟用FreeRDP的\"首次使用時信任\"(TOFU)策略，第一次連接時信任未知證書。",
+      "cert_fingerprints": "證書指紋",
+      "cert_fingerprints_extra": "逗號分隔的證書指紋和雜湊組合清單，連接時將驗證伺服器證書。",
+      "cert_fingerprints_placeholder": "例如：sha256:1234567890abcdef...",
+      "disable_auth": "禁用認證",
+      "disable_auth_extra": "禁用連接時的身份認證（不影響遠端桌面會話中的登入認證）。",
+      "modes": {
+        "any": "自動選擇",
+        "any_desc": "基於客戶端和伺服器支援的安全協議自動選擇安全模式（預設）",
+        "nla": "網路級身分認證(NLA)",
+        "nla_desc": "使用TLS加密，需要預先提供用戶名和密碼",
+        "nla_ext": "擴展網路級身份認證",
+        "nla_ext_desc": "與NLA相同，但需要伺服器發送額外的「早期用戶授權結果",
+        "tls": "TLS認證",
+        "tls_desc": "通過TLS實現RDP認證和加密，主要用於負載平衡配置",
+        "vmconnect": "VMConnect 模式",
+        "vmconnect_desc": "自動選擇安全模式，但僅限於Hyper-V/VMConnect支援的協議",
+        "rdp": "傳統RDP加密",
+        "rdp_desc": "傳統RDP加密模式，通常用於較舊的Windows伺服器"
+      }
+    }
   },
   "gateways": {
     "name": "名稱",
@@ -1245,6 +1374,36 @@
     },
     "webauthn": {
       "setting": "WebAuthn"
+    },
+    "wechat_work": {
+      "setting": "企業微信認證",
+      "tip": "開啟後，用戶可以使用企業微信掃碼登錄系統。",
+      "enabled": "啟用企業微信登錄",
+      "corp_id": "企業ID",
+      "corp_id_placeholder": "請輸入企業微信企業ID",
+      "agent_id": "應用ID",
+      "agent_id_placeholder": "請輸入企業微信應用ID",
+      "secret": "應用Secret",
+      "redirect_uri": "回調地址",
+      "redirect_uri_placeholder": "https://your-domain.com/wechat-work/callback",
+      "department": "預設部門",
+      "department_placeholder": "請選擇用戶預設部門"
+    },
+    "oidc": {
+      "setting": "OIDC認證",
+      "tip": "開啟後，用戶可以使用OIDC身份提供者登錄系統。",
+      "enabled": "啟用OIDC登錄",
+      "issuer": "身份提供者地址",
+      "issuer_placeholder": "請輸入OIDC身份提供者的Issuer URL",
+      "client_id": "客戶端ID",
+      "client_id_placeholder": "請輸入OIDC客戶端ID",
+      "client_secret": "客戶端密鑰",
+      "redirect_uri": "回調地址",
+      "redirect_uri_placeholder": "https://your-domain.com/oidc/callback",
+      "scopes": "權限範圍",
+      "scopes_placeholder": "請輸入權限範圍，多個用空格將分隔，如：openid profile email",
+      "department": "預設部門",
+      "department_placeholder": "請選擇用戶預設部門"
     }
   },
   "errors": {
@@ -1292,5 +1451,14 @@
     "10001": "名稱已被人使用。",
     "10021": "原密碼不正確",
     "10022": "密碼登入已遭禁用"
+  },
+  "websites": {
+    "group": "分組",
+    "group_tip": "拖曳可以調整順序",
+    "add_group": "新增分組",
+    "edit_group": "編輯分組",
+    "group_name": "分組名稱",
+    "group_name_placeholder": "請輸入分組名稱",
+    "group_name_required": "分組名稱不能為空"
   }
 }

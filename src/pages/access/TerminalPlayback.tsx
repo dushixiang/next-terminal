@@ -69,9 +69,8 @@ const TerminalPlayback = () => {
                 pageIndex: 1,
                 pageSize: 1000,
                 sessionId: sessionId,
-                sort: JSON.stringify({
-                    "createdAt": "asc"
-                })
+                sortField: "createdAt",
+                sortOrder: "asc",
             })
         }
     });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {Drawer} from "antd";
 import AssetsPost from "@/src/pages/assets/AssetPost";
 import {useTranslation} from "react-i18next";
@@ -19,12 +19,17 @@ const AssetPostDrawer = ({open, onClose, assetId, groupId, copy}: Props) => {
     if(copy){
         title = t('actions.copy')
     }
+
+    const drawerWidth = useMemo(() => {
+        return Math.min(window.innerWidth - 200, 1200);
+    }, []);
+
     return (
         <div>
             <Drawer title={title}
                     onClose={onClose}
                     open={open}
-                    width={Math.min(window.innerWidth - 200, 1200)}
+                    width={drawerWidth}
                     destroyOnHidden={true}
             >
                 <AssetsPost

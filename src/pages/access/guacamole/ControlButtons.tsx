@@ -10,11 +10,7 @@ import {
     WindowsOutlined
 } from '@ant-design/icons';
 import {useTranslation} from 'react-i18next';
-
-interface MenuItem {
-    key: string;
-    label: string;
-}
+import type {ItemType} from "antd/es/menu/interface";
 
 interface Props {
     sessionId?: string;
@@ -26,7 +22,7 @@ interface Props {
     onSendKeys: (keys: string[]) => void;
 }
 
-const comboMenu: MenuItem[] = [
+const comboMenu: ItemType[] = [
     {key: '65507+65513+65535', label: 'Ctrl+Alt+Delete'},
     {key: '65507+65513+65228', label: 'Ctrl+Alt+Backspace'},
     {key: '65515+100', label: 'Window+D'},

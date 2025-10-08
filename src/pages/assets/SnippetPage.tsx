@@ -4,6 +4,7 @@ import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import snippetApi, {Snippet} from "../../api/snippet-api";
 import SnippetModal from "./SnippetModal";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {useMutation} from "@tanstack/react-query";
 import NButton from "@/src/components/NButton";
 
@@ -111,11 +112,14 @@ const SnippetPage = () => {
         <ProTable
             columns={columns}
             actionRef={actionRef}
-            request={async (params = {}, sort, filter) => {
-                let queryParams = {
+                request={async (params = {}, sort, filter) => {
+                    let [sortOrder, sortField] = getSort(sort);
+                    
+                    let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
-                    sort: JSON.stringify(sort),
+                    sortOrder: sortOrder,
+                    sortField: sortField,
                     name: params.name,
                 }
                 let result = await api.getPaging(queryParams);

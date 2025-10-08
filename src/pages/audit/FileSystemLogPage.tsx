@@ -1,6 +1,7 @@
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {Link} from "react-router-dom";
 import fileSystemLogApi, {FileSystemLog} from "@/src/api/fileystem-log-api";
 import {App, Button} from "antd";
@@ -82,11 +83,14 @@ const FileSystemLogPage = () => {
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let queryParams = {
+                    request={async (params = {}, sort, filter) => {
+                        let [sortOrder, sortField] = getSort(sort);
+                        
+                        let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         action: params.action,
                         username: params.username,
                         clientIp: params.clientIp,

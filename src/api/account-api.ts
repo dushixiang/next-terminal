@@ -27,6 +27,13 @@ export enum LoginStatus {
     LoggedIn = "Logged In"
 }
 
+export interface LoginStatusResult {
+    status: LoginStatus;
+    webauthnEnabled: boolean;
+    wechatWorkEnabled: boolean;
+    oidcEnabled: boolean;
+}
+
 export type Captcha = {
     enabled: boolean
     captcha: string
@@ -104,7 +111,7 @@ class AccountApi {
 
     getLoginStatus = async () => {
         let data = await requests.get(`/login-status`);
-        return data['status'] as LoginStatus;
+        return data as LoginStatusResult;
     }
 
     getUserInfo = async () => {

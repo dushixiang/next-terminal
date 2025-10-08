@@ -1,4 +1,4 @@
-import React, {Key, useEffect, useRef, useState} from 'react';
+import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {App, ConfigProvider, Input, Tabs, theme, Tooltip, Tree, TreeDataNode} from "antd";
 import './AccessPage.css'
 import brandingApi from "@/src/api/branding-api";
@@ -37,6 +37,8 @@ import {safeDecode} from "@/src/utils/codec";
 import {useAccessSetting} from "@/src/hook/use-access-setting";
 import accessSettingApi from "@/src/api/access-setting-api";
 import {setThemeColor} from "@/src/utils/theme";
+import TabContextMenu from "@/src/components/TabContextMenu";
+import {LocalStorage, STORAGE_KEYS} from "@/src/utils/storage";
 
 
 interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -66,7 +68,18 @@ const DraggableTabNode = ({className, ...props}: DraggableTabPaneProps) => {
 const AccessPage = () => {
 
     let {t} = useTranslation();
-    const [isCollapsed, setIsCollapsed] = React.useState(false);
+    
+    // 从本地存储恢复面板状态
+    const [isCollapsed, setIsCollapsed] = React.useState(() => {
+        return LocalStorage.get(STORAGE_KEYS.COLLAPSED_STATE, false);
+    });
+    
+    // 从本地存储恢复面板大小
+    const [leftPanelSize, setLeftPanelSize] = useState(() => {
+        const savedSizes = LocalStorage.get(STORAGE_KEYS.PANEL_SIZES, { left: 15, right: 85 });
+        return savedSizes.left;
+    });
+    
     const [items, setItems] = useState([]);
     const [activeKey, setActiveKey] = useAccessTab();
     let [searchParams, setSearchParams] = useSearchParams();
@@ -75,34 +88,6 @@ const AccessPage = () => {
     let [sshChooserOpen, setSSHChooserOpen] = useState(false);
     let [mfaOpen, setMfaOpen] = useState(false);
     let [chooseAssetIds, setChooseAssetIds] = useState<string[]>([]);
-    let [licence, setLicense] = useLicense();
-    let [accessSetting, setAccessSetting] = useAccessSetting();
-
-    let licenseQuery = useQuery({
-        queryKey: ['simpleLicense'],
-        queryFn: licenseApi.getSimpleLicense,
-    })
-
-    let settingQuery = useQuery({
-        queryKey: ['access-setting'],
-        queryFn: accessSettingApi.get,
-    });
-
-    useEffect(() => {
-        if (licenseQuery.data) {
-            setLicense(licenseQuery.data);
-        }
-    }, [licenseQuery.data]);
-
-    useEffect(() => {
-        if (settingQuery.data) {
-            setAccessSetting(settingQuery.data);
-        }
-    }, [settingQuery.data]);
-
-    useEffect(() => {
-        setExpandedKeys(accessSetting?.treeExpandedKeys);
-    }, [accessSetting]);
 
     useEffect(() => {
         document.body.style.overflow = 'hidden';
@@ -134,7 +119,7 @@ const AccessPage = () => {
     const sensor = useSensor(PointerSensor, {activationConstraint: {distance: 10}});
     let {height} = useWindowSize();
 
-    const onDragEnd = ({active, over}: DragEndEvent) => {
+    const onDragEnd = useCallback(({active, over}: DragEndEvent) => {
         if (active.id !== over?.id) {
             setItems((prev) => {
                 const activeIndex = prev.findIndex((i) => i.key === active.id);
@@ -142,10 +127,11 @@ const AccessPage = () => {
                 return arrayMove(prev, activeIndex, overIndex);
             });
         }
-    };
+    }, []);
 
-    const [treeData, setTreeData] = useState<TreeDataNodeWithExtra[]>([]);
+    // 从本地存储恢复树展开状态
     let [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
+    
     const [searchValue, setSearchValue] = useState('');
 
     let leftRef = useRef<ImperativePanelHandle>();
@@ -160,16 +146,47 @@ const AccessPage = () => {
     });
 
     useEffect(() => {
-        if (treeQuery.data) {
-            setTreeData(treeQuery.data);
+        if (treeQuery.data?.length) {
+            const saved = LocalStorage.get(STORAGE_KEYS.TREE_EXPANDED_KEYS, []);
+            if (Array.isArray(saved)) {
+                setExpandedKeys(saved);
+            }
         }
     }, [treeQuery.data]);
+
+    useEffect(() => {
+        // 当树数据更新时，确保展开状态得到保持
+        if (treeQuery.data && expandedKeys.length > 0) {
+            // 验证保存的展开键是否仍然存在于新的树数据中
+            const validateExpandedKeys = (keys: React.Key[], treeData: TreeDataNode[]): React.Key[] => {
+                const allKeys = new Set<React.Key>();
+                
+                const collectKeys = (nodes: TreeDataNode[]) => {
+                    nodes.forEach(node => {
+                        allKeys.add(node.key);
+                        if (node.children) {
+                            collectKeys(node.children);
+                        }
+                    });
+                };
+                
+                collectKeys(treeData);
+                return keys.filter(key => allKeys.has(key));
+            };
+            
+            const validKeys = validateExpandedKeys(expandedKeys, treeQuery.data);
+            if (validKeys.length !== expandedKeys.length) {
+                setExpandedKeys(validKeys);
+                LocalStorage.set(STORAGE_KEYS.TREE_EXPANDED_KEYS, validKeys);
+            }
+        }
+    }, [treeQuery.data, expandedKeys]);
 
     useEffect(() => {
         treeQuery.refetch();
     }, [searchValue]);
 
-    const addTab = (key: string, label: string, children: React.ReactNode) => {
+    const addTab = useCallback((key: string, label: string, children: React.ReactNode) => {
         let find = items.filter((item) => item.key === key);
         if (find && find.length > 0) {
             setActiveKey(key);
@@ -179,9 +196,9 @@ const AccessPage = () => {
         newPanes.push({label: label, children: children, key: key});
         setItems(newPanes);
         setActiveKey(key);
-    }
+    }, [items]);
 
-    const removeTab = (targetKey: string) => {
+    const removeTab = useCallback((targetKey: string) => {
         let newActiveKey = activeKey;
         let lastIndex = -1;
         items.forEach((item, i) => {
@@ -199,9 +216,9 @@ const AccessPage = () => {
         }
         setItems(newPanes);
         setActiveKey(newActiveKey);
-    }
+    }, [items, activeKey]);
 
-    const openAssetTab = (msg: AccessTabSyncMessage) => {
+    const openAssetTab = useCallback((msg: AccessTabSyncMessage) => {
         const randomId = generateRandomId();
         const key = randomId + '_' + msg.id;
         switch (msg.protocol) {
@@ -217,7 +234,7 @@ const AccessPage = () => {
                 // alert('not support')
                 break;
         }
-    }
+    }, [addTab]);
 
 
     useEffect(() => {
@@ -234,7 +251,7 @@ const AccessPage = () => {
         }
     }, [items]);
 
-    const getParentKey = (key: React.Key, tree: TreeDataNode[]): React.Key => {
+    const getParentKey = useCallback((key: React.Key, tree: TreeDataNode[]): React.Key => {
         let parentKey: React.Key;
         for (let i = 0; i < tree.length; i++) {
             const node = tree[i];
@@ -247,22 +264,96 @@ const AccessPage = () => {
             }
         }
         return parentKey!;
-    };
+    }, []);
 
-    const handleSearchTree = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchTree = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const {value} = e.target;
         setSearchValue(value);
-    }
+    }, []);
 
-    const onExpand = (newExpandedKeys: React.Key[]) => {
+    const onExpand = useCallback((newExpandedKeys: React.Key[]) => {
         setExpandedKeys(newExpandedKeys);
-        accessSettingApi.set({
-            'treeExpandedKeys': newExpandedKeys.join(',')
-        })
-        // setAutoExpandParent(false);
-    };
+        // 保存到本地存储
+        LocalStorage.set(STORAGE_KEYS.TREE_EXPANDED_KEYS, newExpandedKeys);
+    }, []);
 
-    const renderLogo = (node: TreeDataNodeWithExtra) => {
+    // 标签页操作函数
+    const handleCloseLeft = useCallback((targetKey: string) => {
+        const targetIndex = items.findIndex(item => item.key === targetKey);
+        if (targetIndex <= 0) return;
+        
+        const leftTabs = items.slice(0, targetIndex);
+        const remainingTabs = items.slice(targetIndex);
+        
+        setItems(remainingTabs);
+        
+        // 如果当前激活的标签页被关闭，切换到目标标签页
+        if (leftTabs.some(tab => tab.key === activeKey)) {
+            setActiveKey(targetKey);
+        }
+    }, [items, activeKey]);
+
+    const handleCloseRight = useCallback((targetKey: string) => {
+        const targetIndex = items.findIndex(item => item.key === targetKey);
+        if (targetIndex < 0 || targetIndex >= items.length - 1) return;
+        
+        const leftTabs = items.slice(0, targetIndex + 1);
+        
+        setItems(leftTabs);
+        
+        // 如果当前激活的标签页被关闭，切换到目标标签页
+        if (!leftTabs.some(tab => tab.key === activeKey)) {
+            setActiveKey(targetKey);
+        }
+    }, [items, activeKey]);
+
+    const handleCloseAll = useCallback(() => {
+        setItems([]);
+        setActiveKey('');
+    }, []);
+
+    const handleCloseOthers = useCallback((targetKey: string) => {
+        const targetTab = items.find(item => item.key === targetKey);
+        if (!targetTab) return;
+        
+        setItems([targetTab]);
+        setActiveKey(targetKey);
+    }, [items]);
+
+    const handleReconnect = useCallback((targetKey: string) => {
+        // 刷新标签页 - 重新渲染组件
+        const targetTab = items.find(item => item.key === targetKey);
+        if (!targetTab) return;
+        
+        // 通过更新 key 来强制重新渲染
+        const newKey = targetKey + '_refresh_' + Date.now();
+        const newTab = { ...targetTab, key: newKey };
+        
+        setItems(prev => prev.map(item => 
+            item.key === targetKey ? newTab : item
+        ));
+        setActiveKey(newKey);
+    }, [items]);
+
+    // 面板大小变化处理
+    const handlePanelResize = useCallback((size: number) => {
+        setLeftPanelSize(size);
+        
+        // 保存到本地存储
+        const panelSizes = { left: size, right: 100 - size };
+        LocalStorage.set(STORAGE_KEYS.PANEL_SIZES, panelSizes);
+        
+        // 更新折叠状态
+        const collapsed = size === 2;
+        if (collapsed !== isCollapsed) {
+            setIsCollapsed(collapsed);
+            LocalStorage.set(STORAGE_KEYS.COLLAPSED_STATE, collapsed);
+        }
+        
+        setContentSize(100 - size);
+    }, [isCollapsed, setContentSize]);
+
+    const renderLogo = useCallback((node: TreeDataNodeWithExtra) => {
         if (!node.isLeaf) {
             return undefined;
         }
@@ -277,7 +368,7 @@ const AccessPage = () => {
         >
             {node.title[0]}
         </div>
-    }
+    }, []);
 
     return (
         <ConfigProvider
@@ -325,7 +416,7 @@ const AccessPage = () => {
                         <ThemeProvider defaultTheme="dark" storageKey="nt-ui-theme">
                             <ResizablePanelGroup direction="horizontal">
                                 <ResizablePanel
-                                    defaultSize={15}
+                                    defaultSize={leftPanelSize}
                                     minSize={15}
                                     maxSize={20}
                                     style={{
@@ -333,13 +424,7 @@ const AccessPage = () => {
                                     }}
                                     collapsible={true}
                                     collapsedSize={2}
-                                    onResize={(size) => {
-                                        if (size === 2) {
-                                            setIsCollapsed(true);
-                                        } else {
-                                            setIsCollapsed(false);
-                                        }
-                                    }}
+                                    onResize={handlePanelResize}
                                     className={cn(
                                         "bg-[#141414] transition-all duration-300 ease-in-out",
                                         isCollapsed && "min-w-[48px]",
@@ -378,6 +463,20 @@ const AccessPage = () => {
                                         {!isCollapsed &&
                                             <Tree
                                                 titleRender={(node) => {
+                                                    const strTitle = node.title as string;
+                                                    const index = searchValue ? strTitle.indexOf(searchValue) : -1;
+                                                    const beforeStr = strTitle.substring(0, index);
+                                                    const afterStr = strTitle.slice(index + searchValue.length);
+                                                    const displayTitle = index > -1 ? (
+                                                        <span>
+                                                            {beforeStr}
+                                                            <span className="text-yellow-500">{searchValue}</span>
+                                                            {afterStr}
+                                                        </span>
+                                                    ) : (
+                                                        <span>{strTitle}</span>
+                                                    );
+                                                    
                                                     return <Tooltip title={node.extra?.network}>
                                                         <span className={cn(
                                                             'flex items-center gap-1',
@@ -398,12 +497,12 @@ const AccessPage = () => {
                                                             <div className={cn(
                                                                 node.extra?.status === 'inactive' && 'text-gray-500'
                                                             )}>
-                                                                {node.title}
+                                                                {displayTitle}
                                                             </div>
                                                     </span>
                                                     </Tooltip>
                                                 }}
-                                                treeData={treeData}
+                                                treeData={treeQuery.data || []}
                                                 onExpand={onExpand}
                                                 expandedKeys={expandedKeys}
                                             />
@@ -411,7 +510,7 @@ const AccessPage = () => {
                                     </SimpleBar>
                                 </ResizablePanel>
                                 <ResizableHandle withHandle/>
-                                <ResizablePanel defaultSize={85}
+                                <ResizablePanel defaultSize={100 - leftPanelSize}
                                                 className={'bg-[#1E1E1E] access-container'}
                                                 onResize={(size) => {
                                                     // console.log('resize content', size)
@@ -419,7 +518,24 @@ const AccessPage = () => {
                                                 }}
                                 >
                                     <Tabs
-                                        items={items}
+                                        items={items.map((item) => ({
+                                            key: item.key,
+                                            label: (
+                                                <TabContextMenu
+                                                    tabKey={item.key}
+                                                    currentActiveKey={activeKey}
+                                                    allTabs={items}
+                                                    onCloseLeft={handleCloseLeft}
+                                                    onCloseRight={handleCloseRight}
+                                                    onCloseAll={handleCloseAll}
+                                                    onCloseOthers={handleCloseOthers}
+                                                    onReconnect={handleReconnect}
+                                                >
+                                                    {item.label}
+                                                </TabContextMenu>
+                                            ),
+                                            children: item.children,
+                                        }))}
                                         hideAdd
                                         size={'small'}
                                         type={'editable-card'}
@@ -441,13 +557,13 @@ const AccessPage = () => {
                                         tabBarStyle={{}}
                                         activeKey={activeKey}
                                         onChange={setActiveKey}
-                                        onEdit={(targetKey, action) => {
+                                        onEdit={useCallback((targetKey, action) => {
                                             if (action === 'add') {
                                                 // add();
                                             } else {
                                                 removeTab(targetKey as string);
                                             }
-                                        }}
+                                        }, [removeTab])}
                                     />
                                 </ResizablePanel>
                             </ResizablePanelGroup>

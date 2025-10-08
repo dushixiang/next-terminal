@@ -3,7 +3,6 @@ import {Tabs, TabsProps} from "antd";
 import {useSearchParams} from "react-router-dom";
 import ToolsPing from './ToolsPing';
 import ToolsTcping from "@/src/pages/sysops/ToolsTcping";
-import ToolsTraceRoute from "@/src/pages/sysops/ToolsTraceRoute";
 
 const ToolsPage = () => {
 
@@ -19,11 +18,6 @@ const ToolsPage = () => {
             key: 'tcping',
             label: 'TCP Ping',
             children: <ToolsTcping/>,
-        },
-        {
-            key: 'traceroute',
-            label: 'Trace Route',
-            children: <ToolsTraceRoute/>,
         },
     ];
 

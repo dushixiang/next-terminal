@@ -5,6 +5,7 @@ import {Link, useNavigate} from "react-router-dom";
 import {SafetyCertificateOutlined, StopOutlined} from "@ant-design/icons";
 import loginPolicyApi, {LoginPolicy} from "../../api/login-policy-api";
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import NButton from "../../components/NButton";
 import NLink from "@/src/components/NLink";
 import {useLicense} from "@/src/hook/use-license";
@@ -135,11 +136,13 @@ const LoginPolicyPage = () => {
                     columns={columns}
                     actionRef={actionRef}
                     request={async (params = {}, sort, filter) => {
-
+                        let [sortOrder, sortField] = getSort(sort);
+                        
                         let queryParams = {
                             pageIndex: params.current,
                             pageSize: params.pageSize,
-                            sort: JSON.stringify(sort),
+                            sortOrder: sortOrder,
+                            sortField: sortField,
                             name: params.name,
                         }
                         let result = await api.getPaging(queryParams);

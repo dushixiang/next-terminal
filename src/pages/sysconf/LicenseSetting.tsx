@@ -6,26 +6,17 @@ import licenseApi, {License} from "../../api/license-api";
 import {useTranslation} from "react-i18next";
 import {cn} from "@/lib/utils";
 import {useLicense} from "@/src/hook/use-license";
+import {useMobile} from "@/src/hook/use-mobile";
 
 const {Title, Text} = Typography;
 
 const LicenseSetting = () => {
 
+    const { isMobile } = useMobile();
     const {message} = App.useApp();
     let {t} = useTranslation();
 
-    let [licence, setLicense] = useLicense();
-
-    let licenseQuery = useQuery({
-        queryKey: ['simpleLicense'],
-        queryFn: licenseApi.getSimpleLicense,
-    })
-
-    useEffect(() => {
-        if (licenseQuery.data) {
-            setLicense(licenseQuery.data);
-        }
-    }, [licenseQuery.data]);
+    let [licence, licenseQuery] = useLicense();
 
     let queryMachineId = useQuery({
         queryKey: ['machine-id'],
@@ -124,8 +115,8 @@ const LicenseSetting = () => {
         <div>
             <Title level={5} style={{marginTop: 0}}>{t('settings.license.setting')}</Title>
 
-            <Row justify="space-around" gutter={16}>
-                <Col span={12}>
+            <Row justify="space-around" gutter={[16, 16]}>
+                <Col span={isMobile ? 24 : 12}>
                     <Spin spinning={queryMachineId.isLoading}>
                         <Card>
                             <Descriptions title={t('settings.license.device')} column={1}>
@@ -134,10 +125,12 @@ const LicenseSetting = () => {
                                 </Descriptions.Item>
                             </Descriptions>
 
-                            <Space className={'mt-4'}>
-                                <Button color="default" variant={'filled'} onClick={() => {
-                                    window.document.getElementById('import-license')?.click();
-                                }}>
+                            <Space className={cn('mt-4', isMobile && 'flex-wrap')} size={isMobile ? 'small' : 'middle'}>
+                                <Button color="default" variant={'filled'} 
+                                        size={isMobile ? 'small' : 'middle'}
+                                        onClick={() => {
+                                            window.document.getElementById('import-license')?.click();
+                                        }}>
                                     {t('settings.license.import')}
                                 </Button>
                                 <input type="file" id="import-license" style={{display: 'none'}}
@@ -145,13 +138,16 @@ const LicenseSetting = () => {
 
                                 {!licence.isOEM() &&
                                     <Button color="primary" variant="filled"
+                                            size={isMobile ? 'small' : 'middle'}
                                             href={'https://license.typesafe.cn/'}
                                             target={'_blank'}>
                                         {t('settings.license.binding')}
                                     </Button>
                                 }
                                 
-                                <Button color="purple" variant="filled" loading={requestLicense.isPending}
+                                <Button color="purple" variant="filled" 
+                                        size={isMobile ? 'small' : 'middle'}
+                                        loading={requestLicense.isPending}
                                         onClick={() => requestLicense.mutate()}
                                 >
                                     {t('settings.license.request')}
@@ -160,15 +156,15 @@ const LicenseSetting = () => {
                         </Card>
                     </Spin>
                 </Col>
-                <Col span={12}>
+                <Col span={isMobile ? 24 : 12}>
                     <Spin spinning={queryLicense.isLoading}>
                         <Card>
                             <Descriptions title={t('settings.license.info')}
                                           column={1}
                                           styles={{
                                               label: {
-                                                  justifyContent: 'flex-end',
-                                                  minWidth: 200,
+                                                  justifyContent: isMobile ? 'flex-start' : 'flex-end',
+                                                  minWidth: isMobile ? 100 : 200,
                                               }
                                           }}
                             >

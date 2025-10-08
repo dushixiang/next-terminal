@@ -16,6 +16,8 @@ import {
 import {Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis} from "recharts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import dayjs from "dayjs";
+import {useMobile} from "@/src/hook/use-mobile";
+import {cn} from "@/lib/utils";
 
 const chartConfig2 = {
     rdp: {
@@ -43,6 +45,7 @@ const chartConfig2 = {
 const DashboardPage = () => {
 
     let {t} = useTranslation();
+    const { isMobile } = useMobile();
 
     let [pieData, setPidData] = useState([]);
 
@@ -136,18 +139,30 @@ const DashboardPage = () => {
     ];
 
     return (
-        <div className={'px-4 space-y-4'}>
+        <div className={cn('px-4 space-y-4', isMobile && 'px-2')}>
             <div className={'font-medium'}>{t('dashboard.name')}</div>
-            <div className={'grid grid-cols-6 gap-4'}>
+            <div className={cn(
+                'grid gap-4',
+                isMobile ? 'grid-cols-2' : 'grid-cols-6'
+            )}>
                 {counters.map(item => {
-                    return <div className={'rounded-xl p-4 border'} key={item.title}>
+                    return <div className={cn(
+                        'rounded-xl border',
+                        isMobile ? 'p-3' : 'p-4'
+                    )} key={item.title}>
                         <div className={'flex items-center justify-between'}>
-                            <div className={'font-medium'}>
+                            <div className={cn(
+                                'font-medium',
+                                isMobile && 'text-sm line-clamp-2'
+                            )}>
                                 {item.title}
                             </div>
                             {item.icon}
                         </div>
-                        <div className={'mt-2 text-lg font-bold'}>
+                        <div className={cn(
+                            'mt-2 font-bold',
+                            isMobile ? 'text-base' : 'text-lg'
+                        )}>
                             <CountUp delay={2} end={item.value}/>
                         </div>
                     </div>
@@ -155,10 +170,13 @@ const DashboardPage = () => {
             </div>
 
             <div className={'font-medium'}>{t('dashboard.date_counter')}</div>
-            <div className={'rounded-xl p-4 border'}>
+            <div className={cn('rounded-xl border', isMobile ? 'p-2' : 'p-4')}>
                 <ChartContainer
                     config={chartConfig}
-                    className="aspect-auto h-[250px] w-full"
+                    className={cn(
+                        "aspect-auto w-full",
+                        isMobile ? "h-[200px]" : "h-[250px]"
+                    )}
                 >
                     <AreaChart data={dateCounterQuery.data}>
                         <defs>
@@ -248,49 +266,66 @@ const DashboardPage = () => {
                 </ChartContainer>
             </div>
 
-            <div className={'grid grid-cols-3 gap-4'}>
-                <div className={'col-span-2 space-y-4'}>
+            <div className={cn(
+                'grid gap-4',
+                isMobile ? 'grid-cols-1' : 'grid-cols-3'
+            )}>
+                <div className={cn(
+                    'space-y-4',
+                    !isMobile && 'col-span-2'
+                )}>
                     <div className={'font-medium'}>{t('dashboard.latest_session')}</div>
-                    <div className={'p-4 border rounded-xl'}>
-                        <Table
-                            className={'min-h-[250px]'}
-                        >
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead className="w-[100px] text-center">{t('audit.client_ip')}</TableHead>
-                                    <TableHead className={'text-center'}>{t('audit.user')}</TableHead>
-                                    <TableHead className={'text-center'}>{t('audit.protocol')}</TableHead>
-                                    <TableHead className={'text-center'}>{t('audit.asset')}</TableHead>
-                                    <TableHead className={'text-center'}>{t('audit.connected_at')}</TableHead>
-                                    <TableHead className={'text-center'}>{t('audit.connection_duration')}</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {sessionQuery.data?.items.map((session) => (
-                                    <TableRow key={session.id}>
-                                        <TableCell className={'text-center p-2.5'}>{session.clientIp}</TableCell>
-                                        <TableCell className={'text-center p-2.5'}>{session.userAccount}</TableCell>
-                                        <TableCell className={'text-center p-2.5'}>{session.protocol}</TableCell>
-                                        <TableCell className={'text-center p-2.5'}>
-                                            {`${session.username}@${session.ip}:${session.port}`}
-                                        </TableCell>
-                                        <TableCell className={'text-center p-2.5'}>
-                                            {dayjs(session.connectedAt).format('YYYY-MM-DD HH:mm:ss')}
-                                        </TableCell>
-                                        <TableCell
-                                            className={'text-center p-2.5'}>{session.connectionDuration}</TableCell>
+                    <div className={cn('border rounded-xl', isMobile ? 'p-2' : 'p-4')}>
+                        <div className="overflow-x-auto">
+                            <Table className={cn(isMobile ? 'min-h-[200px]' : 'min-h-[250px]')}>
+                                <TableHeader>
+                                    <TableRow>
+                                        {!isMobile && <TableHead className="w-[100px] text-center">{t('audit.client_ip')}</TableHead>}
+                                        <TableHead className={'text-center'}>{t('audit.user')}</TableHead>
+                                        <TableHead className={'text-center'}>{t('audit.protocol')}</TableHead>
+                                        <TableHead className={'text-center'}>{t('audit.asset')}</TableHead>
+                                        {!isMobile && <TableHead className={'text-center'}>{t('audit.connected_at')}</TableHead>}
+                                        {!isMobile && <TableHead className={'text-center'}>{t('audit.connection_duration')}</TableHead>}
                                     </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
+                                </TableHeader>
+                                <TableBody>
+                                    {sessionQuery.data?.items.map((session) => (
+                                        <TableRow key={session.id}>
+                                            {!isMobile && <TableCell className={'text-center p-2.5'}>{session.clientIp}</TableCell>}
+                                            <TableCell className={cn('text-center', isMobile ? 'p-1.5 text-xs' : 'p-2.5')}>{session.userAccount}</TableCell>
+                                            <TableCell className={cn('text-center', isMobile ? 'p-1.5 text-xs' : 'p-2.5')}>{session.protocol}</TableCell>
+                                            <TableCell className={cn('text-center', isMobile ? 'p-1.5 text-xs' : 'p-2.5')}>
+                                                {isMobile ? 
+                                                    <div className="line-clamp-2">
+                                                        {session.username}@{session.ip}
+                                                    </div> :
+                                                    `${session.username}@${session.ip}:${session.port}`
+                                                }
+                                            </TableCell>
+                                            {!isMobile && (
+                                                <>
+                                                    <TableCell className={'text-center p-2.5'}>
+                                                        {dayjs(session.connectedAt).format('YYYY-MM-DD HH:mm:ss')}
+                                                    </TableCell>
+                                                    <TableCell className={'text-center p-2.5'}>{session.connectionDuration}</TableCell>
+                                                </>
+                                            )}
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
                 </div>
                 <div className={'space-y-4'}>
                     <div className={'font-medium'}>{t('dashboard.asset_type')}</div>
-                    <div className={'p-4 rounded-xl border'}>
+                    <div className={cn('rounded-xl border', isMobile ? 'p-2' : 'p-4')}>
                         <ChartContainer
                             config={chartConfig2}
-                            className="mx-auto aspect-square max-h-[250px]"
+                            className={cn(
+                                "mx-auto aspect-square",
+                                isMobile ? "max-h-[200px]" : "max-h-[250px]"
+                            )}
                         >
                             <PieChart>
                                 <ChartTooltip
@@ -301,7 +336,7 @@ const DashboardPage = () => {
                                     data={pieData}
                                     dataKey="value"
                                     nameKey="name"
-                                    innerRadius={50}
+                                    innerRadius={isMobile ? 30 : 50}
                                 >
 
                                 </Pie>

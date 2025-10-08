@@ -8,6 +8,7 @@ import StorageModal from "@/src/pages/assets/StorageModal";
 import {renderSize} from "@/src/utils/utils";
 import FileSystemPage from "@/src/pages/access/FileSystemPage";
 import NButton from "@/src/components/NButton";
+import {getSort} from "@/src/utils/sort";
 
 const api = storageApi;
 
@@ -55,6 +56,8 @@ const StoragePage = () => {
         {
             title: t('assets.name'),
             dataIndex: 'name',
+            ellipsis: true,
+            width: 100,
         },
         {
             title: t('assets.is_default'),
@@ -68,6 +71,7 @@ const StoragePage = () => {
                     return <Tag color={'gray'} bordered={false}>{t('general.no')}</Tag>
                 }
             },
+            width: 50,
         },
         {
             title: t('assets.is_share'),
@@ -80,7 +84,8 @@ const StoragePage = () => {
                 } else {
                     return <Tag color={'gray'} bordered={false}>{t('general.no')}</Tag>
                 }
-            }
+            },
+            width: 50,
         },
         {
             title: t('assets.used_size'),
@@ -89,7 +94,8 @@ const StoragePage = () => {
             hideInSearch: true,
             render: (text) => {
                 return renderSize(text as number);
-            }
+            },
+            width: 100,
         },
         {
             title: t('assets.limit_size'),
@@ -98,20 +104,23 @@ const StoragePage = () => {
             hideInSearch: true,
             render: (text) => {
                 return renderSize(text as number);
-            }
+            },
+            width: 100,
         },
         {
             title: t('general.creator'),
             key: 'creator',
             dataIndex: 'creator',
             hideInSearch: true,
+            width: 100,
         },
         {
             title: t('general.created_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',
             hideInSearch: true,
-            valueType: 'dateTime'
+            valueType: 'dateTime',
+            width: 191,
         },
         {
             title: t('actions.option'),
@@ -156,10 +165,13 @@ const StoragePage = () => {
             columns={columns}
             actionRef={actionRef}
             request={async (params = {}, sort, filter) => {
+                let [sortOrder, sortField] = getSort(sort);
+                
                 let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
-                    sort: JSON.stringify(sort),
+                    sortOrder: sortOrder,
+                    sortField: sortField,
                     name: params.name,
                 }
                 let result = await api.getPaging(queryParams);

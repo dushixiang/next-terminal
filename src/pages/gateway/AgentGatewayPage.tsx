@@ -13,6 +13,7 @@ import AgentGatewayTokenDrawer from "@/src/pages/gateway/AgentGatewayTokenDrawer
 import {ArrowDownIcon, ArrowUpIcon, HardDriveDownloadIcon, HardDriveUploadIcon} from "lucide-react";
 import {formatUptimeEn, getColor, renderSize} from "@/src/utils/utils";
 import AgentGatewayStat from "@/src/pages/gateway/AgentGatewayStat";
+import {getSort} from "@/src/utils/sort";
 
 const api = agentGatewayApi;
 
@@ -314,7 +315,7 @@ const AgentGatewayPage = () => {
     ];
 
     return (
-        <div>
+        <div className={'w-full'}>
             <Disabled disabled={license.isFree()}>
                 <DragSortTable
                     headerTitle={t('menus.gateway.submenus.agent_gateway')}
@@ -329,10 +330,13 @@ const AgentGatewayPage = () => {
                         showSizeChanger: true
                     }}
                     request={async (params = {}, sort, filter) => {
+                        let [sortOrder, sortField] = getSort(sort);
+                        
                         let queryParams = {
                             pageIndex: params.current,
                             pageSize: params.pageSize,
-                            sort: JSON.stringify(sort),
+                            sortOrder: sortOrder,
+                            sortField: sortField,
                             name: params.name,
                         }
                         let result = await api.getPaging(queryParams);
@@ -366,6 +370,12 @@ const AgentGatewayPage = () => {
                         </Button>
                     ]}
                     polling={5000}
+                    // style={{
+                    //     width: '400px',
+                    // }}
+                    // scroll={{
+                    //     x: 'max-content'
+                    // }}
                 />
 
                 <AgentGatewayModal

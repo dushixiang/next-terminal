@@ -11,13 +11,18 @@ import {useSearchParams} from "react-router-dom";
 import propertyApi from "../../api/property-api";
 import {useTranslation} from "react-i18next";
 import {maybe} from "../../utils/maybe";
-import ReverseProxySetting from "@/src/pages/sysconf/ReverseProxySetting";
+
 import SystemSetting from "@/src/pages/sysconf/SystemSetting";
 import About from "@/src/pages/sysconf/About";
-import BackupSetting from "@/src/pages/sysconf/BackupSetting";
+import GeoIPSetting from "./GeoIPSetting";
+import BackupSetting from "./BackupSetting";
 import LogoSetting from "@/src/pages/sysconf/LogoSetting";
 import IdentitySetting from "@/src/pages/sysconf/IdentitySetting";
 import {useLicense} from "@/src/hook/use-license";
+import NetworkSetting from "@/src/pages/sysconf/NetworkSetting";
+import LLMSetting from "@/src/pages/sysconf/LLMSetting";
+import {useMobile} from "@/src/hook/use-mobile";
+import {cn} from "@/lib/utils";
 
 export interface SettingProps {
     get: () => any
@@ -26,6 +31,7 @@ export interface SettingProps {
 
 const SettingPage = () => {
 
+    const { isMobile } = useMobile();
     const [messageApi, contextHolder] = message.useMessage();
     const [searchParams, setSearchParams] = useSearchParams();
     let [license] = useLicense();
@@ -65,11 +71,7 @@ const SettingPage = () => {
             key: 'sshd',
             children: <SshdSetting get={get} set={set}/>
         },
-        {
-            label: t('settings.rp.setting'),
-            key: 'reverse-proxy',
-            children: <ReverseProxySetting get={get} set={set}/>
-        },
+
         {
             label: t('settings.rdp.setting'),
             key: 'rdp',
@@ -101,6 +103,21 @@ const SettingPage = () => {
             children: <BackupSetting/>
         },
         {
+            label: "网络设置",
+            key: 'network',
+            children: <NetworkSetting get={get} set={set}/>
+        },
+        {
+            label: 'GeoIP 设置',
+            key: 'geoip',
+            children: <GeoIPSetting/>
+        },
+        {
+            label: 'LLM 设置',
+            key: 'llm',
+            children: <LLMSetting get={get} set={set}/>
+        },
+        {
             label: t('settings.license.setting'),
             key: 'license',
             children: <LicenseSetting/>
@@ -122,9 +139,18 @@ const SettingPage = () => {
     }
 
     return (
-        <div className="px-4">
-            <Tabs tabPosition={'left'} activeKey={activeKey} onChange={handleTagChange} tabBarStyle={{width: 150}}
-                  items={items}>
+        <div className={cn('px-4', isMobile && 'px-2')}>
+            <Tabs 
+                tabPosition={isMobile ? 'top' : 'left'} 
+                activeKey={activeKey} 
+                onChange={handleTagChange} 
+                tabBarStyle={isMobile ? {} : {width: 150}}
+                items={items}
+                size={isMobile ? 'small' : 'middle'}
+                className={cn(
+                    isMobile && 'mobile-setting-tabs'
+                )}
+            >
             </Tabs>
             {contextHolder}
         </div>

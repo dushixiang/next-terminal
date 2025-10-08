@@ -1,5 +1,6 @@
 import React, {useRef, useState} from 'react';
 import {useTranslation} from "react-i18next";
+import {getSort} from "@/src/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {App, Button, Drawer, Popconfirm, Select, Space, Table, Typography} from "antd";
 import sessionApi, {Session} from "@/src/api/session-api";
@@ -36,12 +37,17 @@ const OfflineSessionPage = () => {
 
     const columns: ProColumns<Session>[] = [
         {
-            title: t('audit.client_ip'),
-            dataIndex: 'clientIp',
-            key: 'clientIp',
+            title: t('audit.user'),
+            dataIndex: 'userAccount',
+            key: 'userAccount',
+        },
+        {
+            title: t('audit.asset'),
+            dataIndex: 'assetName',
+            key: 'assetName',
             render: (text, record) => {
                 let view = <div>{text}</div>;
-                const title = record.region;
+                const title = `${record['protocol']} ${record.username}@${record.ip}:${record.port}`;
                 return <div>
                     {view}
                     <Typography.Text type="secondary">{title}</Typography.Text>
@@ -49,10 +55,19 @@ const OfflineSessionPage = () => {
             },
         },
         {
-            title: t('audit.user'),
-            dataIndex: 'userAccount',
-            key: 'userAccount',
+            title: t('audit.client_ip'),
+            dataIndex: 'clientIp',
+            key: 'clientIp',
+            render: (text, record) => {
+                let view = <div>{text}</div>;
+                const title = record.region;
+                return <div className={'flex items-center gap-2'}>
+                    {view}
+                    <Typography.Text type="secondary">{title}</Typography.Text>
+                </div>
+            },
         },
+
         {
             title: t('audit.protocol'),
             dataIndex: 'protocol',
@@ -81,19 +96,7 @@ const OfflineSessionPage = () => {
                 );
             },
         },
-        {
-            title: t('audit.asset'),
-            dataIndex: 'assetName',
-            key: 'assetName',
-            render: (text, record) => {
-                let view = <div>{text}</div>;
-                const title = `${record['protocol']} ${record.username}@${record.ip}:${record.port}`;
-                return <div>
-                    {view}
-                    <Typography.Text type="secondary">{title}</Typography.Text>
-                </div>
-            },
-        },
+
         {
             title: t('audit.connected_at'),
             dataIndex: 'connectedAt',
@@ -175,11 +178,14 @@ const OfflineSessionPage = () => {
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let queryParams = {
+                    request={async (params = {}, sort, filter) => {
+                        let [sortOrder, sortField] = getSort(sort);
+                        
+                        let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sort: JSON.stringify(sort),
+                        sortOrder: sortOrder,
+                        sortField: sortField,
                         status: 'disconnected',
                         clientIp: params.clientIp,
                         protocol: params.protocol,

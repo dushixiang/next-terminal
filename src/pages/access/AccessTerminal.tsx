@@ -1,6 +1,9 @@
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit";
+import {SearchAddon} from "@xterm/addon-search";
+import {WebglAddon} from "@xterm/addon-webgl";
+import {CanvasAddon} from "@xterm/addon-canvas";
 import "@xterm/xterm/css/xterm.css";
 import portalApi, {ExportSession} from "@/src/api/portal-api";
 import {
@@ -15,16 +18,26 @@ import {
 import {useInterval, useWindowSize} from "react-use";
 import {CleanTheme, useTerminalTheme} from "@/src/hook/use-terminal-theme";
 import {useAccessTab} from "@/src/hook/use-access-tab";
-import {ActivityIcon, FolderCode, FolderIcon, Share2Icon} from "lucide-react";
+import {
+    ActivityIcon,
+    BotIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    FolderCode,
+    FolderIcon,
+    SearchIcon,
+    Share2Icon,
+    XIcon
+} from "lucide-react";
 import SnippetSheet from "@/src/pages/access/SnippetSheet";
 import SessionSharerModal from "@/src/pages/access/SessionSharerModal";
+import ShellAssistantSheet from "@/src/pages/access/ShellAssistantSheet";
 import AccessStats from "@/src/pages/access/AccessStats";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import clsx from "clsx";
 import {debounce} from "@/src/utils/debounce";
 import FileSystemPage from "@/src/pages/access/FileSystemPage";
 import {App, Watermark} from "antd";
-import Timeout, {TimeoutHandle} from "@/src/components/Timeout";
 import {useAccessContentSize} from "@/src/hook/use-access-size";
 import {cn} from "@/lib/utils";
 import {baseWebSocketUrl, getToken} from "@/src/api/core/requests";
@@ -33,7 +46,7 @@ import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentica
 import {isMobileByMediaQuery} from "@/src/utils/utils";
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
-import {useAccessSetting} from "@/src/hook/use-access-setting";
+import accessSettingApi, {Setting} from "@/src/api/access-setting-api";
 
 interface Props {
     assetId: string;
@@ -46,6 +59,9 @@ const AccessTerminal = ({assetId}: Props) => {
     const divRef = React.useRef<HTMLDivElement>(null);
     const terminalRef = useRef<Terminal>();
     const fitRef = useRef<FitAddon>();
+    const searchRef = useRef<SearchAddon>();
+    const webglRef = useRef<WebglAddon>();
+    const canvasRef = useRef<CanvasAddon>();
 
     let [websocket, setWebsocket] = useState<WebSocket>();
     let [session, setSession] = useState<ExportSession>();
@@ -53,7 +69,7 @@ const AccessTerminal = ({assetId}: Props) => {
     let [accessTheme] = useTerminalTheme();
     let [accessTab] = useAccessTab();
     let {width, height} = useWindowSize();
-    let [accessSetting] = useAccessSetting();
+    let [accessSetting, setAccessSetting] = useState<Setting>();
 
     let [fileSystemOpen, setFileSystemOpen] = useState(false);
     let [preFileSystemOpen, setPreFileSystemOpen] = useState(false);
@@ -61,6 +77,8 @@ const AccessTerminal = ({assetId}: Props) => {
     let [snippetOpen, setSnippetOpen] = useState(false);
     let [sharerOpen, setSharerOpen] = useState(false);
     let [statsOpen, setStatsOpen] = useState(false);
+    let [shellAssistantOpen, setShellAssistantOpen] = useState(false);
+    let [shellAssistantEnabled, setShellAssistantEnabled] = useState(false);
 
     let [loading, setLoading] = useState(false);
     let [reconnected, setReconnected] = useState('');
@@ -69,19 +87,44 @@ const AccessTerminal = ({assetId}: Props) => {
     let {notification, message} = App.useApp();
     const fsRef = useRef();
 
-    const timeoutRef = useRef<TimeoutHandle>();
     let [mfaOpen, setMfaOpen] = useState(false);
+
+    // 搜索相关状态
+    let [searchOpen, setSearchOpen] = useState(false);
+    let [searchTerm, setSearchTerm] = useState('');
+    let [searchMatchIndex, setSearchMatchIndex] = useState(0);
+    let [searchMatchCount, setSearchMatchCount] = useState(0);
+
+    // 获取访问设置和 Shell 助手状态
+    useEffect(() => {
+        const fetchAccessSetting = async () => {
+            try {
+                const setting = await accessSettingApi.get();
+                setAccessSetting(setting);
+            } catch (error) {
+                console.error('Failed to fetch access setting:', error);
+            }
+        };
+        
+        const fetchShellAssistantEnabled = async () => {
+            try {
+                const result = await accessSettingApi.getShellAssistantEnabled();
+                setShellAssistantEnabled(result.enabled);
+            } catch (error) {
+                console.error('Failed to fetch shell assistant enabled status:', error);
+                setShellAssistantEnabled(false);
+            }
+        };
+        
+        fetchAccessSetting();
+        fetchShellAssistantEnabled();
+    }, []);
 
     useInterval(() => {
         if (websocket?.readyState === WebSocket.OPEN) {
             websocket?.send(new Message(MessageTypeKeepAlive, "").toString());
         }
     }, 5000);
-
-    const resetTimer = () => {
-        timeoutRef.current?.reset();
-        // console.log(`reset timer`, timeoutRef.current);
-    }
 
     useEffect(() => {
         let current = accessTab.split('_')[1];
@@ -110,35 +153,46 @@ const AccessTerminal = ({assetId}: Props) => {
     }, [accessTheme]);
 
     useEffect(() => {
-        let selectionChange = terminalRef.current?.onSelectionChange(async () => {
+        if (!terminalRef.current) {
+            return;
+        }
+
+        let selectionChange = terminalRef.current.onSelectionChange(() => {
             // console.log(`on selection change`, accessSetting)
-            if (accessSetting?.selectionCopy === false) {
+            if (accessSetting?.selectionCopy !== true) {
                 return
             }
             if (terminalRef.current?.hasSelection()) {
                 let selection = terminalRef.current?.getSelection();
-                copy(selection)
-                message.success(t('general.copy_success'));
+                if (selection) {
+                    copy(selection)
+                    message.success(t('general.copy_success'));
+                }
             }
         });
 
         const handleContextMenu = async (e: MouseEvent) => {
             // console.log(`on context menu`, accessSetting)
-            if (accessSetting?.rightClickPaste === false) {
+            if (accessSetting?.rightClickPaste !== true) {
                 return
             }
             e.preventDefault();
-            const clipboardText = await navigator.clipboard.readText();
-            websocket?.send(new Message(MessageTypeData, clipboardText).toString());
+            try {
+                const clipboardText = await navigator.clipboard.readText();
+                websocket?.send(new Message(MessageTypeData, clipboardText).toString());
+            } catch (error) {
+                console.warn('Failed to read clipboard:', error);
+            }
         }
 
-        divRef?.current?.addEventListener("contextmenu", handleContextMenu);
+        const divElement = divRef.current;
+        divElement?.addEventListener("contextmenu", handleContextMenu);
 
         return () => {
             selectionChange?.dispose();
-            divRef?.current?.removeEventListener("contextmenu", handleContextMenu);
+            divElement?.removeEventListener("contextmenu", handleContextMenu);
         };
-    }, [accessSetting, websocket]);
+    }, [accessSetting, websocket, terminalRef.current]);
 
     useEffect(() => {
         if (terminalRef.current || !divRef.current) return;
@@ -151,10 +205,22 @@ const AccessTerminal = ({assetId}: Props) => {
             lineHeight: cleanTheme.lineHeight,
             allowProposedApi: true,
             cursorBlink: true,
+            // WebGL 渲染器性能优化配置
+            convertEol: true, // 启用自动换行符转换
+            fastScrollModifier: 'alt', // 启用快速滚动
+            fastScrollSensitivity: 5, // 提高滚动敏感度
+            scrollback: 10000, // 增加回滚缓冲区
+            windowsMode: false, // 禁用 Windows 模式以提高性能
         });
 
         term.attachCustomKeyEventHandler((domEvent) => {
             if (domEvent.ctrlKey && domEvent.key === 'c' && term.hasSelection()) {
+                return false;
+            }
+            // 支持 Ctrl+F (Windows/Linux) 和 Cmd+F (Mac)
+            if ((domEvent.ctrlKey || domEvent.metaKey) && domEvent.key === 'f') {
+                domEvent.preventDefault();
+                setSearchOpen(true);
                 return false;
             }
             return !(domEvent.ctrlKey && domEvent.key === 'v');
@@ -162,10 +228,41 @@ const AccessTerminal = ({assetId}: Props) => {
 
         term.open(divRef.current);
         let fitAddon = new FitAddon();
+        let searchAddon = new SearchAddon();
         term.loadAddon(fitAddon);
+        term.loadAddon(searchAddon);
+
+        // 尝试加载 WebGL 渲染器，失败时回退到 Canvas 渲染器
+        let webglAddon: WebglAddon | null = null;
+        let canvasAddon: CanvasAddon | null = null;
+        
+        try {
+            webglAddon = new WebglAddon();
+            term.loadAddon(webglAddon);
+            console.log('✅ WebGL renderer loaded successfully - Hardware acceleration enabled');
+            
+            // WebGL 特定优化
+            if (webglAddon && 'preserveDrawingBuffer' in webglAddon) {
+                // 启用绘图缓冲区保持，提高渲染性能
+                (webglAddon as any).preserveDrawingBuffer = false;
+            }
+        } catch (e) {
+            console.warn('⚠️ Failed to load WebGL renderer, falling back to Canvas renderer:', e);
+            try {
+                canvasAddon = new CanvasAddon();
+                term.loadAddon(canvasAddon);
+                console.log('✅ Canvas renderer loaded successfully - Software acceleration enabled');
+            } catch (e2) {
+                console.warn('⚠️ Failed to load Canvas renderer, using default DOM renderer:', e2);
+                console.log('🐌 Using DOM renderer - Performance may be reduced');
+            }
+        }
 
         terminalRef.current = term;
         fitRef.current = fitAddon;
+        searchRef.current = searchAddon;
+        webglRef.current = webglAddon;
+        canvasRef.current = canvasAddon;
 
         fitAddon.fit();
         term.focus();
@@ -173,6 +270,8 @@ const AccessTerminal = ({assetId}: Props) => {
         return () => {
             term.dispose();
             fitAddon.dispose();
+            webglAddon?.dispose();
+            canvasAddon?.dispose();
         }
     }, []);
 
@@ -294,7 +393,6 @@ const AccessTerminal = ({assetId}: Props) => {
             } else {
                 websocket?.send(new Message(MessageTypeData, data).toString());
             }
-            resetTimer();
         });
 
         return () => {
@@ -309,6 +407,104 @@ const AccessTerminal = ({assetId}: Props) => {
             fitRef.current.fit();
         }
     }, 300), []);
+
+    // 搜索功能函数
+    const handleSearch = (term: string) => {
+        if (!searchRef.current || !term) {
+            setSearchMatchCount(0);
+            setSearchMatchIndex(0);
+            searchRef.current?.clearDecorations();
+            return;
+        }
+
+        // 清除之前的搜索结果
+        searchRef.current.clearDecorations();
+
+        // 使用简单的文本匹配来计算总数
+        const terminalContent = terminalRef.current?.buffer.active;
+        if (terminalContent) {
+            let totalMatches = 0;
+            const searchTermLower = term.toLowerCase();
+
+            // 遍历所有行来计算匹配数量
+            for (let i = 0; i < terminalContent.length; i++) {
+                const line = terminalContent.getLine(i);
+                if (line) {
+                    const lineText = line.translateToString().toLowerCase();
+                    let lastIndex = 0;
+                    while (true) {
+                        const index = lineText.indexOf(searchTermLower, lastIndex);
+                        if (index === -1) break;
+                        totalMatches++;
+                        lastIndex = index + 1;
+                    }
+                }
+            }
+
+            setSearchMatchCount(totalMatches);
+
+            // 执行第一次搜索
+            if (totalMatches > 0) {
+                const result = searchRef.current.findNext(term, {
+                    caseSensitive: false, // 大小写敏感
+                    wholeWord: false,
+                    regex: false
+                });
+                setSearchMatchIndex(result ? 1 : 0);
+            } else {
+                setSearchMatchIndex(0);
+            }
+        }
+    };
+
+    const decorations = {
+        // 匹配项的背景颜色
+        // matchBackground: '#FFD700', // 金色，明亮且易于识别
+        // 匹配项的边框颜色
+        // matchBorder: '#FF8C00', // 暗橙色，与背景形成对比
+        // 匹配项在概览标尺中的颜色
+        matchOverviewRuler: '#FFD700', // 与背景相同，使其在标尺中突出
+        // 当前激活匹配项的背景颜色
+        activeMatchBackground: '#FF4500', // 橙红色，清晰显示当前项
+        // 当前激活匹配项的边框颜色
+        activeMatchBorder: '#FF6347', // 西红柿色，进一步强调当前匹配
+        // 当前激活匹配项在概览标尺中的颜色
+        activeMatchColorOverviewRuler: '#FF4500', // 与激活背景相同，便于识别
+    }
+
+    const handleSearchNext = () => {
+        if (!searchRef.current || !searchTerm) return;
+        const result = searchRef.current.findNext(searchTerm, {
+            caseSensitive: false,
+            wholeWord: false,
+            regex: false,
+            decorations: decorations,
+        });
+        if (result && searchMatchCount > 0) {
+            setSearchMatchIndex(prev => prev < searchMatchCount ? prev + 1 : 1);
+        }
+    };
+
+    const handleSearchPrevious = () => {
+        if (!searchRef.current || !searchTerm) return;
+        const result = searchRef.current.findPrevious(searchTerm, {
+            caseSensitive: false,
+            wholeWord: false,
+            regex: false,
+            decorations: decorations,
+        });
+        if (result && searchMatchCount > 0) {
+            setSearchMatchIndex(prev => prev > 1 ? prev - 1 : searchMatchCount);
+        }
+    };
+
+    const clearSearch = () => {
+        setSearchTerm('');
+        setSearchMatchIndex(0);
+        setSearchMatchCount(0);
+        searchRef.current?.clearDecorations();
+        setSearchOpen(false);
+    };
 
     let isMobile = isMobileByMediaQuery();
 
@@ -389,11 +585,77 @@ const AccessTerminal = ({assetId}: Props) => {
                                     </div>
                                 }
 
-                                <div className={'p-2 flex-grow h-full'}
+                                <div className={'p-2 flex-grow h-full relative'}
                                      style={{
                                          backgroundColor: accessTheme?.theme?.value['background'],
                                      }}
                                 >
+                                    {/* 搜索框 */}
+                                    {searchOpen && (
+                                        <div
+                                            className="absolute top-2 right-2 z-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-1.5 flex items-center gap-1.5 min-w-[240px]">
+                                            <SearchIcon className="h-3.5 w-3.5 text-gray-500"/>
+                                            <input
+                                                type="text"
+                                                value={searchTerm}
+                                                onChange={(e) => {
+                                                    setSearchTerm(e.target.value);
+                                                    handleSearch(e.target.value);
+                                                }}
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter') {
+                                                        if (e.shiftKey) {
+                                                            handleSearchPrevious();
+                                                        } else {
+                                                            handleSearchNext();
+                                                        }
+                                                    } else if (e.key === 'Escape') {
+                                                        clearSearch();
+                                                    }
+                                                }}
+                                                // onBlur={(e) => {
+                                                //     // 当搜索框失去焦点且没有搜索内容时，自动关闭搜索框
+                                                //     if (!searchTerm.trim()) {
+                                                //         setTimeout(() => {
+                                                //             if (!searchTerm.trim()) {
+                                                //                 setSearchOpen(false);
+                                                //             }
+                                                //         }, 100);
+                                                //     }
+                                                // }}
+                                                placeholder={t('access.settings.terminal.search_placeholder') || '搜索终端内容...'}
+                                                className="flex-1 px-1.5 py-0.5 text-xs border-none outline-none bg-transparent text-gray-900 dark:text-gray-100"
+                                                autoFocus
+                                            />
+                                            {searchMatchCount > 0 && (
+                                                <span className="text-[10px] text-gray-500 whitespace-nowrap">
+                                                    {searchMatchIndex}/{searchMatchCount}
+                                                </span>
+                                            )}
+                                            <div className="flex items-center gap-0.5">
+                                                <button
+                                                    onClick={handleSearchPrevious}
+                                                    disabled={!searchTerm || searchMatchCount === 0}
+                                                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <ChevronUpIcon className="h-3 w-3"/>
+                                                </button>
+                                                <button
+                                                    onClick={handleSearchNext}
+                                                    disabled={!searchTerm || searchMatchCount === 0}
+                                                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                                >
+                                                    <ChevronDownIcon className="h-3 w-3"/>
+                                                </button>
+                                                <button
+                                                    onClick={clearSearch}
+                                                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                                >
+                                                    <XIcon className="h-3 w-3"/>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className={'h-full'} ref={divRef}/>
                                 </div>
                             </div>
@@ -421,7 +683,14 @@ const AccessTerminal = ({assetId}: Props) => {
                 </ResizablePanelGroup>
 
                 {isMobile &&
-                    <div className={cn('absolute right-4 top-4 p-2 rounded bg-[#1E1F22]', isMobile && 'top-12')}>
+                    <div
+                        className={cn('absolute right-4 top-4 p-2 rounded bg-[#1E1F22] flex gap-2', isMobile && 'top-12')}>
+                        <div title="搜索终端内容">
+                            <SearchIcon
+                                className={cn('h-4 w-4', isMobile && 'text-white', searchOpen && 'text-blue-400')}
+                                onClick={() => setSearchOpen(!searchOpen)}
+                            />
+                        </div>
                         <Share2Icon className={cn('h-4 w-4', isMobile && 'text-white')}
                                     onClick={() => setSharerOpen(true)}/>
                     </div>
@@ -430,6 +699,11 @@ const AccessTerminal = ({assetId}: Props) => {
                 {!isMobile &&
                     <div className={'w-10 bg-[#1E1F22] flex flex-col items-center border'}>
                         <div className={'flex-grow py-4 space-y-6 cursor-pointer'}>
+                            <div title="搜索终端内容">
+                                <SearchIcon className={clsx('h-4 w-4', searchOpen && 'text-blue-500')}
+                                            onClick={() => setSearchOpen(!searchOpen)}
+                                />
+                            </div>
                             <Share2Icon className={'h-4 w-4'} onClick={() => setSharerOpen(true)}/>
                             <FolderIcon className={'h-4 w-4'} onClick={() => {
                                 setFileSystemOpen(true);
@@ -439,6 +713,9 @@ const AccessTerminal = ({assetId}: Props) => {
                                           onClick={() => setStatsOpen(!statsOpen)}
                             />
                             <FolderCode className={'h-4 w-4'} onClick={() => setSnippetOpen(true)}/>
+                            {shellAssistantEnabled && (
+                                <BotIcon className={'h-4 w-4'} onClick={() => setShellAssistantOpen(true)}/>
+                            )}
                         </div>
                     </div>
                 }
@@ -448,8 +725,18 @@ const AccessTerminal = ({assetId}: Props) => {
                 onClose={() => setSnippetOpen(false)}
                 onUse={(content: string) => {
                     terminalRef.current?.paste(content);
+                    websocket?.send(new Message(MessageTypeData, '\r').toString());
                 }}
                 open={snippetOpen}
+                mask={false}
+            />
+            <ShellAssistantSheet
+                onClose={() => setShellAssistantOpen(false)}
+                onExecute={(content: string) => {
+                    terminalRef.current?.paste(content);
+                    websocket?.send(new Message(MessageTypeData, '\r').toString());
+                }}
+                open={shellAssistantOpen}
                 mask={false}
             />
             <SessionSharerModal sessionId={session?.id} open={sharerOpen}
@@ -465,15 +752,6 @@ const AccessTerminal = ({assetId}: Props) => {
                                 setPreFileSystemOpen(false);
                             }}
                             ref={fsRef}
-            />
-
-            <Timeout
-                ref={timeoutRef}
-                fn={() => {
-                    websocket?.close(3886);
-                    console.log(`client disconnect by timeout`, session?.idle)
-                }}
-                ms={session?.idle * 1000}
             />
 
             <MultiFactorAuthentication
