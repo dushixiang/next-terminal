@@ -34,6 +34,7 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
             type: 'user',
             recording: 'enabled',
             watermark: 'enabled',
+            source: 'local',
         };
     }
 
@@ -128,6 +129,24 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                     </Col>
                     <Col span={12}>
                         <ProFormText name={'phone'} label={t('identity.user.phone')}/>
+                    </Col>
+                </Row>
+
+                <Row gutter={8}>
+                    <Col span={12}>
+                        <ProFormSelect 
+                            name={'source'} 
+                            label={t('identity.user.source')} 
+                            options={[
+                                {label: t('identity.user.sources.local'), value: 'local'},
+                                {label: t('identity.user.sources.ldap'), value: 'ldap'},
+                                {label: t('identity.user.sources.wechat'), value: 'wechat'},
+                                {label: t('identity.user.sources.oidc'), value: 'oidc'},
+                            ]}
+                        />
+                    </Col>
+                    <Col span={12}>
+                        <ProFormText name={'remark'} label={t('general.remark')}/>
                     </Col>
                 </Row>
 

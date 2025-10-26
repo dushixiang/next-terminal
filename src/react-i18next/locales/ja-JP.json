@@ -25,7 +25,8 @@
     "enter_remark": "備考を入力してください",
     "required": "必須",
     "error": "操作に失敗しました",
-    "status": "状態"
+    "status": "状態",
+    "language": "言語"
   },
   "actions": {
     "option": "操作",
@@ -196,7 +197,8 @@
       "create_dir": "フォルダ作成",
       "upload_file": "ファイルアップロード",
       "upload_dir": "ディレクトリアップロード",
-      "batch_download": "一括ダウンロード"
+      "batch_download": "一括ダウンロード",
+      "chmod": "権限設定"
     },
     "attributes": {
       "path": "パス",
@@ -210,7 +212,17 @@
       "permissions": {
         "label": "権限",
         "owner": "所有者",
-        "group": "グループ"
+        "group": "グループ",
+        "owner_read": "読み取り",
+        "owner_write": "書き込み",
+        "owner_execute": "実行する",
+        "group_read": "読み取り",
+        "group_write": "書き込み",
+        "group_execute": "実行する",
+        "public": "公共",
+        "public_read": "読み取り",
+        "public_write": "書き込み",
+        "public_execute": "実行する"
       }
     },
     "file_types": {
@@ -232,7 +244,11 @@
     "editor": {
       "label": "エディタ",
       "save": "保存",
-      "refetch": "再読み込み"
+      "refetch": "再読み込み",
+      "copy_path": "パスをコピー",
+      "no_files_open": "開かれたファイルがありません",
+      "unsaved_changes_title": "保存されていないファイルが存在します。",
+      "unsaved_changes_content": "エディタを閉じると保存されていない変更が失われますが、閉じてもよろしいですか？"
     },
     "transmission": {
       "filename": "ファイル名",
@@ -258,13 +274,15 @@
       "connected": "接続成功",
       "disconnecting": "セッション終了中...",
       "disconnected": "セッションが閉じられました",
-      "closed": "セッションが閉じられました"
+      "closed": "セッションが閉じられました",
+      "unknown": "未知の状態"
     },
     "tunnel": {
       "connecting": "トンネルが接続中です...",
       "open": "トンネル接続に成功しました。",
       "closed": "トンネル接続が閉じられました",
-      "unstable": "トンネル接続が不安定です"
+      "unstable": "トンネル接続が不安定です",
+      "unknown": "未知のトンネル状態"
     }
   },
   "identity": {
@@ -359,7 +377,15 @@
       "locked_type_ip": "IPロック",
       "last_login_at": "最終ログイン時間",
       "available": "オプションユーザー",
-      "selected": "選択されたユーザー"
+      "selected": "選択されたユーザー",
+      "phone": "携帯電話番号",
+      "source": "出典",
+      "sources": {
+        "local": "ローカル",
+        "ldap": "LDAP",
+        "wechat": "企業微信",
+        "oidc": "OIDC"
+      }
     },
     "options": {
       "authorized_asset": "承認された資産",
@@ -380,7 +406,8 @@
       "tree_view": "ツリービュー",
       "tree_structure": "部門のツリー構造",
       "sub_departments": "子部門",
-      "manage_users": "ユーザー管理"
+      "manage_users": "ユーザー管理",
+      "user_count": "メンバー数"
     }
   },
   "dw": {
@@ -670,7 +697,8 @@
           "size": "フォントサイズ",
           "family": "フォント"
         },
-        "line_height": "行の高さ"
+        "line_height": "行の高さ",
+        "search_placeholder": "端末のコンテンツを検索中…"
       },
       "mouse": {
         "label": "マウス設定",
@@ -820,7 +848,14 @@
     "otp_security_tip": "安全のヒント",
     "otp_security_description": "バインドが成功すると、アカウントは2要素認証の保護を受けます。認証デバイスを適切に管理してください。",
     "otp_step3_description": "認証コードを入力してバインディングを完了してください。",
-    "otp_step2_description": "認証アプリでQRコードをスキャンする"
+    "otp_step2_description": "認証アプリでQRコードをスキャンする",
+    "otp_code_label": "OTP認証コード",
+    "select_auth_type": "認証方法を選択してください。",
+    "auth_type_passkey": "パスキー",
+    "auth_type_passkey_desc": "生体認証またはセキュリティキーを使用して認証する",
+    "auth_type_otp": "OTP認証コード",
+    "auth_type_otp_desc": "動的認証コードを使用して認証する",
+    "auth_type_unavailable": "無効"
   },
   "assets": {
     "name": "名前",
@@ -941,6 +976,10 @@
       "is_default": "デフォルトの証明書",
       "is_default_tooltip": "デフォルトの証明書とは、他の証明書が一致しない場合に使用される証明書を指します。",
       "set_as_default": "デフォルトに設定",
+      "download": "証明書をダウンロード",
+      "renew": "証明書を更新",
+      "renew_confirm": "証明書を更新しますか？",
+      "renew_confirm_content": "証明書を再申請して更新します。続行しますか？",
       "issued_log": "証明書申請ログ",
       "self_signed_tip_title": "ヒント: ルート証明書を自分で交換できます。交換後、再起動してください。",
       "self_signed_root_ca_cert_path": "ルート証明書ファイルのパス",
@@ -1059,7 +1098,8 @@
         "rdp": "伝統的なRDP暗号化",
         "rdp_desc": "伝統的なRDP暗号化モードは、通常、古いWindowsサーバーで使用されます。"
       }
-    }
+    },
+    "sort": "ソート"
   },
   "gateways": {
     "name": "名前",

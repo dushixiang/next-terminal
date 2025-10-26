@@ -1,12 +1,12 @@
 import React from 'react';
 import {UploadIcon} from "lucide-react";
-import {message, Popconfirm, TreeDataNode, Typography, Upload} from "antd";
+import {message, Popconfirm, Tooltip, TreeDataNode, Typography, Upload} from "antd";
 import {useQuery} from "@tanstack/react-query";
 import {logoApi} from "@/src/api/logo-api";
 import {RcFile} from "antd/es/upload";
 import {useTranslation} from "react-i18next";
 
-const {Title, Text} = Typography;
+const {Title} = Typography;
 
 const LogoSetting = () => {
     let {t} = useTranslation();
@@ -56,9 +56,11 @@ const LogoSetting = () => {
             <div className={'flex items-center gap-2 flex-wrap'}>
                 {logosQuery.data?.filter(item => !item.deletable)
                     .map(item => {
-                        return <div className={'h-10 w-10 rounded-lg cursor-pointer border p-2'} key={item.name}>
-                            <img key={item.name} src={item.data} alt={item.name}/>
-                        </div>
+                        return <Tooltip title={item.name}>
+                            <div className={'h-10 w-10 rounded-lg cursor-pointer border p-2'} key={item.name}>
+                                <img key={item.name} src={item.data} alt={item.name}/>
+                            </div>
+                        </Tooltip>
                     })}
             </div>
 
@@ -77,10 +79,12 @@ const LogoSetting = () => {
                                     });
                                 }}
                             >
-                                <div
-                                    className={'h-10 w-10 rounded-lg cursor-pointer border p-2 border-dashed border-red-500'}>
-                                    <img key={item.name} src={item.data} alt={item.name}/>
-                                </div>
+                                <Tooltip title={item.name}>
+                                    <div
+                                        className={'h-10 w-10 rounded-lg cursor-pointer border p-2 border-dashed border-red-500'}>
+                                        <img key={item.name} src={item.data} alt={item.name}/>
+                                    </div>
+                                </Tooltip>
                             </Popconfirm>
                         })}
 

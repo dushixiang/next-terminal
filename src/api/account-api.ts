@@ -93,6 +93,8 @@ export interface WebauthnCredential {
     usedAt: number;
 }
 
+export type AuthType = 'passkey' | 'otp' | 'none' | '';
+
 class AccountApi {
 
     group = 'account';
@@ -162,8 +164,8 @@ class AccountApi {
         await requests.post(`/${this.group}/confirm-totp`, values);
     }
 
-    resetTotp = async () => {
-        return await requests.post(`/${this.group}/reset-totp`);
+    resetTotp = async (securityToken: string) => {
+        await requests.post(`/${this.group}/reset-totp?securityToken=${securityToken}`);
     }
 
     getCaptcha = async () => {
@@ -190,20 +192,16 @@ class AccountApi {
         return await requests.post(`/${this.group}/webauthn/credentials/finish`, val);
     }
 
-    webauthnLoginStart = async (username: string) => {
-        return await requests.post(`/webauthn-login-start`, {username}) as WebauthnCredentialRequest;
-    }
-
-    webauthnLoginFinish = async (token: string, val: any) => {
-        return await requests.post(`/webauthn-login-finish?token=${token}`, val) as LoginResult;
-    }
-
     webauthnLoginStartV2 = async () => {
         return await requests.post(`/v2/webauthn-login-start`,) as WebauthnCredentialRequest;
     }
 
     webauthnLoginFinishV2 = async (token: string, val: any) => {
         return await requests.post(`/v2/webauthn-login-finish?token=${token}`, val) as LoginResult;
+    }
+
+    getSecurityTokenSupportTypes = async () => {
+        return await requests.get(`/${this.group}/security-token/support-types`) as AuthType[];
     }
 
     generateSecurityTokenByWebauthnStart = async () => {

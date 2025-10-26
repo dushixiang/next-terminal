@@ -13,6 +13,7 @@ export interface User {
     roles: string[];
     lastLoginAt: number;
     departments?: SimpleDepartment[];
+    remark?: string;
 }
 
 interface SimpleDepartment {

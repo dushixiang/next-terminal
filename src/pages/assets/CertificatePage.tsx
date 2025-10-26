@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 
-import {App, Badge, Button, Popconfirm, Tag, Tooltip} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {App, Badge, Button, Tag, Tooltip} from "antd";
+import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/src/utils/sort";
 import {useMutation} from "@tanstack/react-query";
@@ -39,7 +39,7 @@ const CertificatePage = () => {
         onSuccess: () => {
             setDnsProviderOpen(false);
             message.open({
-                type:'success',
+                type: 'success',
                 content: t('general.success'),
             })
         }
@@ -142,7 +142,7 @@ const CertificatePage = () => {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
-            width: 200,
+            width: 180,
             render: (text, record, _, action) => [
                 <NButton
                     key="set_as_default"
@@ -165,16 +165,59 @@ const CertificatePage = () => {
                 >
                     {t('actions.edit')}
                 </NButton>,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>,
+                <TableDropdown
+                    key="actionGroup"
+                    menus={[
+                        {
+                            key: 'download',
+                            name: t('assets.certificates.download'),
+                            onClick: () => {
+                                api.download(record.id, record.commonName);
+                            }
+                        },
+                        {
+                            key: 'renew',
+                            name: t('assets.certificates.renew'),
+                            disabled: record.type !== 'issued',
+                            onClick: () => {
+                                modal.confirm({
+                                    title: t('assets.certificates.renew_confirm'),
+                                    content: t('assets.certificates.renew_confirm_content'),
+                                    onOk: async () => {
+                                        try {
+                                            const result = await api.renew(record.id);
+                                            if (result.success) {
+                                                message.success(t('general.success'));
+                                                actionRef.current?.reload();
+                                            } else if (result.warning) {
+                                                message.warning(result.error || t('general.failed'));
+                                            } else {
+                                                message.error(result.error || t('general.failed'));
+                                            }
+                                        } catch (error: any) {
+                                            const errorMsg = error?.response?.data?.message || error?.message || t('general.failed');
+                                            message.error(errorMsg);
+                                        }
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            key: 'delete',
+                            name: t('actions.delete'),
+                            danger: true,
+                            onClick: () => {
+                                modal.confirm({
+                                    title: t('general.delete_confirm'),
+                                    onOk: async () => {
+                                        await api.deleteById(record.id);
+                                        actionRef.current?.reload();
+                                    }
+                                });
+                            }
+                        },
+                    ]}
+                />
             ],
         },
     ];
@@ -185,7 +228,7 @@ const CertificatePage = () => {
             actionRef={actionRef}
             request={async (params = {}, sort, filter) => {
                 let [sortOrder, sortField] = getSort(sort);
-                
+
                 let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,

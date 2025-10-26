@@ -106,6 +106,10 @@ export function isFirefox() {
     return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 }
 
+export function isMac(){
+    return /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
+}
+
 // 1、在IE中这个事件你只要去关闭窗口就触发。
 // 2、谷歌、火狐等在F12调试模式中也会起效
 // 3、谷歌、火狐、QQ等浏览器中被优化了，需要用户在页面有过任何操作才会出现提示！（坑）。

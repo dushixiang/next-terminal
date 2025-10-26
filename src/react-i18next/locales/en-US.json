@@ -25,7 +25,8 @@
     "enter_remark": "Please enter remark",
     "required": "Required",
     "error": "Operation failed",
-    "status": "State"
+    "status": "State",
+    "language": "Language"
   },
   "actions": {
     "option": "Actions",
@@ -184,7 +185,8 @@
       "create_dir": "Create Directory",
       "upload_file": "Upload File",
       "upload_dir": "Upload Directory",
-      "batch_download": "Batch download"
+      "batch_download": "Batch download",
+      "chmod": "Permission Settings"
     },
     "attributes": {
       "path": "Path",
@@ -198,7 +200,17 @@
       "permissions": {
         "label": "Permissions",
         "owner": "Owner",
-        "group": "Group"
+        "group": "Group",
+        "owner_read": "Read",
+        "owner_write": "Write",
+        "owner_execute": "Execute",
+        "group_read": "Read",
+        "group_write": "Write",
+        "group_execute": "Execute",
+        "public": "Public",
+        "public_read": "Read",
+        "public_write": "Write",
+        "public_execute": "Execute"
       }
     },
     "file_types": {
@@ -220,7 +232,11 @@
     "editor": {
       "label": "Editor",
       "save": "Save",
-      "refetch": "Reload"
+      "refetch": "Reload",
+      "copy_path": "Copy Path",
+      "no_files_open": "No files opened",
+      "unsaved_changes_title": "There are unsaved files.",
+      "unsaved_changes_content": "Closing the editor will discard unsaved changes. Are you sure you want to close?"
     },
     "transmission": {
       "filename": "File Name",
@@ -246,13 +262,15 @@
       "connected": "Connected",
       "disconnecting": "Disconnecting...",
       "disconnected": "Disconnected",
-      "closed": "Closed"
+      "closed": "Closed",
+      "unknown": "Unknown status"
     },
     "tunnel": {
       "connecting": "The tunnel is being connected...",
       "open": "Tunnel connection successful",
       "closed": "The tunnel connection has been closed.",
-      "unstable": "Tunnel connection is unstable"
+      "unstable": "Tunnel connection is unstable",
+      "unknown": "Unknown tunnel status"
     }
   },
   "identity": {
@@ -347,7 +365,15 @@
       "locked_type_ip": "IP lock",
       "last_login_at": "Last login time",
       "available": "Optional User",
-      "selected": "Selected users"
+      "selected": "Selected users",
+      "phone": "Phone number",
+      "source": "Source",
+      "sources": {
+        "local": "Local",
+        "ldap": "LDAP",
+        "wechat": "WeCom",
+        "oidc": "OIDC"
+      }
     },
     "options": {
       "authorized_asset": "Authorized Assets",
@@ -368,7 +394,8 @@
       "tree_view": "Tree view",
       "tree_structure": "Department tree structure",
       "sub_departments": "Sub-department",
-      "manage_users": "Manage Users"
+      "manage_users": "Manage Users",
+      "user_count": "Number of members"
     }
   },
   "dw": {
@@ -658,7 +685,8 @@
           "size": "Font Size",
           "family": "Font Family"
         },
-        "line_height": "Line Height"
+        "line_height": "Line Height",
+        "search_placeholder": "Search terminal content..."
       },
       "mouse": {
         "label": "Mouse settings",
@@ -808,7 +836,14 @@
     "otp_security_tip": "Safety Tips",
     "otp_security_description": "After successful binding, your account will be protected by two-factor authentication. Please make sure to keep your authentication device safe.",
     "otp_step3_description": "Enter the verification code to complete the binding",
-    "otp_step2_description": "Scan the QR code with an authentication app"
+    "otp_step2_description": "Scan the QR code with an authentication app",
+    "otp_code_label": "OTP verification code",
+    "select_auth_type": "Please select an identity verification method.",
+    "auth_type_passkey": "Passkey",
+    "auth_type_passkey_desc": "Authenticate using biometrics or a security key",
+    "auth_type_otp": "OTP verification code",
+    "auth_type_otp_desc": "Authenticate using a dynamic verification code",
+    "auth_type_unavailable": "Not enabled"
   },
   "assets": {
     "name": "Name",
@@ -940,6 +975,10 @@
       "is_default": "Default",
       "is_default_tooltip": "The default certificate refers to the certificate used when no other certificates match.",
       "set_as_default": "Set as Default",
+      "download": "Download Certificate",
+      "renew": "Renew Certificate",
+      "renew_confirm": "Confirm certificate renewal?",
+      "renew_confirm_content": "The certificate will be reapplied and updated. Do you want to continue?",
       "issued_log": "Certificate application log",
       "self_signed_tip_title": "Tip: You can replace the root certificate yourself, and the change will take effect after a restart.",
       "self_signed_root_ca_cert_path": "Root certificate file path",
@@ -1047,7 +1086,8 @@
         "rdp": "Traditional RDP encryption",
         "rdp_desc": "Traditional RDP encryption mode, commonly used for older Windows servers"
       }
-    }
+    },
+    "sort": "Sort"
   },
   "gateways": {
     "name": "Name",

@@ -23,6 +23,8 @@ export interface Website {
     public: Public;
     createdAt: number;
     groupId?: string;
+    sort: string;  // LexoRank 排序字段
+    groupFullName: string;
 
     scheme: string;
     host: string;
@@ -48,6 +50,12 @@ interface BasicAuth {
     password: string;
 }
 
+export interface SortPositionRequest {
+    id: string;        // 被拖拽的项 ID
+    beforeId: string;  // 目标位置的前一项 ID (空字符串表示移到最前)
+    afterId: string;   // 目标位置的后一项 ID (空字符串表示移到最后)
+}
+
 class WebsiteApi extends Api<Website> {
     constructor() {
         super("admin/websites");
@@ -67,6 +75,10 @@ class WebsiteApi extends Api<Website> {
 
     changeGroup = async (data: any) => {
         return await requests.post(`/${this.group}/change-group`, data);
+    }
+
+    updateSortPosition = async (req: SortPositionRequest) => {
+        return await requests.post(`/${this.group}/sort`, req);
     }
 }
 

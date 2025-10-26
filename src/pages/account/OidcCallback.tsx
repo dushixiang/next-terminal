@@ -35,14 +35,33 @@ const OidcCallback = () => {
     useEffect(() => {
         const code = searchParams.get('code');
         const state = searchParams.get('state');
+        const savedState = sessionStorage.getItem('oidc_state');
 
-        if (code) {
-            // 使用授权码进行登录
-            mutation.mutate({code, state: state || undefined});
-        } else {
+        if (!code) {
             // 没有授权码，可能是用户拒绝授权或其他错误
             navigate('/login?error=oidc_cancelled');
+            return;
         }
+
+        if (!state) {
+            // 没有 state 参数，可能是 CSRF 攻击
+            console.error('Missing state parameter');
+            navigate('/login?error=invalid_state');
+            return;
+        }
+
+        // 验证 state（前端额外验证，后端也会验证）
+        if (savedState && state !== savedState) {
+            console.error('State mismatch');
+            navigate('/login?error=state_mismatch');
+            return;
+        }
+
+        // 清除存储的 state
+        sessionStorage.removeItem('oidc_state');
+
+        // 使用授权码进行登录
+        mutation.mutate({code, state});
     }, []);
 
     if (mutation.isPending) {

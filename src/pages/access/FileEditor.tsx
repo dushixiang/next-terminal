@@ -1,175 +1,116 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Button, ConfigProvider, Empty, message, Modal, Tabs, theme, Tooltip} from "antd";
+import React, {useEffect, useState} from 'react';
+import {App, Button, ConfigProvider, Empty, Modal, Tabs, theme, Tooltip} from "antd";
 import {Copy, RefreshCw, Save, X} from "lucide-react";
 import {Editor as MonacoEditor, loader} from '@monaco-editor/react';
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
 import fileSystemApi from "@/src/api/filesystem-api";
-import requests, {getToken} from "@/src/api/core/requests";
-import {getLanguageFromFileName} from "@/src/utils/editor-language";
+import {OpenFile} from "@/src/hook/use-file-editor";
+import * as monaco from 'monaco-editor';
+import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
+import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
+import cssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker';
+import htmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker';
+import tsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
 
-// 配置方式
-// https://github.com/suren-atoyan/monaco-react/issues/168#issuecomment-762336713
-loader.config({ paths: { vs: '/monaco-editor/min/vs' } });
+self.MonacoEnvironment = {
+    getWorker(_, label) {
+        if (label === 'json') {
+            return new jsonWorker();
+        }
+        if (label === 'css' || label === 'scss' || label === 'less') {
+            return new cssWorker();
+        }
+        if (label === 'html' || label === 'handlebars' || label === 'razor') {
+            return new htmlWorker();
+        }
+        if (label === 'typescript' || label === 'javascript') {
+            return new tsWorker();
+        }
+        return new editorWorker();
+    },
+};
 
-interface OpenFile {
-    key: string
-    title: string
-    content: string
-    changed: boolean
-    language: string
-}
+loader.config({monaco});
+
+loader.init().then(() => {
+    console.log('monaco init success')
+}).catch((error) => {
+    console.error('monaco init error', error);
+});
 
 interface Props {
     fsId: string
     open: boolean
     onClose: () => void
-    initialFiles?: OpenFile[]
+    openFiles: OpenFile[]
+    activeFileKey: string
+    onActiveFileChange: (key: string) => void
+    onFileContentChange: (key: string, content: string) => void
+    onFileSaved: (key: string) => void
     onCloseFile?: (key: string) => void
+    onRefreshFile?: (key: string) => void
 }
 
 // 语言解析函数已提取为公共工具
-
-const FileEditor: React.FC<Props> = ({fsId, open, onClose, initialFiles = [], onCloseFile}) => {
+const FileEditor: React.FC<Props> = ({
+                                         fsId,
+                                         open,
+                                         onClose,
+                                         openFiles,
+                                         activeFileKey,
+                                         onActiveFileChange,
+                                         onFileContentChange,
+                                         onFileSaved,
+                                         onCloseFile,
+                                         onRefreshFile
+                                     }) => {
     const {t} = useTranslation();
-    const [messageApi, messageContextHolder] = message.useMessage();
+    let {message, modal} = App.useApp();
 
-    const [openFiles, setOpenFiles] = useState<OpenFile[]>(initialFiles);
-    const [activeFileKey, setActiveFileKey] = useState<string>('');
     const [editorSaving, setEditorSaving] = useState<boolean>(false);
 
-    // 初始化文件
-    useEffect(() => {
-        // 将父级的 initialFiles 作为真源，合并本地状态（保留未保存的改动）
-        setOpenFiles(prevFiles => {
-            const prevMap = new Map(prevFiles.map(f => [f.key, f] as const));
-            const nextFiles: OpenFile[] = initialFiles.map(f => {
-                const prev = prevMap.get(f.key);
-                if (prev && prev.changed) {
-                    return prev; // 保留本地未保存的内容
-                }
-                return f;
-            });
-
-            // 若有新文件追加，则激活最新追加的那个
-            const prevKeys = new Set(prevFiles.map(f => f.key));
-            const newAdded = initialFiles.filter(f => !prevKeys.has(f.key));
-            if (newAdded.length > 0) {
-                setActiveFileKey(newAdded[newAdded.length - 1].key);
-            } else if (!initialFiles.find(f => f.key === activeFileKey)) {
-                // 若当前激活文件已不存在，切换到第一个或清空
-                setActiveFileKey(initialFiles[0]?.key || '');
-            }
-            return nextFiles;
-        });
-    }, [initialFiles]);
-
-    // 获取当前活动文件的索引
-    const activeFileIndex = openFiles.findIndex(file => file.key === activeFileKey);
-    const activeFile = openFiles[activeFileIndex];
-
-    // 获取文件内容
-    const fetchFile = useCallback(async (key: string, title: string) => {
-        messageApi.loading({key: key, content: 'Loading'});
-        try {
-            const language = getLanguageFromFileName(title);
-            const fileContent = await requests.get(`/${fileSystemApi.group}/${fsId}/download?filename=${key}&X-Auth-Token=${getToken()}&t=${new Date().getTime()}`);
-
-            setOpenFiles(prevFiles => {
-                const existingIndex = prevFiles.findIndex(file => file.key === key);
-                const newFile: OpenFile = {
-                    key,
-                    content: fileContent,
-                    title,
-                    language: language || 'text',
-                    changed: false,
-                };
-
-                if (existingIndex >= 0) {
-                    // 更新现有文件
-                    const updatedFiles = [...prevFiles];
-                    updatedFiles[existingIndex] = newFile;
-                    return updatedFiles;
-                } else {
-                    // 添加新文件
-                    return [...prevFiles, newFile];
-                }
-            });
-
-            messageApi.destroy(key);
-            setActiveFileKey(key);
-        } catch (error) {
-            messageApi.error(`Failed to load file: ${error.message}`);
-            messageApi.destroy(key);
-        }
-    }, [fsId, messageApi]);
+    // 获取当前活动文件
+    const activeFile = openFiles.find(f => f.key === activeFileKey);
 
     // 保存文件
-    const handleSaveFile = useCallback(async () => {
-        if (!activeFile) return;
+    const handleSaveFile = async () => {
+        // 修复：防止重复请求
+        if (!activeFile || editorSaving) return;
 
         setEditorSaving(true);
         try {
             await fileSystemApi.edit(fsId, activeFile.key, activeFile.content);
             message.success(t('general.success'));
 
-            // 更新文件状态为未修改
-            setOpenFiles(prevFiles =>
-                prevFiles.map(file =>
-                    file.key === activeFile.key
-                        ? {...file, changed: false}
-                        : file
-                )
-            );
+            // 通知父级标记文件为已保存
+            onFileSaved(activeFile.key);
         } catch (error) {
             message.error(`Failed to save file: ${error.message}`);
         } finally {
             setEditorSaving(false);
         }
-    }, [activeFile, fsId, t]);
+    };
 
     // 重新加载文件
-    const handleRefreshFile = useCallback(async () => {
-        if (!activeFile) return;
-        await fetchFile(activeFile.key, activeFile.title);
-    }, [activeFile, fetchFile]);
+    const handleRefreshFile = async () => {
+        if (!activeFile || !onRefreshFile) return;
+        onRefreshFile(activeFile.key);
+    };
 
     // 关闭文件
-    const handleCloseFile = useCallback((fileKey: string) => {
-        setOpenFiles(prevFiles => {
-            const updatedFiles = prevFiles.filter(file => file.key !== fileKey);
-
-            // 如果关闭的是当前活动文件，需要切换到其他文件
-            if (fileKey === activeFileKey) {
-                if (updatedFiles.length > 0) {
-                    const currentIndex = prevFiles.findIndex(file => file.key === fileKey);
-                    const nextIndex = currentIndex > 0 ? currentIndex - 1 : 0;
-                    setActiveFileKey(updatedFiles[nextIndex]?.key || '');
-                } else {
-                    setActiveFileKey('');
-                }
-            }
-
-            return updatedFiles;
-        });
-        // 通知父级移除此文件，避免后续 props 变更时再次注入
+    const handleCloseFile = (fileKey: string) => {
+        // 通知父级关闭文件
         if (typeof onCloseFile === 'function') {
             onCloseFile(fileKey);
         }
-    }, [activeFileKey, onCloseFile]);
+    };
 
     // 更新文件内容
-    const handleFileContentChange = useCallback((newContent: string) => {
-        if (activeFileIndex === -1) return;
-
-        setOpenFiles(prevFiles =>
-            prevFiles.map((file, index) =>
-                index === activeFileIndex
-                    ? {...file, content: newContent, changed: true}
-                    : file
-            )
-        );
-    }, [activeFileIndex]);
+    const handleFileContentChange = (newContent: string) => {
+        if (!activeFile) return;
+        onFileContentChange(activeFile.key, newContent);
+    };
 
     // 键盘快捷键
     useEffect(() => {
@@ -219,7 +160,7 @@ const FileEditor: React.FC<Props> = ({fsId, open, onClose, initialFiles = [], on
                             fontSize: 12,
                             lineHeight: 1.4,
                             fontFamily: "Monaco, Menlo, Consolas, 'Courier New', monospace",
-                            minimap: {enabled: false},
+                            minimap: {enabled: true},
                             scrollBeyondLastLine: false,
                             wordWrap: 'on',
                             smoothScrolling: true,
@@ -241,22 +182,10 @@ const FileEditor: React.FC<Props> = ({fsId, open, onClose, initialFiles = [], on
     });
 
     const handleClose = () => {
-        // 检查是否有未保存的文件
-        const hasUnsavedFiles = openFiles.some(file => file.changed);
-        if (hasUnsavedFiles) {
-            Modal.confirm({
-                title: t('fs.editor.unsaved_changes_title'),
-                content: t('fs.editor.unsaved_changes_content'),
-                onOk: () => {
-                    onClose();
-                },
-            });
-        } else {
-            onClose();
-        }
+        onClose();
     };
 
-     const title = <div className="flex items-center">
+    const title = <div className="flex items-center">
         <Tooltip title={`${t('fs.editor.save')} (Ctrl+S)`}>
             <Button
                 type="text"
@@ -280,21 +209,21 @@ const FileEditor: React.FC<Props> = ({fsId, open, onClose, initialFiles = [], on
                 {t('fs.editor.refetch')}
             </Button>
         </Tooltip>
-         {activeFile && (
-             <Tooltip title={t('fs.editor.copy_path')}>
-                 <Button
-                     type="text"
-                     size="small"
-                     icon={<Copy className="h-3 w-3"/>}
-                     onClick={() => {
-                         copy(activeFile.key);
-                         message.success(t('general.copy_success'));
-                     }}
-                 >
-                     {t('fs.editor.copy_path')}
-                 </Button>
-             </Tooltip>
-         )}
+        {activeFile && (
+            <Tooltip title={t('fs.editor.copy_path')}>
+                <Button
+                    type="text"
+                    size="small"
+                    icon={<Copy className="h-3 w-3"/>}
+                    onClick={() => {
+                        copy(activeFile.key);
+                        message.success(t('general.copy_success'));
+                    }}
+                >
+                    {t('fs.editor.copy_path')}
+                </Button>
+            </Tooltip>
+        )}
     </div>
 
     return (
@@ -307,24 +236,23 @@ const FileEditor: React.FC<Props> = ({fsId, open, onClose, initialFiles = [], on
                     centered={true}
                     onCancel={handleClose}
                     footer={false}
-                    destroyOnHidden={true}
                     styles={{body: {padding: 0}}}
                 >
                     <div className="h-full flex flex-col">
-                        <div className={'w-full h-1 border-b'}></div>
-                        <div className="flex-1 min-h-0">
+                        <div className={'w-full h-1 border-b border-[#303030]'}></div>
+                        <div className="flex-1">
                             {tabItems.length > 0 ? (
                                 <Tabs
                                     activeKey={activeFileKey}
                                     items={tabItems}
-                                    onChange={setActiveFileKey}
+                                    onChange={onActiveFileChange}
                                     hideAdd
                                     tabBarGutter={4}
                                     tabBarStyle={{margin: 0, padding: '0 8px'}}
                                     size="small"
                                 />
                             ) : (
-                                <div className="flex items-center justify-center h-full">
+                                <div className="flex items-center justify-center h-[70vh]">
                                     <Empty description={t('fs.editor.no_files_open')}/>
                                 </div>
                             )}
@@ -332,41 +260,6 @@ const FileEditor: React.FC<Props> = ({fsId, open, onClose, initialFiles = [], on
                     </div>
                 </Modal>
             </ConfigProvider>
-            {messageContextHolder}
-
-            <style dangerouslySetInnerHTML={{
-                __html: `
-                    .editor-tabs .ant-tabs-tab {
-                        background: transparent !important;
-                        border: none !important;
-                        padding: 8px 4px !important;
-                        margin: 0 2px !important;
-                    }
-                    
-                    .editor-tabs .ant-tabs-tab:hover {
-                        background: rgba(51, 65, 85, 0.5) !important;
-                    }
-                    
-                    .editor-tabs .ant-tabs-tab-active {
-                        background: rgba(71, 85, 105, 0.5) !important;
-                        border-bottom: 2px solid #3b82f6 !important;
-                    }
-                    
-                    .editor-tabs .ant-tabs-content-holder {
-                        background: #1e1e1e;
-                        height: calc(100vh - 200px);
-                    }
-                    
-                    .editor-tabs .ant-tabs-tabpane {
-                        height: 100%;
-                        padding: 0;
-                    }
-                    
-                    .editor-tabs .ant-tabs-nav {
-                        margin-bottom: 0 !important;
-                    }
-                `
-            }}/>
         </>
     );
 };

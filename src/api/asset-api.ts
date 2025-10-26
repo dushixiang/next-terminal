@@ -25,6 +25,8 @@ export interface Asset {
     createdAt: number;
     lastAccessTime: number;
     groupId: string;
+    sort: string;  // LexoRank 排序字段
+    groupFullName: string;
 }
 
 export interface CheckingResult {
@@ -38,6 +40,12 @@ export interface CheckingResult {
 export interface Image {
     name: string;
     data: string;
+}
+
+export interface SortPositionRequest {
+    id: string;        // 被拖拽的项 ID
+    beforeId: string;  // 目标位置的前一项 ID (空字符串表示移到最前)
+    afterId: string;   // 目标位置的后一项 ID (空字符串表示移到最后)
 }
 
 class AssetApi extends Api<Asset> {
@@ -83,14 +91,6 @@ class AssetApi extends Api<Asset> {
         return await requests.get(`/${this.group}/logos`) as Image[]
     }
 
-    up = async (id: string) => {
-        await requests.post(`/${this.group}/${id}/up`);
-    }
-
-    down = async (id: string) => {
-        await requests.post(`/${this.group}/${id}/down`);
-    }
-
     decrypt = async (id: string, securityToken: string) => {
         return await requests.get(`/${this.group}/${id}/decrypted?securityToken=${securityToken}`) as Asset;
     }
@@ -100,6 +100,10 @@ class AssetApi extends Api<Asset> {
             protocol = '';
         }
         return await requests.get(`/${this.group}/tree?protocol=${protocol}`) as TreeDataNode[];
+    }
+
+    updateSortPosition = async (req: SortPositionRequest) => {
+        return await requests.post(`/${this.group}/sort`, req);
     }
 }
 

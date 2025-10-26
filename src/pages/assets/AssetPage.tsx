@@ -2,10 +2,10 @@ import React, {useEffect, useRef, useState} from 'react';
 
 import {App, Badge, Button, Popover, Select, Space, Table, Tag, Tooltip, Upload} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
+import {ActionType, DragSortTable, ProColumns, TableDropdown} from "@ant-design/pro-components";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
-import assetsApi, {Asset} from '@/src/api/asset-api';
+import assetsApi, {Asset, SortPositionRequest} from '@/src/api/asset-api';
 import NButton from "@/src/components/NButton";
 import NLink from "@/src/components/NLink";
 import AssetTree from "@/src/pages/assets/AssetTree";
@@ -46,6 +46,7 @@ const AssetPage = () => {
 
     let [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
     let [groupId, setGroupId] = useState(searchParams.get('groupId') || '');
+    let [dataSource, setDataSource] = useState<Asset[]>([]);
 
     let [groupChooserOpen, setGroupChooserOpen] = useState(false);
     let [params, setParams] = useState<PostParams>({
@@ -57,7 +58,7 @@ const AssetPage = () => {
 
     let navigate = useNavigate();
     let {t} = useTranslation();
-    let {modal} = App.useApp();
+    let {modal, message} = App.useApp();
 
     const [isCollapsed, setIsCollapsed] = React.useState(false);
     let leftRef = useRef<ImperativePanelHandle>();
@@ -88,12 +89,48 @@ const AssetPage = () => {
         }
     });
 
+    const updateSortMutation = useMutation({
+        mutationFn: (req: SortPositionRequest) => assetsApi.updateSortPosition(req),
+        onSuccess: () => {
+            message.success(t('general.success'));
+        }
+    });
+
+    const handleDragSortEnd = (beforeIndex: number, afterIndex: number, newDataSource: Asset[]) => {
+        // 立即更新本地状态，避免闪烁
+        setDataSource(newDataSource);
+
+        // 获取被拖拽的项
+        const draggedItem = newDataSource[afterIndex];
+
+        // 因为使用 DESC 排序，sort 大的在前面
+        const req: SortPositionRequest = {
+            id: draggedItem.id,
+            // 前一项的 sort 更大（DESC 排序）
+            beforeId: afterIndex > 0 ? newDataSource[afterIndex - 1].id : '',
+            // 后一项的 sort 更小（DESC 排序）
+            afterId: afterIndex < newDataSource.length - 1 ? newDataSource[afterIndex + 1].id : ''
+        };
+
+        console.log('排序请求', req);
+
+        // 服务器更新
+        updateSortMutation.mutate(req);
+    };
+
     const importExampleContent = <>
         <NButton onClick={downloadImportExampleCsv}>{t('assets.download_sample')}</NButton>
         <div>{t('assets.import_asset_tip')}</div>
     </>
 
     const columns: ProColumns<Asset>[] = [
+        {
+            title: t('assets.sort'),
+            dataIndex: 'sort',
+            width: 60,
+            className: 'drag-visible',
+            hideInSearch: true,
+        },
         {
             title: t('assets.logo'),
             dataIndex: 'logo',
@@ -303,16 +340,6 @@ const AssetPage = () => {
                                 case 'asset-detail':
                                     navigate(`/asset/${record['id']}?activeKey=info`);
                                     break;
-                                case "up":
-                                    api.up(record.id).then(() => {
-                                        actionRef.current?.reload();
-                                    })
-                                    break;
-                                case "down":
-                                    api.down(record.id).then(() => {
-                                        actionRef.current?.reload();
-                                    })
-                                    break;
                                 case 'delete':
                                     modal.confirm({
                                         title: t('general.delete_confirm'),
@@ -328,8 +355,6 @@ const AssetPage = () => {
                             {key: 'copy', name: t('assets.copy')},
                             {key: 'edit', name: t('actions.edit')},
                             {key: 'asset-detail', name: t('actions.detail')},
-                            {key: 'up', name: t('assets.up')},
-                            {key: 'down', name: t('assets.down')},
                             {key: 'delete', name: t('actions.delete'), danger: true},
                         ]}
                     />,
@@ -386,6 +411,10 @@ const AssetPage = () => {
             }
 
             let [sortOrder, sortField] = getSort(sort);
+            if (sortOrder === "" && sortField === "") {
+                sortOrder = "desc";  // 使用降序，让最大的 sort 显示在最上面
+                sortField = "sort";
+            }
 
             let queryParams = {
                 pageIndex: params.current,
@@ -403,12 +432,16 @@ const AssetPage = () => {
                 status: params.status,
             }
             let result = await api.getPaging(queryParams);
+            setDataSource(result['items']);
             return {
                 data: result.items,
                 success: true,
                 total: result['total']
             };
         },
+        dataSource: dataSource,
+        dragSortKey: "sort",
+        onDragSortEnd: handleDragSortEnd,
         columnsState: {
             persistenceKey: 'assets-table',
             persistenceType: 'localStorage' as const,
@@ -556,9 +589,9 @@ const AssetPage = () => {
                                  }}
                             >
                                 {isCollapsed ? (
-                                    <PanelLeftOpenIcon className={'w-4 h-4'} />
+                                    <PanelLeftOpenIcon className={'w-4 h-4'}/>
                                 ) : (
-                                    <PanelLeftCloseIcon className={'w-4 h-4'} />
+                                    <PanelLeftCloseIcon className={'w-4 h-4'}/>
                                 )}
                             </div>
                         </div>
@@ -568,12 +601,12 @@ const AssetPage = () => {
                                         console.log('resize content', size)
                                     }}
                     >
-                        <ProTable {...tableProps}/>
+                        <DragSortTable {...tableProps}/>
                     </ResizablePanel>
                 </ResizablePanelGroup>
             ) : (
-                /* 移动端表格 - 全宽显示，使用统一的 ProTable 配置 */
-                <ProTable {...tableProps}/>
+                /* 移动端表格 - 全宽显示，使用统一的 DragSortTable 配置 */
+                <DragSortTable {...tableProps}/>
             )}
 
         </div>

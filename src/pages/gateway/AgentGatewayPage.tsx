@@ -1,9 +1,9 @@
-import React, {useState, useRef} from 'react';
-import {ProColumns, DragSortTable, ActionType} from "@ant-design/pro-components";
+import React, {useRef, useState} from 'react';
+import {ActionType, DragSortTable, ProColumns} from "@ant-design/pro-components";
 import {App, Button, Popconfirm, Progress} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
-import agentGatewayApi, {AgentGateway, SortItem} from "@/src/api/agent-gateway-api";
+import agentGatewayApi, {AgentGateway, SortPositionRequest} from "@/src/api/agent-gateway-api";
 import AgentGatewayModal from "@/src/pages/gateway/AgentGatewayModal";
 import AgentGatewayRegister from "@/src/pages/gateway/AgentGatewayRegister";
 import NButton from "@/src/components/NButton";
@@ -57,10 +57,10 @@ const AgentGatewayPage = () => {
     });
 
     const updateSortMutation = useMutation({
-        mutationFn: (items: SortItem[]) => api.updateSort(items),
+        mutationFn: (req: SortPositionRequest) => api.updateSortPosition(req),
         onSuccess: () => {
             // 不立即重新加载，让 polling 自然更新数据
-            message.success(t('gateways.sort_success'));
+            message.success(t('general.success'));
         }
     });
 
@@ -72,19 +72,28 @@ const AgentGatewayPage = () => {
     }
 
     const handleDragSortEnd = (beforeIndex: number, afterIndex: number, newDataSource: AgentGateway[]) => {
-        console.log('排序后的数据', newDataSource);
-        
+        console.log('排序操作', {beforeIndex, afterIndex});
+
         // 立即更新本地状态，避免闪烁
         setDataSource(newDataSource);
-        
-        // 更新排序 - 后端使用倒序排列，越大的在前面
-        const sortItems: SortItem[] = newDataSource.map((item, index) => ({
-            id: item.id,
-            sortOrder: newDataSource.length - index  // 倒序：第一个位置的sortOrder最大
-        }));
+
+        // 获取被拖拽的项
+        const draggedItem = newDataSource[afterIndex];
+
+        // 因为使用 DESC 排序，sort 大的在前面
+        // 所以 beforeId 对应的 sort 应该更大，afterId 对应的 sort 应该更小
+        const req: SortPositionRequest = {
+            id: draggedItem.id,
+            // 前一项的 sort 更大（DESC 排序）
+            beforeId: afterIndex > 0 ? newDataSource[afterIndex - 1].id : '',
+            // 后一项的 sort 更小（DESC 排序）
+            afterId: afterIndex < newDataSource.length - 1 ? newDataSource[afterIndex + 1].id : ''
+        };
+
+        console.log('排序请求', req);
 
         // 服务器更新
-        updateSortMutation.mutate(sortItems);
+        updateSortMutation.mutate(req);
     };
 
     const JudgeLoadBusy = (load: number, cores: number) => {
@@ -97,8 +106,8 @@ const AgentGatewayPage = () => {
 
     let columns: ProColumns<AgentGateway>[] = [
         {
-            title: t('gateways.sort'),
-            dataIndex: 'sortOrder',
+            title: t('assets.sort'),
+            dataIndex: 'sort',
             width: 60,
             className: 'drag-visible',
             hideInSearch: true,
@@ -331,7 +340,11 @@ const AgentGatewayPage = () => {
                     }}
                     request={async (params = {}, sort, filter) => {
                         let [sortOrder, sortField] = getSort(sort);
-                        
+                        if (sortOrder === "" && sortField === "") {
+                            sortOrder = "desc";  // 使用降序，让最大的 sort 显示在最上面
+                            sortField = "sort";
+                        }
+
                         let queryParams = {
                             pageIndex: params.current,
                             pageSize: params.pageSize,
@@ -349,7 +362,7 @@ const AgentGatewayPage = () => {
                         };
                     }}
                     dataSource={dataSource}
-                    dragSortKey="sortOrder"
+                    dragSortKey="sort"
                     onDragSortEnd={handleDragSortEnd}
                     rowClassName={(record) => {
                         if (record.online == false) {

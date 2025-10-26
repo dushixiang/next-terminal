@@ -1,13 +1,11 @@
 import React, {useState} from 'react';
-import {Alert, Typography} from "antd";
+import {Alert} from "antd";
 import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormSwitch, ProFormText, ProFormTreeSelect} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import Disabled from "@/src/components/Disabled";
 import {useLicense} from "@/src/hook/use-license";
 import departmentApi from "@/src/api/department-api";
-
-const {Title} = Typography;
 
 const OidcSetting = ({get, set}: SettingProps) => {
 
@@ -23,7 +21,7 @@ const OidcSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <Disabled disabled={!license.isEnterprise()}>
+            <Disabled disabled={license.isFree()}>
                 <Alert
                     message={t('settings.oidc.tip')}
                     type="info"

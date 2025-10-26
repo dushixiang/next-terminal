@@ -39,6 +39,8 @@ import accessSettingApi from "@/src/api/access-setting-api";
 import {setThemeColor} from "@/src/utils/theme";
 import TabContextMenu from "@/src/components/TabContextMenu";
 import {LocalStorage, STORAGE_KEYS} from "@/src/utils/storage";
+import {translateI18nToAntdLocale} from "@/src/helper/lang";
+import i18n from "i18next";
 
 
 interface DraggableTabPaneProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -93,6 +95,18 @@ const AccessPage = () => {
         document.body.style.overflow = 'hidden';
         window.addEventListener("beforeunload", beforeUnload, true);
         document.addEventListener("keydown", handleKeyDown);
+        
+        // 只在 /access 路径下注册 Service Worker
+        if ('serviceWorker' in navigator && import.meta.env.PROD) {
+            navigator.serviceWorker.register('/sw.js', { scope: '/access/' })
+                .then(registration => {
+                    console.log('SW registered: ', registration);
+                })
+                .catch(registrationError => {
+                    console.log('SW registration failed: ', registrationError);
+                });
+        }
+        
         return () => {
             window.removeEventListener("beforeunload", beforeUnload, true);
             document.removeEventListener("keydown", handleKeyDown);
@@ -380,6 +394,7 @@ const AccessPage = () => {
                 },
                 algorithm: theme.darkAlgorithm
             }}
+            locale={translateI18nToAntdLocale(i18n.language)}
         >
             <App>
                 <StyleProvider hashPriority="high">

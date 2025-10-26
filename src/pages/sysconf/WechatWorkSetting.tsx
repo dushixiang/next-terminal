@@ -1,13 +1,11 @@
 import React, {useState} from 'react';
-import {Alert, Typography} from "antd";
+import {Alert} from "antd";
 import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormSwitch, ProFormText, ProFormTreeSelect} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import Disabled from "@/src/components/Disabled";
 import {useLicense} from "@/src/hook/use-license";
 import departmentApi from "@/src/api/department-api";
-
-const {Title} = Typography;
 
 const WechatWorkSetting = ({get, set}: SettingProps) => {
 
@@ -23,7 +21,7 @@ const WechatWorkSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <Disabled disabled={!license.isEnterprise()}>
+            <Disabled disabled={license.isFree()}>
                 <Alert
                     message={t('settings.wechat_work.tip')}
                     type="info"
@@ -60,10 +58,10 @@ const WechatWorkSetting = ({get, set}: SettingProps) => {
                                  rules={[{required: enabled}]}
                     />
                     <ProFormText.Password name="wechat-work-secret"
-                                 label={t('settings.wechat_work.secret')}
-                                 placeholder="******"
-                                 disabled={!enabled}
-                                 rules={[{required: enabled}]}
+                                          label={t('settings.wechat_work.secret')}
+                                          placeholder="******"
+                                          disabled={!enabled}
+                                          rules={[{required: enabled}]}
                     />
                     <ProFormText name="wechat-work-redirect-uri"
                                  label={t('settings.wechat_work.redirect_uri')}

@@ -23,6 +23,7 @@ let o = {
         "days": "天",
         "tips": "提示",
         "status": "状态",
+        "language": "语言",
     },
     "actions": {
         "option": "操作",
@@ -181,7 +182,8 @@ let o = {
             "create_file": "创建文件",
             "create_dir": "创建文件夹",
             "upload_file": "上传文件",
-            "upload_dir": "上传目录"
+            "upload_dir": "上传目录",
+            "chmod": "权限设置"
         },
         "attributes": {
             "path": "路径",
@@ -194,7 +196,18 @@ let o = {
             },
             "permissions": {
                 "label": "权限",
-                "group": "组"
+                "group": "组",
+                "owner": "所有者",
+                "owner_read": "读取",
+                "owner_write": "写入",
+                "owner_execute": "执行",
+                "group_read": "读取",
+                "group_write": "写入",
+                "group_execute": "执行",
+                "public": "公共",
+                "public_read": "读取",
+                "public_write": "写入",
+                "public_execute": "执行"
             }
         },
         "file_types": {
@@ -218,6 +231,7 @@ let o = {
             "save": "保存",
             "refetch": "重新加载",
             "copy_path": "复制路径",
+            "no_files_open": "没有打开的文件",
         },
         "transmission": {
             "filename": "文件名称",
@@ -325,6 +339,13 @@ let o = {
             "nickname": "姓名",
             "mail": "邮箱",
             "phone": "手机号",
+            "source": "来源",
+            "sources": {
+                "local": "本地",
+                "ldap": "LDAP",
+                "wechat": "企业微信",
+                "oidc": "OIDC"
+            },
             "status": "账号状态",
             "login": "登陆状态",
             "logins": {
@@ -792,12 +813,20 @@ let o = {
         'no_mfa_subtitle': '您尚未绑定任何安全认证方式，无法查看敏感数据。',
         'enable_otp': '启用OTP认证',
         'enable_passkey': '启用通行密钥认证',
+        'otp_code_label': 'OTP 验证码',
+        'select_auth_type': '请选择身份认证方式',
+        'auth_type_passkey': '通行密钥',
+        'auth_type_passkey_desc': '使用生物识别或安全密钥进行认证',
+        'auth_type_otp': 'OTP 验证码',
+        'auth_type_otp_desc': '使用动态验证码进行认证',
+        'auth_type_unavailable': '未启用',
     },
     "assets": {
         "name": "名称",
         "type": "类型",
         "content": "内容",
         "status": "状态",
+        "sort": "排序",
         "group": "分组",
         "group_tip": "右键可编辑/删除（Default 分组除外）",
         "width": "宽度",
@@ -940,6 +969,10 @@ let o = {
             "is_default": "默认证书",
             "is_default_tooltip": "默认证书指的是在匹配不到其他证书的时候使用的证书。",
             "set_as_default": "设为默认",
+            "download": "下载证书",
+            "renew": "续签证书",
+            "renew_confirm": "确认续签证书？",
+            "renew_confirm_content": "将会重新申请并更新证书，确认继续吗？",
             "issued_log": "证书申请日志",
             "renew_before": "续签提前时间",
             "log_viewer": {
@@ -1096,8 +1129,6 @@ let o = {
             "moderate": "轻度繁忙",
             "busy": "资源紧张",
         },
-        "sort": "排序",
-        "sort_success": "排序成功",
         "add_token": "新增令牌",
         "edit_token_remark": "修改令牌备注"
     },

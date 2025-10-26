@@ -43,7 +43,7 @@ import {cn} from "@/lib/utils";
 import {baseWebSocketUrl, getToken} from "@/src/api/core/requests";
 import qs from "qs";
 import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
-import {isMobileByMediaQuery} from "@/src/utils/utils";
+import {isMac, isMobileByMediaQuery} from "@/src/utils/utils";
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
 import accessSettingApi, {Setting} from "@/src/api/access-setting-api";
@@ -51,6 +51,8 @@ import accessSettingApi, {Setting} from "@/src/api/access-setting-api";
 interface Props {
     assetId: string;
 }
+
+let _isMac = isMac();
 
 const AccessTerminal = ({assetId}: Props) => {
 
@@ -171,6 +173,8 @@ const AccessTerminal = ({assetId}: Props) => {
             }
         });
 
+        const normalizeNewlines = (text: string) => text.replace(/\r\n?/g, '\n');
+
         const handleContextMenu = async (e: MouseEvent) => {
             // console.log(`on context menu`, accessSetting)
             if (accessSetting?.rightClickPaste !== true) {
@@ -179,9 +183,10 @@ const AccessTerminal = ({assetId}: Props) => {
             e.preventDefault();
             try {
                 const clipboardText = await navigator.clipboard.readText();
-                websocket?.send(new Message(MessageTypeData, clipboardText).toString());
+                const text = normalizeNewlines(clipboardText);
+                websocket?.send(new Message(MessageTypeData, text).toString());
             } catch (error) {
-                console.warn('Failed to read clipboard:', error);
+                console.error('Failed to read clipboard:', error);
             }
         }
 
@@ -218,10 +223,18 @@ const AccessTerminal = ({assetId}: Props) => {
                 return false;
             }
             // 支持 Ctrl+F (Windows/Linux) 和 Cmd+F (Mac)
-            if ((domEvent.ctrlKey || domEvent.metaKey) && domEvent.key === 'f') {
-                domEvent.preventDefault();
-                setSearchOpen(true);
-                return false;
+            if (_isMac) {
+                if (domEvent.metaKey && domEvent.key === 'f') {
+                    domEvent.preventDefault();
+                    setSearchOpen(true);
+                    return false;
+                }
+            } else {
+                if (domEvent.ctrlKey && domEvent.key === 'f') {
+                    domEvent.preventDefault();
+                    setSearchOpen(true);
+                    return false;
+                }
             }
             return !(domEvent.ctrlKey && domEvent.key === 'v');
         })

@@ -153,7 +153,11 @@ const LoginPage = () => {
     const loginByOidc = async () => {
         setLoading(true);
         try {
-            const {authorizeUrl} = await oidcApi.getAuthorizeUrl('login');
+            const {authorizeUrl, state} = await oidcApi.getAuthorizeUrl();
+            // 将 state 存储到 sessionStorage，用于回调时验证
+            if (state) {
+                sessionStorage.setItem('oidc_state', state);
+            }
             // 跳转到 OIDC 授权页面
             window.location.href = authorizeUrl;
         } catch (e) {

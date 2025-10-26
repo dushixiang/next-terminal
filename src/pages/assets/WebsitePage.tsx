@@ -1,8 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Button, Popconfirm, Tag} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {App, Button, Popconfirm, Tag} from "antd";
+import {ActionType, DragSortTable, ProColumns} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import websiteApi, {Website} from "@/src/api/website-api";
+import {useMutation} from "@tanstack/react-query";
+import websiteApi, {SortPositionRequest, Website} from "@/src/api/website-api";
 import NButton from "@/src/components/NButton";
 import NLink from "@/src/components/NLink";
 import clsx from "clsx";
@@ -23,11 +24,13 @@ const WebsitePage = () => {
 
     const {isMobile} = useMobile();
     const {t} = useTranslation();
+    const {message} = App.useApp();
     const actionRef = useRef<ActionType>();
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
     let [searchParams, setSearchParams] = useSearchParams();
     let [groupId, setGroupId] = useState(searchParams.get('groupId') || '');
+    let [dataSource, setDataSource] = useState<Website[]>([]);
     const [groupDrawerOpen, setGroupDrawerOpen] = useState<boolean>(false);
     const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('');
     const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(false);
@@ -35,6 +38,37 @@ const WebsitePage = () => {
 
     let navigate = useNavigate();
     const containerRef = useRef(null);
+
+    const updateSortMutation = useMutation({
+        mutationFn: (req: SortPositionRequest) => api.updateSortPosition(req),
+        onSuccess: () => {
+            message.success(t('general.success'));
+        }
+    });
+
+    const handleDragSortEnd = (beforeIndex: number, afterIndex: number, newDataSource: Website[]) => {
+        console.log('排序操作', {beforeIndex, afterIndex});
+
+        // 立即更新本地状态，避免闪烁
+        setDataSource(newDataSource);
+
+        // 获取被拖拽的项
+        const draggedItem = newDataSource[afterIndex];
+
+        // 因为使用 DESC 排序，sort 大的在前面
+        const req: SortPositionRequest = {
+            id: draggedItem.id,
+            // 前一项的 sort 更大（DESC 排序）
+            beforeId: afterIndex > 0 ? newDataSource[afterIndex - 1].id : '',
+            // 后一项的 sort 更小（DESC 排序）
+            afterId: afterIndex < newDataSource.length - 1 ? newDataSource[afterIndex + 1].id : ''
+        };
+
+        console.log('排序请求', req);
+
+        // 服务器更新
+        updateSortMutation.mutate(req);
+    };
 
     useEffect(() => {
         setSearchParams({
@@ -49,6 +83,13 @@ const WebsitePage = () => {
     }, [groupId]);
 
     const columns: ProColumns<Website>[] = [
+        {
+            title: t('assets.sort'),
+            dataIndex: 'sort',
+            width: 60,
+            className: 'drag-visible',
+            hideInSearch: true,
+        },
         {
             title: t('assets.logo'),
             dataIndex: 'logo',
@@ -178,6 +219,10 @@ const WebsitePage = () => {
         actionRef,
         request: async (params: any = {}, sort: any, filter: any) => {
             let [sortOrder, sortField] = getSort(sort);
+            if (sortOrder === "" && sortField === "") {
+                sortOrder = "desc";  // 使用降序，让最大的 sort 显示在最上面
+                sortField = "sort";
+            }
             
             let queryParams = {
                 pageIndex: params.current,
@@ -188,12 +233,16 @@ const WebsitePage = () => {
                 groupId: groupId || undefined,
             }
             let result = await api.getPaging(queryParams);
+            setDataSource(result['items']);
             return {
                 data: result['items'],
                 success: true,
                 total: result['total']
             };
         },
+        dataSource: dataSource,
+        dragSortKey: "sort",
+        onDragSortEnd: handleDragSortEnd,
         rowKey: "id" as const,
         search: {
             labelWidth: 'auto' as const,
@@ -234,7 +283,7 @@ const WebsitePage = () => {
                             onSelect={setGroupId}
                         />
                     </div>
-                    <ProTable {...tableProps}/>
+                    <DragSortTable {...tableProps}/>
                 </>
             )}
 
@@ -267,7 +316,7 @@ const WebsitePage = () => {
                         </div>
                     </div>
                     <div className="overflow-hidden">
-                        <ProTable {...tableProps}
+                        <DragSortTable {...tableProps}
                                   scroll={{
                                       x: 'max-content'
                                   }}

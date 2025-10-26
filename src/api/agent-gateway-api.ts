@@ -10,7 +10,7 @@ export interface AgentGateway {
     online: boolean;
     createdAt: number;
     updatedAt: number;
-    sortOrder: number;
+    sort: string;  // 使用 LexoRank 排序
     stat?: Stat;
     version: string;
 }
@@ -104,6 +104,12 @@ export interface SortItem {
     sortOrder: number;
 }
 
+export interface SortPositionRequest {
+    id: string;        // 被拖拽的项 ID
+    beforeId: string;  // 目标位置的前一项 ID (空字符串表示移到最前)
+    afterId: string;   // 目标位置的后一项 ID (空字符串表示移到最后)
+}
+
 class AgentGatewayApi extends Api<AgentGateway> {
     constructor() {
         super("admin/agent-gateways");
@@ -123,6 +129,10 @@ class AgentGatewayApi extends Api<AgentGateway> {
 
     updateSort = async (items: SortItem[]) => {
         return await requests.post(`/${this.group}/sort`, items);
+    }
+
+    updateSortPosition = async (req: SortPositionRequest) => {
+        return await requests.post(`/${this.group}/sort`, req);
     }
 }
 

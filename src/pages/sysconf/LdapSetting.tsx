@@ -8,8 +8,6 @@ import {useLicense} from "@/src/hook/use-license";
 import {useMutation} from "@tanstack/react-query";
 import userApi from "@/src/api/user-api";
 
-const {Title} = Typography;
-
 const LdapSetting = ({get, set}: SettingProps) => {
 
     let {t} = useTranslation();
@@ -33,12 +31,12 @@ const LdapSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <Disabled disabled={!license.isEnterprise()}>
-                <Title level={5} style={{marginTop: 0}}>{t('settings.ldap.setting')}</Title>
+            <Disabled disabled={license.isFree()}>
                 <Alert
                     message={t('settings.ldap.tip')}
                     type={"info"}
-                    style={{marginBottom: 10}}
+                    showIcon
+                    style={{marginBottom: 16}}
                 />
                 <ProForm onFinish={set} request={wrapGet}
                          autoFocus={false}

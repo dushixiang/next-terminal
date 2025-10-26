@@ -175,7 +175,7 @@ const OTP = () => {
     }
 
     return (
-        <div style={{padding: '0 24px'}}>
+        <div>
             <Title level={3} style={{marginTop: 0, marginBottom: 16}}>
                 <Space>
                     <SafetyOutlined />

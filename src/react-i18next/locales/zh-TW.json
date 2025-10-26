@@ -25,7 +25,8 @@
     "enter_remark": "請輸入備註",
     "required": "必填項",
     "error": "操作失敗",
-    "status": "狀態"
+    "status": "狀態",
+    "language": "語言"
   },
   "actions": {
     "option": "操作",
@@ -196,7 +197,8 @@
       "upload_file": "上傳檔案",
       "upload_dir": "上傳目錄",
       "paste": "粘貼",
-      "batch_download": "批量下載"
+      "batch_download": "批量下載",
+      "chmod": "權限設定"
     },
     "attributes": {
       "path": "路徑",
@@ -210,7 +212,17 @@
       "permissions": {
         "label": "權限",
         "owner": "擁有者",
-        "group": "組"
+        "group": "組",
+        "owner_read": "讀取",
+        "owner_write": "寫入",
+        "owner_execute": "執行",
+        "group_read": "讀取",
+        "group_write": "寫入",
+        "group_execute": "執行",
+        "public": "公共",
+        "public_read": "讀取",
+        "public_write": "寫入",
+        "public_execute": "執行"
       }
     },
     "file_types": {
@@ -232,7 +244,11 @@
     "editor": {
       "label": "編輯器",
       "save": "保存",
-      "refetch": "重新載入"
+      "refetch": "重新載入",
+      "copy_path": "複製路徑",
+      "no_files_open": "沒有打開的檔案",
+      "unsaved_changes_title": "存在未儲存的檔案",
+      "unsaved_changes_content": "關閉編輯器將遺失未儲存的修改，確定要關閉嗎？"
     },
     "transmission": {
       "filename": "檔案名稱",
@@ -258,13 +274,15 @@
       "connected": "連接成功",
       "disconnecting": "會話關閉中...",
       "disconnected": "會話已關閉",
-      "closed": "會話已關閉"
+      "closed": "會話已關閉",
+      "unknown": "未知狀態"
     },
     "tunnel": {
       "connecting": "隧道正在連接中...",
       "open": "隧道連接成功",
       "closed": "隧道連接已關閉",
-      "unstable": "隧道連接不穩定"
+      "unstable": "隧道連接不穩定",
+      "unknown": "未知隧道狀態"
     }
   },
   "identity": {
@@ -359,7 +377,15 @@
       "locked_type_ip": "IP封鎖",
       "last_login_at": "最後登錄時間",
       "available": "可選用戶",
-      "selected": "已選擇用戶"
+      "selected": "已選擇用戶",
+      "phone": "手機號",
+      "source": "來源",
+      "sources": {
+        "local": "本地",
+        "ldap": "LDAP",
+        "wechat": "企業微信",
+        "oidc": "OIDC"
+      }
     },
     "options": {
       "authorized_asset": "授權資產",
@@ -380,7 +406,8 @@
       "tree_view": "樹形視圖",
       "tree_structure": "部門樹形結構",
       "sub_departments": "子部門",
-      "manage_users": "管理用戶"
+      "manage_users": "管理用戶",
+      "user_count": "成員數量"
     }
   },
   "dw": {
@@ -670,7 +697,8 @@
           "size": "字體大小",
           "family": "字體"
         },
-        "line_height": "行高"
+        "line_height": "行高",
+        "search_placeholder": "搜尋終端內容..."
       },
       "mouse": {
         "label": "滑鼠設定",
@@ -820,7 +848,14 @@
     "otp_security_tip": "安全提示",
     "otp_security_description": "綁定成功後，您的帳戶將受到雙因素認證保護。請確保妥善保管您的身份驗證設備。",
     "otp_step2_description": "使用身份驗證應用掃描二維碼",
-    "otp_step3_description": "輸入驗證碼完成綁定"
+    "otp_step3_description": "輸入驗證碼完成綁定",
+    "otp_code_label": "OTP 驗證碼",
+    "select_auth_type": "請選擇身份認證方式",
+    "auth_type_passkey": "通行密鑰",
+    "auth_type_passkey_desc": "使用生物識別或安全密鑰進行驗證",
+    "auth_type_otp": "OTP 驗證碼",
+    "auth_type_otp_desc": "使用動態驗證碼進行認證",
+    "auth_type_unavailable": "未啟用"
   },
   "assets": {
     "name": "名稱",
@@ -941,6 +976,10 @@
       "is_default": "預設憑證",
       "is_default_tooltip": "預設憑證是指在找不到其他憑證時所使用的憑證。",
       "set_as_default": "設為預設",
+      "download": "下載證書",
+      "renew": "續簽證書",
+      "renew_confirm": "確認續簽證書？",
+      "renew_confirm_content": "將會重新申請並更新證書，確認繼續嗎？",
       "issued_log": "證書申請日誌",
       "self_signed_tip_title": "提示: 可自行替換根證書，替換後重啟生效。",
       "self_signed_root_ca_cert_path": "根證書文件路徑",
@@ -1059,7 +1098,8 @@
         "rdp": "傳統RDP加密",
         "rdp_desc": "傳統RDP加密模式，通常用於較舊的Windows伺服器"
       }
-    }
+    },
+    "sort": "排序"
   },
   "gateways": {
     "name": "名稱",

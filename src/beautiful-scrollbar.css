@@ -62,3 +62,38 @@
 .custom-scrollbar::-webkit-scrollbar-corner {
     background: rgba(31, 41, 55, 0.3); /* 角落背景 */
 }
+
+/* Tailwind 暗黑模式（class）全局滚动条与选中样式 */
+.dark ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+    background: rgba(31, 41, 55, 0.3);
+    border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: rgba(75, 85, 99, 0.8) !important;
+    border-radius: 4px;
+    border: 1px solid rgba(55, 65, 81, 0.5);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: rgba(107, 114, 128, 0.9) !important;
+}
+
+.dark ::-webkit-scrollbar-corner {
+    background: rgba(31, 41, 55, 0.3);
+}
+
+.dark ::selection {
+    background: rgba(99, 102, 241, 0.35);
+    color: #E5E7EB;
+}
+
+.dark ::-moz-selection {
+    background: rgba(99, 102, 241, 0.35);
+    color: #E5E7EB;
+}

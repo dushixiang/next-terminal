@@ -1,7 +1,7 @@
-import {useState, useCallback} from 'react';
-import requests, {getToken} from "@/src/api/core/requests";
+import {useState} from 'react';
 import fileSystemApi, {FileInfo} from "@/src/api/filesystem-api";
 import {getLanguageFromFileName} from "@/src/utils/editor-language";
+import {downloadFileContent} from "@/src/utils/filesystem-utils";
 
 interface OpenFile {
     key: string
@@ -27,22 +27,21 @@ export function useFileEditor(fsId: string) {
     });
 
     // 打开编辑器
-    const openEditor = useCallback(() => {
-        setState(prev => ({ ...prev, isOpen: true }));
-    }, []);
+    const openEditor = () => {
+        setState(prev => ({...prev, isOpen: true}));
+    };
 
     // 关闭编辑器
-    const closeEditor = useCallback(() => {
-        setState(prev => ({ ...prev, isOpen: false }));
-    }, []);
+    const closeEditor = () => {
+        setState(prev => ({...prev, isOpen: false}));
+    };
 
     // 打开文件进行编辑
-    const openFile = useCallback(async (file: FileInfo) => {
+    const openFile = async (file: FileInfo) => {
         try {
             const language = getLanguageFromFileName(file.name);
-            const fileContent = await requests.get(
-                `/${fileSystemApi.group}/${fsId}/download?filename=${file.path}&X-Auth-Token=${getToken()}&t=${new Date().getTime()}`
-            );
+            // 使用公共工具函数下载文件
+            const fileContent = await downloadFileContent(fsId, file.path);
 
             const newFile: OpenFile = {
                 key: file.path,
@@ -76,10 +75,10 @@ export function useFileEditor(fsId: string) {
             console.error('Failed to open file:', error);
             throw error;
         }
-    }, [fsId]);
+    };
 
     // 关闭某个已打开的文件
-    const closeFile = useCallback((fileKey: string) => {
+    const closeFile = (fileKey: string) => {
         setState(prev => {
             const updated = prev.openFiles.filter(f => f.key !== fileKey);
             let nextActive = prev.activeFileKey;
@@ -100,7 +99,62 @@ export function useFileEditor(fsId: string) {
                 activeFileKey: nextActive,
             };
         });
-    }, []);
+    };
+
+    // 切换活动文件
+    const setActiveFile = (fileKey: string) => {
+        setState(prev => ({
+            ...prev,
+            activeFileKey: fileKey
+        }));
+    };
+
+    // 更新文件内容
+    const updateFileContent = (fileKey: string, content: string) => {
+        setState(prev => ({
+            ...prev,
+            openFiles: prev.openFiles.map(file =>
+                file.key === fileKey
+                    ? {...file, content, changed: true}
+                    : file
+            )
+        }));
+    };
+
+    // 标记文件为已保存（清除changed标记）
+    const markFileSaved = (fileKey: string) => {
+        setState(prev => ({
+            ...prev,
+            openFiles: prev.openFiles.map(file =>
+                file.key === fileKey
+                    ? {...file, changed: false}
+                    : file
+            )
+        }));
+    };
+
+    // 刷新文件（重新从服务器加载）
+    const refreshFile = async (fileKey: string) => {
+        const file = state.openFiles.find(f => f.key === fileKey);
+        if (!file) return;
+
+        try {
+            const language = getLanguageFromFileName(file.title);
+            const fileContent = await downloadFileContent(fsId, fileKey);
+
+            setState(prev => ({
+                ...prev,
+                openFiles: prev.openFiles.map(f =>
+                    f.key === fileKey
+                        ? {...f, content: fileContent, language: language || 'text', changed: false}
+                        : f
+                )
+            }));
+        } catch (error) {
+            console.error('Failed to refresh file:', error);
+            throw error;
+        }
+    };
 
     // 检查是否有打开的文件
     const hasOpenFiles = state.openFiles.length > 0;
@@ -116,6 +170,10 @@ export function useFileEditor(fsId: string) {
         closeEditor,
         openFile,
         closeFile,
+        setActiveFile,
+        updateFileContent,
+        markFileSaved,
+        refreshFile,
     };
 }
 

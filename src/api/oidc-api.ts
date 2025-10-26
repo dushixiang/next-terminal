@@ -3,7 +3,7 @@ import requests from './core/requests';
 
 export interface OidcAuthorizeResponse {
     authorizeUrl: string;
-    nonce?: string;
+    state: string;
 }
 
 export interface OidcLoginResponse {

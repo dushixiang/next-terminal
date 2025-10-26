@@ -101,18 +101,13 @@ ${t('identity.user.password')}: ${result.password}`)
 
     const columns: ProColumns<User>[] = [
         {
-            dataIndex: 'index',
-            valueType: 'indexBorder',
-            width: 48,
-        },
-        {
             title: t('identity.user.nickname'),
             dataIndex: 'nickname',
             key: 'nickname',
             sorter: true,
             render: (text, record) => {
                 return <NLink to={`/user/${record['id']}`}>{text}</NLink>;
-            }
+            },
         },
         {
             title: t('identity.user.username'),
@@ -134,6 +129,32 @@ ${t('identity.user.password')}: ${result.password}`)
                 let departmentNames = record.departments;
                 return departmentNames?.map(d => d.name)?.join(', ') || '-';
             }
+        },
+        {
+            title: t('identity.user.source'),
+            dataIndex: 'source',
+            key: 'source',
+            hideInSearch: true,
+            render: (source: string) => {
+                const sourceMap: Record<string, string> = {
+                    'local': t('identity.user.sources.local'),
+                    'ldap': t('identity.user.sources.ldap'),
+                    'wechat': t('identity.user.sources.wechat'),
+                    'oidc': t('identity.user.sources.oidc'),
+                    // 兼容旧值
+                    'self': t('identity.user.sources.local'),
+                    'wechat-work': t('identity.user.sources.wechat'),
+                };
+                return sourceMap[source] || source;
+            },
+            width: 80,
+        },
+        {
+            title: t('general.remark'),
+            dataIndex: 'remark',
+            key: 'remark',
+            hideInSearch: true,
+            ellipsis: true,
         },
         {
             title: t('identity.user.status'),
@@ -169,7 +190,7 @@ ${t('identity.user.password')}: ${result.password}`)
             dataIndex: 'lastLoginAt',
             valueType: 'dateTime',
             hideInSearch: true,
-            width: 191,
+            width: 180,
         },
         {
             title: t('general.created_at'),
@@ -178,13 +199,14 @@ ${t('identity.user.password')}: ${result.password}`)
             valueType: 'dateTime',
             hideInSearch: true,
             sorter: true,
-            width: 191,
+            width: 180,
         },
         {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
             width: 160,
+            fixed: 'right',
             render: (text, record, _, action) => [
                 <NButton
                     key="edit"
@@ -326,6 +348,9 @@ ${t('identity.user.password')}: ${result.password}`)
             pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true
+            }}
+            scroll={{
+                x: 'max-content',
             }}
             dateFormatter="string"
             toolbar={{

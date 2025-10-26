@@ -20,12 +20,28 @@ const UserInfo = ({active, id}: UserInfoProps) => {
         }
     }
 
+    const sourceMap: Record<string, string> = {
+        'local': t('identity.user.sources.local'),
+        'ldap': t('identity.user.sources.ldap'),
+        'wechat': t('identity.user.sources.wechat'),
+        'oidc': t('identity.user.sources.oidc'),
+        // 兼容旧值
+        'self': t('identity.user.sources.local'),
+        'wechat-work': t('identity.user.sources.wechat'),
+    };
+
     return (
         <div className={'page-detail-info'}>
             <ProDescriptions column={1} request={get}>
                 <ProDescriptions.Item label={t('identity.user.username')} dataIndex="username"/>
                 <ProDescriptions.Item label={t('identity.user.nickname')} dataIndex="nickname"/>
                 <ProDescriptions.Item label={t('identity.user.mail')} dataIndex="mail"/>
+                <ProDescriptions.Item 
+                    label={t('identity.user.source')} 
+                    dataIndex="source"
+                    render={(_, record) => sourceMap[record.source] || record.source}
+                />
+                <ProDescriptions.Item label={t('general.remark')} dataIndex="remark"/>
                 <ProDescriptions.Item label={t('identity.user.status')} dataIndex="status" valueEnum={{
                     disabled: {
                         text: t('general.disabled'),

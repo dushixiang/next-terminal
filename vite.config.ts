@@ -13,7 +13,8 @@ export default defineConfig(({mode}) => {
             ...(isProd ? [
                 VitePWA({
                     registerType: 'autoUpdate',
-                    injectRegister: 'auto',
+                    injectRegister: false, // 改为 false，手动控制注册
+                    scope: '/access/', // Service Worker 的作用域
                     workbox: {
                         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB
                         navigateFallbackDenylist: [/^\/api\//], // 阻止 /api 被 fallback 到 index.html
@@ -26,13 +27,14 @@ export default defineConfig(({mode}) => {
                     },
                     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
                     manifest: {
-                        name: 'Next Terminal',
-                        short_name: 'NT',
+                        start_url: "/access/",
+                        scope: "/access/",
+                        name: '{{.SystemName}}',
                         description: '',
                         background_color: '#313131',
                         icons: [
                             {
-                                src: '/logo.png',
+                                src: '/api/logo',
                                 sizes: '512x512',
                                 type: 'image/png',
                                 purpose: "any"

@@ -53,6 +53,10 @@ class FileSystemApi {
         let data = await requests.get(`/${this.group}/${sessionId}/upload/progress?id=${id}`);
         return data as Progress;
     }
+
+    chmod = async (sessionId: string, filename: string, mode: number) => {
+        await requests.post(`/${this.group}/${sessionId}/chmod?filename=${filename}&mode=${mode}`);
+    }
 }
 
 const fileSystemApi = new FileSystemApi();

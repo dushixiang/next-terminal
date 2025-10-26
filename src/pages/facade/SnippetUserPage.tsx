@@ -8,12 +8,15 @@ import NButton from "@/src/components/NButton";
 import SnippetUserModal from "@/src/pages/facade/SnippetUserModal";
 import snippetUserApi from "@/src/api/snippet-user-api";
 import {Snippet} from "@/src/api/snippet-api";
+import {useMobile} from "@/src/hook/use-mobile";
+import {cn} from "@/lib/utils";
 
 const api = snippetUserApi;
 
 const SnippetUserPage = () => {
 
     const {t} = useTranslation();
+    const {isMobile} = useMobile();
     const actionRef = useRef<ActionType>();
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -50,29 +53,34 @@ const SnippetUserPage = () => {
             dataIndex: 'index',
             valueType: 'indexBorder',
             width: 48,
+            hideInTable: isMobile, // 移动端隐藏序号列
         },
         {
             title: t('assets.name'),
             dataIndex: 'name',
+            width: isMobile ? 100 : undefined, // 移动端固定宽度
         },
         {
             title: t('assets.content'),
             dataIndex: 'content',
             key: 'content',
             copyable: true,
-            ellipsis: true
+            ellipsis: true,
+            width: isMobile ? 150 : undefined, // 移动端固定宽度
         },
         {
             title: t('general.created_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',
             hideInSearch: true,
-            valueType: 'dateTime'
+            valueType: 'dateTime',
+            hideInTable: isMobile, // 移动端隐藏创建时间
         },
         {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
+            width: isMobile ? 80 : undefined, // 移动端固定宽度
             render: (text, record, _, action) => [
                 <NButton
                     key="edit"
@@ -91,25 +99,30 @@ const SnippetUserPage = () => {
                         actionRef.current?.reload();
                     }}
                 >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    <NButton 
+                        key='delete' 
+                        danger={true}
+                    >
+                        {t('actions.delete')}
+                    </NButton>
                 </Popconfirm>,
             ],
         },
     ];
 
-    return (<div className="px-20 ">
-        <div className={'py-6 flex '}>
-            <div className={'flex-grow text-xl font-bold'}>
+    return (<div className={cn('px-4 lg:px-20', isMobile && 'px-2')}>
+        <div className={cn('py-6 flex', isMobile && 'py-3')}>
+            <div className={cn('flex-grow font-bold', isMobile ? 'text-lg' : 'text-xl')}>
                 {t('menus.resource.submenus.snippet')}
             </div>
         </div>
         <ProTable
             columns={columns}
             actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let [sortOrder, sortField] = getSort(sort);
-                    
-                    let queryParams = {
+            request={async (params = {}, sort, filter) => {
+                let [sortOrder, sortField] = getSort(sort);
+                
+                let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
                     sortOrder: sortOrder,
@@ -126,20 +139,37 @@ const SnippetUserPage = () => {
             rowKey="id"
             search={{
                 labelWidth: 'auto',
+                collapsed: isMobile, // 移动端默认折叠搜索
+                collapseRender: false, // 移动端不显示展开/收起按钮
             }}
             pagination={{
                 defaultPageSize: 10,
-                showSizeChanger: true
+                showSizeChanger: !isMobile, // 移动端隐藏分页大小选择器
+                simple: isMobile, // 移动端使用简单分页
             }}
             dateFormatter="string"
-            headerTitle={t('menus.resource.submenus.snippet')}
+            headerTitle={isMobile ? null : t('menus.resource.submenus.snippet')} // 移动端隐藏标题
             toolBarRender={() => [
-                <Button key="button" type="primary" onClick={() => {
-                    setOpen(true)
-                }}>
+                <Button 
+                    key="button" 
+                    type="primary" 
+                    size={isMobile ? 'middle' : 'middle'}
+                    onClick={() => {
+                        setOpen(true)
+                    }}
+                >
                     {t('actions.new')}
                 </Button>,
             ]}
+            tableStyle={{
+                padding: isMobile ? '0' : undefined,
+            }}
+            options={{
+                density: !isMobile, // 移动端隐藏密度设置
+                fullScreen: !isMobile, // 移动端隐藏全屏按钮
+                reload: true,
+                setting: !isMobile, // 移动端隐藏列设置
+            }}
         />
 
         <SnippetUserModal

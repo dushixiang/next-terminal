@@ -99,11 +99,6 @@ const CredentialPage = () => {
                         let publicKey = await credentialApi.getPublicKey(record.id);
                         copy(publicKey);
                         showSuccess();
-                        // const blob = new Blob([publicKey], {type: 'text/plain;charset=utf-8'});
-                        // let a = document.createElement('a');
-                        // a.download = record.name + 'public-key.pem';
-                        // a.href = URL.createObjectURL(blob);
-                        // a.click();
                     }}
                 >
                     {t('assets.copy_public_key')}

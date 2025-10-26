@@ -1,5 +1,6 @@
 import {Api} from "./core/api";
-import requests from "./core/requests";
+import requests, {baseUrl, getToken} from "./core/requests";
+import {browserDownload} from "@/src/utils/utils";
 
 export interface Certificate {
     id: string;
@@ -25,6 +26,15 @@ class CertificateApi extends Api<Certificate> {
 
     updateAsDefault = async (id: string) => {
         await requests.patch(`/${this.group}/${id}/default`)
+    }
+
+    download = async (id: string, commonName: string) => {
+        let u = `${baseUrl()}/${this.group}/${id}/download?X-Auth-Token=${getToken()}`
+        browserDownload(u)
+    }
+
+    renew = async (id: string) => {
+        return await requests.post(`/${this.group}/${id}/renew`)
     }
 }
 

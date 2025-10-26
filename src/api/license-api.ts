@@ -43,7 +43,6 @@ export class SimpleLicense {
     }
 
     isOEM(): boolean {
-        console.log("isOEM", this.oem)
         return this.oem === true;
     }
 }

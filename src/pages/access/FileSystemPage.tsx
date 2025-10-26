@@ -1,11 +1,19 @@
-import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState, useCallback, useMemo, useReducer} from 'react';
+import React, {
+    forwardRef,
+    useCallback,
+    useEffect,
+    useImperativeHandle,
+    useMemo,
+    useReducer,
+    useRef,
+    useState
+} from 'react';
 import {
     Button,
+    Checkbox,
     Col,
-    ConfigProvider,
     Drawer,
     Dropdown,
-    Empty,
     FloatButton,
     Input,
     MenuProps,
@@ -15,9 +23,7 @@ import {
     Row,
     Space,
     Table,
-    Tabs,
     Tag,
-    theme,
     Tooltip
 } from "antd";
 import {
@@ -35,6 +41,7 @@ import {
     FolderEdit,
     FolderUpIcon,
     Link,
+    Shield,
     Trash2Icon,
     TrashIcon,
     Undo2,
@@ -47,16 +54,13 @@ import {useQuery} from "@tanstack/react-query";
 import dayjs from "dayjs";
 import strings from "@/src/utils/strings";
 import {useTranslation} from "react-i18next";
-import requests, {baseUrl, getToken} from "@/src/api/core/requests";
-import {useList} from "react-use";
+import {baseUrl, getToken} from "@/src/api/core/requests";
 import PromptModal from "@/src/components/PromptModal";
 import FileEditor from "@/src/pages/access/FileEditor";
 import {useFileEditor} from "@/src/hook/use-file-editor";
 import fileSystemApi, {FileInfo} from "@/src/api/filesystem-api";
-import {EyeInvisibleOutlined, EyeOutlined, LineOutlined, ReloadOutlined, SyncOutlined} from "@ant-design/icons";
-import copy from "copy-to-clipboard";
+import {EyeInvisibleOutlined, EyeOutlined, ReloadOutlined, SyncOutlined} from "@ant-design/icons";
 import clsx from "clsx";
-import {ScrollArea} from "@/components/ui/scroll-area";
 import {cn} from "@/lib/utils";
 import {Strategy} from "@/src/api/strategy-api";
 import {Base64} from 'js-base64';
@@ -99,10 +103,22 @@ interface TransmissionRecord {
 
 
 interface PromptState {
-    type: "create-dir" | "create-file" | "rename" | undefined
+    type: "create-dir" | "create-file" | "rename" | "chmod" | undefined
     value: string
     open: boolean
     loading: boolean
+}
+
+interface ChmodState {
+    ownerRead: boolean
+    ownerWrite: boolean
+    ownerExecute: boolean
+    groupRead: boolean
+    groupWrite: boolean
+    groupExecute: boolean
+    publicRead: boolean
+    publicWrite: boolean
+    publicExecute: boolean
 }
 
 interface ContextMenu {
@@ -112,7 +128,7 @@ interface ContextMenu {
 }
 
 // 传输记录的 reducer
-type TransmissionAction = 
+type TransmissionAction =
     | { type: 'ADD_RECORDS'; records: TransmissionRecord[] }
     | { type: 'UPDATE_RECORD'; id: string; updates: Partial<TransmissionRecord> }
     | { type: 'REMOVE_RECORD'; id: string }
@@ -124,16 +140,16 @@ function transmissionReducer(state: TransmissionRecord[], action: TransmissionAc
         case 'ADD_RECORDS':
             return [...state, ...action.records];
         case 'UPDATE_RECORD':
-            return state.map(record => 
-                record.id === action.id ? { ...record, ...action.updates } : record
+            return state.map(record =>
+                record.id === action.id ? {...record, ...action.updates} : record
             );
         case 'REMOVE_RECORD':
             return state.filter(record => record.id !== action.id);
         case 'CLEAR_COMPLETED':
             // 清除已完成的记录，但保留上传中和传输中的
-            return state.filter(record => 
-                record.status === 'uploading' || 
-                record.status === 'transmitting' || 
+            return state.filter(record =>
+                record.status === 'uploading' ||
+                record.status === 'transmitting' ||
                 record.status === 'preparing'
             );
         case 'CANCEL_UPLOAD':
@@ -146,7 +162,7 @@ function transmissionReducer(state: TransmissionRecord[], action: TransmissionAc
                     if (record.intervalId) {
                         clearInterval(record.intervalId);
                     }
-                    return { ...record, status: 'cancelled' as const, speed: 0 };
+                    return {...record, status: 'cancelled' as const, speed: 0};
                 }
                 return record;
             });
@@ -228,6 +244,18 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         loading: false, value: "", open: false, type: undefined
     });
 
+    let [chmodState, setChmodState] = useState<ChmodState>({
+        ownerRead: false,
+        ownerWrite: false,
+        ownerExecute: false,
+        groupRead: false,
+        groupWrite: false,
+        groupExecute: false,
+        publicRead: false,
+        publicWrite: false,
+        publicExecute: false,
+    });
+
     const fileEditor = useFileEditor(fsId);
 
     const [modal, contextHolder] = Modal.useModal();
@@ -253,6 +281,32 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 } catch (error) {
                     messageApi.error(`Failed to open file: ${error.message}`);
                 }
+            },
+        },
+        {
+            label: t('fs.operations.chmod'),
+            key: 'chmod',
+            icon: <Shield className={iconClassName}/>,
+            onClick: () => {
+                let file = contextMenu.file;
+                // 解析文件权限
+                const mode = file.mode;
+                // mode 格式通常是 -rwxrwxrwx 或 drwxrwxrwx
+                const perms = mode.slice(-9); // 取最后9位
+                setChmodState({
+                    ownerRead: perms[0] === 'r',
+                    ownerWrite: perms[1] === 'w',
+                    ownerExecute: perms[2] === 'x',
+                    groupRead: perms[3] === 'r',
+                    groupWrite: perms[4] === 'w',
+                    groupExecute: perms[5] === 'x',
+                    publicRead: perms[6] === 'r',
+                    publicWrite: perms[7] === 'w',
+                    publicExecute: perms[8] === 'x',
+                });
+                setPromptState({
+                    loading: false, open: true, type: "chmod", value: file.name
+                })
             },
         },
         {
@@ -300,7 +354,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     }
 
     let filesQuery = useQuery({
-        queryKey: ['files'],
+        queryKey: ['files', fsId, currentDirectory, hiddenFileVisible],
         enabled: open,
         retry: 0,
         queryFn: () => {
@@ -452,7 +506,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     status={record.status === 'error' ? 'exception' :
                         record.status === 'success' ? 'success' : 'active'}
                     format={(percent) => `${percent?.toFixed(1)}%`}
-                    style={{ width: 80 }}
+                    style={{width: 80}}
                 />
             ),
             width: 120,
@@ -481,8 +535,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                             <Button
                                 type="text"
                                 size="small"
-                                icon={<XCircle className="h-3 w-3" />}
-                                onClick={() => transmissionDispatch({ type: 'CANCEL_UPLOAD', id: record.id })}
+                                icon={<XCircle className="h-3 w-3"/>}
+                                onClick={() => transmissionDispatch({type: 'CANCEL_UPLOAD', id: record.id})}
                             />
                         </Tooltip>
                     )}
@@ -491,8 +545,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                             <Button
                                 type="text"
                                 size="small"
-                                icon={<X className="h-3 w-3" />}
-                                onClick={() => transmissionDispatch({ type: 'REMOVE_RECORD', id: record.id })}
+                                icon={<X className="h-3 w-3"/>}
+                                onClick={() => transmissionDispatch({type: 'REMOVE_RECORD', id: record.id})}
                             />
                         </Tooltip>
                     )}
@@ -538,18 +592,18 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     // 重构的上传函数，修复进度显示bug
     const uploadFile = useCallback(async (id: string, file: File, dir: string, fsId: string): Promise<void> => {
         return new Promise((resolve, reject) => {
-            const { size } = file;
+            const {size} = file;
             const name = getFileName(file);
             const url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/upload?X-Auth-Token=${getToken()}&dir=${dir}&id=${id}`;
 
             const xhr = new XMLHttpRequest();
             let intervalId: NodeJS.Timeout | undefined;
-            
+
             // 保存 xhr 和 intervalId 到记录中，用于取消操作
             transmissionDispatch({
                 type: 'UPDATE_RECORD',
                 id,
-                updates: { xhr, intervalId }
+                updates: {xhr, intervalId}
             });
 
             let prevTime = Date.now();
@@ -586,7 +640,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 // 当前端上传完成时，开始后端处理阶段
                 if (event.loaded === event.total && !hasStartedBackendPolling) {
                     hasStartedBackendPolling = true;
-                    
+
                     transmissionDispatch({
                         type: 'UPDATE_RECORD',
                         id,
@@ -600,12 +654,12 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     // 开始轮询后端进度，无延迟
                     let retryCount = 0;
                     const maxRetries = 10; // 最多重试10次（5秒）
-                    
+
                     intervalId = setInterval(async () => {
                         try {
                             const progress = await fileSystemApi.uploadProgress(fsId, id);
                             console.log('Upload progress polling result:', progress);
-                            
+
                             // 如果返回-1，可能是后端还没准备好，重试几次
                             if (progress.total === -1) {
                                 retryCount++;
@@ -626,10 +680,10 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                 }
                                 return;
                             }
-                            
+
                             // 重置重试计数
                             retryCount = 0;
-                            
+
                             transmissionDispatch({
                                 type: 'UPDATE_RECORD',
                                 id,
@@ -673,12 +727,12 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                             }
                         }
                     }, 500);
-                    
+
                     // 保存更新后的 intervalId
                     transmissionDispatch({
                         type: 'UPDATE_RECORD',
                         id,
-                        updates: { intervalId }
+                        updates: {intervalId}
                     });
                 }
 
@@ -697,13 +751,13 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     // 检查响应体是否包含错误信息
                     let hasError = false;
                     let errorMessage = '';
-                    
+
                     try {
                         const responseText = xhr.responseText;
                         if (responseText) {
                             const result = JSON.parse(responseText);
                             console.log('Upload response parsed:', result);
-                            
+
                             // 检查是否是标准错误响应格式
                             if (result.error === true || (result.message && result.code)) {
                                 hasError = true;
@@ -715,13 +769,13 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                         // JSON解析失败，可能是成功的空响应，继续处理为成功
                         console.log('Upload response parse failed, treating as success:', e);
                     }
-                    
+
                     if (hasError) {
                         // 虽然HTTP状态码是200，但响应内容表示失败
                         if (intervalId) {
                             clearInterval(intervalId);
                         }
-                        
+
                         transmissionDispatch({
                             type: 'UPDATE_RECORD',
                             id,
@@ -758,7 +812,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     if (intervalId) {
                         clearInterval(intervalId);
                     }
-                    
+
                     let errorMessage = `Upload failed with status code: ${xhr.status}`;
                     try {
                         const responseText = xhr.responseText;
@@ -791,7 +845,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 if (intervalId) {
                     clearInterval(intervalId);
                 }
-                
+
                 const errorMessage = `Upload failed due to a network error`;
                 transmissionDispatch({
                     type: 'UPDATE_RECORD',
@@ -802,7 +856,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                         speed: 0
                     }
                 });
-                
+
                 console.error(errorMessage);
                 reject(new Error(errorMessage));
             };
@@ -827,7 +881,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         }
         setUploading(true);
         const records: TransmissionRecord[] = [];
-        
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const relativePath = file['webkitRelativePath'];
@@ -843,8 +897,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 speed: 0,
             });
         }
-        
-        transmissionDispatch({ type: 'ADD_RECORDS', records });
+
+        transmissionDispatch({type: 'ADD_RECORDS', records});
 
         try {
             const uploadPromises = [];
@@ -852,10 +906,10 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 const file = files[i];
                 const relativePath = file['webkitRelativePath'];
                 const dir = relativePath.substring(0, relativePath.length - file.name.length);
-                
+
                 uploadPromises.push(uploadFile(records[i].id, file, currentDirectory + '/' + dir, fsId));
             }
-            
+
             await Promise.allSettled(uploadPromises);
             filesQuery.refetch();
         } finally {
@@ -870,7 +924,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
 
         setUploading(true);
         const records: TransmissionRecord[] = [];
-        
+
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             records.push({
@@ -885,8 +939,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 speed: 0,
             });
         }
-        
-        transmissionDispatch({ type: 'ADD_RECORDS', records });
+
+        transmissionDispatch({type: 'ADD_RECORDS', records});
 
         try {
             const uploadPromises = [];
@@ -894,7 +948,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 const file = files[i];
                 uploadPromises.push(uploadFile(records[i].id, file, currentDirectory, fsId));
             }
-            
+
             await Promise.allSettled(uploadPromises);
             filesQuery.refetch();
         } finally {
@@ -939,6 +993,20 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 case "rename":
                     await fileSystemApi.rename(fsId, `${currentDirectory}/${promptState.value}`, `${currentDirectory}/${value}`);
                     break;
+                case "chmod":
+                    // 计算权限值
+                    let mode = 0;
+                    if (chmodState.ownerRead) mode += 0o400;
+                    if (chmodState.ownerWrite) mode += 0o200;
+                    if (chmodState.ownerExecute) mode += 0o100;
+                    if (chmodState.groupRead) mode += 0o040;
+                    if (chmodState.groupWrite) mode += 0o020;
+                    if (chmodState.groupExecute) mode += 0o010;
+                    if (chmodState.publicRead) mode += 0o004;
+                    if (chmodState.publicWrite) mode += 0o002;
+                    if (chmodState.publicExecute) mode += 0o001;
+                    await fileSystemApi.chmod(fsId, `${currentDirectory}/${promptState.value}`, mode);
+                    break;
             }
             filesQuery.refetch();
         } finally {
@@ -958,6 +1026,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 return t('fs.operations.create_file');
             case "rename":
                 return t('fs.operations.rename');
+            case "chmod":
+                return t('fs.operations.chmod');
             default:
                 return 'Prompt';
         }
@@ -969,11 +1039,11 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         const totalRecords = transmissionRecords.length;
         const completedRecords = transmissionRecords.filter(r => r.status === 'success').length;
         const errorRecords = transmissionRecords.filter(r => r.status === 'error').length;
-        const activeRecords = transmissionRecords.filter(r => 
+        const activeRecords = transmissionRecords.filter(r =>
             r.status === 'uploading' || r.status === 'transmitting' || r.status === 'preparing'
         ).length;
-        
-        return { totalRecords, completedRecords, errorRecords, activeRecords };
+
+        return {totalRecords, completedRecords, errorRecords, activeRecords};
     }, [transmissionRecords]);
 
     let uploadDirLabel = t('fs.operations.upload_dir');
@@ -1155,54 +1225,50 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     </Col>
                 </Row>
 
-                <ScrollArea style={{
-                    height: window.innerHeight - 240,
-                }}>
-                    <Table
-                        virtual
-                        scroll={{y: window.innerHeight - 240}}
-                        rowKey={'path'}
-                        columns={fileColumns}
-                        rowSelection={rowSelection}
-                        dataSource={files}
-                        size={'small'}
-                        pagination={false}
-                        loading={filesQuery.isFetching}
-                        onRow={(file, index) => {
-                            return {
-                                onDoubleClick: event => {
-                                    if (!file.isDir && !file.isLink) return;
-                                    setCurrentDirectory(file.path);
-                                },
-                                onContextMenu: (event) => {
-                                    event.preventDefault();
+                <Table
+                    virtual
+                    // scroll={{y: window.innerHeight - 240}}
+                    rowKey={'path'}
+                    columns={fileColumns}
+                    rowSelection={rowSelection}
+                    dataSource={files}
+                    size={'small'}
+                    pagination={false}
+                    loading={filesQuery.isFetching}
+                    onRow={(file, index) => {
+                        return {
+                            onDoubleClick: event => {
+                                if (!file.isDir && !file.isLink) return;
+                                setCurrentDirectory(file.path);
+                            },
+                            onContextMenu: (event) => {
+                                event.preventDefault();
 
-                                    setSelectedRowKeys([file.path]);
+                                setSelectedRowKeys([file.path]);
 
-                                    const {innerWidth, innerHeight} = window;
-                                    let adjustedX = event.pageX;
-                                    let adjustedY = event.pageY;
-                                    let menuRectWidth = 150;
-                                    let menuRectHeight = 200;
+                                const {innerWidth, innerHeight} = window;
+                                let adjustedX = event.pageX;
+                                let adjustedY = event.pageY;
+                                let menuRectWidth = 150;
+                                let menuRectHeight = 200;
 
-                                    if (adjustedX + menuRectWidth > innerWidth) {
-                                        adjustedX = innerWidth - menuRectWidth;
-                                    }
-
-                                    if (adjustedY + menuRectHeight > innerHeight) {
-                                        adjustedY = innerHeight - menuRectHeight;
-                                    }
-
-                                    setContextMenu({
-                                        pageX: adjustedX,
-                                        pageY: adjustedY,
-                                        file,
-                                    });
+                                if (adjustedX + menuRectWidth > innerWidth) {
+                                    adjustedX = innerWidth - menuRectWidth;
                                 }
+
+                                if (adjustedY + menuRectHeight > innerHeight) {
+                                    adjustedY = innerHeight - menuRectHeight;
+                                }
+
+                                setContextMenu({
+                                    pageX: adjustedX,
+                                    pageY: adjustedY,
+                                    file,
+                                });
                             }
-                        }}
-                    />
-                </ScrollArea>
+                        }
+                    }}
+                />
 
                 <Drawer
                     title={
@@ -1232,7 +1298,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                             type={'primary'}
                             danger={true}
                             onClick={() => {
-                                transmissionDispatch({ type: 'CLEAR_COMPLETED' });
+                                transmissionDispatch({type: 'CLEAR_COMPLETED'});
                             }}
                         >
                             {t('actions.clear')}
@@ -1245,14 +1311,13 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                         dataSource={transmissionRecords}
                         size={'small'}
                         pagination={false}
-                        // scroll={{ x: 600 }}
                     />
                 </Drawer>
 
                 <PromptModal
                     title={getPromptTitle()}
                     value={promptState.value}
-                    open={promptState.open}
+                    open={promptState.open && promptState.type !== "chmod"}
                     onOk={handlePromptOk}
                     onCancel={() => {
                         setPromptState({
@@ -1263,6 +1328,102 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     placeholder={''}
                     confirmLoading={promptState.loading}
                 />
+
+                <Modal
+                    title={t('fs.operations.chmod')}
+                    open={promptState.open && promptState.type === "chmod"}
+                    onOk={() => handlePromptOk(promptState.value)}
+                    onCancel={() => {
+                        setPromptState({
+                            loading: false, value: "", open: false, type: undefined
+                        })
+                    }}
+                    confirmLoading={promptState.loading}
+                >
+                    <div className="space-y-4">
+                        <div>
+                            <div className="font-semibold mb-2">{t('fs.attributes.permissions.owner')}</div>
+                            <Space>
+                                <Checkbox
+                                    checked={chmodState.ownerRead}
+                                    onChange={(e) => setChmodState({...chmodState, ownerRead: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.owner_read')}
+                                </Checkbox>
+                                <Checkbox
+                                    checked={chmodState.ownerWrite}
+                                    onChange={(e) => setChmodState({...chmodState, ownerWrite: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.owner_write')}
+                                </Checkbox>
+                                <Checkbox
+                                    checked={chmodState.ownerExecute}
+                                    onChange={(e) => setChmodState({...chmodState, ownerExecute: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.owner_execute')}
+                                </Checkbox>
+                            </Space>
+                        </div>
+
+                        <div>
+                            <div className="font-semibold mb-2">{t('fs.attributes.permissions.group')}</div>
+                            <Space>
+                                <Checkbox
+                                    checked={chmodState.groupRead}
+                                    onChange={(e) => setChmodState({...chmodState, groupRead: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.group_read')}
+                                </Checkbox>
+                                <Checkbox
+                                    checked={chmodState.groupWrite}
+                                    onChange={(e) => setChmodState({...chmodState, groupWrite: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.group_write')}
+                                </Checkbox>
+                                <Checkbox
+                                    checked={chmodState.groupExecute}
+                                    onChange={(e) => setChmodState({...chmodState, groupExecute: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.group_execute')}
+                                </Checkbox>
+                            </Space>
+                        </div>
+
+                        <div>
+                            <div className="font-semibold mb-2">{t('fs.attributes.permissions.public')}</div>
+                            <Space>
+                                <Checkbox
+                                    checked={chmodState.publicRead}
+                                    onChange={(e) => setChmodState({...chmodState, publicRead: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.public_read')}
+                                </Checkbox>
+                                <Checkbox
+                                    checked={chmodState.publicWrite}
+                                    onChange={(e) => setChmodState({...chmodState, publicWrite: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.public_write')}
+                                </Checkbox>
+                                <Checkbox
+                                    checked={chmodState.publicExecute}
+                                    onChange={(e) => setChmodState({...chmodState, publicExecute: e.target.checked})}
+                                >
+                                    {t('fs.attributes.permissions.public_execute')}
+                                </Checkbox>
+                            </Space>
+                        </div>
+
+                        <div className="mt-4 p-3 bg-gray-50 rounded dark:bg-gray-700">
+                            <div className="text-sm text-gray-600 dark:text-gray-300">
+                                {t('fs.attributes.permissions.label')}: {
+                                    ((chmodState.ownerRead ? 4 : 0) + (chmodState.ownerWrite ? 2 : 0) + (chmodState.ownerExecute ? 1 : 0)).toString() +
+                                    ((chmodState.groupRead ? 4 : 0) + (chmodState.groupWrite ? 2 : 0) + (chmodState.groupExecute ? 1 : 0)).toString() +
+                                    ((chmodState.publicRead ? 4 : 0) + (chmodState.publicWrite ? 2 : 0) + (chmodState.publicExecute ? 1 : 0)).toString()
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
 
 
                 {contextHolder}
@@ -1293,10 +1454,10 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 )}
 
                 {fileEditor.hasOpenFiles && (
-                    <FloatButton 
+                    <FloatButton
                         badge={{
                             count: fileEditor.unsavedFilesCount
-                        }} 
+                        }}
                         onClick={() => {
                             fileEditor.openEditor();
                         }}
@@ -1307,8 +1468,13 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     fsId={fsId}
                     open={fileEditor.isOpen}
                     onClose={fileEditor.closeEditor}
-                    initialFiles={fileEditor.openFiles}
+                    openFiles={fileEditor.openFiles}
+                    activeFileKey={fileEditor.activeFileKey}
+                    onActiveFileChange={fileEditor.setActiveFile}
+                    onFileContentChange={fileEditor.updateFileContent}
+                    onFileSaved={fileEditor.markFileSaved}
                     onCloseFile={fileEditor.closeFile}
+                    onRefreshFile={fileEditor.refreshFile}
                 />
             </Drawer>
         </div>
