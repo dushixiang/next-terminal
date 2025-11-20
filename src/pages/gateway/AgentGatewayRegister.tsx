@@ -1,12 +1,12 @@
 import {Input, Modal, Select, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
-import agentGatewayApi, {RegisterParam} from "@/src/api/agent-gateway-api";
+import agentGatewayApi, {RegisterParam} from "@/api/agent-gateway-api";
 import clsx from "clsx";
 import {useQuery} from "@tanstack/react-query";
-import agentGatewayTokenApi from "@/src/api/agent-gateway-token-api";
-import {baseUrl} from "@/src/api/core/requests";
-import strings from "@/src/utils/strings";
+import agentGatewayTokenApi from "@/api/agent-gateway-token-api";
+import {baseUrl} from "@/api/core/requests";
+import strings from "@/utils/strings";
 
 const {Paragraph} = Typography;
 
@@ -15,9 +15,9 @@ interface Props {
     handleCancel: () => void
 }
 
-const linuxImg = new URL('@/src/assets/images/linux.png', import.meta.url).href;
-const windowsImg = new URL('@/src/assets/images/windows.png', import.meta.url).href;
-const macosImg = new URL('@/src/assets/images/macos.png', import.meta.url).href;
+const linuxImg = new URL('@/assets/images/linux.png', import.meta.url).href;
+const windowsImg = new URL('@/assets/images/windows.png', import.meta.url).href;
+const macosImg = new URL('@/assets/images/macos.png', import.meta.url).href;
 
 const AgentGatewayRegister = ({
                                   open,

@@ -1,15 +1,15 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Terminal} from "@xterm/xterm";
-import {CleanTheme, useTerminalTheme} from "@/src/hook/use-terminal-theme";
+import {CleanTheme, useTerminalTheme} from "@/hook/use-terminal-theme";
 import {FitAddon} from "@xterm/addon-fit";
-import {debounce} from "@/src/utils/debounce";
-import {useAccessContentSize} from "@/src/hook/use-access-size";
+import {debounce} from "@/utils/debounce";
+import {useAccessContentSize} from "@/hook/use-access-size";
 import {useInterval, useWindowSize} from "react-use";
-import {Message, MessageTypeData, MessageTypeKeepAlive, MessageTypeResize} from "@/src/pages/access/Terminal";
-import portalApi, {ExportSession} from "@/src/api/portal-api";
-import {baseWebSocketUrl, getToken} from "@/src/api/core/requests";
+import {Message, MessageTypeData, MessageTypeKeepAlive, MessageTypeResize} from "@/pages/access/Terminal";
+import portalApi, {ExportSession} from "@/api/portal-api";
+import {baseWebSocketUrl, getToken} from "@/api/core/requests";
 import qs from "qs";
-import eventEmitter from "@/src/api/core/event-emitter";
+import eventEmitter from "@/api/core/event-emitter";
 import {clsx} from "clsx";
 
 interface Props {
@@ -22,8 +22,8 @@ interface Props {
 const AccessTerminalBulkItem = React.memo(({assetId, securityToken, tabId, onClose}: Props) => {
 
     const terminalRef = React.useRef<HTMLDivElement>(null);
-    const terminal = useRef<Terminal>();
-    const fit = useRef<FitAddon>();
+    const terminal = useRef<Terminal>(null);
+    const fit = useRef<FitAddon>(null);
 
     let [websocket, setWebsocket] = useState<WebSocket>();
     let {width, height} = useWindowSize();

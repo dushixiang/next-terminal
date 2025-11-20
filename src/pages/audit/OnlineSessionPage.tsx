@@ -1,12 +1,12 @@
 import React, {useRef} from 'react';
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {App, Popconfirm, Select, Typography} from "antd";
-import sessionApi, {Session} from "@/src/api/session-api";
-import NButton from "@/src/components/NButton";
+import sessionApi, {Session} from "@/api/session-api";
+import NButton from "@/components/NButton";
 import clsx from "clsx";
-import {getProtocolColor} from "@/src/helper/asset-helper";
+import {getProtocolColor} from "@/helper/asset-helper";
 
 const OnlineSessionPage = () => {
     const {t} = useTranslation();

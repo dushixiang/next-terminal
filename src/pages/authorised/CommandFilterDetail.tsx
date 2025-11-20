@@ -3,7 +3,7 @@ import {Tabs} from "antd";
 import {useParams, useSearchParams} from "react-router-dom";
 import CommandFilterInfo from "./CommandFilterInfo";
 import CommandFilterRulePage from "./CommandFilterRulePage";
-import {maybe} from "@/src/utils/maybe";
+import {maybe} from "@/utils/maybe";
 import {useTranslation} from "react-i18next";
 
 const CommandFilterDetail = () => {

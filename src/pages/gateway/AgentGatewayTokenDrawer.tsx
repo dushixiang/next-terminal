@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 import {Drawer, Popconfirm, Table, TableProps, Typography, Button, Modal, Form, Input, message} from "antd";
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
-import agentGatewayTokenApi, {AgentGatewayToken} from "@/src/api/agent-gateway-token-api";
+import agentGatewayTokenApi, {AgentGatewayToken} from "@/api/agent-gateway-token-api";
 import dayjs from "dayjs";
-import NButton from "@/src/components/NButton";
-import i18n from '@/src/react-i18next/i18n';
+import NButton from "@/components/NButton";
+import i18n from '@/react-i18next/i18n';
 
 interface Props {
     open: boolean;

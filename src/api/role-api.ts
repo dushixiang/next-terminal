@@ -1,6 +1,6 @@
 import {Api} from "./core/api";
 import requests from "./core/requests";
-import {Menu} from "@/src/api/account-api";
+import {Menu} from "@/api/account-api";
 
 export interface Role {
     id: string;

@@ -1,5 +1,5 @@
-import {AccountInfo} from "@/src/api/account-api";
-import {Branding} from "@/src/api/branding-api";
+import {AccountInfo} from "@/api/account-api";
+import {Branding} from "@/api/branding-api";
 
 export type Global = {
     user: AccountInfo;

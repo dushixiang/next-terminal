@@ -1,6 +1,6 @@
 import {useAtom} from "jotai"
-import XtermThemes, {XtermTheme} from "@/src/color-theme/XtermThemes";
-import {atomWithLocalStorage} from "@/src/hook/atom";
+import XtermThemes, {XtermTheme} from "@/color-theme/XtermThemes";
+import {atomWithLocalStorage} from "@/hook/atom";
 
 type ConfigTerminalTheme = {
     selected: string | null,

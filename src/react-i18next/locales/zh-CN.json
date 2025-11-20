@@ -658,6 +658,7 @@
       "theme": "主题设置",
       "system": "系统设置",
       "font": "字体设置",
+      "font.preview": "字体预览",
       "terminal": {
         "font": {
           "size": "字体大小",
@@ -1090,6 +1091,7 @@
     "username": "账号",
     "account_type": {},
     "register": "注册",
+    "free_limit_tip": "免费版仅支持注册 1 个安全网关，如需更多请升级商业版。",
     "endpoint": "通信地址",
     "token": "通信令牌",
     "select_token": "请选择通信令牌",

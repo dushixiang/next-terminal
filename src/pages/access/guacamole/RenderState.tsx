@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
 import {HashLoader} from 'react-spinners';
-import {ErrorAlert, GuacamoleStatus} from '@/src/pages/access/guacamole/ErrorAlert';
+import {ErrorAlert, GuacamoleStatus} from '@/pages/access/guacamole/ErrorAlert';
 import {useTranslation} from 'react-i18next';
 // @ts-ignore
 import Guacamole from '@dushixiang/guacamole-common-js';

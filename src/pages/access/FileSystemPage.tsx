@@ -49,22 +49,22 @@ import {
     XCircle
 } from "lucide-react";
 import {ColumnsType} from "antd/es/table";
-import {browserDownload, generateRandomId, renderSize} from "@/src/utils/utils";
+import {browserDownload, generateRandomId, renderSize} from "@/utils/utils";
 import {useQuery} from "@tanstack/react-query";
 import dayjs from "dayjs";
-import strings from "@/src/utils/strings";
+import strings from "@/utils/strings";
 import {useTranslation} from "react-i18next";
-import {baseUrl, getToken} from "@/src/api/core/requests";
-import PromptModal from "@/src/components/PromptModal";
-import FileEditor from "@/src/pages/access/FileEditor";
-import {useFileEditor} from "@/src/hook/use-file-editor";
-import fileSystemApi, {FileInfo} from "@/src/api/filesystem-api";
+import {baseUrl, getToken} from "@/api/core/requests";
+import PromptModal from "@/components/PromptModal";
+import FileEditor from "@/pages/access/FileEditor";
+import {useFileEditor} from "@/hook/use-file-editor";
+import fileSystemApi, {FileInfo} from "@/api/filesystem-api";
 import {EyeInvisibleOutlined, EyeOutlined, ReloadOutlined, SyncOutlined} from "@ant-design/icons";
 import clsx from "clsx";
 import {cn} from "@/lib/utils";
-import {Strategy} from "@/src/api/strategy-api";
+import {Strategy} from "@/api/strategy-api";
 import {Base64} from 'js-base64';
-import {useLicense} from "@/src/hook/use-license";
+import {useLicense} from "@/hook/use-license";
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -226,14 +226,16 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
 
     let {t} = useTranslation();
 
-    let fileUploadRef = useRef<HTMLInputElement>();
-    let dirUploadRef = useRef<HTMLInputElement>();
+    let fileUploadRef = useRef<HTMLInputElement>(null);
+    let dirUploadRef = useRef<HTMLInputElement>(null);
+    const dragCounterRef = useRef(0);
 
     const [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
     let [currentDirectory, setCurrentDirectory] = useState('/');
     let [currentDirectoryForInput, setCurrentDirectoryForInput] = useState(currentDirectory);
     let [files, setFiles] = useState<FileInfo[]>([]);
     let [hiddenFileVisible, setHiddenFileVisible] = useState<boolean>(false);
+    const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const [transmissionRecords, transmissionDispatch] = useReducer(transmissionReducer, []);
 
@@ -262,6 +264,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     const [messageApi, messageContextHolder] = message.useMessage();
     const [contextMenu, setContextMenu] = useState<ContextMenu>(null);
     let [license] = useLicense();
+    const dragUploadHint = t('fs.drag_upload_hint', {defaultValue: '拖拽文件到此处上传'});
+    const dragUploadDisabledMessage = t('fs.drag_upload_disabled', {defaultValue: '当前策略不允许上传'});
 
     let editLabel = t('fs.operations.edit');
     if (license.isFree()) {
@@ -276,10 +280,20 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             disabled: contextMenu?.file?.isDir || license.isFree(),
             onClick: async () => {
                 let file = contextMenu.file;
+                const loadingKey = `loading`
+                messageApi.open({
+                    type: 'loading',
+                    key: loadingKey,
+                    content: 'Loading...',
+                    duration: 0,
+                })
+
                 try {
                     await fileEditor.openFile(file);
                 } catch (error) {
                     messageApi.error(`Failed to open file: ${error.message}`);
+                } finally {
+                    messageApi.destroy(loadingKey);
                 }
             },
         },
@@ -956,6 +970,60 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         }
     }
 
+    const handleDragEnter = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!strategy?.upload) {
+            event.dataTransfer.dropEffect = 'none';
+            return;
+        }
+        dragCounterRef.current += 1;
+        if (!isDraggingOver) {
+            setIsDraggingOver(true);
+        }
+    }, [strategy?.upload, isDraggingOver]);
+
+    const handleDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!strategy?.upload) {
+            event.dataTransfer.dropEffect = 'none';
+            return;
+        }
+        event.dataTransfer.dropEffect = 'copy';
+    }, [strategy?.upload]);
+
+    const handleDragLeave = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!strategy?.upload) {
+            return;
+        }
+        dragCounterRef.current = Math.max(0, dragCounterRef.current - 1);
+        if (dragCounterRef.current === 0) {
+            setIsDraggingOver(false);
+        }
+    }, [strategy?.upload]);
+
+    const handleDrop = useCallback(async (event: React.DragEvent<HTMLDivElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+        dragCounterRef.current = 0;
+        setIsDraggingOver(false);
+
+        if (!strategy?.upload) {
+            messageApi.warning(dragUploadDisabledMessage);
+            return;
+        }
+
+        const files = event.dataTransfer?.files;
+        if (!files || files.length === 0) {
+            return;
+        }
+
+        await handleUploadFile(files, fsId);
+    }, [strategy?.upload, messageApi, dragUploadDisabledMessage, handleUploadFile, fsId]);
+
     const realDeleteFile = async (keys: string[]) => {
         try {
             for (let key of keys) {
@@ -1225,50 +1293,70 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     </Col>
                 </Row>
 
-                <Table
-                    virtual
-                    // scroll={{y: window.innerHeight - 240}}
-                    rowKey={'path'}
-                    columns={fileColumns}
-                    rowSelection={rowSelection}
-                    dataSource={files}
-                    size={'small'}
-                    pagination={false}
-                    loading={filesQuery.isFetching}
-                    onRow={(file, index) => {
-                        return {
-                            onDoubleClick: event => {
-                                if (!file.isDir && !file.isLink) return;
-                                setCurrentDirectory(file.path);
-                            },
-                            onContextMenu: (event) => {
-                                event.preventDefault();
+                <div
+                    onDragEnter={handleDragEnter}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    className={cn(
+                        'relative',
+                        strategy?.upload && 'rounded-md border border-transparent transition-colors',
+                        strategy?.upload && isDraggingOver && 'border-dashed border-blue-400 bg-blue-50/60'
+                    )}
+                >
+                    {strategy?.upload && isDraggingOver && (
+                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                            <div
+                                className="rounded-md border border-blue-400 bg-white/90 px-6 py-3 text-sm font-medium text-blue-600">
+                                {dragUploadHint}
+                            </div>
+                        </div>
+                    )}
+                    <Table
+                        virtual
+                        // scroll={{y: window.innerHeight - 240}}
+                        rowKey={'path'}
+                        columns={fileColumns}
+                        rowSelection={rowSelection}
+                        dataSource={files}
+                        size={'small'}
+                        pagination={false}
+                        loading={filesQuery.isFetching}
+                        onRow={(file, index) => {
+                            return {
+                                onDoubleClick: event => {
+                                    if (!file.isDir && !file.isLink) return;
+                                    setCurrentDirectory(file.path);
+                                },
+                                onContextMenu: (event) => {
+                                    event.preventDefault();
 
-                                setSelectedRowKeys([file.path]);
+                                    setSelectedRowKeys([file.path]);
 
-                                const {innerWidth, innerHeight} = window;
-                                let adjustedX = event.pageX;
-                                let adjustedY = event.pageY;
-                                let menuRectWidth = 150;
-                                let menuRectHeight = 200;
+                                    const {innerWidth, innerHeight} = window;
+                                    let adjustedX = event.pageX;
+                                    let adjustedY = event.pageY;
+                                    let menuRectWidth = 150;
+                                    let menuRectHeight = 200;
 
-                                if (adjustedX + menuRectWidth > innerWidth) {
-                                    adjustedX = innerWidth - menuRectWidth;
+                                    if (adjustedX + menuRectWidth > innerWidth) {
+                                        adjustedX = innerWidth - menuRectWidth;
+                                    }
+
+                                    if (adjustedY + menuRectHeight > innerHeight) {
+                                        adjustedY = innerHeight - menuRectHeight;
+                                    }
+
+                                    setContextMenu({
+                                        pageX: adjustedX,
+                                        pageY: adjustedY,
+                                        file,
+                                    });
                                 }
-
-                                if (adjustedY + menuRectHeight > innerHeight) {
-                                    adjustedY = innerHeight - menuRectHeight;
-                                }
-
-                                setContextMenu({
-                                    pageX: adjustedX,
-                                    pageY: adjustedY,
-                                    file,
-                                });
                             }
-                        }
-                    }}
-                />
+                        }}
+                    />
+                </div>
 
                 <Drawer
                     title={
@@ -1416,10 +1504,10 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                         <div className="mt-4 p-3 bg-gray-50 rounded dark:bg-gray-700">
                             <div className="text-sm text-gray-600 dark:text-gray-300">
                                 {t('fs.attributes.permissions.label')}: {
-                                    ((chmodState.ownerRead ? 4 : 0) + (chmodState.ownerWrite ? 2 : 0) + (chmodState.ownerExecute ? 1 : 0)).toString() +
-                                    ((chmodState.groupRead ? 4 : 0) + (chmodState.groupWrite ? 2 : 0) + (chmodState.groupExecute ? 1 : 0)).toString() +
-                                    ((chmodState.publicRead ? 4 : 0) + (chmodState.publicWrite ? 2 : 0) + (chmodState.publicExecute ? 1 : 0)).toString()
-                                }
+                                ((chmodState.ownerRead ? 4 : 0) + (chmodState.ownerWrite ? 2 : 0) + (chmodState.ownerExecute ? 1 : 0)).toString() +
+                                ((chmodState.groupRead ? 4 : 0) + (chmodState.groupWrite ? 2 : 0) + (chmodState.groupExecute ? 1 : 0)).toString() +
+                                ((chmodState.publicRead ? 4 : 0) + (chmodState.publicWrite ? 2 : 0) + (chmodState.publicExecute ? 1 : 0)).toString()
+                            }
                             </div>
                         </div>
                     </div>

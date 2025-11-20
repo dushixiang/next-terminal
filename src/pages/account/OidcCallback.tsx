@@ -2,8 +2,8 @@ import React, {useEffect} from 'react';
 import {Result, Spin} from 'antd';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
-import oidcApi from '@/src/api/oidc-api';
-import {setToken} from '@/src/api/core/requests';
+import oidcApi from '@/api/oidc-api';
+import {setToken} from '@/api/core/requests';
 import {useTranslation} from 'react-i18next';
 
 const OidcCallback = () => {

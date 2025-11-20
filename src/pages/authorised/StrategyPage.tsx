@@ -2,12 +2,12 @@ import React, {useRef, useState} from 'react';
 
 import {App, Button, Popconfirm, Tag} from "antd";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import strategyApi, {Strategy} from '@/src/api/strategy-api';
+import strategyApi, {Strategy} from '@/api/strategy-api';
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
-import StrategyModal from "@/src/pages/authorised/StrategyModal";
+import {getSort} from "@/utils/sort";
+import StrategyModal from "@/pages/authorised/StrategyModal";
 import {useMutation} from "@tanstack/react-query";
-import NButton from "@/src/components/NButton";
+import NButton from "@/components/NButton";
 
 const api = strategyApi;
 

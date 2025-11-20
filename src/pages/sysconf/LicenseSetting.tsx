@@ -5,8 +5,8 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import licenseApi, {License} from "../../api/license-api";
 import {useTranslation} from "react-i18next";
 import {cn} from "@/lib/utils";
-import {useLicense} from "@/src/hook/use-license";
-import {useMobile} from "@/src/hook/use-mobile";
+import {useLicense} from "@/hook/use-license";
+import {useMobile} from "@/hook/use-mobile";
 
 const {Title, Text} = Typography;
 

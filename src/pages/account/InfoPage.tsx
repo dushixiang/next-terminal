@@ -3,13 +3,13 @@ import React from 'react';
 import ChangePassword from "./ChangePassword";
 import OTP from "./OTP";
 import {useTranslation} from "react-i18next";
-import AccessToken from "@/src/pages/account/AccessToken";
+import AccessToken from "@/pages/account/AccessToken";
 import {useSearchParams} from "react-router-dom";
-import {maybe} from "@/src/utils/maybe";
-import ChangeInfo from "@/src/pages/account/ChangeInfo";
-import {isMobileByMediaQuery} from "@/src/utils/utils";
+import {maybe} from "@/utils/maybe";
+import ChangeInfo from "@/pages/account/ChangeInfo";
+import {isMobileByMediaQuery} from "@/utils/utils";
 import {cn} from "@/lib/utils";
-import Passkey from "@/src/pages/account/Passkey";
+import Passkey from "@/pages/account/Passkey";
 
 const InfoPage = () => {
 

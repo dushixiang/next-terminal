@@ -1,21 +1,19 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {App, Button, Popconfirm, Tag} from "antd";
-import {ActionType, DragSortTable, ProColumns} from "@ant-design/pro-components";
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {App, Button, Tag} from "antd";
+import {ActionType, DragSortTable, ProColumns, TableDropdown} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
-import websiteApi, {SortPositionRequest, Website} from "@/src/api/website-api";
-import NButton from "@/src/components/NButton";
-import NLink from "@/src/components/NLink";
+import websiteApi, {SortPositionRequest, Website} from "@/api/website-api";
+import NButton from "@/components/NButton";
 import clsx from "clsx";
-import {getImgColor} from "@/src/helper/asset-helper";
+import {getImgColor} from "@/helper/asset-helper";
 import {useNavigate, useSearchParams} from "react-router-dom";
-import WebsiteDrawer from "@/src/pages/assets/WebsiteDrawer";
-import WebsiteGroupDrawer from "@/src/pages/assets/WebsiteGroupDrawer";
+import WebsiteDrawer from "@/pages/assets/WebsiteDrawer";
+import WebsiteGroupDrawer from "@/pages/assets/WebsiteGroupDrawer";
 import WebsiteTree from "./WebsiteTree";
 import {cn} from "@/lib/utils";
-import {useMobile} from "@/src/hook/use-mobile";
-import {useWindowSize} from "react-use";
-import {getSort} from "@/src/utils/sort";
+import {useMobile} from "@/hook/use-mobile";
+import {getSort} from "@/utils/sort";
 import {PanelLeftCloseIcon, PanelLeftOpenIcon} from "lucide-react";
 
 const api = websiteApi;
@@ -24,20 +22,52 @@ const WebsitePage = () => {
 
     const {isMobile} = useMobile();
     const {t} = useTranslation();
-    const {message} = App.useApp();
-    const actionRef = useRef<ActionType>();
+    const {message, modal} = App.useApp();
+    const actionRef = useRef<ActionType>(null);
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
     let [searchParams, setSearchParams] = useSearchParams();
+    const queryState = useMemo(() => {
+        const obj: Record<string, string> = {};
+        searchParams.forEach((value, key) => {
+            obj[key] = value;
+        });
+        return obj;
+    }, [searchParams]);
+
+    const applyQueryPatch = useCallback((patch: Record<string, string | undefined>) => {
+        const next: Record<string, string> = {...queryState};
+        Object.entries(patch).forEach(([key, value]) => {
+            if (value) {
+                next[key] = value;
+            } else {
+                delete next[key];
+            }
+        });
+        const sameSize = Object.keys(next).length === Object.keys(queryState).length;
+        const isSame = sameSize && Object.entries(next).every(([key, value]) => queryState[key] === value);
+        if (isSame) {
+            return;
+        }
+        setSearchParams(next);
+    }, [queryState, setSearchParams]);
     let [groupId, setGroupId] = useState(searchParams.get('groupId') || '');
     let [dataSource, setDataSource] = useState<Website[]>([]);
     const [groupDrawerOpen, setGroupDrawerOpen] = useState<boolean>(false);
     const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('');
     const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(false);
-    let {width} = useWindowSize();
 
     let navigate = useNavigate();
     const containerRef = useRef(null);
+
+    const websiteIdFromUrl = queryState.websiteId;
+
+    useEffect(() => {
+        if (websiteIdFromUrl) {
+            setOpen(true);
+            setSelectedRowKey(websiteIdFromUrl);
+        }
+    }, [websiteIdFromUrl]);
 
     const updateSortMutation = useMutation({
         mutationFn: (req: SortPositionRequest) => api.updateSortPosition(req),
@@ -70,17 +100,23 @@ const WebsitePage = () => {
         updateSortMutation.mutate(req);
     };
 
+    const openWebsiteEditor = (websiteId: string) => {
+        setOpen(true);
+        setSelectedRowKey(websiteId);
+        applyQueryPatch({websiteId});
+    };
+
     useEffect(() => {
-        setSearchParams({
-            groupId: groupId,
-        })
+        applyQueryPatch({
+            groupId: groupId || undefined,
+        });
         actionRef.current?.setPageInfo({
             pageSize: 10,
             current: 1,
         });
         actionRef.current?.reload();
 
-    }, [groupId]);
+    }, [applyQueryPatch, groupId]);
 
     const columns: ProColumns<Website>[] = [
         {
@@ -110,7 +146,14 @@ const WebsitePage = () => {
             dataIndex: 'name',
             width: 120,
             render: (text, record) => {
-                return <NLink to={`/website/${record['id']}`}>{text}</NLink>;
+                return (
+                    <span
+                        className={'cursor-pointer text-blue-600 hover:underline'}
+                        onClick={() => openWebsiteEditor(record.id)}
+                    >
+                        {text}
+                    </span>
+                );
             },
         },
         {
@@ -176,7 +219,7 @@ const WebsitePage = () => {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
-            width: 120,
+            width: 160,
             render: (text, record, _, action) => [
                 <NButton
                     key="access"
@@ -187,34 +230,49 @@ const WebsitePage = () => {
                 >
                     {isMobile ? t('assets.access').substring(0, 2) : t('assets.access')}
                 </NButton>,
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record['id']);
+                <TableDropdown
+                    key={`website-actions-${record.id}`}
+                    onSelect={(key) => {
+                        switch (key) {
+                            case 'edit':
+                                openWebsiteEditor(record.id);
+                                break;
+                            case 'view-authorised':
+                                navigate(`/authorised-website?websiteId=${record.id}`);
+                                break;
+                            case 'delete':
+                                modal.confirm({
+                                    title: t('general.delete_confirm'),
+                                    okText: t('actions.delete'),
+                                    okButtonProps: {danger: true},
+                                    onOk: async () => {
+                                        if (queryState.websiteId === record.id) {
+                                            applyQueryPatch({websiteId: undefined});
+                                            setOpen(false);
+                                            setSelectedRowKey(undefined);
+                                        }
+                                        await api.deleteById(record.id);
+                                        actionRef.current?.reload();
+                                    },
+                                });
+                                break;
+                        }
                     }}
-                >
-                    {isMobile ? t('actions.edit').substring(0, 2) : t('actions.edit')}
-                </NButton>,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>
-                        {isMobile ? t('actions.delete').substring(0, 2) : t('actions.delete')}
-                    </NButton>
-                </Popconfirm>,
+                    menus={[
+                        {key: 'edit', name: t('actions.edit')},
+                        {
+                            key: 'view-authorised',
+                            name: `${t('authorised.label.authorised')}${t('authorised.label.user')}`
+                        },
+                        {key: 'delete', name: t('actions.delete'), danger: true},
+                    ]}
+                />,
             ],
         },
     ];
 
     // 统一的 ProTable 配置
     const tableProps = {
-        className: 'border rounded-lg',
         columns,
         actionRef,
         request: async (params: any = {}, sort: any, filter: any) => {
@@ -223,7 +281,7 @@ const WebsitePage = () => {
                 sortOrder = "desc";  // 使用降序，让最大的 sort 显示在最上面
                 sortField = "sort";
             }
-            
+
             let queryParams = {
                 pageIndex: params.current,
                 pageSize: params.pageSize,
@@ -264,7 +322,17 @@ const WebsitePage = () => {
             >
                 {t('authorised.label.authorised')}
             </Button>,
+            groupId && (
+                <Button
+                    key="group-auth"
+                    onClick={() => navigate(`/authorised-website?websiteGroupId=${groupId}`)}
+                >
+                    {`${t('authorised.label.website_group')}${t('authorised.label.authorised')}`}
+                </Button>
+            ),
             <Button key="button" type="primary" onClick={() => {
+                applyQueryPatch({websiteId: undefined});
+                setSelectedRowKey(undefined);
                 setOpen(true)
             }}>
                 {t('actions.new')}
@@ -293,15 +361,15 @@ const WebsitePage = () => {
                     "grid gap-4 transition-all duration-300",
                     isTreeCollapsed ? "grid-cols-[48px_1fr]" : "grid-cols-[240px_1fr]"
                 )}>
-                    <div className="relative">
+                    <div className="relative border rounded-md dark:bg-[#141414]">
                         {!isTreeCollapsed && (
                             <WebsiteTree
                                 selected={groupId}
                                 onSelect={setGroupId}
                             />
                         )}
-                        
-                        <div 
+
+                        <div
                             className={cn(
                                 'absolute top-4 bg-gray-100 p-1.5 rounded dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors',
                                 isTreeCollapsed ? 'left-2' : 'right-4'
@@ -309,17 +377,17 @@ const WebsitePage = () => {
                             onClick={() => setIsTreeCollapsed(!isTreeCollapsed)}
                         >
                             {isTreeCollapsed ? (
-                                <PanelLeftOpenIcon className={'w-4 h-4'} />
+                                <PanelLeftOpenIcon className={'w-4 h-4'}/>
                             ) : (
-                                <PanelLeftCloseIcon className={'w-4 h-4'} />
+                                <PanelLeftCloseIcon className={'w-4 h-4'}/>
                             )}
                         </div>
                     </div>
-                    <div className="overflow-hidden">
+                    <div className="overflow-hidden rounded-md border">
                         <DragSortTable {...tableProps}
-                                  scroll={{
-                                      x: 'max-content'
-                                  }}
+                                       scroll={{
+                                           x: 'max-content'
+                                       }}
                         />
                     </div>
                 </div>
@@ -331,6 +399,7 @@ const WebsitePage = () => {
             id={selectedRowKey}
             open={open}
             onClose={() => {
+                applyQueryPatch({websiteId: undefined});
                 setOpen(false);
                 setSelectedRowKey(undefined);
             }}

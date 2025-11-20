@@ -1,16 +1,16 @@
 import React, {useRef, useState} from 'react';
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {App, Button, Popconfirm, Switch, Tag} from "antd";
 import {useMutation} from "@tanstack/react-query";
-import scheduledTaskApi, {ScheduledTask} from "@/src/api/scheduled-task-api";
-import ScheduledTaskModal from "@/src/pages/sysops/ScheduledTaskModal";
-import NButton from "@/src/components/NButton";
-import ScheduledTaskLogPage from "@/src/pages/sysops/ScheduledTaskLogPage";
-import {generateRandomId} from "@/src/utils/utils";
-import AccessTerminalBulk from "@/src/pages/access/AccessTerminalBulk";
-import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
+import scheduledTaskApi, {ScheduledTask} from "@/api/scheduled-task-api";
+import ScheduledTaskModal from "@/pages/sysops/ScheduledTaskModal";
+import NButton from "@/components/NButton";
+import ScheduledTaskLogPage from "@/pages/sysops/ScheduledTaskLogPage";
+import {generateRandomId} from "@/utils/utils";
+import AccessTerminalBulk from "@/pages/access/AccessTerminalBulk";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 
 const api = scheduledTaskApi;
 

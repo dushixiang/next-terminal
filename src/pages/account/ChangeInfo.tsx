@@ -2,7 +2,7 @@ import React from 'react';
 import {ProForm, ProFormText, ProFormTextArea} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {App, Typography} from "antd";
-import accountApi, {AccountInfo} from "@/src/api/account-api";
+import accountApi, {AccountInfo} from "@/api/account-api";
 
 const {Title} = Typography;
 

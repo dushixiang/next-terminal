@@ -1,15 +1,15 @@
 import React, {useRef, useState} from 'react';
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {App, Button, Drawer, Popconfirm, Select, Space, Table, Typography} from "antd";
-import sessionApi, {Session} from "@/src/api/session-api";
-import {renderSize} from "@/src/utils/utils";
-import SessionCommandPage from "@/src/pages/audit/SessionCommandPage";
-import NButton from "@/src/components/NButton";
+import sessionApi, {Session} from "@/api/session-api";
+import {renderSize} from "@/utils/utils";
+import SessionCommandPage from "@/pages/audit/SessionCommandPage";
+import NButton from "@/components/NButton";
 import {useMutation} from "@tanstack/react-query";
 import clsx from "clsx";
-import {getProtocolColor} from "@/src/helper/asset-helper";
+import {getProtocolColor} from "@/helper/asset-helper";
 
 
 const OfflineSessionPage = () => {

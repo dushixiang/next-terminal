@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {message, Modal, Transfer} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import departmentApi from "@/src/api/department-api";
-import userApi, {User} from "@/src/api/user-api";
+import departmentApi from "@/api/department-api";
+import userApi, {User} from "@/api/user-api";
 
 export interface DepartmentUserModalProps {
     departmentId?: string

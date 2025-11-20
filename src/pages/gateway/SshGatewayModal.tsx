@@ -10,9 +10,9 @@ import {
     ProFormTextArea
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import sshGatewayApi from "@/src/api/ssh-gateway-api";
-import credentialApi from "@/src/api/credential-api";
-import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
+import sshGatewayApi from "@/api/ssh-gateway-api";
+import credentialApi from "@/api/credential-api";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
 
 const api = sshGatewayApi;

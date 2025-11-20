@@ -1,10 +1,10 @@
 import React, {useId, useState} from 'react';
-import AccessTerminalBulkItem from "@/src/pages/access/AccessTerminalBulkItem";
+import AccessTerminalBulkItem from "@/pages/access/AccessTerminalBulkItem";
 import {FolderCodeIcon, TerminalIcon} from "lucide-react";
-import eventEmitter from "@/src/api/core/event-emitter";
+import eventEmitter from "@/api/core/event-emitter";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useWindowSize} from "react-use";
-import SnippetSheet from "@/src/pages/access/SnippetSheet";
+import SnippetSheet from "@/pages/access/SnippetSheet";
 
 interface Props {
     assetIds: string[];

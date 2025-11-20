@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
 import {Button, Card, Modal, Result, Space, Spin} from "antd";
-import accountApi, {AuthType} from "@/src/api/account-api";
+import accountApi, {AuthType} from "@/api/account-api";
 import {startAuthentication} from "@simplewebauthn/browser";
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
@@ -15,7 +15,7 @@ export interface Props {
 }
 
 interface Error {
-    code?: number
+    code?: number | string
     message?: string
 }
 
@@ -23,7 +23,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
     const {t} = useTranslation();
 
     const [authType, setAuthType] = useState<AuthType>('');
-    const [error, setError] = useState<Error>(null);
+    const [error, setError] = useState<Error | null>(null);
     const [loading, setLoading] = useState(false);
     const [otpValue, setOtpValue] = useState('');
     const [showSelector, setShowSelector] = useState(false);
@@ -89,7 +89,8 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
             const securityToken = await accountApi.generateSecurityTokenByWebauthnFinish(data.token, authentication);
             handleOk(securityToken);
         } catch (e: any) {
-            setError({code: e.code || 1, message: e.message || String(e)});
+            const code = typeof e?.code === 'number' ? e.code : undefined;
+            setError({code, message: e?.message || String(e)});
         } finally {
             setLoading(false);
         }
@@ -102,7 +103,8 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
         onError: (e: any) => {
             setOtpValue('');
             setOtpKey(prev => prev + 1); // 强制重新挂载以重新获得焦点
-            setError({code: e.code || 1, message: e.message || String(e)});
+            const code = typeof e?.code === 'number' ? e.code : 1;
+            setError({code, message: e?.message || String(e)});
         }
     });
 
@@ -203,14 +205,25 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
 
     // 渲染错误提示
     const renderError = () => {
+        if (!error) {
+            return <div className={'min-h-[24px] text-sm'} />;
+        }
+
+        let content: React.ReactNode = null;
+        if (typeof error.code === 'number' && error.code > 0) {
+            const key = `errors.${error.code}`;
+            const translated = t(key);
+            content = translated !== key ? translated : error.message;
+        } else {
+            content = error.message;
+        }
+
         return (
             <div className={'min-h-[24px] text-sm'}>
-                {error && error.code > 0 && (
-                    <div className={'text-red-500'}>{t(`errors.${error.code}`)}</div>
-                )}
+                {content && <div className={'text-red-500'}>{content}</div>}
             </div>
         );
-    }
+    };
 
 
     // 渲染未配置提示
@@ -299,6 +312,16 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
         />
     );
 
+    const renderPasskeyPending = () => (
+        <div className={'space-y-3 text-center'}>
+            <div className={'text-lg font-medium'}>{t('account.mfa_authing')}</div>
+            <div className={'text-sm text-gray-500'}>
+                {t('account.mfa_passkey_prompt', '请在浏览器弹出的窗口中完成 Passkey 认证')}
+            </div>
+            {renderSwitchButton()}
+        </div>
+    );
+
     // 渲染内容
     const renderContent = () => {
         if (showSelector) return renderSelector();
@@ -309,7 +332,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
             case 'otp':
                 return renderOTP();
             case 'passkey':
-                return error && error.code > 0 ? renderPasskeyError() : null;
+                return error ? renderPasskeyError() : renderPasskeyPending();
             default:
                 return null;
         }

@@ -1,9 +1,13 @@
-export const MessageTypeData = 0;
-export const MessageTypeResize = 1;
-export const MessageTypeJoin = 2;
-export const MessageTypeExit = 3;
-export const MessageTypeDirChanged = 4;
-export const MessageTypeKeepAlive = 5;
+export const MessageTypeError = 0;
+export const MessageTypeData = 1;
+export const MessageTypeResize = 2;
+export const MessageTypeJoin = 3;
+export const MessageTypeExit = 4;
+export const MessageTypeDirChanged = 5;
+export const MessageTypeKeepAlive = 6;
+export const MessageTypeAuthPrompt = 7; // 请求认证信息
+export const MessageTypeAuthReply = 8; // 回复认证信息
+export const MessageTypePing = 9; // Ping 延迟
 
 
 /**
@@ -76,7 +80,7 @@ export class Message {
 
     public static parse(value: string): Message {
         if (value === "") {
-            return new Message(0, "");
+            return new Message(1, "");
         }
 
         let typ = parseInt(value[0]);

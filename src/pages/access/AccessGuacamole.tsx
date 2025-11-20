@@ -1,28 +1,28 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {baseWebSocketUrl, getToken} from "@/src/api/core/requests";
+import {baseWebSocketUrl, getToken} from "@/api/core/requests";
 import qs from "qs";
 // @ts-ignore
 import Guacamole from '@dushixiang/guacamole-common-js';
 import {useTranslation} from "react-i18next";
 import {useWindowSize} from "react-use";
-import portalApi, {ExportSession} from "@/src/api/portal-api";
-import {useAccessContentSize} from "@/src/hook/use-access-size";
-import {useAccessTab} from "@/src/hook/use-access-tab";
-import FileSystemPage from "@/src/pages/access/FileSystemPage";
-import SessionSharerModal from "@/src/pages/access/SessionSharerModal";
-import GuacClipboard from "@/src/pages/access/GuacClipboard";
-import GuacdRequiredParameters from "@/src/pages/access/GuacdRequiredParameters";
+import portalApi, {ExportSession} from "@/api/portal-api";
+import {useAccessContentSize} from "@/hook/use-access-size";
+import {useAccessTab} from "@/hook/use-access-tab";
+import FileSystemPage from "@/pages/access/FileSystemPage";
+import SessionSharerModal from "@/pages/access/SessionSharerModal";
+import GuacClipboard from "@/pages/access/GuacClipboard";
+import GuacdRequiredParameters from "@/pages/access/GuacdRequiredParameters";
 import {useMutation} from "@tanstack/react-query";
 import {App, Watermark} from "antd";
 import copy from "copy-to-clipboard";
-import useWindowFocus from "@/src/hook/use-window-focus";
-import {dropKeydown, isFullScreen, requestFullScreen} from "@/src/utils/utils";
-import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
-import RenderState, {GuacamoleState} from "@/src/pages/access/guacamole/RenderState";
-import ControlButtons from "@/src/pages/access/guacamole/ControlButtons";
-import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
-import {debounce} from "@/src/utils/debounce";
-import {duplicateKeys} from "@/src/pages/access/guacamole/keys";
+import useWindowFocus from "@/hook/use-window-focus";
+import {dropKeydown, isFullScreen, requestFullScreen} from "@/utils/utils";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
+import RenderState, {GuacamoleState} from "@/pages/access/guacamole/RenderState";
+import ControlButtons from "@/pages/access/guacamole/ControlButtons";
+import {GuacamoleStatus} from "@/pages/access/guacamole/ErrorAlert";
+import {debounce} from "@/utils/debounce";
+import {duplicateKeys} from "@/pages/access/guacamole/keys";
 
 interface Props {
     assetId: string;

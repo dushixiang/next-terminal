@@ -2,17 +2,17 @@ import React, {useEffect, useRef, useState} from 'react';
 // @ts-ignore
 import Guacamole from "@dushixiang/guacamole-common-js";
 import {useWindowSize} from "react-use";
-import useWindowFocus from "@/src/hook/use-window-focus";
-import {debounce} from "@/src/utils/debounce";
-import {isFullScreen} from "@/src/utils/utils";
-import portalApi, {ExportSession} from "@/src/api/portal-api";
-import {baseWebSocketUrl} from "@/src/api/core/requests";
+import useWindowFocus from "@/hook/use-window-focus";
+import {debounce} from "@/utils/debounce";
+import {isFullScreen} from "@/utils/utils";
+import portalApi, {ExportSession} from "@/api/portal-api";
+import {baseWebSocketUrl} from "@/api/core/requests";
 import qs from "qs";
-import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
+import {GuacamoleStatus} from "@/pages/access/guacamole/ErrorAlert";
 import {useSearchParams} from "react-router-dom";
-import {maybe} from "@/src/utils/maybe";
-import RenderState from "@/src/pages/access/guacamole/RenderState";
-import {duplicateKeys} from "@/src/pages/access/guacamole/keys";
+import {maybe} from "@/utils/maybe";
+import RenderState from "@/pages/access/guacamole/RenderState";
+import {duplicateKeys} from "@/pages/access/guacamole/keys";
 
 const GuacamolePage = () => {
 

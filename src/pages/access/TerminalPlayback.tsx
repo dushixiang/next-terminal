@@ -3,19 +3,19 @@ import {useSearchParams} from 'react-router-dom';
 // @ts-ignore
 import * as AsciinemaPlayer from 'asciinema-player';
 import 'asciinema-player/dist/bundle/asciinema-player.css';
-import {baseUrl, getToken} from "@/src/api/core/requests";
+import {baseUrl, getToken} from "@/api/core/requests";
 import {Button, ConfigProvider, Descriptions, Drawer, Table, Tabs, TabsProps, theme} from "antd";
 import {TerminalSquare} from "lucide-react";
-import {maybe} from "@/src/utils/maybe";
+import {maybe} from "@/utils/maybe";
 import {useQuery} from "@tanstack/react-query";
-import sessionCommandApi from "@/src/api/session-command-api";
+import sessionCommandApi from "@/api/session-command-api";
 import {ColumnsType} from "antd/es/table";
-import sessionApi, {Session, SessionCommand} from "@/src/api/session-api";
+import sessionApi, {Session, SessionCommand} from "@/api/session-api";
 import {StyleProvider} from '@ant-design/cssinjs';
-import {renderSize} from "@/src/utils/utils";
-import times from "@/src/components/time/times";
+import {renderSize} from "@/utils/utils";
+import times from "@/components/time/times";
 import {useTranslation} from "react-i18next";
-import strings from "@/src/utils/strings";
+import strings from "@/utils/strings";
 import './TerminalPlayback.css';
 
 const TerminalPlayback = () => {

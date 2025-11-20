@@ -1,29 +1,25 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import {App, Badge, Button, Popover, Select, Space, Table, Tag, Tooltip, Upload} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {ActionType, DragSortTable, ProColumns, TableDropdown} from "@ant-design/pro-components";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
-import assetsApi, {Asset, SortPositionRequest} from '@/src/api/asset-api';
-import NButton from "@/src/components/NButton";
-import NLink from "@/src/components/NLink";
-import AssetTree from "@/src/pages/assets/AssetTree";
-import {accessAsset} from "@/src/helper/access-tab-channel";
+import assetsApi, {Asset, SortPositionRequest} from '@/api/asset-api';
+import NButton from "@/components/NButton";
+import AssetTree from "@/pages/assets/AssetTree";
+import {accessAsset} from "@/helper/access-tab-channel";
 import clsx from "clsx";
-import {getImgColor, getProtocolColor} from "@/src/helper/asset-helper";
-import AssetTreeChoose from "@/src/pages/assets/AssetTreeChoose";
-import {browserDownload, openOrSwitchToPage} from "@/src/utils/utils";
-import {useMobile} from "@/src/hook/use-mobile";
-import {ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
+import {getImgColor, getProtocolColor} from "@/helper/asset-helper";
+import AssetTreeChoose from "@/pages/assets/AssetTreeChoose";
+import {browserDownload, openOrSwitchToPage} from "@/utils/utils";
+import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
-import {ImperativePanelHandle} from "react-resizable-panels";
-import {useWindowSize} from "react-use";
 import {PanelLeftCloseIcon, PanelLeftOpenIcon} from "lucide-react";
-import {safeEncode} from "@/src/utils/codec";
-import AssetPostDrawer from "@/src/pages/assets/AssetPostDrawer";
-import {baseUrl} from "@/src/api/core/requests";
-import {getSort} from "@/src/utils/sort";
+import {safeEncode} from "@/utils/codec";
+import AssetPostDrawer from "@/pages/assets/AssetPostDrawer";
+import {baseUrl} from "@/api/core/requests";
+import {getSort} from "@/utils/sort";
 
 const api = assetsApi;
 
@@ -41,8 +37,33 @@ interface PostParams {
 const AssetPage = () => {
 
     const {isMobile} = useMobile();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
     let [searchParams, setSearchParams] = useSearchParams();
+
+    const queryState = useMemo(() => {
+        const obj: Record<string, string> = {};
+        searchParams.forEach((value, key) => {
+            obj[key] = value;
+        });
+        return obj;
+    }, [searchParams]);
+
+    const applyQueryPatch = useCallback((patch: Record<string, string | undefined>) => {
+        const next: Record<string, string> = {...queryState};
+        Object.entries(patch).forEach(([key, value]) => {
+            if (value) {
+                next[key] = value;
+            } else {
+                delete next[key];
+            }
+        });
+        const sameSize = Object.keys(next).length === Object.keys(queryState).length;
+        const isSame = sameSize && Object.entries(next).every(([key, value]) => queryState[key] === value);
+        if (isSame) {
+            return;
+        }
+        setSearchParams(next);
+    }, [queryState, setSearchParams]);
 
     let [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
     let [groupId, setGroupId] = useState(searchParams.get('groupId') || '');
@@ -60,21 +81,37 @@ const AssetPage = () => {
     let {t} = useTranslation();
     let {modal, message} = App.useApp();
 
-    const [isCollapsed, setIsCollapsed] = React.useState(false);
-    let leftRef = useRef<ImperativePanelHandle>();
-    let {height} = useWindowSize();
+    const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(false);
+
+    const assetIdFromUrl = queryState.assetId;
 
     useEffect(() => {
-        setSearchParams({
-            groupId: groupId,
-        })
+        if (assetIdFromUrl) {
+            setParams(prev => {
+                if (prev.open && prev.assetId === assetIdFromUrl) {
+                    return prev;
+                }
+                return {
+                    open: true,
+                    assetId: assetIdFromUrl,
+                    groupId: prev.groupId,
+                    copy: false,
+                };
+            });
+        }
+    }, [assetIdFromUrl]);
+
+    useEffect(() => {
+        applyQueryPatch({
+            groupId: groupId || undefined,
+        });
         actionRef.current?.setPageInfo({
             pageSize: 10,
             current: 1,
         });
         actionRef.current?.reload();
 
-    }, [groupId]);
+    }, [applyQueryPatch, groupId]);
 
     let tagsQuery = useQuery({
         queryKey: ['tags'],
@@ -123,6 +160,16 @@ const AssetPage = () => {
         <div>{t('assets.import_asset_tip')}</div>
     </>
 
+    const openAssetEditor = (assetId: string, options?: Partial<PostParams>) => {
+        setParams({
+            open: true,
+            assetId,
+            groupId: options?.groupId,
+            copy: options?.copy ?? false,
+        });
+        applyQueryPatch({assetId});
+    };
+
     const columns: ProColumns<Asset>[] = [
         {
             title: t('assets.sort'),
@@ -152,9 +199,14 @@ const AssetPage = () => {
             sorter: true,
             width: isMobile ? 120 : 200,
             render: (text, record) => {
-                let view = <NLink to={`/asset/${record['id']}`}>{text}</NLink>;
+                const handleOpen = () => openAssetEditor(record.id, {groupId: record.groupId});
                 return <div className={'flex flex-col'}>
-                    {view}
+                    <span
+                        className={'cursor-pointer text-blue-600 hover:underline'}
+                        onClick={handleOpen}
+                    >
+                        {text}
+                    </span>
                     {!isMobile && (
                         <Tooltip title={record.description}>
                             <div className={'text-gray-500 line-clamp-1'}>{record.description}</div>
@@ -322,29 +374,28 @@ const AssetPage = () => {
                         onSelect={(key) => {
                             switch (key) {
                                 case "copy":
-                                    setParams({
-                                        open: true,
-                                        assetId: record.id,
-                                        groupId: '',
-                                        copy: true,
-                                    })
+                                    openAssetEditor(record.id, {groupId: record.groupId, copy: true});
                                     break;
                                 case "edit":
-                                    setParams({
-                                        open: true,
-                                        assetId: record.id,
-                                        groupId: '',
-                                        copy: false,
-                                    })
+                                    openAssetEditor(record.id, {groupId: record.groupId});
                                     break;
-                                case 'asset-detail':
-                                    navigate(`/asset/${record['id']}?activeKey=info`);
+                                case 'view-authorised-asset':
+                                    navigate(`/authorised-asset?assetId=${record['id']}`);
                                     break;
                                 case 'delete':
                                     modal.confirm({
                                         title: t('general.delete_confirm'),
                                         okText: t('actions.delete'),
                                         onOk: async () => {
+                                            if (queryState.assetId === record.id) {
+                                                applyQueryPatch({assetId: undefined});
+                                                setParams({
+                                                    open: false,
+                                                    assetId: undefined,
+                                                    groupId: undefined,
+                                                    copy: false,
+                                                });
+                                            }
                                             await api.deleteById(record.id);
                                             actionRef.current?.reload();
                                         },
@@ -354,7 +405,10 @@ const AssetPage = () => {
                         menus={[
                             {key: 'copy', name: t('assets.copy')},
                             {key: 'edit', name: t('actions.edit')},
-                            {key: 'asset-detail', name: t('actions.detail')},
+                            {
+                                key: 'view-authorised-asset',
+                                name: `${t('authorised.label.authorised')}${t('authorised.label.user')}`
+                            },
                             {key: 'delete', name: t('actions.delete'), danger: true},
                         ]}
                     />,
@@ -395,7 +449,6 @@ const AssetPage = () => {
 
     // 统一的 ProTable 配置
     const tableProps = {
-        className: 'flex-grow border rounded-lg',
         columns,
         actionRef,
         request: async (params: any = {}, sort: any, filter: any) => {
@@ -502,9 +555,18 @@ const AssetPage = () => {
                 >
                     {t('authorised.label.authorised')}
                 </Button>,
+                groupId && (
+                    <Button
+                        key="group-auth"
+                        onClick={() => navigate(`/authorised-asset?assetGroupId=${groupId}`)}
+                    >
+                        {`${t('authorised.label.asset_group')}${t('authorised.label.authorised')}`}
+                    </Button>
+                ),
                 <Button key="add"
                         type="primary"
                         onClick={() => {
+                            applyQueryPatch({assetId: undefined});
                             setParams({
                                 open: true,
                                 assetId: undefined,
@@ -530,83 +592,55 @@ const AssetPage = () => {
 
     return (<div>
         <div className={cn('px-4', isMobile && 'px-2')}>
-            {/* 移动端资产树 - 在表格上方显示 */}
+            {/* 移动端网站树 - 在表格上方显示 */}
             {isMobile && (
-                <div className="mb-4 bg-white dark:bg-gray-800 rounded-lg">
-                    <AssetTree
-                        selected={groupId}
-                        onSelect={setGroupId}
-                    />
-                </div>
+                <>
+                    <div className="mb-4 bg-white dark:bg-gray-800 rounded-lg">
+                        <AssetTree
+                            selected={groupId}
+                            onSelect={setGroupId}
+                        />
+                    </div>
+                    <DragSortTable {...tableProps}/>
+                </>
             )}
 
-            {/* 桌面端使用可调整面板，移动端使用全宽布局 */}
-            {!isMobile ? (
-                <ResizablePanelGroup direction="horizontal"
-                                     className={cn(
-                                         !isCollapsed && 'gap-3'
-                                     )}
-                >
-                    <ResizablePanel
-                        defaultSize={15}
-                        style={{
-                            maxHeight: height - 40,
-                        }}
-                        collapsible={true}
-                        collapsedSize={2}
-                        onResize={(size) => {
-                            if (size === 2) {
-                                setIsCollapsed(true);
-                            } else {
-                                setIsCollapsed(false);
-                            }
-                        }}
-                        className={cn(
-                            "transition-all duration-300 ease-in-out",
-                            isCollapsed && "min-w-[48px]",
-                            !isCollapsed && "min-w-[240px]",
+            {/* 桌面端使用 Grid 布局 */}
+            {!isMobile && (
+                <div className={cn(
+                    "grid gap-4 transition-all duration-300",
+                    isTreeCollapsed ? "grid-cols-[48px_1fr]" : "grid-cols-[240px_1fr]"
+                )}>
+                    <div className="relative border rounded-md dark:bg-[#141414]">
+                        {!isTreeCollapsed && (
+                            <AssetTree
+                                selected={groupId}
+                                onSelect={setGroupId}
+                            />
                         )}
-                        ref={leftRef}
-                    >
-                        <div className={'relative'}>
-                            {!isCollapsed &&
-                                <AssetTree
-                                    selected={groupId}
-                                    onSelect={setGroupId}
-                                />
-                            }
 
-                            <div className={cn(
+                        <div
+                            className={cn(
                                 'absolute top-4 bg-gray-100 p-1.5 rounded dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors',
-                                isCollapsed ? 'left-2' : 'right-4'
+                                isTreeCollapsed ? 'left-2' : 'right-4'
                             )}
-                                 onClick={() => {
-                                     if (leftRef.current?.isCollapsed()) {
-                                         leftRef.current?.expand();
-                                     } else {
-                                         leftRef.current?.collapse();
-                                     }
-                                 }}
-                            >
-                                {isCollapsed ? (
-                                    <PanelLeftOpenIcon className={'w-4 h-4'}/>
-                                ) : (
-                                    <PanelLeftCloseIcon className={'w-4 h-4'}/>
-                                )}
-                            </div>
+                            onClick={() => setIsTreeCollapsed(!isTreeCollapsed)}
+                        >
+                            {isTreeCollapsed ? (
+                                <PanelLeftOpenIcon className={'w-4 h-4'}/>
+                            ) : (
+                                <PanelLeftCloseIcon className={'w-4 h-4'}/>
+                            )}
                         </div>
-                    </ResizablePanel>
-                    <ResizablePanel defaultSize={85}
-                                    onResize={(size) => {
-                                        console.log('resize content', size)
-                                    }}
-                    >
-                        <DragSortTable {...tableProps}/>
-                    </ResizablePanel>
-                </ResizablePanelGroup>
-            ) : (
-                /* 移动端表格 - 全宽显示，使用统一的 DragSortTable 配置 */
-                <DragSortTable {...tableProps}/>
+                    </div>
+                    <div className="overflow-hidden rounded-md border">
+                        <DragSortTable {...tableProps}
+                                       scroll={{
+                                           x: 'max-content'
+                                       }}
+                        />
+                    </div>
+                </div>
             )}
 
         </div>
@@ -624,6 +658,7 @@ const AssetPage = () => {
         <AssetPostDrawer
             open={params.open}
             onClose={() => {
+                applyQueryPatch({assetId: undefined});
                 setParams({
                     open: false,
                     assetId: undefined,

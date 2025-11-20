@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { isMobileByMediaQuery } from '@/src/utils/utils';
+import { isMobileByMediaQuery } from '@/utils/utils';
 
 /**
  * 移动端检测 Hook

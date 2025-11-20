@@ -9,7 +9,7 @@ import {
     ChartTooltipContent,
 } from "@/components/ui/chart"
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {renderSize} from "@/src/utils/utils";
+import {renderSize} from "@/utils/utils";
 
 interface PercentageChartProps {
     title: string

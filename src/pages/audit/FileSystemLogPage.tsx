@@ -1,9 +1,9 @@
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {Link} from "react-router-dom";
-import fileSystemLogApi, {FileSystemLog} from "@/src/api/fileystem-log-api";
+import fileSystemLogApi, {FileSystemLog} from "@/api/fileystem-log-api";
 import {App, Button} from "antd";
 import {useMutation} from "@tanstack/react-query";
 
@@ -33,7 +33,7 @@ const FileSystemLogPage = () => {
             dataIndex: 'assetName',
             hideInSearch: true,
             render: ((text, record) => {
-                return <Link to={`/asset/${record['assetId']}`}>{text}</Link>
+                return <Link to={`/asset?assetId=${record['assetId']}`}>{text}</Link>
             })
         },
         {

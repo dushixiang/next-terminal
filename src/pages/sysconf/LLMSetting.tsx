@@ -3,7 +3,7 @@ import { Alert, Button, Divider, Typography } from 'antd';
 import { SettingProps } from './SettingPage';
 import { useTranslation } from 'react-i18next';
 import { ProForm, ProFormDigit, ProFormSelect, ProFormSwitch, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { useMobile } from '@/src/hook/use-mobile';
+import { useMobile } from '@/hook/use-mobile';
 import { cn } from '@/lib/utils';
 
 const { Title } = Typography;

@@ -1,13 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import "@xterm/xterm/css/xterm.css";
-import XtermThemes from "@/src/color-theme/XtermThemes";
+import XtermThemes from "@/color-theme/XtermThemes";
 import {CheckCard} from '@ant-design/pro-components';
 import SimpleBar from "simplebar-react";
 import {useWindowSize} from "react-use";
-import {useTerminalTheme} from "@/src/hook/use-terminal-theme";
+import {useTerminalTheme} from "@/hook/use-terminal-theme";
 import {useTranslation} from 'react-i18next';
-import {useLicense} from "@/src/hook/use-license";
-import Disabled from "@/src/components/Disabled";
+import {useLicense} from "@/hook/use-license";
+import Disabled from "@/components/Disabled";
 
 const themes = XtermThemes;
 

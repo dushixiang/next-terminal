@@ -3,11 +3,11 @@ import {ProForm, ProFormInstance, ProFormText} from "@ant-design/pro-components"
 import {useTranslation} from "react-i18next";
 import {Alert, Button, Result, Typography} from "antd";
 import {useQuery} from "@tanstack/react-query";
-import brandingApi from "@/src/api/branding-api";
-import userApi from "@/src/api/user-api";
+import brandingApi from "@/api/branding-api";
+import userApi from "@/api/user-api";
 import {ValidateStatus} from "antd/es/form/FormItem";
 import {StyleProvider} from '@ant-design/cssinjs';
-import strings from "@/src/utils/strings";
+import strings from "@/utils/strings";
 
 const {Title} = Typography;
 

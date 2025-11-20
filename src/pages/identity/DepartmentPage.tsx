@@ -4,13 +4,13 @@ import {Button, message, Tag, Tree} from "antd";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import DepartmentModal from "./DepartmentModal";
 import {useNavigate} from "react-router-dom";
-import departmentApi, {Department} from '@/src/api/department-api';
+import departmentApi, {Department} from '@/api/department-api';
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import NLink from "@/src/components/NLink";
-import NButton from "@/src/components/NButton";
-import DepartmentUserModal from "@/src/pages/identity/DepartmentUserModal";
+import NLink from "@/components/NLink";
+import NButton from "@/components/NButton";
+import DepartmentUserModal from "@/pages/identity/DepartmentUserModal";
 
 const api = departmentApi;
 
@@ -85,7 +85,10 @@ const DepartmentPage = () => {
             title: t('general.name'),
             dataIndex: 'name',
             render: (text, record) => {
-                return <NLink to={`/department/${record.id}`}>{text}</NLink>;
+                return <a onClick={() => {
+                    setOpen(true);
+                    setSelectedRowKey(record.id);
+                }}>{text}</a>;
             },
         },
         {
@@ -124,7 +127,7 @@ const DepartmentPage = () => {
             title: t('actions.option'),
             valueType: 'option',
             key: 'option',
-            width: 100,
+            width: 160,
             render: (text, record, _, action) => [
                 <NButton key="edit" onClick={() => {
                     setSelectedRowKey(record.id);
@@ -146,6 +149,23 @@ const DepartmentPage = () => {
                 >
                     {t('actions.delete')}
                 </NButton>,
+                <TableDropdown
+                    key="more"
+                    onSelect={(key) => {
+                        switch (key) {
+                            case 'view-authorised-asset':
+                                navigate(`/authorised-asset?departmentId=${record.id}`);
+                                break;
+                            case 'view-authorised-website':
+                                navigate(`/authorised-website?departmentId=${record.id}`);
+                                break;
+                        }
+                    }}
+                    menus={[
+                        {key: 'view-authorised-asset', name: `${t('authorised.label.asset')}${t('authorised.label.authorised')}`},
+                        {key: 'view-authorised-website', name: `${t('authorised.label.website')}${t('authorised.label.authorised')}`},
+                    ]}
+                />,
             ],
         },
     ];

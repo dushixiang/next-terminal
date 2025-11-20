@@ -3,8 +3,8 @@ import { useQuery } from "@tanstack/react-query";
 import { Button, Drawer, Input, Spin } from "antd";
 import { ProCard } from "@ant-design/pro-components";
 import { ReloadOutlined } from '@ant-design/icons'
-import snippetUserApi from "@/src/api/snippet-user-api";
-import { Snippet } from "@/src/api/snippet-api";
+import snippetUserApi from "@/api/snippet-user-api";
+import { Snippet } from "@/api/snippet-api";
 import { useTranslation } from "react-i18next";
 import { CirclePlay } from "lucide-react";
 

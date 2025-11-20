@@ -1,30 +1,29 @@
 import React, {useRef, useState} from 'react';
 import {ActionType, DragSortTable, ProColumns} from "@ant-design/pro-components";
-import {App, Button, Popconfirm, Progress} from "antd";
+import {App, Button, Popconfirm, Progress, Tooltip} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
-import agentGatewayApi, {AgentGateway, SortPositionRequest} from "@/src/api/agent-gateway-api";
-import AgentGatewayModal from "@/src/pages/gateway/AgentGatewayModal";
-import AgentGatewayRegister from "@/src/pages/gateway/AgentGatewayRegister";
-import NButton from "@/src/components/NButton";
-import {useLicense} from "@/src/hook/use-license";
-import Disabled from "@/src/components/Disabled";
-import AgentGatewayTokenDrawer from "@/src/pages/gateway/AgentGatewayTokenDrawer";
+import agentGatewayApi, {AgentGateway, SortPositionRequest} from "@/api/agent-gateway-api";
+import AgentGatewayModal from "@/pages/gateway/AgentGatewayModal";
+import AgentGatewayRegister from "@/pages/gateway/AgentGatewayRegister";
+import NButton from "@/components/NButton";
+import {useLicense} from "@/hook/use-license";
+import AgentGatewayTokenDrawer from "@/pages/gateway/AgentGatewayTokenDrawer";
 import {ArrowDownIcon, ArrowUpIcon, HardDriveDownloadIcon, HardDriveUploadIcon} from "lucide-react";
-import {formatUptimeEn, getColor, renderSize} from "@/src/utils/utils";
-import AgentGatewayStat from "@/src/pages/gateway/AgentGatewayStat";
-import {getSort} from "@/src/utils/sort";
+import {formatUptimeEn, getColor, renderSize} from "@/utils/utils";
+import AgentGatewayStat from "@/pages/gateway/AgentGatewayStat";
+import {getSort} from "@/utils/sort";
 
 const api = agentGatewayApi;
 
-const linuxImg = new URL('@/src/assets/images/linux.png', import.meta.url).href;
-const windowsImg = new URL('@/src/assets/images/windows.png', import.meta.url).href;
-const macosImg = new URL('@/src/assets/images/macos.png', import.meta.url).href;
+const linuxImg = new URL('@/assets/images/linux.png', import.meta.url).href;
+const windowsImg = new URL('@/assets/images/windows.png', import.meta.url).href;
+const macosImg = new URL('@/assets/images/macos.png', import.meta.url).href;
 
 const AgentGatewayPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [registerOpen, setRegisterOpen] = useState<boolean>(false);
@@ -72,7 +71,7 @@ const AgentGatewayPage = () => {
     }
 
     const handleDragSortEnd = (beforeIndex: number, afterIndex: number, newDataSource: AgentGateway[]) => {
-        console.log('排序操作', {beforeIndex, afterIndex});
+        // console.log('排序操作', {beforeIndex, afterIndex});
 
         // 立即更新本地状态，避免闪烁
         setDataSource(newDataSource);
@@ -323,10 +322,37 @@ const AgentGatewayPage = () => {
         },
     ];
 
+    const registerLimitReached = license.isFree() && dataSource.length >= 1;
+
+    const renderRegisterButton = () => {
+        const button = (
+            <Button
+                type="primary"
+                disabled={registerLimitReached}
+                onClick={() => {
+                    setRegisterOpen(true)
+                }}
+            >
+                {t('gateways.register')}
+            </Button>
+        );
+
+        if (registerLimitReached) {
+            return (
+                <Tooltip key="register-button" title={t('gateways.free_limit_tip')}>
+                    <span style={{display: 'inline-block'}}>
+                        {button}
+                    </span>
+                </Tooltip>
+            );
+        }
+
+        return React.cloneElement(button, {key: 'register-button'});
+    };
+
     return (
         <div className={'w-full'}>
-            <Disabled disabled={license.isFree()}>
-                <DragSortTable
+            <DragSortTable
                     headerTitle={t('menus.gateway.submenus.agent_gateway')}
                     columns={columns}
                     actionRef={actionRef}
@@ -371,12 +397,8 @@ const AgentGatewayPage = () => {
                     }}
                     dateFormatter="string"
                     toolBarRender={() => [
-                        <Button key="button" type="primary" onClick={() => {
-                            setRegisterOpen(true)
-                        }}>
-                            {t('gateways.register')}
-                        </Button>,
-                        <Button key="button" color={'purple'} variant={'filled'} onClick={() => {
+                        renderRegisterButton(),
+                        <Button key="token-manage" color={'purple'} variant={'filled'} onClick={() => {
                             setTokenManageOpen(true)
                         }}>
                             {t('gateways.token_manage')}
@@ -391,7 +413,7 @@ const AgentGatewayPage = () => {
                     // }}
                 />
 
-                <AgentGatewayModal
+            <AgentGatewayModal
                     id={selectedRowKey}
                     open={open}
                     confirmLoading={mutation.isPending}
@@ -402,28 +424,27 @@ const AgentGatewayPage = () => {
                     handleOk={mutation.mutate}
                 />
 
-                <AgentGatewayRegister
+            <AgentGatewayRegister
                     open={registerOpen}
                     handleCancel={() => {
                         setRegisterOpen(false);
                     }}
                 />
 
-                <AgentGatewayTokenDrawer
+            <AgentGatewayTokenDrawer
                     open={tokenManageOpen}
                     onClose={() => {
                         setTokenManageOpen(false);
                     }}
                 />
 
-                <AgentGatewayStat
+            <AgentGatewayStat
                     open={statOpen}
                     id={selectedRowKey}
                     onClose={() => {
                         setStatOpen(false);
                     }}
                 />
-            </Disabled>
         </div>
     );
 };

@@ -2,12 +2,12 @@ import React, {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 // @ts-ignore
 import Guacamole from '@dushixiang/guacamole-common-js';
-import {baseWebSocketUrl, getToken} from "@/src/api/core/requests";
-import {debounce} from "@/src/utils/debounce";
+import {baseWebSocketUrl, getToken} from "@/api/core/requests";
+import {debounce} from "@/utils/debounce";
 import qs from "qs";
-import strings from "@/src/utils/strings";
-import {GuacamoleStatus} from "@/src/pages/access/guacamole/ErrorAlert";
-import RenderState from "@/src/pages/access/guacamole/RenderState";
+import strings from "@/utils/strings";
+import {GuacamoleStatus} from "@/pages/access/guacamole/ErrorAlert";
+import RenderState from "@/pages/access/guacamole/RenderState";
 
 const GuacdMonitor = () => {
 

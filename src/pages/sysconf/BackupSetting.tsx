@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import {Alert, Button, message, Space, Typography} from "antd";
-import requests from "@/src/api/core/requests";
+import requests from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 
 const {Title} = Typography;

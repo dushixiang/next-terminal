@@ -3,7 +3,7 @@ import {ProForm, ProFormDependency, ProFormSelect} from "@ant-design/pro-compone
 import {Col, Divider, Row, Tooltip} from "antd";
 import {Info} from "lucide-react";
 import {useTranslation} from "react-i18next";
-import {SettingProps} from "@/src/pages/sysconf/SettingPage";
+import {SettingProps} from "@/pages/sysconf/SettingPage";
 
 const NetworkSetting = ({get, set}: SettingProps) => {
     let {t} = useTranslation();

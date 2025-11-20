@@ -2,11 +2,11 @@ import React, {useRef, useState} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {App, Badge, Button, Popconfirm, Tag, Tooltip} from "antd";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
-import sshGatewayApi, {SSHGateway} from "@/src/api/ssh-gateway-api";
-import SshGatewayModal from "@/src/pages/gateway/SshGatewayModal";
-import NButton from "@/src/components/NButton";
+import sshGatewayApi, {SSHGateway} from "@/api/ssh-gateway-api";
+import SshGatewayModal from "@/pages/gateway/SshGatewayModal";
+import NButton from "@/components/NButton";
 
 const api = sshGatewayApi;
 

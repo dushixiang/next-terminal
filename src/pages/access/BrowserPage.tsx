@@ -1,8 +1,8 @@
 import React, {useEffect} from 'react';
-import {maybe} from "@/src/utils/maybe";
+import {maybe} from "@/utils/maybe";
 import {useSearchParams} from "react-router-dom";
 import './BrowserPage.css';
-import portalApi from "@/src/api/portal-api";
+import portalApi from "@/api/portal-api";
 
 const BrowserPage = () => {
 

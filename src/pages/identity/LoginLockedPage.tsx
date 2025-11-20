@@ -4,7 +4,7 @@ import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import loginLockedApi, {LoginLocked} from "../../api/login-locked-api";
 import {useTranslation} from "react-i18next";
 import NButton from "../../components/NButton";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 
 const LoginLockedPage = () => {
 

@@ -1,21 +1,55 @@
-import React, {useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useTranslation} from "react-i18next";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Button} from "antd";
-import authorisedWebsiteApi, {AuthorisedWebsite} from "@/src/api/authorised-website-api";
-import {UserSelect, DepartmentSelect, WebsiteSelect, WebsiteGroupSelect} from "@/src/components/shared/QuerySelects";
-import NButton from "@/src/components/NButton";
-import NLink from "@/src/components/NLink";
+import type {ProFormInstance} from "@ant-design/pro-components";
+import {Button} from "antd";
+import authorisedWebsiteApi, {AuthorisedWebsite} from "@/api/authorised-website-api";
+import {UserSelect, DepartmentSelect, WebsiteSelect, WebsiteGroupSelect} from "@/components/shared/QuerySelects";
+import NButton from "@/components/NButton";
+import NLink from "@/components/NLink";
 import dayjs from "dayjs";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 
 const AuthorisedWebsitePage = () => {
 
     const {t} = useTranslation();
     const actionRef = useRef<ActionType>();
+    const formRef = useRef<ProFormInstance>();
     let navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const {message} = App.useApp();
+    const urlState = useMemo(() => ({
+        userId: searchParams.get('userId') || undefined,
+        departmentId: searchParams.get('departmentId') || undefined,
+        websiteGroupId: searchParams.get('websiteGroupId') || undefined,
+        websiteId: searchParams.get('websiteId') || undefined,
+    }), [searchParams]);
+
+    const tableParams = useMemo(() => {
+        const filtered = Object.fromEntries(
+            Object.entries(urlState).filter(([, value]) => value)
+        );
+        return filtered;
+    }, [urlState]);
+
+    useEffect(() => {
+        formRef.current?.setFieldsValue(urlState);
+    }, [urlState]);
+
+    const syncUrl = useCallback((values: Record<string, any>) => {
+        const next: Record<string, string> = {};
+        Object.entries(values).forEach(([key, value]) => {
+            if (value) {
+                next[key] = String(value);
+            }
+        });
+        const sameSize = Object.keys(next).length === Object.keys(urlState).length;
+        const isSame = sameSize && Object.entries(next).every(([key, value]) => urlState[key as keyof typeof urlState] === value);
+        if (isSame) {
+            return;
+        }
+        setSearchParams(next);
+    }, [setSearchParams, urlState]);
 
     const columns: ProColumns<AuthorisedWebsite>[] = [
         {
@@ -26,6 +60,9 @@ const AuthorisedWebsitePage = () => {
         {
             title: t('authorised.label.user'),
             dataIndex: 'userName',
+            formItemProps: {
+                name: 'userId',
+            },
             renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
                 if (type === 'form') {
                     return null;
@@ -42,6 +79,9 @@ const AuthorisedWebsitePage = () => {
         {
             title: t('authorised.label.department'),
             dataIndex: 'departmentName',
+            formItemProps: {
+                name: 'departmentId',
+            },
             renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
                 if (type === 'form') {
                     return null;
@@ -56,8 +96,30 @@ const AuthorisedWebsitePage = () => {
             })
         },
         {
+            title: t('authorised.label.website'),
+            dataIndex: 'websiteName',
+            formItemProps: {
+                name: 'websiteId',
+            },
+            renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+                return <WebsiteSelect {...rest} />;
+            },
+            render: ((text, record) => {
+                if (text === '-') {
+                    return '-';
+                }
+                return <NLink to={`/website?websiteId=${record['websiteId']}`}>{text}</NLink>
+            })
+        },
+        {
             title: t('authorised.label.website_group'),
             dataIndex: 'websiteGroupName',
+            formItemProps: {
+                name: 'websiteGroupId',
+            },
             renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
                 if (type === 'form') {
                     return null;
@@ -69,22 +131,6 @@ const AuthorisedWebsitePage = () => {
                     return '-';
                 }
                 return <NLink to={`/website?groupId=${record.websiteGroupId}`}>{text}</NLink>
-            })
-        },
-        {
-            title: t('authorised.label.website'),
-            dataIndex: 'websiteName',
-            renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
-                if (type === 'form') {
-                    return null;
-                }
-                return <WebsiteSelect {...rest} />;
-            },
-            render: ((text, record) => {
-                if (text === '-') {
-                    return '-';
-                }
-                return <NLink to={`/website/${record['websiteId']}`}>{text}</NLink>
             })
         },
         {
@@ -149,14 +195,22 @@ const AuthorisedWebsitePage = () => {
             <ProTable
                 columns={columns}
                 actionRef={actionRef}
+                formRef={formRef}
+                params={tableParams}
+                form={{
+                    initialValues: urlState,
+                }}
+                onSubmit={(values) => syncUrl(values)}
+                onReset={() => syncUrl({})}
                 request={async (params = {}, sort, filter) => {
 
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        userId: params.userName,
-                        departmentId: params.departmentName,
-                        websiteId: params.websiteName,
+                        userId: params.userId,
+                        departmentId: params.departmentId,
+                        websiteGroupId: params.websiteGroupId,
+                        websiteId: params.websiteId,
                     }
                     let result = await authorisedWebsiteApi.paging(queryParams);
                     return {

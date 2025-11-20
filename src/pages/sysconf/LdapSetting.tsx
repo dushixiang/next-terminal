@@ -3,10 +3,10 @@ import {Alert, App, Button, Typography} from "antd";
 import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormDigit, ProFormSwitch, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import Disabled from "@/src/components/Disabled";
-import {useLicense} from "@/src/hook/use-license";
+import Disabled from "@/components/Disabled";
+import {useLicense} from "@/hook/use-license";
 import {useMutation} from "@tanstack/react-query";
-import userApi from "@/src/api/user-api";
+import userApi from "@/api/user-api";
 
 const LdapSetting = ({get, set}: SettingProps) => {
 

@@ -3,8 +3,8 @@ import {Alert, Col, Divider, Row, Typography} from "antd";
 import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormDependency, ProFormDigit, ProFormRadio, ProFormSwitch} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import NLink from "@/src/components/NLink";
-import {useMobile} from "@/src/hook/use-mobile";
+import NLink from "@/components/NLink";
+import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 
 const {Title} = Typography;

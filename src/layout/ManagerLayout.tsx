@@ -24,25 +24,25 @@ import accountApi from "../api/account-api";
 import {useTranslation} from "react-i18next";
 import {StyleProvider} from '@ant-design/cssinjs';
 import {useQuery} from "@tanstack/react-query";
-import brandingApi from "@/src/api/branding-api";
-import {hasMenu} from "@/src/utils/permission";
+import brandingApi from "@/api/branding-api";
+import {hasMenu} from "@/utils/permission";
 import clsx from "clsx";
 import './ManagerLayout.css'
 import {flushSync} from "react-dom";
-import eventEmitter from "@/src/api/core/event-emitter";
-import {debounce} from "@/src/utils/debounce";
+import eventEmitter from "@/api/core/event-emitter";
+import {debounce} from "@/utils/debounce";
 import SimpleBar from "simplebar-react";
-import {DarkTheme, DefaultTheme, useNTTheme} from "@/src/hook/use-theme";
-import {translateI18nToAntdLocale} from "@/src/helper/lang";
+import {DarkTheme, DefaultTheme, useNTTheme} from "@/hook/use-theme";
+import {translateI18nToAntdLocale} from "@/helper/lang";
 import {LanguagesIcon, LaptopIcon, LogOutIcon, UserIcon} from "lucide-react";
-import {openOrSwitchToPage} from "@/src/utils/utils";
-import {useMobile} from "@/src/hook/use-mobile";
-import {useLicense} from "@/src/hook/use-license";
+import {openOrSwitchToPage} from "@/utils/utils";
+import {useMobile} from "@/hook/use-mobile";
+import {useLicense} from "@/hook/use-license";
 import Marquee from 'react-fast-marquee';
 import dayjs from "dayjs";
-import {baseUrl} from "@/src/api/core/requests";
+import {baseUrl} from "@/api/core/requests";
 import i18n from "i18next";
-import {setThemeColor} from "@/src/utils/theme";
+import {setThemeColor} from "@/utils/theme";
 
 const breadcrumbNameMap = new Map<string, string>();
 

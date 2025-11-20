@@ -10,8 +10,8 @@ import {
     ProFormTextArea
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import certificateApi from "@/src/api/certificate-api";
-import strings from "@/src/utils/strings";
+import certificateApi from "@/api/certificate-api";
+import strings from "@/utils/strings";
 
 const api = certificateApi;
 
@@ -31,7 +31,7 @@ const CertificateModal = ({
                               id,
                           }: CertificateProps) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
 
     const get = async () => {

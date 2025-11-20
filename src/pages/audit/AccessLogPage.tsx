@@ -1,14 +1,14 @@
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {Link} from "react-router-dom";
-import accessLogApi, {AccessLog} from "@/src/api/access-log-api";
+import accessLogApi, {AccessLog} from "@/api/access-log-api";
 import {App, Button, Tag, Typography} from "antd";
 import {useMutation} from "@tanstack/react-query";
-import {renderSize} from "@/src/utils/utils";
+import {renderSize} from "@/utils/utils";
 import {useWindowSize} from 'react-use';
-import {useMobile} from "@/src/hook/use-mobile";
+import {useMobile} from "@/hook/use-mobile";
 
 const AccessLogPage = () => {
     const {t} = useTranslation();

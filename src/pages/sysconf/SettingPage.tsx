@@ -12,16 +12,16 @@ import propertyApi from "../../api/property-api";
 import {useTranslation} from "react-i18next";
 import {maybe} from "../../utils/maybe";
 
-import SystemSetting from "@/src/pages/sysconf/SystemSetting";
-import About from "@/src/pages/sysconf/About";
+import SystemSetting from "@/pages/sysconf/SystemSetting";
+import About from "@/pages/sysconf/About";
 import GeoIPSetting from "./GeoIPSetting";
 import BackupSetting from "./BackupSetting";
-import LogoSetting from "@/src/pages/sysconf/LogoSetting";
-import IdentitySetting from "@/src/pages/sysconf/IdentitySetting";
-import {useLicense} from "@/src/hook/use-license";
-import NetworkSetting from "@/src/pages/sysconf/NetworkSetting";
-import LLMSetting from "@/src/pages/sysconf/LLMSetting";
-import {useMobile} from "@/src/hook/use-mobile";
+import LogoSetting from "@/pages/sysconf/LogoSetting";
+import IdentitySetting from "@/pages/sysconf/IdentitySetting";
+import {useLicense} from "@/hook/use-license";
+import NetworkSetting from "@/pages/sysconf/NetworkSetting";
+import LLMSetting from "@/pages/sysconf/LLMSetting";
+import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 
 export interface SettingProps {

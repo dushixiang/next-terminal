@@ -2,9 +2,9 @@
 
 English | [简体中文](README.md)
 
-## Free Enterprise License — Simplify Your Operations and Audit Management!
+Note: Starting with v2.0.0, the backend code for this project is no longer open source.
 
-https://license.typesafe.cn/request-quote
+----
 
 ## Introduction
 

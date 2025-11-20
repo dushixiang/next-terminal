@@ -1,11 +1,11 @@
 import {App, Button, Tag, Typography} from 'antd';
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import loginLogApi from "@/src/api/login-log-api";
+import loginLogApi from "@/api/login-log-api";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
-import {LoginLog} from "@/src/api/user-api";
+import {LoginLog} from "@/api/user-api";
 
 const LoginLogPage = () => {
 

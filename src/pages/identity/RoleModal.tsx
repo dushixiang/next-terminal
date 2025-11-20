@@ -4,7 +4,7 @@ import roleApi, {TreeNode} from "../../api/role-api";
 import {useQuery} from "@tanstack/react-query";
 import {ProForm, ProFormInstance, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import strings from '@/src/utils/strings';
+import strings from '@/utils/strings';
 
 const api = roleApi;
 

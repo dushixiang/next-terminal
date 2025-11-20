@@ -2,9 +2,9 @@ import {App, Button, Tag, Tooltip} from 'antd';
 import React, {useRef} from 'react';
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
-import operationLogApi, {OperationLog} from "@/src/api/operation-log-api";
+import operationLogApi, {OperationLog} from "@/api/operation-log-api";
 
 const OperationLogPage = () => {
 

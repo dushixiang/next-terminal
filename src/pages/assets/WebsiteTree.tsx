@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
-import WebsiteTreeModal from "@/src/pages/assets/WebsiteTreeModal";
-import {generateRandomId} from "@/src/utils/utils";
+import WebsiteTreeModal from "@/pages/assets/WebsiteTreeModal";
+import {generateRandomId} from "@/utils/utils";
 import {useQuery} from "@tanstack/react-query";
-import websiteApi from "@/src/api/website-api";
+import websiteApi from "@/api/website-api";
 import {useTranslation} from "react-i18next";
 import {CogIcon, PackagePlusIcon, PlusIcon, TrashIcon} from "lucide-react";
 
@@ -217,7 +217,7 @@ const WebsiteTree = ({selected, onSelect}: Props) => {
     };
 
     return (
-        <div className={'rounded-lg border dark:bg-[#141414]'}>
+        <div>
             <div className={'px-4 pt-4 flex items-center justify-between'}>
                 <div className={'font-medium text-[15px] flex items-center gap-2'}>
                     <Tooltip title={t('actions.add')}>

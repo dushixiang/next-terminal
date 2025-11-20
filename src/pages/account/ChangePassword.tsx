@@ -5,7 +5,7 @@ import {ValidateStatus} from "antd/es/form/FormItem";
 import {useTranslation} from "react-i18next";
 import {redirect} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import {getCurrentUser} from "@/src/utils/permission";
+import {getCurrentUser} from "@/utils/permission";
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 const {Title} = Typography;

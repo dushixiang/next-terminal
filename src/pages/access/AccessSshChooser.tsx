@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {useQuery} from "@tanstack/react-query";
-import portalApi from "@/src/api/portal-api";
+import portalApi from "@/api/portal-api";
 import {Input, Modal, Tree, TreeDataNode, TreeProps} from "antd";
 import clsx from "clsx";
-import {getImgColor} from "@/src/helper/asset-helper";
+import {getImgColor} from "@/helper/asset-helper";
 import {useTranslation} from "react-i18next";
 
 interface Props {

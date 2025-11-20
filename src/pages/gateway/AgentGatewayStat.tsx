@@ -2,8 +2,8 @@ import React from 'react';
 import {Drawer} from "antd";
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
-import agentGatewayApi from "@/src/api/agent-gateway-api";
-import {CpuChart} from "@/src/components/charts/CpuChart";
+import agentGatewayApi from "@/api/agent-gateway-api";
+import {CpuChart} from "@/components/charts/CpuChart";
 import {
     ArrowDownIcon,
     ArrowUpIcon,
@@ -15,10 +15,10 @@ import {
     MemoryStickIcon,
     ServerIcon
 } from 'lucide-react';
-import {formatUptime, renderSize} from "@/src/utils/utils";
-import {MemoryChart} from "@/src/components/charts/MemoryChart";
-import {ConnChart} from "@/src/components/charts/ConnChart";
-import {StateChart} from "@/src/components/charts/StateChart";
+import {formatUptime, renderSize} from "@/utils/utils";
+import {MemoryChart} from "@/components/charts/MemoryChart";
+import {ConnChart} from "@/components/charts/ConnChart";
+import {StateChart} from "@/components/charts/StateChart";
 
 interface Props {
     open: boolean;

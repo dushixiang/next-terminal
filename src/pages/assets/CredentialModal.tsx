@@ -10,7 +10,7 @@ import {
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import credentialApi from "../../api/credential-api";
-import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
 
 const api = credentialApi;

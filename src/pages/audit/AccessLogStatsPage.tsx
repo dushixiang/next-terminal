@@ -11,9 +11,9 @@ import {
     ChartTooltipContent
 } from "@/components/ui/chart";
 import {Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxis, YAxis} from "recharts";
-import accessLogApi, {RealtimeMetrics, TopPages, TopReferers, WebsiteStats} from "@/src/api/access-log-api";
-import websiteApi from "@/src/api/website-api";
-import {renderSize} from "@/src/utils/utils";
+import accessLogApi, {RealtimeMetrics, TopPages, TopReferers, WebsiteStats} from "@/api/access-log-api";
+import websiteApi from "@/api/website-api";
+import {renderSize} from "@/utils/utils";
 import {
     ActivityIcon,
     EyeIcon,

@@ -1,9 +1,9 @@
 import React, {useEffect} from 'react';
-import Landing from "@/src/components/Landing";
+import Landing from "@/components/Landing";
 import {useNavigate} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import accountApi from "@/src/api/account-api";
-import {isMobileByMediaQuery} from "@/src/utils/utils";
+import accountApi from "@/api/account-api";
+import {isMobileByMediaQuery} from "@/utils/utils";
 
 const RedirectPage = () => {
 

@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Modal, Space} from "antd";
 import {ProForm, ProFormInstance, ProFormSwitch, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import strategyApi from "@/src/api/strategy-api";
+import strategyApi from "@/api/strategy-api";
 
 const api = strategyApi;
 

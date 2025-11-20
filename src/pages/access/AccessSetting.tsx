@@ -1,29 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {ProForm, ProFormCheckbox, ProFormDigit, ProFormInstance, ProFormSelect} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {CleanTheme, DefaultTerminalTheme, useTerminalTheme} from "@/src/hook/use-terminal-theme";
-import {isFontAvailable} from "@/src/utils/utils";
+import {CleanTheme, DefaultTerminalTheme, useTerminalTheme} from "@/hook/use-terminal-theme";
+import {getAvailableFonts} from "@/utils/utils";
 import {App} from "antd";
-import accessSettingApi from "@/src/api/access-setting-api";
-import {useAccessSetting} from "@/src/hook/use-access-setting";
+import accessSettingApi from "@/api/access-setting-api";
+import {useAccessSetting} from "@/hook/use-access-setting";
 import {useQuery} from "@tanstack/react-query";
-
-const fontList = [
-    // Windows 上常见的终端字体
-    'Consolas',
-    'Lucida Console',
-    'Courier New',
-    'Arial Mono',
-
-    // macOS 上常见的终端字体
-    'Menlo',
-    'Monaco',
-    'Courier',
-    'Helvetica Neue',
-
-    'JetBrains Mono',
-    'Monospace'
-];
 
 
 const AccessSetting = () => {
@@ -35,6 +18,9 @@ const AccessSetting = () => {
     let {message} = App.useApp();
 
     const [availableFonts, setAvailableFonts] = useState([]);
+    const [previewFont, setPreviewFont] = useState<string>('');
+    const [previewFontSize, setPreviewFontSize] = useState<number>(14);
+    const [previewLineHeight, setPreviewLineHeight] = useState<number>(1.2);
 
     let settingQuery = useQuery({
         queryKey: ['access-setting'],
@@ -49,15 +35,17 @@ const AccessSetting = () => {
     }, [settingQuery.data]);
 
     useEffect(() => {
-        const checkFonts = async () => {
-            const results = await Promise.all(
-                fontList
-                    .filter(font => isFontAvailable(font))
-            );
-            setAvailableFonts(results);
+        const loadFonts = async () => {
+            try {
+                const fonts = await getAvailableFonts();
+                setAvailableFonts(fonts);
+            } catch (error) {
+                console.error('Failed to load fonts:', error);
+                setAvailableFonts([]);
+            }
         };
 
-        checkFonts();
+        loadFonts();
     }, []);
 
     const get = async () => {
@@ -77,6 +65,12 @@ const AccessSetting = () => {
         if (setting.fontFamily == DefaultTerminalTheme.fontFamily) {
             setting.fontFamily = 'default';
         }
+
+        // 初始化预览状态
+        setPreviewFont(setting.fontFamily === 'default' ? DefaultTerminalTheme.fontFamily : setting.fontFamily);
+        setPreviewFontSize(setting.fontSize);
+        setPreviewLineHeight(setting.lineHeight);
+
         return setting
     }
 
@@ -110,6 +104,11 @@ const AccessSetting = () => {
                             <ProFormSelect label={t('access.settings.terminal.font.family')}
                                            showSearch={true}
                                            name="fontFamily" rules={[{required: true}]}
+                                           fieldProps={{
+                                               onChange: (value) => {
+                                                   setPreviewFont(value === 'default' ? DefaultTerminalTheme.fontFamily : value as string);
+                                               }
+                                           }}
                                            request={async () => {
                                                return [
                                                    {
@@ -129,6 +128,11 @@ const AccessSetting = () => {
                             <ProFormSelect label={t('access.settings.terminal.font.size')}
                                            name="fontSize"
                                            rules={[{required: true}]}
+                                           fieldProps={{
+                                               onChange: (value) => {
+                                                   setPreviewFontSize(value as number);
+                                               }
+                                           }}
                                            request={async () => {
                                                return [
                                                    {
@@ -184,8 +188,36 @@ const AccessSetting = () => {
                                 min={1.0}
                                 max={2.0}
                                 rules={[{required: true}]}
+                                fieldProps={{
+                                    onChange: (value) => {
+                                        if (value) {
+                                            setPreviewLineHeight(value);
+                                        }
+                                    }
+                                }}
                             />
 
+                        </div>
+
+                        {/* 字体预览区域 */}
+                        <div className={'my-4'}>
+                            <div className={'mb-2 font-semibold'}>{t('access.settings.font.preview')}</div>
+                            <div
+                                className={'p-4 border rounded bg-gray-50 dark:bg-[#141414] overflow-auto'}
+                                style={{
+                                    fontFamily: previewFont,
+                                    fontSize: `${previewFontSize}px`,
+                                    lineHeight: previewLineHeight,
+                                }}
+                            >
+                                <div>ABCDEFGHIJKLMNOPQRSTUVWXYZ</div>
+                                <div>abcdefghijklmnopqrstuvwxyz</div>
+                                <div>0123456789 !@#$%^&*()</div>
+                                <div>{'`~-_=+[]{}\\|;:\'",.<>/?'}</div>
+                                <div className={'mt-2'}>$ npm install next-terminal</div>
+                                <div>$ ssh user@192.168.1.100</div>
+                                <div>$ ps aux | grep node</div>
+                            </div>
                         </div>
 
                         <div>{t('access.settings.mouse.label')}</div>

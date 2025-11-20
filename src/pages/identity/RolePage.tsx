@@ -6,12 +6,12 @@ import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import RoleModal from "./RoleModal";
 import roleApi, {Role} from "../../api/role-api";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
 import NButton from "../../components/NButton";
-import NLink from "@/src/components/NLink";
-import {useLicense} from "@/src/hook/use-license";
-import Disabled from "@/src/components/Disabled";
+import NLink from "@/components/NLink";
+import {useLicense} from "@/hook/use-license";
+import Disabled from "@/components/Disabled";
 
 const api = roleApi;
 
@@ -61,7 +61,10 @@ const RolePage = () => {
             title: t('general.name'),
             dataIndex: 'name',
             render: (text, record) => {
-                return <NLink to={`/role/${record['id']}`}>{text}</NLink>;
+                return <a onClick={() => {
+                    setOpen(true);
+                    setSelectedRowKey(record['id']);
+                }}>{text}</a>;
             },
         },
         {

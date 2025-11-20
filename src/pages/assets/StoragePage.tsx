@@ -3,12 +3,12 @@ import {App, Button, Popconfirm, Tag} from "antd";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
-import storageApi,{Storage} from "@/src/api/storage-api";
-import StorageModal from "@/src/pages/assets/StorageModal";
-import {renderSize} from "@/src/utils/utils";
-import FileSystemPage from "@/src/pages/access/FileSystemPage";
-import NButton from "@/src/components/NButton";
-import {getSort} from "@/src/utils/sort";
+import storageApi,{Storage} from "@/api/storage-api";
+import StorageModal from "@/pages/assets/StorageModal";
+import {renderSize} from "@/utils/utils";
+import FileSystemPage from "@/pages/access/FileSystemPage";
+import NButton from "@/components/NButton";
+import {getSort} from "@/utils/sort";
 
 const api = storageApi;
 

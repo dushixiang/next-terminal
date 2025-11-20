@@ -1,4 +1,4 @@
-import {atomWithLocalStorage} from "@/src/hook/atom";
+import {atomWithLocalStorage} from "@/hook/atom";
 import {useAtom} from "jotai/index";
 import type {MapToken, SeedToken} from "antd/es/theme/interface";
 import {theme} from "antd";

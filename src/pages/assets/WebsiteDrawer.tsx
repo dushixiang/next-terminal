@@ -21,13 +21,13 @@ import { RcFile } from "antd/es/upload";
 import dayjs, { Dayjs } from "dayjs";
 import { ServerIcon, TrashIcon, UploadIcon } from "lucide-react";
 
-import websiteApi from "@/src/api/website-api";
-import agentGatewayApi from "@/src/api/agent-gateway-api";
-import assetsApi from "@/src/api/asset-api";
-import certificateApi from "@/src/api/certificate-api";
-import WebsiteModifyResponseView from "@/src/pages/assets/WebsiteModifyResponseView";
-import { useLicense } from "@/src/hook/use-license";
-import Disabled from "@/src/components/Disabled";
+import websiteApi from "@/api/website-api";
+import agentGatewayApi from "@/api/agent-gateway-api";
+import assetsApi from "@/api/asset-api";
+import certificateApi from "@/api/certificate-api";
+import WebsiteModifyResponseView from "@/pages/assets/WebsiteModifyResponseView";
+import { useLicense } from "@/hook/use-license";
+import Disabled from "@/components/Disabled";
 
 // ==================== 常量定义 ====================
 const DEFAULT_HTTP_PORT = '80';

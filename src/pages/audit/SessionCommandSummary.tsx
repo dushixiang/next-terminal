@@ -1,11 +1,11 @@
 import React, {useEffect, useRef} from 'react';
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {Tag} from "antd";
-import sessionCommandApi from "@/src/api/session-command-api";
-import strings from "@/src/utils/strings";
-import {SessionCommand} from "@/src/api/session-api";
+import sessionCommandApi from "@/api/session-command-api";
+import strings from "@/utils/strings";
+import {SessionCommand} from "@/api/session-api";
 
 interface Props {
     sessionId: string

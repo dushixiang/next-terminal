@@ -5,7 +5,7 @@ import {useTranslation} from "react-i18next";
 import DisplaySettings from './DisplaySettings';
 import SecuritySettings from './SecuritySettings';
 import WOLSettings from '../../../components/WOLSettings';
-import storageApi from "@/src/api/storage-api";
+import storageApi from "@/api/storage-api";
 
 interface AssetAdvancedSettingsProps {
     protocol: string;

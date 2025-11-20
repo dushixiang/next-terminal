@@ -3,11 +3,11 @@ import {ProForm, ProFormInstance, ProFormSelect, ProFormTreeSelect} from "@ant-d
 import {Checkbox, DatePicker, Form, message, Space} from "antd";
 import dayjs from "dayjs";
 import {useTranslation} from "react-i18next";
-import userApi from "@/src/api/user-api";
-import departmentApi from "@/src/api/department-api";
+import userApi from "@/api/user-api";
+import departmentApi from "@/api/department-api";
 import {RangePickerProps} from "antd/es/date-picker";
-import websiteApi from "@/src/api/website-api";
-import authorisedWebsiteApi from "@/src/api/authorised-website-api";
+import websiteApi from "@/api/website-api";
+import authorisedWebsiteApi from "@/api/authorised-website-api";
 import {useNavigate} from "react-router-dom";
 
 const AuthorisedWebsitePost = () => {

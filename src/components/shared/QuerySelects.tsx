@@ -1,10 +1,10 @@
 import React, {useState, useEffect} from 'react';
 import {useTranslation} from "react-i18next";
 import {Select} from "antd";
-import userApi, {User} from "@/src/api/user-api";
-import departmentApi, {Department} from "@/src/api/department-api";
-import assetApi, {Asset} from "@/src/api/asset-api";
-import websiteApi, {Website} from "@/src/api/website-api";
+import userApi, {User} from "@/api/user-api";
+import departmentApi, {Department} from "@/api/department-api";
+import assetApi, {Asset} from "@/api/asset-api";
+import websiteApi, {Website} from "@/api/website-api";
 
 interface SelectProps {
     value?: string;

@@ -2,7 +2,7 @@ import React from 'react';
 import {Tabs, TabsProps} from "antd";
 import {useSearchParams} from "react-router-dom";
 import ToolsPing from './ToolsPing';
-import ToolsTcping from "@/src/pages/sysops/ToolsTcping";
+import ToolsTcping from "@/pages/sysops/ToolsTcping";
 
 const ToolsPage = () => {
 

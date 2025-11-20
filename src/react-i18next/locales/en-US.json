@@ -680,6 +680,7 @@
       "theme": "Theme Settings",
       "system": "System Settings",
       "font": "Font Settings",
+      "font.preview": "Font Preview",
       "terminal": {
         "font": {
           "size": "Font Size",
@@ -1110,6 +1111,7 @@
     "online": "Online",
     "offline": "Offline",
     "register": "Register",
+    "free_limit_tip": "Free edition can register only 1 security gateway. Upgrade to unlock more.",
     "stat": {
       "label": "statistical data",
       "uptime": "Run time",

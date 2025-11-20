@@ -1,4 +1,4 @@
-import {Api} from "@/src/api/core/api";
+import {Api} from "@/api/core/api";
 
 export interface Strategy {
     id: string;

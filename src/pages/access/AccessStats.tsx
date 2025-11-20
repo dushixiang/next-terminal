@@ -1,4 +1,4 @@
-import React, {ComponentType, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
     ArrowUpDownIcon,
     CpuIcon,
@@ -9,22 +9,21 @@ import {
     MonitorCogIcon,
     MonitorPlayIcon
 } from "lucide-react";
-import {FixedSizeList as _FixedSizeList, FixedSizeListProps} from 'react-window';
+import {List, type RowComponentProps} from 'react-window';
 import {Tooltip} from "antd";
 import {ChartConfig, ChartContainer} from "@/components/ui/chart";
 import {Pie, PieChart} from "recharts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {useTranslation} from "react-i18next";
-import portalApi, {CPUUsage, Stats} from "@/src/api/portal-api";
+import portalApi, {CPUUsage, Stats} from "@/api/portal-api";
 import {useQuery} from "@tanstack/react-query";
-import strings from "@/src/utils/strings";
-import {renderSize} from "@/src/utils/utils";
+import strings from "@/utils/strings";
+import {renderSize} from "@/utils/utils";
 import SimpleBar from "simplebar-react";
 import {Skeleton} from "@/components/ui/skeleton";
 import {cn} from "@/lib/utils";
-import {CpuProgressBar} from '@/src/components/CpuProgressBar';
+import {CpuProgressBar} from '@/components/CpuProgressBar';
 
-const List = _FixedSizeList as unknown as ComponentType<FixedSizeListProps>;
 
 const defaultStats = {
     "info": {
@@ -65,7 +64,10 @@ const defaultStats = {
 }
 
 const CpuList = ({cpus}: { cpus: CPUUsage[] }) => {
-    const Row = ({index, style}: { index: number; style: React.CSSProperties }) => (
+
+    const Row = ({index, style, cpus}: RowComponentProps<{
+        cpus: CPUUsage[];
+    }>) => (
         <div style={style} className="flex gap-2 items-center px-2 py-1">
             <span className="w-6 text-right text-xs text-gray-400">{index + 1}</span>
             <CpuProgressBar cpu={cpus[index]} index={index}/>
@@ -74,13 +76,11 @@ const CpuList = ({cpus}: { cpus: CPUUsage[] }) => {
 
     return (
         <List
-            height={cpus.length > 16 ? 384 : cpus.length * 24}
-            itemCount={cpus.length}
-            itemSize={24}
-            width="100%"
-        >
-            {Row}
-        </List>
+            rowComponent={Row}
+            rowCount={cpus.length}
+            rowHeight={24}
+            rowProps={{cpus}}
+        />
     );
 };
 

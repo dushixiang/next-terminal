@@ -2,7 +2,7 @@ import {Modal} from 'antd';
 import React, {useRef} from 'react';
 import {ProForm, ProFormInstance, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import agentGatewayApi from "@/src/api/agent-gateway-api";
+import agentGatewayApi from "@/api/agent-gateway-api";
 
 const api = agentGatewayApi;
 

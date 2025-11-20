@@ -1,7 +1,7 @@
 import requests from "./core/requests";
 import {TreeDataNode} from "antd";
-import {Strategy} from "@/src/api/strategy-api";
-import {SessionSharer, SessionWatermark} from "@/src/api/session-api";
+import {Strategy} from "@/api/strategy-api";
+import {SessionSharer, SessionWatermark} from "@/api/session-api";
 
 export interface ExportSession {
     id: string;

@@ -4,8 +4,8 @@ import {Copy, RefreshCw, Save, X} from "lucide-react";
 import {Editor as MonacoEditor, loader} from '@monaco-editor/react';
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
-import fileSystemApi from "@/src/api/filesystem-api";
-import {OpenFile} from "@/src/hook/use-file-editor";
+import fileSystemApi from "@/api/filesystem-api";
+import {OpenFile} from "@/hook/use-file-editor";
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
@@ -66,7 +66,7 @@ const FileEditor: React.FC<Props> = ({
                                          onRefreshFile
                                      }) => {
     const {t} = useTranslation();
-    let {message, modal} = App.useApp();
+    let {message} = App.useApp();
 
     const [editorSaving, setEditorSaving] = useState<boolean>(false);
 

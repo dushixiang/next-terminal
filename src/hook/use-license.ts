@@ -1,5 +1,5 @@
 import {useQuery} from "@tanstack/react-query";
-import licenseApi, {SimpleLicense} from "@/src/api/license-api";
+import licenseApi, {SimpleLicense} from "@/api/license-api";
 
 export function useLicense() {
     const query = useQuery({

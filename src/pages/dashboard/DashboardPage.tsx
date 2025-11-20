@@ -1,8 +1,8 @@
-import React, {useEffect, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
-import dashboardApi from "@/src/api/dashboard-api";
-import sessionApi from "@/src/api/session-api";
+import dashboardApi from "@/api/dashboard-api";
+import sessionApi from "@/api/session-api";
 import CountUp from "react-countup";
 import {GlobeIcon, RouteIcon, ServerIcon, ShieldBanIcon, TerminalIcon, UsersIcon} from "lucide-react";
 import {
@@ -16,29 +16,29 @@ import {
 import {Area, AreaChart, CartesianGrid, Pie, PieChart, XAxis} from "recharts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import dayjs from "dayjs";
-import {useMobile} from "@/src/hook/use-mobile";
+import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 
 const chartConfig2 = {
     rdp: {
         label: "RDP",
-        color: "hsl(var(--chart-1))",
+        color: "var(--chart-1)",
     },
     vnc: {
         label: "VNC",
-        color: "hsl(var(--chart-2))",
+        color: "var(--chart-2)",
     },
     ssh: {
         label: "SSH",
-        color: "hsl(var(--chart-3))",
+        color: "var(--chart-3)",
     },
     telnet: {
         label: "TELNET",
-        color: "hsl(var(--chart-4))",
+        color: "var(--chart-4)",
     },
     http: {
         label: "HTTP",
-        color: "hsl(var(--chart-5))",
+        color: "var(--chart-5)",
     },
 } satisfies ChartConfig
 
@@ -67,15 +67,15 @@ const DashboardPage = () => {
     const chartConfig = {
         login: {
             label: t('dashboard.login_times'),
-            color: "hsl(var(--chart-1))",
+            color: "var(--chart-1)",
         },
         user: {
             label: t('dashboard.active_users'),
-            color: "hsl(var(--chart-2))",
+            color: "var(--chart-2)",
         },
         asset: {
             label: t('dashboard.active_assets'),
-            color: "hsl(var(--chart-3))",
+            color: "var(--chart-3)",
         },
     } satisfies ChartConfig
 

@@ -2,8 +2,8 @@ import React, {useEffect} from 'react';
 import {Result, Spin} from 'antd';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
-import wechatWorkApi from '@/src/api/wechat-work-api';
-import {setToken} from '@/src/api/core/requests';
+import wechatWorkApi from '@/api/wechat-work-api';
+import {setToken} from '@/api/core/requests';
 import {useTranslation} from 'react-i18next';
 
 const WechatWorkCallback = () => {

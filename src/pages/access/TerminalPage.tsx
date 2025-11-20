@@ -1,13 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {baseWebSocketUrl, getToken} from '@/src/api/core/requests';
+import {baseWebSocketUrl, getToken} from '@/api/core/requests';
 import qs from "qs";
 import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
 import {useSearchParams} from "react-router-dom";
-import {maybe} from "@/src/utils/maybe";
-import portalApi, {ExportSession} from "@/src/api/portal-api";
-import strings from "@/src/utils/strings";
+import {maybe} from "@/utils/maybe";
+import portalApi, {ExportSession} from "@/api/portal-api";
+import strings from "@/utils/strings";
 import {Message, MessageTypeData, MessageTypeKeepAlive, MessageTypeResize} from './Terminal';
 import {useInterval} from "react-use";
 

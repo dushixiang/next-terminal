@@ -2,7 +2,7 @@ import React from 'react';
 import {UploadIcon} from "lucide-react";
 import {message, Popconfirm, Tooltip, TreeDataNode, Typography, Upload} from "antd";
 import {useQuery} from "@tanstack/react-query";
-import {logoApi} from "@/src/api/logo-api";
+import {logoApi} from "@/api/logo-api";
 import {RcFile} from "antd/es/upload";
 import {useTranslation} from "react-i18next";
 

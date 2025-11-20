@@ -1,5 +1,5 @@
 import {Api} from "./core/api";
-import {Snippet} from "@/src/api/snippet-api";
+import {Snippet} from "@/api/snippet-api";
 
 class SnippetUserApi extends Api<Snippet>{
     constructor() {

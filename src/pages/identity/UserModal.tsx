@@ -2,6 +2,7 @@ import React, {useRef} from 'react';
 import {Col, Modal, Row} from "antd";
 import roleApi from "../../api/role-api";
 import userApi from "../../api/user-api";
+import departmentApi from "../../api/department-api";
 import {
     ProForm,
     ProFormDependency,
@@ -10,6 +11,7 @@ import {
     ProFormSelect,
     ProFormText,
     ProFormTextArea,
+    ProFormTreeSelect,
 } from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 
@@ -28,7 +30,9 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
 
     const get = async () => {
         if (id) {
-            return await userApi.getById(id);
+            const user = await userApi.getById(id);
+            // 后端返回的 departments 已经是字符串数组，无需转换
+            return user;
         }
         return {
             type: 'user',
@@ -47,6 +51,12 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
             onOk={() => {
                 formRef.current?.validateFields()
                     .then(async values => {
+                        // 转换 departments 字段格式：从 [{label, value}] 转为 [value1, value2]
+                        if (values.departments && Array.isArray(values.departments)) {
+                            values.departments = values.departments.map((dept: any) => {
+                                return typeof dept === 'object' ? dept.value : dept;
+                            });
+                        }
                         handleOk(values);
                     });
             }}
@@ -101,6 +111,22 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                         )
                     }}
                 </ProFormDependency>
+
+                <ProFormTreeSelect
+                    label={t('identity.user.department')}
+                    name='departments'
+                    fieldProps={{
+                        multiple: true,
+                        treeCheckable: true,
+                        showCheckedStrategy: 'SHOW_ALL',
+                        placeholder: t('identity.user.select_department'),
+                        treeDefaultExpandAll: true,
+                        treeCheckStrictly: true,
+                    }}
+                    request={async () => {
+                        return await departmentApi.getTree();
+                    }}
+                />
 
                 <Row gutter={8}>
                     <Col span={12}>

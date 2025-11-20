@@ -2,6 +2,8 @@ import userApi from "../../api/user-api";
 import {ProDescriptions} from "@ant-design/pro-components";
 import React from "react";
 import {useTranslation} from "react-i18next";
+import {Space} from "antd";
+import NLink from "@/components/NLink";
 
 interface UserInfoProps {
     active: boolean
@@ -62,6 +64,16 @@ const UserInfo = ({active, id}: UserInfoProps) => {
                         status: 'Success',
                     },
                 }}/>
+                <ProDescriptions.Item label={t('authorised.label.authorised')}>
+                    <Space size={12} wrap>
+                        <NLink to={`/authorised-asset?userId=${id}`}>
+                            {`${t('authorised.label.asset')}${t('authorised.label.authorised')}`}
+                        </NLink>
+                        <NLink to={`/authorised-website?userId=${id}`}>
+                            {`${t('authorised.label.website')}${t('authorised.label.authorised')}`}
+                        </NLink>
+                    </Space>
+                </ProDescriptions.Item>
                 <ProDescriptions.Item label={t('general.created_at')} dataIndex="createdAt" valueType='dateTime'/>
             </ProDescriptions>
         </div>

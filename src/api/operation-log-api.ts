@@ -1,6 +1,6 @@
 import {Api} from "./core/api";
-import requests from "@/src/api/core/requests";
-import {UserAgent} from "@/src/api/user-api";
+import requests from "@/api/core/requests";
+import {UserAgent} from "@/api/user-api";
 
 export interface OperationLog {
     id: string;

@@ -1,18 +1,18 @@
 import React, {useEffect, useRef, useState} from 'react';
 
-import {App, Button, Popconfirm, Popover, Space, Switch, Table, Upload} from "antd";
+import {App, Button, Popconfirm, Popover, Space, Switch, Table, Tag, Upload} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
-import userApi, {CreateUserResult, User} from "@/src/api/user-api";
+import userApi, {CreateUserResult, User} from "@/api/user-api";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import UserModal from "./UserModal";
 import {useMutation} from "@tanstack/react-query";
-import NButton from "@/src/components/NButton";
-import NLink from "@/src/components/NLink";
+import NButton from "@/components/NButton";
+import NLink from "@/components/NLink";
 import copy from 'copy-to-clipboard';
-import {maybe} from "@/src/utils/maybe";
-import UserResetPasswordModal from "@/src/pages/identity/UserResetPasswordModal";
+import {maybe} from "@/utils/maybe";
+import UserResetPasswordModal from "@/pages/identity/UserResetPasswordModal";
 
 const api = userApi;
 
@@ -106,7 +106,10 @@ ${t('identity.user.password')}: ${result.password}`)
             key: 'nickname',
             sorter: true,
             render: (text, record) => {
-                return <NLink to={`/user/${record['id']}`}>{text}</NLink>;
+                return <a onClick={() => {
+                    setOpen(true);
+                    setSelectedRowKey(record.id);
+                }}>{text}</a>;
             },
         },
         {
@@ -126,8 +129,19 @@ ${t('identity.user.password')}: ${result.password}`)
             key: 'departmentNames',
             hideInSearch: true,
             render: (_, record) => {
-                let departmentNames = record.departments;
-                return departmentNames?.map(d => d.name)?.join(', ') || '-';
+                const departments = record.departments;
+                if (!departments || departments.length === 0) {
+                    return '-';
+                }
+                return (
+                    <Space size={[0, 4]} wrap>
+                        {departments.map((dept, index) => (
+                            <Tag key={index} color="blue">
+                                {dept.name}
+                            </Tag>
+                        ))}
+                    </Space>
+                );
             }
         },
         {
@@ -235,6 +249,12 @@ ${t('identity.user.password')}: ${result.password}`)
                             case 'detail':
                                 navigate(`/user/${record['id']}?activeKey=info`);
                                 break;
+                            case 'view-authorised-asset':
+                                navigate(`/authorised-asset?userId=${record['id']}`);
+                                break;
+                            case 'view-authorised-website':
+                                navigate(`/authorised-website?userId=${record['id']}`);
+                                break;
                             case 'reset-password':
                                 bulkResetPassword([record['id']])
                                 break;
@@ -248,6 +268,8 @@ ${t('identity.user.password')}: ${result.password}`)
                     }}
                     menus={[
                         {key: 'detail', name: t('actions.detail')},
+                        {key: 'view-authorised-asset', name: `${t('authorised.label.asset')}${t('authorised.label.authorised')}`},
+                        {key: 'view-authorised-website', name: `${t('authorised.label.website')}${t('authorised.label.authorised')}`},
                         {key: 'reset-password', name: t('identity.user.options.reset.password.action')},
                         {key: 'reset-totp', name: t('identity.user.options.reset.otp.action')},
                         {key: 'login-policy', name: t('identity.options.login_policy')},

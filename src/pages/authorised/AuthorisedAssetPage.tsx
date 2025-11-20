@@ -1,21 +1,55 @@
-import React, {useRef} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useTranslation} from "react-i18next";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Button} from "antd";
-import authorisedAssetApi, {Authorised} from "@/src/api/authorised-asset-api";
-import {UserSelect, DepartmentSelect, AssetGroupSelect, AssetSelect} from "@/src/components/shared/QuerySelects";
-import NButton from "@/src/components/NButton";
-import NLink from "@/src/components/NLink";
+import type {ProFormInstance} from "@ant-design/pro-components";
+import {Button} from "antd";
+import authorisedAssetApi, {Authorised} from "@/api/authorised-asset-api";
+import {UserSelect, DepartmentSelect, AssetGroupSelect, AssetSelect} from "@/components/shared/QuerySelects";
+import NButton from "@/components/NButton";
+import NLink from "@/components/NLink";
 import dayjs from "dayjs";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useSearchParams} from "react-router-dom";
 
 const AuthorisedAssetPage = () => {
 
     const {t} = useTranslation();
     const actionRef = useRef<ActionType>();
+    const formRef = useRef<ProFormInstance>();
     let navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const {message} = App.useApp();
+    const urlState = useMemo(() => ({
+        userId: searchParams.get('userId') || undefined,
+        departmentId: searchParams.get('departmentId') || undefined,
+        assetGroupId: searchParams.get('assetGroupId') || undefined,
+        assetId: searchParams.get('assetId') || undefined,
+    }), [searchParams]);
+
+    const tableParams = useMemo(() => {
+        const filtered = Object.fromEntries(
+            Object.entries(urlState).filter(([, value]) => value)
+        );
+        return filtered;
+    }, [urlState]);
+
+    useEffect(() => {
+        formRef.current?.setFieldsValue(urlState);
+    }, [urlState]);
+
+    const syncUrl = useCallback((values: Record<string, any>) => {
+        const next: Record<string, string> = {};
+        Object.entries(values).forEach(([key, value]) => {
+            if (value) {
+                next[key] = String(value);
+            }
+        });
+        const sameSize = Object.keys(next).length === Object.keys(urlState).length;
+        const isSame = sameSize && Object.entries(next).every(([key, value]) => urlState[key as keyof typeof urlState] === value);
+        if (isSame) {
+            return;
+        }
+        setSearchParams(next);
+    }, [setSearchParams, urlState]);
 
     const columns: ProColumns<Authorised>[] = [
         {
@@ -26,6 +60,9 @@ const AuthorisedAssetPage = () => {
         {
             title: t('authorised.label.user'),
             dataIndex: 'userName',
+            formItemProps: {
+                name: 'userId',
+            },
             renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
                 if (type === 'form') {
                     return null;
@@ -42,6 +79,9 @@ const AuthorisedAssetPage = () => {
         {
             title: t('authorised.label.department'),
             dataIndex: 'departmentName',
+            formItemProps: {
+                name: 'departmentId',
+            },
             renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
                 if (type === 'form') {
                     return null;
@@ -56,8 +96,30 @@ const AuthorisedAssetPage = () => {
             })
         },
         {
+            title: t('authorised.label.asset'),
+            dataIndex: 'assetName',
+            formItemProps: {
+                name: 'assetId',
+            },
+            renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
+                if (type === 'form') {
+                    return null;
+                }
+                return <AssetSelect {...rest} />;
+            },
+            render: ((text, record) => {
+                if (text === '-') {
+                    return '-';
+                }
+                return <NLink to={`/asset?assetId=${record['assetId']}`}>{text}</NLink>
+            })
+        },
+        {
             title: t('authorised.label.asset_group'),
             dataIndex: 'assetGroupName',
+            formItemProps: {
+                name: 'assetGroupId',
+            },
             renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
                 if (type === 'form') {
                     return null;
@@ -69,19 +131,6 @@ const AuthorisedAssetPage = () => {
                     return '-';
                 }
                 return <NLink to={`/asset?groupId=${record.assetGroupId}`}>{text}</NLink>
-            })
-        },
-        {
-            title: t('authorised.label.asset'),
-            dataIndex: 'assetName',
-            renderFormItem: (_, {type, defaultRender, ...rest}, form) => {
-                if (type === 'form') {
-                    return null;
-                }
-                return <AssetSelect {...rest} />;
-            },
-            render: ((text, record) => {
-                return <NLink to={`/asset/${record['assetId']}`}>{text}</NLink>
             })
         },
         {
@@ -146,17 +195,22 @@ const AuthorisedAssetPage = () => {
             <ProTable
                 columns={columns}
                 actionRef={actionRef}
+                formRef={formRef}
+                params={tableParams}
+                form={{
+                    initialValues: urlState,
+                }}
+                onSubmit={(values) => syncUrl(values)}
+                onReset={() => syncUrl({})}
                 request={async (params = {}, sort, filter) => {
 
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        userId: params.userName,
-                        departmentId: params.departmentName,
-                        assetId: params.assetName,
-                        // 注意：后端不支持这些参数，需要根据实际API调整
-                        // commandFilterId: params.commandFilterName,
-                        // strategyId: params.strategyName,
+                        userId: params.userId,
+                        departmentId: params.departmentId,
+                        assetGroupId: params.assetGroupId,
+                        assetId: params.assetId,
                     }
                     let result = await authorisedAssetApi.paging(queryParams);
                     return {

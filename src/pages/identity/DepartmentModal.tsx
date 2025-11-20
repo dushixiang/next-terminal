@@ -2,8 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {Form, Input, InputNumber, Modal, TreeSelect} from "antd";
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
-import departmentApi, {Department, TreeNode} from "@/src/api/department-api";
-import userApi from "@/src/api/user-api";
+import departmentApi, {Department, TreeNode} from "@/api/department-api";
+import userApi from "@/api/user-api";
 
 export interface DepartmentModalProps {
     id?: string

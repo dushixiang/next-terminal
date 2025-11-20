@@ -1,6 +1,6 @@
 import React from 'react';
 import {Typography} from "antd";
-import {SessionCommand} from "@/src/api/session-api";
+import {SessionCommand} from "@/api/session-api";
 
 interface Props {
     command?: SessionCommand

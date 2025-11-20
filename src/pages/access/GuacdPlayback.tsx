@@ -2,10 +2,10 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 // @ts-ignore
 import Guacamole from '@dushixiang/guacamole-common-js';
-import {baseUrl, getToken} from "@/src/api/core/requests";
-import times from '@/src/components/time/times';
+import {baseUrl, getToken} from "@/api/core/requests";
+import times from '@/components/time/times';
 import {useTranslation} from "react-i18next";
-import strings from "@/src/utils/strings";
+import strings from "@/utils/strings";
 import './GuacdPlayback.css';
 import {ConfigProvider, Select, Slider, theme, Tooltip} from "antd";
 import {Pause, Play, Maximize, Minimize, SkipBack, SkipForward, Volume2, VolumeX} from "lucide-react";

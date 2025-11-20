@@ -4,11 +4,11 @@ import {App as AntdApp, ConfigProvider, Modal} from "antd";
 import Landing from "../components/Landing";
 import {StyleProvider} from '@ant-design/cssinjs';
 import './UserLayout.css';
-import FooterComponent from "@/src/layout/FooterComponent";
-import UserHeader from "@/src/layout/UserHeader";
-import eventEmitter from "@/src/api/core/event-emitter";
-import {debounce} from "@/src/utils/debounce";
-import {translateI18nToAntdLocale} from "@/src/helper/lang";
+import FooterComponent from "@/layout/FooterComponent";
+import UserHeader from "@/layout/UserHeader";
+import eventEmitter from "@/api/core/event-emitter";
+import {debounce} from "@/utils/debounce";
+import {translateI18nToAntdLocale} from "@/helper/lang";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
 

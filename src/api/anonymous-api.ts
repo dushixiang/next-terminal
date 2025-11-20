@@ -1,6 +1,6 @@
-import requests from "@/src/api/core/requests";
-import {Strategy} from "@/src/api/strategy-api";
-import {SessionWatermark} from "@/src/api/session-api";
+import requests from "@/api/core/requests";
+import {Strategy} from "@/api/strategy-api";
+import {SessionWatermark} from "@/api/session-api";
 
 export interface AnonymousSession {
     id: string

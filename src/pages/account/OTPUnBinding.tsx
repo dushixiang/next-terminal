@@ -3,7 +3,7 @@ import accountApi from "../../api/account-api";
 import {App, Button, message, Result} from "antd";
 import {ExclamationCircleOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
-import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 
 export interface UnBinding2faProps {
     refetch: () => void

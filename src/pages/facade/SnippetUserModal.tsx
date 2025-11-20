@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Modal} from "antd";
 import {ProForm, ProFormInstance, ProFormText, ProFormTextArea} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import snippetUserApi from "@/src/api/snippet-user-api";
+import snippetUserApi from "@/api/snippet-user-api";
 
 const api = snippetUserApi;
 

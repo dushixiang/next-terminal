@@ -10,9 +10,9 @@ import {
     ProFormTreeSelect
 } from "@ant-design/pro-components";
 import {Col, Modal, Popover, Row} from "antd";
-import scheduledTaskApi, {ScheduledTask} from "@/src/api/scheduled-task-api";
-import assetApi from "@/src/api/asset-api";
-import ScheduledTaskRuntime from "@/src/pages/sysops/ScheduledTaskRuntime";
+import scheduledTaskApi, {ScheduledTask} from "@/api/scheduled-task-api";
+import assetApi from "@/api/asset-api";
+import ScheduledTaskRuntime from "@/pages/sysops/ScheduledTaskRuntime";
 
 const ScheduledTaskModal = ({
                                 open,

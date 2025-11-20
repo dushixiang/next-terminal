@@ -1,5 +1,5 @@
 import React from 'react';
-import InfoPage from "@/src/pages/account/InfoPage";
+import InfoPage from "@/pages/account/InfoPage";
 import {useTranslation} from "react-i18next";
 
 const UserInfoPage = () => {

@@ -1,6 +1,6 @@
 import {Button, Form, Input, InputNumber} from 'antd';
 import React, {useState} from 'react';
-import {baseUrl, getToken} from "@/src/api/core/requests";
+import {baseUrl, getToken} from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 
 const ToolsPing = () => {

@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import strings from "@/src/utils/strings";
+import strings from "@/utils/strings";
 
 export const DateTime = `YYYY-MM-DD HH:mm:ss`
 

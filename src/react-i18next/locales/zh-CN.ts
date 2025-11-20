@@ -357,6 +357,8 @@ let o = {
             "public_key": "公钥",
             "password": "密码",
             "role": "角色",
+            "department": "部门",
+            "select_department": "请选择部门",
             "options": {
                 "reset": {
                     "password": {
@@ -1088,6 +1090,7 @@ let o = {
         "username": "账号",
         "account_type": {},
         "register": "注册",
+        "free_limit_tip": "免费版仅支持注册 1 个安全网关，如需更多请升级商业版。",
         "endpoint": "通信地址",
         "token": "通信令牌",
         "select_token": "请选择通信令牌",

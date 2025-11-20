@@ -1,10 +1,10 @@
 import React, {useState} from 'react';
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
-import brandingApi from "@/src/api/branding-api";
+import brandingApi from "@/api/branding-api";
 import {Drawer, Dropdown, Menu, Select, Spin} from "antd";
-import accountApi from "@/src/api/account-api";
-import {isMobileByMediaQuery, openOrSwitchToPage} from "@/src/utils/utils";
+import accountApi from "@/api/account-api";
+import {isMobileByMediaQuery, openOrSwitchToPage} from "@/utils/utils";
 import {
     ChevronDownIcon,
     LanguagesIcon,
@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
-import {useMobile} from "@/src/hook/use-mobile";
+import {useMobile} from "@/hook/use-mobile";
 
 const UserHeader = () => {
 

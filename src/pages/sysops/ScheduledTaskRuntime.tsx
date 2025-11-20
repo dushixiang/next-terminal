@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {useQuery} from "@tanstack/react-query";
-import scheduledTaskApi from '@/src/api/scheduled-task-api';
+import scheduledTaskApi from '@/api/scheduled-task-api';
 
 interface Props {
     open: boolean

@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import {Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
-import AssetTreeModal, {OP} from "@/src/pages/assets/AssetTreeModal";
-import {generateRandomId} from "@/src/utils/utils";
+import AssetTreeModal, {OP} from "@/pages/assets/AssetTreeModal";
+import {generateRandomId} from "@/utils/utils";
 import {useQuery} from "@tanstack/react-query";
-import assetApi from "@/src/api/asset-api";
+import assetApi from "@/api/asset-api";
 import {useTranslation} from "react-i18next";
 import {CogIcon, PackagePlusIcon, PlusIcon, TrashIcon} from "lucide-react";
 
@@ -215,7 +215,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
     };
 
     return (
-        <div className={'rounded-lg border dark:bg-[#141414]'}>
+        <div>
             <div className={'px-4 pt-4 flex items-center justify-between'}>
                 <div className={'font-medium text-[15px] flex items-center gap-2'}>
                     <Tooltip title={t('actions.add')}>

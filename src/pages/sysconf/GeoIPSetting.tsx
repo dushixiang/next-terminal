@@ -2,10 +2,10 @@ import React, {useEffect, useState} from 'react';
 import {Alert, Button, Card, Descriptions, message, Space} from "antd";
 import {useTranslation} from "react-i18next";
 import {Download, Info, MapPin} from 'lucide-react';
-import requests from '@/src/api/core/requests';
-import Disabled from "@/src/components/Disabled";
-import {useLicense} from "@/src/hook/use-license";
-import {renderSize} from "@/src/utils/utils";
+import requests from '@/api/core/requests';
+import Disabled from "@/components/Disabled";
+import {useLicense} from "@/hook/use-license";
+import {renderSize} from "@/utils/utils";
 import dayjs from "dayjs";
 
 interface GeoIPFileInfo {

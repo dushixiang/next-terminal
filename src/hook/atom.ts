@@ -1,5 +1,5 @@
 import {atom} from "jotai/index";
-import {SimpleLicense} from "@/src/api/license-api";
+import {SimpleLicense} from "@/api/license-api";
 
 export const atomWithLocalStorage = <T>(key: string, initialValue: T) => {
     const getInitialValue = () => {

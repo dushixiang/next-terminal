@@ -3,7 +3,8 @@ import departmentApi from "../../api/department-api";
 import {ProDescriptions} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
-import {Tag} from "antd";
+import {Space, Tag} from "antd";
+import NLink from "@/components/NLink";
 
 const api = departmentApi;
 
@@ -32,7 +33,7 @@ const DepartmentInfo = ({active, id}: DepartmentInfoProps) => {
 
     return (
         <ProDescriptions
-            column={2}
+            column={1}
             title={t('actions.detail')}
             dataSource={department}
             columns={[
@@ -68,6 +69,20 @@ const DepartmentInfo = ({active, id}: DepartmentInfoProps) => {
                     title: 'ID',
                     dataIndex: 'id',
                     copyable: true,
+                },
+                {
+                    title: t('authorised.label.authorised'),
+                    dataIndex: 'authorisedLinks',
+                    render: () => (
+                        <Space size={12} wrap>
+                            <NLink to={`/authorised-asset?departmentId=${id}`}>
+                                {`${t('authorised.label.asset')}${t('authorised.label.authorised')}`}
+                            </NLink>
+                            <NLink to={`/authorised-website?departmentId=${id}`}>
+                                {`${t('authorised.label.website')}${t('authorised.label.authorised')}`}
+                            </NLink>
+                        </Space>
+                    ),
                 },
             ]}
         />

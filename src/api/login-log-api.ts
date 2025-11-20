@@ -1,6 +1,6 @@
 import {Api} from "./core/api";
-import requests from "@/src/api/core/requests";
-import {LoginLog} from "@/src/api/user-api";
+import requests from "@/api/core/requests";
+import {LoginLog} from "@/api/user-api";
 
 class LoginLogApi extends Api<LoginLog> {
     constructor() {

@@ -3,9 +3,9 @@ import {Alert} from "antd";
 import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormSwitch, ProFormText, ProFormTreeSelect} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import Disabled from "@/src/components/Disabled";
-import {useLicense} from "@/src/hook/use-license";
-import departmentApi from "@/src/api/department-api";
+import Disabled from "@/components/Disabled";
+import {useLicense} from "@/hook/use-license";
+import departmentApi from "@/api/department-api";
 
 const WechatWorkSetting = ({get, set}: SettingProps) => {
 

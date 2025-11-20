@@ -1,5 +1,5 @@
-import requests from "@/src/api/core/requests";
-import strings from "@/src/utils/strings";
+import requests from "@/api/core/requests";
+import strings from "@/utils/strings";
 
 export type Setting = {
     fontSize: number;

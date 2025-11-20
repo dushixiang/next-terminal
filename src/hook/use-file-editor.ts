@@ -1,7 +1,7 @@
 import {useState} from 'react';
-import fileSystemApi, {FileInfo} from "@/src/api/filesystem-api";
-import {getLanguageFromFileName} from "@/src/utils/editor-language";
-import {downloadFileContent} from "@/src/utils/filesystem-utils";
+import fileSystemApi, {FileInfo} from "@/api/filesystem-api";
+import {getLanguageFromFileName} from "@/utils/editor-language";
+import {downloadFileContent} from "@/utils/filesystem-utils";
 
 interface OpenFile {
     key: string

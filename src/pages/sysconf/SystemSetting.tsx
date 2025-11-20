@@ -5,10 +5,10 @@ import {ProForm, ProFormCheckbox, ProFormSlider, ProFormSwitch, ProFormText} fro
 import {useTranslation} from "react-i18next";
 import {generate, green, presetPalettes, red} from '@ant-design/colors';
 import {Color} from "antd/es/color-picker";
-import {useLicense} from "@/src/hook/use-license";
-import Disabled from "@/src/components/Disabled";
+import {useLicense} from "@/hook/use-license";
+import Disabled from "@/components/Disabled";
 import {Upload as UploadIcon} from 'lucide-react';
-import {useMobile} from "@/src/hook/use-mobile";
+import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 
 const {Title, Text} = Typography;

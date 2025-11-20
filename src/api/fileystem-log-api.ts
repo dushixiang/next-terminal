@@ -1,5 +1,5 @@
-import {Api} from "@/src/api/core/api";
-import requests from "@/src/api/core/requests";
+import {Api} from "@/api/core/api";
+import requests from "@/api/core/requests";
 
 export interface FileSystemLog {
     id: string;

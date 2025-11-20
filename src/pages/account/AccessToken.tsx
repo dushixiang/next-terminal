@@ -2,8 +2,8 @@ import React from 'react';
 import {Button, Descriptions, Space, Typography} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import accountApi from "@/src/api/account-api";
-import times from "@/src/components/time/times";
+import accountApi from "@/api/account-api";
+import times from "@/components/time/times";
 
 const AccessToken = () => {
     let {t} = useTranslation();

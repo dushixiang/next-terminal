@@ -1,5 +1,5 @@
 import {global} from './global'
-import {AccountInfo} from "@/src/api/account-api";
+import {AccountInfo} from "@/api/account-api";
 
 export function isAdmin() {
     let user = getCurrentUser();

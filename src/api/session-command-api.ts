@@ -1,5 +1,5 @@
-import {Api} from "@/src/api/core/api";
-import {SessionCommand} from "@/src/api/session-api";
+import {Api} from "@/api/core/api";
+import {SessionCommand} from "@/api/session-api";
 
 class SessionCommandApi extends Api<SessionCommand> {
     constructor() {

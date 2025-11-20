@@ -1,7 +1,7 @@
 import React, {MutableRefObject, useCallback, useEffect, useRef, useState} from 'react';
 import Guacamole from '@dushixiang/guacamole-common-js';
-import portalApi, {ExportSession} from '@/src/api/portal-api';
-import {baseWebSocketUrl, getToken} from '@/src/api/core/requests';
+import portalApi, {ExportSession} from '@/api/portal-api';
+import {baseWebSocketUrl, getToken} from '@/api/core/requests';
 import qs from 'qs';
 
 interface Options {

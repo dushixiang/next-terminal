@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Modal} from "antd";
 import {ProForm, ProFormDigit, ProFormInstance, ProFormSwitch, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import storageApi from "@/src/api/storage-api";
+import storageApi from "@/api/storage-api";
 
 const api = storageApi;
 

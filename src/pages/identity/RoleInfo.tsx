@@ -4,8 +4,8 @@ import {useQuery} from "@tanstack/react-query";
 import {ProDescriptions} from "@ant-design/pro-components";
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
-import {useNTTheme} from "@/src/hook/use-theme";
-import strings from "@/src/utils/strings";
+import {useNTTheme} from "@/hook/use-theme";
+import strings from "@/utils/strings";
 
 const api = roleApi;
 

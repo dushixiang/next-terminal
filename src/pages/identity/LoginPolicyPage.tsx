@@ -5,11 +5,11 @@ import {Link, useNavigate} from "react-router-dom";
 import {SafetyCertificateOutlined, StopOutlined} from "@ant-design/icons";
 import loginPolicyApi, {LoginPolicy} from "../../api/login-policy-api";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import NButton from "../../components/NButton";
-import NLink from "@/src/components/NLink";
-import {useLicense} from "@/src/hook/use-license";
-import Disabled from "@/src/components/Disabled";
+import NLink from "@/components/NLink";
+import {useLicense} from "@/hook/use-license";
+import Disabled from "@/components/Disabled";
 
 const api = loginPolicyApi;
 
@@ -31,7 +31,7 @@ const LoginPolicyPage = () => {
             title: t('identity.policy.name'),
             dataIndex: 'name',
             render: (text, record) => {
-                return <NLink to={`/login-policy/${record['id']}`}>{text}</NLink>;
+                return <NLink to={`/login-policy/new?loginPolicyId=${record['id']}`}>{text}</NLink>;
             },
         },
         {

@@ -1,13 +1,13 @@
 import React, {useEffect} from 'react';
 import {useSearchParams} from "react-router-dom";
-import {maybe} from "@/src/utils/maybe";
+import {maybe} from "@/utils/maybe";
 import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
-import {baseWebSocketUrl, getToken} from "@/src/api/core/requests";
+import {baseWebSocketUrl, getToken} from "@/api/core/requests";
 import qs from "qs";
-import strings from "@/src/utils/strings";
-import {Message, MessageTypeData, MessageTypeExit, MessageTypeJoin} from "@/src/pages/access/Terminal";
+import strings from "@/utils/strings";
+import {Message, MessageTypeData, MessageTypeExit, MessageTypeJoin} from "@/pages/access/Terminal";
 
 const TerminalMonitor = () => {
 

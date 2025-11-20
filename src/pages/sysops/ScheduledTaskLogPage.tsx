@@ -1,11 +1,11 @@
 import React, {useEffect, useRef} from 'react';
 import {App, Button, Drawer, Progress, Tag, Space, Typography, Card} from "antd";
 import {ActionType, ProColumns, ProTable} from '@ant-design/pro-components';
-import scheduledTaskApi, {CheckStatusResult, ExecScriptResult, RenewCertificateResult, ScheduledTaskLog} from "@/src/api/scheduled-task-api";
-import NButton from "@/src/components/NButton";
+import scheduledTaskApi, {CheckStatusResult, ExecScriptResult, RenewCertificateResult, ScheduledTaskLog} from "@/api/scheduled-task-api";
+import NButton from "@/components/NButton";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
-import {maybe} from "@/src/utils/maybe";
+import {getSort} from "@/utils/sort";
+import {maybe} from "@/utils/maybe";
 import {CheckCircle, XCircle, Shield, Server, Code, ChevronDown, ChevronUp} from "lucide-react";
 
 const {Text, Title} = Typography;

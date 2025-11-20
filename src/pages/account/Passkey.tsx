@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
 import {useMutation, useQuery} from "@tanstack/react-query";
-import accountApi, {WebauthnCredential} from "@/src/api/account-api";
+import accountApi, {WebauthnCredential} from "@/api/account-api";
 import {App, Button, List, Typography} from "antd";
 import {useTranslation} from "react-i18next";
 import {startRegistration} from "@simplewebauthn/browser";
 import {KeySquareIcon, PencilLineIcon, Trash2Icon} from "lucide-react";
 import dayjs from "dayjs";
-import PasskeyModal from "@/src/pages/account/PasskeyModal";
+import PasskeyModal from "@/pages/account/PasskeyModal";
 
 const Passkey = () => {
 

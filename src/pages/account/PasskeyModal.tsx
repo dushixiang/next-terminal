@@ -2,7 +2,7 @@ import React, {useRef} from 'react';
 import {Modal} from "antd";
 import {useTranslation} from "react-i18next";
 import {ProForm, ProFormInstance, ProFormText} from "@ant-design/pro-components";
-import {WebauthnCredential} from "@/src/api/account-api";
+import {WebauthnCredential} from "@/api/account-api";
 
 export interface Props {
     open: boolean

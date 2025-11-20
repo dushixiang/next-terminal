@@ -1,4 +1,4 @@
-import eventEmitter from "@/src/api/core/event-emitter";
+import eventEmitter from "@/api/core/event-emitter";
 
 export const baseUrl = () => {
     if (import.meta.env.DEV) {

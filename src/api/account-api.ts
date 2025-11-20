@@ -1,6 +1,6 @@
 import requests from "./core/requests";
-import {setCurrentUser} from "@/src/utils/permission";
-import eventEmitter from "@/src/api/core/event-emitter";
+import {setCurrentUser} from "@/utils/permission";
+import eventEmitter from "@/api/core/event-emitter";
 import {PublicKeyCredentialCreationOptionsJSON} from "@simplewebauthn/browser/script/types";
 import type {PublicKeyCredentialRequestOptionsJSON} from "@simplewebauthn/browser/esm/types";
 

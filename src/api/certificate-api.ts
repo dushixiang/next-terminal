@@ -1,6 +1,6 @@
 import {Api} from "./core/api";
 import requests, {baseUrl, getToken} from "./core/requests";
-import {browserDownload} from "@/src/utils/utils";
+import {browserDownload} from "@/utils/utils";
 
 export interface Certificate {
     id: string;

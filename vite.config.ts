@@ -1,8 +1,9 @@
 import {defineConfig, PluginOption} from 'vite'
-import react from '@vitejs/plugin-react'
 import {resolve} from 'path';
 import {VitePWA} from 'vite-plugin-pwa';
 import {visualizer} from "rollup-plugin-visualizer";
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({mode}) => {
@@ -10,6 +11,7 @@ export default defineConfig(({mode}) => {
     return {
         plugins: [
             react(),
+            tailwindcss(),
             ...(isProd ? [
                 VitePWA({
                     registerType: 'autoUpdate',
@@ -48,7 +50,7 @@ export default defineConfig(({mode}) => {
             }) as unknown as PluginOption
         ],
         resolve: {
-            alias: {'@': resolve(__dirname, './')},
+            alias: {'@': resolve(__dirname, './src')},
         },
     }
 });

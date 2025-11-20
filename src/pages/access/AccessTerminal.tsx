@@ -5,19 +5,23 @@ import {SearchAddon} from "@xterm/addon-search";
 import {WebglAddon} from "@xterm/addon-webgl";
 import {CanvasAddon} from "@xterm/addon-canvas";
 import "@xterm/xterm/css/xterm.css";
-import portalApi, {ExportSession} from "@/src/api/portal-api";
+import portalApi, {ExportSession} from "@/api/portal-api";
 import {
     Message,
+    MessageTypeAuthPrompt,
+    MessageTypeAuthReply,
     MessageTypeData,
     MessageTypeDirChanged,
+    MessageTypeError,
     MessageTypeExit,
     MessageTypeJoin,
     MessageTypeKeepAlive,
+    MessageTypePing,
     MessageTypeResize
-} from "@/src/pages/access/Terminal";
+} from "@/pages/access/Terminal";
 import {useInterval, useWindowSize} from "react-use";
-import {CleanTheme, useTerminalTheme} from "@/src/hook/use-terminal-theme";
-import {useAccessTab} from "@/src/hook/use-access-tab";
+import {CleanTheme, useTerminalTheme} from "@/hook/use-terminal-theme";
+import {useAccessTab} from "@/hook/use-access-tab";
 import {
     ActivityIcon,
     BotIcon,
@@ -29,24 +33,24 @@ import {
     Share2Icon,
     XIcon
 } from "lucide-react";
-import SnippetSheet from "@/src/pages/access/SnippetSheet";
-import SessionSharerModal from "@/src/pages/access/SessionSharerModal";
-import ShellAssistantSheet from "@/src/pages/access/ShellAssistantSheet";
-import AccessStats from "@/src/pages/access/AccessStats";
+import SnippetSheet from "@/pages/access/SnippetSheet";
+import SessionSharerModal from "@/pages/access/SessionSharerModal";
+import ShellAssistantSheet from "@/pages/access/ShellAssistantSheet";
+import AccessStats from "@/pages/access/AccessStats";
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from "@/components/ui/resizable";
 import clsx from "clsx";
-import {debounce} from "@/src/utils/debounce";
-import FileSystemPage from "@/src/pages/access/FileSystemPage";
+import {debounce} from "@/utils/debounce";
+import FileSystemPage from "@/pages/access/FileSystemPage";
 import {App, Watermark} from "antd";
-import {useAccessContentSize} from "@/src/hook/use-access-size";
+import {useAccessContentSize} from "@/hook/use-access-size";
 import {cn} from "@/lib/utils";
-import {baseWebSocketUrl, getToken} from "@/src/api/core/requests";
+import {baseWebSocketUrl, getToken} from "@/api/core/requests";
 import qs from "qs";
-import MultiFactorAuthentication from "@/src/pages/account/MultiFactorAuthentication";
-import {isMac, isMobileByMediaQuery} from "@/src/utils/utils";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
+import {isMac, isMobileByMediaQuery} from "@/utils/utils";
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
-import accessSettingApi, {Setting} from "@/src/api/access-setting-api";
+import accessSettingApi, {Setting} from "@/api/access-setting-api";
 
 interface Props {
     assetId: string;
@@ -59,13 +63,13 @@ const AccessTerminal = ({assetId}: Props) => {
     let {t} = useTranslation();
 
     const divRef = React.useRef<HTMLDivElement>(null);
-    const terminalRef = useRef<Terminal>();
-    const fitRef = useRef<FitAddon>();
-    const searchRef = useRef<SearchAddon>();
-    const webglRef = useRef<WebglAddon>();
-    const canvasRef = useRef<CanvasAddon>();
+    const terminalRef = useRef<Terminal>(null);
+    const fitRef = useRef<FitAddon>(null);
+    const searchRef = useRef<SearchAddon>(null);
+    const webglRef = useRef<WebglAddon>(null);
+    const canvasRef = useRef<CanvasAddon>(null);
 
-    let [websocket, setWebsocket] = useState<WebSocket>();
+    let websocketRef = useRef<WebSocket>(null); // 使用 ref 来存储 websocket
     let [session, setSession] = useState<ExportSession>();
 
     let [accessTheme] = useTerminalTheme();
@@ -81,13 +85,13 @@ const AccessTerminal = ({assetId}: Props) => {
     let [statsOpen, setStatsOpen] = useState(false);
     let [shellAssistantOpen, setShellAssistantOpen] = useState(false);
     let [shellAssistantEnabled, setShellAssistantEnabled] = useState(false);
+    const [pingDelay, setPingDelay] = useState<number | null>(null);
 
-    let [loading, setLoading] = useState(false);
     let [reconnected, setReconnected] = useState('');
     let [contentSize] = useAccessContentSize();
 
     let {notification, message} = App.useApp();
-    const fsRef = useRef();
+    const fsRef = useRef(null);
 
     let [mfaOpen, setMfaOpen] = useState(false);
 
@@ -96,6 +100,11 @@ const AccessTerminal = ({assetId}: Props) => {
     let [searchTerm, setSearchTerm] = useState('');
     let [searchMatchIndex, setSearchMatchIndex] = useState(0);
     let [searchMatchCount, setSearchMatchCount] = useState(0);
+
+    // 交互式认证状态
+    let [authMode, setAuthMode] = useState<'none' | 'username' | 'password'>('none');
+    let [authUsername, setAuthUsername] = useState('');
+    let [authPassword, setAuthPassword] = useState('');
 
     // 获取访问设置和 Shell 助手状态
     useEffect(() => {
@@ -107,7 +116,7 @@ const AccessTerminal = ({assetId}: Props) => {
                 console.error('Failed to fetch access setting:', error);
             }
         };
-        
+
         const fetchShellAssistantEnabled = async () => {
             try {
                 const result = await accessSettingApi.getShellAssistantEnabled();
@@ -117,16 +126,18 @@ const AccessTerminal = ({assetId}: Props) => {
                 setShellAssistantEnabled(false);
             }
         };
-        
+
         fetchAccessSetting();
         fetchShellAssistantEnabled();
     }, []);
 
     useInterval(() => {
-        if (websocket?.readyState === WebSocket.OPEN) {
-            websocket?.send(new Message(MessageTypeKeepAlive, "").toString());
+        const ws = websocketRef.current;
+        if (ws?.readyState === WebSocket.OPEN) {
+            const timestamp = Date.now();
+            ws.send(new Message(MessageTypePing, timestamp.toString()).toString());
         }
-    }, 5000);
+    }, 1000);
 
     useEffect(() => {
         let current = accessTab.split('_')[1];
@@ -184,7 +195,10 @@ const AccessTerminal = ({assetId}: Props) => {
             try {
                 const clipboardText = await navigator.clipboard.readText();
                 const text = normalizeNewlines(clipboardText);
-                websocket?.send(new Message(MessageTypeData, text).toString());
+                const ws = websocketRef.current;
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(new Message(MessageTypeData, text).toString());
+                }
             } catch (error) {
                 console.error('Failed to read clipboard:', error);
             }
@@ -197,7 +211,7 @@ const AccessTerminal = ({assetId}: Props) => {
             selectionChange?.dispose();
             divElement?.removeEventListener("contextmenu", handleContextMenu);
         };
-    }, [accessSetting, websocket, terminalRef.current]);
+    }, [accessSetting, terminalRef.current]);
 
     useEffect(() => {
         if (terminalRef.current || !divRef.current) return;
@@ -248,12 +262,12 @@ const AccessTerminal = ({assetId}: Props) => {
         // 尝试加载 WebGL 渲染器，失败时回退到 Canvas 渲染器
         let webglAddon: WebglAddon | null = null;
         let canvasAddon: CanvasAddon | null = null;
-        
+
         try {
             webglAddon = new WebglAddon();
             term.loadAddon(webglAddon);
             console.log('✅ WebGL renderer loaded successfully - Hardware acceleration enabled');
-            
+
             // WebGL 特定优化
             if (webglAddon && 'preserveDrawingBuffer' in webglAddon) {
                 // 启用绘图缓冲区保持，提高渲染性能
@@ -299,10 +313,9 @@ const AccessTerminal = ({assetId}: Props) => {
     };
 
     const connect = async (securityToken?: string) => {
-        if (loading === true) {
+        if (websocketRef.current !== null) {
             return;
         }
-        setLoading(true);
         let session: ExportSession;
         try {
             session = await portalApi.createSessionByAssetsId(assetId, securityToken);
@@ -325,14 +338,16 @@ const AccessTerminal = ({assetId}: Props) => {
         let paramStr = qs.stringify(params);
         let websocket = new WebSocket(`${baseWebSocketUrl()}/access/terminal?${paramStr}`);
 
-        terminalRef.current?.writeln('trying to connect to the server...');
         websocket.onopen = (e => {
-            setLoading(false);
+            terminalRef.current?.clear();
+            setPingDelay(null);
         });
 
         websocket.onerror = (e) => {
             console.error(`websocket error`, e);
             terminalRef.current?.writeln(`websocket error`);
+            setPingDelay(null);
+            websocketRef.current = null;
         }
 
         websocket.onclose = (e) => {
@@ -345,15 +360,19 @@ const AccessTerminal = ({assetId}: Props) => {
                 terminalRef.current?.writeln('');
                 terminalRef.current?.writeln(`\x1b[41m ${session.protocol.toUpperCase()} \x1b[0m ${session.assetName}: session closed.`);
             }
-            setLoading(false);
             terminalRef.current?.writeln('Press any key to reconnect');
 
-            setWebsocket(null);
+            setPingDelay(null);
+            websocketRef.current = null;
         }
 
         websocket.onmessage = (e) => {
             let msg = Message.parse(e.data);
             switch (msg.type) {
+                case MessageTypeError:
+                    terminalRef.current.write(msg.content);
+                    websocketRef?.current.close();
+                    break;
                 case MessageTypeData:
                     terminalRef.current.write(msg.content);
                     break;
@@ -374,9 +393,36 @@ const AccessTerminal = ({assetId}: Props) => {
                 case MessageTypeDirChanged:
                     onDirChanged(msg.content);
                     break;
+                case MessageTypeKeepAlive:
+                    websocket?.send(new Message(MessageTypePing, "").toString());
+                    break;
+                case MessageTypeAuthPrompt:
+                    // 收到认证提示，根据内容决定提示什么
+                    if (msg.content === 'password') {
+                        // 只需要密码
+                        terminalRef.current.write('Password: ');
+                        setAuthMode('password');
+                        setAuthPassword('');
+                    } else {
+                        // 需要用户名和密码
+                        terminalRef.current.write('Username: ');
+                        setAuthMode('username');
+                        setAuthUsername('');
+                        setAuthPassword('');
+                    }
+                    break;
+                case MessageTypePing:
+                    if (msg.content) {
+                        const sentAt = parseInt(msg.content, 10);
+                        if (!Number.isNaN(sentAt)) {
+                            const latency = Date.now() - sentAt;
+                            setPingDelay(latency >= 0 ? latency : 0);
+                        }
+                    }
+                    break;
             }
         }
-        setWebsocket(websocket);
+        websocketRef.current = websocket;
     }
 
     const connectWrap = async () => {
@@ -388,32 +434,105 @@ const AccessTerminal = ({assetId}: Props) => {
         }
     }
 
+    // 处理认证输入
+    const handleAuthInput = (data: string) => {
+        if (authMode === 'username') {
+            // 输入用户名
+            if (data === '\r' || data === '\n') {
+                // 用户按下回车，切换到密码输入
+                terminalRef.current.writeln('');
+                terminalRef.current.write('Password: ');
+                setAuthMode('password');
+            } else if (data === '\x7f' || data === '\b') {
+                // 退格键
+                if (authUsername.length > 0) {
+                    setAuthUsername(authUsername.slice(0, -1));
+                    terminalRef.current.write('\b \b');
+                }
+            } else if (data >= ' ' && data <= '~') {
+                // 可打印字符
+                setAuthUsername(authUsername + data);
+                terminalRef.current.write(data);
+            }
+        } else if (authMode === 'password') {
+            // 输入密码
+            if (data === '\r' || data === '\n') {
+                // 用户按下回车，提交认证信息
+                terminalRef.current.writeln('');
+
+                // 根据是否有用户名来决定发送内容
+                let authContent: string;
+                if (authUsername) {
+                    // 有用户名，发送 username\npassword
+                    authContent = `${authUsername}\n${authPassword}`;
+                } else {
+                    // 只有密码，直接发送密码
+                    authContent = authPassword;
+                }
+
+                // 使用 ref 获取最新的 WebSocket 连接
+                const ws = websocketRef.current;
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    ws.send(new Message(MessageTypeAuthReply, authContent).toString());
+                } else {
+                    console.error('WebSocket is not open', ws?.readyState);
+                    terminalRef.current.writeln('\r\n\x1b[41m ERROR \x1b[0m : Connection lost, please try again');
+                }
+
+                // 重置认证状态
+                setAuthMode('none');
+                setAuthUsername('');
+                setAuthPassword('');
+            } else if (data === '\x7f' || data === '\b') {
+                // 退格键
+                if (authPassword.length > 0) {
+                    setAuthPassword(authPassword.slice(0, -1));
+                    terminalRef.current.write('\b \b');
+                }
+            } else if (data >= ' ' && data <= '~') {
+                // 可打印字符，不回显
+                setAuthPassword(authPassword + data);
+                terminalRef.current.write('*'); // 显示星号
+            }
+        }
+    }
+
     useEffect(() => {
         if (!terminalRef.current) {
             return;
         }
+        setAuthMode('none');
         connectWrap();
     }, [terminalRef.current, reconnected]);
 
     useEffect(() => {
         let sizeListener = terminalRef.current?.onResize(function (evt) {
             // console.log(`term resize`, evt.cols, evt.rows);
-            websocket?.send(new Message(MessageTypeResize, `${evt.cols},${evt.rows}`).toString());
+            const ws = websocketRef.current;
+            if (ws?.readyState === WebSocket.OPEN) {
+                ws.send(new Message(MessageTypeResize, `${evt.cols},${evt.rows}`).toString());
+            }
         });
         let dataListener = terminalRef.current?.onData(data => {
-            if (!websocket) {
+            // 如果处于认证模式，拦截输入用于认证
+            if (authMode !== 'none') {
+                handleAuthInput(data);
+                return;
+            }
+
+            const ws = websocketRef.current;
+            if (!ws) {
                 setReconnected(new Date().toString());
-            } else {
-                websocket?.send(new Message(MessageTypeData, data).toString());
+            } else if (ws.readyState === WebSocket.OPEN) {
+                ws.send(new Message(MessageTypeData, data).toString());
             }
         });
 
         return () => {
             sizeListener?.dispose();
             dataListener?.dispose();
-            websocket?.close();
         }
-    }, [websocket]);
+    }, [authMode, authUsername, authPassword]);
 
     const fitFit = useMemo(() => debounce(() => {
         if (terminalRef.current && fitRef.current) {
@@ -527,6 +646,14 @@ const AccessTerminal = ({assetId}: Props) => {
         }
     }, [isMobile]);
 
+    const pingColorClass = pingDelay === null
+        ? 'text-gray-400'
+        : pingDelay < 100
+            ? 'text-green-400'
+            : pingDelay < 200
+                ? 'text-yellow-400'
+                : 'text-red-400';
+
     return (
         <div>
             <div className={cn(
@@ -559,38 +686,56 @@ const AccessTerminal = ({assetId}: Props) => {
                                     <div
                                         className={'h-[40px] bg-[#1b1b1b] grid grid-cols-6 text-white text-center items-center'}>
                                         <div onClick={() => {
-                                            websocket?.send(new Message(MessageTypeData, '\x1b').toString());
+                                            const ws = websocketRef.current;
+                                            if (ws?.readyState === WebSocket.OPEN) {
+                                                ws.send(new Message(MessageTypeData, '\x1b').toString());
+                                            }
                                             terminalRef.current?.focus();
                                         }}>
                                             ESC
                                         </div>
                                         <div onClick={() => {
-                                            websocket?.send(new Message(MessageTypeData, '\x09').toString());
+                                            const ws = websocketRef.current;
+                                            if (ws?.readyState === WebSocket.OPEN) {
+                                                ws.send(new Message(MessageTypeData, '\x09').toString());
+                                            }
                                             terminalRef.current?.focus();
                                         }}>
                                             ⇥
                                         </div>
                                         <div onClick={() => {
-                                            websocket?.send(new Message(MessageTypeData, '\x02').toString());
+                                            const ws = websocketRef.current;
+                                            if (ws?.readyState === WebSocket.OPEN) {
+                                                ws.send(new Message(MessageTypeData, '\x02').toString());
+                                            }
                                             terminalRef.current?.focus();
                                         }}>
                                             CTRL+B
                                         </div>
                                         <div onClick={() => {
-                                            websocket.send(new Message(MessageTypeData, '\x03').toString());
+                                            const ws = websocketRef.current;
+                                            if (ws?.readyState === WebSocket.OPEN) {
+                                                ws.send(new Message(MessageTypeData, '\x03').toString());
+                                            }
                                             terminalRef.current?.focus();
                                         }}>
                                             CTRL+C
                                         </div>
 
                                         <div onClick={() => {
-                                            websocket.send(new Message(MessageTypeData, '\x1b[A').toString());
+                                            const ws = websocketRef.current;
+                                            if (ws?.readyState === WebSocket.OPEN) {
+                                                ws.send(new Message(MessageTypeData, '\x1b[A').toString());
+                                            }
                                             terminalRef.current?.focus();
                                         }}>
                                             ↑
                                         </div>
                                         <div onClick={() => {
-                                            websocket.send(new Message(MessageTypeData, '\x1b[B').toString());
+                                            const ws = websocketRef.current;
+                                            if (ws?.readyState === WebSocket.OPEN) {
+                                                ws.send(new Message(MessageTypeData, '\x1b[B').toString());
+                                            }
                                             terminalRef.current?.focus();
                                         }}>
                                             ↓
@@ -603,72 +748,73 @@ const AccessTerminal = ({assetId}: Props) => {
                                          backgroundColor: accessTheme?.theme?.value['background'],
                                      }}
                                 >
-                                    {/* 搜索框 */}
-                                    {searchOpen && (
+                                    <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-2">
                                         <div
-                                            className="absolute top-2 right-2 z-10 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-1.5 flex items-center gap-1.5 min-w-[240px]">
-                                            <SearchIcon className="h-3.5 w-3.5 text-gray-500"/>
-                                            <input
-                                                type="text"
-                                                value={searchTerm}
-                                                onChange={(e) => {
-                                                    setSearchTerm(e.target.value);
-                                                    handleSearch(e.target.value);
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Enter') {
-                                                        if (e.shiftKey) {
-                                                            handleSearchPrevious();
-                                                        } else {
-                                                            handleSearchNext();
-                                                        }
-                                                    } else if (e.key === 'Escape') {
-                                                        clearSearch();
-                                                    }
-                                                }}
-                                                // onBlur={(e) => {
-                                                //     // 当搜索框失去焦点且没有搜索内容时，自动关闭搜索框
-                                                //     if (!searchTerm.trim()) {
-                                                //         setTimeout(() => {
-                                                //             if (!searchTerm.trim()) {
-                                                //                 setSearchOpen(false);
-                                                //             }
-                                                //         }, 100);
-                                                //     }
-                                                // }}
-                                                placeholder={t('access.settings.terminal.search_placeholder') || '搜索终端内容...'}
-                                                className="flex-1 px-1.5 py-0.5 text-xs border-none outline-none bg-transparent text-gray-900 dark:text-gray-100"
-                                                autoFocus
-                                            />
-                                            {searchMatchCount > 0 && (
-                                                <span className="text-[10px] text-gray-500 whitespace-nowrap">
-                                                    {searchMatchIndex}/{searchMatchCount}
-                                                </span>
-                                            )}
-                                            <div className="flex items-center gap-0.5">
-                                                <button
-                                                    onClick={handleSearchPrevious}
-                                                    disabled={!searchTerm || searchMatchCount === 0}
-                                                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    <ChevronUpIcon className="h-3 w-3"/>
-                                                </button>
-                                                <button
-                                                    onClick={handleSearchNext}
-                                                    disabled={!searchTerm || searchMatchCount === 0}
-                                                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                                >
-                                                    <ChevronDownIcon className="h-3 w-3"/>
-                                                </button>
-                                                <button
-                                                    onClick={clearSearch}
-                                                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                                                >
-                                                    <XIcon className="h-3 w-3"/>
-                                                </button>
-                                            </div>
+                                            className="flex items-center gap-1 rounded bg-white/80 px-2 py-1 text-[11px] text-gray-700 shadow dark:bg-black/60 dark:text-gray-200"
+                                        >
+                                            <span>Ping</span>
+                                            <span className={clsx('font-semibold', pingColorClass)}>
+                                                {pingDelay === null ? '--' : `${pingDelay} ms`}
+                                            </span>
                                         </div>
-                                    )}
+                                        {/* 搜索框 */}
+                                        {searchOpen && (
+                                            <div
+                                                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-1.5 flex items-center gap-1.5 min-w-[240px]"
+                                            >
+                                                <SearchIcon className="h-3.5 w-3.5 text-gray-500"/>
+                                                <input
+                                                    type="text"
+                                                    value={searchTerm}
+                                                    onChange={(e) => {
+                                                        setSearchTerm(e.target.value);
+                                                        handleSearch(e.target.value);
+                                                    }}
+                                                    onKeyDown={(e) => {
+                                                        if (e.key === 'Enter') {
+                                                            if (e.shiftKey) {
+                                                                handleSearchPrevious();
+                                                            } else {
+                                                                handleSearchNext();
+                                                            }
+                                                        } else if (e.key === 'Escape') {
+                                                            clearSearch();
+                                                        }
+                                                    }}
+                                                    placeholder={t('access.settings.terminal.search_placeholder') || '搜索终端内容...'}
+                                                    className="flex-1 px-1.5 py-0.5 text-xs border-none outline-none bg-transparent text-gray-900 dark:text-gray-100"
+                                                    autoFocus
+                                                />
+                                                {searchMatchCount > 0 && (
+                                                    <span className="text-[10px] text-gray-500 whitespace-nowrap">
+                                                        {searchMatchIndex}/{searchMatchCount}
+                                                    </span>
+                                                )}
+                                                <div className="flex items-center gap-0.5">
+                                                    <button
+                                                        onClick={handleSearchPrevious}
+                                                        disabled={!searchTerm || searchMatchCount === 0}
+                                                        className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        <ChevronUpIcon className="h-3 w-3"/>
+                                                    </button>
+                                                    <button
+                                                        onClick={handleSearchNext}
+                                                        disabled={!searchTerm || searchMatchCount === 0}
+                                                        className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                                                    >
+                                                        <ChevronDownIcon className="h-3 w-3"/>
+                                                    </button>
+                                                    <button
+                                                        onClick={clearSearch}
+                                                        className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                                                    >
+                                                        <XIcon className="h-3 w-3"/>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                     <div className={'h-full'} ref={divRef}/>
                                 </div>
                             </div>
@@ -738,7 +884,10 @@ const AccessTerminal = ({assetId}: Props) => {
                 onClose={() => setSnippetOpen(false)}
                 onUse={(content: string) => {
                     terminalRef.current?.paste(content);
-                    websocket?.send(new Message(MessageTypeData, '\r').toString());
+                    const ws = websocketRef.current;
+                    if (ws?.readyState === WebSocket.OPEN) {
+                        ws.send(new Message(MessageTypeData, '\r').toString());
+                    }
                 }}
                 open={snippetOpen}
                 mask={false}
@@ -747,7 +896,10 @@ const AccessTerminal = ({assetId}: Props) => {
                 onClose={() => setShellAssistantOpen(false)}
                 onExecute={(content: string) => {
                     terminalRef.current?.paste(content);
-                    websocket?.send(new Message(MessageTypeData, '\r').toString());
+                    const ws = websocketRef.current;
+                    if (ws?.readyState === WebSocket.OPEN) {
+                        ws.send(new Message(MessageTypeData, '\r').toString());
+                    }
                 }}
                 open={shellAssistantOpen}
                 mask={false}

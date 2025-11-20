@@ -1,6 +1,6 @@
 import {Button, Form, Input, InputNumber, Space} from 'antd';
 import React, {useState} from 'react';
-import {baseUrl, getToken} from "@/src/api/core/requests";
+import {baseUrl, getToken} from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 
 const ToolsTcping = () => {

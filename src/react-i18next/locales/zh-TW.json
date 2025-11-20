@@ -1122,6 +1122,7 @@
     "online": "在線",
     "offline": "離線",
     "register": "註冊",
+    "free_limit_tip": "免費版僅支援註冊 1 個安全網關，如需更多請升級商業版。",
     "stat": {
       "label": "統計數據",
       "uptime": "運行時間",

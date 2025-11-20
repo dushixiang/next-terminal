@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import assetApi from "@/src/api/asset-api";
+import assetApi from "@/api/asset-api";
 import {useTranslation} from "react-i18next";
 import {Drawer, Tree, TreeDataNode} from "antd";
 import {useQuery} from "@tanstack/react-query";

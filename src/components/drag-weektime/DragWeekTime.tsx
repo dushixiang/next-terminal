@@ -15,7 +15,11 @@ export interface TimePeriod {
 const theadArr = Array.from(Array(24)).map((ret, id) => id);
 const formatDate = (date: Date, format: string): string => {
     const options: Record<string, Intl.DateTimeFormatOptions> = {
-        'hh:mm': {hour: '2-digit', minute: '2-digit'},
+        'hh:mm': {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false, // 强制使用 24 小时制
+        },
         // 可根据需要添加其他格式
     };
 
@@ -33,7 +37,7 @@ const formatWeekTime = (col: number) => {
 
     let begin = formatDate(new Date(beginstamp), 'hh:mm')
     let end = formatDate(new Date(endstamp), 'hh:mm')
-    if(end === '00:00'){
+    if (end === '00:00') {
         end = '24:00'
     }
     return `${begin}~${end}`
@@ -80,7 +84,7 @@ const DragWeekTime = ({onChange, value}: DragWeekTimeProps) => {
     useEffect(() => {
         if (value) {
             renderWeekTime(value)
-        }else {
+        } else {
             handleClearWeekTime();
         }
     }, []);

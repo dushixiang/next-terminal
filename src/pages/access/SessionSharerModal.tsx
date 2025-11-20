@@ -3,9 +3,9 @@ import {App, Button, Empty, Modal, Typography} from "antd";
 import {ProForm, ProFormInstance} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
-import portalApi from "@/src/api/portal-api";
+import portalApi from "@/api/portal-api";
 import copy from "copy-to-clipboard";
-import {SessionSharer} from "@/src/api/session-api";
+import {SessionSharer} from "@/api/session-api";
 
 interface Props {
     open: boolean

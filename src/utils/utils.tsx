@@ -97,6 +97,89 @@ export function isFontAvailable(fontName: string) {
     return newSize !== baselineSize;
 }
 
+/**
+ * 获取系统可用字体列表
+ * 优先使用 Local Font Access API，如果不支持则使用预定义列表检测
+ */
+export async function getAvailableFonts(): Promise<string[]> {
+    try {
+        // 检查是否支持 Local Font Access API
+        // @ts-ignore
+        if ('queryLocalFonts' in window) {
+            // @ts-ignore
+            const fonts = await window.queryLocalFonts();
+            const fontFamilies = new Set<string>();
+
+            fonts.forEach((font: any) => {
+                // 只添加等宽字体或常见的终端字体
+                const family = font.family;
+                fontFamilies.add(family);
+            });
+
+            // 转换为数组并排序
+            const fontList = Array.from(fontFamilies).sort();
+
+            if (fontList.length > 0) {
+                return fontList;
+            }
+        }
+    } catch (error) {
+        console.warn('Local Font Access API not available or permission denied:', error);
+    }
+
+    // 回退到预定义列表检测
+    return getCommonFonts();
+}
+
+/**
+ * 获取常见字体列表并检测可用性
+ */
+export function getCommonFonts(): string[] {
+    const commonFonts = [
+        // Windows 常见终端字体
+        'Consolas',
+        'Cascadia Code',
+        'Cascadia Mono',
+        'Courier New',
+        'Lucida Console',
+        'MS Gothic',
+
+        // macOS 常见终端字体
+        'Menlo',
+        'Monaco',
+        'SF Mono',
+        'Courier',
+
+        // Linux 常见终端字体
+        'DejaVu Sans Mono',
+        'Liberation Mono',
+        'Ubuntu Mono',
+        'Noto Mono',
+        'Droid Sans Mono',
+
+        // 跨平台开发字体
+        'Fira Code',
+        'Fira Mono',
+        'JetBrains Mono',
+        'Source Code Pro',
+        'Roboto Mono',
+        'IBM Plex Mono',
+        'Hack',
+        'Inconsolata',
+        'Anonymous Pro',
+        'Victor Mono',
+        'Monoid',
+        'Iosevka',
+
+        // 通用字体
+        'Monospace',
+        'monospace'
+    ];
+
+    // 过滤出可用的字体
+    return commonFonts.filter(font => isFontAvailable(font));
+}
+
 export function isMobileByMediaQuery() {
     const mediaQuery = window.matchMedia("(max-width: 768px)");
     return mediaQuery.matches;

@@ -1,14 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import {useQuery} from "@tanstack/react-query";
-import portalApi, {AssetUser, TreeDataNodeWithExtra} from "@/src/api/portal-api";
+import portalApi, {AssetUser, TreeDataNodeWithExtra} from "@/api/portal-api";
 import './FacadePage.css';
-import strings from "@/src/utils/strings";
+import strings from "@/utils/strings";
 import clsx from "clsx";
 import {Search} from "lucide-react";
 import {Badge, Popover, Tooltip, Tree, Typography} from "antd";
 import {useTranslation} from "react-i18next";
-import {getImgColor, getProtocolColor} from "@/src/helper/asset-helper";
-import {isMobileByMediaQuery} from "@/src/utils/utils";
+import {getImgColor, getProtocolColor} from "@/helper/asset-helper";
+import {isMobileByMediaQuery} from "@/utils/utils";
 import {cn} from "@/lib/utils";
 
 const WebsiteFacadePage = () => {

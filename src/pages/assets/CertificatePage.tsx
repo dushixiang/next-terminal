@@ -3,14 +3,14 @@ import React, {useRef, useState} from 'react';
 import {App, Badge, Button, Tag, Tooltip} from "antd";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
-import NButton from "@/src/components/NButton";
-import certificateApi, {Certificate} from "@/src/api/certificate-api";
-import CertificateModal from "@/src/pages/assets/CertificateModal";
-import CertificateDNSProviderModal from "@/src/pages/assets/CertificateDNSProviderModal";
-import dnsProviderApi from "@/src/api/dns-provider-api";
-import CertificateIssuedLog from "@/src/pages/assets/CertificateIssuedLog";
+import NButton from "@/components/NButton";
+import certificateApi, {Certificate} from "@/api/certificate-api";
+import CertificateModal from "@/pages/assets/CertificateModal";
+import CertificateDNSProviderModal from "@/pages/assets/CertificateDNSProviderModal";
+import dnsProviderApi from "@/api/dns-provider-api";
+import CertificateIssuedLog from "@/pages/assets/CertificateIssuedLog";
 
 const api = certificateApi;
 

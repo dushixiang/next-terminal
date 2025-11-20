@@ -1,20 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {App, Button, Divider, Form, Input, message, Select, Spin, Typography} from "antd";
+import {Button, Divider, Form, Input, Select, Spin, Typography} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {removeToken, setToken} from "../../api/core/requests";
+import {removeToken, setToken} from "@/api/core/requests.ts";
 import {StyleProvider} from '@ant-design/cssinjs';
-import brandingApi from "@/src/api/branding-api";
+import brandingApi from "@/api/branding-api";
 import {useTranslation} from "react-i18next";
 import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {startAuthentication} from "@simplewebauthn/browser";
 import {LanguagesIcon} from "lucide-react";
 import i18n from "i18next";
-import wechatWorkApi from "@/src/api/wechat-work-api";
-import oidcApi from "@/src/api/oidc-api";
+import wechatWorkApi from "@/api/wechat-work-api";
+import oidcApi from "@/api/oidc-api";
 
 const {Title} = Typography;
 
@@ -127,13 +127,12 @@ const LoginPage = () => {
             }
             let authentication = await startAuthentication({
                 optionsJSON: data.publicKey,
+                verifyBrowserAutofillInput: false,
             });
             let data2 = await accountApi.webauthnLoginFinishV2(data.token, authentication);
             afterLoginSuccess(data2, false);
-        } catch (e) {
-            message.error(`${e}`)
         } finally {
-            setLoading(false)
+            setLoading(false);
         }
     }
 
@@ -160,9 +159,6 @@ const LoginPage = () => {
             }
             // 跳转到 OIDC 授权页面
             window.location.href = authorizeUrl;
-        } catch (e) {
-            console.error('OIDC login error:', e);
-            message.error(`OIDC 登录失败: ${e}`);
         } finally {
             setLoading(false);
         }
@@ -176,7 +172,11 @@ const LoginPage = () => {
                     <Form onFinish={handleSubmit} className="login-form" layout="vertical">
                         <Form.Item label={t('account.username')} name='username'
                                    rules={[{required: true}]}>
-                            <Input size={'large'} prefix={<UserOutlined/>} placeholder={t('account.enter')}/>
+                            <Input size={'large'}
+                                   prefix={<UserOutlined/>}
+                                   placeholder={t('account.enter')}
+                                   autoComplete={'username webauthn'}
+                            />
                         </Form.Item>
                         <Form.Item label={t('account.password')}
                                    name='password'
@@ -225,7 +225,7 @@ const LoginPage = () => {
                                     color={'default'}
                                     size={'large'}
                                     className="w-full mb-2"
-                                    onClick={loginByPasskeyV2}
+                                    onClick={() => loginByPasskeyV2()}
                                     loading={loading}
                             >
                                 {t('account.login.methods.passkey')}

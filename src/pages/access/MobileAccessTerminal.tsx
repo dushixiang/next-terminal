@@ -1,7 +1,7 @@
 import React from 'react';
 import {useSearchParams} from "react-router-dom";
-import strings from "@/src/utils/strings";
-import AccessTerminal from "@/src/pages/access/AccessTerminal";
+import strings from "@/utils/strings";
+import AccessTerminal from "@/pages/access/AccessTerminal";
 
 const MobileAccessTerminal = () => {
 

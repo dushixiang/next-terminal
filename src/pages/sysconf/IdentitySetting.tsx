@@ -1,11 +1,11 @@
 import {Tabs, TabsProps} from 'antd';
 import React from 'react';
-import {SettingProps} from "@/src/pages/sysconf/SettingPage";
-import LdapSetting from "@/src/pages/sysconf/LdapSetting";
+import {SettingProps} from "@/pages/sysconf/SettingPage";
+import LdapSetting from "@/pages/sysconf/LdapSetting";
 import {useTranslation} from "react-i18next";
-import WebAuthnSetting from "@/src/pages/sysconf/WebAuthnSetting";
-import WechatWorkSetting from "@/src/pages/sysconf/WechatWorkSetting";
-import OidcSetting from "@/src/pages/sysconf/OidcSetting";
+import WebAuthnSetting from "@/pages/sysconf/WebAuthnSetting";
+import WechatWorkSetting from "@/pages/sysconf/WechatWorkSetting";
+import OidcSetting from "@/pages/sysconf/OidcSetting";
 
 const IdentitySetting = ({get, set}: SettingProps) => {
 

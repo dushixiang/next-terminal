@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Button, Drawer, Space, Tooltip, Typography} from "antd";
 import {DownloadOutlined, PauseOutlined, PlayCircleOutlined} from "@ant-design/icons";
-import {baseUrl, getToken} from "@/src/api/core/requests";
+import {baseUrl, getToken} from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 
 const {Text} = Typography;

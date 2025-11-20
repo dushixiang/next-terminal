@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {ProCard} from "@ant-design/pro-components";
-import SessionCommandSummary from "@/src/pages/audit/SessionCommandSummary";
-import SessionCommandDetail from "@/src/pages/audit/SessionCommandDetail";
-import {SessionCommand} from "@/src/api/session-api";
+import SessionCommandSummary from "@/pages/audit/SessionCommandSummary";
+import SessionCommandDetail from "@/pages/audit/SessionCommandDetail";
+import {SessionCommand} from "@/api/session-api";
 
 interface Props {
     open: boolean

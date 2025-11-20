@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import {Drawer} from "antd";
-import AssetsPost from "@/src/pages/assets/AssetPost";
+import AssetsPost from "@/pages/assets/AssetPost";
 import {useTranslation} from "react-i18next";
 
 interface Props {

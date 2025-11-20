@@ -1,75 +1,73 @@
-import '@/src/beautiful-scrollbar.css';
-import '@/src/App.css';
+import '@/beautiful-scrollbar.css';
+import '@/App.css';
 import React, {lazy, useEffect} from "react";
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
-import '@/src/react-i18next/i18n'
-import ManagerLayout from '@/src/layout/ManagerLayout';
-import AccessPage from "@/src/pages/access/AccessPage";
-import eventEmitter from "@/src/api/core/event-emitter";
-import {baseUrl} from "@/src/api/core/requests";
+import '@/react-i18next/i18n'
+import ManagerLayout from '@/layout/ManagerLayout';
+import AccessPage from "@/pages/access/AccessPage";
+import eventEmitter from "@/api/core/event-emitter";
+import {baseUrl} from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 import {message} from "antd";
 
-import TerminalPage from "@/src/pages/access/TerminalPage";
-import GuacamolePage from "@/src/pages/access/GuacamolePage";
+import TerminalPage from "@/pages/access/TerminalPage";
+import GuacamolePage from "@/pages/access/GuacamolePage";
 
-const AuthorisedAssetPage = lazy(() => import("@/src/pages/authorised/AuthorisedAssetPage"));
-const AuthorisedWebsitePage = lazy(() => import("@/src/pages/authorised/AuthorisedWebsitePage"));
-const AuthorisedAssetPost = lazy(() => import("@/src/pages/authorised/AuthorisedAssetPost"));
-const AuthorisedWebsitePost = lazy(() => import("@/src/pages/authorised/AuthorisedWebsitePost"));
-const LoginPage = lazy(() => import("@/src/pages/account/LoginPage"));
-const WechatWorkCallback = lazy(() => import("@/src/pages/account/WechatWorkCallback"));
-const OidcCallback = lazy(() => import("@/src/pages/account/OidcCallback"));
-const MobileAccessTerminal = lazy(() => import("@/src/pages/access/MobileAccessTerminal"));
-const UserPage = lazy(() => import("@/src/pages/identity/UserPage"));
-const UserDetailPage = lazy(() => import("@/src/pages/identity/UserDetailPage"));
-const SettingPage = lazy(() => import("@/src/pages/sysconf/SettingPage"));
-const InfoPage = lazy(() => import("@/src/pages/account/InfoPage"));
-const DepartmentPage = lazy(() => import("@/src/pages/identity/DepartmentPage"));
-const DepartmentDetail = lazy(() => import("@/src/pages/identity/DepartmentDetail"));
-const RolePage = lazy(() => import("@/src/pages/identity/RolePage"));
-const RoleDetail = lazy(() => import("@/src/pages/identity/RoleDetail"));
-const LoginLockedPage = lazy(() => import("@/src/pages/identity/LoginLockedPage"));
-const LoginPolicyPage = lazy(() => import("@/src/pages/identity/LoginPolicyPage"));
-const LoginPolicyPostPage = lazy(() => import("@/src/pages/identity/LoginPolicyPostPage"));
-const LoginPolicyDetailPage = lazy(() => import("@/src/pages/identity/LoginPolicyDetailPage"));
-const AssetsPage = lazy(() => import("@/src/pages/assets/AssetPage"));
-const CredentialPage = lazy(() => import("@/src/pages/assets/CredentialPage"));
-const CertificatePage = lazy(() => import("@/src/pages/assets/CertificatePage"));
-const SnippetPage = lazy(() => import("@/src/pages/assets/SnippetPage"));
-const AssetDetail = lazy(() => import("@/src/pages/assets/AssetDetail"));
-const StrategyPage = lazy(() => import("@/src/pages/authorised/StrategyPage"));
-const CommandFilterPage = lazy(() => import("@/src/pages/authorised/CommandFilterPage"));
-const CommandFilterDetail = lazy(() => import("@/src/pages/authorised/CommandFilterDetail"));
-const ScheduledTaskPage = lazy(() => import("@/src/pages/sysops/ScheduledTaskPage"));
-const ToolsPage = lazy(() => import("@/src/pages/sysops/ToolsPage"));
-const LoginLogPage = lazy(() => import("@/src/pages/audit/LoginLogPage"));
-const OperationLogPage = lazy(() => import("@/src/pages/audit/OperationLogPage"));
-const OfflineSessionPage = lazy(() => import("@/src/pages/audit/OfflineSessionPage"));
-const OnlineSessionPage = lazy(() => import("@/src/pages/audit/OnlineSessionPage"));
-const TerminalPlayback = lazy(() => import("@/src/pages/access/TerminalPlayback"));
-const TerminalMonitor = lazy(() => import("@/src/pages/access/TerminalMonitor"));
-const GuacdPlayback = lazy(() => import("@/src/pages/access/GuacdPlayback"));
-const GuacdMonitor = lazy(() => import("@/src/pages/access/GuacdMonitor"));
-const FileSystemLogPage = lazy(() => import("@/src/pages/audit/FileSystemLogPage"));
-const AccessLogPage = lazy(() => import("@/src/pages/audit/AccessLogPage"));
-const AccessLogStatsPage = lazy(() => import("@/src/pages/audit/AccessLogStatsPage"));
-const SshGatewayPage = lazy(() => import("@/src/pages/gateway/SshGatewayPage"));
-const AgentGatewayPage = lazy(() => import("@/src/pages/gateway/AgentGatewayPage"));
-const ErrorPage = lazy(() => import("@/src/components/ErrorPage"));
-const StoragePage = lazy(() => import("@/src/pages/assets/StoragePage"));
-const WebsitePage = lazy(() => import("@/src/pages/assets/WebsitePage"));
-const BrowserPage = lazy(() => import("@/src/pages/access/BrowserPage"));
-const FacadePage = lazy(() => import("@/src/pages/facade/FacadePage"));
-const WebsiteFacadePage = lazy(() => import("@/src/pages/facade/WebsiteFacadePage"));
-const RedirectPage = lazy(() => import("@/src/layout/RedirectPage"));
-const UserLayout = lazy(() => import("@/src/layout/UserLayout"));
-const DashboardPage = lazy(() => import("@/src/pages/dashboard/DashboardPage"));
-const WebsiteDetail = lazy(() => import("@/src/pages/assets/WebsiteDetail"));
-const UserInfoPage = lazy(() => import("@/src/pages/facade/UserInfoPage"));
-const SnippetUserPage = lazy(() => import("@/src/pages/facade/SnippetUserPage"));
-const SystemMonitorPage = lazy(() => import("@/src/pages/sysops/SystemMonitorPage"));
-const SetupPage = lazy(() => import("@/src/pages/identity/SetupPage"));
+const AuthorisedAssetPage = lazy(() => import("@/pages/authorised/AuthorisedAssetPage"));
+const AuthorisedWebsitePage = lazy(() => import("@/pages/authorised/AuthorisedWebsitePage"));
+const AuthorisedAssetPost = lazy(() => import("@/pages/authorised/AuthorisedAssetPost"));
+const AuthorisedWebsitePost = lazy(() => import("@/pages/authorised/AuthorisedWebsitePost"));
+const LoginPage = lazy(() => import("@/pages/account/LoginPage"));
+const WechatWorkCallback = lazy(() => import("@/pages/account/WechatWorkCallback"));
+const OidcCallback = lazy(() => import("@/pages/account/OidcCallback"));
+const MobileAccessTerminal = lazy(() => import("@/pages/access/MobileAccessTerminal"));
+const UserPage = lazy(() => import("@/pages/identity/UserPage"));
+const UserDetailPage = lazy(() => import("@/pages/identity/UserDetailPage"));
+const SettingPage = lazy(() => import("@/pages/sysconf/SettingPage"));
+const InfoPage = lazy(() => import("@/pages/account/InfoPage"));
+const DepartmentPage = lazy(() => import("@/pages/identity/DepartmentPage"));
+const DepartmentDetail = lazy(() => import("@/pages/identity/DepartmentDetail"));
+const RolePage = lazy(() => import("@/pages/identity/RolePage"));
+const RoleDetail = lazy(() => import("@/pages/identity/RoleDetail"));
+const LoginLockedPage = lazy(() => import("@/pages/identity/LoginLockedPage"));
+const LoginPolicyPage = lazy(() => import("@/pages/identity/LoginPolicyPage"));
+const LoginPolicyPostPage = lazy(() => import("@/pages/identity/LoginPolicyPostPage"));
+const LoginPolicyDetailPage = lazy(() => import("@/pages/identity/LoginPolicyDetailPage"));
+const AssetsPage = lazy(() => import("@/pages/assets/AssetPage"));
+const CredentialPage = lazy(() => import("@/pages/assets/CredentialPage"));
+const CertificatePage = lazy(() => import("@/pages/assets/CertificatePage"));
+const SnippetPage = lazy(() => import("@/pages/assets/SnippetPage"));
+const StrategyPage = lazy(() => import("@/pages/authorised/StrategyPage"));
+const CommandFilterPage = lazy(() => import("@/pages/authorised/CommandFilterPage"));
+const CommandFilterDetail = lazy(() => import("@/pages/authorised/CommandFilterDetail"));
+const ScheduledTaskPage = lazy(() => import("@/pages/sysops/ScheduledTaskPage"));
+const ToolsPage = lazy(() => import("@/pages/sysops/ToolsPage"));
+const LoginLogPage = lazy(() => import("@/pages/audit/LoginLogPage"));
+const OperationLogPage = lazy(() => import("@/pages/audit/OperationLogPage"));
+const OfflineSessionPage = lazy(() => import("@/pages/audit/OfflineSessionPage"));
+const OnlineSessionPage = lazy(() => import("@/pages/audit/OnlineSessionPage"));
+const TerminalPlayback = lazy(() => import("@/pages/access/TerminalPlayback"));
+const TerminalMonitor = lazy(() => import("@/pages/access/TerminalMonitor"));
+const GuacdPlayback = lazy(() => import("@/pages/access/GuacdPlayback"));
+const GuacdMonitor = lazy(() => import("@/pages/access/GuacdMonitor"));
+const FileSystemLogPage = lazy(() => import("@/pages/audit/FileSystemLogPage"));
+const AccessLogPage = lazy(() => import("@/pages/audit/AccessLogPage"));
+const AccessLogStatsPage = lazy(() => import("@/pages/audit/AccessLogStatsPage"));
+const SshGatewayPage = lazy(() => import("@/pages/gateway/SshGatewayPage"));
+const AgentGatewayPage = lazy(() => import("@/pages/gateway/AgentGatewayPage"));
+const ErrorPage = lazy(() => import("@/components/ErrorPage"));
+const StoragePage = lazy(() => import("@/pages/assets/StoragePage"));
+const WebsitePage = lazy(() => import("@/pages/assets/WebsitePage"));
+const BrowserPage = lazy(() => import("@/pages/access/BrowserPage"));
+const FacadePage = lazy(() => import("@/pages/facade/FacadePage"));
+const WebsiteFacadePage = lazy(() => import("@/pages/facade/WebsiteFacadePage"));
+const RedirectPage = lazy(() => import("@/layout/RedirectPage"));
+const UserLayout = lazy(() => import("@/layout/UserLayout"));
+const DashboardPage = lazy(() => import("@/pages/dashboard/DashboardPage"));
+const UserInfoPage = lazy(() => import("@/pages/facade/UserInfoPage"));
+const SnippetUserPage = lazy(() => import("@/pages/facade/SnippetUserPage"));
+const SystemMonitorPage = lazy(() => import("@/pages/sysops/SystemMonitorPage"));
+const SetupPage = lazy(() => import("@/pages/identity/SetupPage"));
 
 const router = createBrowserRouter([
     {path: "/setup", element: <SetupPage/>},
@@ -113,12 +111,10 @@ const router = createBrowserRouter([
             {path: "/operation-log", element: <OperationLogPage/>},
 
             {path: "/asset", element: <AssetsPage/>},
-            {path: "/asset/:assetId", element: <AssetDetail/>},
             {path: "/credential", element: <CredentialPage/>},
             {path: "/snippet", element: <SnippetPage/>},
             {path: "/storage", element: <StoragePage/>},
             {path: "/website", element: <WebsitePage/>},
-            {path: "/website/:websiteId", element: <WebsiteDetail/>},
             {path: "/certificate", element: <CertificatePage/>},
 
             {path: "/strategy", element: <StrategyPage/>},

@@ -2,7 +2,7 @@ import React, {useRef, useState} from 'react';
 import {App, Modal} from "antd";
 import {ProForm, ProFormDependency, ProFormInstance, ProFormRadio, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import dnsProviderApi from "@/src/api/dns-provider-api";
+import dnsProviderApi from "@/api/dns-provider-api";
 
 export interface Props {
     open: boolean

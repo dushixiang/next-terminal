@@ -4,9 +4,9 @@ import {SettingProps} from "./SettingPage";
 import {useQuery} from "@tanstack/react-query";
 import {ProForm, ProFormDigit, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import requests from "@/src/api/core/requests";
-import propertyApi from "@/src/api/property-api";
-import {useMobile} from "@/src/hook/use-mobile";
+import requests from "@/api/core/requests";
+import propertyApi from "@/api/property-api";
+import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 
 const {Title} = Typography;

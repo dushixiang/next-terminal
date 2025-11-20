@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {useTranslation} from "react-i18next";
 import {ProForm, ProFormSelect, ProFormSwitch, ProFormText} from "@ant-design/pro-components";
-import {SettingProps} from "@/src/pages/sysconf/SettingPage";
-import {useMobile} from "@/src/hook/use-mobile";
+import {SettingProps} from "@/pages/sysconf/SettingPage";
+import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 
 const WebAuthnSetting = ({get, set}: SettingProps) => {

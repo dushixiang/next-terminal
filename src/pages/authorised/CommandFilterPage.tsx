@@ -2,13 +2,13 @@ import React, {useRef, useState} from 'react';
 import {App, Button, Popconfirm} from "antd";
 import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
 import {useNavigate} from "react-router-dom";
-import commandFilterApi, {CommandFilter} from '@/src/api/command-filter-api';
-import CommandFilterModal from "@/src/pages/authorised/CommandFilterModal";
+import commandFilterApi, {CommandFilter} from '@/api/command-filter-api';
+import CommandFilterModal from "@/pages/authorised/CommandFilterModal";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/src/utils/sort";
+import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
-import NLink from "@/src/components/NLink";
-import NButton from "@/src/components/NButton";
+import NLink from "@/components/NLink";
+import NButton from "@/components/NButton";
 
 const api = commandFilterApi;
 
@@ -58,7 +58,10 @@ const CommandFilterPage = () => {
             title: t('authorised.command_filter.name'),
             dataIndex: 'name',
             render: (text, record) => {
-                return <NLink to={`/command-filter/${record['id']}`}>{text}</NLink>;
+                return <a onClick={() => {
+                    setOpen(true);
+                    setSelectedRowKey(record['id']);
+                }}>{text}</a>;
             },
         },
         {

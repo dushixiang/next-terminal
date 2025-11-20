@@ -4,8 +4,8 @@ import {CirclePlay, RotateCcw, Send} from 'lucide-react';
 import {useTranslation} from "react-i18next";
 import {useWindowSize} from 'react-use';
 import {ScrollArea} from "@/components/ui/scroll-area";
-import shellAssistantApi, {StreamResponse} from "@/src/api/shell-assistant-api";
-import accessSettingApi from "@/src/api/access-setting-api";
+import shellAssistantApi, {StreamResponse} from "@/api/shell-assistant-api";
+import accessSettingApi from "@/api/access-setting-api";
 
 const {TextArea} = Input;
 

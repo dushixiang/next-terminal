@@ -2,10 +2,9 @@
 
 [English](./README-en.md) | 简体中文
 
+提示：本项目从 v2.0.0 开始，后端代码不再开源。
 
-## 免费企业版授权，助您运维审计无忧！
-
-https://license.typesafe.cn/request-quote
+----
 
 ## 简介
 

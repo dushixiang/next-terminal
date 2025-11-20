@@ -1,4 +1,4 @@
-import requests from "@/src/api/core/requests";
+import requests from "@/api/core/requests";
 
 export interface FileInfo {
     name: string

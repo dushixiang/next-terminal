@@ -1,16 +1,16 @@
 import React, {useEffect, useState} from 'react';
 import {useQuery} from "@tanstack/react-query";
-import portalApi, {AssetUser, TreeDataNodeWithExtra} from "@/src/api/portal-api";
+import portalApi, {AssetUser, TreeDataNodeWithExtra} from "@/api/portal-api";
 import './FacadePage.css';
-import strings from "@/src/utils/strings";
+import strings from "@/utils/strings";
 import clsx from "clsx";
 import {Search} from "lucide-react";
 import {Badge, Popover, Tooltip, Tree, Typography} from "antd";
 import {useTranslation} from "react-i18next";
-import {accessAsset} from "@/src/helper/access-tab-channel";
-import {getImgColor, getProtocolColor} from "@/src/helper/asset-helper";
-import {isMobileByMediaQuery, openOrSwitchToPage} from "@/src/utils/utils";
-import {safeEncode} from "@/src/utils/codec";
+import {accessAsset} from "@/helper/access-tab-channel";
+import {getImgColor, getProtocolColor} from "@/helper/asset-helper";
+import {isMobileByMediaQuery, openOrSwitchToPage} from "@/utils/utils";
+import {safeEncode} from "@/utils/codec";
 import {cn} from "@/lib/utils";
 
 const FacadePage = () => {
