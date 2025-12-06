@@ -49,6 +49,10 @@ Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多
 
     <img src="images/lcayun.png" width="200" height="auto"/>
 
+- **[Digitalvirt](https://digitalvirt.com/aff.php?aff=1326)** 提供安全可靠的弹性计算服务
+
+    [![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=1326)
+
 ## 优秀项目推荐
 
 - [go-ldap-admin：基于Go+Vue实现的openLDAP后台管理项目](https://github.com/eryajf/go-ldap-admin)
