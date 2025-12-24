@@ -32,7 +32,6 @@ Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多
 
 ## 社群
 - telegram https://t.me/next_terminal
-- QQ 群：938145268
 - 微信群：加我微信备注「next-terminal」，拉你进群
 
 <img src="screenshots/zh/wx1.png" width="300" height="auto"/>
@@ -49,9 +48,13 @@ Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多
 
     <img src="images/lcayun.png" width="200" height="auto"/>
 
-- **[Digitalvirt](https://digitalvirt.com/aff.php?aff=1326)** 提供安全可靠的弹性计算服务
+- **[Digitalvirt](https://digitalvirt.com/aff.php?aff=1326)** 提供安全可靠的弹性计算服务（优惠码 typesafe 全线云主机 八五折）
 
     [![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=1326)
+
+- **[Gomami](https://gomami.io/aff.php?aff=298)**  The Fastest China Route. The Strongest Performance.
+
+  <img src="https://gomami.io/templates/webflow/images/GoMami.svg" width="200" height="auto" alt="Gomami"/>
 
 ## 优秀项目推荐
 
