@@ -50,7 +50,7 @@ Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多
 
 - **[Digitalvirt](https://digitalvirt.com/aff.php?aff=1326)** 提供安全可靠的弹性计算服务（优惠码 typesafe 全线云主机 八五折）
 
-    [![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=1326)
+  [![digitalvirt](https://digitalvirt.com/templates/BlueWhite/img/logo-dark.svg)](https://digitalvirt.com/aff.php?aff=1326)
 
 - **[Gomami](https://gomami.io/aff.php?aff=298)**  The Fastest China Route. The Strongest Performance.
 

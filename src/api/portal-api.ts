@@ -30,6 +30,7 @@ export interface AssetUser {
     type: string; // asset 或 website
     groupId: string; // 分组ID
     users: string[];
+    attrs?: Record<string, any>; // 资产属性，包含 WOL 配置等
 }
 
 export interface Stats {
@@ -107,6 +108,20 @@ interface Extra {
     logo: string;
     status: string;
     network: string;
+    wolEnabled: boolean; // 是否启用 WOL 唤醒
+}
+
+export interface WolResponse {
+    error?: string;
+    delay: number; // 唤醒等待时间（秒）
+}
+
+export interface PingResponse {
+    name: string;
+    active: boolean;
+    error?: string;
+    usedTime: number;
+    usedTimeStr: string;
 }
 
 class PortalApi {
@@ -177,6 +192,14 @@ class PortalApi {
     accessWebsite = async (id: string) => {
         const data = await requests.get(`/${this.group}/website/access?websiteId=${id}`);
         return data['url'] as string;
+    }
+
+    wakeOnLan = async (assetId: string) => {
+        return await requests.post(`/${this.group}/assets/${assetId}/wol`) as WolResponse;
+    }
+
+    pingAsset = async (assetId: string) => {
+        return await requests.post(`/${this.group}/assets/${assetId}/ping`) as PingResponse;
     }
 }
 

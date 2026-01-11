@@ -13,8 +13,8 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 const AuthorisedAssetPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
-    const formRef = useRef<ProFormInstance>();
+    const actionRef = useRef<ActionType>(null);
+    const formRef = useRef<ProFormInstance>(null);
     let navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 

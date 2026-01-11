@@ -39,7 +39,7 @@ const RoleModal = ({
                    }: RoleProps) => {
 
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
 
     let [checkedMenus, setCheckedMenus] = useState<string[]>([]);
 

@@ -22,7 +22,7 @@ const AgentGatewayModal = ({
                                id,
                            }: Props) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
 
     const get = async () => {

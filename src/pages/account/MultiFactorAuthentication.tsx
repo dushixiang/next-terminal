@@ -74,6 +74,26 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
         setShowSelector(false);
     };
 
+    const storeSecurityToken = (securityToken: string) => {
+        sessionStorage.setItem('securityToken', securityToken);
+        handleOk(securityToken);
+    }
+
+    const validateSecurityToken = () => {
+        const securityToken = sessionStorage.getItem('securityToken');
+        if (securityToken) {
+            // 检查 Token 是否有效，有效则直接使用
+            accountApi.validateSecurityToken(securityToken).then((ok) => {
+                if (ok) {
+                    storeSecurityToken(securityToken);
+                } else {
+                    // 无效则清除
+                    sessionStorage.removeItem('securityToken');
+                }
+            });
+        }
+    }
+
     // Passkey 认证
     const authenticateWithPasskey = async () => {
         setError(null);
@@ -87,7 +107,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
 
             const authentication = await startAuthentication({optionsJSON: data.publicKey});
             const securityToken = await accountApi.generateSecurityTokenByWebauthnFinish(data.token, authentication);
-            handleOk(securityToken);
+            storeSecurityToken(securityToken);
         } catch (e: any) {
             const code = typeof e?.code === 'number' ? e.code : undefined;
             setError({code, message: e?.message || String(e)});
@@ -99,7 +119,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
     // OTP 认证
     const validateOTP = useMutation({
         mutationFn: accountApi.generateSecurityTokenByMfa,
-        onSuccess: (token) => token && handleOk(token),
+        onSuccess: (token) => token && storeSecurityToken(token),
         onError: (e: any) => {
             setOtpValue('');
             setOtpKey(prev => prev + 1); // 强制重新挂载以重新获得焦点
@@ -146,6 +166,13 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
             authenticateWithPasskey();
         }
     }, [authType, showSelector, open]);
+
+    useEffect(() => {
+        if (open) {
+            // 检查是否有存储的 securityToken
+            validateSecurityToken();
+        }
+    }, [open]);
 
     // 渲染选择器
     const renderSelector = () => (
@@ -206,7 +233,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
     // 渲染错误提示
     const renderError = () => {
         if (!error) {
-            return <div className={'min-h-[24px] text-sm'} />;
+            return <div className={'min-h-[24px] text-sm'}/>;
         }
 
         let content: React.ReactNode = null;

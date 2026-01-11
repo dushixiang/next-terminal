@@ -11,7 +11,7 @@ import {useMutation} from "@tanstack/react-query";
 const FileSystemLogPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
     let {modal} = App.useApp();
 
     let clearMutation = useMutation({

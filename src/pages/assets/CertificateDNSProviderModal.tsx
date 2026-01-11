@@ -16,7 +16,7 @@ const CertificateDNSProviderModal = ({
                                          handleCancel,
                                      }: Props) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
     let [ok, setOk] = useState(false);
     let {modal,message} = App.useApp();

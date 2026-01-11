@@ -1,13 +1,24 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {ProForm, ProFormDependency, ProFormSelect} from "@ant-design/pro-components";
 import {Col, Divider, Row, Tooltip} from "antd";
 import {Info} from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {SettingProps} from "@/pages/sysconf/SettingPage";
+import propertyApi, {ClientIPs} from "@/api/property-api";
 
 const NetworkSetting = ({get, set}: SettingProps) => {
     let {t} = useTranslation();
     let [ipTrustList, setIpTrustList] = useState<string[]>([]);
+    let [clientIPs, setClientIPs] = useState<ClientIPs | null>(null);
+
+    useEffect(() => {
+        // 获取客户端 IP 信息
+        propertyApi.getClientIPs().then(ips => {
+            setClientIPs(ips);
+        }).catch(err => {
+            console.error('Failed to get client IPs:', err);
+        });
+    }, []);
 
     const wrapGet = async () => {
         let values = await get();
@@ -40,9 +51,18 @@ const NetworkSetting = ({get, set}: SettingProps) => {
                     label={t('settings.system.ip.extractor')}
                     rules={[{required: true}]}
                     options={[
-                        {label: t('settings.system.ip.extractor_direct'), value: 'direct'},
-                        {label: 'Header(X-Real-IP)', value: 'x-real-ip'},
-                        {label: 'Header(X-Forwarded-For)', value: 'x-forwarded-for'},
+                        {
+                            label: `${t('settings.system.ip.extractor_direct')}${clientIPs?.direct ? ` (${clientIPs.direct})` : ''}`,
+                            value: 'direct'
+                        },
+                        {
+                            label: `Header(X-Real-IP)${clientIPs?.['x-real-ip'] ? ` (${clientIPs['x-real-ip']})` : ' (未检测到)'}`,
+                            value: 'x-real-ip'
+                        },
+                        {
+                            label: `Header(X-Forwarded-For)${clientIPs?.['x-forwarded-for'] ? ` (${clientIPs['x-forwarded-for']})` : ' (未检测到)'}`,
+                            value: 'x-forwarded-for'
+                        },
                     ]}
                 />
 

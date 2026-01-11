@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "NODE_OPTIONS=--max-old-space-size=6144 tsc && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -24,7 +24,7 @@
     "@xterm/addon-search": "^0.15.0",
     "@xterm/addon-webgl": "^0.18.0",
     "@xterm/xterm": "^5.5.0",
-    "antd": "^5.28.1",
+    "antd": "5.29.2",
     "asciinema-player": "^3.12.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -34,7 +34,7 @@
     "jotai": "^2.15.1",
     "js-base64": "^3.7.8",
     "lucide-react": "^0.553.0",
-    "monaco-editor": "^0.54.0",
+    "monaco-editor": "^0.55.1",
     "qs": "^6.14.0",
     "react": "^18.3.1",
     "react-countup": "^6.5.3",
@@ -45,9 +45,7 @@
     "react-router-dom": "^7.9.6",
     "react-spinners": "^0.17.0",
     "react-use": "^17.6.0",
-    "react-window": "^2.2.3",
     "recharts": "2.15.4",
-    "simplebar-react": "^3.3.2",
     "tailwind-merge": "^3.4.0",
     "tailwindcss-animate": "^1.0.7"
   },
@@ -58,6 +56,7 @@
     "@types/react-window": "^2.0.0",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.22",
+    "baseline-browser-mapping": "^2.9.4",
     "postcss": "^8.5.6",
     "rollup-plugin-visualizer": "^6.0.5",
     "tailwindcss": "^4.1.17",

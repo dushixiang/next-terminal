@@ -1,6 +1,5 @@
 import {Input, Modal, Select, Typography} from 'antd';
 import React, {useEffect, useState} from 'react';
-import {useTranslation} from "react-i18next";
 import agentGatewayApi, {RegisterParam} from "@/api/agent-gateway-api";
 import clsx from "clsx";
 import {useQuery} from "@tanstack/react-query";
@@ -23,8 +22,6 @@ const AgentGatewayRegister = ({
                                   open,
                                   handleCancel,
                               }: Props) => {
-
-    let {t} = useTranslation();
 
     let [param, setParam] = useState<RegisterParam>({
         endpoint: "", token: ""
@@ -65,7 +62,7 @@ const AgentGatewayRegister = ({
     }, [open]);
 
     useEffect(() => {
-        setBash(`curl -k ${param.endpoint}/api/agent-gateway/install.sh | bash -s ${param.token}`);
+        setBash(`curl -k ${param.endpoint}/api/agent/install.sh | bash -s ${param.token}`);
     }, [param]);
 
     const options = [
@@ -77,48 +74,75 @@ const AgentGatewayRegister = ({
     const renderInstallShell = (os: string) => {
         switch (os) {
             case 'linux':
-                return <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
-                    <Paragraph copyable={true} style={{margin: 0}}>
-                        {bash}
-                    </Paragraph>
+                return <div className={'space-y-2'}>
+                    <div className={'font-medium'}>自动安装</div>
+                    <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
+                        <Paragraph copyable={true} style={{margin: 0}}>
+                            {bash}
+                        </Paragraph>
+                    </div>
+                    <div className={'font-medium mt-4'}>手动安装</div>
+                    <div>1. 下载二进制文件</div>
+                    <div className={'flex items-center gap-2'}>
+                        <a href={`${baseUrl()}/agent/downloads/nt-tunnel-linux-amd64`}>amd64</a>
+                        <a href={`${baseUrl()}/agent/downloads/nt-tunnel-linux-arm64`}>arm64</a>
+                    </div>
+                    <div>2. 重命名并添加执行权限</div>
+                    <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
+                        <Paragraph copyable={true} style={{margin: 0}}>
+                            {`mv nt-tunnel-linux-amd64 nt-tunnel && chmod +x nt-tunnel`}
+                        </Paragraph>
+                    </div>
+                    <div>3. 运行注册命令</div>
+                    <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
+                        <Paragraph copyable={true} style={{margin: 0}}>
+                            {`sudo ./nt-tunnel register --endpoint ${param.endpoint} --token ${param.token} --yes`}
+                        </Paragraph>
+                    </div>
                 </div>;
             case 'windows':
                 return <div className={'space-y-2'}>
-                    <div>1. {t('gateways.download_binary')}</div>
+                    <div>1. 下载二进制文件</div>
                     <div>
-                        <a href={`${baseUrl()}/agent-gateway/binary?os=windows&arch=amd64`}>amd64</a>
+                        <a href={`${baseUrl()}/agent/downloads/nt-tunnel-windows-amd64.exe`}>amd64</a>
                     </div>
-                    <div>2. {t('gateways.install_service_admin')}</div>
+                    <div>2. 重命名文件</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
-                            {`nt-tunnel.exe install --endpoint ${param.endpoint} --token ${param.token} `}
+                            {`ren nt-tunnel-windows-amd64.exe nt-tunnel.exe`}
                         </Paragraph>
                     </div>
-                    <div>3. {t('gateways.start_service')}</div>
+                    <div>3. 以管理员身份运行注册命令</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
-                            {`nt-tunnel.exe start`}
+                            {`nt-tunnel.exe register --endpoint ${param.endpoint} --token ${param.token} --yes`}
                         </Paragraph>
+                    </div>
+                    <div className={'text-sm text-gray-500 dark:text-gray-400'}>
+                        注册成功后将自动安装为 Windows 服务并启动
                     </div>
                 </div>;
             case 'macos':
                 return <div className={'space-y-2'}>
-                    <div>1. {t('gateways.download_binary')}</div>
+                    <div>1. 下载二进制文件</div>
                     <div className={'flex items-center gap-2'}>
-                        <a href={`${baseUrl()}/agent-gateway/binary?os=darwin&arch=arm64`}>arm64</a>
-                        <a href={`${baseUrl()}/agent-gateway/binary?os=darwin&arch=amd64`}>amd64</a>
+                        <a href={`${baseUrl()}/agent/downloads/nt-tunnel-darwin-arm64`}>arm64</a>
+                        <a href={`${baseUrl()}/agent/downloads/nt-tunnel-darwin-amd64`}>amd64</a>
                     </div>
-                    <div>2. {t('gateways.install_service')}</div>
+                    <div>2. 重命名并添加执行权限</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
-                            {`sudo nt-tunnel install --endpoint ${param.endpoint} --token ${param.token} `}
+                            {`mv nt-tunnel-darwin-arm64 nt-tunnel && chmod +x nt-tunnel`}
                         </Paragraph>
                     </div>
-                    <div>3. {t('gateways.start_service')}</div>
+                    <div>3. 运行注册命令</div>
                     <div className={clsx('bg-slate-200 p-4 rounded', 'dark:bg-slate-700')}>
                         <Paragraph copyable={true} style={{margin: 0}}>
-                            {`sudo nt-tunnel start`}
+                            {`sudo ./nt-tunnel register --endpoint ${param.endpoint} --token ${param.token} --yes`}
                         </Paragraph>
+                    </div>
+                    <div className={'text-sm text-gray-500 dark:text-gray-400'}>
+                        注册成功后将自动安装为系统服务并启动
                     </div>
                 </div>;
         }
@@ -135,7 +159,7 @@ const AgentGatewayRegister = ({
 
     return (
         <Modal
-            title={t('gateways.register')}
+            title="注册网关"
             open={open}
             maskClosable={false}
             destroyOnHidden={true}
@@ -146,7 +170,7 @@ const AgentGatewayRegister = ({
             }}
         >
             <div className={'mb-2 flex flex-col gap-2'}>
-                <div>{t('gateways.endpoint')}</div>
+                <div>服务端地址</div>
                 <Input
                     value={param.endpoint}
                     onChange={(e) => {
@@ -162,10 +186,10 @@ const AgentGatewayRegister = ({
                     }}
                 />
 
-                <div>{t('gateways.token')}</div>
+                <div>注册令牌</div>
                 <Select
                     showSearch
-                    placeholder={t('gateways.select_token')}
+                    placeholder="请选择注册令牌"
                     filterOption={(input, option) => {
                         const searchText = input.toLowerCase();
                         const optionText = option?.label?.toLowerCase() || '';
@@ -217,7 +241,7 @@ const AgentGatewayRegister = ({
             </div>
 
             <div className={'mt-4 space-y-2'}>
-                <div>{t('gateways.install_shell')}</div>
+                <div>安装脚本</div>
                 {renderInstallShell(os)}
             </div>
 

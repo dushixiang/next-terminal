@@ -4,6 +4,7 @@ export interface Snippet {
     id: string;
     name: string;
     content: string;
+    visibility: 'public' | 'private';
     createdBy: string;
     createdAt: number;
 }

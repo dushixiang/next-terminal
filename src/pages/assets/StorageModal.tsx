@@ -22,7 +22,7 @@ const StorageModal = ({
                           id,
                       }: SnippetProps) => {
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
 
     const get = async () => {
         if (id) {

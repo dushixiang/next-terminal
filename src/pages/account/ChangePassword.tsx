@@ -3,10 +3,9 @@ import {Button, Form, Input, message, Typography} from "antd";
 import accountApi from "../../api/account-api";
 import {ValidateStatus} from "antd/es/form/FormItem";
 import {useTranslation} from "react-i18next";
-import {redirect} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import {getCurrentUser} from "@/utils/permission";
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import {EyeInvisibleOutlined, EyeTwoTone} from '@ant-design/icons';
 
 const {Title} = Typography;
 
@@ -49,7 +48,7 @@ const ChangePassword = () => {
                 characterType++;
             }
             if (characterType < policy.minCharacterType) {
-                return t('settings.security.password.too_simple').replaceAll('?', policy.minCharacterType + '');
+                return `密码需包含大写字母、小写字母、数字、特殊字符中的至少 ${policy.minCharacterType} 种`;
             }
         }
         let user = getCurrentUser();
@@ -59,7 +58,7 @@ const ChangePassword = () => {
 
         // 判断一个字符串是否是回文
         function isPalindrome(s: string): boolean {
-            console.log(`s`,s)
+            console.log(`s`, s)
             for (let i = 0; i < s.length / 2; i++) {
                 if (s[i] !== s[s.length - i - 1]) {
                     return false;
@@ -139,11 +138,11 @@ const ChangePassword = () => {
                     help={error}
                 >
                     <Input.Password
-                           showCount
-                           iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                           onChange={(value) => onNewPasswordChange(value)}
-                           style={{width: 240}}
-                           placeholder={t('account.enter')}
+                        showCount
+                        iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                        onChange={(value) => onNewPasswordChange(value)}
+                        style={{width: 240}}
+                        placeholder={t('account.enter')}
                     />
                 </Form.Item>
                 <Form.Item
@@ -157,11 +156,11 @@ const ChangePassword = () => {
                     validateStatus={newPasswordStatus}
                 >
                     <Input.Password
-                           showCount
-                           iconRender={(visible) => (visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />)}
-                           onChange={(value) => onNewPassword2Change(value)}
-                           style={{width: 240}}
-                           placeholder={t('account.enter')}
+                        showCount
+                        iconRender={(visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>)}
+                        onChange={(value) => onNewPassword2Change(value)}
+                        style={{width: 240}}
+                        placeholder={t('account.enter')}
                     />
                 </Form.Item>
                 <Form.Item>

@@ -9,7 +9,6 @@ import {
     MonitorCogIcon,
     MonitorPlayIcon
 } from "lucide-react";
-import {List, type RowComponentProps} from 'react-window';
 import {Tooltip} from "antd";
 import {ChartConfig, ChartContainer} from "@/components/ui/chart";
 import {Pie, PieChart} from "recharts";
@@ -19,7 +18,7 @@ import portalApi, {CPUUsage, Stats} from "@/api/portal-api";
 import {useQuery} from "@tanstack/react-query";
 import strings from "@/utils/strings";
 import {renderSize} from "@/utils/utils";
-import SimpleBar from "simplebar-react";
+import {ScrollArea} from "@/components/ui/scroll-area";
 import {Skeleton} from "@/components/ui/skeleton";
 import {cn} from "@/lib/utils";
 import {CpuProgressBar} from '@/components/CpuProgressBar';
@@ -64,23 +63,17 @@ const defaultStats = {
 }
 
 const CpuList = ({cpus}: { cpus: CPUUsage[] }) => {
-
-    const Row = ({index, style, cpus}: RowComponentProps<{
-        cpus: CPUUsage[];
-    }>) => (
-        <div style={style} className="flex gap-2 items-center px-2 py-1">
-            <span className="w-6 text-right text-xs text-gray-400">{index + 1}</span>
-            <CpuProgressBar cpu={cpus[index]} index={index}/>
-        </div>
-    );
-
     return (
-        <List
-            rowComponent={Row}
-            rowCount={cpus.length}
-            rowHeight={24}
-            rowProps={{cpus}}
-        />
+        <ScrollArea style={{maxHeight: 220}}>
+            <div className="overflow-y-auto space-y-1 px-2">
+                {cpus.map((cpu, index) => (
+                    <div key={index} className="flex gap-2 items-center py-1">
+                        <span className="w-6 text-right text-xs text-gray-400">{index + 1}</span>
+                        <CpuProgressBar cpu={cpu} index={index}/>
+                    </div>
+                ))}
+            </div>
+        </ScrollArea>
     );
 };
 
@@ -116,7 +109,7 @@ const AccessStats = ({sessionId, open}: Props) => {
     }
 
     return (
-        <SimpleBar style={{
+        <ScrollArea style={{
             height: 'calc(100vh - 80px)',
         }}>
             <div className={'space-y-2 p-2'}>
@@ -377,7 +370,7 @@ const AccessStats = ({sessionId, open}: Props) => {
 
                 </div>
             </div>
-        </SimpleBar>
+        </ScrollArea>
     );
 };
 

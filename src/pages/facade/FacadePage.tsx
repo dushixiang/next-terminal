@@ -7,9 +7,8 @@ import clsx from "clsx";
 import {Search} from "lucide-react";
 import {Badge, Popover, Tooltip, Tree, Typography} from "antd";
 import {useTranslation} from "react-i18next";
-import {accessAsset} from "@/helper/access-tab-channel";
 import {getImgColor, getProtocolColor} from "@/helper/asset-helper";
-import {isMobileByMediaQuery, openOrSwitchToPage} from "@/utils/utils";
+import {isMobileByMediaQuery} from "@/utils/utils";
 import {safeEncode} from "@/utils/codec";
 import {cn} from "@/lib/utils";
 
@@ -250,17 +249,17 @@ const FacadePage = () => {
                                                 }
                                         }
                                     } else {
+                                        let msg = {
+                                            id: id,
+                                            name: item['name'],
+                                            protocol: item['protocol'],
+                                            status: item['status'],
+                                            wolEnabled: item.attrs?.['wol-enabled'] || false,
+                                        }
                                         props = {
-                                            onClick: () => {
-                                                let msg = {
-                                                    id: id,
-                                                    name: item['name'],
-                                                    protocol: item['protocol'],
-                                                }
-                                                const url = `/access?asset=${safeEncode(msg)}`;
-                                                openOrSwitchToPage(url, 'NT_Access');
-                                                accessAsset(msg);
-                                            }
+                                            href: `/access?asset=${safeEncode(msg)}`,
+                                            target: '_blank',
+                                            rel: 'noopener noreferrer',
                                         }
                                         break
                                     }

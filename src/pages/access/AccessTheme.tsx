@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import "@xterm/xterm/css/xterm.css";
 import XtermThemes from "@/color-theme/XtermThemes";
 import {CheckCard} from '@ant-design/pro-components';
-import SimpleBar from "simplebar-react";
+import {ScrollArea} from "@/components/ui/scroll-area";
 import {useWindowSize} from "react-use";
 import {useTerminalTheme} from "@/hook/use-terminal-theme";
 import {useTranslation} from 'react-i18next';
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import Disabled from "@/components/Disabled";
 
 const themes = XtermThemes;
@@ -76,11 +76,11 @@ const AccessTheme = () => {
     let [accessTheme, setAccessTheme] = useTerminalTheme();
     let {height} = useWindowSize();
     let {t} = useTranslation();
-    let [license] = useLicense();
+    let { license } = useLicense();
 
     return (
-        <SimpleBar style={{
-            maxHeight: height - 40,
+        <ScrollArea style={{
+            height: height - 80,
         }}>
             <div className={'flex items-center justify-center'}>
                 <div className={'m-8'}>
@@ -124,7 +124,7 @@ const AccessTheme = () => {
 
                 </div>
             </div>
-        </SimpleBar>
+        </ScrollArea>
     );
 };
 

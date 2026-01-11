@@ -16,7 +16,8 @@ export interface Website {
     description: string;
     status: string;
     statusText: string;
-    agentGatewayId: string;
+    gatewayType: string;
+    gatewayId: string;
     basicAuth: BasicAuth;
     headers?: any;
     cert: Cert;
@@ -75,6 +76,11 @@ class WebsiteApi extends Api<Website> {
 
     changeGroup = async (data: any) => {
         return await requests.post(`/${this.group}/change-group`, data);
+    }
+
+    // 统一的修改网关接口，支持 ssh/agent/group 三种类型
+    changeGateway = async (data: { websiteIds: string[], gatewayType: string, gatewayId: string }) => {
+        return await requests.post(`/${this.group}/change-gateway`, data);
     }
 
     updateSortPosition = async (req: SortPositionRequest) => {

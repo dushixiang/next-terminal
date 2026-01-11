@@ -19,13 +19,14 @@ export interface Asset {
     status: string;
     statusText: string;
     owner: string;
-    accessGatewayId: string;
+    gatewayType: string;
+    gatewayId: string;
     tags?: string[];
     attrs?: any;
     createdAt: number;
     lastAccessTime: number;
     groupId: string;
-    sort: string;  // LexoRank 排序字段
+    sort: string;
     groupFullName: string;
 }
 
@@ -69,6 +70,11 @@ class AssetApi extends Api<Asset> {
 
     changeGroup = async (data: any) => {
         return await requests.post(`/${this.group}/change-group`, data);
+    }
+
+    // 统一的修改网关接口，支持 ssh/agent/group 三种类型
+    changeGateway = async (data: { assetIds: string[], gatewayType: string, gatewayId: string }) => {
+        return await requests.post(`/${this.group}/change-gateway`, data);
     }
 
     getTags = async () => {

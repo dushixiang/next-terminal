@@ -19,7 +19,7 @@ interface Props {
 const ScheduledTaskLogPage = ({open, jobId, handleCancel}: Props) => {
 
     let {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
     let {modal} = App.useApp();
 
     useEffect(() => {

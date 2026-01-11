@@ -4,14 +4,14 @@ import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormSwitch, ProFormText, ProFormTreeSelect} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import Disabled from "@/components/Disabled";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import departmentApi from "@/api/department-api";
 
 const WechatWorkSetting = ({get, set}: SettingProps) => {
 
     let {t} = useTranslation();
     let [enabled, setEnabled] = useState(false);
-    let [license] = useLicense();
+    let { license } = useLicense();
 
     const wrapGet = async () => {
         let data = await get();

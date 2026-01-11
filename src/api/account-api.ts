@@ -1,7 +1,9 @@
 import requests from "./core/requests";
 import {setCurrentUser} from "@/utils/permission";
 import eventEmitter from "@/api/core/event-emitter";
+// @ts-ignore
 import {PublicKeyCredentialCreationOptionsJSON} from "@simplewebauthn/browser/script/types";
+// @ts-ignore
 import type {PublicKeyCredentialRequestOptionsJSON} from "@simplewebauthn/browser/esm/types";
 
 interface AccessToken {
@@ -29,6 +31,7 @@ export enum LoginStatus {
 
 export interface LoginStatusResult {
     status: LoginStatus;
+    passwordEnabled: boolean;
     webauthnEnabled: boolean;
     wechatWorkEnabled: boolean;
     oidcEnabled: boolean;
@@ -95,6 +98,22 @@ export interface WebauthnCredential {
 
 export type AuthType = 'passkey' | 'otp' | 'none' | '';
 
+export interface OidcConsentPageData {
+    clientID: string;
+    scopes: string[];
+    redirectURI: string;
+    state: string;
+    requestedBy: string;
+}
+
+export interface OidcUserConsentItem {
+    id: string;
+    clientId: string;
+    scopes: string[];
+    createdAt: number;
+    updatedAt: number;
+}
+
 class AccountApi {
 
     group = 'account';
@@ -156,8 +175,8 @@ class AccountApi {
         return await requests.post(`/${this.group}/change-info`, values);
     }
 
-    reloadTotp = async () => {
-        return await requests.get('/account/reload-totp') as Totp;
+    reloadTotp = async (host: string) => {
+        return await requests.get(`/account/reload-totp?host=${encodeURIComponent(host)}`) as Totp;
     }
 
     confirmTotp = async (values: any) => {
@@ -216,6 +235,44 @@ class AccountApi {
     generateSecurityTokenByMfa = async (passcode: number) => {
         let data = await requests.post(`/${this.group}/security-token/mfa?passcode=${passcode}&noerr`);
         return data['token'];
+    }
+
+    validateSecurityToken = async (token: string) => {
+        let data = await requests.post(`/${this.group}/security-token/validate?securityToken=${token}`);
+        return data['ok'] as boolean;
+    }
+
+    // OIDC Server Consent 相关方法
+    getOidcConsentPage = async (clientId: string, scopes: string, returnUrl: string, state?: string) => {
+        const queryParams = new URLSearchParams({
+            client_id: clientId,
+            scopes: scopes,
+            return_url: returnUrl,
+            ...(state && { state: state }),
+        });
+        let data = await requests.get(`/oidc/server/consent?${queryParams.toString()}`);
+        return data as OidcConsentPageData;
+    }
+
+    submitOidcConsent = async (clientId: string, returnUrl: string, allow: boolean, scopes: string[]): Promise<{ return_url: string }> => {
+        const queryParams = new URLSearchParams({
+            client_id: clientId,
+            return_url: returnUrl,
+        });
+        return await requests.post(`/oidc/server/consent?${queryParams.toString()}`, {
+            allow: allow,
+            scopes: scopes,
+        });
+    }
+
+    // 获取 OIDC Server 授权列表
+    getOidcServerConsents = async () => {
+        return await requests.get(`/${this.group}/oidc-server-consents`) as OidcUserConsentItem[];
+    }
+
+    // 撤销 OIDC Server 授权
+    revokeOidcServerConsent = async (clientId: string) => {
+        return await requests.delete(`/${this.group}/oidc-server-consents/${clientId}`);
     }
 }
 

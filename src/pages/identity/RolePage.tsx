@@ -10,16 +10,16 @@ import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
 import NButton from "../../components/NButton";
 import NLink from "@/components/NLink";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import Disabled from "@/components/Disabled";
 
 const api = roleApi;
 
 const RolePage = () => {
 
-    let [license] = useLicense();
+    let { license } = useLicense();
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();

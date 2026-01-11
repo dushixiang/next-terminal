@@ -33,7 +33,7 @@ const SshGatewayModal = ({
                              id,
                          }: Props) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
 
     let [decrypted, setDecrypted] = useState(false);
@@ -50,6 +50,7 @@ const SshGatewayModal = ({
             return await api.getById(id);
         }
         return {
+            configMode: 'direct',
             accountType: 'password',
             port: 22,
         };
@@ -142,33 +143,104 @@ const SshGatewayModal = ({
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <ProFormText hidden={true} name={'id'}/>
                 <ProFormText name={'name'} label={t('assets.name')} rules={[{required: true}]}/>
-                <Form.Item label={t('assets.addr')} className={'nesting-form-item'} rules={[{required: true}]}>
-                    <Space.Compact block>
-                        <Form.Item noStyle name='ip'
-                                   rules={[{required: true}]}>
-                            <Input style={{width: '70%'}} placeholder="hostname or ip"/>
-                        </Form.Item>
 
-                        <Form.Item noStyle name='port' rules={[{required: true}]}>
-                            <InputNumber style={{width: '30%'}} min={1} max={65535} placeholder='1-65535'/>
-                        </Form.Item>
-                    </Space.Compact>
-                </Form.Item>
-
+                {/* 配置模式选择 */}
                 <ProFormRadio.Group
-                    label={t('assets.account_type')} name='accountType' rules={[{required: true}]}
+                    label={t('gateways.config_mode')}
+                    name='configMode'
+                    rules={[{required: true}]}
                     options={[
-                        {label: t('assets.password'), value: 'password'},
-                        {label: t('assets.private_key'), value: 'private-key'},
-                        // {label: t('credential'), value: 'credential'},
+                        {label: t('gateways.config_mode_direct'), value: 'direct'},
+                        {label: t('gateways.config_mode_credential'), value: 'credential'},
+                        {label: t('gateways.config_mode_asset'), value: 'asset'},
                     ]}
                 />
-                <ProFormDependency name={['accountType']}>
-                    {
-                        ({accountType}) => {
-                            return renderAccountType(accountType)
+
+                <ProFormDependency name={['configMode']}>
+                    {({configMode}) => {
+                        if (configMode === 'direct') {
+                            // 直接配置模式
+                            return <>
+                                <Form.Item label={t('assets.addr')} className={'nesting-form-item'} rules={[{required: true}]}>
+                                    <Space.Compact block>
+                                        <Form.Item noStyle name='ip' rules={[{required: true}]}>
+                                            <Input style={{width: '70%'}} placeholder="hostname or ip"/>
+                                        </Form.Item>
+                                        <Form.Item noStyle name='port' rules={[{required: true}]}>
+                                            <InputNumber style={{width: '30%'}} min={1} max={65535} placeholder='1-65535'/>
+                                        </Form.Item>
+                                    </Space.Compact>
+                                </Form.Item>
+
+                                <ProFormRadio.Group
+                                    label={t('assets.account_type')} name='accountType' rules={[{required: true}]}
+                                    options={[
+                                        {label: t('assets.password'), value: 'password'},
+                                        {label: t('assets.private_key'), value: 'private-key'},
+                                    ]}
+                                />
+                                <ProFormDependency name={['accountType']}>
+                                    {({accountType}) => {
+                                        return renderAccountType(accountType)
+                                    }}
+                                </ProFormDependency>
+                            </>;
+                        } else if (configMode === 'credential') {
+                            // 凭据模式
+                            return <>
+                                <Form.Item label={t('assets.addr')} className={'nesting-form-item'} rules={[{required: true}]}>
+                                    <Space.Compact block>
+                                        <Form.Item noStyle name='ip' rules={[{required: true}]}>
+                                            <Input style={{width: '70%'}} placeholder="hostname or ip"/>
+                                        </Form.Item>
+                                        <Form.Item noStyle name='port' rules={[{required: true}]}>
+                                            <InputNumber style={{width: '30%'}} min={1} max={65535} placeholder='1-65535'/>
+                                        </Form.Item>
+                                    </Space.Compact>
+                                </Form.Item>
+
+                                <ProFormSelect
+                                    label={t('assets.credential')}
+                                    name='credentialId'
+                                    rules={[{required: true}]}
+                                    request={async () => {
+                                        let credentials = await credentialApi.getAll();
+                                        return credentials.map(item => {
+                                            return {
+                                                label: item.name,
+                                                value: item.id,
+                                            }
+                                        });
+                                    }}
+                                />
+                            </>;
+                        } else if (configMode === 'asset') {
+                            // 资产模式
+                            return <>
+                                <ProFormSelect
+                                    label={t('gateways.ssh_asset')}
+                                    name='assetId'
+                                    rules={[{required: true}]}
+                                    request={async () => {
+                                        let assets = await api.getAvailableAssets();
+                                        return assets.map(item => {
+                                            return {
+                                                label: `${item.name} (${item.ip}:${item.port})`,
+                                                value: item.id,
+                                                disabled: !item.canBeGateway,
+                                                title: item.disableReason || `${item.ip}:${item.port}`,
+                                            }
+                                        });
+                                    }}
+                                    fieldProps={{
+                                        showSearch: true,
+                                        optionFilterProp: 'label',
+                                    }}
+                                />
+                            </>;
                         }
-                    }
+                        return null;
+                    }}
                 </ProFormDependency>
             </ProForm>
 

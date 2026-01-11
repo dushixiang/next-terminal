@@ -10,7 +10,7 @@ import {LoginLog} from "@/api/user-api";
 const LoginLogPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     let {modal} = App.useApp();
 

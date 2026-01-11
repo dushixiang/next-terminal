@@ -9,7 +9,7 @@ export interface Props {
 }
 
 const Disabled = ({disabled, children, classNames, style}: Props) => {
-    let ref = useRef<HTMLDivElement>();
+    let ref = useRef<HTMLDivElement>(null);
     let {t} = useTranslation();
 
     useEffect(() => {

@@ -25,7 +25,7 @@ export interface UserModalProps {
 
 const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModalProps) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
 
     const get = async () => {

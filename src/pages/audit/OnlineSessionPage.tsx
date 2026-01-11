@@ -10,7 +10,7 @@ import {getProtocolColor} from "@/helper/asset-helper";
 
 const OnlineSessionPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     const {message} = App.useApp();
 

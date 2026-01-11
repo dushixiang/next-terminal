@@ -5,34 +5,22 @@ import {CleanTheme, DefaultTerminalTheme, useTerminalTheme} from "@/hook/use-ter
 import {getAvailableFonts} from "@/utils/utils";
 import {App} from "antd";
 import accessSettingApi from "@/api/access-setting-api";
-import {useAccessSetting} from "@/hook/use-access-setting";
-import {useQuery} from "@tanstack/react-query";
+import {ScrollArea} from "@/components/ui/scroll-area";
+import {useWindowSize} from "react-use";
 
 
 const AccessSetting = () => {
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
+    let {height} = useWindowSize();
 
     let [terminalTheme, setTerminalTheme] = useTerminalTheme();
-    let [_, setAccessSetting] = useAccessSetting();
     let {message} = App.useApp();
 
     const [availableFonts, setAvailableFonts] = useState([]);
     const [previewFont, setPreviewFont] = useState<string>('');
     const [previewFontSize, setPreviewFontSize] = useState<number>(14);
     const [previewLineHeight, setPreviewLineHeight] = useState<number>(1.2);
-
-    let settingQuery = useQuery({
-        queryKey: ['access-setting'],
-        queryFn: accessSettingApi.get,
-        enabled: false,
-    });
-
-    useEffect(() => {
-        if (settingQuery.data) {
-            setAccessSetting(settingQuery.data);
-        }
-    }, [settingQuery.data]);
 
     useEffect(() => {
         const loadFonts = async () => {
@@ -75,7 +63,9 @@ const AccessSetting = () => {
     }
 
     return (
-        <div className={'flex items-center'}>
+        <ScrollArea style={{
+            height: height - 80,
+        }}>
             <div className={'m-8'}>
                 <div className={'text-lg font-bold'}>{t('access.settings.system')}</div>
 
@@ -95,8 +85,6 @@ const AccessSetting = () => {
                         })
                         await accessSettingApi.set(record);
                         message.success(t('general.success'));
-
-                        settingQuery.refetch();
                     }}>
                         <div>{t('access.settings.font')}</div>
 
@@ -231,10 +219,18 @@ const AccessSetting = () => {
                                 name={'rightClickPaste'}
                             />
                         </div>
+
+                        <div>{t('access.settings.keyboard.label')}</div>
+                        <div className={'my-4 flex p-4 border gap-2 rounded'}>
+                            <ProFormCheckbox
+                                label={t('access.settings.keyboard.intercept_search_shortcut')}
+                                name={'interceptSearchShortcut'}
+                            />
+                        </div>
                     </ProForm>
                 </div>
             </div>
-        </div>
+        </ScrollArea>
     );
 };
 

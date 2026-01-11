@@ -31,7 +31,7 @@ const CredentialModal = ({
                              id,
                          }: CredentialProps) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
     let [decrypted, setDecrypted] = useState(false);
     let [mfaOpen, setMfaOpen] = useState(false);

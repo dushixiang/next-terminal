@@ -11,7 +11,7 @@ const {Title, Paragraph} = Typography;
 const SshdSetting = ({get, set}: SettingProps) => {
 
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let [enabled, setEnabled] = useState(false);
     let [portForwardEnabled, setPortForwardEnabled] = useState(false);
 

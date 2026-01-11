@@ -20,6 +20,7 @@ const AuthorisedWebsitePost = lazy(() => import("@/pages/authorised/AuthorisedWe
 const LoginPage = lazy(() => import("@/pages/account/LoginPage"));
 const WechatWorkCallback = lazy(() => import("@/pages/account/WechatWorkCallback"));
 const OidcCallback = lazy(() => import("@/pages/account/OidcCallback"));
+const OidcServerConsent = lazy(() => import("@/pages/account/OidcServerConsent"));
 const MobileAccessTerminal = lazy(() => import("@/pages/access/MobileAccessTerminal"));
 const UserPage = lazy(() => import("@/pages/identity/UserPage"));
 const UserDetailPage = lazy(() => import("@/pages/identity/UserDetailPage"));
@@ -33,6 +34,7 @@ const LoginLockedPage = lazy(() => import("@/pages/identity/LoginLockedPage"));
 const LoginPolicyPage = lazy(() => import("@/pages/identity/LoginPolicyPage"));
 const LoginPolicyPostPage = lazy(() => import("@/pages/identity/LoginPolicyPostPage"));
 const LoginPolicyDetailPage = lazy(() => import("@/pages/identity/LoginPolicyDetailPage"));
+const OidcClientPage = lazy(() => import("@/pages/identity/OidcClientPage"));
 const AssetsPage = lazy(() => import("@/pages/assets/AssetPage"));
 const CredentialPage = lazy(() => import("@/pages/assets/CredentialPage"));
 const CertificatePage = lazy(() => import("@/pages/assets/CertificatePage"));
@@ -55,6 +57,7 @@ const AccessLogPage = lazy(() => import("@/pages/audit/AccessLogPage"));
 const AccessLogStatsPage = lazy(() => import("@/pages/audit/AccessLogStatsPage"));
 const SshGatewayPage = lazy(() => import("@/pages/gateway/SshGatewayPage"));
 const AgentGatewayPage = lazy(() => import("@/pages/gateway/AgentGatewayPage"));
+const GatewayGroupPage = lazy(() => import("@/pages/gateway/GatewayGroupPage"));
 const ErrorPage = lazy(() => import("@/components/ErrorPage"));
 const StoragePage = lazy(() => import("@/pages/assets/StoragePage"));
 const WebsitePage = lazy(() => import("@/pages/assets/WebsitePage"));
@@ -75,6 +78,7 @@ const router = createBrowserRouter([
     {path: "/login", element: <LoginPage/>},
     {path: "/wechat-work/callback", element: <WechatWorkCallback/>},
     {path: "/oidc/callback", element: <OidcCallback/>},
+    {path: "/oidc/server/consent", element: <OidcServerConsent/>},
     {path: "/terminal-playback", element: <TerminalPlayback/>},
     {path: "/terminal-monitor", element: <TerminalMonitor/>},
     {path: "/graphics-playback", element: <GuacdPlayback/>},
@@ -107,6 +111,7 @@ const router = createBrowserRouter([
             {path: "/login-policy/:loginPolicyId", element: <LoginPolicyDetailPage/>},
             {path: "/role", element: <RolePage/>},
             {path: "/role/:roleId", element: <RoleDetail/>},
+            {path: "/oidc-client", element: <OidcClientPage/>},
             {path: "/login-log", element: <LoginLogPage/>},
             {path: "/operation-log", element: <OperationLogPage/>},
 
@@ -137,6 +142,7 @@ const router = createBrowserRouter([
 
             {path: "/ssh-gateway", element: <SshGatewayPage/>},
             {path: "/agent-gateway", element: <AgentGatewayPage/>},
+            {path: "/gateway-group", element: <GatewayGroupPage/>},
 
             {path: "/setting", element: <SettingPage/>},
             {path: "/info", element: <InfoPage/>},
@@ -167,10 +173,6 @@ function App() {
     }
 
     const validate_error = (errorCode: number, error: string) => {
-        if (window.location.pathname === '/access') {
-            return;
-        }
-
         let msg = t(`errors.${errorCode}`);
         if (!msg || msg === `errors.${errorCode}`) {
             msg = error;

@@ -10,7 +10,7 @@ import SshdSetting from "./SshdSetting";
 import {useSearchParams} from "react-router-dom";
 import propertyApi from "../../api/property-api";
 import {useTranslation} from "react-i18next";
-import {maybe} from "../../utils/maybe";
+import {maybe} from "@/utils/maybe.ts";
 
 import SystemSetting from "@/pages/sysconf/SystemSetting";
 import About from "@/pages/sysconf/About";
@@ -18,7 +18,8 @@ import GeoIPSetting from "./GeoIPSetting";
 import BackupSetting from "./BackupSetting";
 import LogoSetting from "@/pages/sysconf/LogoSetting";
 import IdentitySetting from "@/pages/sysconf/IdentitySetting";
-import {useLicense} from "@/hook/use-license";
+import IdentitySourceSetting from "@/pages/sysconf/IdentitySourceSetting";
+import {useLicense} from "@/hook/LicenseContext";
 import NetworkSetting from "@/pages/sysconf/NetworkSetting";
 import LLMSetting from "@/pages/sysconf/LLMSetting";
 import {useMobile} from "@/hook/use-mobile";
@@ -34,7 +35,7 @@ const SettingPage = () => {
     const { isMobile } = useMobile();
     const [messageApi, contextHolder] = message.useMessage();
     const [searchParams, setSearchParams] = useSearchParams();
-    let [license] = useLicense();
+    let { license } = useLicense();
 
     let key = maybe(searchParams.get('activeKey'), 'system-setting');
 
@@ -88,9 +89,14 @@ const SettingPage = () => {
             children: <MailSetting get={get} set={set}/>
         },
         {
-            label: t('settings.identity.setting'),
+            label: '认证方式',
             key: 'ldap',
             children: <IdentitySetting get={get} set={set}/>
+        },
+        {
+            label: '身份服务',
+            key: 'identity-source',
+            children: <IdentitySourceSetting get={get} set={set}/>
         },
         {
             label: t('settings.log.setting'),

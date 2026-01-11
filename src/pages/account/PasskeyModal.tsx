@@ -21,7 +21,7 @@ const PasskeyModal = ({
                       }: Props) => {
 
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     const get = async () => {
         return credential;
     }

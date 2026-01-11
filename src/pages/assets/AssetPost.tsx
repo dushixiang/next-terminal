@@ -1,14 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {
-    App,
-    Collapse,
-    Form,
-    Input,
-    InputNumber,
-    Space,
-    theme,
-    TreeDataNode,
-} from "antd";
+import {App, Collapse, Form, Input, InputNumber, Space, theme, TreeDataNode,} from "antd";
 import {
     ProForm,
     ProFormDependency,
@@ -27,6 +18,7 @@ import assetsApi, {Asset} from "../../api/asset-api";
 import agentGatewayApi from "@/api/agent-gateway-api";
 import strings from "@/utils/strings";
 import sshGatewayApi from "@/api/ssh-gateway-api";
+import gatewayGroupApi from "@/api/gateway-group-api";
 import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 import AssetLogo from "./components/AssetLogo";
 import AccountTypeForm from "./components/AccountTypeForm";
@@ -47,7 +39,7 @@ interface AssetsInfoProps {
 const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps) {
 
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
 
     let [logo, setLogo] = useState<string>();
     let [decrypted, setDecrypted] = useState(false);
@@ -166,6 +158,30 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
         border: 'none',
     };
 
+    const sshGatewayRequest = async () => {
+        const items = await sshGatewayApi.getAll();
+        return items.map(item => ({
+            label: item.name,
+            value: item.id,
+        }));
+    };
+
+    const agentGatewayRequest = async () => {
+        const items = await agentGatewayApi.getAll();
+        return items.map(item => ({
+            label: item.name,
+            value: item.id,
+        }));
+    };
+
+    const gatewayGroupRequest = async () => {
+        const items = await gatewayGroupApi.getAll();
+        return items.map(item => ({
+            label: item.name,
+            value: item.id,
+        }));
+    };
+
     return (
         <div className="px-4">
             <ProForm {...formItemLayout}
@@ -173,11 +189,11 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                      request={get} onFinish={wrapSet}
             >
                 <ProFormText hidden={true} name={'id'}/>
-                
-                <AssetLogo value={logo} onChange={setLogo} />
-                
+
+                <AssetLogo value={logo} onChange={setLogo}/>
+
                 <ProFormText name={'name'} label={t('assets.name')} rules={[{required: true}]}/>
-                
+
                 <ProFormSegmented
                     label={t('assets.protocol')} name='protocol' rules={[{required: true}]}
                     valueEnum={{
@@ -209,7 +225,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                         }
                     }}
                 />
-                
+
                 <Form.Item label={t('assets.addr')} className={'nesting-form-item'}>
                     <Space.Compact block>
                         <Form.Item noStyle name='ip'
@@ -234,29 +250,59 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                     {({protocol}) => renderProtocol(protocol)}
                 </ProFormDependency>
 
-                <ProFormSelect
-                    label={t('assets.agent_gateway')} name='agentGatewayId'
-                    request={async () => {
-                        let items = await agentGatewayApi.getAll();
-                        return items.map(item => ({
-                            label: item.name,
-                            value: item.id,
-                        }));
-                    }}
+                <ProFormRadio.Group
+                    label={t('assets.gateway_type')}
+                    name='gatewayType'
+                    options={[
+                        {label: t('assets.no_gateway'), value: ''},
+                        {label: t('assets.ssh_gateway'), value: 'ssh'},
+                        {label: t('assets.agent_gateway'), value: 'agent'},
+                        {label: t('assets.gateway_group'), value: 'group'},
+                    ]}
                 />
 
-                <ProFormSelect
-                    label={t('assets.ssh_gateway')} name='sshGatewayId'
-                    extra={t('assets.gateway_tip')}
-                    request={async () => {
-                        let items = await sshGatewayApi.getAll();
-                        return items.map(item => ({
-                            label: item.name,
-                            value: item.id,
-                        }));
+                <ProFormDependency name={['gatewayType']}>
+                    {({gatewayType}) => {
+                        if (gatewayType === 'ssh') {
+                            return (
+                                <ProFormSelect
+                                    key="ssh"
+                                    label={t('assets.ssh_gateway')}
+                                    name='gatewayId'
+                                    request={sshGatewayRequest}
+                                    params={{gatewayType}}
+                                    showSearch
+                                    rules={[{required: true}]}
+                                />
+                            );
+                        } else if (gatewayType === 'agent') {
+                            return (
+                                <ProFormSelect
+                                    key="agent"
+                                    label={t('assets.agent_gateway')}
+                                    name='gatewayId'
+                                    request={agentGatewayRequest}
+                                    params={{gatewayType}}
+                                    showSearch
+                                    rules={[{required: true}]}
+                                />
+                            );
+                        } else if (gatewayType === 'group') {
+                            return (
+                                <ProFormSelect
+                                    key="group"
+                                    label={t('assets.gateway_group')}
+                                    name='gatewayId'
+                                    request={gatewayGroupRequest}
+                                    params={{gatewayType}}
+                                    showSearch
+                                    rules={[{required: true}]}
+                                />
+                            );
+                        }
+                        return null;
                     }}
-                    showSearch
-                />
+                </ProFormDependency>
 
                 <ProFormSelect
                     label={t('assets.tags')} name='tags'
@@ -288,7 +334,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
 
                 <ProFormTextArea label={t('assets.description')} name='description'
                                  fieldProps={{rows: 4}}/>
-                                 
+
                 <Collapse
                     defaultActiveKey={['advanced_setting']}
                     ghost
@@ -301,7 +347,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                             children: (
                                 <ProFormDependency name={['protocol']}>
                                     {({protocol}) => (
-                                        <AssetAdvancedSettings protocol={protocol} />
+                                        <AssetAdvancedSettings protocol={protocol}/>
                                     )}
                                 </ProFormDependency>
                             ),

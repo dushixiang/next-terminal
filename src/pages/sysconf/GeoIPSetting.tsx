@@ -4,7 +4,7 @@ import {useTranslation} from "react-i18next";
 import {Download, Info, MapPin} from 'lucide-react';
 import requests from '@/api/core/requests';
 import Disabled from "@/components/Disabled";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import {renderSize} from "@/utils/utils";
 import dayjs from "dayjs";
 
@@ -22,7 +22,7 @@ const GeoIPSetting = () => {
     const [fileInfo, setFileInfo] = useState<GeoIPFileInfo | null>(null);
     const [loading, setLoading] = useState(false);
     const [updating, setUpdating] = useState(false);
-    const [license] = useLicense();
+    const { license } = useLicense();
 
     // 获取 GeoIP 文件信息
     const fetchFileInfo = async () => {

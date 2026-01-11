@@ -9,6 +9,7 @@ import {
     ProFormGroup,
     ProFormInstance,
     ProFormList,
+    ProFormRadio,
     ProFormSelect,
     ProFormSwitch,
     ProFormText,
@@ -23,10 +24,12 @@ import { ServerIcon, TrashIcon, UploadIcon } from "lucide-react";
 
 import websiteApi from "@/api/website-api";
 import agentGatewayApi from "@/api/agent-gateway-api";
+import sshGatewayApi from "@/api/ssh-gateway-api";
+import gatewayGroupApi from "@/api/gateway-group-api";
 import assetsApi from "@/api/asset-api";
 import certificateApi from "@/api/certificate-api";
 import WebsiteModifyResponseView from "@/pages/assets/WebsiteModifyResponseView";
-import { useLicense } from "@/hook/use-license";
+import { useLicense } from "@/hook/LicenseContext";
 import Disabled from "@/components/Disabled";
 
 // ==================== 常量定义 ====================
@@ -62,8 +65,9 @@ interface WebsiteFormData {
     targetUrl: string;
     logo?: string;
     groupId?: string;
-    agentGatewayId?: string;
+    gatewayId?: string;
     preserveHost?: boolean;
+    disableAccessLog?: boolean;
     headers?: Array<{ name: string; value: string }>;
     basicAuth?: {
         enabled: boolean;
@@ -282,13 +286,29 @@ const BasicView: React.FC<{
         { value: 'https', label: 'HTTPS' },
     ], []);
 
-    const agentGatewayRequest = useCallback(async () => {
+    const agentGatewayRequest = async () => {
         const items = await agentGatewayApi.getAll();
         return items.map(item => ({
             label: item.name,
             value: item.id,
         }));
-    }, []);
+    };
+
+    const sshGatewayRequest = async () => {
+        const items = await sshGatewayApi.getAll();
+        return items.map(item => ({
+            label: item.name,
+            value: item.id,
+        }));
+    };
+
+    const gatewayGroupRequest = async () => {
+        const items = await gatewayGroupApi.getAll();
+        return items.map(item => ({
+            label: item.name,
+            value: item.id,
+        }));
+    };
 
     const transformGroupData = useCallback((data: any[]): any[] => {
         return data.map(item => ({
@@ -314,11 +334,20 @@ const BasicView: React.FC<{
                             logosData={logosData}
                         />
                     </div>
-                    <div className="flex-1 pt-2">
+                    <div className="flex items-center gap-2">
                         <ProFormSwitch
                             label={t('general.enabled')}
                             name="enabled"
                             rules={[{ required: true }]}
+                            fieldProps={{
+                                checkedChildren: t('general.yes'),
+                                unCheckedChildren: t('general.no'),
+                            }}
+                        />
+                        <ProFormSwitch
+                            label={t('assets.disable_access_log')}
+                            name="disableAccessLog"
+                            tooltip={t('assets.disable_access_log_tip')}
                             fieldProps={{
                                 checkedChildren: t('general.yes'),
                                 unCheckedChildren: t('general.no'),
@@ -406,11 +435,59 @@ const BasicView: React.FC<{
                 </div>
             </Card>
 
-            <ProFormSelect
-                label={t('assets.agent_gateway')}
-                name="agentGatewayId"
-                request={agentGatewayRequest}
+            <ProFormRadio.Group
+                label={t('assets.gateway_type')}
+                name='gatewayType'
+                options={[
+                    {label: t('assets.no_gateway'), value: ''},
+                    {label: t('assets.ssh_gateway'), value: 'ssh'},
+                    {label: t('assets.agent_gateway'), value: 'agent'},
+                    {label: t('assets.gateway_group'), value: 'group'},
+                ]}
             />
+
+            <ProFormDependency name={['gatewayType']}>
+                {({gatewayType}) => {
+                    if (gatewayType === 'ssh') {
+                        return (
+                            <ProFormSelect
+                                key="ssh"
+                                label={t('assets.ssh_gateway')}
+                                name='gatewayId'
+                                request={sshGatewayRequest}
+                                params={{gatewayType}}
+                                showSearch
+                                rules={[{required: true}]}
+                            />
+                        );
+                    } else if (gatewayType === 'agent') {
+                        return (
+                            <ProFormSelect
+                                key="agent"
+                                label={t('assets.agent_gateway')}
+                                name='gatewayId'
+                                request={agentGatewayRequest}
+                                params={{gatewayType}}
+                                showSearch
+                                rules={[{required: true}]}
+                            />
+                        );
+                    } else if (gatewayType === 'group') {
+                        return (
+                            <ProFormSelect
+                                key="group"
+                                label={t('assets.gateway_group')}
+                                name='gatewayId'
+                                request={gatewayGroupRequest}
+                                params={{gatewayType}}
+                                showSearch
+                                rules={[{required: true}]}
+                            />
+                        );
+                    }
+                    return null;
+                }}
+            </ProFormDependency>
         </div>
     );
 });
@@ -654,8 +731,8 @@ const WebsiteDrawer: React.FC<WebsiteDrawerProps> = ({
     id,
 }) => {
     const { t } = useTranslation();
-    const [license] = useLicense();
-    const formRef = useRef<ProFormInstance>();
+    const { license } = useLicense();
+    const formRef = useRef<ProFormInstance>(null);
 
     const {
         timeLimit,

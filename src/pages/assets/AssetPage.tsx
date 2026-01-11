@@ -8,11 +8,11 @@ import {useTranslation} from "react-i18next";
 import assetsApi, {Asset, SortPositionRequest} from '@/api/asset-api';
 import NButton from "@/components/NButton";
 import AssetTree from "@/pages/assets/AssetTree";
-import {accessAsset} from "@/helper/access-tab-channel";
 import clsx from "clsx";
 import {getImgColor, getProtocolColor} from "@/helper/asset-helper";
 import AssetTreeChoose from "@/pages/assets/AssetTreeChoose";
-import {browserDownload, openOrSwitchToPage} from "@/utils/utils";
+import AssetGatewayChoose from "@/pages/assets/AssetGatewayChoose";
+import {browserDownload} from "@/utils/utils";
 import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 import {PanelLeftCloseIcon, PanelLeftOpenIcon} from "lucide-react";
@@ -70,6 +70,7 @@ const AssetPage = () => {
     let [dataSource, setDataSource] = useState<Asset[]>([]);
 
     let [groupChooserOpen, setGroupChooserOpen] = useState(false);
+    let [gatewayChooserOpen, setGatewayChooserOpen] = useState(false);
     let [params, setParams] = useState<PostParams>({
         open: false,
         assetId: undefined,
@@ -81,9 +82,16 @@ const AssetPage = () => {
     let {t} = useTranslation();
     let {modal, message} = App.useApp();
 
-    const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(false);
+    const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(() => {
+        const saved = localStorage.getItem('asset-tree-collapsed');
+        return saved ? JSON.parse(saved) : false;
+    });
 
     const assetIdFromUrl = queryState.assetId;
+
+    useEffect(() => {
+        localStorage.setItem('asset-tree-collapsed', JSON.stringify(isTreeCollapsed));
+    }, [isTreeCollapsed]);
 
     useEffect(() => {
         if (assetIdFromUrl) {
@@ -354,21 +362,24 @@ const AssetPage = () => {
             render: (text, record, index, action) => {
                 const id = record['id'];
                 return [
-                    <NButton
+                    <a
                         key={`btn-access-${id}`}
-                        onClick={() => {
+                        href={(() => {
                             let msg = {
                                 id: id,
                                 name: record['name'],
                                 protocol: record['protocol'],
+                                status: record['status'],
+                                wolEnabled: record.attrs?.['wol-enabled'] || false,
                             }
-                            const url = `/access?asset=${safeEncode(msg)}`;
-                            openOrSwitchToPage(url, 'NT_Access');
-                            accessAsset(msg);
-                        }}
+                            return `/access?asset=${safeEncode(msg)}`;
+                        })()}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ant-btn ant-btn-default ant-btn-sm"
                     >
                         {isMobile ? t('assets.access').substring(0, 2) : t('assets.access')}
-                    </NButton>,
+                    </a>,
                     <TableDropdown
                         key={`perm-action-${id}`}
                         onSelect={(key) => {
@@ -414,6 +425,7 @@ const AssetPage = () => {
                     />,
                 ]
             },
+            fixed: 'right'
         },
     ];
 
@@ -512,6 +524,14 @@ const AssetPage = () => {
                         }}
                     >
                         {t('assets.change_group')}
+                    </NButton>
+                    <NButton
+                        onClick={() => {
+                            setSelectedRowKeys(selectedRowKeys as string[]);
+                            setGatewayChooserOpen(true);
+                        }}
+                    >
+                        {t('assets.change_gateway')}
                     </NButton>
                     <NButton
                         onClick={() => {
@@ -650,6 +670,17 @@ const AssetPage = () => {
             open={groupChooserOpen}
             onClose={() => {
                 setGroupChooserOpen(false);
+                setSelectedRowKeys([]);
+                actionRef.current?.reload();
+            }}
+        />
+
+        <AssetGatewayChoose
+            type={'asset'}
+            resourceIds={selectedRowKeys}
+            open={gatewayChooserOpen}
+            onClose={() => {
+                setGatewayChooserOpen(false);
                 setSelectedRowKeys([]);
                 actionRef.current?.reload();
             }}

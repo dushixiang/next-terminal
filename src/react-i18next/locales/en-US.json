@@ -26,7 +26,8 @@
     "required": "Required",
     "error": "Operation failed",
     "status": "State",
-    "language": "Language"
+    "language": "Language",
+    "confirm_delete": "Confirm deletion of this item?"
   },
   "actions": {
     "option": "Actions",
@@ -50,7 +51,12 @@
     "save": "Save",
     "remove": "Remove",
     "label": "Actions",
-    "batch_delete": "Batch Delete"
+    "batch_delete": "Batch Delete",
+    "refresh": "Refresh",
+    "create": "Create",
+    "submit": "Submit",
+    "actions": "Operation",
+    "confirm": "Confirm"
   },
   "dashboard": {
     "name": "Dashboard",
@@ -122,7 +128,8 @@
       "label": "Gateway",
       "submenus": {
         "ssh_gateway": "SSH Gateway",
-        "agent_gateway": "Security Gateway"
+        "agent_gateway": "Security Gateway",
+        "gateway_group": "Gateway Group"
       }
     },
     "log_audit": {
@@ -373,7 +380,9 @@
         "ldap": "LDAP",
         "wechat": "WeCom",
         "oidc": "OIDC"
-      }
+      },
+      "department": "Department",
+      "select_department": "Please select a department."
     },
     "options": {
       "authorized_asset": "Authorized Assets",
@@ -693,6 +702,10 @@
         "label": "Mouse settings",
         "selection_copy": "Select Copy",
         "right_click_paste": "Right-click paste"
+      },
+      "keyboard": {
+        "label": "Keyboard Settings",
+        "intercept_search_shortcut": "Intercept search shortcut (Ctrl/Cmd+F)"
       }
     },
     "batch": {
@@ -726,6 +739,22 @@
       "closeOthers": "Close other tabs",
       "closeAll": "Close all tabs",
       "reconnect": "Reconnect"
+    },
+    "wol": {
+      "title": "Wake Up Asset",
+      "message": "Asset {{name}} is offline. Do you want to wake it up?",
+      "confirm": "Wake Up",
+      "waking": "Sending wake-up command...",
+      "countdown_message": "Waiting for device to start, time remaining:",
+      "seconds": "s",
+      "checking": "Checking if asset is online...",
+      "online": "Asset Online",
+      "online_desc": "Asset has been successfully woken up and is online. You can connect now.",
+      "offline": "Asset Offline",
+      "offline_desc": "Asset may not have fully started yet. Please retry detection later.",
+      "failed": "Wake-up Failed",
+      "check_now": "Check Now",
+      "connect": "Connect Now"
     }
   },
   "account": {
@@ -1088,7 +1117,17 @@
         "rdp_desc": "Traditional RDP encryption mode, commonly used for older Windows servers"
       }
     },
-    "sort": "Sort"
+    "sort": "Sort",
+    "disable_access_log": "Disable access logs",
+    "disable_access_log_tip": "When enabled, access requests to this website will not be recorded in the access log.",
+    "gateway_type": "Gateway Type",
+    "no_gateway": "Do not use a gateway",
+    "gateway_group": "Gateway Group",
+    "select_gateway_type": "Please select the gateway type.",
+    "select_gateway_group": "Please select a gateway group.",
+    "change_gateway": "Configure gateway",
+    "select_agent_gateway": "Please select a security gateway.",
+    "select_ssh_gateway": "Please select an SSH gateway."
   },
   "gateways": {
     "name": "Name",
@@ -1156,7 +1195,17 @@
     "sort": "Sorting",
     "sort_success": "Sorting successful",
     "add_token": "Add Token",
-    "edit_token_remark": "Edit Token Remark"
+    "edit_token_remark": "Edit Token Remark",
+    "method_auto": "Method 1: Automatic Installation (Recommended)",
+    "method_manual": "Method 2: Manual Installation",
+    "run_register_command": "Run register command (Automatically install and start service)",
+    "run_register_command_admin": "Run register command (Open CMD with administrator privileges)",
+    "register_tip": "This command will automatically generate configuration file, install and start the system service",
+    "config_mode": "Configuration Mode",
+    "config_mode_direct": "Direct configuration",
+    "config_mode_credential": "Citation credentials",
+    "config_mode_asset": "Referenced asset",
+    "ssh_asset": "SSH assets"
   },
   "settings": {
     "system": {
@@ -1237,7 +1286,8 @@
         "origins_tip": "Do not include trailing /",
         "origins_error": "Please enter a valid URL"
       },
-      "disable_password_login": "Disable password login"
+      "disable_password_login": "Disable password login",
+      "access_mfa_expires_at": "Effective duration of multi-factor authentication for connected assets"
     },
     "sshd": {
       "setting": "SSH Proxy Server",
@@ -1490,5 +1540,23 @@
     "group_name": "Group Name",
     "group_name_placeholder": "Please enter the group name",
     "group_name_required": "Group name cannot be empty"
+  },
+  "gateway_group": {
+    "name": "Group Name",
+    "name_placeholder": "Please enter a group name",
+    "description": "Description",
+    "description_placeholder": "Please enter a description",
+    "selection_mode": "Select Mode",
+    "mode_priority": "Priority Mode",
+    "mode_latency": "Delay Mode",
+    "mode_random": "Random Mode",
+    "members": "Gateway member",
+    "member": "Member",
+    "add_member": "Add gateway member",
+    "priority": "Priority",
+    "priority_tooltip": "The smaller the number, the higher the priority; takes effect in priority mode.",
+    "enabled": "Enable",
+    "create": "Create Gateway Group",
+    "edit": "Edit Gateway Group"
   }
 }

@@ -24,6 +24,12 @@ export interface UpgradeStatus {
     status: string;
 }
 
+export interface ClientIPs {
+    direct: string;
+    "x-real-ip": string;
+    "x-forwarded-for": string;
+}
+
 class PropertyApi {
     group = "admin/properties";
 
@@ -74,6 +80,11 @@ class PropertyApi {
     upgradeStatus = async () => {
         let data = await requests.get(`/${this.group}/upgrade-status`);
         return data as UpgradeStatus;
+    }
+
+    getClientIPs = async () => {
+        let data = await requests.get(`/${this.group}/client-ips`);
+        return data as ClientIPs;
     }
 }
 

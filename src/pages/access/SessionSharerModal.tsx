@@ -18,7 +18,7 @@ const {Paragraph} = Typography;
 const SessionSharerModal = ({open, onClose, sessionId}: Props) => {
 
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
 
     let {message} = App.useApp();
 

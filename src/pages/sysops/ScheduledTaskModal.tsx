@@ -22,7 +22,7 @@ const ScheduledTaskModal = ({
                                 id,
                             }: Props) => {
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let [spec, setSpec] = useState('');
     let [runtimeOpen, setRuntimeOpen] = useState(false);
 

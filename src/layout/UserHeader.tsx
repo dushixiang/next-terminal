@@ -4,12 +4,14 @@ import {useQuery} from "@tanstack/react-query";
 import brandingApi from "@/api/branding-api";
 import {Drawer, Dropdown, Menu, Select, Spin} from "antd";
 import accountApi from "@/api/account-api";
-import {isMobileByMediaQuery, openOrSwitchToPage} from "@/utils/utils";
 import {
     ChevronDownIcon,
     LanguagesIcon,
     LaptopIcon,
-    LayoutDashboard, LogOutIcon, MenuIcon, UserIcon
+    LayoutDashboard,
+    LogOutIcon,
+    MenuIcon,
+    UserIcon
 } from "lucide-react";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
@@ -91,11 +93,11 @@ const UserHeader = () => {
                 <div className="h-14 flex gap-2 lg:gap-8 items-center px-4 lg:px-20">
                     {/* 移动端汉堡菜单图标 */}
                     {isMobile && (
-                        <div 
+                        <div
                             className={'cursor-pointer text-white'}
                             onClick={() => setMobileMenuVisible(true)}
                         >
-                            <MenuIcon className={'w-6 h-6'} />
+                            <MenuIcon className={'w-6 h-6'}/>
                         </div>
                     )}
 
@@ -156,14 +158,14 @@ const UserHeader = () => {
                                 }}
                             />
 
-                            <div className={'cursor-pointer'}
-                                 onClick={() => {
-                                     const url = `/access`;
-                                     openOrSwitchToPage(url, 'NT_Access');
-                                 }}
+                            <a
+                                className={'cursor-pointer'}
+                                href="/access"
+                                target="_blank"
+                                rel="noopener noreferrer"
                             >
                                 <LaptopIcon className={'w-5 h-5 text-white'}/>
-                            </div>
+                            </a>
                         </div>
                     }
 
@@ -196,8 +198,8 @@ const UserHeader = () => {
                             <Link to={'/x-asset'} onClick={() => setMobileMenuVisible(false)}>
                                 <div className={'flex items-center gap-2 justify-center h-[60px]'}>
                                     {brandingQuery.data && (
-                                        <img 
-                                            src={brandingApi.getLogo()} 
+                                        <img
+                                            src={brandingApi.getLogo()}
                                             alt='logo'
                                             className={'h-8 w-8 rounded'}
                                         />
@@ -252,17 +254,18 @@ const UserHeader = () => {
                         </div>
 
                         {/* 访问页面按钮 */}
-                        <div 
+                        <a
                             className={'flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100'}
+                            href="/access"
+                            target="_blank"
+                            rel="noopener noreferrer"
                             onClick={() => {
-                                const url = `/access`;
-                                openOrSwitchToPage(url, 'NT_Access');
                                 setMobileMenuVisible(false);
                             }}
                         >
                             <LaptopIcon className={'w-5 h-5'}/>
                             <span>{t('menus.access.label')}</span>
-                        </div>
+                        </a>
                     </div>
                 </div>
             </Drawer>

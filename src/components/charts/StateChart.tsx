@@ -21,23 +21,23 @@ const chartConfig = {
     },
     CLOSED: {
         label: "CLOSED",
-        color: "hsl(var(--chart-1))",
+        color: "var(--chart-1)",
     },
     CLOSE_WAIT: {
         label: "CLOSE_WAIT",
-        color: "hsl(var(--chart-2))",
+        color: "var(--chart-2)",
     },
     ESTABLISHED: {
         label: "ESTABLISHED",
-        color: "hsl(var(--chart-3))",
+        color: "var(--chart-3)",
     },
     LISTEN: {
         label: "LISTEN",
-        color: "hsl(var(--chart-4))",
+        color: "var(--chart-4)",
     },
     SYN_SENT: {
         label: "SYN_SENT",
-        color: "hsl(var(--chart-5))",
+        color: "var(--chart-5)",
     }
 } satisfies ChartConfig
 

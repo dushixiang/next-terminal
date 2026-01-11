@@ -21,11 +21,11 @@ const chartConfig = {
     },
     tcp: {
         label: "TCP",
-        color: "hsl(var(--chart-1))",
+        color: "var(--chart-1)",
     },
     udp: {
         label: "UDP",
-        color: "hsl(var(--chart-2))",
+        color: "var(--chart-2)",
     }
 } satisfies ChartConfig
 

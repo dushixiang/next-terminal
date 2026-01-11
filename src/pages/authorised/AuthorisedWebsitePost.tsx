@@ -11,7 +11,7 @@ import authorisedWebsiteApi from "@/api/authorised-website-api";
 import {useNavigate} from "react-router-dom";
 
 const AuthorisedWebsitePost = () => {
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
     const [expiredAtDayjs, setExpiredAtDayjs] = useState<dayjs.Dayjs>();
     const [expiredAtNoLimit, setExpiredAtNoLimit] = useState<boolean>(true);

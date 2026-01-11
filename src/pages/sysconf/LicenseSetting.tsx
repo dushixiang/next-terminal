@@ -5,7 +5,7 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import licenseApi, {License} from "../../api/license-api";
 import {useTranslation} from "react-i18next";
 import {cn} from "@/lib/utils";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import {useMobile} from "@/hook/use-mobile";
 
 const {Title, Text} = Typography;
@@ -16,7 +16,7 @@ const LicenseSetting = () => {
     const {message} = App.useApp();
     let {t} = useTranslation();
 
-    let [licence, licenseQuery] = useLicense();
+    let { license: licence, refetch: licenseRefetch } = useLicense();
 
     let queryMachineId = useQuery({
         queryKey: ['machine-id'],
@@ -49,7 +49,7 @@ const LicenseSetting = () => {
         onSuccess: () => {
             message.success(t('general.success'));
             queryLicense.refetch();
-            licenseQuery.refetch();
+            licenseRefetch();
         }
     });
 

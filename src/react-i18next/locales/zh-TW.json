@@ -26,7 +26,8 @@
     "required": "必填項",
     "error": "操作失敗",
     "status": "狀態",
-    "language": "語言"
+    "language": "語言",
+    "confirm_delete": "確認刪除此項？"
   },
   "actions": {
     "option": "操作",
@@ -50,7 +51,12 @@
     "save": "保存",
     "remove": "移除",
     "label": "操作",
-    "batch_delete": "批量刪除"
+    "batch_delete": "批量刪除",
+    "refresh": "重新整理",
+    "create": "建立",
+    "submit": "提交",
+    "actions": "操作",
+    "confirm": "確認"
   },
   "dashboard": {
     "name": "數據概觀",
@@ -134,7 +140,8 @@
       "label": "接入網關",
       "submenus": {
         "ssh_gateway": "SSH網關",
-        "agent_gateway": "安全網關"
+        "agent_gateway": "安全網關",
+        "gateway_group": "網關分組"
       }
     },
     "log_audit": {
@@ -385,7 +392,9 @@
         "ldap": "LDAP",
         "wechat": "企業微信",
         "oidc": "OIDC"
-      }
+      },
+      "department": "部門",
+      "select_department": "請選擇部門"
     },
     "options": {
       "authorized_asset": "授權資產",
@@ -704,7 +713,12 @@
         "label": "滑鼠設定",
         "selection_copy": "選中複製",
         "right_click_paste": "右鍵貼上"
-      }
+      },
+      "keyboard": {
+        "label": "鍵盤設定",
+        "intercept_search_shortcut": "攔截搜尋快捷鍵 (Ctrl/Cmd+F)"
+      },
+      "font.preview": "字型預覽"
     },
     "batch": {
       "exec": "批量執行",
@@ -737,6 +751,22 @@
       "closeOthers": "關閉其他標籤頁",
       "closeAll": "關閉所有標籤頁",
       "reconnect": "重新連接"
+    },
+    "wol": {
+      "title": "喚醒資產",
+      "message": "資產 {{name}} 處於離線狀態，是否喚醒？",
+      "confirm": "喚醒",
+      "waking": "正在發送喚醒指令...",
+      "countdown_message": "正在等待裝置啟動，剩餘時間：",
+      "seconds": "秒",
+      "checking": "正在檢查資產是否在線...",
+      "online": "資產在線",
+      "online_desc": "資產已成功喚醒並上線，可立即連接。",
+      "offline": "資產離線",
+      "offline_desc": "資產可能還未完全啟動，請稍後重試檢測。",
+      "failed": "喚醒失敗",
+      "check_now": "立即檢測",
+      "connect": "立即連接"
     }
   },
   "account": {
@@ -1099,7 +1129,17 @@
         "rdp_desc": "傳統RDP加密模式，通常用於較舊的Windows伺服器"
       }
     },
-    "sort": "排序"
+    "sort": "排序",
+    "disable_access_log": "停用存取日誌",
+    "disable_access_log_tip": "啟用後，該網站的訪問請求將不會被記錄到訪問日誌中。",
+    "gateway_type": "閘道器類型",
+    "no_gateway": "不使用閘道器",
+    "gateway_group": "網關分組",
+    "select_gateway_type": "請選擇網關類型",
+    "select_gateway_group": "請選擇網關分組",
+    "change_gateway": "配置閘道器",
+    "select_agent_gateway": "請選擇安全閘道",
+    "select_ssh_gateway": "請選擇SSH網關"
   },
   "gateways": {
     "name": "名稱",
@@ -1167,7 +1207,12 @@
     "sort": "排序",
     "sort_success": "排序成功",
     "add_token": "新增令牌",
-    "edit_token_remark": "修改令牌備註"
+    "edit_token_remark": "修改令牌備註",
+    "config_mode": "配置模式",
+    "config_mode_direct": "直接配置",
+    "config_mode_credential": "引用憑據",
+    "config_mode_asset": "引用資產",
+    "ssh_asset": "SSH資產"
   },
   "settings": {
     "system": {
@@ -1248,7 +1293,8 @@
       },
       "setting": "安全設置",
       "force_otp": "強制多重因素認證",
-      "disable_password_login": "禁用密碼登入"
+      "disable_password_login": "禁用密碼登入",
+      "access_mfa_expires_at": "接入資產多因素認證有效時間"
     },
     "sshd": {
       "setting": "SSH 代理伺服器",
@@ -1501,5 +1547,23 @@
     "group_name": "分組名稱",
     "group_name_placeholder": "請輸入分組名稱",
     "group_name_required": "分組名稱不能為空"
+  },
+  "gateway_group": {
+    "name": "分組名稱",
+    "name_placeholder": "請輸入分組名稱",
+    "description": "描述",
+    "description_placeholder": "請輸入描述",
+    "selection_mode": "選擇模式",
+    "mode_priority": "優先級模式",
+    "mode_latency": "延遲模式",
+    "mode_random": "隨機模式",
+    "members": "網關成員",
+    "member": "成員",
+    "add_member": "新增閘道成員",
+    "priority": "優先級",
+    "priority_tooltip": "數字越小優先級越高，按優先級模式時生效",
+    "enabled": "啟用",
+    "create": "創建網關分組",
+    "edit": "編輯網關分組"
   }
 }

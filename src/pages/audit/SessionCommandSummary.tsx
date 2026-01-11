@@ -14,7 +14,7 @@ interface Props {
 
 const SessionCommandSummary = ({sessionId, onChange}: Props) => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     useEffect(() => {
         if (strings.hasText(sessionId)) {

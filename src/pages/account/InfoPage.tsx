@@ -10,6 +10,7 @@ import ChangeInfo from "@/pages/account/ChangeInfo";
 import {isMobileByMediaQuery} from "@/utils/utils";
 import {cn} from "@/lib/utils";
 import Passkey from "@/pages/account/Passkey";
+import OidcServerAuthorizations from "@/pages/account/OidcServerAuthorizations";
 
 const InfoPage = () => {
 
@@ -47,6 +48,11 @@ const InfoPage = () => {
             label: t('account.access_token'),
             key: 'access-token',
             children: <AccessToken/>
+        },
+        {
+            label: 'OIDC 授权管理',
+            key: 'oidc-server-authorizations',
+            children: <OidcServerAuthorizations/>
         },
     ];
 

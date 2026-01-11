@@ -49,10 +49,7 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                 }}
             >
                 <Divider orientation="left">{t('settings.security.protection')}</Divider>
-                <div className={cn(
-                    'grid gap-4',
-                    isMobile ? 'grid-cols-1' : 'grid-cols-4'
-                )}>
+                <div className={'flex md:items-center md:gap-2 md:flex-row flex-col'}>
                     <ProFormSwitch
                         name="login-captcha-enabled"
                         label={t("settings.security.captcha")}
@@ -67,6 +64,17 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         checkedChildren={t('general.enabled')}
                         unCheckedChildren={t('general.disabled')}
                     />
+
+                    <ProFormSwitch
+                        name="disable-password-login"
+                        label={t("settings.security.disable_password_login")}
+                        rules={[{required: true}]}
+                        checkedChildren={t('general.enabled')}
+                        unCheckedChildren={t('general.disabled')}
+                    />
+                </div>
+
+                <div className={'flex md:items-center md:gap-2 md:flex-row flex-col'}>
                     <ProFormSwitch
                         name="access-require-mfa"
                         label={t("settings.security.access_require_mfa")}
@@ -74,12 +82,14 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         checkedChildren={t('general.enabled')}
                         unCheckedChildren={t('general.disabled')}
                     />
-                    <ProFormSwitch
-                        name="disable-password-login"
-                        label={t("settings.security.disable_password_login")}
-                        rules={[{required: true}]}
-                        checkedChildren={t('general.enabled')}
-                        unCheckedChildren={t('general.disabled')}
+                    <ProFormDigit
+                        name="access-mfa-expires-at"
+                        label={t('settings.security.access_mfa_expires_at')}
+                        min={0}
+                        addonAfter={t('settings.security.minute')}
+                        fieldProps={{
+                            precision: 0 // 只允许整数
+                        }}
                     />
                 </div>
 

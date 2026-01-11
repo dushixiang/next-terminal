@@ -118,22 +118,22 @@ const AccessLogStatsPage = () => {
     const trafficTrendConfig = {
         pv: {
             label: t('audit.accessLog.stats.metrics.pv'),
-            color: "hsl(var(--chart-1))",
+            color: "var(--chart-1)",
         },
         uv: {
             label: t('audit.accessLog.stats.metrics.uv'),
-            color: "hsl(var(--chart-2))",
+            color: "var(--chart-2)",
         },
         traffic: {
             label: t('audit.accessLog.stats.metrics.traffic'),
-            color: "hsl(var(--chart-3))",
+            color: "var(--chart-3)",
         },
     } satisfies ChartConfig;
 
     const hourlyChartConfig = {
         count: {
             label: t('audit.accessLog.stats.tooltip.visitCount'),
-            color: "hsl(var(--chart-1))",
+            color: "var(--chart-1)",
         },
     } satisfies ChartConfig;
 

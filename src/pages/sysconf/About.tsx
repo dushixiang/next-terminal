@@ -6,7 +6,7 @@ import brandingApi from "@/api/branding-api";
 import propertyApi from "@/api/property-api";
 import {CustomerServiceOutlined, LoadingOutlined} from "@ant-design/icons";
 import strings from "@/utils/strings";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 import {MarkdownRenderer} from "@/components/MarkdownRenderer";
@@ -27,7 +27,7 @@ const About = () => {
 
     let [canUpgrade, setCanUpgrade] = useState(false);
     let [contactVisible, setContactVisible] = useState(false);
-    let [license] = useLicense();
+    let { license } = useLicense();
     let {height} = useWindowSize();
 
     let brandingQuery = useQuery({

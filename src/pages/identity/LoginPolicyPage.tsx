@@ -8,7 +8,7 @@ import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
 import NButton from "../../components/NButton";
 import NLink from "@/components/NLink";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import Disabled from "@/components/Disabled";
 
 const api = loginPolicyApi;
@@ -16,10 +16,10 @@ const api = loginPolicyApi;
 const LoginPolicyPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     let navigate = useNavigate();
-    let [license] = useLicense();
+    let { license } = useLicense();
 
     const columns: ProColumns<LoginPolicy>[] = [
         {

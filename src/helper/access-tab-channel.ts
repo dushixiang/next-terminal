@@ -4,6 +4,8 @@ export interface AccessTabSyncMessage {
     id: string;
     name: string;
     protocol: string;
+    status?: string;
+    wolEnabled?: boolean;
 }
 
 export const accessAsset = (message: AccessTabSyncMessage) => {

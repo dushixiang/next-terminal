@@ -9,7 +9,7 @@ import operationLogApi, {OperationLog} from "@/api/operation-log-api";
 const OperationLogPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     let {modal} = App.useApp();
 

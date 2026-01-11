@@ -22,7 +22,7 @@ const CommandFilterModal = ({
                                 id
                             }: CommandFilterProps) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
 
     const get = async () => {

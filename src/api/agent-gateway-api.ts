@@ -79,6 +79,7 @@ interface Disk {
 interface Memory {
     total: number;
     used: number;
+    available: number;
     free: number;
     percent: number;
     swap_total: number;
@@ -133,6 +134,10 @@ class AgentGatewayApi extends Api<AgentGateway> {
 
     updateSortPosition = async (req: SortPositionRequest) => {
         return await requests.post(`/${this.group}/sort`, req);
+    }
+
+    getVersion = async () => {
+        return await requests.get(`/agent/version`) as { version: string };
     }
 }
 

@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {App, Button, Popconfirm} from "antd";
+import {App, Button, Popconfirm, Tag} from "antd";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import snippetApi, {Snippet} from "../../api/snippet-api";
 import SnippetModal from "./SnippetModal";
@@ -13,7 +13,7 @@ const api = snippetApi;
 const SnippetPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
 
@@ -64,6 +64,18 @@ const SnippetPage = () => {
             ellipsis: true
         },
         {
+            title: '可见性',
+            dataIndex: 'visibility',
+            key: 'visibility',
+            width: 100,
+            hideInSearch: true,
+            render: (_, record) => {
+                return record.visibility === 'public'
+                    ? <Tag color="green">公开</Tag>
+                    : <Tag color="default">私有</Tag>;
+            }
+        },
+        {
             title: t('general.creator'),
             key: 'creator',
             dataIndex: 'creator',
@@ -112,10 +124,10 @@ const SnippetPage = () => {
         <ProTable
             columns={columns}
             actionRef={actionRef}
-                request={async (params = {}, sort, filter) => {
-                    let [sortOrder, sortField] = getSort(sort);
-                    
-                    let queryParams = {
+            request={async (params = {}, sort, filter) => {
+                let [sortOrder, sortField] = getSort(sort);
+
+                let queryParams = {
                     pageIndex: params.current,
                     pageSize: params.pageSize,
                     sortOrder: sortOrder,

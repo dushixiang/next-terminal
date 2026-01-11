@@ -4,7 +4,7 @@ import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormDigit, ProFormSwitch, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import Disabled from "@/components/Disabled";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import {useMutation} from "@tanstack/react-query";
 import userApi from "@/api/user-api";
 
@@ -13,7 +13,7 @@ const LdapSetting = ({get, set}: SettingProps) => {
     let {t} = useTranslation();
     let [enabled, setEnabled] = useState(false);
 
-    let [license] = useLicense();
+    let { license } = useLicense();
     let {message} = App.useApp();
 
     let mutation = useMutation({

@@ -64,7 +64,7 @@ import clsx from "clsx";
 import {cn} from "@/lib/utils";
 import {Strategy} from "@/api/strategy-api";
 import {Base64} from 'js-base64';
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -263,7 +263,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     const [modal, contextHolder] = Modal.useModal();
     const [messageApi, messageContextHolder] = message.useMessage();
     const [contextMenu, setContextMenu] = useState<ContextMenu>(null);
-    let [license] = useLicense();
+    let { license } = useLicense();
     const dragUploadHint = t('fs.drag_upload_hint', {defaultValue: '拖拽文件到此处上传'});
     const dragUploadDisabledMessage = t('fs.drag_upload_disabled', {defaultValue: '当前策略不允许上传'});
 

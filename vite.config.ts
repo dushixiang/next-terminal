@@ -15,8 +15,6 @@ export default defineConfig(({mode}) => {
             ...(isProd ? [
                 VitePWA({
                     registerType: 'autoUpdate',
-                    injectRegister: false, // 改为 false，手动控制注册
-                    scope: '/access/', // Service Worker 的作用域
                     workbox: {
                         maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB
                         navigateFallbackDenylist: [/^\/api\//], // 阻止 /api 被 fallback 到 index.html
@@ -29,8 +27,6 @@ export default defineConfig(({mode}) => {
                     },
                     includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
                     manifest: {
-                        start_url: "/access/",
-                        scope: "/access/",
                         name: '{{.SystemName}}',
                         description: '',
                         background_color: '#313131',
@@ -52,5 +48,27 @@ export default defineConfig(({mode}) => {
         resolve: {
             alias: {'@': resolve(__dirname, './src')},
         },
+        build: {
+            sourcemap: false,
+            minify: 'esbuild',
+            rollupOptions: {
+                maxParallelFileOps: 2,
+                output: {
+                    manualChunks: {
+                        react: ['react', 'react-dom'],
+                        antd: ['antd', '@ant-design/pro-components'],
+                        monaco: ['monaco-editor', '@monaco-editor/react'],
+                        xterm: [
+                            '@xterm/xterm',
+                            '@xterm/addon-fit',
+                            '@xterm/addon-search',
+                            '@xterm/addon-canvas',
+                            '@xterm/addon-webgl'
+                        ],
+                        charts: ['recharts']
+                    }
+                }
+            }
+        }
     }
 });

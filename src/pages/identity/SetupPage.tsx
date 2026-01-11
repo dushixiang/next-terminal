@@ -24,7 +24,7 @@ const SetupPage = () => {
     let [newPasswordStatus, setNewPasswordStatus] = useState<ValidateStatus>();
     let [error, setError] = useState<string>('');
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
 
     const get = async () => {

@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
 import {Modal} from "antd";
-import {ProForm, ProFormInstance, ProFormText, ProFormTextArea} from "@ant-design/pro-components";
+import {ProForm, ProFormInstance, ProFormText, ProFormTextArea, ProFormRadio} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import snippetUserApi from "@/api/snippet-user-api";
 
@@ -22,7 +22,7 @@ const SnippetUserModal = ({
                               id,
                           }: SnippetProps) => {
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
 
     const get = async () => {
         if (id) {
@@ -55,6 +55,16 @@ const SnippetUserModal = ({
                 <ProFormText hidden={true} name={'id'}/>
                 <ProFormText label={t('general.name')} name="name" rules={[{required: true}]}/>
                 <ProFormTextArea label={t('assets.content')} name='content' rules={[{required: true}]}/>
+                <ProFormRadio.Group
+                    name="visibility"
+                    label="可见性"
+                    initialValue="private"
+                    options={[
+                        {label: '私有', value: 'private'},
+                        {label: '公开', value: 'public'},
+                    ]}
+                    rules={[{required: true}]}
+                />
             </ProForm>
         </Modal>
     )

@@ -13,7 +13,7 @@ const api = sshGatewayApi;
 const SshGatewayPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -56,6 +56,24 @@ const SshGatewayPage = () => {
             dataIndex: 'name',
         },
         {
+            title: t('gateways.config_mode'),
+            dataIndex: 'configMode',
+            key: 'configMode',
+            hideInSearch: true,
+            render: (configMode) => {
+                switch (configMode) {
+                    case 'direct':
+                        return <Tag color="blue">{t('gateways.config_mode_direct')}</Tag>
+                    case 'credential':
+                        return <Tag color="orange">{t('gateways.config_mode_credential')}</Tag>
+                    case 'asset':
+                        return <Tag color="green">{t('gateways.config_mode_asset')}</Tag>
+                    default:
+                        return <Tag color="blue">{t('gateways.config_mode_direct')}</Tag>
+                }
+            }
+        },
+        {
             title: 'IP',
             dataIndex: 'ip',
             key: 'ip',
@@ -86,28 +104,6 @@ const SshGatewayPage = () => {
             dataIndex: 'username',
             key: 'username',
             hideInSearch: true
-        },
-        {
-            title: t('gateways.status'),
-            dataIndex: 'status',
-            key: 'status',
-            hideInSearch: true,
-            render: (text, record) => {
-                switch (text) {
-                    case "disconnected":
-                        return <Badge status="default" text={t('gateways.ssh_status.disconnected')}/>
-                    case "connecting":
-                        return <Badge status="processing" text={t('gateways.ssh_status.connecting')}/>
-                    case "connected":
-                        return <Badge status="success" text={t('gateways.ssh_status.connected')}/>
-                    case "error":
-                        return (
-                            <Tooltip title={record.statusMessage}>
-                                <Badge status="error" text={t('gateways.ssh_status.error')}/>
-                            </Tooltip>
-                        )
-                }
-            }
         },
         {
             title: t('general.created_at'),

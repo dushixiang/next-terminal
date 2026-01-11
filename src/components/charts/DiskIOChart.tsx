@@ -22,11 +22,11 @@ const chartConfig = {
     },
     read: {
         label: "Read",
-        color: "hsl(var(--chart-1))",
+        color: "var(--chart-1)",
     },
     write: {
         label: "Write",
-        color: "hsl(var(--chart-2))",
+        color: "var(--chart-2)",
     }
 } satisfies ChartConfig
 

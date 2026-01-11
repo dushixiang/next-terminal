@@ -9,7 +9,7 @@ import {getSort} from "@/utils/sort";
 const LoginLockedPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     const columns: ProColumns<LoginLocked>[] = [
         {

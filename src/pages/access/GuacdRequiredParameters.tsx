@@ -14,7 +14,7 @@ interface Props {
 const GuacdRequiredParameters = ({open, parameters, confirmLoading, handleCancel, handleOk}: Props) => {
 
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     return (
         <Modal
             title={t('access.required_auth')}

@@ -27,6 +27,7 @@ import {
     BotIcon,
     ChevronDownIcon,
     ChevronUpIcon,
+    EraserIcon,
     FolderCode,
     FolderIcon,
     SearchIcon,
@@ -204,12 +205,31 @@ const AccessTerminal = ({assetId}: Props) => {
             }
         }
 
+        const handleKeyDown = (e: KeyboardEvent) => {
+            // 只有在配置启用时才拦截搜索快捷键
+            if (accessSetting?.interceptSearchShortcut !== true) {
+                return;
+            }
+
+            // 支持 Ctrl+F (Windows/Linux) 和 Cmd+F (Mac)
+            const isSearchShortcut = _isMac
+                ? (e.metaKey && e.key === 'f')
+                : (e.ctrlKey && e.key === 'f');
+
+            if (isSearchShortcut) {
+                e.preventDefault();
+                setSearchOpen(true);
+            }
+        }
+
         const divElement = divRef.current;
         divElement?.addEventListener("contextmenu", handleContextMenu);
+        divElement?.addEventListener("keydown", handleKeyDown);
 
         return () => {
             selectionChange?.dispose();
             divElement?.removeEventListener("contextmenu", handleContextMenu);
+            divElement?.removeEventListener("keydown", handleKeyDown);
         };
     }, [accessSetting, terminalRef.current]);
 
@@ -235,20 +255,6 @@ const AccessTerminal = ({assetId}: Props) => {
         term.attachCustomKeyEventHandler((domEvent) => {
             if (domEvent.ctrlKey && domEvent.key === 'c' && term.hasSelection()) {
                 return false;
-            }
-            // 支持 Ctrl+F (Windows/Linux) 和 Cmd+F (Mac)
-            if (_isMac) {
-                if (domEvent.metaKey && domEvent.key === 'f') {
-                    domEvent.preventDefault();
-                    setSearchOpen(true);
-                    return false;
-                }
-            } else {
-                if (domEvent.ctrlKey && domEvent.key === 'f') {
-                    domEvent.preventDefault();
-                    setSearchOpen(true);
-                    return false;
-                }
             }
             return !(domEvent.ctrlKey && domEvent.key === 'v');
         })
@@ -638,6 +644,10 @@ const AccessTerminal = ({assetId}: Props) => {
         setSearchOpen(false);
     };
 
+    const handleClearTerminal = () => {
+        terminalRef.current?.clear();
+    };
+
     let isMobile = isMobileByMediaQuery();
 
     useEffect(() => {
@@ -850,6 +860,12 @@ const AccessTerminal = ({assetId}: Props) => {
                                 onClick={() => setSearchOpen(!searchOpen)}
                             />
                         </div>
+                        <div title="清屏">
+                            <EraserIcon
+                                className={cn('h-4 w-4', isMobile && 'text-white')}
+                                onClick={handleClearTerminal}
+                            />
+                        </div>
                         <Share2Icon className={cn('h-4 w-4', isMobile && 'text-white')}
                                     onClick={() => setSharerOpen(true)}/>
                     </div>
@@ -862,6 +878,9 @@ const AccessTerminal = ({assetId}: Props) => {
                                 <SearchIcon className={clsx('h-4 w-4', searchOpen && 'text-blue-500')}
                                             onClick={() => setSearchOpen(!searchOpen)}
                                 />
+                            </div>
+                            <div title="清屏">
+                                <EraserIcon className={'h-4 w-4'} onClick={handleClearTerminal}/>
                             </div>
                             <Share2Icon className={'h-4 w-4'} onClick={() => setSharerOpen(true)}/>
                             <FolderIcon className={'h-4 w-4'} onClick={() => {

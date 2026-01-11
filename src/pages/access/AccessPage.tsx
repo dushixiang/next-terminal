@@ -1,4 +1,4 @@
-import React, {Key, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {Key, useCallback, useEffect, useRef, useState} from 'react';
 import {App, ConfigProvider, Input, Tabs, theme, Tooltip, Tree, TreeDataNode} from "antd";
 import './AccessPage.css'
 import brandingApi from "@/api/branding-api";
@@ -14,7 +14,7 @@ import AccessTheme from "@/pages/access/AccessTheme";
 import AccessSetting from "@/pages/access/AccessSetting";
 import {useQuery} from "@tanstack/react-query";
 import portalApi, {TreeDataNodeWithExtra} from "@/api/portal-api";
-import SimpleBar from "simplebar-react";
+import {ScrollArea} from "@/components/ui/scroll-area";
 import {useWindowSize} from "react-use";
 import {useAccessTab} from "@/hook/use-access-tab";
 import AccessGuacamole from "@/pages/access/AccessGuacamole";
@@ -28,14 +28,11 @@ import {ImperativePanelHandle} from "react-resizable-panels";
 import AccessSshChooser from "@/pages/access/AccessSshChooser";
 import AccessTerminalBulk from "@/pages/access/AccessTerminalBulk";
 import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
+import AccessWolDialog from "@/pages/access/AccessWolDialog";
 import clsx from "clsx";
 import {getImgColor} from "@/helper/asset-helper";
 import {useTranslation} from "react-i18next";
-import {useLicense} from "@/hook/use-license";
-import licenseApi from "@/api/license-api";
 import {safeDecode} from "@/utils/codec";
-import {useAccessSetting} from "@/hook/use-access-setting";
-import accessSettingApi from "@/api/access-setting-api";
 import {setThemeColor} from "@/utils/theme";
 import TabContextMenu from "@/components/TabContextMenu";
 import {LocalStorage, STORAGE_KEYS} from "@/utils/storage";
@@ -60,6 +57,7 @@ const DraggableTabNode = ({className, ...props}: DraggableTabPaneProps) => {
     };
 
     return React.cloneElement(props.children as React.ReactElement, {
+        // @ts-ignore
         ref: setNodeRef,
         style,
         ...attributes,
@@ -70,18 +68,18 @@ const DraggableTabNode = ({className, ...props}: DraggableTabPaneProps) => {
 const AccessPage = () => {
 
     let {t} = useTranslation();
-    
+
     // 从本地存储恢复面板状态
     const [isCollapsed, setIsCollapsed] = React.useState(() => {
         return LocalStorage.get(STORAGE_KEYS.COLLAPSED_STATE, false);
     });
-    
+
     // 从本地存储恢复面板大小
     const [leftPanelSize, setLeftPanelSize] = useState(() => {
-        const savedSizes = LocalStorage.get(STORAGE_KEYS.PANEL_SIZES, { left: 15, right: 85 });
+        const savedSizes = LocalStorage.get(STORAGE_KEYS.PANEL_SIZES, {left: 15, right: 85});
         return savedSizes.left;
     });
-    
+
     const [items, setItems] = useState([]);
     const [activeKey, setActiveKey] = useAccessTab();
     let [searchParams, setSearchParams] = useSearchParams();
@@ -91,22 +89,15 @@ const AccessPage = () => {
     let [mfaOpen, setMfaOpen] = useState(false);
     let [chooseAssetIds, setChooseAssetIds] = useState<string[]>([]);
 
+    // WOL 相关状态
+    const [wolDialogOpen, setWolDialogOpen] = useState(false);
+    const [wolAssetInfo, setWolAssetInfo] = useState<{ id: string, name: string, protocol: string } | null>(null);
+
     useEffect(() => {
         document.body.style.overflow = 'hidden';
         window.addEventListener("beforeunload", beforeUnload, true);
         document.addEventListener("keydown", handleKeyDown);
-        
-        // 只在 /access 路径下注册 Service Worker
-        if ('serviceWorker' in navigator && import.meta.env.PROD) {
-            navigator.serviceWorker.register('/sw.js', { scope: '/access/' })
-                .then(registration => {
-                    console.log('SW registered: ', registration);
-                })
-                .catch(registrationError => {
-                    console.log('SW registration failed: ', registrationError);
-                });
-        }
-        
+
         return () => {
             window.removeEventListener("beforeunload", beforeUnload, true);
             document.removeEventListener("keydown", handleKeyDown);
@@ -117,7 +108,17 @@ const AccessPage = () => {
         if (defaultAsset) {
             let msg = safeDecode(defaultAsset) as AccessTabSyncMessage;
             if (msg) {
-                openAssetTab(msg);
+                // 检查是否需要 WOL 唤醒
+                if (msg.status === 'inactive' && msg.wolEnabled) {
+                    setWolAssetInfo({
+                        id: msg.id,
+                        name: msg.name,
+                        protocol: msg.protocol,
+                    });
+                    setWolDialogOpen(true);
+                } else {
+                    openAssetTab(msg);
+                }
             }
         }
         setSearchParams({}, {replace: true});
@@ -145,10 +146,10 @@ const AccessPage = () => {
 
     // 从本地存储恢复树展开状态
     let [expandedKeys, setExpandedKeys] = useState<Key[]>([]);
-    
+
     const [searchValue, setSearchValue] = useState('');
 
-    let leftRef = useRef<ImperativePanelHandle>();
+    let leftRef = useRef<ImperativePanelHandle>(null);
 
     let [_, setContentSize] = useAccessContentSize();
 
@@ -174,7 +175,7 @@ const AccessPage = () => {
             // 验证保存的展开键是否仍然存在于新的树数据中
             const validateExpandedKeys = (keys: React.Key[], treeData: TreeDataNode[]): React.Key[] => {
                 const allKeys = new Set<React.Key>();
-                
+
                 const collectKeys = (nodes: TreeDataNode[]) => {
                     nodes.forEach(node => {
                         allKeys.add(node.key);
@@ -183,11 +184,11 @@ const AccessPage = () => {
                         }
                     });
                 };
-                
+
                 collectKeys(treeData);
                 return keys.filter(key => allKeys.has(key));
             };
-            
+
             const validKeys = validateExpandedKeys(expandedKeys, treeQuery.data);
             if (validKeys.length !== expandedKeys.length) {
                 setExpandedKeys(validKeys);
@@ -295,12 +296,12 @@ const AccessPage = () => {
     const handleCloseLeft = useCallback((targetKey: string) => {
         const targetIndex = items.findIndex(item => item.key === targetKey);
         if (targetIndex <= 0) return;
-        
+
         const leftTabs = items.slice(0, targetIndex);
         const remainingTabs = items.slice(targetIndex);
-        
+
         setItems(remainingTabs);
-        
+
         // 如果当前激活的标签页被关闭，切换到目标标签页
         if (leftTabs.some(tab => tab.key === activeKey)) {
             setActiveKey(targetKey);
@@ -310,11 +311,11 @@ const AccessPage = () => {
     const handleCloseRight = useCallback((targetKey: string) => {
         const targetIndex = items.findIndex(item => item.key === targetKey);
         if (targetIndex < 0 || targetIndex >= items.length - 1) return;
-        
+
         const leftTabs = items.slice(0, targetIndex + 1);
-        
+
         setItems(leftTabs);
-        
+
         // 如果当前激活的标签页被关闭，切换到目标标签页
         if (!leftTabs.some(tab => tab.key === activeKey)) {
             setActiveKey(targetKey);
@@ -329,7 +330,7 @@ const AccessPage = () => {
     const handleCloseOthers = useCallback((targetKey: string) => {
         const targetTab = items.find(item => item.key === targetKey);
         if (!targetTab) return;
-        
+
         setItems([targetTab]);
         setActiveKey(targetKey);
     }, [items]);
@@ -338,12 +339,12 @@ const AccessPage = () => {
         // 刷新标签页 - 重新渲染组件
         const targetTab = items.find(item => item.key === targetKey);
         if (!targetTab) return;
-        
+
         // 通过更新 key 来强制重新渲染
         const newKey = targetKey + '_refresh_' + Date.now();
-        const newTab = { ...targetTab, key: newKey };
-        
-        setItems(prev => prev.map(item => 
+        const newTab = {...targetTab, key: newKey};
+
+        setItems(prev => prev.map(item =>
             item.key === targetKey ? newTab : item
         ));
         setActiveKey(newKey);
@@ -352,18 +353,18 @@ const AccessPage = () => {
     // 面板大小变化处理
     const handlePanelResize = useCallback((size: number) => {
         setLeftPanelSize(size);
-        
+
         // 保存到本地存储
-        const panelSizes = { left: size, right: 100 - size };
+        const panelSizes = {left: size, right: 100 - size};
         LocalStorage.set(STORAGE_KEYS.PANEL_SIZES, panelSizes);
-        
+
         // 更新折叠状态
         const collapsed = size === 2;
         if (collapsed !== isCollapsed) {
             setIsCollapsed(collapsed);
             LocalStorage.set(STORAGE_KEYS.COLLAPSED_STATE, collapsed);
         }
-        
+
         setContentSize(100 - size);
     }, [isCollapsed, setContentSize]);
 
@@ -447,10 +448,10 @@ const AccessPage = () => {
                                     )}
                                     ref={leftRef}
                                 >
-                                    <SimpleBar className={'py-2'}
-                                               style={{
-                                                   maxHeight: height - 40,
-                                               }}
+                                    <ScrollArea className={'py-2'}
+                                                style={{
+                                                    height: height - 40,
+                                                }}
                                     >
                                         <div className={'px-2 pb-2 flex items-center gap-2'}>
                                             {!isCollapsed &&
@@ -491,7 +492,7 @@ const AccessPage = () => {
                                                     ) : (
                                                         <span>{strTitle}</span>
                                                     );
-                                                    
+
                                                     return <Tooltip title={node.extra?.network}>
                                                         <span className={cn(
                                                             'flex items-center gap-1',
@@ -499,13 +500,26 @@ const AccessPage = () => {
                                                         )}
                                                               onDoubleClick={() => {
                                                                   if (!node.isLeaf) {
-                                                                      return
+                                                                      return;
                                                                   }
+
+                                                                  // 检查是否需要 WOL 唤醒
+                                                                  if (node.extra?.status === 'inactive' && node.extra?.wolEnabled) {
+                                                                      setWolAssetInfo({
+                                                                          id: node.key as string,
+                                                                          name: node.title as string,
+                                                                          protocol: node.extra?.protocol,
+                                                                      });
+                                                                      setWolDialogOpen(true);
+                                                                      return;
+                                                                  }
+
+                                                                  // 直接打开连接
                                                                   openAssetTab({
                                                                       id: node.key,
                                                                       name: node.title,
                                                                       protocol: node.extra?.protocol,
-                                                                  })
+                                                                  });
                                                               }}
                                                         >
                                                             {renderLogo(node)}
@@ -522,7 +536,7 @@ const AccessPage = () => {
                                                 expandedKeys={expandedKeys}
                                             />
                                         }
-                                    </SimpleBar>
+                                    </ScrollArea>
                                 </ResizablePanel>
                                 <ResizableHandle withHandle/>
                                 <ResizablePanel defaultSize={100 - leftPanelSize}
@@ -561,7 +575,10 @@ const AccessPage = () => {
                                                                  strategy={horizontalListSortingStrategy}>
                                                     <DefaultTabBar {...tabBarProps}>
                                                         {(node) => (
-                                                            <DraggableTabNode {...node.props} key={node.key}>
+                                                            <DraggableTabNode
+                                                                {...(node as React.ReactElement<DraggableTabPaneProps>).props}
+                                                                key={node.key}
+                                                            >
                                                                 {node}
                                                             </DraggableTabNode>
                                                         )}
@@ -611,6 +628,30 @@ const AccessPage = () => {
                                                                                             securityToken={securityToken}/>)
                                 }}
                                 handleCancel={() => setMfaOpen(false)}
+                            />
+
+                            <AccessWolDialog
+                                open={wolDialogOpen}
+                                assetId={wolAssetInfo?.id || ''}
+                                assetName={wolAssetInfo?.name || ''}
+                                onSuccess={() => {
+                                    setWolDialogOpen(false);
+                                    // 唤醒成功后自动打开连接
+                                    if (wolAssetInfo) {
+                                        openAssetTab({
+                                            id: wolAssetInfo.id,
+                                            name: wolAssetInfo.name,
+                                            protocol: wolAssetInfo.protocol,
+                                        });
+                                    }
+                                    setWolAssetInfo(null);
+                                    // 刷新树数据以更新状态
+                                    treeQuery.refetch();
+                                }}
+                                onCancel={() => {
+                                    setWolDialogOpen(false);
+                                    setWolAssetInfo(null);
+                                }}
                             />
                         </ThemeProvider>
                     </div>

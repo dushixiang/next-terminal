@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Button, Divider, Form, Input, Select, Spin, Typography} from "antd";
+import {Button, Divider, Form, Input, Select, Space, Spin, Typography} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
@@ -77,6 +77,14 @@ const LoginPage = () => {
     });
 
     const redirect = () => {
+        // 优先检查 return_url (OIDC Server 场景，重定向到第三方系统)
+        let returnUrl = searchParams.get('return_url');
+        if (returnUrl) {
+            window.location.href = returnUrl;
+            return;
+        }
+
+        // 其次检查 redirect (普通登录重定向)
         let redirectUrl = searchParams.get('redirect');
         if (redirectUrl) {
             window.location.href = redirectUrl;
@@ -167,93 +175,105 @@ const LoginPage = () => {
     const renderLoginForm = () => {
         switch (step) {
             case LoginStep.Default:
+                const loginStatus = queryLoginStatus.data;
+                const showPassword = loginStatus?.passwordEnabled !== false;
+                const showWebauthn = loginStatus?.webauthnEnabled;
+                const showWechat = loginStatus?.wechatWorkEnabled;
+                const showOidc = loginStatus?.oidcEnabled;
+                const hasAlternatives = showWebauthn || showWechat || showOidc;
+
                 return <div>
                     <Title level={3}>{t('account.login.action')}</Title>
-                    <Form onFinish={handleSubmit} className="login-form" layout="vertical">
-                        <Form.Item label={t('account.username')} name='username'
-                                   rules={[{required: true}]}>
-                            <Input size={'large'}
-                                   prefix={<UserOutlined/>}
-                                   placeholder={t('account.enter')}
-                                   autoComplete={'username webauthn'}
-                            />
-                        </Form.Item>
-                        <Form.Item label={t('account.password')}
-                                   name='password'
-                                   rules={[{required: true}]}>
-                            <Input.Password size={'large'} prefix={<LockOutlined/>} placeholder={t('account.enter')}/>
-                        </Form.Item>
-                        {
-                            queryCaptcha.data?.enabled ?
+
+                    {/* 密码登录表单 */}
+                    {showPassword && (
+                        <Form onFinish={handleSubmit} className="login-form" layout="vertical">
+                            <Form.Item label={t('account.username')} name='username'
+                                       rules={[{required: true}]}>
+                                <Input size={'large'}
+                                       prefix={<UserOutlined/>}
+                                       placeholder={t('account.enter')}
+                                       autoComplete={'username webauthn'}
+                                />
+                            </Form.Item>
+                            <Form.Item label={t('account.password')}
+                                       name='password'
+                                       rules={[{required: true}]}>
+                                <Input.Password size={'large'} prefix={<LockOutlined/>}
+                                                placeholder={t('account.enter')}/>
+                            </Form.Item>
+                            {queryCaptcha.data?.enabled && (
                                 <Form.Item label={t('account.captcha')} name='captcha'
-                                           rules={[{required: true}]}
-                                >
-                                    <Input prefix={<LockOutlined/>}
-                                           size={'large'}
-                                           addonAfter={
-                                               <Spin spinning={queryCaptcha.isLoading}>
-                                                   <div style={{width: 100}}>
-                                                       <img
-                                                           onClick={() => {
-                                                               queryCaptcha.refetch();
-                                                           }}
-                                                           src={queryCaptcha.data?.captcha}
-                                                           alt='captcha'
-                                                           style={{cursor: 'pointer'}}
-                                                       />
-                                                   </div>
-                                               </Spin>
-                                           }
-                                           placeholder={t(t('account.enter'))}/>
+                                           rules={[{required: true}]}>
+                                    <Space.Compact>
+                                        <Input prefix={<LockOutlined/>}
+                                               size={'large'}
+                                               placeholder={t('account.enter')}
+                                        />
+                                        <Spin spinning={queryCaptcha.isLoading}>
+                                            <div style={{width: 100}}>
+                                                <img
+                                                    onClick={() => queryCaptcha.refetch()}
+                                                    src={queryCaptcha.data?.captcha}
+                                                    alt='captcha'
+                                                    style={{cursor: 'pointer'}}
+                                                />
+                                            </div>
+                                        </Spin>
+                                    </Space.Compact>
                                 </Form.Item>
-                                : undefined
-                        }
-                        <Form.Item>
-                            <Button type="primary" htmlType="submit"
-                                    size={'large'}
-                                    className="w-full"
-                                    loading={mutation.isPending}
-                            >
-                                {t('account.login.action')}
-                            </Button>
-                        </Form.Item>
-                        <Divider className="my-4" plain>
-                            Or
-                        </Divider>
-                        {queryLoginStatus.data?.webauthnEnabled && (
-                            <Button variant={'filled'}
-                                    color={'default'}
-                                    size={'large'}
-                                    className="w-full mb-2"
-                                    onClick={() => loginByPasskeyV2()}
-                                    loading={loading}
-                            >
-                                {t('account.login.methods.passkey')}
-                            </Button>
-                        )}
-                        {queryLoginStatus.data?.wechatWorkEnabled && (
-                            <Button variant={'filled'}
-                                    color={'geekblue'}
-                                    size={'large'}
-                                    className="w-full mb-2"
-                                    onClick={loginByWechatWork}
-                                    loading={loading}
-                            >
-                                {t('account.login.methods.wechat_work')}
-                            </Button>
-                        )}
-                        {queryLoginStatus.data?.oidcEnabled && (
-                            <Button variant={'filled'}
-                                    color={'primary'}
-                                    size={'large'}
-                                    className="w-full"
-                                    onClick={loginByOidc}
-                                    loading={loading}
-                            >
-                                {t('account.login.methods.oidc')}
-                            </Button>
-                        )}
-                    </Form>
+                            )}
+                            <Form.Item>
+                                <Button type="primary" htmlType="submit"
+                                        size={'large'}
+                                        className="w-full"
+                                        loading={mutation.isPending}
+                                >
+                                    {t('account.login.action')}
+                                </Button>
+                            </Form.Item>
+                        </Form>
+                    )}
+
+                    {/* 分隔线 */}
+                    {showPassword && hasAlternatives && (
+                        <Divider className="my-4" plain>Or</Divider>
+                    )}
+
+                    {/* 其他登录方式 */}
+                    {showWebauthn && (
+                        <Button variant={'filled'}
+                                color={'default'}
+                                size={'large'}
+                                className="w-full mb-2"
+                                onClick={loginByPasskeyV2}
+                                loading={loading}
+                        >
+                            {t('account.login.methods.passkey')}
+                        </Button>
+                    )}
+                    {showWechat && (
+                        <Button variant={'filled'}
+                                color={'geekblue'}
+                                size={'large'}
+                                className="w-full mb-2"
+                                onClick={loginByWechatWork}
+                                loading={loading}
+                        >
+                            {t('account.login.methods.wechat_work')}
+                        </Button>
+                    )}
+                    {showOidc && (
+                        <Button variant={'filled'}
+                                color={'primary'}
+                                size={'large'}
+                                className="w-full"
+                                onClick={loginByOidc}
+                                loading={loading}
+                        >
+                            {t('account.login.methods.oidc')}
+                        </Button>
+                    )}
                 </div>;
             case LoginStep.OTP:
                 return <div>

@@ -1,7 +1,7 @@
 {
   "llm": {
     "provider": "custom",
-    "base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "base_url": "https://openai.qiniu.com/v1",
     "model": "qwen3-max"
   },
   "input": "zh-CN.json",

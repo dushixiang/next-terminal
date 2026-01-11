@@ -28,7 +28,7 @@ const WebsiteTreeModal = ({
                             },
                         }: Props) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
     const inputRef = useRef(null);
 

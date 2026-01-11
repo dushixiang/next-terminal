@@ -45,11 +45,21 @@ const handleError = async (error: any, url?: string) => {
     console.error(`error`, error)
     if (error.status === 418) {
         eventEmitter.emit("API:REDIRECT", "/setup");
-        return;
+        return Promise.reject({
+            status: error.status,
+            statusText: error.statusText,
+            message: 'Redirect to setup',
+            code: 418,
+        });
     }
     if (error.status === 401) {
         eventEmitter.emit("API:UN_AUTH");
-        return;
+        return Promise.reject({
+            status: error.status,
+            statusText: error.statusText,
+            message: 'Unauthorized',
+            code: 401,
+        });
     }
     let response = error.response;
     let msg = '';

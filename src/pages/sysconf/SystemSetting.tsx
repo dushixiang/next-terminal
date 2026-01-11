@@ -5,7 +5,7 @@ import {ProForm, ProFormCheckbox, ProFormSlider, ProFormSwitch, ProFormText} fro
 import {useTranslation} from "react-i18next";
 import {generate, green, presetPalettes, red} from '@ant-design/colors';
 import {Color} from "antd/es/color-picker";
-import {useLicense} from "@/hook/use-license";
+import {useLicense} from "@/hook/LicenseContext";
 import Disabled from "@/components/Disabled";
 import {Upload as UploadIcon} from 'lucide-react';
 import {useMobile} from "@/hook/use-mobile";
@@ -29,7 +29,7 @@ const SystemSetting = ({get, set}: SettingProps) => {
     let [enabled, setEnabled] = useState(false);
 
 
-    let [license] = useLicense();
+    let { license } = useLicense();
 
     const wrapGet = async () => {
         let values = await get();

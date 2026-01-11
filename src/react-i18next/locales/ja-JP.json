@@ -26,7 +26,8 @@
     "required": "必須",
     "error": "操作に失敗しました",
     "status": "状態",
-    "language": "言語"
+    "language": "言語",
+    "confirm_delete": "この項目を削除してもよろしいですか？"
   },
   "actions": {
     "option": "操作",
@@ -50,7 +51,12 @@
     "save": "保存",
     "remove": "削除",
     "label": "操作",
-    "batch_delete": "一括削除"
+    "batch_delete": "一括削除",
+    "refresh": "更新",
+    "create": "作成",
+    "submit": "提出する",
+    "actions": "操作",
+    "confirm": "確認"
   },
   "dashboard": {
     "name": "データ概要",
@@ -134,7 +140,8 @@
       "label": "アクセスゲートウェイ",
       "submenus": {
         "ssh_gateway": "SSHゲートウェイ",
-        "agent_gateway": "セキュリティゲートウェイ"
+        "agent_gateway": "セキュリティゲートウェイ",
+        "gateway_group": "ゲートウェイグループ"
       }
     },
     "log_audit": {
@@ -385,7 +392,9 @@
         "ldap": "LDAP",
         "wechat": "企業微信",
         "oidc": "OIDC"
-      }
+      },
+      "department": "部門",
+      "select_department": "部門を選択してください。"
     },
     "options": {
       "authorized_asset": "承認された資産",
@@ -704,7 +713,12 @@
         "label": "マウス設定",
         "selection_copy": "選択してコピー",
         "right_click_paste": "右クリックして貼り付け"
-      }
+      },
+      "keyboard": {
+        "label": "キーボード設定",
+        "intercept_search_shortcut": "検索ショートカットをインターセプト（Ctrl/Cmd+F）"
+      },
+      "font.preview": "フォントプレビュー"
     },
     "batch": {
       "exec": "一括実行",
@@ -737,6 +751,22 @@
       "closeOthers": "他のタブを閉じる",
       "closeAll": "すべてのタブを閉じる",
       "reconnect": "再接続"
+    },
+    "wol": {
+      "title": "資産を目覚めさせる",
+      "message": "アセット「{{name}}」はオフライン状態です。起動しますか？",
+      "confirm": "目覚めさせる",
+      "waking": "ウェイクアップコマンドを送信中…",
+      "countdown_message": "デバイスの起動を待機中、残り時間：",
+      "seconds": "秒",
+      "checking": "アセットがオンラインかどうかを確認中です…",
+      "online": "資産オンライン",
+      "online_desc": "アセットは正常に起動され、オンラインになりました。すぐに接続可能です。",
+      "offline": "資産がオフライン",
+      "offline_desc": "アセットがまだ完全に起動していない可能性があります。しばらくしてから再度検出をお試しください。",
+      "failed": "起動に失敗しました",
+      "check_now": "即時検出",
+      "connect": "すぐに接続"
     }
   },
   "account": {
@@ -1099,7 +1129,17 @@
         "rdp_desc": "伝統的なRDP暗号化モードは、通常、古いWindowsサーバーで使用されます。"
       }
     },
-    "sort": "ソート"
+    "sort": "ソート",
+    "disable_access_log": "アクセスログを無効にする",
+    "disable_access_log_tip": "有効にすると、このウェブサイトへのアクセス要求はアクセスログに記録されません。",
+    "gateway_type": "ゲートウェイの種類",
+    "no_gateway": "ゲートウェイを使用しない",
+    "gateway_group": "ゲートウェイグループ",
+    "select_gateway_type": "ゲートウェイの種類を選択してください。",
+    "select_gateway_group": "ゲートウェイグループを選択してください。",
+    "change_gateway": "ゲートウェイを配置する",
+    "select_agent_gateway": "セキュリティゲートウェイを選択してください。",
+    "select_ssh_gateway": "SSHゲートウェイを選択してください。"
   },
   "gateways": {
     "name": "名前",
@@ -1167,7 +1207,12 @@
     "sort": "ソート",
     "sort_success": "ソートが成功しました",
     "add_token": "トークンを追加",
-    "edit_token_remark": "トークン備考を編集"
+    "edit_token_remark": "トークン備考を編集",
+    "config_mode": "配置モード",
+    "config_mode_direct": "直接配置",
+    "config_mode_credential": "引用資格",
+    "config_mode_asset": "引用アセット",
+    "ssh_asset": "SSH資産"
   },
   "settings": {
     "system": {
@@ -1248,7 +1293,8 @@
         "origins_tip": "末尾に / を含めないでください",
         "origins_error": "正しいURLアドレスを入力してください"
       },
-      "disable_password_login": "パスワードログインの禁止"
+      "disable_password_login": "パスワードログインの禁止",
+      "access_mfa_expires_at": "接続資産の多要素認証の有効期間"
     },
     "sshd": {
       "setting": "SSHプロキシサーバー",
@@ -1501,5 +1547,23 @@
     "group_name": "グループ名",
     "group_name_placeholder": "グループ名を入力してください。",
     "group_name_required": "グループ名は空にできません"
+  },
+  "gateway_group": {
+    "name": "グループ名",
+    "name_placeholder": "グループ名を入力してください",
+    "description": "記述",
+    "description_placeholder": "説明を入力してください",
+    "selection_mode": "モードを選択",
+    "mode_priority": "優先度モード",
+    "mode_latency": "遅延モード",
+    "mode_random": "ランダムモード",
+    "members": "ゲートウェイメンバー",
+    "member": "メンバー",
+    "add_member": "ゲートウェイメンバーを追加",
+    "priority": "優先度",
+    "priority_tooltip": "数字が小さいほど優先度が高く、優先度モード時に有効になります。",
+    "enabled": "有効にする",
+    "create": "ゲートウェイグループを作成",
+    "edit": "ゲートウェイグループを編集"
   }
 }

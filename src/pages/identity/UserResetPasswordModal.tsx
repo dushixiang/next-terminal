@@ -13,7 +13,7 @@ export interface Props {
 
 const UserResetPasswordModal = ({open, handleOk, handleCancel, confirmLoading}: Props) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
 
     return (

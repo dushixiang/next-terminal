@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {App, Button, Popconfirm} from "antd";
+import {App, Button, Popconfirm, Tag} from "antd";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
@@ -10,6 +10,7 @@ import snippetUserApi from "@/api/snippet-user-api";
 import {Snippet} from "@/api/snippet-api";
 import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
+import {getCurrentUser} from "@/utils/permission";
 
 const api = snippetUserApi;
 
@@ -17,9 +18,10 @@ const SnippetUserPage = () => {
 
     const {t} = useTranslation();
     const {isMobile} = useMobile();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
+    const currentUser = getCurrentUser();
 
     const {message} = App.useApp();
 
@@ -69,6 +71,18 @@ const SnippetUserPage = () => {
             width: isMobile ? 150 : undefined, // 移动端固定宽度
         },
         {
+            title: '可见性',
+            dataIndex: 'visibility',
+            key: 'visibility',
+            width: isMobile ? 70 : 100,
+            hideInSearch: true,
+            render: (_, record) => {
+                return record.visibility === 'public'
+                    ? <Tag color="green">公开</Tag>
+                    : <Tag color="default">私有</Tag>;
+            }
+        },
+        {
             title: t('general.created_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',
@@ -81,32 +95,41 @@ const SnippetUserPage = () => {
             valueType: 'option',
             key: 'option',
             width: isMobile ? 80 : undefined, // 移动端固定宽度
-            render: (text, record, _, action) => [
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record['id']);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton 
-                        key='delete' 
-                        danger={true}
+            render: (text, record, _, action) => {
+                // 只有创建者才能编辑和删除
+                const isOwner = record.createdBy === currentUser.id;
+
+                if (!isOwner) {
+                    return null;
+                }
+
+                return [
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record['id']);
+                        }}
                     >
-                        {t('actions.delete')}
-                    </NButton>
-                </Popconfirm>,
-            ],
+                        {t('actions.edit')}
+                    </NButton>,
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.delete_confirm')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton
+                            key='delete'
+                            danger={true}
+                        >
+                            {t('actions.delete')}
+                        </NButton>
+                    </Popconfirm>,
+                ];
+            },
         },
     ];
 

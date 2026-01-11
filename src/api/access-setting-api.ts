@@ -9,6 +9,7 @@ export type Setting = {
     rightClickPaste: boolean;
     treeExpandedKeys: string[];
     useSnippets: boolean;
+    interceptSearchShortcut: boolean;
 }
 
 class AccessSettingApi {
@@ -22,6 +23,7 @@ class AccessSettingApi {
             rightClickPaste: strings.isTrue(record['rightClickPaste']),
             treeExpandedKeys: record['treeExpandedKeys']?.split(','),
             useSnippets: strings.isTrue(record['useSnippets']),
+            interceptSearchShortcut: strings.isTrue(record['interceptSearchShortcut']),
         }
         return setting;
     }

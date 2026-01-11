@@ -189,7 +189,7 @@ export function isFirefox() {
     return navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 }
 
-export function isMac(){
+export function isMac() {
     return /Mac|iPod|iPhone|iPad/.test(navigator.userAgent);
 }
 
@@ -313,106 +313,29 @@ export const dropKeydown = (e) => {
     return true; // Allow other events
 };
 
+export const formatUptime = (seconds: number | undefined | null): string => {
+    if (seconds === undefined || seconds === null) return '-';
+    if (seconds <= 0) return '0 秒';
 
-export function formatUptime(seconds?: number): string {
-    if (!seconds || seconds === 0) {
-        return '0秒';
-    }
-
-    const days = Math.floor(seconds / (24 * 60 * 60));
-    const remainingSecondsAfterDays = seconds % (24 * 60 * 60);
-    const hours = Math.floor(remainingSecondsAfterDays / (60 * 60));
-    const remainingSecondsAfterHours = remainingSecondsAfterDays % (60 * 60);
-    const minutes = Math.floor(remainingSecondsAfterHours / 60);
-    const secs = Math.floor(remainingSecondsAfterHours % 60);
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
 
     const parts: string[] = [];
 
+    // 智能显示：只显示最重要的两个单位，避免文本过长
     if (days > 0) {
-        parts.push(`${days}天`);
-    }
-    if (hours > 0) {
-        parts.push(`${hours}小时`);
-    }
-    if (minutes > 0) {
-        parts.push(`${minutes}分钟`);
-    }
-
-    // 如果时间很短（小于1分钟），显示秒数
-    if (days === 0 && hours === 0 && minutes === 0 && secs > 0) {
-        parts.push(`${secs}秒`);
+        parts.push(`${days} 天`);
+        if (hours > 0) parts.push(`${hours} 小时`);
+    } else if (hours > 0) {
+        parts.push(`${hours} 小时`);
+        if (minutes > 0) parts.push(`${minutes} 分钟`);
+    } else if (minutes > 0) {
+        parts.push(`${minutes} 分钟`);
     }
 
-    // 如果没有任何时间单位，返回 0秒
-    if (parts.length === 0) {
-        return '0秒';
-    }
-
-    // 最多显示2个最大的时间单位，避免过长
-    return parts.slice(0, 2).join(' ');
-}
-
-// 如果您更喜欢英文格式，可以使用这个版本
-export function formatUptimeEn(seconds?: number): string {
-    if (!seconds || seconds === 0) {
-        return '0s';
-    }
-
-    const days = Math.floor(seconds / (24 * 60 * 60));
-    const remainingSecondsAfterDays = seconds % (24 * 60 * 60);
-    const hours = Math.floor(remainingSecondsAfterDays / (60 * 60));
-    const remainingSecondsAfterHours = remainingSecondsAfterDays % (60 * 60);
-    const minutes = Math.floor(remainingSecondsAfterHours / 60);
-    const secs = Math.floor(remainingSecondsAfterHours % 60);
-
-    const parts: string[] = [];
-
-    if (days > 0) {
-        parts.push(`${days}d`);
-    }
-    if (hours > 0) {
-        parts.push(`${hours}h`);
-    }
-    if (minutes > 0) {
-        parts.push(`${minutes}m`);
-    }
-
-    // 如果时间很短（小于1分钟），显示秒数
-    if (days === 0 && hours === 0 && minutes === 0 && secs > 0) {
-        parts.push(`${secs}s`);
-    }
-
-    // 如果没有任何时间单位，返回 0s
-    if (parts.length === 0) {
-        return '0s';
-    }
-
-    // 最多显示2个最大的时间单位
-    return parts.slice(0, 2).join(' ');
-}
-
-// 更简洁的格式化函数，适合表格显示
-export function formatUptimeCompact(seconds?: number): string {
-    if (!seconds || seconds === 0) {
-        return '-';
-    }
-
-    const days = Math.floor(seconds / (24 * 60 * 60));
-    const hours = Math.floor((seconds % (24 * 60 * 60)) / (60 * 60));
-    const minutes = Math.floor((seconds % (60 * 60)) / 60);
-
-    if (days > 0) {
-        return `${days}天${hours}时`;
-    }
-    if (hours > 0) {
-        return `${hours}时${minutes}分`;
-    }
-    if (minutes > 0) {
-        return `${minutes}分钟`;
-    }
-
-    return '< 1分钟';
-}
+    return parts.length > 0 ? parts.join(' ') : '不到 1 分钟';
+};
 
 export function getColor(percent: number): string {
     if (percent < 60) return "#06DF73";

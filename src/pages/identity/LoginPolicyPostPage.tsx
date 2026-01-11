@@ -25,7 +25,7 @@ const LoginPolicyPostPage = () => {
     let id = maybe(searchParams.get('loginPolicyId'), '');
 
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let navigate = useNavigate();
 
     const get = async () => {

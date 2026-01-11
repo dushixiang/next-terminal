@@ -14,7 +14,7 @@ import {getProtocolColor} from "@/helper/asset-helper";
 
 const OfflineSessionPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType>(null);
 
     let [selectedRowKey, setSelectedRowKey] = useState('');
     let [sessionCommandOpen, setSessionCommandOpen] = useState(false);

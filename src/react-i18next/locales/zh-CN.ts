@@ -16,6 +16,7 @@ let o = {
         "copy_success": "复制成功",
         "remark": "备注",
         "delete_confirm": "确认删除此项？",
+        "confirm_delete": "确认删除此项？",
         "clear_confirm": "确认清空数据？",
         "unbound": "未绑定",
         "bound": "已绑定",
@@ -29,6 +30,7 @@ let o = {
         "option": "操作",
         "new": "新建",
         "add": "添加",
+        "create": "创建",
         "edit": "编辑",
         "delete": "删除",
         "clear": "清空",
@@ -44,10 +46,14 @@ let o = {
         "import": "导入",
         "download_import_sample": "下载导入示例",
         "cancel": "取消",
+        "submit": "提交",
         "save": "保存",
         "remove": "移除",
         "label": "操作",
+        "actions": "操作",
         "batch_delete": "批量删除",
+        "refresh": "刷新",
+        "confirm": "确认",
     },
     "dashboard": {
         "name": "数据概览",
@@ -119,7 +125,8 @@ let o = {
             "label": "接入网关",
             "submenus": {
                 "ssh_gateway": "SSH网关",
-                "agent_gateway": "安全网关"
+                "agent_gateway": "安全网关",
+                "gateway_group": "网关分组"
             }
         },
         "log_audit": {
@@ -658,6 +665,7 @@ let o = {
             "theme": "主题设置",
             "system": "系统设置",
             "font": "字体设置",
+            "font.preview": "字体预览",
             "terminal": {
                 "font": {
                     "size": "字体大小",
@@ -670,6 +678,10 @@ let o = {
                 "label": "鼠标设置",
                 "selection_copy": "选中复制",
                 "right_click_paste": "右键粘贴",
+            },
+            "keyboard": {
+                "label": "键盘设置",
+                "intercept_search_shortcut": "拦截搜索快捷键 (Ctrl/Cmd+F)",
             }
         },
         "batch": {
@@ -704,6 +716,22 @@ let o = {
             "closeAll": "关闭所有标签页",
             "reconnect": "重新连接"
         },
+        "wol": {
+            "title": "唤醒资产",
+            "message": "资产 {{name}} 处于离线状态，是否唤醒？",
+            "confirm": "唤醒",
+            "waking": "正在发送唤醒指令...",
+            "countdown_message": "正在等待设备启动，剩余时间：",
+            "seconds": "秒",
+            "checking": "正在检查资产是否在线...",
+            "online": "资产在线",
+            "online_desc": "资产已成功唤醒并在线，可以立即连接",
+            "offline": "资产离线",
+            "offline_desc": "资产可能还未完全启动，请稍后重试检测",
+            "failed": "唤醒失败",
+            "check_now": "立即检测",
+            "connect": "立即连接"
+        }
     },
     "account": {
         "my_asset": "我的资产",
@@ -848,8 +876,13 @@ let o = {
         "username": "用户",
         "password": "密码",
         "credential": "授权凭证",
+        "gateway_type": "网关类型",
+        "no_gateway": "不使用网关",
         "agent_gateway": "安全网关",
         "ssh_gateway": "SSH网关",
+        "gateway_group": "网关分组",
+        "select_gateway_type": "请选择网关类型",
+        "select_gateway_group": "请选择网关分组",
         "gateway_tip": "安全网关和SSH网关仅能二选一，同时选择时则使用SSH网关。",
         "description": "备注",
         "advanced_setting": "高级设置",
@@ -897,10 +930,15 @@ let o = {
         "entrance": "入口路径",
         "entrance_tip": "入口路径是首次访问自动打开的地址",
         "change_group": "修改分组",
+        "change_gateway": "配置网关",
+        "select_agent_gateway": "请选择安全网关",
+        "select_ssh_gateway": "请选择SSH网关",
         "general": "常规",
         "header": "请求头",
         "preserve_host": "保留主机名",
         "preserve_host_tip": "会将请求头中的主机名保留为原始请求的主机名，而不是代理服务器的主机名。",
+        "disable_access_log": "禁用访问日志",
+        "disable_access_log_tip": "启用后，该网站的访问请求将不会被记录到访问日志中",
         "custom_header": "自定义请求头",
         "custom_header_tip": "可以添加多个自定义请求头，格式为：键: 值。",
         "custom_certificate": "自定义证书",
@@ -1074,6 +1112,24 @@ let o = {
         "group_name_placeholder": "请输入分组名称",
         "group_name_required": "分组名称不能为空"
     },
+    "gateway_group": {
+        "name": "分组名称",
+        "name_placeholder": "请输入分组名称",
+        "description": "描述",
+        "description_placeholder": "请输入描述",
+        "selection_mode": "选择模式",
+        "mode_priority": "优先级模式",
+        "mode_latency": "延迟模式",
+        "mode_random": "随机模式",
+        "members": "网关成员",
+        "member": "成员",
+        "add_member": "添加网关成员",
+        "priority": "优先级",
+        "priority_tooltip": "数字越小优先级越高，按优先级模式时生效",
+        "enabled": "启用",
+        "create": "创建网关分组",
+        "edit": "编辑网关分组",
+    },
     "gateways": {
         "name": "名称",
         "port": "端口",
@@ -1087,6 +1143,11 @@ let o = {
             "connected": "已连接",
             "error": "连接失败",
         },
+        "config_mode": "配置模式",
+        "config_mode_direct": "直接配置",
+        "config_mode_credential": "引用凭据",
+        "config_mode_asset": "引用资产",
+        "ssh_asset": "SSH资产",
         "username": "账号",
         "account_type": {},
         "register": "注册",
@@ -1178,6 +1239,7 @@ let o = {
             "captcha": "图形验证码",
             "force_otp": "强制多因素认证",
             "access_require_mfa": "接入资产需要多因素认证",
+            "access_mfa_expires_at": "接入资产多因素认证有效时间",
             "disable_password_login": "禁用密码登陆",
             "devices": "设备",
             "minute": "分钟",

@@ -1,28 +1,18 @@
 import React, {useState} from 'react';
 import {useQuery} from "@tanstack/react-query";
 import accountApi from "../../api/account-api";
+import {Alert, App, Button, Divider, Form, Input, QRCode, Steps, Typography} from "antd";
 import {
-    Alert, 
-    App, 
-    Button, 
-    Form, 
-    Input, 
-    QRCode, 
-    Typography, 
-    Divider,
-    Steps
-} from "antd";
-import {
-    QrcodeOutlined,
-    KeyOutlined,
-    MobileOutlined,
     CopyOutlined,
     EyeInvisibleOutlined,
-    EyeTwoTone
+    EyeTwoTone,
+    KeyOutlined,
+    MobileOutlined,
+    QrcodeOutlined
 } from '@ant-design/icons';
 import {useTranslation} from "react-i18next";
 
-const {Text, Paragraph} = Typography;
+const {Paragraph} = Typography;
 
 export interface Binding2faProps {
     refetch: () => void
@@ -37,7 +27,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
 
     let totpQuery = useQuery({
         queryKey: ['totp'],
-        queryFn: accountApi.reloadTotp,
+        queryFn: () => accountApi.reloadTotp(window.location.hostname),
         refetchOnWindowFocus: false,
     })
 
@@ -69,7 +59,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
             status: 'process' as const
         },
         {
-            title: t('account.otp_setup_guide.step3.title'), 
+            title: t('account.otp_setup_guide.step3.title'),
             description: t('account.otp_step3_description'),
             status: 'wait' as const
         }
@@ -77,7 +67,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
 
     return (
         <div>
-            <Steps 
+            <Steps
                 items={setupSteps}
                 size="small"
                 style={{marginBottom: 24}}
@@ -85,18 +75,18 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-4">
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="border  rounded-lg">
+                        <div className="px-4 py-3 border-b ">
                             <div className="flex items-center gap-2">
-                                <QrcodeOutlined />
+                                <QrcodeOutlined/>
                                 <span>{t('account.otp_scan_qr')}</span>
                             </div>
                         </div>
                         <div className="p-4 text-center">
                             <div className="flex flex-col items-center gap-4 w-full">
-                                <QRCode 
-                                    value={totpQuery.data?.url as string} 
-                                    errorLevel={'M'} 
+                                <QRCode
+                                    value={totpQuery.data?.url as string}
+                                    errorLevel={'M'}
                                     status={renderQRCodeStatus()}
                                     onRefresh={() => totpQuery.refetch()}
                                     size={200}
@@ -112,10 +102,10 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                         </div>
                     </div>
 
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="border  rounded-lg">
+                        <div className="px-4 py-3 border-b">
                             <div className="flex items-center gap-2">
-                                <KeyOutlined />
+                                <KeyOutlined/>
                                 <span>{t('account.otp_manual_setup')}</span>
                             </div>
                         </div>
@@ -123,7 +113,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                             <Paragraph style={{marginBottom: 12}}>
                                 {t('account.otp_manual_setup_desc')}
                             </Paragraph>
-                            
+
                             <Input.Group compact>
                                 <Input
                                     value={totpQuery.data?.secret}
@@ -131,13 +121,13 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                                     type={showSecret ? "text" : "password"}
                                     style={{width: 'calc(100% - 80px)'}}
                                 />
-                                <Button 
-                                    icon={showSecret ? <EyeInvisibleOutlined /> : <EyeTwoTone />}
+                                <Button
+                                    icon={showSecret ? <EyeInvisibleOutlined/> : <EyeTwoTone/>}
                                     onClick={() => setShowSecret(!showSecret)}
                                     style={{width: '40px'}}
                                 />
-                                <Button 
-                                    icon={<CopyOutlined />}
+                                <Button
+                                    icon={<CopyOutlined/>}
                                     onClick={copySecret}
                                     style={{width: '40px'}}
                                     type="primary"
@@ -148,10 +138,10 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                 </div>
 
                 <div>
-                    <div className="bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="border rounded-lg">
+                        <div className="px-4 py-3 border-b">
                             <div className="flex items-center gap-2">
-                                <MobileOutlined />
+                                <MobileOutlined/>
                                 <span>{t('account.otp_verification_title')}</span>
                             </div>
                         </div>
@@ -164,8 +154,8 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                                 />
                             </div>
 
-                            <Form 
-                                form={form} 
+                            <Form
+                                form={form}
                                 onFinish={confirmTOTP}
                                 layout="vertical"
                             >
@@ -177,18 +167,18 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                                         {pattern: /^\d{6}$/, message: '验证码必须是6位数字'}
                                     ]}
                                 >
-                                    <Input 
+                                    <Input
                                         placeholder={t('account.otp_verification_placeholder')}
                                         size="large"
                                         maxLength={6}
                                         style={{textAlign: 'center', fontSize: '18px', letterSpacing: '4px'}}
                                     />
                                 </Form.Item>
-                                
+
                                 <Form.Item style={{marginBottom: 0}}>
-                                    <Button 
-                                        type="primary" 
-                                        htmlType="submit" 
+                                    <Button
+                                        type="primary"
+                                        htmlType="submit"
                                         size="large"
                                         block
                                         loading={false}
@@ -198,7 +188,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                                 </Form.Item>
                             </Form>
 
-                            <Divider />
+                            <Divider/>
 
                             <Alert
                                 message={t('account.otp_security_tip')}

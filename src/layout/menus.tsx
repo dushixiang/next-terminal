@@ -78,7 +78,7 @@ export const getMenus = (t: any) => {
         {
             key: 'gateway',
             label: t('menus.gateway.label'),
-            icon: <CloudServerOutlined/>,
+            icon: <ClusterOutlined/>,
             children: [
                 {
                     key: 'ssh-gateway',
@@ -89,6 +89,11 @@ export const getMenus = (t: any) => {
                     key: 'agent-gateway',
                     label: t('menus.gateway.submenus.agent_gateway'),
                     icon: <ClusterOutlined/>,
+                },
+                {
+                    key: 'gateway-group',
+                    label: t('menus.gateway.submenus.gateway_group'),
+                    icon: <TeamOutlined/>,
                 },
             ]
         },
@@ -185,6 +190,11 @@ export const getMenus = (t: any) => {
                     key: 'login-locked',
                     label: t('menus.identity.submenus.login_locked'),
                     icon: <WarningOutlined/>,
+                },
+                {
+                    key: 'oidc-client',
+                    label: 'OIDC 客户端',
+                    icon: <ApiOutlined/>,
                 },
             ]
         },

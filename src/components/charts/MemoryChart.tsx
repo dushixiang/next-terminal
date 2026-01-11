@@ -20,13 +20,13 @@ const chartConfig = {
     visitors: {
         label: "Visitors",
     },
-    free: {
-        label: "Free",
-        color: "hsl(var(--chart-2))",
+    available: {
+        label: "Available",
+        color: "var(--chart-2)",
     },
     used: {
         label: "Used",
-        color: "hsl(var(--chart-1))",
+        color: "var(--chart-1)",
     }
 } satisfies ChartConfig
 
@@ -71,7 +71,6 @@ export const MemoryChart: React.FC<PercentageChartProps> = ({title,data,}) => {
                             cursor={true}
                             content={
                                 <ChartTooltipContent
-                                    // labelFormatter={(value) => new Date(value).toLocaleTimeString()}
                                     indicator="dot"
                                     valueFormatter={(value) => renderSize(value as number)}
                                 />
@@ -86,10 +85,10 @@ export const MemoryChart: React.FC<PercentageChartProps> = ({title,data,}) => {
                             stackId="a"
                         />
                         <Area
-                            dataKey={'free'}
+                            dataKey={'available'}
                             type="natural"
-                            fill={`var(--color-free)`}
-                            stroke={`var(--color-free)`}
+                            fill={`var(--color-available)`}
+                            stroke={`var(--color-available)`}
                             stackId="a"
                         />
                         <ChartLegend content={<ChartLegendContent/>}/>

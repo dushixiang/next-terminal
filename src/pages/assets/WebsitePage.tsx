@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {App, Button, Tag} from "antd";
+import {App, Button, Space, Table, Tag} from "antd";
 import {ActionType, DragSortTable, ProColumns, TableDropdown} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
@@ -10,6 +10,7 @@ import {getImgColor} from "@/helper/asset-helper";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import WebsiteDrawer from "@/pages/assets/WebsiteDrawer";
 import WebsiteGroupDrawer from "@/pages/assets/WebsiteGroupDrawer";
+import AssetGatewayChoose from "@/pages/assets/AssetGatewayChoose";
 import WebsiteTree from "./WebsiteTree";
 import {cn} from "@/lib/utils";
 import {useMobile} from "@/hook/use-mobile";
@@ -51,16 +52,25 @@ const WebsitePage = () => {
         }
         setSearchParams(next);
     }, [queryState, setSearchParams]);
+    let [selectedRowKeys, setSelectedRowKeys] = useState<string[]>([]);
     let [groupId, setGroupId] = useState(searchParams.get('groupId') || '');
     let [dataSource, setDataSource] = useState<Website[]>([]);
     const [groupDrawerOpen, setGroupDrawerOpen] = useState<boolean>(false);
+    const [gatewayChooserOpen, setGatewayChooserOpen] = useState<boolean>(false);
     const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('');
-    const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(false);
+    const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(() => {
+        const saved = localStorage.getItem('website-tree-collapsed');
+        return saved ? JSON.parse(saved) : false;
+    });
 
     let navigate = useNavigate();
     const containerRef = useRef(null);
 
     const websiteIdFromUrl = queryState.websiteId;
+
+    useEffect(() => {
+        localStorage.setItem('website-tree-collapsed', JSON.stringify(isTreeCollapsed));
+    }, [isTreeCollapsed]);
 
     useEffect(() => {
         if (websiteIdFromUrl) {
@@ -301,6 +311,32 @@ const WebsitePage = () => {
         dataSource: dataSource,
         dragSortKey: "sort",
         onDragSortEnd: handleDragSortEnd,
+        rowSelection: {
+            selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+        },
+        tableAlertOptionRender: ({selectedRowKeys}: any) => {
+            return (
+                <Space size={16}>
+                    <NButton
+                        onClick={() => {
+                            setSelectedRowKeys(selectedRowKeys as string[]);
+                            setSelectedWebsiteId(selectedRowKeys[0]);
+                            setGroupDrawerOpen(true);
+                        }}
+                    >
+                        {t('assets.change_group')}
+                    </NButton>
+                    <NButton
+                        onClick={() => {
+                            setSelectedRowKeys(selectedRowKeys as string[]);
+                            setGatewayChooserOpen(true);
+                        }}
+                    >
+                        {t('assets.change_gateway')}
+                    </NButton>
+                </Space>
+            );
+        },
         rowKey: "id" as const,
         search: {
             labelWidth: 'auto' as const,
@@ -414,9 +450,22 @@ const WebsitePage = () => {
             onClose={() => {
                 setGroupDrawerOpen(false);
                 setSelectedWebsiteId('');
+                setSelectedRowKeys([]);
             }}
-            websiteIds={[selectedWebsiteId]}
+            websiteIds={selectedRowKeys.length > 0 ? selectedRowKeys : [selectedWebsiteId]}
             onSuccess={() => {
+                actionRef.current?.reload();
+                setSelectedRowKeys([]);
+            }}
+        />
+
+        <AssetGatewayChoose
+            resourceIds={selectedRowKeys}
+            type="website"
+            open={gatewayChooserOpen}
+            onClose={() => {
+                setGatewayChooserOpen(false);
+                setSelectedRowKeys([]);
                 actionRef.current?.reload();
             }}
         />

@@ -15,7 +15,7 @@ interface Props {
 
 const PromptModal = ({title, open, onOk, onCancel, label, placeholder, confirmLoading, value}: Props) => {
 
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
 
     useEffect(() => {
         if (open) {

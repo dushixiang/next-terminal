@@ -13,7 +13,7 @@ import authorisedAssetApi from "@/api/authorised-asset-api";
 import {useNavigate} from "react-router-dom";
 
 const AuthorisedAssetPost = () => {
-    const formRef = useRef<ProFormInstance>();
+    const formRef = useRef<ProFormInstance>(null);
     let {t} = useTranslation();
     const [expiredAtDayjs, setExpiredAtDayjs] = useState<dayjs.Dayjs>();
     const [expiredAtNoLimit, setExpiredAtNoLimit] = useState<boolean>(true);
