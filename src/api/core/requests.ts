@@ -42,8 +42,10 @@ const handleError = async (error: any, url?: string) => {
         }
         return;
     }
-    console.error(`error`, error)
-    if (error.status === 418) {
+
+    let noerr = url?.includes('noerr');
+
+    if (!noerr &&error.status === 418) {
         eventEmitter.emit("API:REDIRECT", "/setup");
         return Promise.reject({
             status: error.status,
@@ -52,7 +54,7 @@ const handleError = async (error: any, url?: string) => {
             code: 418,
         });
     }
-    if (error.status === 401) {
+    if (!noerr &&error.status === 401) {
         eventEmitter.emit("API:UN_AUTH");
         return Promise.reject({
             status: error.status,
@@ -72,7 +74,6 @@ const handleError = async (error: any, url?: string) => {
         msg = error.response?.text();
     }
 
-    let noerr = url?.includes('noerr');
     if (!noerr) {
         eventEmitter.emit("API:VALIDATE_ERROR", errorCode, msg);
     }

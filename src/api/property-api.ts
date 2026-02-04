@@ -17,6 +17,7 @@ const booleanKeys = [
     'ssh-server-port-forwarding-enabled',
     'access-require-mfa',
     'ssh-server-disable-password-auth',
+    'db-proxy-block-dml',
 ]
 
 export interface UpgradeStatus {
@@ -55,8 +56,9 @@ class PropertyApi {
         return properties;
     }
 
-    set = async (values: any) => {
-        await requests.put(`/${this.group}`, values);
+    set = async (values: any, securityToken?: string) => {
+        const tokenParam = securityToken ? `?securityToken=${encodeURIComponent(securityToken)}` : '';
+        await requests.put(`/${this.group}${tokenParam}`, values);
     }
 
     genRSAPrivateKey = async () => {

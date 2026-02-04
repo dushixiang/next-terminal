@@ -69,8 +69,8 @@ const WebsiteTreeModal = ({
                 <ProFormText hidden={true} name={'key'}/>
                 <ProFormText
                     name="title"
-                    label={t('websites.group_name')}
-                    placeholder={t('websites.group_name_placeholder')}
+                    label={t('gateway_group.name')}
+                    placeholder={t('gateway_group.name_placeholder')}
                     rules={[
                         {
                             required: true,

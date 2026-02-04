@@ -28,7 +28,7 @@ const FileSystemLogPage = () => {
             width: 48,
         },
         {
-            title: t('audit.asset'),
+            title: t('menus.resource.submenus.asset'),
             key: 'assetName',
             dataIndex: 'assetName',
             hideInSearch: true,
@@ -37,7 +37,7 @@ const FileSystemLogPage = () => {
             })
         },
         {
-            title: t('audit.user'),
+            title: t('menus.identity.submenus.user'),
             key: 'userName',
             dataIndex: 'userName',
             hideInSearch: true,
@@ -51,12 +51,12 @@ const FileSystemLogPage = () => {
             dataIndex: 'action',
             valueType: 'select',
             valueEnum: {
-                // 'rm': {text: t('authorised.strategy.remove')},
-                // 'edit': {text: t('authorised.strategy.edit')},
-                'upload': {text: t('authorised.strategy.upload'),},
+                // 'rm': {text: t('actions.delete')},
+                // 'edit': {text: t('actions.edit')},
+                'upload': {text: t('general.upload'),},
                 'download': {text: t('authorised.strategy.download'),},
                 'rename': {text: t('authorised.strategy.rename'),},
-                'remove': {text: t('authorised.strategy.remove'),},
+                'remove': {text: t('actions.delete'),},
                 'create-dir': {text: t('authorised.strategy.create_dir'),},
                 'create-file': {text: t('authorised.strategy.create_file'),},
             },

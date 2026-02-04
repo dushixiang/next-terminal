@@ -35,11 +35,11 @@ const UserInfo = ({active, id}: UserInfoProps) => {
     return (
         <div className={'page-detail-info'}>
             <ProDescriptions column={1} request={get}>
-                <ProDescriptions.Item label={t('identity.user.username')} dataIndex="username"/>
+                <ProDescriptions.Item label={t('gateways.username')} dataIndex="username"/>
                 <ProDescriptions.Item label={t('identity.user.nickname')} dataIndex="nickname"/>
                 <ProDescriptions.Item label={t('identity.user.mail')} dataIndex="mail"/>
                 <ProDescriptions.Item 
-                    label={t('identity.user.source')} 
+                    label={t('audit.accessLog.stats.table.referer')} 
                     dataIndex="source"
                     render={(_, record) => sourceMap[record.source] || record.source}
                 />
@@ -64,13 +64,13 @@ const UserInfo = ({active, id}: UserInfoProps) => {
                         status: 'Success',
                     },
                 }}/>
-                <ProDescriptions.Item label={t('authorised.label.authorised')}>
+                <ProDescriptions.Item label={t('actions.authorized')}>
                     <Space size={12} wrap>
                         <NLink to={`/authorised-asset?userId=${id}`}>
-                            {`${t('authorised.label.asset')}${t('authorised.label.authorised')}`}
+                            {`${t('menus.resource.submenus.asset')}${t('actions.authorized')}`}
                         </NLink>
                         <NLink to={`/authorised-website?userId=${id}`}>
-                            {`${t('authorised.label.website')}${t('authorised.label.authorised')}`}
+                            {`${t('menus.resource.submenus.website')}${t('actions.authorized')}`}
                         </NLink>
                     </Space>
                 </ProDescriptions.Item>

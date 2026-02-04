@@ -28,7 +28,7 @@ const LoginPolicyPage = () => {
             width: 48,
         },
         {
-            title: t('identity.policy.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             render: (text, record) => {
                 return <NLink to={`/login-policy/new?loginPolicyId=${record['id']}`}>{text}</NLink>;
@@ -57,17 +57,17 @@ const LoginPolicyPage = () => {
             render: (text => {
                 if (text === 'allow') {
                     return <Tag icon={<SafetyCertificateOutlined/>} color="success" bordered={false}>
-                        {t('identity.policy.action.options.allow')}
+                        {t('identity.policy.action.allow')}
                     </Tag>;
                 } else {
                     return <Tag icon={<StopOutlined/>} color="error" bordered={false}>
-                        {t('identity.policy.action.options.reject')}
+                        {t('identity.policy.action.reject')}
                     </Tag>;
                 }
             })
         },
         {
-            title: t('identity.policy.status'),
+            title: t('general.status'),
             key: 'enabled',
             dataIndex: 'enabled',
             hideInSearch: true,
@@ -77,7 +77,7 @@ const LoginPolicyPage = () => {
             }
         },
         {
-            title: t('identity.user.expiration_at'),
+            title: t('assets.limit_time'),
             key: 'expirationAt',
             dataIndex: 'expirationAt',
             hideInSearch: true,
@@ -86,7 +86,7 @@ const LoginPolicyPage = () => {
             width: 191,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 160,
@@ -99,7 +99,7 @@ const LoginPolicyPage = () => {
                 ,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

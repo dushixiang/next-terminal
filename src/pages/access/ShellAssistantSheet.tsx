@@ -133,22 +133,22 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                     }
                 },
                 (error: Error) => {
-                    console.error('Shell助手请求失败:', error);
+                    console.error('Shell assistant request failed:', error);
                     setResponses(prev =>
                         prev.map(r =>
                             r.id === responseId
-                                ? {...r, success: false, error: '请求失败，请稍后重试', isComplete: true}
+                                ? {...r, success: false, error: t('access.shell_assistant.request_failed_retry'), isComplete: true}
                                 : r
                         )
                     );
                 }
             );
         } catch (error) {
-            console.error('Shell助手请求失败:', error);
+            console.error('Shell assistant request failed:', error);
             setResponses(prev =>
                 prev.map(r =>
                     r.id === responseId
-                        ? {...r, success: false, error: '请求失败，请稍后重试', isComplete: true}
+                        ? {...r, success: false, error: t('access.shell_assistant.request_failed_retry'), isComplete: true}
                         : r
                 )
             );
@@ -177,7 +177,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
 
     return (
         <Drawer
-            title={<span className="text-gray-100">Shell 助手</span>}
+            title={<span className="text-gray-100">{t('access.shell_assistant.title')}</span>}
             placement={placement}
             onClose={onClose}
             open={open}
@@ -202,7 +202,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                     disabled={responses.length === 0}
                     className="text-gray-300 hover:text-white"
                 >
-                    清空
+                    {t('actions.clear')}
                 </Button>
             }
             getContainer={false}
@@ -214,7 +214,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                         value={question}
                         onChange={(e) => setQuestion(e.target.value)}
                         onKeyDown={handleKeyPress}
-                        placeholder="描述您需要的Shell命令功能，例如：查找大于100MB的文件"
+                        placeholder={t('access.shell_assistant.placeholder')}
                         rows={3}
                         disabled={loading}
                         className="bg-gray-800 border-gray-600 text-gray-100"
@@ -242,10 +242,10 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                                 }}
                                 className="text-gray-300"
                             >
-                                <span className="text-gray-300">优先使用命令片段</span>
+                                <span className="text-gray-300">{t('access.shell_assistant.use_snippets')}</span>
                             </Checkbox>
                             <span className="text-xs text-gray-500">
-                                Enter 发送 • Shift+Enter 换行
+                                {t('access.shell_assistant.shortcut_tip')}
                             </span>
                         </div>
                         <Button
@@ -255,7 +255,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                             disabled={!question.trim()}
                         >
                             <Send className="h-4 w-4"/>
-                            询问
+                            {t('access.shell_assistant.ask')}
                         </Button>
                     </div>
                 </div>
@@ -289,7 +289,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                                                     <div
                                                         className="bg-gray-800/50 border border-gray-700/50 rounded-lg p-3">
                                                         <div className="flex justify-between items-start mb-2">
-                                                            <span className="text-xs text-gray-400">Shell 命令</span>
+                                                            <span className="text-xs text-gray-400">{t('access.shell_assistant.command_label')}</span>
                                                             {response.isComplete && response.content && (
                                                                 <CirclePlay
                                                                     className="h-4 w-4 text-green-400 hover:text-green-300 cursor-pointer"
@@ -328,8 +328,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                                             </div>
                                             <div className="flex-1">
                                                 <div className="bg-red-900/10 border border-red-800/30 rounded-lg p-3">
-                                                    <div className="text-red-400 text-sm font-medium mb-1">请求失败
-                                                    </div>
+                                                    <div className="text-red-400 text-sm font-medium mb-1">{t('access.shell_assistant.request_failed')}</div>
                                                     <div 
                                                         className="text-red-300 text-sm"
                                                         style={{
@@ -353,8 +352,8 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                 {responses.length === 0 && !loading && (
                     <div className="text-center py-8 text-gray-400">
                         <div className="text-2xl mb-2">🤖</div>
-                        <div className="text-gray-300">Shell 助手准备就绪</div>
-                        <div className="text-xs mt-1 text-gray-500">输入您的需求，我会为您生成合适的命令</div>
+                        <div className="text-gray-300">{t('access.shell_assistant.ready_title')}</div>
+                        <div className="text-xs mt-1 text-gray-500">{t('access.shell_assistant.ready_subtitle')}</div>
                     </div>
                 )}
             </div>

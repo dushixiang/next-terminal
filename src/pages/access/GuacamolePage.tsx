@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 // @ts-ignore
 import Guacamole from "@dushixiang/guacamole-common-js";
 import {useWindowSize} from "react-use";
-import useWindowFocus from "@/hook/use-window-focus";
+import useWindowFocus from "@/pages/access/hooks/use-window-focus";
 import {debounce} from "@/utils/debounce";
 import {isFullScreen} from "@/utils/utils";
 import portalApi, {ExportSession} from "@/api/portal-api";

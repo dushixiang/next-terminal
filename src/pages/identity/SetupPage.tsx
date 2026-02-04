@@ -1,7 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {ProForm, ProFormInstance, ProFormText} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {Alert, Button, Result, Typography} from "antd";
+import {Alert, Button, Result, Spin, Typography} from "antd";
 import {useQuery} from "@tanstack/react-query";
 import brandingApi from "@/api/branding-api";
 import userApi from "@/api/user-api";
@@ -17,6 +17,15 @@ const SetupPage = () => {
     let brandingQuery = useQuery({
         queryKey: ['branding'],
         queryFn: brandingApi.getBranding,
+    });
+
+    let setupStatusQuery = useQuery({
+        queryKey: ['setup-status'],
+        queryFn: userApi.getSetupStatus,
+        retry: false,
+        initialData: {
+            needSetup: true,
+        }
     });
 
     let [newPassword1, setNewPassword1] = useState('');
@@ -72,6 +81,66 @@ const SetupPage = () => {
         };
     }
 
+    const renderContent = () => {
+        if (setupStatusQuery.isLoading) {
+            return <div className={'flex justify-center py-6'}>
+                <Spin/>
+            </div>;
+        }
+        if (ok) {
+            return <Result
+                status="success"
+                title={t('identity.setup.success')}
+                extra={[
+                    <Button type="link" key="go-login" href="/login">
+                        {t('identity.setup.go_to_login')}
+                    </Button>,
+                ]}
+            />;
+        }
+        if (!setupStatusQuery.data?.needSetup) {
+            return <Result
+                status="info"
+                title={t('identity.setup.already_done_title')}
+                subTitle={t('identity.setup.already_done_subtitle')}
+                extra={[
+                    <Button type="link" key="go-login" href="/login">
+                        {t('identity.setup.go_to_login')}
+                    </Button>,
+                ]}
+            />;
+        }
+        return <div>
+            {strings.hasText(error) &&
+                <div className={'mb-4'}>
+                    <Alert showIcon type="warning" message={error}/>
+                </div>
+            }
+            <ProForm formRef={formRef} request={get} onFinish={handleSubmit} submitter={{
+                submitButtonProps:{
+                    disabled: strings.hasText(error)
+                }
+            }}>
+                <ProFormText name={'username'} label={t('audit.operation.account')} rules={[{required: true}]}/>
+                <ProFormText.Password name={'password'}
+                                      label={t('assets.password')}
+                                      rules={[{required: true}]}
+                                      fieldProps={{
+                                          onChange: onNewPasswordChange,
+                                      }}
+                />
+                <ProFormText.Password name={'newPassword2'}
+                                      label={t('account.confirm_password')}
+                                      rules={[{required: true}]}
+                                      validateStatus={newPasswordStatus}
+                                      fieldProps={{
+                                          onChange: onNewPassword2Change,
+                                      }}
+                />
+            </ProForm>
+        </div>;
+    }
+
     return (
         <StyleProvider hashPriority="high">
             <div className="bg-gray-100 h-screen w-screen flex flex-col items-center justify-center">
@@ -81,49 +150,7 @@ const SetupPage = () => {
                         <div className={'font-medium mb-8'}>{t('identity.setup.user')}</div>
                     </div>
 
-                    {ok ?
-                        <div>
-                            <Result
-                                status="success"
-                                title={t('identity.setup.success')}
-                                extra={[
-                                    <Button type="link" key="go-login" href="/login">
-                                        {t('identity.setup.go_to_login')}
-                                    </Button>,
-                                ]}
-                            />
-                        </div>
-                        :
-                        <div>
-                            {strings.hasText(error) &&
-                                <div className={'mb-4'}>
-                                    <Alert showIcon type="warning" message={error}/>
-                                </div>
-                            }
-                            <ProForm formRef={formRef} request={get} onFinish={handleSubmit} submitter={{
-                                submitButtonProps:{
-                                    disabled: strings.hasText(error)
-                                }
-                            }}>
-                                <ProFormText name={'username'} label={t('account.username')} rules={[{required: true}]}/>
-                                <ProFormText.Password name={'password'}
-                                                      label={t('account.password')}
-                                                      rules={[{required: true}]}
-                                                      fieldProps={{
-                                                          onChange: onNewPasswordChange,
-                                                      }}
-                                />
-                                <ProFormText.Password name={'newPassword2'}
-                                                      label={t('account.confirm_password')}
-                                                      rules={[{required: true}]}
-                                                      validateStatus={newPasswordStatus}
-                                                      fieldProps={{
-                                                          onChange: onNewPassword2Change,
-                                                      }}
-                                />
-                            </ProForm>
-                        </div>
-                    }
+                    {renderContent()}
 
                 </div>
             </div>

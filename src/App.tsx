@@ -36,12 +36,15 @@ const LoginPolicyPostPage = lazy(() => import("@/pages/identity/LoginPolicyPostP
 const LoginPolicyDetailPage = lazy(() => import("@/pages/identity/LoginPolicyDetailPage"));
 const OidcClientPage = lazy(() => import("@/pages/identity/OidcClientPage"));
 const AssetsPage = lazy(() => import("@/pages/assets/AssetPage"));
+const DatabaseAssetPage = lazy(() => import("@/pages/assets/DatabaseAssetPage"));
 const CredentialPage = lazy(() => import("@/pages/assets/CredentialPage"));
 const CertificatePage = lazy(() => import("@/pages/assets/CertificatePage"));
 const SnippetPage = lazy(() => import("@/pages/assets/SnippetPage"));
 const StrategyPage = lazy(() => import("@/pages/authorised/StrategyPage"));
 const CommandFilterPage = lazy(() => import("@/pages/authorised/CommandFilterPage"));
 const CommandFilterDetail = lazy(() => import("@/pages/authorised/CommandFilterDetail"));
+const AuthorisedDatabaseAssetPage = lazy(() => import("@/pages/authorised/AuthorisedDatabaseAssetPage"));
+const AuthorisedDatabaseAssetPost = lazy(() => import("@/pages/authorised/AuthorisedDatabaseAssetPost"));
 const ScheduledTaskPage = lazy(() => import("@/pages/sysops/ScheduledTaskPage"));
 const ToolsPage = lazy(() => import("@/pages/sysops/ToolsPage"));
 const LoginLogPage = lazy(() => import("@/pages/audit/LoginLogPage"));
@@ -55,6 +58,7 @@ const GuacdMonitor = lazy(() => import("@/pages/access/GuacdMonitor"));
 const FileSystemLogPage = lazy(() => import("@/pages/audit/FileSystemLogPage"));
 const AccessLogPage = lazy(() => import("@/pages/audit/AccessLogPage"));
 const AccessLogStatsPage = lazy(() => import("@/pages/audit/AccessLogStatsPage"));
+const DatabaseSQLLogPage = lazy(() => import("@/pages/dbproxy/DatabaseSQLLogPage"));
 const SshGatewayPage = lazy(() => import("@/pages/gateway/SshGatewayPage"));
 const AgentGatewayPage = lazy(() => import("@/pages/gateway/AgentGatewayPage"));
 const GatewayGroupPage = lazy(() => import("@/pages/gateway/GatewayGroupPage"));
@@ -62,7 +66,7 @@ const ErrorPage = lazy(() => import("@/components/ErrorPage"));
 const StoragePage = lazy(() => import("@/pages/assets/StoragePage"));
 const WebsitePage = lazy(() => import("@/pages/assets/WebsitePage"));
 const BrowserPage = lazy(() => import("@/pages/access/BrowserPage"));
-const FacadePage = lazy(() => import("@/pages/facade/FacadePage"));
+const FacadePage = lazy(() => import("@/pages/facade/AssetFacadePage.tsx"));
 const WebsiteFacadePage = lazy(() => import("@/pages/facade/WebsiteFacadePage"));
 const RedirectPage = lazy(() => import("@/layout/RedirectPage"));
 const UserLayout = lazy(() => import("@/layout/UserLayout"));
@@ -71,6 +75,8 @@ const UserInfoPage = lazy(() => import("@/pages/facade/UserInfoPage"));
 const SnippetUserPage = lazy(() => import("@/pages/facade/SnippetUserPage"));
 const SystemMonitorPage = lazy(() => import("@/pages/sysops/SystemMonitorPage"));
 const SetupPage = lazy(() => import("@/pages/identity/SetupPage"));
+const DatabaseWorkOrderPage = lazy(() => import("@/pages/dbproxy/DatabaseWorkOrderPage"));
+const DatabaseWorkOrderUserPage = lazy(() => import("@/pages/facade/DatabaseWorkOrderUserPage"));
 
 const router = createBrowserRouter([
     {path: "/setup", element: <SetupPage/>},
@@ -95,6 +101,7 @@ const router = createBrowserRouter([
             {path: "/x-website", element: <WebsiteFacadePage/>,},
             {path: "/x-snippet", element: <SnippetUserPage/>,},
             {path: "/x-info", element: <UserInfoPage/>,},
+            {path: "/x-db-work-order", element: <DatabaseWorkOrderUserPage/>},
         ]
     },
     {
@@ -116,11 +123,13 @@ const router = createBrowserRouter([
             {path: "/operation-log", element: <OperationLogPage/>},
 
             {path: "/asset", element: <AssetsPage/>},
+            {path: "/database-asset", element: <DatabaseAssetPage/>},
             {path: "/credential", element: <CredentialPage/>},
             {path: "/snippet", element: <SnippetPage/>},
             {path: "/storage", element: <StoragePage/>},
             {path: "/website", element: <WebsitePage/>},
             {path: "/certificate", element: <CertificatePage/>},
+            {path: "/db-work-order", element: <DatabaseWorkOrderPage/>},
 
             {path: "/strategy", element: <StrategyPage/>},
             {path: "/command-filter", element: <CommandFilterPage/>},
@@ -129,6 +138,8 @@ const router = createBrowserRouter([
             {path: "/authorised-asset/post", element: <AuthorisedAssetPost/>},
             {path: "/authorised-website", element: <AuthorisedWebsitePage/>},
             {path: "/authorised-website/post", element: <AuthorisedWebsitePost/>},
+            {path: "/authorised-database-asset", element: <AuthorisedDatabaseAssetPage/>},
+            {path: "/authorised-database-asset/post", element: <AuthorisedDatabaseAssetPost/>},
 
             {path: "/scheduled-task", element: <ScheduledTaskPage/>},
             {path: "/tools", element: <ToolsPage/>},
@@ -139,6 +150,7 @@ const router = createBrowserRouter([
             {path: "/filesystem-log", element: <FileSystemLogPage/>},
             {path: "/access-log", element: <AccessLogPage/>},
             {path: "/access-log-stats", element: <AccessLogStatsPage/>},
+            {path: "/database-sql-log", element: <DatabaseSQLLogPage/>},
 
             {path: "/ssh-gateway", element: <SshGatewayPage/>},
             {path: "/agent-gateway", element: <AgentGatewayPage/>},

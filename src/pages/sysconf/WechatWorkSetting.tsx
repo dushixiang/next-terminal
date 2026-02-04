@@ -21,7 +21,7 @@ const WechatWorkSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <Disabled disabled={license.isFree()}>
+            <Disabled disabled={!license.isEnterprise()}>
                 <Alert
                     message={t('settings.wechat_work.tip')}
                     type="info"
@@ -64,15 +64,15 @@ const WechatWorkSetting = ({get, set}: SettingProps) => {
                                           rules={[{required: enabled}]}
                     />
                     <ProFormText name="wechat-work-redirect-uri"
-                                 label={t('settings.wechat_work.redirect_uri')}
+                                 label={t('identity.oidc_client.redirect_uris')}
                                  placeholder={t('settings.wechat_work.redirect_uri_placeholder')}
                                  disabled={!enabled}
                                  rules={[{required: enabled}]}
                     />
                     <ProFormTreeSelect
                         name="wechat-work-department"
-                        label={t('settings.wechat_work.department')}
-                        placeholder={t('settings.wechat_work.department_placeholder')}
+                        label={t('settings.oidc.department')}
+                        placeholder={t('settings.oidc.department_placeholder')}
                         disabled={!enabled}
                         fieldProps={{
                             showSearch: true,

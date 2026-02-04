@@ -74,7 +74,7 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                         <ProFormText name={'nickname'} label={t('identity.user.nickname')} rules={[{required: true}]}/>
                     </Col>
                     <Col span={12}>
-                        <ProFormText name={'username'} label={t('identity.user.username')} rules={[{required: true}]}/>
+                        <ProFormText name={'username'} label={t('gateways.username')} rules={[{required: true}]}/>
                     </Col>
                 </Row>
 
@@ -94,7 +94,7 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                         }
                         return (
                             <ProFormSelect
-                                label={t('identity.user.role')} name='roles'
+                                label={t('menus.identity.submenus.role')} name='roles'
                                 fieldProps={{
                                     mode: 'multiple'
                                 }}
@@ -113,7 +113,7 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                 </ProFormDependency>
 
                 <ProFormTreeSelect
-                    label={t('identity.user.department')}
+                    label={t('menus.identity.submenus.department')}
                     name='departments'
                     fieldProps={{
                         multiple: true,
@@ -162,7 +162,7 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                     <Col span={12}>
                         <ProFormSelect 
                             name={'source'} 
-                            label={t('identity.user.source')} 
+                            label={t('audit.accessLog.stats.table.referer')} 
                             options={[
                                 {label: t('identity.user.sources.local'), value: 'local'},
                                 {label: t('identity.user.sources.ldap'), value: 'ldap'},
@@ -183,7 +183,7 @@ const UserModal = ({open, handleOk, handleCancel, confirmLoading, id}: UserModal
                 {!id &&
                     <ProFormText.Password
                         name={'password'}
-                        label={t('identity.user.password')}
+                        label={t('assets.password')}
                     />
                 }
             </ProForm>

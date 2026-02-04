@@ -58,7 +58,7 @@ const AuthorisedWebsitePage = () => {
             width: 48,
         },
         {
-            title: t('authorised.label.user'),
+            title: t('menus.identity.submenus.user'),
             dataIndex: 'userName',
             formItemProps: {
                 name: 'userId',
@@ -77,7 +77,7 @@ const AuthorisedWebsitePage = () => {
             })
         },
         {
-            title: t('authorised.label.department'),
+            title: t('menus.identity.submenus.department'),
             dataIndex: 'departmentName',
             formItemProps: {
                 name: 'departmentId',
@@ -96,7 +96,7 @@ const AuthorisedWebsitePage = () => {
             })
         },
         {
-            title: t('authorised.label.website'),
+            title: t('menus.resource.submenus.website'),
             dataIndex: 'websiteName',
             formItemProps: {
                 name: 'websiteId',
@@ -134,7 +134,7 @@ const AuthorisedWebsitePage = () => {
             })
         },
         {
-            title: t('authorised.label.expired_at'),
+            title: t('assets.limit_time'),
             key: 'expiredAt',
             dataIndex: 'expiredAt',
             hideInSearch: true,
@@ -170,7 +170,7 @@ const AuthorisedWebsitePage = () => {
             width: 180,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 50,
@@ -228,7 +228,7 @@ const AuthorisedWebsitePage = () => {
                     showSizeChanger: true
                 }}
                 dateFormatter="string"
-                headerTitle={t('authorised.label.authorised')}
+                headerTitle={t('actions.authorized')}
                 toolBarRender={() => [
                     <Button key="button" type="primary" onClick={() => {
                         navigate('/authorised-website/post')

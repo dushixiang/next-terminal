@@ -64,7 +64,7 @@ const ScheduledTaskPage = () => {
             sorter: true,
         }
         , {
-            title: t('sysops.status'),
+            title: t('general.status'),
             dataIndex: 'enabled',
             key: 'enabled',
             hideInSearch: true,
@@ -77,7 +77,7 @@ const ScheduledTaskPage = () => {
                 />
             }
         }, {
-            title: t('sysops.type.label'),
+            title: t('assets.type'),
             dataIndex: 'type',
             key: 'type',
             hideInSearch: true,
@@ -90,7 +90,7 @@ const ScheduledTaskPage = () => {
                     case "delete-history-log":
                         return <Tag color="green" bordered={false}>{t('sysops.type.options.delete_log')}</Tag>;
                     case "renew-certificate":
-                        return <Tag color="orange" bordered={false}>{t('sysops.type.options.renew_certificate')}</Tag>;
+                        return <Tag color="orange" bordered={false}>{t('assets.certificates.renew')}</Tag>;
                     default:
                         return '';
                 }
@@ -116,7 +116,7 @@ const ScheduledTaskPage = () => {
             sorter: true,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 200,
@@ -145,7 +145,7 @@ const ScheduledTaskPage = () => {
                 </NButton>,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

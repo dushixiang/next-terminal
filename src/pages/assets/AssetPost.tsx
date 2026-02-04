@@ -57,6 +57,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                 asset.password = '';
                 asset.privateKey = '';
                 asset.passphrase = '';
+                asset.alias = '';
             }
             return asset;
         }
@@ -113,7 +114,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                             options={[
                                 {label: t('assets.password'), value: 'password'},
                                 {label: t('assets.private_key'), value: 'private-key', disabled: protocol !== 'ssh'},
-                                {label: t('assets.credential'), value: 'credential'},
+                                {label: t('menus.resource.submenus.credential'), value: 'credential'},
                             ]}
                         />
                         <ProFormDependency name={['accountType']}>
@@ -192,7 +193,20 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
 
                 <AssetLogo value={logo} onChange={setLogo}/>
 
-                <ProFormText name={'name'} label={t('assets.name')} rules={[{required: true}]}/>
+                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
+
+                <ProFormText
+                    name={'alias'}
+                    label={t('assets.alias')}
+                    placeholder={t('assets.alias_placeholder')}
+                    extra={t('assets.alias_tip')}
+                    rules={[
+                        {
+                            pattern: /^[A-Za-z][A-Za-z0-9_-]*$/,
+                            message: t('assets.alias_invalid'),
+                        },
+                    ]}
+                />
 
                 <ProFormSegmented
                     label={t('assets.protocol')} name='protocol' rules={[{required: true}]}
@@ -255,9 +269,9 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                     name='gatewayType'
                     options={[
                         {label: t('assets.no_gateway'), value: ''},
-                        {label: t('assets.ssh_gateway'), value: 'ssh'},
-                        {label: t('assets.agent_gateway'), value: 'agent'},
-                        {label: t('assets.gateway_group'), value: 'group'},
+                        {label: t('menus.gateway.submenus.ssh_gateway'), value: 'ssh'},
+                        {label: t('menus.gateway.submenus.agent_gateway'), value: 'agent'},
+                        {label: t('menus.gateway.submenus.gateway_group'), value: 'group'},
                     ]}
                 />
 
@@ -267,7 +281,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                             return (
                                 <ProFormSelect
                                     key="ssh"
-                                    label={t('assets.ssh_gateway')}
+                                    label={t('menus.gateway.submenus.ssh_gateway')}
                                     name='gatewayId'
                                     request={sshGatewayRequest}
                                     params={{gatewayType}}
@@ -279,7 +293,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                             return (
                                 <ProFormSelect
                                     key="agent"
-                                    label={t('assets.agent_gateway')}
+                                    label={t('menus.gateway.submenus.agent_gateway')}
                                     name='gatewayId'
                                     request={agentGatewayRequest}
                                     params={{gatewayType}}
@@ -291,7 +305,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                             return (
                                 <ProFormSelect
                                     key="group"
-                                    label={t('assets.gateway_group')}
+                                    label={t('menus.gateway.submenus.gateway_group')}
                                     name='gatewayId'
                                     request={gatewayGroupRequest}
                                     params={{gatewayType}}
@@ -332,7 +346,7 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
                     }}
                 />
 
-                <ProFormTextArea label={t('assets.description')} name='description'
+                <ProFormTextArea label={t('general.remark')} name='description'
                                  fieldProps={{rows: 4}}/>
 
                 <Collapse

@@ -96,7 +96,7 @@ const SshGatewayPage = () => {
                     case 'private-key':
                         return <Tag color="green">{t('assets.private_key')}</Tag>
                     case 'credential':
-                        return <Tag color={'orange'}>{t('assets.credential')}</Tag>
+                        return <Tag color={'orange'}>{t('menus.resource.submenus.credential')}</Tag>
                 }
             }
         }, {
@@ -113,7 +113,7 @@ const SshGatewayPage = () => {
             valueType: 'dateTime'
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
@@ -128,7 +128,7 @@ const SshGatewayPage = () => {
                 </NButton>,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

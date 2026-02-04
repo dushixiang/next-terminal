@@ -60,7 +60,7 @@ const StorageModal = ({
         >
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <ProFormText hidden={true} name={'id'}/>
-                <ProFormText label={t('assets.name')} name="name" rules={[{required: true}]}/>
+                <ProFormText label={t('general.name')} name="name" rules={[{required: true}]}/>
                 <ProFormSwitch label={t('assets.is_share')} name="isShare" rules={[{required: true}]}/>
                 <ProFormDigit label={t('assets.limit_size')}
                               name="limitSize"

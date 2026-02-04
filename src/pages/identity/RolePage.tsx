@@ -86,7 +86,7 @@ const RolePage = () => {
             width: 191,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 160,
@@ -107,7 +107,7 @@ const RolePage = () => {
                 ,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

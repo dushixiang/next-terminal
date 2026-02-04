@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import {formatUptime, renderSize} from "@/utils/utils";
 import clsx from "clsx";
+import {useTranslation} from "react-i18next";
 
 interface Props {
     open: boolean;
@@ -23,6 +24,7 @@ interface Props {
 }
 
 const AgentGatewayStat = ({open, id, onClose}: Props) => {
+    const {t} = useTranslation();
     let query = useQuery({
         queryKey: ['agent-gateway', id, 'stat'],
         queryFn: async () => {
@@ -39,9 +41,9 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
             title={
                 <div className="flex items-center gap-2">
                     <Activity className="h-5 w-5"/>
-                    <span>网关监控</span>
+                    <span>{t('gateways.monitor.title')}</span>
                     {data?.ping && (
-                        <Tag color="green">延迟: {data.ping}ms</Tag>
+                        <Tag color="green">{t('gateways.stat.ping')}: {data.ping}ms</Tag>
                     )}
                 </div>
             }
@@ -56,27 +58,27 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                     title={
                         <div className="flex items-center gap-2">
                             <Server className="h-4 w-4"/>
-                            <span>系统信息</span>
+                            <span>{t('gateways.monitor.system_info')}</span>
                         </div>
                     }
                 >
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div>
-                            <div className="text-gray-500 text-sm">主机名</div>
+                            <div className="text-gray-500 text-sm">{t('stat.info.hostname')}</div>
                             <div className="font-medium">{data?.host.hostname || '-'}</div>
                         </div>
                         <div>
-                            <div className="text-gray-500 text-sm">操作系统</div>
+                            <div className="text-gray-500 text-sm">{t('stat.info.os')}</div>
                             <div className="font-medium">{data?.host.os || '-'} / {data?.host.arch || '-'}</div>
                         </div>
                         <div>
-                            <div className="text-gray-500 text-sm">系统版本</div>
+                            <div className="text-gray-500 text-sm">{t('gateways.stat.system_version')}</div>
                             <div className="font-medium">{data?.host.version || '-'}</div>
                         </div>
                         <div>
                             <div className="text-gray-500 text-sm flex items-center gap-1">
                                 <Clock className="h-3 w-3"/>
-                                运行时间
+                                {t('gateways.stat.uptime')}
                             </div>
                             <div className="font-medium">{formatUptime(data?.host.uptime)}</div>
                         </div>
@@ -86,15 +88,15 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                             <Divider className="my-3"/>
                             <div className="grid grid-cols-3 gap-4">
                                 <div>
-                                    <div className="text-gray-500 text-sm">负载 (1分钟)</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.monitor.load_1m')}</div>
                                     <div className="font-medium">{data.load.load_1?.toFixed(2) || '-'}</div>
                                 </div>
                                 <div>
-                                    <div className="text-gray-500 text-sm">负载 (5分钟)</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.monitor.load_5m')}</div>
                                     <div className="font-medium">{data.load.load_5?.toFixed(2) || '-'}</div>
                                 </div>
                                 <div>
-                                    <div className="text-gray-500 text-sm">负载 (15分钟)</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.monitor.load_15m')}</div>
                                     <div className="font-medium">{data.load.load_15?.toFixed(2) || '-'}</div>
                                 </div>
                             </div>
@@ -110,28 +112,28 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                         title={
                             <div className="flex items-center gap-2">
                                 <Cpu className="h-4 w-4"/>
-                                <span>CPU</span>
+                                <span>{t('gateways.stat.cpu')}</span>
                             </div>
                         }
                     >
                         <div className="space-y-3">
                             <div>
-                                <div className="text-gray-500 text-sm mb-1">型号</div>
+                                <div className="text-gray-500 text-sm mb-1">{t('gateways.stat.model')}</div>
                                 <div className="text-xs font-mono">{data?.cpu.model || '-'}</div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <div className="text-gray-500 text-sm">物理核心</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.physical_cores')}</div>
                                     <div className="font-medium">{data?.cpu.physical_cores || 0}</div>
                                 </div>
                                 <div>
-                                    <div className="text-gray-500 text-sm">逻辑核心</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.logical_cores')}</div>
                                     <div className="font-medium">{data?.cpu.logical_cores || 0}</div>
                                 </div>
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="text-gray-500 text-sm">使用率</span>
+                                    <span className="text-gray-500 text-sm">{t('gateways.stat.percent')}</span>
                                     <span className="font-medium">{data?.cpu.percent?.toFixed(1) || 0}%</span>
                                 </div>
                                 <Progress
@@ -152,32 +154,32 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                         title={
                             <div className="flex items-center gap-2">
                                 <MemoryStick className="h-4 w-4"/>
-                                <span>内存</span>
+                                <span>{t('gateways.stat.memory')}</span>
                             </div>
                         }
                     >
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <div className="text-gray-500 text-sm">总容量</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.total')}</div>
                                     <div className="font-medium">{renderSize(data?.memory.total)}</div>
                                 </div>
                                 <div>
-                                    <div className="text-gray-500 text-sm">已使用</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.used')}</div>
                                     <div className="font-medium">{renderSize(data?.memory.used)}</div>
                                 </div>
                                 <div>
-                                    <div className="text-gray-500 text-sm">可用</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.available')}</div>
                                     <div className="font-medium">{renderSize(data?.memory.available)}</div>
                                 </div>
                                 <div>
-                                    <div className="text-gray-500 text-sm">空闲</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.free')}</div>
                                     <div className="font-medium">{renderSize(data?.memory.free)}</div>
                                 </div>
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="text-gray-500 text-sm">使用率</span>
+                                    <span className="text-gray-500 text-sm">{t('gateways.stat.percent')}</span>
                                     <span className="font-medium">{data?.memory.percent?.toFixed(1) || 0}%</span>
                                 </div>
                                 <Progress
@@ -191,10 +193,10 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                             </div>
                             {data?.memory.swap_total > 0 && (
                                 <div className="pt-2 border-t">
-                                    <div className="text-gray-500 text-sm mb-1">交换分区</div>
+                                    <div className="text-gray-500 text-sm mb-1">{t('gateways.stat.swap')}</div>
                                     <div className="flex justify-between text-xs">
-                                        <span>总量: {renderSize(data.memory.swap_total)}</span>
-                                        <span>空闲: {renderSize(data.memory.swap_free)}</span>
+                                        <span>{t('gateways.stat.total')}: {renderSize(data.memory.swap_total)}</span>
+                                        <span>{t('gateways.stat.free')}: {renderSize(data.memory.swap_free)}</span>
                                     </div>
                                 </div>
                             )}
@@ -210,24 +212,24 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                         title={
                             <div className="flex items-center gap-2">
                                 <HardDrive className="h-4 w-4"/>
-                                <span>磁盘</span>
+                                <span>{t('gateways.stat.disk')}</span>
                             </div>
                         }
                     >
                         <div className="space-y-3">
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <div className="text-gray-500 text-sm">总容量</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.total')}</div>
                                     <div className="font-medium">{renderSize(data?.disk.total)}</div>
                                 </div>
                                 <div>
-                                    <div className="text-gray-500 text-sm">已使用</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.used')}</div>
                                     <div className="font-medium">{renderSize(data?.disk.used)}</div>
                                 </div>
                             </div>
                             <div>
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="text-gray-500 text-sm">使用率</span>
+                                    <span className="text-gray-500 text-sm">{t('gateways.stat.percent')}</span>
                                     <span className="font-medium">{data?.disk.percent?.toFixed(1) || 0}%</span>
                                 </div>
                                 <Progress
@@ -241,7 +243,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                             </div>
                             <Divider className="my-2"/>
                             <div>
-                                <div className="text-gray-500 text-sm mb-2">磁盘 I/O 速率</div>
+                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.disk_io_rate')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className={clsx(
                                         'flex items-center gap-2 px-3 py-2 rounded',
@@ -249,7 +251,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                     )}>
                                         <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400"/>
                                         <div>
-                                            <div className="text-xs text-gray-500">读取</div>
+                                            <div className="text-xs text-gray-500">{t('general.read')}</div>
                                             <div className="font-medium text-green-600 dark:text-green-400">
                                                 {renderSize(data?.disk_io.read_bytes)}/s
                                             </div>
@@ -261,7 +263,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                     )}>
                                         <ArrowDown className="h-4 w-4 text-red-600 dark:text-red-400"/>
                                         <div>
-                                            <div className="text-xs text-gray-500">写入</div>
+                                            <div className="text-xs text-gray-500">{t('general.write')}</div>
                                             <div className="font-medium text-red-600 dark:text-red-400">
                                                 {renderSize(data?.disk_io.write_bytes)}/s
                                             </div>
@@ -278,13 +280,13 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                         title={
                             <div className="flex items-center gap-2">
                                 <Network className="h-4 w-4"/>
-                                <span>网络</span>
+                                <span>{t('assets.network')}</span>
                             </div>
                         }
                     >
                         <div className="space-y-3">
                             <div>
-                                <div className="text-gray-500 text-sm mb-2">网络 I/O 速率</div>
+                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.network_io_rate')}</div>
                                 <div className="grid grid-cols-2 gap-2">
                                     <div className={clsx(
                                         'flex items-center gap-2 px-3 py-2 rounded',
@@ -292,7 +294,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                     )}>
                                         <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400"/>
                                         <div>
-                                            <div className="text-xs text-gray-500">上传</div>
+                                            <div className="text-xs text-gray-500">{t('general.upload')}</div>
                                             <div className="font-medium text-green-600 dark:text-green-400">
                                                 {renderSize(data?.network.tx_sec)}/s
                                             </div>
@@ -304,7 +306,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                     )}>
                                         <ArrowDown className="h-4 w-4 text-blue-600 dark:text-blue-400"/>
                                         <div>
-                                            <div className="text-xs text-gray-500">下载</div>
+                                            <div className="text-xs text-gray-500">{t('authorised.strategy.download')}</div>
                                             <div className="font-medium text-blue-600 dark:text-blue-400">
                                                 {renderSize(data?.network.rx_sec)}/s
                                             </div>
@@ -313,34 +315,34 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                 </div>
                             </div>
                             <div>
-                                <div className="text-gray-500 text-sm mb-2">累计流量</div>
+                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.total_traffic')}</div>
                                 <div className="grid grid-cols-2 gap-4 text-xs">
                                     <div>
-                                        <span className="text-gray-500">上传: </span>
+                                        <span className="text-gray-500">{t('general.upload')}: </span>
                                         <span className="font-medium">{renderSize(data?.network.tx)}</span>
                                     </div>
                                     <div>
-                                        <span className="text-gray-500">下载: </span>
+                                        <span className="text-gray-500">{t('authorised.strategy.download')}: </span>
                                         <span className="font-medium">{renderSize(data?.network.rx)}</span>
                                     </div>
                                 </div>
                             </div>
                             <Divider className="my-2"/>
                             <div>
-                                <div className="text-gray-500 text-sm mb-2">IP 地址</div>
+                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.ip_address')}</div>
                                 <div className="space-y-2">
                                     {data?.network.external_ip && (
                                         <div className="flex items-center gap-2">
-                                            <Tag color="blue">外部</Tag>
+                                            <Tag color="blue">{t('gateways.monitor.external')}</Tag>
                                             <span className="font-mono text-sm">{data.network.external_ip}</span>
                                         </div>
                                     )}
                                     {data?.network.internal_ips && data.network.internal_ips.length > 0 && (
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
-                                                <Tag color="green">内部</Tag>
+                                                <Tag color="green">{t('gateways.monitor.internal')}</Tag>
                                                 <span className="text-xs text-gray-500">
-                                                    ({data.network.internal_ips.length} 个)
+                                                    ({data.network.internal_ips.length} {t('gateways.monitor.items')})
                                                 </span>
                                             </div>
                                             <div className="pl-16 space-y-1">
@@ -362,7 +364,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                 {data?.errors && Object.keys(data.errors).length > 0 && (
                     <Card
                         size="small"
-                        title={<span className="text-red-600">采集错误</span>}
+                        title={<span className="text-red-600">{t('gateways.monitor.collection_errors')}</span>}
                     >
                         <div className="space-y-2">
                             {Object.entries(data.errors).map(([key, value]) => (

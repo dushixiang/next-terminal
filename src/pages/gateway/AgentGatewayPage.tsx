@@ -96,7 +96,7 @@ const AgentGatewayPage = () => {
             afterId: afterIndex < newDataSource.length - 1 ? newDataSource[afterIndex + 1].id : ''
         };
 
-        console.log('排序请求', req);
+        console.log('Sort request', req);
 
         // 服务器更新
         updateSortMutation.mutate(req);
@@ -119,7 +119,7 @@ const AgentGatewayPage = () => {
             hideInSearch: true,
         },
         {
-            title: t('gateways.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             className: 'drag-visible',
             width: 200,
@@ -138,9 +138,9 @@ const AgentGatewayPage = () => {
                 }
                 return <Tooltip title={
                     <div className="text-xs">
-                        <div>版本: {record.version || '-'}</div>
-                        <div>延迟: {record.stat?.ping || '-'} ms</div>
-                        <div>运行时间: {formatUptime(record.stat?.host.uptime)}</div>
+                        <div>{t('gateways.version')}: {record.version || '-'}</div>
+                        <div>{t('gateways.stat.ping')}: {record.stat?.ping || '-'} ms</div>
+                        <div>{t('gateways.stat.uptime')}: {formatUptime(record.stat?.host.uptime)}</div>
                     </div>
                 }>
                     <div className={'flex items-center gap-2'}>
@@ -151,7 +151,7 @@ const AgentGatewayPage = () => {
             }
         },
         {
-            title: '负载',
+            title: t('gateways.stat.load'),
             dataIndex: 'stat.load',
             key: 'stat.load',
             hideInSearch: true,
@@ -182,7 +182,7 @@ const AgentGatewayPage = () => {
             }
         },
         {
-            title: '内存',
+            title: t('gateways.stat.memory'),
             dataIndex: 'stat.memory',
             key: 'stat.memory',
             hideInSearch: true,
@@ -198,7 +198,7 @@ const AgentGatewayPage = () => {
             }
         },
         {
-            title: '磁盘',
+            title: t('gateways.stat.disk'),
             dataIndex: 'stat.disk',
             key: 'stat.disk',
             hideInSearch: true,
@@ -214,7 +214,7 @@ const AgentGatewayPage = () => {
             }
         },
         {
-            title: '网络 I/O',
+            title: t('gateways.stat.network_io'),
             dataIndex: 'stat.network_io',
             key: 'stat.network_io',
             hideInSearch: true,
@@ -234,7 +234,7 @@ const AgentGatewayPage = () => {
             }
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 100,
@@ -247,7 +247,7 @@ const AgentGatewayPage = () => {
                         setSelectedRowKey(record.id);
                     }}
                 >
-                    监控
+                    {t('gateways.monitor.action')}
                 </NButton>,
                 <NButton
                     key="edit"
@@ -260,7 +260,7 @@ const AgentGatewayPage = () => {
                 </NButton>,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

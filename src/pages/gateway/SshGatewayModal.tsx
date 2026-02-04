@@ -61,7 +61,7 @@ const SshGatewayModal = ({
             case 'credential':
                 return <>
                     <ProFormSelect
-                        label={t('assets.credential')} name='credentialId'
+                        label={t('menus.resource.submenus.credential')} name='credentialId'
                         rules={[{required: true}]}
                         request={async () => {
                             let credentials = await credentialApi.getAll();
@@ -76,7 +76,7 @@ const SshGatewayModal = ({
                 </>;
             case 'password':
                 return <>
-                    <ProFormText label={t('assets.username')} name='username' rules={[{required: true}]}/>
+                    <ProFormText label={t('menus.identity.submenus.user')} name='username' rules={[{required: true}]}/>
                     <ProFormText.Password label={t('assets.password')}
                                           name='password'
                                           rules={[{required: true}]}
@@ -96,7 +96,7 @@ const SshGatewayModal = ({
                 </>
             case 'private-key':
                 return <>
-                    <ProFormText label={t('assets.username')} name='username' rules={[{required: true}]}/>
+                    <ProFormText label={t('menus.identity.submenus.user')} name='username' rules={[{required: true}]}/>
                     <ProFormTextArea label={t('assets.private_key')}
                                      name='privateKey'
                                      rules={[{required: true}]}
@@ -142,7 +142,7 @@ const SshGatewayModal = ({
 
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <ProFormText hidden={true} name={'id'}/>
-                <ProFormText name={'name'} label={t('assets.name')} rules={[{required: true}]}/>
+                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
 
                 {/* 配置模式选择 */}
                 <ProFormRadio.Group
@@ -200,7 +200,7 @@ const SshGatewayModal = ({
                                 </Form.Item>
 
                                 <ProFormSelect
-                                    label={t('assets.credential')}
+                                    label={t('menus.resource.submenus.credential')}
                                     name='credentialId'
                                     rules={[{required: true}]}
                                     request={async () => {

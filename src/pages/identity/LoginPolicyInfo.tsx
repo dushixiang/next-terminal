@@ -31,7 +31,7 @@ const LoginPolicyInfo = ({id}: any) => {
     return (
         <div className={'page-detail-info'}>
             <ProDescriptions<LoginPolicy> column={1} request={get}>
-                <ProDescriptions.Item label={t('identity.policy.name')} dataIndex="name"/>
+                <ProDescriptions.Item label={t('general.name')} dataIndex="name"/>
                 <ProDescriptions.Item label={t('identity.policy.priority')} dataIndex="priority"/>
                 <ProDescriptions.Item label={t('identity.policy.ip_group')} dataIndex="ipGroup"/>
                 <ProDescriptions.Item
@@ -54,15 +54,15 @@ const LoginPolicyInfo = ({id}: any) => {
                     render={(text) => {
                         if (text === 'allow') {
                             return <Tag icon={<SafetyCertificateOutlined/>} color="success" bordered={false}>
-                                {t('identity.policy.action.options.allow')}
+                                {t('identity.policy.action.allow')}
                             </Tag>;
                         } else {
                             return <Tag icon={<StopOutlined/>} color="error" bordered={false}>
-                                {t('identity.policy.action.options.reject')}
+                                {t('identity.policy.action.reject')}
                             </Tag>;
                         }
                     }}/>
-                <ProDescriptions.Item label={t('identity.policy.status')} dataIndex="enabled"
+                <ProDescriptions.Item label={t('general.status')} dataIndex="enabled"
                                       valueEnum={{
                                           true: {text: t('general.enabled'), status: 'success'},
                                           false: {text: t('general.disabled'), status: 'default'},

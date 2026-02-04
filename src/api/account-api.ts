@@ -1,16 +1,36 @@
-import requests from "./core/requests";
+import requests, {baseUrl, getToken} from "./core/requests";
 import {setCurrentUser} from "@/utils/permission";
 import eventEmitter from "@/api/core/event-emitter";
+import {browserDownload} from "@/utils/utils";
 // @ts-ignore
 import {PublicKeyCredentialCreationOptionsJSON} from "@simplewebauthn/browser/script/types";
 // @ts-ignore
 import type {PublicKeyCredentialRequestOptionsJSON} from "@simplewebauthn/browser/esm/types";
 
-interface AccessToken {
+export interface AccessTokenItem {
     id: string;
-    userId: string;
-    userType: string;
+    token: string;
     type: string;
+    createdAt: number;
+}
+
+export interface AccessTokenCreateResult {
+    id: string;
+    token: string;
+    mask: string;
+    type: string;
+    createdAt: number;
+}
+
+export interface UserClientCertInfo {
+    id: string;
+    serialNumber: string;
+    fingerprint: string;
+    notBefore: number;
+    notAfter: number;
+    status: string;
+    revokedAt: number;
+    lastUsedAt: number;
     createdAt: number;
 }
 
@@ -61,6 +81,7 @@ export type AccountInfo = {
     nickname: string;
     type: string;
     enabledTotp: boolean;
+    mfaEnabled: boolean;
     roles: string[];
     menus?: Menu[];
     language: string;
@@ -151,16 +172,29 @@ class AccountApi {
         return data;
     }
 
-    getAccessToken = async () => {
-        return await requests.get(`/${this.group}/access-token`) as AccessToken;
+    getAccessTokens = async () => {
+        return await requests.get(`/${this.group}/access-token`) as AccessTokenItem[];
     }
 
-    createAccessToken = async () => {
-        return await requests.post(`/${this.group}/access-token`);
+    createAccessToken = async (type: string = 'api') => {
+        return await requests.post(`/${this.group}/access-token`, {type}) as AccessTokenCreateResult;
     }
 
-    deleteAccessToken = async () => {
-        return await requests.delete(`/${this.group}/access-token`);
+    deleteAccessToken = async (id: string) => {
+        return await requests.delete(`/${this.group}/access-token/${id}`);
+    }
+
+    getClientCert = async () => {
+        return await requests.get(`/${this.group}/client-cert`) as UserClientCertInfo | null;
+    }
+
+    downloadClientCert = async () => {
+        let u = `${baseUrl()}/${this.group}/client-cert/download?X-Auth-Token=${getToken()}`
+        browserDownload(u)
+    }
+
+    revokeClientCert = async () => {
+        return await requests.delete(`/${this.group}/client-cert`);
     }
 
     getPasswordPolicy = async () => {
@@ -199,12 +233,14 @@ class AccountApi {
         await requests.put(`/${this.group}/webauthn/credentials/${id}`, val);
     }
 
-    deleteWebauthnCredentials = async (id: string) => {
-        await requests.delete(`/${this.group}/webauthn/credentials/${id}`);
+    deleteWebauthnCredentials = async (id: string, securityToken?: string) => {
+        const tokenParam = securityToken ? `?securityToken=${encodeURIComponent(securityToken)}` : '';
+        await requests.delete(`/${this.group}/webauthn/credentials/${id}${tokenParam}`);
     }
 
-    webauthnCredentialStart = async () => {
-        return await requests.post(`/${this.group}/webauthn/credentials/start`) as WebauthnCredentialCreation;
+    webauthnCredentialStart = async (securityToken?: string) => {
+        const tokenParam = securityToken ? `?securityToken=${encodeURIComponent(securityToken)}` : '';
+        return await requests.post(`/${this.group}/webauthn/credentials/start${tokenParam}`) as WebauthnCredentialCreation;
     }
 
     webauthnCredentialFinish = async (val: any) => {

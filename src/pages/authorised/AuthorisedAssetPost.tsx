@@ -47,7 +47,7 @@ const AuthorisedAssetPost = () => {
 
     return (
         <div className={'px-4'}>
-            <div className={'mb-4 font-bold text-lg'}>授权资产</div>
+            <div className={'mb-4 font-bold text-lg'}>{t('menus.authorised.submenus.authorised_asset')}</div>
             <ProForm formRef={formRef} onFinish={async (values) => {
                 if (expiredAtDayjs) {
                     values['expiredAt'] = expiredAtDayjs.valueOf();
@@ -60,7 +60,7 @@ const AuthorisedAssetPost = () => {
                 navigate('/authorised-asset')
             }}>
                 <ProFormSelect
-                    label={t('authorised.label.user')} name='userIds'
+                    label={t('menus.identity.submenus.user')} name='userIds'
                     fieldProps={{mode: 'multiple', showSearch: true}}
                     request={async () => {
                         let items = await userApi.getAll();
@@ -73,7 +73,7 @@ const AuthorisedAssetPost = () => {
                     }}
                 />
                 <ProFormTreeSelect
-                    label={t('authorised.label.department')} name='departmentIds'
+                    label={t('menus.identity.submenus.department')} name='departmentIds'
                     fieldProps={{showSearch: true, multiple: true, treeDefaultExpandAll: true}}
                     request={async () => {
                         let items = await departmentApi.getTree();
@@ -117,7 +117,7 @@ const AuthorisedAssetPost = () => {
                 />
 
                 <ProFormTreeSelect
-                    label={t('authorised.label.asset')}
+                    label={t('menus.resource.submenus.asset')}
                     name='assetIds'
                     fieldProps={{
                         multiple: true,
@@ -155,7 +155,7 @@ const AuthorisedAssetPost = () => {
                 />
 
                 <ProFormSelect
-                    label={t('authorised.label.command_filter')} name='commandFilterId'
+                    label={t('menus.authorised.submenus.command_filter')} name='commandFilterId'
                     fieldProps={{showSearch: true}}
                     request={async () => {
                         let items = await commandFilterApi.getAll();
@@ -182,7 +182,7 @@ const AuthorisedAssetPost = () => {
                     }}
                 />
 
-                <Form.Item label={t('authorised.label.expired_at')} name="expiredAt">
+                <Form.Item label={t('assets.limit_time')} name="expiredAt">
                     <Space>
                         <Checkbox onChange={handleNoTimeLimit}
                                   checked={expiredAtNoLimit}>

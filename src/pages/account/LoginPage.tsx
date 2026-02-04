@@ -188,7 +188,7 @@ const LoginPage = () => {
                     {/* 密码登录表单 */}
                     {showPassword && (
                         <Form onFinish={handleSubmit} className="login-form" layout="vertical">
-                            <Form.Item label={t('account.username')} name='username'
+                            <Form.Item label={t('audit.operation.account')} name='username'
                                        rules={[{required: true}]}>
                                 <Input size={'large'}
                                        prefix={<UserOutlined/>}
@@ -196,7 +196,7 @@ const LoginPage = () => {
                                        autoComplete={'username webauthn'}
                                 />
                             </Form.Item>
-                            <Form.Item label={t('account.password')}
+                            <Form.Item label={t('assets.password')}
                                        name='password'
                                        rules={[{required: true}]}>
                                 <Input.Password size={'large'} prefix={<LockOutlined/>}
@@ -280,7 +280,7 @@ const LoginPage = () => {
                     <Title level={3}>{t('account.login.methods.otp')}</Title>
 
                     <Form form={optForm} onFinish={validateTOTP.mutate} className="login-form" layout="vertical">
-                        <Form.Item label={t('account.otp')} name='totp'
+                        <Form.Item label={t('identity.user.otp')} name='totp'
                                    rules={[{required: true}]}>
                             <InputOTP maxLength={6}
                                       pattern={REGEXP_ONLY_DIGITS}
@@ -341,9 +341,9 @@ const LoginPage = () => {
                         prefix={<LanguagesIcon className={'w-4 h-4'}/>}
                         options={[
                             {value: 'en-US', label: 'English'},
-                            {value: 'zh-CN', label: '简体中文'},
-                            {value: 'zh-TW', label: '繁体中文'},
-                            {value: 'ja-JP', label: '日本語'},
+                            {value: 'zh-CN', label: t('general.language_zh_cn')},
+                            {value: 'zh-TW', label: t('general.language_zh_tw')},
+                            {value: 'ja-JP', label: t('general.language_ja_jp')},
                         ]}
                         value={i18n.language}
                         onChange={(value) => {

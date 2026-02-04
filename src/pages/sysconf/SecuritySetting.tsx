@@ -86,18 +86,15 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         name="access-mfa-expires-at"
                         label={t('settings.security.access_mfa_expires_at')}
                         min={0}
-                        addonAfter={t('settings.security.minute')}
+                        addonAfter={t('general.minute')}
                         fieldProps={{
                             precision: 0 // 只允许整数
                         }}
                     />
                 </div>
 
-                <Divider orientation="left">会话管理</Divider>
-                <div className={cn(
-                    'grid gap-4',
-                    isMobile ? 'grid-cols-1' : 'grid-cols-4'
-                )}>
+                <Divider orientation="left">{t('settings.security.session_management')}</Divider>
+                <div className={'flex md:items-center md:gap-2 md:flex-row flex-col'}>
                     <ProFormSwitch
                         name="login-session-count-custom"
                         label={t("settings.security.session.count_custom")}
@@ -124,7 +121,7 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         name="login-session-duration"
                         label={t('settings.security.session.duration')}
                         min={1}
-                        addonAfter={t('settings.security.minute')}
+                        addonAfter={t('general.minute')}
                         fieldProps={{
                             precision: 0 // 只允许整数
                         }}
@@ -135,6 +132,15 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         tooltip={t('general.less-zero-tip')}
                         min={-1}
                         required={true}
+                        addonAfter={t('general.days')}
+                        fieldProps={{
+                            precision: 0 // 只允许整数
+                        }}
+                    />
+                    <ProFormDigit
+                        name="user-client-cert-valid-days"
+                        label={t('settings.security.client_cert_valid_days')}
+                        min={1}
                         addonAfter={t('general.days')}
                         fieldProps={{
                             precision: 0 // 只允许整数
@@ -177,7 +183,7 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                                     min={1}
                                     max={3}
                                     required
-                                    addonAfter={t('settings.security.password.type')}
+                                    addonAfter={t('assets.type')}
                                 />
                                 <ProFormSwitch
                                     name={['password-strength', "mustNotContainUsername"]}
@@ -238,7 +244,7 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         min={1}
                         required={lockEnabled}
                         disabled={!lockEnabled}
-                        addonAfter={t('settings.security.minute')}
+                        addonAfter={t('general.minute')}
                     />
                     <ProFormDigit
                         name="login-lock-failed-times"
@@ -252,7 +258,7 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         label={t('settings.security.login_lock.account_duration')}
                         min={0}
                         required={lockEnabled}
-                        addonAfter={t('settings.security.minute')}
+                        addonAfter={t('general.minute')}
                         disabled={!lockEnabled}
                     />
                     <ProFormDigit
@@ -260,7 +266,7 @@ const SecuritySetting = ({get, set}: SettingProps) => {
                         label={t('settings.security.login_lock.ip_duration')}
                         min={0}
                         required={lockEnabled}
-                        addonAfter={t('settings.security.minute')}
+                        addonAfter={t('general.minute')}
                         disabled={!lockEnabled}
                     />
                 </div>

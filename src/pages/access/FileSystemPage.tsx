@@ -57,7 +57,7 @@ import {useTranslation} from "react-i18next";
 import {baseUrl, getToken} from "@/api/core/requests";
 import PromptModal from "@/components/PromptModal";
 import FileEditor from "@/pages/access/FileEditor";
-import {useFileEditor} from "@/hook/use-file-editor";
+import {useFileEditor} from "@/pages/access/hooks/use-file-editor";
 import fileSystemApi, {FileInfo} from "@/api/filesystem-api";
 import {EyeInvisibleOutlined, EyeOutlined, ReloadOutlined, SyncOutlined} from "@ant-design/icons";
 import clsx from "clsx";
@@ -264,12 +264,12 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     const [messageApi, messageContextHolder] = message.useMessage();
     const [contextMenu, setContextMenu] = useState<ContextMenu>(null);
     let { license } = useLicense();
-    const dragUploadHint = t('fs.drag_upload_hint', {defaultValue: '拖拽文件到此处上传'});
-    const dragUploadDisabledMessage = t('fs.drag_upload_disabled', {defaultValue: '当前策略不允许上传'});
+    const dragUploadHint = t('fs.drag_upload_hint');
+    const dragUploadDisabledMessage = t('fs.drag_upload_disabled');
 
-    let editLabel = t('fs.operations.edit');
+    let editLabel = t('actions.edit');
     if (license.isFree()) {
-        editLabel += ` (${t('settings.license.type.options.premium')})`;
+        editLabel += ` (${t('settings.license.type.premium')})`;
     }
 
     const items: MenuProps['items'] = [
@@ -324,7 +324,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             },
         },
         {
-            label: t('fs.operations.download'),
+            label: t('authorised.strategy.download'),
             key: 'download',
             icon: <Download className={iconClassName}/>,
             disabled: contextMenu?.file?.isDir,
@@ -335,7 +335,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             },
         },
         {
-            label: t('fs.operations.rename'),
+            label: t('authorised.strategy.rename'),
             key: 'rename',
             icon: <FolderEdit className={iconClassName}/>,
             onClick: () => {
@@ -349,7 +349,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             type: 'divider',
         },
         {
-            label: t('fs.operations.remove'),
+            label: t('actions.delete'),
             key: 'delete',
             danger: true,
             icon: <TrashIcon className={iconClassName}/>,
@@ -454,7 +454,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 return <span>{dayjs(value).format(`YYYY-MM-DD HH:mm:ss`)}</span>;
             },
         }, {
-            title: t('fs.attributes.permissions.label'),
+            title: t('identity.role.permission'),
             dataIndex: 'mode',
             key: 'mode',
             width: 100,
@@ -466,7 +466,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
 
     const tranColumns: ColumnsType<TransmissionRecord> = [
         {
-            title: t('fs.transmission.filename'),
+            title: t('audit.filename'),
             dataIndex: 'name',
             key: 'name',
             ellipsis: true,
@@ -477,7 +477,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             ),
         },
         {
-            title: t('fs.transmission.size'),
+            title: t('fs.attributes.size'),
             dataIndex: 'size',
             key: 'size',
             render: (value, item) => {
@@ -486,7 +486,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             width: 80,
         },
         {
-            title: t('fs.transmission.status'),
+            title: t('general.status'),
             dataIndex: 'status',
             key: 'status',
             render: (v, item) => {
@@ -555,7 +555,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                         </Tooltip>
                     )}
                     {(record.status === 'success' || record.status === 'error' || record.status === 'cancelled') && (
-                        <Tooltip title={t('actions.remove')}>
+                        <Tooltip title={t('actions.delete')}>
                             <Button
                                 type="text"
                                 size="small"
@@ -1091,9 +1091,9 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             case "create-dir":
                 return t('fs.operations.create_dir');
             case "create-file":
-                return t('fs.operations.create_file');
+                return t('authorised.strategy.create_file');
             case "rename":
-                return t('fs.operations.rename');
+                return t('authorised.strategy.rename');
             case "chmod":
                 return t('fs.operations.chmod');
             default:
@@ -1116,12 +1116,12 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
 
     let uploadDirLabel = t('fs.operations.upload_dir');
     if (license.isFree()) {
-        uploadDirLabel += ` (${t('settings.license.type.options.premium')})`;
+        uploadDirLabel += ` (${t('settings.license.type.premium')})`;
     }
 
     let batchDownloadLabel = t('fs.operations.batch_download');
     if (license.isFree()) {
-        batchDownloadLabel += ` (${t('settings.license.type.options.premium')})`;
+        batchDownloadLabel += ` (${t('settings.license.type.premium')})`;
     }
 
     return (
@@ -1180,7 +1180,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                     />
                                 </Tooltip>
 
-                                <Tooltip title={t('fs.operations.create_file')}>
+                                <Tooltip title={t('authorised.strategy.create_file')}>
                                     {strategy?.createFile &&
                                         <FilePlus2Icon className={'h-4 w-4 cursor-pointer'} onClick={() => {
                                             setPromptState({
@@ -1221,7 +1221,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                     }
                                 </Tooltip>
 
-                                <Tooltip title={t('fs.operations.remove')}>
+                                <Tooltip title={t('actions.delete')}>
                                     {strategy?.delete &&
                                         <Trash2Icon className={'h-4 w-4 cursor-pointer'} onClick={() => {
                                             if (!hasSelected) {
@@ -1264,7 +1264,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                 </Button>
                             </Tooltip>
 
-                            <Tooltip title={t('fs.navigation.refresh')}>
+                            <Tooltip title={t('actions.refresh')}>
                                 <Button
                                     onClick={() => filesQuery.refetch()}
                                     icon={<ReloadOutlined/>}
@@ -1436,19 +1436,19 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                     checked={chmodState.ownerRead}
                                     onChange={(e) => setChmodState({...chmodState, ownerRead: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.owner_read')}
+                                    {t('general.read')}
                                 </Checkbox>
                                 <Checkbox
                                     checked={chmodState.ownerWrite}
                                     onChange={(e) => setChmodState({...chmodState, ownerWrite: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.owner_write')}
+                                    {t('general.write')}
                                 </Checkbox>
                                 <Checkbox
                                     checked={chmodState.ownerExecute}
                                     onChange={(e) => setChmodState({...chmodState, ownerExecute: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.owner_execute')}
+                                    {t('fs.attributes.permissions.group_execute')}
                                 </Checkbox>
                             </Space>
                         </div>
@@ -1460,13 +1460,13 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                     checked={chmodState.groupRead}
                                     onChange={(e) => setChmodState({...chmodState, groupRead: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.group_read')}
+                                    {t('general.read')}
                                 </Checkbox>
                                 <Checkbox
                                     checked={chmodState.groupWrite}
                                     onChange={(e) => setChmodState({...chmodState, groupWrite: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.group_write')}
+                                    {t('general.write')}
                                 </Checkbox>
                                 <Checkbox
                                     checked={chmodState.groupExecute}
@@ -1484,26 +1484,26 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                     checked={chmodState.publicRead}
                                     onChange={(e) => setChmodState({...chmodState, publicRead: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.public_read')}
+                                    {t('general.read')}
                                 </Checkbox>
                                 <Checkbox
                                     checked={chmodState.publicWrite}
                                     onChange={(e) => setChmodState({...chmodState, publicWrite: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.public_write')}
+                                    {t('general.write')}
                                 </Checkbox>
                                 <Checkbox
                                     checked={chmodState.publicExecute}
                                     onChange={(e) => setChmodState({...chmodState, publicExecute: e.target.checked})}
                                 >
-                                    {t('fs.attributes.permissions.public_execute')}
+                                    {t('fs.attributes.permissions.group_execute')}
                                 </Checkbox>
                             </Space>
                         </div>
 
                         <div className="mt-4 p-3 bg-gray-50 rounded dark:bg-gray-700">
                             <div className="text-sm text-gray-600 dark:text-gray-300">
-                                {t('fs.attributes.permissions.label')}: {
+                                {t('identity.role.permission')}: {
                                 ((chmodState.ownerRead ? 4 : 0) + (chmodState.ownerWrite ? 2 : 0) + (chmodState.ownerExecute ? 1 : 0)).toString() +
                                 ((chmodState.groupRead ? 4 : 0) + (chmodState.groupWrite ? 2 : 0) + (chmodState.groupExecute ? 1 : 0)).toString() +
                                 ((chmodState.publicRead ? 4 : 0) + (chmodState.publicWrite ? 2 : 0) + (chmodState.publicExecute ? 1 : 0)).toString()

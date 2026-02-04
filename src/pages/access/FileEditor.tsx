@@ -5,7 +5,7 @@ import {Editor as MonacoEditor, loader} from '@monaco-editor/react';
 import {useTranslation} from "react-i18next";
 import copy from "copy-to-clipboard";
 import fileSystemApi from "@/api/filesystem-api";
-import {OpenFile} from "@/hook/use-file-editor";
+import {OpenFile} from "@/pages/access/hooks/use-file-editor";
 import * as monaco from 'monaco-editor';
 import editorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import jsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
@@ -186,7 +186,7 @@ const FileEditor: React.FC<Props> = ({
     };
 
     const title = <div className="flex items-center">
-        <Tooltip title={`${t('fs.editor.save')} (Ctrl+S)`}>
+        <Tooltip title={`${t('actions.save')} (Ctrl+S)`}>
             <Button
                 type="text"
                 size="small"
@@ -195,7 +195,7 @@ const FileEditor: React.FC<Props> = ({
                 onClick={handleSaveFile}
                 disabled={!activeFile?.changed}
             >
-                {t('fs.editor.save')}
+                {t('actions.save')}
             </Button>
         </Tooltip>
         <Tooltip title={t('fs.editor.refetch')}>

@@ -75,11 +75,11 @@ const OTP = () => {
 
     const renderAuthApps = () => {
         const apps = [
-            { name: t('account.otp_apps.google_authenticator'), color: 'blue' },
-            { name: t('account.otp_apps.microsoft_authenticator'), color: 'green' },
-            { name: t('account.otp_apps.authy'), color: 'orange' },
-            { name: t('account.otp_apps.1password'), color: 'purple' },
-            { name: t('account.otp_apps.lastpass'), color: 'red' },
+            { name: 'Google Authenticator', color: 'blue' },
+            { name: 'Microsoft Authenticator', color: 'green' },
+            { name: 'Authy', color: 'orange' },
+            { name: '1Password', color: 'purple' },
+            { name: 'LastPass Authenticator', color: 'red' },
         ];
 
         return (
@@ -130,7 +130,7 @@ const OTP = () => {
     const renderView = (view: string) => {
         switch (view) {
             case 'unbinding':
-                return <OTPUnBinding refetch={refetch}/>;
+                return <OTPUnBinding refetch={refetch} forceReauth/>;
             case 'binding':
                 return (
                     <Row gutter={[24, 24]}>
@@ -179,7 +179,7 @@ const OTP = () => {
             <Title level={3} style={{marginTop: 0, marginBottom: 16}}>
                 <Space>
                     <SafetyOutlined />
-                    {t('account.otp')}
+                    {t('identity.user.otp')}
                 </Space>
             </Title>
             

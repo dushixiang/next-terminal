@@ -23,7 +23,7 @@ const LoginLockedPage = () => {
             key: 'ip',
             sorter: true,
         }, {
-            title: t('identity.user.username'),
+            title: t('gateways.username'),
             dataIndex: 'username',
             key: 'username',
             sorter: true,
@@ -51,7 +51,7 @@ const LoginLockedPage = () => {
             sorter: true,
         },
         {
-            title: t('identity.user.expiration_at'),
+            title: t('assets.limit_time'),
             dataIndex: 'expirationAt',
             key: 'expirationAt',
             valueType: 'dateTime',
@@ -59,13 +59,13 @@ const LoginLockedPage = () => {
             sorter: true,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await loginLockedApi.deleteById(record.id);
                         actionRef.current?.reload();

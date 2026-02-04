@@ -167,7 +167,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
 
     const items: MenuProps['items'] = [
         {
-            label: t('actions.add'),
+            label: t('actions.new'),
             key: 'add',
             icon: <PlusIcon className={'h-4 w-4'}/>,
             onClick: () => {
@@ -218,7 +218,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
         <div>
             <div className={'px-4 pt-4 flex items-center justify-between'}>
                 <div className={'font-medium text-[15px] flex items-center gap-2'}>
-                    <Tooltip title={t('actions.add')}>
+                    <Tooltip title={t('actions.new')}>
                         <PackagePlusIcon className={'h-4 w-4 cursor-pointer'}
                                          onClick={() => {
                                              setSelectedRowKey(undefined);

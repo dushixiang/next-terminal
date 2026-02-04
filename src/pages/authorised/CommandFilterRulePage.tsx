@@ -57,7 +57,7 @@ const CommandFilterRulePage = ({id}: Props) => {
             width: 48,
         },
         {
-            title: t('authorised.command_filter.rule.priority'),
+            title: t('identity.policy.priority'),
             key: 'priority',
             dataIndex: 'priority',
             sorter: true,
@@ -70,9 +70,9 @@ const CommandFilterRulePage = ({id}: Props) => {
             hideInSearch: true,
             render: (text => {
                 if (text === 'regexp') {
-                    return <Tag color={'blue'}>{t('authorised.command_filter.rule.type.options.regexp')}</Tag>;
+                    return <Tag color={'blue'}>{t('authorised.command_filter.rule.type.regexp')}</Tag>;
                 } else {
-                    return <Tag color={'geekblue'}>{t('authorised.command_filter.rule.type.options.command')}</Tag>;
+                    return <Tag color={'geekblue'}>{t('authorised.command_filter.rule.type.command')}</Tag>;
                 }
             })
         },
@@ -83,21 +83,21 @@ const CommandFilterRulePage = ({id}: Props) => {
             sorter: true,
         },
         {
-            title: t('authorised.command_filter.rule.action.label'),
+            title: t('identity.policy.action.label'),
             key: 'action',
             dataIndex: 'action',
             hideInSearch: true,
             render: (text => {
                 switch (text) {
                     case 'allow':
-                        return <Tag color={'green'}>{t('authorised.command_filter.rule.action.options.allow')}</Tag>
+                        return <Tag color={'green'}>{t('identity.policy.action.allow')}</Tag>
                     case 'reject':
-                        return <Tag color={'red'}>{t('authorised.command_filter.rule.action.options.reject')}</Tag>
+                        return <Tag color={'red'}>{t('identity.policy.action.reject')}</Tag>
                 }
             })
         },
         {
-            title: t('authorised.command_filter.rule.status'),
+            title: t('general.status'),
             key: 'enabled',
             dataIndex: 'enabled',
             hideInSearch: true,
@@ -110,7 +110,7 @@ const CommandFilterRulePage = ({id}: Props) => {
             })
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
@@ -126,7 +126,7 @@ const CommandFilterRulePage = ({id}: Props) => {
                 ,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

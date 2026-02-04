@@ -70,7 +70,7 @@ const CertificatePage = () => {
             width: 48,
         },
         {
-            title: t('assets.certificates.common_name'),
+            title: t('assets.domain'),
             dataIndex: 'commonName',
         },
         {
@@ -139,7 +139,7 @@ const CertificatePage = () => {
             sorter: true,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 180,
@@ -208,7 +208,7 @@ const CertificatePage = () => {
                             danger: true,
                             onClick: () => {
                                 modal.confirm({
-                                    title: t('general.delete_confirm'),
+                                    title: t('general.confirm_delete'),
                                     onOk: async () => {
                                         await api.deleteById(record.id);
                                         actionRef.current?.reload();

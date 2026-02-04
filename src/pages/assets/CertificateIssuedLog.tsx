@@ -338,7 +338,7 @@ const CertificateIssuedLog = ({open, onClose}: Props) => {
                     }}>
                         <Space>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
-                                {t('assets.certificates.log_viewer.stats.errors')}: {logs.filter(log => log.level === 'ERROR').length}
+                                {t('general.error')}: {logs.filter(log => log.level === 'ERROR').length}
                             </Text>
                             <Text type="secondary" style={{ fontSize: '12px' }}>
                                 {t('assets.certificates.log_viewer.stats.warnings')}: {logs.filter(log => log.level === 'WARN' || log.level === 'WARNING').length}

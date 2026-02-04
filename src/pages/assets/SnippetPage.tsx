@@ -51,7 +51,7 @@ const SnippetPage = () => {
             width: 48,
         },
         {
-            title: t('assets.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             width: 200,
             ellipsis: true,
@@ -64,15 +64,15 @@ const SnippetPage = () => {
             ellipsis: true
         },
         {
-            title: '可见性',
+            title: t('assets.snippet.visibility'),
             dataIndex: 'visibility',
             key: 'visibility',
             width: 100,
             hideInSearch: true,
             render: (_, record) => {
                 return record.visibility === 'public'
-                    ? <Tag color="green">公开</Tag>
-                    : <Tag color="default">私有</Tag>;
+                    ? <Tag color="green">{t('assets.snippet.visibility_public')}</Tag>
+                    : <Tag color="default">{t('assets.snippet.visibility_private')}</Tag>;
             }
         },
         {
@@ -92,7 +92,7 @@ const SnippetPage = () => {
             width: 191,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 100,
@@ -108,7 +108,7 @@ const SnippetPage = () => {
                 </NButton>,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

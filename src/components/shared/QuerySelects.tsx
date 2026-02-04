@@ -5,6 +5,7 @@ import userApi, {User} from "@/api/user-api";
 import departmentApi, {Department} from "@/api/department-api";
 import assetApi, {Asset} from "@/api/asset-api";
 import websiteApi, {Website} from "@/api/website-api";
+import databaseAssetApi, {DatabaseAsset} from "@/api/database-asset-api";
 
 interface SelectProps {
     value?: string;
@@ -40,7 +41,7 @@ export const UserSelect = ({value, onChange}: SelectProps) => {
         <Select
             value={value}
             onChange={onChange}
-            placeholder={t('authorised.label.user')}
+            placeholder={t('menus.identity.submenus.user')}
             allowClear
             showSearch
             loading={loading}
@@ -81,7 +82,7 @@ export const DepartmentSelect = ({value, onChange}: SelectProps) => {
         <Select
             value={value}
             onChange={onChange}
-            placeholder={t('authorised.label.department')}
+            placeholder={t('menus.identity.submenus.department')}
             allowClear
             showSearch
             loading={loading}
@@ -174,7 +175,7 @@ export const AssetSelect = ({value, onChange}: SelectProps) => {
         <Select
             value={value}
             onChange={onChange}
-            placeholder={t('authorised.label.asset')}
+            placeholder={t('menus.resource.submenus.asset')}
             allowClear
             showSearch
             loading={loading}
@@ -238,6 +239,47 @@ export const WebsiteGroupSelect = ({value, onChange}: SelectProps) => {
     );
 };
 
+// 数据库资产查询组件
+export const DatabaseAssetSelect = ({value, onChange}: SelectProps) => {
+    const {t} = useTranslation();
+    const [options, setOptions] = useState<{label: string, value: string}[]>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const fetchAssets = async () => {
+            setLoading(true);
+            try {
+                const result = await databaseAssetApi.getAll();
+                const assetOptions = result.map((asset: DatabaseAsset) => ({
+                    label: asset.name,
+                    value: asset.id,
+                }));
+                setOptions(assetOptions);
+            } catch (error) {
+                console.error('Failed to fetch database assets:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAssets();
+    }, []);
+
+    return (
+        <Select
+            value={value}
+            onChange={onChange}
+            placeholder={t('menus.resource.submenus.database_asset')}
+            allowClear
+            showSearch
+            loading={loading}
+            options={options}
+            filterOption={(input, option) =>
+                (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+            }
+        />
+    );
+};
+
 // 网站查询组件
 export const WebsiteSelect = ({value, onChange}: SelectProps) => {
     const {t} = useTranslation();
@@ -267,7 +309,7 @@ export const WebsiteSelect = ({value, onChange}: SelectProps) => {
         <Select
             value={value}
             onChange={onChange}
-            placeholder={t('authorised.label.website')}
+            placeholder={t('menus.resource.submenus.website')}
             allowClear
             showSearch
             loading={loading}

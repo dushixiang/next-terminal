@@ -30,7 +30,7 @@ const ToolsPing = () => {
     }
 
     return (
-        <div className={'space-y-4 flex flex-col min-h-[75vh]'}>
+        <div className={'flex flex-col gap-4 min-h-[75vh]'}>
             <Form layout="inline" className="w-full">
                 <Form.Item
                     label={t('sysops.tools.target')}

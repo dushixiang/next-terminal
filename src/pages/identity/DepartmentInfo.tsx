@@ -57,7 +57,7 @@ const DepartmentInfo = ({active, id}: DepartmentInfoProps) => {
                     },
                 },
                 {
-                    title: t('identity.department.weight'),
+                    title: t('assets.sort'),
                     dataIndex: 'weight',
                 },
                 {
@@ -71,15 +71,15 @@ const DepartmentInfo = ({active, id}: DepartmentInfoProps) => {
                     copyable: true,
                 },
                 {
-                    title: t('authorised.label.authorised'),
+                    title: t('actions.authorized'),
                     dataIndex: 'authorisedLinks',
                     render: () => (
                         <Space size={12} wrap>
                             <NLink to={`/authorised-asset?departmentId=${id}`}>
-                                {`${t('authorised.label.asset')}${t('authorised.label.authorised')}`}
+                                {`${t('menus.resource.submenus.asset')}${t('actions.authorized')}`}
                             </NLink>
                             <NLink to={`/authorised-website?departmentId=${id}`}>
-                                {`${t('authorised.label.website')}${t('authorised.label.authorised')}`}
+                                {`${t('menus.resource.submenus.website')}${t('actions.authorized')}`}
                             </NLink>
                         </Space>
                     ),

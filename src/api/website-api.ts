@@ -22,6 +22,7 @@ export interface Website {
     headers?: any;
     cert: Cert;
     public: Public;
+    tempAllow?: TempAllow;
     createdAt: number;
     groupId?: string;
     sort: string;  // LexoRank 排序字段
@@ -37,6 +38,12 @@ interface Public {
     ip: string;
     expiredAt: number;
     password: string;
+}
+
+interface TempAllow {
+    enabled: boolean;
+    durationMinutes?: number;
+    autoRenew?: boolean;
 }
 
 interface Cert {

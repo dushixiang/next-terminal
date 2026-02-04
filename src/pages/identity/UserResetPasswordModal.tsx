@@ -18,7 +18,7 @@ const UserResetPasswordModal = ({open, handleOk, handleCancel, confirmLoading}: 
 
     return (
         <Modal
-            title={t('identity.user.options.reset.password.confirm.title')}
+            title={t('identity.user.reset_password.confirm_title')}
             open={open}
             maskClosable={false}
             destroyOnHidden={true}
@@ -38,14 +38,14 @@ const UserResetPasswordModal = ({open, handleOk, handleCancel, confirmLoading}: 
 
             <ProForm formRef={formRef} submitter={false}>
                 <ProFormText name={'password'}
-                             label={t('identity.user.password')}
+                             label={t('assets.password')}
                              rules={[
                                  {
                                      pattern: /^\S*$/,
                                      message: t('identity.user.no_spaces_allowed'),
                                  }
                              ]}
-                             extra={t('identity.user.options.reset.password.confirm.content')}
+                             extra={t('identity.user.reset_password.confirm_content')}
                 />
             </ProForm>
         </Modal>

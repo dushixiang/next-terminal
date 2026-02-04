@@ -63,14 +63,14 @@ const ScheduledTaskModal = ({
                 <ProFormText label={t('general.name')} name={'name'} rules={[{required: true}]}/>
                 <Row gutter={16}>
                     <Col span={12}>
-                        <ProFormSelect label={t('sysops.type.label')}
+                        <ProFormSelect label={t('assets.type')}
                                        name={'type'}
                                        options={[
                                            {label: t('sysops.type.options.exec_command'), value: 'asset-exec-command'},
                                            {label: t('sysops.type.options.check_status'), value: 'asset-check-status'},
                                            {label: t('sysops.type.options.delete_log'), value: 'delete-history-log'},
                                            {
-                                               label: t('sysops.type.options.renew_certificate'),
+                                               label: t('assets.certificates.renew'),
                                                value: 'renew-certificate'
                                            },
                                        ]}
@@ -131,7 +131,7 @@ const ScheduledTaskModal = ({
                                 break;
                             case 'custom':
                                 return <ProFormTreeSelect
-                                    label={t('sysops.asset')}
+                                    label={t('menus.resource.submenus.asset')}
                                     name='assetIdList'
                                     rules={[{required: true}]}
                                     fieldProps={{

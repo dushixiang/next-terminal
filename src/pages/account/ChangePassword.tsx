@@ -48,7 +48,7 @@ const ChangePassword = () => {
                 characterType++;
             }
             if (characterType < policy.minCharacterType) {
-                return `密码需包含大写字母、小写字母、数字、特殊字符中的至少 ${policy.minCharacterType} 种`;
+                return t('settings.security.password.too_simple', {count: policy.minCharacterType});
             }
         }
         let user = getCurrentUser();
@@ -102,7 +102,7 @@ const ChangePassword = () => {
 
     const changePassword = async (values: any) => {
         await accountApi.changePassword(values);
-        message.success('success');
+        message.success(t('general.success'));
         window.location.href = '/'
     }
 
@@ -128,7 +128,7 @@ const ChangePassword = () => {
                 </Form.Item>
                 <Form.Item
                     name="newPassword"
-                    label={t('account.new_password')}
+                    label={t('identity.user.reset_password.new')}
                     rules={[
                         {
                             required: true,
@@ -167,7 +167,7 @@ const ChangePassword = () => {
                     <Button disabled={newPasswordStatus !== 'success' || error !== ''}
                             type="primary"
                             htmlType="submit">
-                        {t('account.submit')}
+                        {t('actions.confirm')}
                     </Button>
                 </Form.Item>
             </Form>

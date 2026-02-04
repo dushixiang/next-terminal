@@ -109,6 +109,12 @@
     scrollbar-gutter: stable;
 }
 
+/* 暗黑模式 */
+.dark .ant-table-container .ant-table-body,
+.dark .ant-table-container .ant-table-content {
+    scrollbar-color: #444 transparent;
+}
+
 /* 移动端全局样式优化 */
 @media (max-width: 768px) {
     /* 页面容器优化 */

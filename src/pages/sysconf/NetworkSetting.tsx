@@ -45,22 +45,22 @@ const NetworkSetting = ({get, set}: SettingProps) => {
                     }
                 }}
             >
-                <Divider orientation="left">网络设置</Divider>
+                <Divider orientation="left">{t('settings.network.setting')}</Divider>
                 <ProFormSelect
                     name="ip-extractor"
                     label={t('settings.system.ip.extractor')}
                     rules={[{required: true}]}
                     options={[
                         {
-                            label: `${t('settings.system.ip.extractor_direct')}${clientIPs?.direct ? ` (${clientIPs.direct})` : ''}`,
+                            label: `${t('assets.addr')}${clientIPs?.direct ? ` (${clientIPs.direct})` : ''}`,
                             value: 'direct'
                         },
                         {
-                            label: `Header(X-Real-IP)${clientIPs?.['x-real-ip'] ? ` (${clientIPs['x-real-ip']})` : ' (未检测到)'}`,
+                            label: `Header(X-Real-IP)${clientIPs?.['x-real-ip'] ? ` (${clientIPs['x-real-ip']})` : ` (${t('settings.network.not_detected')})`}`,
                             value: 'x-real-ip'
                         },
                         {
-                            label: `Header(X-Forwarded-For)${clientIPs?.['x-forwarded-for'] ? ` (${clientIPs['x-forwarded-for']})` : ' (未检测到)'}`,
+                            label: `Header(X-Forwarded-For)${clientIPs?.['x-forwarded-for'] ? ` (${clientIPs['x-forwarded-for']})` : ` (${t('settings.network.not_detected')})`}`,
                             value: 'x-forwarded-for'
                         },
                     ]}
@@ -79,7 +79,7 @@ const NetworkSetting = ({get, set}: SettingProps) => {
                                         label={
                                             <div className="flex items-center gap-1">
                                                 {t('settings.system.ip.trust_list')}
-                                                <Tooltip title="配置可信任的代理服务器IP地址，支持CIDR格式">
+                                                <Tooltip title={t('settings.network.trust_ip_tip')}>
                                                     <Info className="text-gray-400" size={12}/>
                                                 </Tooltip>
                                             </div>

@@ -110,7 +110,7 @@ const DepartmentPage = () => {
             width: 100,
         },
         {
-            title: t('identity.department.weight'),
+            title: t('assets.sort'),
             dataIndex: 'weight',
             hideInSearch: true,
             width: 100,
@@ -124,7 +124,7 @@ const DepartmentPage = () => {
             width: 191,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 160,
@@ -162,8 +162,8 @@ const DepartmentPage = () => {
                         }
                     }}
                     menus={[
-                        {key: 'view-authorised-asset', name: `${t('authorised.label.asset')}${t('authorised.label.authorised')}`},
-                        {key: 'view-authorised-website', name: `${t('authorised.label.website')}${t('authorised.label.authorised')}`},
+                        {key: 'view-authorised-asset', name: `${t('menus.resource.submenus.asset')}${t('actions.authorized')}`},
+                        {key: 'view-authorised-website', name: `${t('menus.resource.submenus.website')}${t('actions.authorized')}`},
                     ]}
                 />,
             ],

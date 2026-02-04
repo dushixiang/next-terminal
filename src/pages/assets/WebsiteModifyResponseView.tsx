@@ -17,6 +17,7 @@ import {
     Typography
 } from 'antd';
 import {MinusCircleOutlined, PlusOutlined, QuestionCircleOutlined} from '@ant-design/icons';
+import {useTranslation} from "react-i18next";
 
 const {Option} = Select;
 const {Text} = Typography;
@@ -52,6 +53,7 @@ interface FormData {
 }
 
 const WebsiteModifyResponseView = () => {
+    const {t} = useTranslation();
     const [loading, setLoading] = useState(false);
 
     const onFinish = async (values: FormData) => {
@@ -74,26 +76,26 @@ const WebsiteModifyResponseView = () => {
                 modifyRules: formattedRules
             };
 
-            console.log('提交的数据:', JSON.stringify(payload, null, 2));
+            console.log('Submitted payload:', JSON.stringify(payload, null, 2));
 
             // 这里应该调用您的 API
             // await saveModifyRules(payload);
 
             notification.success({
-                message: '保存成功',
-                description: 'HTTP 响应修改规则已成功保存',
+                message: t('assets.website_response_modify.save_success'),
+                description: t('assets.website_response_modify.save_success_desc'),
                 placement: 'topRight',
             });
         } catch (error) {
-            message.error('保存失败，请重试');
-            console.error('保存失败:', error);
+            message.error(t('assets.website_response_modify.save_failed'));
+            console.error('Save failed:', error);
         } finally {
             setLoading(false);
         }
     };
 
     // 渲染键值对字段
-    const renderKeyValueFields = (fieldName: any[], label: string, tooltip: string) => (
+    const renderKeyValueFields = (fieldName: any[], label: string, tooltip: string, addLabel: string) => (
         <Form.List name={fieldName}>
             {(fields, {add, remove}) => (
                 <>
@@ -111,20 +113,20 @@ const WebsiteModifyResponseView = () => {
                                 <Form.Item
                                     {...restField}
                                     name={[name, 'key']}
-                                    rules={[{required: true, message: '请输入键'}]}
+                                    rules={[{required: true, message: t('assets.website_response_modify.header_key_required')}]}
                                     style={{marginBottom: 0}}
                                 >
-                                    <Input placeholder="键"/>
+                                    <Input placeholder={t('assets.header_key')}/>
                                 </Form.Item>
                             </Col>
                             <Col flex="1">
                                 <Form.Item
                                     {...restField}
                                     name={[name, 'value']}
-                                    rules={[{required: true, message: '请输入值'}]}
+                                    rules={[{required: true, message: t('assets.website_response_modify.header_value_required')}]}
                                     style={{marginBottom: 0}}
                                 >
-                                    <Input placeholder="值"/>
+                                    <Input placeholder={t('assets.header_value')}/>
                                 </Form.Item>
                             </Col>
                             <Col>
@@ -143,7 +145,7 @@ const WebsiteModifyResponseView = () => {
                             icon={<PlusOutlined/>}
                             style={{marginTop: 8}}
                         >
-                            添加{label.replace('Headers', '头部').replace('Set ', '设置').replace('Add ', '添加')}
+                            {addLabel}
                         </Button>
                     </Form.Item>
                 </>
@@ -164,10 +166,10 @@ const WebsiteModifyResponseView = () => {
                                     <Form.Item
                                         {...restField}
                                         name={[name, 'name']}
-                                        rules={[{required: true, message: '请输入规则名称'}]}
+                                        rules={[{required: true, message: t('assets.website_response_modify.rule_name_required')}]}
                                         style={{marginBottom: 0}}
                                     >
-                                        <Input placeholder="规则名称"/>
+                                        <Input placeholder={t('assets.website_response_modify.rule_name_placeholder')}/>
                                     </Form.Item>
                                 }
                                 extra={
@@ -182,12 +184,12 @@ const WebsiteModifyResponseView = () => {
                             >
                                 <Row gutter={24}>
                                     <Col span={12}>
-                                        <Card title="匹配条件" size="small" style={{marginBottom: 16}}>
+                                        <Card title={t('assets.website_response_modify.match_conditions')} size="small" style={{marginBottom: 16}}>
                                             <Form.Item
                                                 {...restField}
                                                 name={[name, 'match', 'path']}
-                                                label="请求路径"
-                                                tooltip="要匹配的请求路径，例如: /api/data（为空时匹配所有路径）"
+                                                label={t('assets.website_response_modify.match_path')}
+                                                tooltip={t('assets.website_response_modify.match_path_tip')}
                                             >
                                                 <Input placeholder="/hello"/>
                                             </Form.Item>
@@ -195,10 +197,10 @@ const WebsiteModifyResponseView = () => {
                                             <Form.Item
                                                 {...restField}
                                                 name={[name, 'match', 'method']}
-                                                label="请求方法"
-                                                tooltip="要匹配的 HTTP 方法（为空时匹配所有方法）"
+                                                label={t('assets.website_response_modify.match_method')}
+                                                tooltip={t('assets.website_response_modify.match_method_tip')}
                                             >
-                                                <Select placeholder="选择请求方法" allowClear>
+                                                <Select placeholder={t('assets.website_response_modify.match_method_placeholder')} allowClear>
                                                     <Option value="GET">GET</Option>
                                                     <Option value="POST">POST</Option>
                                                     <Option value="PUT">PUT</Option>
@@ -212,8 +214,8 @@ const WebsiteModifyResponseView = () => {
                                             <Form.Item
                                                 {...restField}
                                                 name={[name, 'match', 'status']}
-                                                label="响应状态码"
-                                                tooltip="要匹配的 HTTP 状态码，例如: 200, 404（为0时匹配所有状态码）"
+                                                label={t('assets.website_response_modify.match_status')}
+                                                tooltip={t('assets.website_response_modify.match_status_tip')}
                                             >
                                                 <InputNumber
                                                     min={0}
@@ -226,21 +228,23 @@ const WebsiteModifyResponseView = () => {
                                     </Col>
 
                                     <Col span={12}>
-                                        <Card title="修改动作" size="small">
+                                        <Card title={t('assets.website_response_modify.actions_title')} size="small">
                                             <Divider orientation="left" style={{margin: '12px 0'}}>
-                                                <Text strong>头部操作</Text>
+                                                <Text strong>{t('assets.website_response_modify.header_operations')}</Text>
                                             </Divider>
 
                                             {renderKeyValueFields(
                                                 [name, 'actions', 'set_headers'],
-                                                'Set Headers',
-                                                '设置或覆盖响应头部'
+                                                t('assets.website_response_modify.set_headers_label'),
+                                                t('assets.website_response_modify.set_headers_tip'),
+                                                t('assets.website_response_modify.add_set_headers')
                                             )}
 
                                             {renderKeyValueFields(
                                                 [name, 'actions', 'add_headers'],
-                                                'Add Headers',
-                                                '添加响应头部（如果不存在）'
+                                                t('assets.website_response_modify.add_headers_label'),
+                                                t('assets.website_response_modify.add_headers_tip'),
+                                                t('assets.website_response_modify.add_add_headers')
                                             )}
 
                                             <Form.List name={[name, 'actions', 'remove_headers']}>
@@ -248,9 +252,9 @@ const WebsiteModifyResponseView = () => {
                                                     <>
                                                         <Row align="middle" style={{marginBottom: 8}}>
                                                             <Col>
-                                                                <Text strong>Remove Headers</Text>
+                                                                <Text strong>{t('assets.website_response_modify.remove_headers_label')}</Text>
                                                                 <Tooltip
-                                                                    title="要移除的响应头部（只需要指定头部名称）">
+                                                                    title={t('assets.website_response_modify.remove_headers_tip')}>
                                                                     <QuestionCircleOutlined style={{
                                                                         marginLeft: 8,
                                                                         cursor: 'pointer'
@@ -266,11 +270,11 @@ const WebsiteModifyResponseView = () => {
                                                                         name={[subName]}
                                                                         rules={[{
                                                                             required: true,
-                                                                            message: '请输入头部名称'
+                                                                            message: t('assets.website_response_modify.remove_header_name_required')
                                                                         }]}
                                                                         style={{marginBottom: 0}}
                                                                     >
-                                                                        <Input placeholder="要移除的头部名称"/>
+                                                                        <Input placeholder={t('assets.website_response_modify.remove_header_name_placeholder')}/>
                                                                     </Form.Item>
                                                                 </Col>
                                                                 <Col>
@@ -292,7 +296,7 @@ const WebsiteModifyResponseView = () => {
                                                                 icon={<PlusOutlined/>}
                                                                 style={{marginTop: 8}}
                                                             >
-                                                                添加要移除的头部
+                                                                {t('assets.website_response_modify.add_remove_header_button')}
                                                             </Button>
                                                         </Form.Item>
                                                     </>
@@ -300,7 +304,7 @@ const WebsiteModifyResponseView = () => {
                                             </Form.List>
 
                                             <Divider orientation="left" style={{margin: '12px 0'}}>
-                                                <Text strong>响应体替换</Text>
+                                                <Text strong>{t('assets.website_response_modify.body_replace_title')}</Text>
                                             </Divider>
 
                                             <Form.List name={[name, 'actions', 'body_replace']}>
@@ -310,7 +314,7 @@ const WebsiteModifyResponseView = () => {
                                                             <Card
                                                                 key={key}
                                                                 size="small"
-                                                                title={`替换规则 ${subName + 1}`}
+                                                                title={t('assets.website_response_modify.replace_rule_title', {index: subName + 1})}
                                                                 extra={
                                                                     <MinusCircleOutlined
                                                                         onClick={() => remove(subName)}
@@ -319,24 +323,24 @@ const WebsiteModifyResponseView = () => {
                                                                 }
                                                                 style={{marginBottom: 12}}
                                                             >
-                                                                <Form.Item
-                                                                    {...restField}
-                                                                    name={[subName, 'search']}
-                                                                    label="搜索文本"
-                                                                    rules={[{
-                                                                        required: true,
-                                                                        message: '请输入搜索文本'
-                                                                    }]}
-                                                                >
-                                                                    <Input placeholder="要搜索的文本"/>
-                                                                </Form.Item>
+                                                                    <Form.Item
+                                                                        {...restField}
+                                                                        name={[subName, 'search']}
+                                                                        label={t('assets.website_response_modify.search_text_label')}
+                                                                        rules={[{
+                                                                            required: true,
+                                                                            message: t('assets.website_response_modify.search_text_required')
+                                                                        }]}
+                                                                    >
+                                                                        <Input placeholder={t('assets.website_response_modify.search_text_placeholder')}/>
+                                                                    </Form.Item>
 
                                                                 <Form.Item
                                                                     {...restField}
                                                                     name={[subName, 'is_regex']}
-                                                                    label="使用正则表达式"
+                                                                    label={t('assets.website_response_modify.use_regex_label')}
                                                                     valuePropName="checked"
-                                                                    tooltip="是否将搜索文本视为正则表达式"
+                                                                    tooltip={t('assets.website_response_modify.use_regex_tip')}
                                                                 >
                                                                     <Switch/>
                                                                 </Form.Item>
@@ -344,13 +348,13 @@ const WebsiteModifyResponseView = () => {
                                                                 <Form.Item
                                                                     {...restField}
                                                                     name={[subName, 'replace']}
-                                                                    label="替换文本"
+                                                                    label={t('assets.website_response_modify.replace_text_label')}
                                                                     rules={[{
                                                                         required: true,
-                                                                        message: '请输入替换文本'
+                                                                        message: t('assets.website_response_modify.replace_text_required')
                                                                     }]}
                                                                 >
-                                                                    <Input placeholder="替换为此文本"/>
+                                                                    <Input placeholder={t('assets.website_response_modify.replace_text_placeholder')}/>
                                                                 </Form.Item>
                                                             </Card>
                                                         ))}
@@ -361,7 +365,7 @@ const WebsiteModifyResponseView = () => {
                                                                 block
                                                                 icon={<PlusOutlined/>}
                                                             >
-                                                                添加替换规则
+                                                                {t('assets.website_response_modify.add_replace_rule')}
                                                             </Button>
                                                         </Form.Item>
                                                     </>
@@ -376,13 +380,13 @@ const WebsiteModifyResponseView = () => {
                             <Button
                                 type="dashed"
                                 onClick={() => add()}
-                                block
-                                icon={<PlusOutlined/>}
-                                size="large"
-                            >
-                                添加修改规则
-                            </Button>
-                        </Form.Item>
+                            block
+                            icon={<PlusOutlined/>}
+                            size="large"
+                        >
+                            {t('assets.website_response_modify.add_modify_rule')}
+                        </Button>
+                    </Form.Item>
                     </>
                 )}
             </Form.List>

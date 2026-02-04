@@ -2,7 +2,7 @@ import React, {useEffect, useRef} from 'react';
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {Tag} from "antd";
+import {Button, Tag} from "antd";
 import sessionCommandApi from "@/api/session-command-api";
 import strings from "@/utils/strings";
 import {SessionCommand} from "@/api/session-api";
@@ -29,7 +29,7 @@ const SessionCommandSummary = ({sessionId, onChange}: Props) => {
 
     const columns: ProColumns<SessionCommand>[] = [
         {
-            title: t('audit.executed_at'),
+            title: t('sysops.logs.exec_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',
             hideInSearch: true,
@@ -49,11 +49,30 @@ const SessionCommandSummary = ({sessionId, onChange}: Props) => {
             width: 75,
         },
         {
-            title: t('audit.command'),
+            title: t('sysops.command'),
             dataIndex: 'command',
-            width: 300,
+            width: 240,
             copyable: true,
             ellipsis: true,
+        },
+        {
+            title: t('actions.label'),
+            key: 'action',
+            hideInSearch: true,
+            width: 60,
+            render: (text, record) => (
+                <Button
+                    type="link"
+                    style={{padding: 0, margin: 0}}
+                    size="small"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onChange(record);
+                    }}
+                >
+                    {t('actions.detail')}
+                </Button>
+            ),
         },
     ];
 
@@ -62,10 +81,10 @@ const SessionCommandSummary = ({sessionId, onChange}: Props) => {
             <ProTable
                 columns={columns}
                 actionRef={actionRef}
-                    request={async (params = {}, sort, filter) => {
-                        let [sortOrder, sortField] = getSort(sort);
-                        
-                        let queryParams = {
+                request={async (params = {}, sort, filter) => {
+                    let [sortOrder, sortField] = getSort(sort);
+
+                    let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
                         command: params.keyword,
@@ -90,7 +109,7 @@ const SessionCommandSummary = ({sessionId, onChange}: Props) => {
                     showSizeChanger: true
                 }}
                 dateFormatter="string"
-                headerTitle={t('audit.command')}
+                headerTitle={t('sysops.command')}
                 onRow={(record) => {
                     return {
                         onClick: () => {

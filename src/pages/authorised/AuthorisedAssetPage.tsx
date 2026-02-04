@@ -58,7 +58,7 @@ const AuthorisedAssetPage = () => {
             width: 48,
         },
         {
-            title: t('authorised.label.user'),
+            title: t('menus.identity.submenus.user'),
             dataIndex: 'userName',
             formItemProps: {
                 name: 'userId',
@@ -77,7 +77,7 @@ const AuthorisedAssetPage = () => {
             })
         },
         {
-            title: t('authorised.label.department'),
+            title: t('menus.identity.submenus.department'),
             dataIndex: 'departmentName',
             formItemProps: {
                 name: 'departmentId',
@@ -96,7 +96,7 @@ const AuthorisedAssetPage = () => {
             })
         },
         {
-            title: t('authorised.label.asset'),
+            title: t('menus.resource.submenus.asset'),
             dataIndex: 'assetName',
             formItemProps: {
                 name: 'assetId',
@@ -134,7 +134,7 @@ const AuthorisedAssetPage = () => {
             })
         },
         {
-            title: t('authorised.label.expired_at'),
+            title: t('assets.limit_time'),
             key: 'expiredAt',
             dataIndex: 'expiredAt',
             hideInSearch: true,
@@ -170,7 +170,7 @@ const AuthorisedAssetPage = () => {
             width: 180,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 50,
@@ -228,7 +228,7 @@ const AuthorisedAssetPage = () => {
                     showSizeChanger: true
                 }}
                 dateFormatter="string"
-                headerTitle={t('authorised.label.authorised')}
+                headerTitle={t('actions.authorized')}
                 toolBarRender={() => [
                     <Button key="button" type="primary" onClick={() => {
                         navigate('/authorised-asset/post')

@@ -123,7 +123,7 @@ const DepartmentModal = ({id, open, confirmLoading, handleCancel, handleOk}: Dep
                 </Form.Item>
 
                 <Form.Item
-                    label={t('identity.department.weight')}
+                    label={t('assets.sort')}
                     name="weight"
                     tooltip={t('identity.department.weight_tooltip')}
                 >

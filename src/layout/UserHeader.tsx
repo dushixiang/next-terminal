@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {useQuery} from "@tanstack/react-query";
 import brandingApi from "@/api/branding-api";
@@ -11,16 +11,23 @@ import {
     LayoutDashboard,
     LogOutIcon,
     MenuIcon,
+    Moon,
+    Sun,
     UserIcon
 } from "lucide-react";
 import {useTranslation} from "react-i18next";
 import i18n from "i18next";
 import {useMobile} from "@/hook/use-mobile";
+import clsx from "clsx";
+import {useThemeToggle} from "@/layout/hooks/use-theme-toggle";
 
 const UserHeader = () => {
 
     let {t} = useTranslation();
     const {isMobile} = useMobile();
+    const themeToggleRef = useRef<HTMLButtonElement>(null);
+    const {isDarkMode, toggleDarkMode} = useThemeToggle(themeToggleRef);
+    const isDark = isDarkMode;
 
     let location = useLocation();
     let navigate = useNavigate();
@@ -38,6 +45,7 @@ const UserHeader = () => {
         queryKey: ['info'],
         queryFn: accountApi.getUserInfo
     });
+
 
     const logout = async () => {
         await accountApi.logout();
@@ -84,13 +92,23 @@ const UserHeader = () => {
             key: '/x-snippet',
             title: t('menus.resource.submenus.snippet'),
         },
+        {
+            key: '/x-db-work-order',
+            title: t('menus.resource.submenus.db_work_order'),
+        },
     ]
 
     return (
         <>
             <div
-                className={'sticky top-0 z-50 w-full bg-[#1A73E8] header-shadow'}>
-                <div className="h-14 flex gap-2 lg:gap-8 items-center px-4 lg:px-20">
+                className={clsx(
+                    'sticky top-0 z-50 w-full border-b shadow-[0_6px_18px_rgba(15,23,42,0.18)]',
+                    isDark
+                        ? 'bg-gradient-to-r from-[#0b1f3a] via-[#0f2a50] to-[#143a6b] border-white/10'
+                        : 'bg-gradient-to-r from-[#1A73E8] via-[#1E7BF2] to-[#3B82F6] border-white/20'
+                )}
+            >
+                <div className="h-14 flex gap-2 lg:gap-8 items-center px-4 lg:px-20 text-white">
                     {/* 移动端汉堡菜单图标 */}
                     {isMobile && (
                         <div
@@ -123,7 +141,12 @@ const UserHeader = () => {
                                 menus.map(item => {
                                     return <div
                                         key={item.key}
-                                        className={`h-full flex items-center cursor-pointer relative ${item.key == pathname && 'header-menu-selected'}`}
+                                        className={clsx(
+                                            'h-full flex items-center cursor-pointer relative px-1.5 transition-colors',
+                                            item.key === pathname
+                                                ? 'text-white font-semibold after:absolute after:bottom-0 after:left-0 after:h-[3px] after:w-full after:bg-white/90'
+                                                : 'text-white/80 hover:text-white'
+                                        )}
                                         onClick={() => {
                                             navigate(item.key)
                                         }}>
@@ -138,19 +161,20 @@ const UserHeader = () => {
 
 
                     {!isMobile &&
-                        <div className={'flex items-center gap-1'}>
+                        <div className={'flex items-center gap-2'}>
                             <Select
-                                placeholder="Language"
+                                placeholder={t('general.language')}
                                 variant="borderless"
+                                className="text-white [&_.ant-select-selector]:!bg-white/10 [&_.ant-select-selector]:!text-white [&_.ant-select-selection-item]:!text-white [&_.ant-select-selection-placeholder]:!text-white/70 [&_.ant-select-arrow]:!text-white"
                                 style={{
                                     width: 120,
                                 }}
                                 prefix={<LanguagesIcon className={'w-4 h-4'}/>}
                                 options={[
-                                    {value: 'en-US', label: 'English'},
-                                    {value: 'zh-CN', label: '简体中文'},
-                                    {value: 'zh-TW', label: '繁体中文'},
-                                    {value: 'ja-JP', label: '日本語'},
+                                    {value: 'en-US', label: t('general.language_en_us')},
+                                    {value: 'zh-CN', label: t('general.language_zh_cn')},
+                                    {value: 'zh-TW', label: t('general.language_zh_tw')},
+                                    {value: 'ja-JP', label: t('general.language_ja_jp')},
                                 ]}
                                 value={i18n.language}
                                 onChange={(value) => {
@@ -158,14 +182,24 @@ const UserHeader = () => {
                                 }}
                             />
 
-                            <a
-                                className={'cursor-pointer'}
-                                href="/access"
-                                target="_blank"
-                                rel="noopener noreferrer"
+                            <button
+                                ref={themeToggleRef}
+                                type="button"
+                                onClick={() => toggleDarkMode(!isDarkMode)}
+                                className="cursor-pointer h-8 w-8 rounded-md border border-white/30 bg-white/10 text-white/90 transition-colors hover:bg-white/20 hover:text-white"
                             >
-                                <LaptopIcon className={'w-5 h-5 text-white'}/>
-                            </a>
+                                {isDarkMode ? <Sun className="h-4 w-4 mx-auto"/> : <Moon className="h-4 w-4 mx-auto"/>}
+                            </button>
+
+                            <button
+                                className={'cursor-pointer h-8 w-8 rounded-md border border-white/30 bg-white/10 text-white/90 transition-colors hover:bg-white/20 hover:text-white'}
+                                onClick={() => {
+                                    window.open('/access', '_blank');
+                                }}
+                            >
+                                <LaptopIcon className={'w-4 h-4 mx-auto'}/>
+                            </button>
+
                         </div>
                     }
 
@@ -186,10 +220,13 @@ const UserHeader = () => {
                 onClose={() => setMobileMenuVisible(false)}
                 open={isMobile && mobileMenuVisible}
                 styles={{
-                    body: {padding: 0}
+                    body: {
+                        padding: 0,
+                        background: isDark ? '#0b1220' : '#ffffff',
+                    }
                 }}
                 width={280}
-                className="mobile-menu-drawer"
+                className={clsx("[&_.ant-drawer-body]:p-0", isDark ? "text-slate-100" : "text-slate-900")}
             >
                 <div className={'flex flex-col h-full'}>
                     {/* Logo 区域 */}
@@ -216,6 +253,11 @@ const UserHeader = () => {
                     <div className={'flex-1 overflow-auto'}>
                         <Menu
                             mode="inline"
+                            theme={isDark ? 'dark' : 'light'}
+                            className={clsx(
+                                "border-0",
+                                isDark && "bg-transparent [&_.ant-menu-item]:text-slate-200 [&_.ant-menu-item-selected]:!bg-blue-500/20 [&_.ant-menu-item-selected]:!text-white"
+                            )}
                             selectedKeys={[pathname]}
                             items={menus.map(item => ({
                                 key: item.key,
@@ -229,22 +271,22 @@ const UserHeader = () => {
                     </div>
 
                     {/* 底部操作区域 */}
-                    <div className={'flex-none border-t p-4 space-y-3'}>
+                    <div className={'flex-none p-4 space-y-4'}>
                         {/* 语言选择 */}
                         <div>
-                            <div className={'text-xs text-gray-500 mb-2'}>
+                            <div className={clsx('mb-2 text-xs', isDark ? 'text-slate-400' : 'text-gray-500')}>
                                 {t('general.language')}
                             </div>
                             <Select
-                                placeholder="Language"
+                                placeholder={t('general.language')}
                                 style={{
                                     width: '100%',
                                 }}
                                 options={[
-                                    {value: 'en-US', label: 'English'},
-                                    {value: 'zh-CN', label: '简体中文'},
-                                    {value: 'zh-TW', label: '繁体中文'},
-                                    {value: 'ja-JP', label: '日本語'},
+                                    {value: 'en-US', label: t('general.language_en_us')},
+                                    {value: 'zh-CN', label: t('general.language_zh_cn')},
+                                    {value: 'zh-TW', label: t('general.language_zh_tw')},
+                                    {value: 'ja-JP', label: t('general.language_ja_jp')},
                                 ]}
                                 value={i18n.language}
                                 onChange={(value) => {
@@ -253,22 +295,20 @@ const UserHeader = () => {
                             />
                         </div>
 
-                        {/* 访问页面按钮 */}
-                        <a
-                            className={'flex items-center gap-2 p-2 rounded cursor-pointer hover:bg-gray-100'}
-                            href="/access"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            onClick={() => {
-                                setMobileMenuVisible(false);
-                            }}
+                        <button
+                            type="button"
+                            onClick={() => toggleDarkMode(!isDarkMode)}
+                            className={clsx(
+                                'flex items-center gap-2 p-2 rounded transition-colors',
+                                isDark ? 'bg-white/5 text-slate-100 hover:bg-white/10' : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
+                            )}
                         >
-                            <LaptopIcon className={'w-5 h-5'}/>
-                            <span>{t('menus.access.label')}</span>
-                        </a>
+                            {isDarkMode ? <Sun className="h-4 w-4"/> : <Moon className="h-4 w-4"/>}
+                        </button>
                     </div>
                 </div>
             </Drawer>
+
         </>
     );
 };

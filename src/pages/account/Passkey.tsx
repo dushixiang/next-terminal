@@ -7,21 +7,30 @@ import {startRegistration} from "@simplewebauthn/browser";
 import {KeySquareIcon, PencilLineIcon, Trash2Icon} from "lucide-react";
 import dayjs from "dayjs";
 import PasskeyModal from "@/pages/account/PasskeyModal";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 
 const Passkey = () => {
 
     let {t} = useTranslation();
     let [open, setOpen] = useState(false);
     let [selected, setSelected] = useState<WebauthnCredential>();
+    let [mfaOpen, setMfaOpen] = useState(false);
+    let [mfaAction, setMfaAction] = useState<'add' | 'delete' | null>(null);
+    let [deleteTarget, setDeleteTarget] = useState<WebauthnCredential>();
     let {message, modal} = App.useApp();
+
+    const infoQuery = useQuery({
+        queryKey: ['info'],
+        queryFn: accountApi.getUserInfo,
+    });
 
     let webauthnCredentialsQuery = useQuery({
         queryKey: ['getWebauthnCredentials'],
         queryFn: accountApi.getWebauthnCredentials,
     });
 
-    const register = async () => {
-        let options = await accountApi.webauthnCredentialStart();
+    const register = async (securityToken?: string) => {
+        let options = await accountApi.webauthnCredentialStart(securityToken);
         const attestationResponse = await startRegistration({
             optionsJSON: options.publicKey,
         });
@@ -51,11 +60,55 @@ const Passkey = () => {
         }
     });
 
+    const resetMfaState = () => {
+        setMfaOpen(false);
+        setMfaAction(null);
+        setDeleteTarget(undefined);
+    };
+
+    const openMfaForAdd = () => {
+        setMfaAction('add');
+        setMfaOpen(true);
+    };
+
+    const openMfaForDelete = (item: WebauthnCredential) => {
+        setDeleteTarget(item);
+        setMfaAction('delete');
+        setMfaOpen(true);
+    };
+
+    const handleMfaOk = async (securityToken: string) => {
+        setMfaOpen(false);
+        if (mfaAction === 'add') {
+            await register(securityToken);
+        }
+        if (mfaAction === 'delete' && deleteTarget) {
+            await accountApi.deleteWebauthnCredentials(deleteTarget.id, securityToken);
+            webauthnCredentialsQuery.refetch();
+            message.success(t('general.success'));
+        }
+        setMfaAction(null);
+        setDeleteTarget(undefined);
+    };
+
+    const hasMfaEnabled = infoQuery.data?.mfaEnabled ?? false;
+    const isAddDisabled = webauthnCredentialsQuery.isLoading || infoQuery.isLoading;
+
     return (
         <div className={'space-y-4'}>
             <div className={'flex items-center justify-between'}>
                 <Typography.Title level={5} style={{marginTop: 0}}>{t('account.passkey')}</Typography.Title>
-                <Button type={'primary'} onClick={register}>
+                <Button
+                    type={'primary'}
+                    disabled={isAddDisabled}
+                    onClick={() => {
+                        if (hasMfaEnabled) {
+                            openMfaForAdd();
+                            return;
+                        }
+                        register();
+                    }}
+                >
                     {t('account.passkey_add')}
                 </Button>
             </div>
@@ -90,8 +143,7 @@ const Passkey = () => {
                                                     content: t('account.passkey_delete_content'),
                                                 });
                                                 if (confirmed) {
-                                                    await accountApi.deleteWebauthnCredentials(item.id);
-                                                    webauthnCredentialsQuery.refetch();
+                                                    openMfaForDelete(item);
                                                 }
                                             }}
                                 />
@@ -109,6 +161,13 @@ const Passkey = () => {
                 }}
                 confirmLoading={false}
                 credential={selected}
+            />
+
+            <MultiFactorAuthentication
+                open={mfaOpen}
+                forceReauth
+                handleOk={handleMfaOk}
+                handleCancel={resetMfaState}
             />
         </div>
     );

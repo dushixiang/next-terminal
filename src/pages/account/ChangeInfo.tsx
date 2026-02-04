@@ -26,8 +26,8 @@ const ChangeInfo = () => {
             <Title level={5} style={{marginTop: 0}}>{t('account.change.info')}</Title>
             <div style={{margin: 16}}></div>
             <ProForm request={get} onFinish={set}>
-                <ProFormText name={'nickname'} label={t('account.nickname')} rules={[{required: true}]}/>
-                <ProFormTextArea label={t('account.public_key')} name='publicKey'
+                <ProFormText name={'nickname'} label={t('identity.user.nickname')} rules={[{required: true}]}/>
+                <ProFormTextArea label={t('identity.user.public_key')} name='publicKey'
                                  placeholder='Public Key, one per line'
                                  fieldProps={{rows: 8}}/>
             </ProForm>

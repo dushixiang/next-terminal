@@ -54,7 +54,7 @@ const CredentialPage = () => {
             width: 48,
         },
         {
-            title: t('assets.name'),
+            title: t('general.name'),
             dataIndex: 'name',
         }, {
             title: t('assets.type'),
@@ -73,7 +73,7 @@ const CredentialPage = () => {
                 }
             }
         }, {
-            title: t('assets.username'),
+            title: t('menus.identity.submenus.user'),
             dataIndex: 'username',
             key: 'username',
             hideInSearch: true
@@ -87,7 +87,7 @@ const CredentialPage = () => {
             width: 191,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 150,
@@ -114,7 +114,7 @@ const CredentialPage = () => {
                 </NButton>,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

@@ -13,6 +13,7 @@ export interface Certificate {
     storageKey: string;
     certificate: string;
     privateKey: string;
+    requireClientAuth: boolean;
     issuedStatus: string;
     issuedError: string;
     updatedAt: number;

@@ -22,7 +22,7 @@ const CommandFilterInfo = ({id}: Props) => {
     return (
         <div className={'page-detail-info'}>
             <ProDescriptions column={1} request={get}>
-                <ProDescriptions.Item label={t("authorised.command_filter.name")} dataIndex="name"/>
+                <ProDescriptions.Item label={t("general.name")} dataIndex="name"/>
                 <ProDescriptions.Item label={t('general.created_at')} dataIndex="createdAt" valueType='dateTime'/>
             </ProDescriptions>
         </div>

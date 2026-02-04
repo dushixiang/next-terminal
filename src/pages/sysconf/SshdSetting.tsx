@@ -1,5 +1,5 @@
 import React, {useRef, useState} from 'react';
-import {Alert, Button, Typography} from "antd";
+import {Alert, Button, Form, Input, Modal, Typography} from "antd";
 import {SettingProps} from "./SettingPage";
 import {ProForm, ProFormInstance, ProFormSwitch, ProFormText, ProFormTextArea} from "@ant-design/pro-components";
 import {useMutation} from "@tanstack/react-query";
@@ -14,29 +14,56 @@ const SshdSetting = ({get, set}: SettingProps) => {
     const formRef = useRef<ProFormInstance>(null);
     let [enabled, setEnabled] = useState(false);
     let [portForwardEnabled, setPortForwardEnabled] = useState(false);
+    let [privateKeyExists, setPrivateKeyExists] = useState(false);
+    let [privateKeyModalOpen, setPrivateKeyModalOpen] = useState(false);
+    let [privateKeySaving, setPrivateKeySaving] = useState(false);
+    const [privateKeyForm] = Form.useForm();
 
     const wrapSet = async (values: any) => {
-        formRef.current?.validateFields()
-            .then(() => {
-                set(values);
-            })
+        await formRef.current?.validateFields();
+        await set(values);
     }
 
     const wrapGet = async () => {
         let values = await get();
         setEnabled(values['ssh-server-enabled']);
         setPortForwardEnabled(values['ssh-server-port-forwarding-enabled']);
+        const existsValue = values['ssh-server-private-key-exists'];
+        const exists = typeof existsValue === 'string'
+            ? existsValue.toLowerCase() === 'true'
+            : Boolean(existsValue);
+        setPrivateKeyExists(exists);
         return values;
     }
 
     let mutation = useMutation({
         mutationFn: propertyApi.genRSAPrivateKey,
         onSuccess: data => {
-            formRef.current?.setFieldsValue({
-                'ssh-server-private-key': data
-            })
+            privateKeyForm.setFieldsValue({
+                privateKey: data
+            });
         }
     });
+
+    const openPrivateKeyModal = () => {
+        privateKeyForm.resetFields();
+        setPrivateKeyModalOpen(true);
+    };
+
+    const handlePrivateKeySave = async () => {
+        const values = await privateKeyForm.validateFields();
+        setPrivateKeySaving(true);
+        try {
+            const result = await set({'ssh-server-private-key': values.privateKey});
+            if (result !== false) {
+                setPrivateKeyExists(true);
+                setPrivateKeyModalOpen(false);
+                privateKeyForm.resetFields();
+            }
+        } finally {
+            setPrivateKeySaving(false);
+        }
+    };
 
     return (
         <div>
@@ -61,22 +88,10 @@ const SshdSetting = ({get, set}: SettingProps) => {
 
             <ProForm formRef={formRef} onFinish={wrapSet} request={wrapGet}
                      submitter={{
-                         submitButtonProps: {
-                             onReset: () => {
-                                 mutation.mutate();
-                             }
-                         },
-                         render: (props, doms) => {
-                             return [
-                                 doms[1],
-                                 <Button htmlType="button" onClick={() => mutation.mutate()} key="gen"
-                                         loading={mutation.isPending}>
-                                     {t('settings.sshd.generate_private_key')}
-                                 </Button>,
-                             ]
+                         resetButtonProps: {
+                             style: {display: 'none'}
                          }
-                     }}
-            >
+                     }}>
                 <ProFormSwitch name="ssh-server-enabled"
                                label={t("settings.sshd.enabled")}
                                rules={[{required: true}]}
@@ -92,12 +107,18 @@ const SshdSetting = ({get, set}: SettingProps) => {
                              placeholder="0.0.0.0:2022"
                              rules={[{required: enabled}]}
                              disabled={!enabled}/>
-                <ProFormTextArea name="ssh-server-private-key"
-                                 label={t('settings.sshd.private_key')}
-                                 rules={[{required: enabled}]}
-                                 disabled={!enabled}
-                                 placeholder={'RSA、EC、DSA、OPENSSH'} fieldProps={{rows: 8}}
-                />
+                <Form.Item label={t('settings.sshd.private_key')}>
+                    <div className={'flex items-center gap-2'}>
+                        <Button type="primary" onClick={openPrivateKeyModal} disabled={!enabled}>
+                            {t('settings.sshd.private_key_button')}
+                        </Button>
+                        <Typography.Text type={privateKeyExists ? 'success' : 'secondary'}>
+                            {privateKeyExists
+                                ? t('settings.sshd.private_key_status_set')
+                                : t('settings.sshd.private_key_status_empty')}
+                        </Typography.Text>
+                    </div>
+                </Form.Item>
                 <ProFormSwitch name="ssh-server-port-forwarding-enabled"
                                label={t("settings.sshd.port_forwarding.enabled")}
                                checkedChildren={t('general.enabled')}
@@ -119,6 +140,34 @@ const SshdSetting = ({get, set}: SettingProps) => {
                                unCheckedChildren={t('general.no')}
                 />
             </ProForm>
+            <Modal
+                title={t('settings.sshd.private_key_modal_title')}
+                open={privateKeyModalOpen}
+                onOk={handlePrivateKeySave}
+                onCancel={() => setPrivateKeyModalOpen(false)}
+                okText={t('actions.save')}
+                cancelText={t('actions.cancel')}
+                confirmLoading={privateKeySaving}
+                destroyOnClose
+            >
+                <Form form={privateKeyForm} layout="vertical">
+                    <Form.Item
+                        name="privateKey"
+                        label={t('settings.sshd.private_key')}
+                        rules={[{required: true}]}
+                    >
+                        <Input.TextArea rows={8} placeholder={'RSA、EC、DSA、OPENSSH'} />
+                    </Form.Item>
+                    <div className={'flex items-center gap-2'}>
+                        <Button onClick={() => mutation.mutate()} loading={mutation.isPending}>
+                            {t('assets.generate_private_key')}
+                        </Button>
+                        <Typography.Text type="secondary">
+                            {t('settings.sshd.private_key_modal_tip')}
+                        </Typography.Text>
+                    </div>
+                </Form>
+            </Modal>
         </div>
     );
 };

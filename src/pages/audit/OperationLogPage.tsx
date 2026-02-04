@@ -33,7 +33,7 @@ const OperationLogPage = () => {
             hideInSearch: true
         },
         {
-            title: t('audit.operation.label'),
+            title: t('assets.type'),
             dataIndex: 'action',
             key: 'action',
             render: (_, record) => {
@@ -49,13 +49,13 @@ const OperationLogPage = () => {
             hideInSearch: true
         },
         {
-            title: t('audit.operation.content'),
+            title: t('actions.detail'),
             dataIndex: 'content',
             key: 'content',
             hideInSearch: true
         },
         {
-            title: t('audit.operation.status'),
+            title: t('general.status'),
             dataIndex: 'success',
             key: 'success',
             hideInSearch: true,

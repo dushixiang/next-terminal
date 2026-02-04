@@ -1,9 +1,11 @@
 import React from 'react';
 import {Button, Result, Space} from "antd";
 import {Link, useNavigate} from "react-router-dom";
+import {useTranslation} from "react-i18next";
 
 const NoMatch = () => {
 
+    const {t} = useTranslation();
     const navigate = useNavigate();
 
     return (
@@ -11,14 +13,14 @@ const NoMatch = () => {
             <Result
                 status="404"
                 title="404"
-                subTitle="抱歉，您似乎到达了预期之外的页面。"
+                subTitle={t('general.not_found_subtitle')}
                 extra={
                     <Space>
                         <Button type="primary" onClick={() => {
                             navigate(-1);
-                        }}>返回上一页</Button>
-                        <Button type="primary"><Link to={'/my-asset'}>我的资产</Link></Button>
-                        <Button type="primary"><Link to={'/'}>后台首页</Link></Button>
+                        }}>{t('actions.back')}</Button>
+                        <Button type="primary"><Link to={'/my-asset'}>{t('general.my_assets')}</Link></Button>
+                        <Button type="primary"><Link to={'/'}>{t('general.home_admin')}</Link></Button>
                     </Space>
                 }
             />

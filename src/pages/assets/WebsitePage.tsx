@@ -1,8 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {App, Button, Space, Table, Tag} from "antd";
+import {App, Button, Modal, Space, Table, Tag} from "antd";
 import {ActionType, DragSortTable, ProColumns, TableDropdown} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import websiteApi, {SortPositionRequest, Website} from "@/api/website-api";
 import NButton from "@/components/NButton";
 import clsx from "clsx";
@@ -16,6 +16,8 @@ import {cn} from "@/lib/utils";
 import {useMobile} from "@/hook/use-mobile";
 import {getSort} from "@/utils/sort";
 import {PanelLeftCloseIcon, PanelLeftOpenIcon} from "lucide-react";
+import dayjs from "dayjs";
+import websiteTempAllowApi, {WebsiteTempAllowEntry} from "@/api/website-temp-allow-api";
 
 const api = websiteApi;
 
@@ -58,6 +60,8 @@ const WebsitePage = () => {
     const [groupDrawerOpen, setGroupDrawerOpen] = useState<boolean>(false);
     const [gatewayChooserOpen, setGatewayChooserOpen] = useState<boolean>(false);
     const [selectedWebsiteId, setSelectedWebsiteId] = useState<string>('');
+    const [tempAllowOpen, setTempAllowOpen] = useState<boolean>(false);
+    const [tempAllowWebsite, setTempAllowWebsite] = useState<Website | null>(null);
     const [isTreeCollapsed, setIsTreeCollapsed] = useState<boolean>(() => {
         const saved = localStorage.getItem('website-tree-collapsed');
         return saved ? JSON.parse(saved) : false;
@@ -79,6 +83,12 @@ const WebsitePage = () => {
         }
     }, [websiteIdFromUrl]);
 
+    const tempAllowQuery = useQuery({
+        queryKey: ['website-temp-allow', tempAllowWebsite?.id],
+        queryFn: () => websiteTempAllowApi.list(tempAllowWebsite!.id),
+        enabled: tempAllowOpen && !!tempAllowWebsite?.id,
+    });
+
     const updateSortMutation = useMutation({
         mutationFn: (req: SortPositionRequest) => api.updateSortPosition(req),
         onSuccess: () => {
@@ -87,7 +97,7 @@ const WebsitePage = () => {
     });
 
     const handleDragSortEnd = (beforeIndex: number, afterIndex: number, newDataSource: Website[]) => {
-        console.log('排序操作', {beforeIndex, afterIndex});
+        console.log('Sort operation', {beforeIndex, afterIndex});
 
         // 立即更新本地状态，避免闪烁
         setDataSource(newDataSource);
@@ -104,7 +114,7 @@ const WebsitePage = () => {
             afterId: afterIndex < newDataSource.length - 1 ? newDataSource[afterIndex + 1].id : ''
         };
 
-        console.log('排序请求', req);
+        console.log('Sort request', req);
 
         // 服务器更新
         updateSortMutation.mutate(req);
@@ -115,6 +125,84 @@ const WebsitePage = () => {
         setSelectedRowKey(websiteId);
         applyQueryPatch({websiteId});
     };
+
+    const openTempAllowManager = (record: Website) => {
+        setTempAllowWebsite(record);
+        setTempAllowOpen(true);
+    };
+
+    const closeTempAllowManager = () => {
+        setTempAllowOpen(false);
+        setTempAllowWebsite(null);
+    };
+
+    const formatRemaining = (seconds?: number) => {
+        if (!seconds || seconds <= 0) {
+            return '-';
+        }
+        if (seconds < 60) {
+            return `${seconds}s`;
+        }
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        if (minutes < 60) {
+            return `${minutes}m ${secs}s`;
+        }
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        return `${hours}h ${mins}m`;
+    };
+
+    const tempAllowColumns = [
+        {
+            title: 'IP',
+            dataIndex: 'ip',
+            key: 'ip',
+            width: 160,
+        },
+        {
+            title: t('assets.temp_allow_expires'),
+            dataIndex: 'expiresAt',
+            key: 'expiresAt',
+            width: 200,
+            render: (value: number) => value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-',
+        },
+        {
+            title: t('assets.temp_allow_remaining'),
+            dataIndex: 'remainingSeconds',
+            key: 'remainingSeconds',
+            width: 120,
+            render: (value: number) => formatRemaining(value),
+        },
+        {
+            title: t('actions.label'),
+            key: 'option',
+            width: 100,
+            render: (_: any, record: WebsiteTempAllowEntry) => (
+                <Button
+                    type="link"
+                    danger
+                    size="small"
+                    onClick={() => {
+                        modal.confirm({
+                            title: t('general.confirm_delete'),
+                            okText: t('actions.delete'),
+                            okButtonProps: {danger: true},
+                            onOk: async () => {
+                                if (!tempAllowWebsite) {
+                                    return;
+                                }
+                                await websiteTempAllowApi.remove(tempAllowWebsite.id, record.ip);
+                                tempAllowQuery.refetch();
+                            },
+                        });
+                    }}
+                >
+                    {t('actions.delete')}
+                </Button>
+            ),
+        },
+    ];
 
     useEffect(() => {
         applyQueryPatch({
@@ -152,7 +240,7 @@ const WebsitePage = () => {
             }
         },
         {
-            title: t('assets.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             width: 120,
             render: (text, record) => {
@@ -226,7 +314,7 @@ const WebsitePage = () => {
             valueType: 'dateTime'
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 160,
@@ -247,12 +335,15 @@ const WebsitePage = () => {
                             case 'edit':
                                 openWebsiteEditor(record.id);
                                 break;
+                            case 'temp-allow':
+                                openTempAllowManager(record);
+                                break;
                             case 'view-authorised':
                                 navigate(`/authorised-website?websiteId=${record.id}`);
                                 break;
                             case 'delete':
                                 modal.confirm({
-                                    title: t('general.delete_confirm'),
+                                    title: t('general.confirm_delete'),
                                     okText: t('actions.delete'),
                                     okButtonProps: {danger: true},
                                     onOk: async () => {
@@ -270,9 +361,10 @@ const WebsitePage = () => {
                     }}
                     menus={[
                         {key: 'edit', name: t('actions.edit')},
+                        {key: 'temp-allow', name: t('assets.temp_allow')},
                         {
                             key: 'view-authorised',
-                            name: `${t('authorised.label.authorised')}${t('authorised.label.user')}`
+                            name: `${t('actions.authorized')}${t('menus.identity.submenus.user')}`
                         },
                         {key: 'delete', name: t('actions.delete'), danger: true},
                     ]}
@@ -356,14 +448,14 @@ const WebsitePage = () => {
                 color={'purple'}
                 variant={'dashed'}
             >
-                {t('authorised.label.authorised')}
+                {t('actions.authorized')}
             </Button>,
             groupId && (
                 <Button
                     key="group-auth"
                     onClick={() => navigate(`/authorised-website?websiteGroupId=${groupId}`)}
                 >
-                    {`${t('authorised.label.website_group')}${t('authorised.label.authorised')}`}
+                    {`${t('authorised.label.website_group')}${t('actions.authorized')}`}
                 </Button>
             ),
             <Button key="button" type="primary" onClick={() => {
@@ -469,6 +561,24 @@ const WebsitePage = () => {
                 actionRef.current?.reload();
             }}
         />
+
+        <Modal
+            title={tempAllowWebsite ? `${tempAllowWebsite.name} · ${t('assets.temp_allow')}` : t('assets.temp_allow')}
+            open={tempAllowOpen}
+            onCancel={closeTempAllowManager}
+            footer={null}
+            width={720}
+            destroyOnClose
+        >
+            <Table
+                rowKey={(record) => `${record.websiteId}-${record.ip}`}
+                loading={tempAllowQuery.isFetching}
+                dataSource={tempAllowQuery.data || []}
+                columns={tempAllowColumns}
+                pagination={false}
+                size="small"
+            />
+        </Modal>
     </div>);
 };
 

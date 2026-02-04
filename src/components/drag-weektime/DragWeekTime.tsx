@@ -301,7 +301,7 @@ const DragWeekTime = ({onChange, value}: DragWeekTimeProps) => {
             <table className='week-time-table'>
                 <thead className='week-time-head'>
                 <tr>
-                    <th rowSpan={8} className='week-td'>{t('dw.week.label')}/{t('dw.time')}</th>
+                    <th rowSpan={8} className='week-td'>{t('dw.week.label')}/{t('audit.accessLog.stats.tooltip.time')}</th>
                     <th colSpan={24}>00:00 - 12:00</th>
                     <th colSpan={24}>12:00 - 24:00</th>
                 </tr>

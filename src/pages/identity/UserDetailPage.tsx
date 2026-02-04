@@ -2,6 +2,7 @@ import React, {useState} from 'react';
 import {Tabs} from "antd";
 import UserInfo from "./UserInfo";
 import UserLoginPolicy from "./UserLoginPolicy";
+import UserClientCert from "./UserClientCert";
 import {useParams, useSearchParams} from "react-router-dom";
 import {maybe} from "../../utils/maybe";
 import {useTranslation} from "react-i18next";
@@ -31,6 +32,11 @@ const UserDetailPage = () => {
             label: t('identity.options.login_policy'),
             key: 'login-policy',
             children: <UserLoginPolicy active={activeKey === 'login-policy'} userId={id}/>
+        },
+        {
+            label: t('account.client_cert'),
+            key: 'client-cert',
+            children: <UserClientCert active={activeKey === 'client-cert'} userId={id}/>
         },
     ];
 

@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {ProForm, ProFormCheckbox, ProFormDigit, ProFormInstance, ProFormSelect} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {CleanTheme, DefaultTerminalTheme, useTerminalTheme} from "@/hook/use-terminal-theme";
+import {CleanTheme, DefaultTerminalTheme, useTerminalTheme} from "@/pages/access/hooks/use-terminal-theme";
 import {getAvailableFonts} from "@/utils/utils";
 import {App} from "antd";
 import accessSettingApi from "@/api/access-setting-api";
@@ -67,7 +67,7 @@ const AccessSetting = () => {
             height: height - 80,
         }}>
             <div className={'m-8'}>
-                <div className={'text-lg font-bold'}>{t('access.settings.system')}</div>
+                <div className={'text-lg font-bold'}>{t('menus.setting.label')}</div>
 
                 <div className={'mt-4'}>
                     <ProForm formRef={formRef} request={get} onFinish={async (values) => {
@@ -89,7 +89,7 @@ const AccessSetting = () => {
                         <div>{t('access.settings.font')}</div>
 
                         <div className={'my-4 flex p-4 border gap-2 rounded'}>
-                            <ProFormSelect label={t('access.settings.terminal.font.family')}
+                            <ProFormSelect label={t('access.settings.terminal.font_family')}
                                            showSearch={true}
                                            name="fontFamily" rules={[{required: true}]}
                                            fieldProps={{
@@ -113,7 +113,7 @@ const AccessSetting = () => {
                                            }}
                                            width={'sm'}
                             />
-                            <ProFormSelect label={t('access.settings.terminal.font.size')}
+                            <ProFormSelect label={t('access.settings.terminal.font_size')}
                                            name="fontSize"
                                            rules={[{required: true}]}
                                            fieldProps={{

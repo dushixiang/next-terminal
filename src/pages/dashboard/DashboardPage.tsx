@@ -117,7 +117,7 @@ const DashboardPage = () => {
             icon: <UsersIcon className={'h-4 w-4'}/>,
         },
         {
-            title: t('dashboard.session_online_count'),
+            title: t('menus.log_audit.submenus.online_session'),
             value: timeCounterQuery.data?.sessionOnlineCount,
             icon: <TerminalIcon className={'h-4 w-4'}/>,
         },
@@ -132,7 +132,7 @@ const DashboardPage = () => {
             icon: <ServerIcon className={'h-4 w-4'}/>,
         },
         {
-            title: t('dashboard.website_count'),
+            title: t('menus.resource.submenus.website'),
             value: timeCounterQuery.data?.websiteTotalCount,
             icon: <GlobeIcon className={'h-4 w-4'}/>,
         },
@@ -140,7 +140,7 @@ const DashboardPage = () => {
 
     return (
         <div className={cn('px-4 space-y-4', isMobile && 'px-2')}>
-            <div className={'font-medium'}>{t('dashboard.name')}</div>
+            <div className={'font-medium'}>{t('menus.dashboard.label')}</div>
             <div className={cn(
                 'grid gap-4',
                 isMobile ? 'grid-cols-2' : 'grid-cols-6'
@@ -281,9 +281,9 @@ const DashboardPage = () => {
                                 <TableHeader>
                                     <TableRow>
                                         {!isMobile && <TableHead className="w-[100px] text-center">{t('audit.client_ip')}</TableHead>}
-                                        <TableHead className={'text-center'}>{t('audit.user')}</TableHead>
-                                        <TableHead className={'text-center'}>{t('audit.protocol')}</TableHead>
-                                        <TableHead className={'text-center'}>{t('audit.asset')}</TableHead>
+                                        <TableHead className={'text-center'}>{t('menus.identity.submenus.user')}</TableHead>
+                                        <TableHead className={'text-center'}>{t('assets.protocol')}</TableHead>
+                                        <TableHead className={'text-center'}>{t('menus.resource.submenus.asset')}</TableHead>
                                         {!isMobile && <TableHead className={'text-center'}>{t('audit.connected_at')}</TableHead>}
                                         {!isMobile && <TableHead className={'text-center'}>{t('audit.connection_duration')}</TableHead>}
                                     </TableRow>

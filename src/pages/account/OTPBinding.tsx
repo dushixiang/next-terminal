@@ -161,10 +161,10 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                             >
                                 <Form.Item
                                     name="totp"
-                                    label={t('account.otp_verification_code')}
+                                    label={t('account.captcha')}
                                     rules={[
-                                        {required: true, message: '请输入验证码'},
-                                        {pattern: /^\d{6}$/, message: '验证码必须是6位数字'}
+                                        {required: true, message: t('account.otp_code_required')},
+                                        {pattern: /^\d{6}$/, message: t('account.otp_code_format')}
                                     ]}
                                 >
                                     <Input
@@ -183,7 +183,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                                         block
                                         loading={false}
                                     >
-                                        {t('account.submit')}
+                                        {t('actions.confirm')}
                                     </Button>
                                 </Form.Item>
                             </Form>

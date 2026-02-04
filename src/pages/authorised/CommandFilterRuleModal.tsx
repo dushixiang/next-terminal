@@ -64,7 +64,7 @@ const CommandFilterRuleModal = ({
         >
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <ProFormText hidden={true} name={'id'}/>
-                <ProFormDigit label={t('authorised.command_filter.rule.priority')} name='priority' rules={[{required: true}]}
+                <ProFormDigit label={t('identity.policy.priority')} name='priority' rules={[{required: true}]}
                               extra={t('authorised.command_filter.rule.priority_extra')}
                               min={1} max={100}
                               fieldProps={{
@@ -74,19 +74,19 @@ const CommandFilterRuleModal = ({
                 <ProFormRadio.Group
                     label={t('authorised.command_filter.rule.type.label')} name='type' rules={[{required: true}]}
                     options={[
-                        {value: 'command', label: t('authorised.command_filter.rule.type.options.command')},
-                        {value: 'regexp', label: t('authorised.command_filter.rule.type.options.regexp')},
+                        {value: 'command', label: t('authorised.command_filter.rule.type.command')},
+                        {value: 'regexp', label: t('authorised.command_filter.rule.type.regexp')},
                     ]}
                 />
                 <ProFormText label={t('authorised.command_filter.rule.match_content')} name='command' rules={[{required: true}]}/>
                 <ProFormRadio.Group
-                    label={t('authorised.command_filter.rule.action.label')} name='action' rules={[{required: true}]}
+                    label={t('identity.policy.action.label')} name='action' rules={[{required: true}]}
                     options={[
-                        {value: 'allow', label: t('authorised.command_filter.rule.action.options.allow')},
-                        {value: 'reject', label: t('authorised.command_filter.rule.action.options.reject')},
+                        {value: 'allow', label: t('identity.policy.action.allow')},
+                        {value: 'reject', label: t('identity.policy.action.reject')},
                     ]}
                 />
-                <ProFormCheckbox label={t('authorised.command_filter.rule.status')} name='enabled' rules={[{required: true}]}>
+                <ProFormCheckbox label={t('general.status')} name='enabled' rules={[{required: true}]}>
 
                 </ProFormCheckbox>
             </ProForm>

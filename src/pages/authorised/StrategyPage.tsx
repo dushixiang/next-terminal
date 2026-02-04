@@ -59,12 +59,12 @@ const StrategyPage = () => {
         valueType: 'indexBorder',
         width: 48,
     }, {
-        title: t('authorised.strategy.name'),
+        title: t('general.name'),
         dataIndex: 'name',
         key: 'name',
         sorter: true,
     }, {
-        title: t('authorised.strategy.upload'),
+        title: t('general.upload'),
         dataIndex: 'upload',
         key: 'upload',
         hideInSearch: true,
@@ -80,7 +80,7 @@ const StrategyPage = () => {
             return renderStatus(text);
         }
     }, {
-        title: t('authorised.strategy.edit'),
+        title: t('actions.edit'),
         dataIndex: 'edit',
         key: 'edit',
         hideInSearch: true,
@@ -88,7 +88,7 @@ const StrategyPage = () => {
             return renderStatus(text);
         }
     }, {
-        title: t('authorised.strategy.remove'),
+        title: t('actions.delete'),
         dataIndex: 'delete',
         key: 'delete',
         hideInSearch: true,
@@ -104,7 +104,7 @@ const StrategyPage = () => {
             return renderStatus(text);
         }
     }, {
-        title: t('authorised.strategy.copy'),
+        title: t('actions.copy'),
         dataIndex: 'copy',
         key: 'copy',
         hideInSearch: true,
@@ -121,7 +121,7 @@ const StrategyPage = () => {
         }
     },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
@@ -137,7 +137,7 @@ const StrategyPage = () => {
                 ,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

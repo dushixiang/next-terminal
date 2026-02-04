@@ -43,7 +43,7 @@ const AuthorisedWebsitePost = () => {
 
     return (
         <div className={'px-4'}>
-            <div className={'mb-4 font-bold text-lg'}>授权网站</div>
+            <div className={'mb-4 font-bold text-lg'}>{t('authorised.website_title')}</div>
             <ProForm formRef={formRef} onFinish={async (values) => {
                 // 处理过期时间
                 if (expiredAtNoLimit || !expiredAtDayjs) {
@@ -58,11 +58,11 @@ const AuthorisedWebsitePost = () => {
                     formRef.current?.resetFields();
                     navigate('/authorised-website');
                 } catch (error) {
-                    message.error('授权失败');
+                    message.error(t('authorised.authorise_failed'));
                 }
             }}>
                 <ProFormSelect
-                    label={t('authorised.label.user')} 
+                    label={t('menus.identity.submenus.user')} 
                     name='userIds'
                     fieldProps={{mode: 'multiple', showSearch: true}}
                     request={async () => {
@@ -77,7 +77,7 @@ const AuthorisedWebsitePost = () => {
                 />
                 
                 <ProFormTreeSelect
-                    label={t('authorised.label.department')} 
+                    label={t('menus.identity.submenus.department')} 
                     name='departmentIds'
                     fieldProps={{showSearch: true, multiple: true, treeDefaultExpandAll: true}}
                     request={async () => {
@@ -117,7 +117,7 @@ const AuthorisedWebsitePost = () => {
                 />
 
                 <ProFormTreeSelect
-                    label="网站"
+                    label={t('menus.resource.submenus.website')}
                     name='websiteIds'
                     fieldProps={{
                         multiple: true,
@@ -138,7 +138,7 @@ const AuthorisedWebsitePost = () => {
                     }}
                 />
 
-                <Form.Item label={t('authorised.label.expired_at')} name="expiredAt">
+                <Form.Item label={t('assets.limit_time')} name="expiredAt">
                     <Space>
                         <Checkbox onChange={handleNoTimeLimit}
                                   checked={expiredAtNoLimit}>

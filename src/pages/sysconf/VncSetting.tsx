@@ -32,7 +32,7 @@ const VncSetting = ({get, set}: SettingProps) => {
                 }
             }}>
                 <ProFormSelect name="color-depth"
-                               label={t("settings.vnc.color_depth")}
+                               label={t("assets.color_depth")}
                                fieldProps={{
                                    options: [
                                        {value: '', label: t('general.default')},
@@ -48,7 +48,7 @@ const VncSetting = ({get, set}: SettingProps) => {
                                fieldProps={{
                                    options: [
                                        {value: '', label: t('general.default')},
-                                       {value: 'local', label: t('settings.vnc.cursor.local')},
+                                       {value: 'local', label: t('identity.user.sources.local')},
                                        {value: 'remote', label: t('settings.vnc.cursor.remote')},
                                    ]
                                }}

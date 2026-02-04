@@ -31,7 +31,7 @@ const LdapSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <Disabled disabled={license.isFree()}>
+            <Disabled disabled={!license.isEnterprise()}>
                 <Alert
                     message={t('settings.ldap.tip')}
                     type={"info"}
@@ -53,7 +53,7 @@ const LdapSetting = ({get, set}: SettingProps) => {
                                          onClick={() => mutation.mutate()}
                                          disabled={!enabled}
                                  >
-                                     {t('actions.sync')}
+                                     {t('actions.refresh')}
                                  </Button>
                              ],
                          }}

@@ -79,7 +79,7 @@ const LoginPolicyPostPage = () => {
             <Title level={5} style={{marginTop: 0}}>{t('actions.new')}</Title>
             <ProForm formRef={formRef} request={get} onFinish={wrapSet}>
                 <ProFormText hidden={true} name={'id'}/>
-                <ProFormText name={'name'} label={t('identity.policy.name')} rules={[{required: true}]}/>
+                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
                 <ProFormDigit name={'priority'}
                               label={t('identity.policy.priority')}
                               extra={t('identity.policy.priority_extra')}
@@ -95,13 +95,13 @@ const LoginPolicyPostPage = () => {
                 <ProFormRadio.Group
                     label={t('identity.policy.action.label')} name='rule' rules={[{required: true}]}
                     options={[
-                        {value: 'allow', label: t('identity.policy.action.options.allow')},
-                        {value: 'reject', label: t('identity.policy.action.options.reject')},
+                        {value: 'allow', label: t('identity.policy.action.allow')},
+                        {value: 'reject', label: t('identity.policy.action.reject')},
                     ]}
                 />
-                <ProFormDatePicker label={t('identity.user.expiration_at')} name='expirationAt'
+                <ProFormDatePicker label={t('assets.limit_time')} name='expirationAt'
                                    fieldProps={{format: 'YYYY-MM-DD HH:mm:ss', showTime: true}}/>
-                <ProFormCheckbox label={t('identity.policy.status')} name='enabled' rules={[{required: true}]}/>
+                <ProFormCheckbox label={t('general.status')} name='enabled' rules={[{required: true}]}/>
             </ProForm>
         </div>
     );

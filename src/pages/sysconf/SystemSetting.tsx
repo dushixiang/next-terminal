@@ -78,7 +78,7 @@ const SystemSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <Title level={5} style={{marginTop: 0}}>{t('settings.system.setting')}</Title>
+            <Title level={5} style={{marginTop: 0}}>{t('menus.setting.label')}</Title>
 
             <ProForm
                 onFinish={wrapSet}
@@ -89,7 +89,7 @@ const SystemSetting = ({get, set}: SettingProps) => {
                     }
                 }}
             >
-                <Divider orientation="left">系统基本信息</Divider>
+                <Divider orientation="left">{t('settings.system.basic_info_title')}</Divider>
                 <Disabled disabled={license.isFree()}>
                     <div className={cn(
                         'flex gap-4',
@@ -129,7 +129,7 @@ const SystemSetting = ({get, set}: SettingProps) => {
                                         ) : (
                                             <div className="flex flex-col items-center gap-1 text-gray-400">
                                                 <UploadIcon size={16}/>
-                                                <Text type="secondary" className="text-xs">上传</Text>
+                                                <Text type="secondary" className="text-xs">{t('general.upload')}</Text>
                                             </div>
                                         )}
                                     </div>
@@ -170,7 +170,7 @@ const SystemSetting = ({get, set}: SettingProps) => {
                 <Disabled disabled={license.isFree()}>
                     <ProFormSwitch
                         name="watermark-enabled"
-                        label={t("settings.system.watermark.status")}
+                        label={t("identity.user.watermark")}
                         rules={[{required: true}]}
                         checkedChildren={t('general.enabled')}
                         unCheckedChildren={t('general.disabled')}
@@ -196,18 +196,18 @@ const SystemSetting = ({get, set}: SettingProps) => {
                         )}>
                             <ProFormCheckbox
                                 name="watermark-content-user-account"
-                                label={t('settings.system.watermark.append.user')}
+                                label={t('settings.system.watermark.append_user')}
                                 disabled={!enabled}
                             />
                             <ProFormCheckbox
                                 name="watermark-content-asset-username"
-                                label={t('settings.system.watermark.append.asset')}
+                                label={t('settings.system.watermark.append_asset')}
                                 disabled={!enabled}
                             />
                         </div>
                         <Form.Item
                             name="watermark-font-color"
-                            label={t('settings.system.watermark.font.color')}
+                            label={t('settings.system.watermark.font_color')}
                             rules={[{required: true}]}
                         >
                             <ColorPicker
@@ -224,16 +224,16 @@ const SystemSetting = ({get, set}: SettingProps) => {
                     <div className={cn(isMobile ? 'w-full' : 'w-1/2')}>
                         <ProFormSlider
                             name="watermark-font-size"
-                            label={t('settings.system.watermark.font.size')}
+                            label={t('settings.system.watermark.font_size')}
                             rules={[{required: true}]}
                             min={1}
                             max={100}
                             disabled={!enabled}
                             marks={{
-                                1: '小',
-                                25: '中',
-                                50: '大',
-                                100: '特大'
+                                1: t('settings.system.watermark.size_small'),
+                                25: t('settings.system.watermark.size_medium'),
+                                50: t('settings.system.watermark.size_large'),
+                                100: t('settings.system.watermark.size_xlarge')
                             }}
                         />
                     </div>

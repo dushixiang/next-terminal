@@ -20,8 +20,8 @@ import {
     MessageTypeResize
 } from "@/pages/access/Terminal";
 import {useInterval, useWindowSize} from "react-use";
-import {CleanTheme, useTerminalTheme} from "@/hook/use-terminal-theme";
-import {useAccessTab} from "@/hook/use-access-tab";
+import {CleanTheme, useTerminalTheme} from "@/pages/access/hooks/use-terminal-theme";
+import {useAccessTab} from "@/pages/access/hooks/use-access-tab";
 import {
     ActivityIcon,
     BotIcon,
@@ -43,7 +43,7 @@ import clsx from "clsx";
 import {debounce} from "@/utils/debounce";
 import FileSystemPage from "@/pages/access/FileSystemPage";
 import {App, Watermark} from "antd";
-import {useAccessContentSize} from "@/hook/use-access-size";
+import {useAccessContentSize} from "@/pages/access/hooks/use-access-size";
 import {cn} from "@/lib/utils";
 import {baseWebSocketUrl, getToken} from "@/api/core/requests";
 import qs from "qs";
@@ -791,7 +791,7 @@ const AccessTerminal = ({assetId}: Props) => {
                                                             clearSearch();
                                                         }
                                                     }}
-                                                    placeholder={t('access.settings.terminal.search_placeholder') || '搜索终端内容...'}
+                                                    placeholder={t('access.settings.terminal.search_placeholder')}
                                                     className="flex-1 px-1.5 py-0.5 text-xs border-none outline-none bg-transparent text-gray-900 dark:text-gray-100"
                                                     autoFocus
                                                 />
@@ -854,13 +854,13 @@ const AccessTerminal = ({assetId}: Props) => {
                 {isMobile &&
                     <div
                         className={cn('absolute right-4 top-4 p-2 rounded bg-[#1E1F22] flex gap-2', isMobile && 'top-12')}>
-                        <div title="搜索终端内容">
+                        <div title={t('access.terminal.search')}>
                             <SearchIcon
                                 className={cn('h-4 w-4', isMobile && 'text-white', searchOpen && 'text-blue-400')}
                                 onClick={() => setSearchOpen(!searchOpen)}
                             />
                         </div>
-                        <div title="清屏">
+                        <div title={t('access.terminal.clear')}>
                             <EraserIcon
                                 className={cn('h-4 w-4', isMobile && 'text-white')}
                                 onClick={handleClearTerminal}
@@ -874,12 +874,12 @@ const AccessTerminal = ({assetId}: Props) => {
                 {!isMobile &&
                     <div className={'w-10 bg-[#1E1F22] flex flex-col items-center border'}>
                         <div className={'flex-grow py-4 space-y-6 cursor-pointer'}>
-                            <div title="搜索终端内容">
+                            <div title={t('access.terminal.search')}>
                                 <SearchIcon className={clsx('h-4 w-4', searchOpen && 'text-blue-500')}
                                             onClick={() => setSearchOpen(!searchOpen)}
                                 />
                             </div>
-                            <div title="清屏">
+                            <div title={t('access.terminal.clear')}>
                                 <EraserIcon className={'h-4 w-4'} onClick={handleClearTerminal}/>
                             </div>
                             <Share2Icon className={'h-4 w-4'} onClick={() => setSharerOpen(true)}/>

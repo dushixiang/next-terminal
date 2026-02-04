@@ -54,13 +54,13 @@ const StoragePage = () => {
             width: 48,
         },
         {
-            title: t('assets.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             ellipsis: true,
             width: 100,
         },
         {
-            title: t('assets.is_default'),
+            title: t('general.default'),
             dataIndex: 'isDefault',
             key: 'isDefault',
             hideInSearch: true,
@@ -123,7 +123,7 @@ const StoragePage = () => {
             width: 191,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 200,
@@ -148,7 +148,7 @@ const StoragePage = () => {
                 </NButton>,
                 <Popconfirm
                     key={'delete_confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

@@ -20,7 +20,7 @@ const BackupSetting = () => {
             setLoading(true);
             try {
                 await requests.post('/admin/backup/import', backup);
-                message.success('恢复成功', 3);
+                message.success(t('settings.backup.restore_success'), 3);
             } finally {
                 // window.document.getElementById('file-upload').value = "";
                 setLoading(false);

@@ -32,7 +32,7 @@ const ToolsTcping = () => {
     }
 
     return (
-        <div className={'space-y-4 flex flex-col min-h-[75vh]'}>
+        <div className={'flex flex-col gap-4 min-h-[75vh]'}>
             <Form layout="inline" className="w-full">
                 <Form.Item
                     label={t('sysops.tools.target')}
@@ -46,7 +46,7 @@ const ToolsTcping = () => {
                         }}
                     />
                 </Form.Item>
-                <Form.Item label={t('sysops.tools.port')}>
+                <Form.Item label={t('gateways.port')}>
                     <InputNumber
                         value={port}
                         onChange={(value) => setPort(value)}

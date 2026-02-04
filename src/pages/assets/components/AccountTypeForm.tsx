@@ -31,7 +31,7 @@ const AccountTypeForm: React.FC<AccountTypeFormProps> = ({
     if (accountType === 'credential') {
         return (
             <ProFormSelect
-                label={t('assets.credential')} 
+                label={t('menus.resource.submenus.credential')} 
                 name='credentialId'
                 rules={[{required: true}]}
                 request={async () => {
@@ -50,7 +50,7 @@ const AccountTypeForm: React.FC<AccountTypeFormProps> = ({
         case 'password':
             return (
                 <>
-                    <ProFormText label={t('assets.username')} name='username'/>
+                    <ProFormText label={t('menus.identity.submenus.user')} name='username'/>
                     <ProFormText.Password 
                         label={t('assets.password')}
                         name='password'
@@ -80,7 +80,7 @@ const AccountTypeForm: React.FC<AccountTypeFormProps> = ({
             return (
                 <>
                     <ProFormText 
-                        label={t('assets.username')} 
+                        label={t('menus.identity.submenus.user')} 
                         name='username' 
                         rules={[{required: true}]}
                     />

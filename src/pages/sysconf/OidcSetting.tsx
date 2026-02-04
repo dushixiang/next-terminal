@@ -21,7 +21,7 @@ const OidcSetting = ({get, set}: SettingProps) => {
 
     return (
         <div>
-            <Disabled disabled={license.isFree()}>
+            <Disabled disabled={!license.isEnterprise()}>
                 <Alert
                     message={t('settings.oidc.tip')}
                     type="info"
@@ -64,7 +64,7 @@ const OidcSetting = ({get, set}: SettingProps) => {
                                           rules={[{required: enabled}]}
                     />
                     <ProFormText name="oidc-redirect-uri"
-                                 label={t('settings.oidc.redirect_uri')}
+                                 label={t('identity.oidc_client.redirect_uris')}
                                  placeholder={t('settings.oidc.redirect_uri_placeholder')}
                                  disabled={!enabled}
                                  rules={[{required: enabled}]}

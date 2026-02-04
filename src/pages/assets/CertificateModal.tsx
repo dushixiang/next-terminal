@@ -6,6 +6,7 @@ import {
     ProFormDigit,
     ProFormInstance,
     ProFormRadio,
+    ProFormSwitch,
     ProFormText,
     ProFormTextArea
 } from "@ant-design/pro-components";
@@ -41,6 +42,7 @@ const CertificateModal = ({
         return {
             type: 'self-signed',
             renewBefore: 30,
+            requireClientAuth: false,
         };
     }
 
@@ -64,7 +66,7 @@ const CertificateModal = ({
         >
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <ProFormText hidden={true} name={'id'}/>
-                <ProFormText name={'commonName'} label={t('assets.certificates.common_name')}
+                <ProFormText name={'commonName'} label={t('assets.domain')}
                              rules={[{required: true}]}
                              disabled={strings.hasText(id)}
                 />
@@ -82,11 +84,15 @@ const CertificateModal = ({
                         switch (type) {
                             case 'self-signed':
                                 return <>
-                                    <div className={'p-4 border rounded-lg space-y-1'}>
+                                    <div className={'p-4 border rounded-lg space-y-1 mb-4'}>
                                         <div className={'font-medium'}>{t('assets.certificates.self_signed_tip_title')}</div>
                                         <div>{t('assets.certificates.self_signed_root_ca_cert_path')} ./data/root_ca_cert.pem</div>
                                         <div>{t('assets.certificates.self_signed_root_ca_key_path')} ./data/root_ca_key.pem</div>
                                     </div>
+                                    <ProFormSwitch
+                                        name="requireClientAuth"
+                                        label={t('assets.certificates.require_client_auth')}
+                                    />
                                 </>
                             case 'issued':
                                 return <>
@@ -103,12 +109,12 @@ const CertificateModal = ({
                                 </>
                             case 'imported':
                                 return <>
-                                    <ProFormTextArea label={t("assets.certificates.certificate")}
+                                    <ProFormTextArea label={t("assets.cert")}
                                                      name='certificate'
                                                      fieldProps={{rows: 4, allowClear: true}}
                                                      rules={[{required: true}]}
                                     />
-                                    <ProFormTextArea label={t("assets.certificates.private_key")}
+                                    <ProFormTextArea label={t("assets.private_key")}
                                                      name='privateKey'
                                                      fieldProps={{rows: 4, allowClear: true}}
                                                      rules={[{required: true}]}

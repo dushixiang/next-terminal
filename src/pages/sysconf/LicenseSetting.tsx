@@ -30,6 +30,7 @@ const LicenseSetting = () => {
             "type": "test",
             "machineId": "",
             "asset": 0,
+            "database": 0,
             "concurrent": 0,
             "user": 0,
             "expired": 0
@@ -56,13 +57,13 @@ const LicenseSetting = () => {
     const renderType = (type: string | undefined) => {
         switch (type) {
             case 'free':
-                return <span className={'text-gray-500'}>{t('settings.license.type.options.free')}</span>;
+                return <span className={'text-gray-500'}>{t('settings.license.type.free')}</span>;
             case 'test':
-                return <span className={'text-yellow-500'}>{t('settings.license.type.options.test')}</span>;
+                return <span className={'text-yellow-500'}>{t('settings.license.type.test')}</span>;
             case 'premium':
-                return <span className={'text-green-500'}>{t('settings.license.type.options.premium')}</span>;
+                return <span className={'text-green-500'}>{t('settings.license.type.premium')}</span>;
             case 'enterprise':
-                return <span className={'text-blue-500'}>{t('settings.license.type.options.enterprise')}</span>;
+                return <span className={'text-blue-500'}>{t('settings.license.type.enterprise')}</span>;
             default:
                 return type;
         }
@@ -176,6 +177,9 @@ const LicenseSetting = () => {
                                 </Descriptions.Item>
                                 <Descriptions.Item label={t('settings.license.max.asset_count')}>
                                     <Text strong>{renderCount(queryLicense.data?.asset)}</Text>
+                                </Descriptions.Item>
+                                <Descriptions.Item label={t('settings.license.max.database_count')}>
+                                    <Text strong>{renderCount(queryLicense.data?.database)}</Text>
                                 </Descriptions.Item>
                                 <Descriptions.Item label={t('settings.license.max.concurrent_count')}>
                                     <Text strong>{renderCount(queryLicense.data?.concurrent)}</Text>

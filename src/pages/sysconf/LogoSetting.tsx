@@ -72,7 +72,7 @@ const LogoSetting = () => {
                         .map(item => {
                             return <Popconfirm
                                 key={'delete-confirm' + item.name}
-                                title={t('general.delete_confirm')}
+                                title={t('general.confirm_delete')}
                                 onConfirm={() => {
                                     logoApi.delete(item.name).then(res => {
                                         logosQuery.refetch();

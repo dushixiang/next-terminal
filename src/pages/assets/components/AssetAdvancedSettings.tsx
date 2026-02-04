@@ -102,7 +102,7 @@ const AssetAdvancedSettings: React.FC<AssetAdvancedSettingsProps> = ({protocol})
                         name={["attrs", "enable-drive"]}
                         checkedChildren={t('general.enabled')}
                         unCheckedChildren={t('general.disabled')}
-                        label={t('assets.rdp_enable_drive')}
+                        label={t('assets.rdp_drive')}
                     />
                     <ProFormSelect
                         name={["attrs", "drive-path"]}

@@ -37,12 +37,12 @@ const OfflineSessionPage = () => {
 
     const columns: ProColumns<Session>[] = [
         {
-            title: t('audit.user'),
+            title: t('menus.identity.submenus.user'),
             dataIndex: 'userAccount',
             key: 'userAccount',
         },
         {
-            title: t('audit.asset'),
+            title: t('menus.resource.submenus.asset'),
             dataIndex: 'assetName',
             key: 'assetName',
             render: (text, record) => {
@@ -69,7 +69,7 @@ const OfflineSessionPage = () => {
         },
 
         {
-            title: t('audit.protocol'),
+            title: t('assets.protocol'),
             dataIndex: 'protocol',
             key: 'protocol',
             sorter: true,
@@ -118,7 +118,7 @@ const OfflineSessionPage = () => {
             hideInSearch: true,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => {
@@ -141,7 +141,7 @@ const OfflineSessionPage = () => {
                                     window.open(`/graphics-playback?sessionId=${record['id']}`, '_blank')
                                     break;
                                 default:
-                                    message.warning(t('unknown protocol ' + record.protocol));
+                                    message.warning(t('audit.unknown_protocol', {protocol: record.protocol}));
                             }
                         }}>
                         {t('audit.options.playback')}
@@ -155,11 +155,11 @@ const OfflineSessionPage = () => {
                             setSelectedRowKey(record.id);
                             setSessionCommandOpen(true);
                         }}>
-                        {t('audit.command')}({record['commandCount']})
+                        {t('sysops.command')}({record['commandCount']})
                     </Button>,
                     <Popconfirm
                         key={'delete-confirm'}
-                        title={t('general.delete_confirm')}
+                        title={t('general.confirm_delete')}
                         onConfirm={async () => {
                             await sessionApi.deleteById(record.id);
                             actionRef.current?.reload();
@@ -243,7 +243,7 @@ const OfflineSessionPage = () => {
                 ]}
             />
 
-            <Drawer title={t('audit.command')}
+            <Drawer title={t('sysops.command')}
                     placement="right"
                     width={window.innerWidth * 0.9}
                     onClose={() => {

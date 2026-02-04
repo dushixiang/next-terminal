@@ -4,7 +4,7 @@ import XtermThemes from "@/color-theme/XtermThemes";
 import {CheckCard} from '@ant-design/pro-components';
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useWindowSize} from "react-use";
-import {useTerminalTheme} from "@/hook/use-terminal-theme";
+import {useTerminalTheme} from "@/pages/access/hooks/use-terminal-theme";
 import {useTranslation} from 'react-i18next';
 import {useLicense} from "@/hook/LicenseContext";
 import Disabled from "@/components/Disabled";

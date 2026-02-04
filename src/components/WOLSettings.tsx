@@ -46,7 +46,7 @@ const WOLSettings: React.FC<WOLSettingsProps> = () => {
                                 max={300}
                                 initialValue={30}
                                 fieldProps={{
-                                    addonAfter: t('general.second', {defaultValue: '秒'}),
+                                    addonAfter: t('general.second'),
                                 }}
                             />
                         </>

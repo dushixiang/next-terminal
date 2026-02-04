@@ -132,7 +132,7 @@ const AccessLogStatsPage = () => {
 
     const hourlyChartConfig = {
         count: {
-            label: t('audit.accessLog.stats.tooltip.visitCount'),
+            label: t('audit.accessLog.stats.table.visitCount'),
             color: "var(--chart-1)",
         },
     } satisfies ChartConfig;
@@ -213,7 +213,7 @@ const AccessLogStatsPage = () => {
             formatter: formatNumber,
         },
         {
-            title: t('audit.accessLog.stats.metrics.avgResponseTime'),
+            title: t('audit.accessLog.stats.table.avgResponseTime'),
             value: websiteStats.avgResponseTime,
             icon: <TimerIcon className="h-4 w-4"/>,
             formatter: (val: number) => `${val?.toFixed(2) || 0}ms`,
@@ -449,7 +449,7 @@ const AccessLogStatsPage = () => {
                                     content={
                                         <ChartTooltipContent
                                             labelFormatter={(value) => `${t('audit.accessLog.stats.tooltip.time')}: ${value}:00`}
-                                            formatter={(value) => [value, t('audit.accessLog.stats.tooltip.visitCount')]}
+                                            formatter={(value) => [value, t('audit.accessLog.stats.table.visitCount')]}
                                             indicator="dot"
                                         />
                                     }
@@ -474,7 +474,7 @@ const AccessLogStatsPage = () => {
                                 <ChartTooltip
                                     cursor={false}
                                     content={<ChartTooltipContent
-                                        labelFormatter={(value, payload) => `${t('audit.accessLog.stats.tooltip.statusCode')} ${payload[0]?.name}`}
+                                        labelFormatter={(value, payload) => `${t('audit.accessLog.statusCode')} ${payload[0]?.name}`}
                                         formatter={(value, name) => [value]}
                                     />}
                                 />

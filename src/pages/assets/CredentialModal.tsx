@@ -73,7 +73,7 @@ const CredentialModal = ({
         >
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <ProFormText hidden={true} name={'id'}/>
-                <ProFormText name={'name'} label={t('assets.name')} rules={[{required: true}]}/>
+                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
                 <ProFormRadio.Group
                     label={t('assets.type')} name='type' rules={[{required: true}]}
                     options={[
@@ -81,7 +81,7 @@ const CredentialModal = ({
                         {label: t('assets.private_key'), value: 'private-key'},
                     ]}
                 />
-                <ProFormText label={t('assets.username')} name='username' rules={[{required: true}]}/>
+                <ProFormText label={t('menus.identity.submenus.user')} name='username' rules={[{required: true}]}/>
                 <ProFormDependency name={['type']}>
                     {({type}) => {
                         switch (type) {

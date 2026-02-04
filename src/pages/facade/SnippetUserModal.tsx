@@ -57,11 +57,11 @@ const SnippetUserModal = ({
                 <ProFormTextArea label={t('assets.content')} name='content' rules={[{required: true}]}/>
                 <ProFormRadio.Group
                     name="visibility"
-                    label="可见性"
+                    label={t('assets.snippet.visibility')}
                     initialValue="private"
                     options={[
-                        {label: '私有', value: 'private'},
-                        {label: '公开', value: 'public'},
+                        {label: t('assets.snippet.visibility_private'), value: 'private'},
+                        {label: t('assets.snippet.visibility_public'), value: 'public'},
                     ]}
                     rules={[{required: true}]}
                 />

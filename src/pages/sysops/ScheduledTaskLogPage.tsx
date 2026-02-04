@@ -61,8 +61,8 @@ const ScheduledTaskLogPage = ({open, jobId, handleCancel}: Props) => {
                             <Space align="center" size="small">
                                 <Server size={14} style={{ color: '#1890ff' }} />
                                 <Text>{t('sysops.logs.asset_status_check')}</Text>
-                                <Tag color="green">{t('online')}: {active}</Tag>
-                                <Tag color="red">{t('offline')}: {inactive}</Tag>
+                                <Tag color="green">{t('general.online')}: {active}</Tag>
+                                <Tag color="red">{t('general.offline')}: {inactive}</Tag>
                             </Space>
                         );
                     case 'asset-exec-command':
@@ -131,9 +131,9 @@ const ScheduledTaskLogPage = ({open, jobId, handleCancel}: Props) => {
                             key: 'active', 
                             render: (text: any) => {
                                 if (text === true) {
-                                    return <Tag color="green">{t('online')}</Tag>
+                                    return <Tag color="green">{t('general.online')}</Tag>
                                 } else {
-                                    return <Tag color="red">{t('offline')}</Tag>
+                                    return <Tag color="red">{t('general.offline')}</Tag>
                                 }
                             }
                         },

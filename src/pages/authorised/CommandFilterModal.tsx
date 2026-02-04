@@ -54,7 +54,7 @@ const CommandFilterModal = ({
 
             <ProForm formRef={formRef} request={get} submitter={false}>
                 <ProFormText hidden={true} name={'id'}/>
-                <ProFormText name={'name'} label={t('authorised.command_filter.name')} rules={[{required: true}]}/>
+                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
             </ProForm>
         </Modal>
     )

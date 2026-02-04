@@ -55,7 +55,7 @@ const CommandFilterPage = () => {
             width: 48,
         },
         {
-            title: t('authorised.command_filter.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             render: (text, record) => {
                 return <a onClick={() => {
@@ -72,7 +72,7 @@ const CommandFilterPage = () => {
             hideInSearch: true,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             render: (text, record, _, action) => [
@@ -88,7 +88,7 @@ const CommandFilterPage = () => {
                 ,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();

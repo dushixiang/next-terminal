@@ -4,6 +4,7 @@ export interface License {
     type: string;
     machineId: string;
     asset: number;
+    database?: number;
     concurrent: number;
     user: number;
     expired: number;
@@ -60,7 +61,7 @@ class LicenseApi {
     }
 
     getSimpleLicense = async () => {
-        let data = await requests.get(`/license`);
+        let data = await requests.get(`/license?noerr`);
         return new SimpleLicense(data.type, data.expired, data.oem);
     }
 

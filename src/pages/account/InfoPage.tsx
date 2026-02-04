@@ -11,6 +11,7 @@ import {isMobileByMediaQuery} from "@/utils/utils";
 import {cn} from "@/lib/utils";
 import Passkey from "@/pages/account/Passkey";
 import OidcServerAuthorizations from "@/pages/account/OidcServerAuthorizations";
+import ClientCertificate from "@/pages/account/ClientCertificate";
 
 const InfoPage = () => {
 
@@ -35,7 +36,7 @@ const InfoPage = () => {
             children: <ChangePassword/>
         },
         {
-            label: t('account.otp'),
+            label: t('identity.user.otp'),
             key: 'otp',
             children: <OTP/>
         },
@@ -50,7 +51,12 @@ const InfoPage = () => {
             children: <AccessToken/>
         },
         {
-            label: 'OIDC 授权管理',
+            label: t('account.client_cert'),
+            key: 'client-cert',
+            children: <ClientCertificate/>
+        },
+        {
+            label: t('account.oidc_server_authorizations'),
             key: 'oidc-server-authorizations',
             children: <OidcServerAuthorizations/>
         },

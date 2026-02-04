@@ -61,6 +61,22 @@ export interface CreateUserResult {
     password: string
 }
 
+export interface UserClientCertInfo {
+    id: string;
+    serialNumber: string;
+    fingerprint: string;
+    notBefore: number;
+    notAfter: number;
+    status: string;
+    revokedAt: number;
+    lastUsedAt: number;
+    createdAt: number;
+}
+
+export interface SetupStatus {
+    needSetup: boolean;
+}
+
 class UserApi extends Api<User> {
     constructor() {
         super("admin/users");
@@ -87,6 +103,11 @@ class UserApi extends Api<User> {
         await requests.post(`/setup-user`, values);
     }
 
+    // 不需要登录
+    getSetupStatus = async () => {
+        return await requests.get(`/setup-status`) as SetupStatus;
+    }
+
     syncLdapUser = async () => {
         await requests.post(`/${this.group}/sync-from-ldap`);
     }
@@ -110,6 +131,14 @@ class UserApi extends Api<User> {
     // 批量设置用户部门
     batchSetUserDepartments = async (userIds: string[], departmentIds: string[]) => {
         await requests.post(`/${this.group}/batch-departments`, { userIds, departmentIds });
+    }
+
+    getUserClientCert = async (userId: string) => {
+        return await requests.get(`/${this.group}/${userId}/client-cert`) as UserClientCertInfo | null;
+    }
+
+    revokeUserClientCert = async (userId: string) => {
+        return await requests.delete(`/${this.group}/${userId}/client-cert`);
     }
 }
 

@@ -7,9 +7,10 @@ import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication
 
 export interface UnBinding2faProps {
     refetch: () => void
+    forceReauth?: boolean
 }
 
-const OTPUnBinding = ({refetch}: UnBinding2faProps) => {
+const OTPUnBinding = ({refetch, forceReauth = false}: UnBinding2faProps) => {
 
     let {t} = useTranslation();
     let [mfaOpen, setMfaOpen] = useState(false);
@@ -40,6 +41,7 @@ const OTPUnBinding = ({refetch}: UnBinding2faProps) => {
 
             <MultiFactorAuthentication
                 open={mfaOpen}
+                forceReauth={forceReauth}
                 handleOk={async (securityToken) => {
                     setMfaOpen(false);
                     await accountApi.resetTotp(securityToken);

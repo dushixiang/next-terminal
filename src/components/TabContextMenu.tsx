@@ -63,7 +63,7 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
     },
     {
       key: 'reconnect',
-      label: t('access.tabs.reconnect'),
+      label: t('assets.resize_methods.reconnect'),
       onClick: () => onReconnect(tabKey),
     },
   ];

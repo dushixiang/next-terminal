@@ -7,32 +7,52 @@
     "disabled": "Disabled",
     "yes": "Yes",
     "no": "No",
-    "less-zero-tip": "Values less than 0 indicate no limit",
+    "less-zero-tip": "Less than 0 means unlimited",
     "success": "Success",
     "failed": "Failed",
     "default": "Default",
     "home": "Home",
-    "copy_success": "Copied",
-    "delete_confirm": "Are you sure you want to delete this item?",
-    "clear_confirm": "Are you sure you want to clear the data?",
-    "unbound": "Unbound",
-    "bound": "Bound",
-    "name": "Name",
-    "days": "Days",
-    "tips": "Tips",
-    "clipboard_disabled": "The clipboard function is disabled.",
+    "clipboard_disabled": "Clipboard feature is disabled.",
+    "copy_success": "Copied successfully",
     "remark": "Remark",
+    "remark_label": "Remark:",
     "enter_remark": "Please enter remark",
     "required": "Required",
-    "error": "Operation failed",
-    "status": "State",
+    "confirm_delete": "Confirm delete this item?",
+    "clear_confirm": "Confirm clear data?",
+    "unbound": "Unbound",
+    "bound": "Bound",
+    "days": "days",
+    "tips": "Tips",
     "language": "Language",
-    "confirm_delete": "Confirm deletion of this item?"
+    "hour": "hour",
+    "minute": "minute",
+    "second": "second",
+    "description": "Description",
+    "less_than_one_minute": "Less than 1 minute",
+    "loading": "Loading...",
+    "error": "Error",
+    "invalid_url": "Please enter a valid URL",
+    "language_en_us": "English",
+    "language_zh_cn": "Simplified Chinese",
+    "language_zh_tw": "Traditional Chinese",
+    "language_ja_jp": "Japanese",
+    "not_found_subtitle": "Sorry, it seems you've reached an unexpected page.",
+    "my_assets": "My Assets",
+    "home_admin": "Admin Home",
+    "leave_confirm": "Are you sure you want to leave this page?",
+    "loading_detail": "Loading...",
+    "status": "Status",
+    "name": "Name",
+    "read": "Read",
+    "write": "Write",
+    "upload": "Upload",
+    "offline": "Offline",
+    "online": "Online",
+    "search_placeholder": "Search keyword"
   },
   "actions": {
-    "option": "Actions",
-    "new": "Create",
-    "add": "Add",
+    "new": "New",
     "edit": "Edit",
     "delete": "Delete",
     "clear": "Clear",
@@ -40,243 +60,201 @@
     "binding": "Bind",
     "unbind": "Unbind",
     "authorized": "Authorize",
-    "decrypt": "Decrypt",
     "copy": "Copy",
-    "export": "Export",
-    "sync": "Sync",
     "view_private_key": "View Private Key",
     "import": "Import",
-    "download_import_sample": "Download Import Example",
+    "download_import_sample": "Download Sample",
     "cancel": "Cancel",
     "save": "Save",
-    "remove": "Remove",
     "label": "Actions",
     "batch_delete": "Batch Delete",
     "refresh": "Refresh",
-    "create": "Create",
-    "submit": "Submit",
-    "actions": "Operation",
-    "confirm": "Confirm"
+    "confirm": "Confirm",
+    "back": "Back"
   },
   "dashboard": {
-    "name": "Dashboard",
     "login_times": "Login Times",
     "active_users": "Active Users",
-    "active_assets": "Online Assets",
-    "login_failed_times": "Login Failure Count",
+    "active_assets": "Active Assets",
+    "login_failed_times": "Login Failed Times",
     "user_online_count": "Online Users",
-    "session_online_count": "Online Sessions",
-    "gateway_active_count": "Online Gateway",
-    "asset_active_count": "Online Assets",
-    "website_active_count": "Online Web Assets",
-    "date_counter": "Activity Statistics",
+    "gateway_active_count": "Online Gateways",
+    "asset_active_count": "Active Assets",
+    "date_counter": "Activity Stats",
     "asset_type": "Asset Type",
-    "latest_session": "Latest Sessions",
-    "website_count": "Web assets"
+    "latest_session": "Latest Session"
   },
   "stat": {
-    "days": "Days",
     "info": {
       "system": "System",
       "hostname": "Hostname",
       "uptime": "Uptime",
-      "os": "OS",
-      "arch": "Arch",
+      "os": "Operating System",
+      "arch": "Architecture",
       "load": "System Load",
       "cpu": "CPU"
     },
     "memory": {
-      "label": "Memory",
-      "used": "Used",
       "free": "Free",
       "cache": "Cache"
     },
     "disk": {
-      "label": "Disk",
       "mount_point": "Mount Point",
       "total": "Total",
       "free": "Free",
       "percent": "Usage"
     },
     "network": {
-      "label": "Network",
       "interface": "Interface",
-      "rx": "Received",
-      "tx": "Sent"
+      "rx": "RX",
+      "tx": "TX"
     }
   },
   "facade": {
-    "accessing": "Accessing",
-    "asset_placeholder": "Asset name, protocol, labels, network address"
+    "asset_placeholder": "Asset name, protocol, tags, network address",
+    "accessing": "Connecting",
+    "website_placeholder": "Website name, tag, address",
+    "processing": "Processing...",
+    "in_use": "In use",
+    "clear_search": "Clear search"
   },
   "menus": {
     "dashboard": {
-      "label": "Dashboard"
+      "label": "Overview"
     },
     "resource": {
-      "label": "Resource",
+      "label": "Resource Management",
       "submenus": {
         "asset": "Assets",
+        "database_asset": "Database Assets",
         "credential": "Credentials",
         "snippet": "Command Snippets",
         "storage": "Storage",
         "website": "Web Assets",
-        "certificate": "Certificate"
+        "db_work_order": "SQL Work Orders",
+        "certificate": "Certificate Management"
       }
     },
     "gateway": {
-      "label": "Gateway",
+      "label": "Access Gateways",
       "submenus": {
         "ssh_gateway": "SSH Gateway",
         "agent_gateway": "Security Gateway",
-        "gateway_group": "Gateway Group"
+        "gateway_group": "Gateway Groups"
       }
     },
     "log_audit": {
-      "label": "Log Audit",
+      "label": "Audit Logs",
       "submenus": {
         "online_session": "Online Sessions",
         "offline_session": "Offline Sessions",
         "filesystem_log": "File Logs",
+        "access_log": "Access Logs",
+        "access_log_stats": "Access Log Stats",
         "login_log": "Login Logs",
         "operation_log": "Operation Logs",
-        "access_log": "Access Log",
-        "access_log_stats": "Visit Log Statistics"
+        "database_sql_log": "SQL Logs"
       }
     },
     "sysops": {
-      "label": "System Operations",
+      "label": "System Ops",
       "submenus": {
         "scheduled_task": "Scheduled Tasks",
-        "monitoring": "System Monitoring",
-        "tools": "Utilities"
+        "tools": "Tools",
+        "monitoring": "Monitoring"
       }
     },
     "identity": {
       "label": "Identity",
       "submenus": {
         "user": "Users",
-        "user_group": "User Groups",
+        "department": "Departments",
         "role": "Roles",
-        "login_policy": "Login Policies",
-        "login_locked": "Login Locks",
-        "department": "department"
+        "login_policy": "Login Policy",
+        "login_locked": "Login Lock",
+        "oidc_client": "OIDC Clients"
       }
     },
     "authorised": {
-      "label": "Authorization",
+      "label": "Resource Authorization",
       "submenus": {
-        "command_filter": "Command Filters",
-        "strategy": "Strategies",
+        "command_filter": "Command Filter",
+        "strategy": "Authorization Strategy",
         "authorised_asset": "Authorized Assets",
-        "authorised_website": "Authorize Web Assets"
+        "authorised_website": "Authorized Web Assets",
+        "authorised_database_asset": "Authorized Database Assets"
       }
     },
     "setting": {
       "label": "System Settings"
-    },
-    "dev": {
-      "label": "Debug Information"
     }
   },
   "fs": {
     "operations": {
-      "upload": "Upload",
-      "download": "Download",
-      "rename": "Rename",
-      "copy": "Copy",
-      "paste": "Paste",
-      "edit": "Edit",
-      "remove": "Remove",
-      "create_file": "Create File",
-      "create_dir": "Create Directory",
+      "batch_download": "Batch Download",
+      "create_dir": "Create Folder",
       "upload_file": "Upload File",
-      "upload_dir": "Upload Directory",
-      "batch_download": "Batch download",
-      "chmod": "Permission Settings"
+      "upload_dir": "Upload Folder",
+      "chmod": "Permissions"
     },
     "attributes": {
       "path": "Path",
-      "type": "Type",
       "size": "Size",
       "last": {
-        "modified": "Last Modified",
-        "accessed": "Last Accessed",
-        "changed": "Last Changed"
+        "modified": "Last Modified"
       },
       "permissions": {
-        "label": "Permissions",
-        "owner": "Owner",
         "group": "Group",
-        "owner_read": "Read",
-        "owner_write": "Write",
-        "owner_execute": "Execute",
-        "group_read": "Read",
-        "group_write": "Write",
+        "owner": "Owner",
         "group_execute": "Execute",
-        "public": "Public",
-        "public_read": "Read",
-        "public_write": "Write",
-        "public_execute": "Execute"
+        "public": "Public"
       }
-    },
-    "file_types": {
-      "file": "File",
-      "directory": "Directory",
-      "link": "Link"
     },
     "delete_confirm": {
       "title": "Are you sure you want to delete this file?",
-      "content": "This operation will permanently delete the file. Are you sure?"
+      "content": "This action will permanently delete the file. Continue?"
     },
     "navigation": {
       "back_to_prev": "Back to Previous",
-      "refresh": "Refresh",
       "show_hidden_file": "Show Hidden Files",
       "hide_hidden_file": "Hide Hidden Files",
-      "file_tran": "Transfer Progress"
+      "file_tran": "File Transfer"
     },
     "editor": {
-      "label": "Editor",
-      "save": "Save",
       "refetch": "Reload",
       "copy_path": "Copy Path",
-      "no_files_open": "No files opened",
-      "unsaved_changes_title": "There are unsaved files.",
-      "unsaved_changes_content": "Closing the editor will discard unsaved changes. Are you sure you want to close?"
+      "no_files_open": "No files open"
     },
     "transmission": {
-      "filename": "File Name",
-      "size": "File Size",
-      "status": "Status",
       "progress": "Progress",
       "speed": "Speed",
       "options": {
         "preparing": "Preparing",
         "uploading": "Uploading",
-        "transmitting": "Transmitting",
-        "upload_failed": "Upload Failed",
-        "upload_success": "Upload Successful",
+        "transmitting": "Transferring",
+        "upload_failed": "Upload failed",
+        "upload_success": "Upload successful",
         "cancelled": "Cancelled"
       }
-    }
+    },
+    "drag_upload_hint": "Drag files here to upload",
+    "drag_upload_disabled": "Uploads are not allowed by current policy"
   },
   "guacamole": {
     "state": {
       "idle": "Initializing...",
-      "connecting": "Connecting...",
+      "connecting": "Connecting to server...",
       "waiting": "Waiting for server response...",
-      "connected": "Connected",
-      "disconnecting": "Disconnecting...",
-      "disconnected": "Disconnected",
-      "closed": "Closed",
+      "connected": "Connected to server",
+      "disconnecting": "Closing session...",
+      "disconnected": "Session closed",
       "unknown": "Unknown status"
     },
     "tunnel": {
-      "connecting": "The tunnel is being connected...",
-      "open": "Tunnel connection successful",
-      "closed": "The tunnel connection has been closed.",
-      "unstable": "Tunnel connection is unstable",
+      "connecting": "Tunnel connecting...",
+      "open": "Tunnel connected",
+      "closed": "Tunnel closed",
+      "unstable": "Tunnel unstable",
       "unknown": "Unknown tunnel status"
     }
   },
@@ -284,26 +262,23 @@
     "setup": {
       "user": "Initialize User",
       "go_to_login": "Go to Login",
-      "success": "Initialization of user successful",
-      "password_not_same": "Passwords do not match"
+      "success": "User initialized successfully",
+      "password_not_same": "Passwords do not match",
+      "already_done_title": "Setup Complete",
+      "already_done_subtitle": "This system has already been initialized. Please go to the login page."
     },
     "policy": {
-      "label": "Login Policy",
-      "name": "Name",
       "ip_group": "IP Group",
-      "ip_group_extra": "Format: comma-separated strings (e.g. 192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20), 0.0.0.0/0 matches all IPs",
+      "ip_group_extra": "Format: comma-separated string (e.g., 192.168.0.1, 192.168.1.0/24, 192.168.2.0-192.168.2.20), 0.0.0.0/0 matches all IPs.",
       "action": {
         "label": "Action",
-        "options": {
-          "allow": "Allow",
-          "reject": "Reject"
-        }
+        "options": {},
+        "allow": "Allow",
+        "reject": "Reject"
       },
-      "status": "Status",
       "priority": "Priority",
       "priority_extra": "Smaller number means higher priority",
-      "time_period": "Time Period",
-      "type": "Type"
+      "time_period": "Time Period"
     },
     "role": {
       "type": "Role Type",
@@ -311,108 +286,121 @@
         "default": "Built-in Role",
         "new": "New Role"
       },
-      "permission": "Permission"
+      "permission": "Permissions"
     },
-    "user_group": {
-      "members": "Members",
-      "members_count": "Number of members"
+    "department": {
+      "parent": "Parent Department",
+      "root": "Root Department",
+      "weight_tooltip": "Higher number means higher order",
+      "weight_placeholder": "Please enter sort value",
+      "name_placeholder": "Please enter department name",
+      "parent_placeholder": "Please select parent department",
+      "table_view": "Table View",
+      "tree_view": "Tree View",
+      "tree_structure": "Department Tree",
+      "manage_users": "Manage Members",
+      "user_count": "Member Count"
     },
     "user": {
-      "username": "Username",
       "locked_at": "Locked At",
+      "locked_type": "Lock Type",
+      "locked_type_username": "Account Lock",
+      "locked_type_ip": "IP Lock",
       "otp": "Two-Factor Authentication",
-      "expiration_at": "Expiration Time",
       "type": "User Type",
       "types": {
-        "super_admin": "Super Administrator",
-        "admin": "Administrator",
-        "normal": "Normal User"
+        "super_admin": "Super Admin",
+        "admin": "Admin",
+        "normal": "User"
       },
       "nickname": "Name",
       "mail": "Email",
-      "status": "Account Status",
-      "login": "Login Status",
-      "logins": {
-        "online": "Online",
-        "offline": "Offline"
-      },
-      "recording": "Recording Status",
-      "watermark": "Watermark Status",
-      "public_key": "Public Key",
-      "password": "Password",
-      "role": "Role",
-      "options": {
-        "reset": {
-          "password": {
-            "action": "Reset Password",
-            "success": "Password Reset Successful",
-            "new": "New Password",
-            "confirm": {
-              "title": "Are you sure you want to reset the user's password?",
-              "content": "If no password is entered, a random one will be generated and sent via email."
-            }
-          },
-          "otp": {
-            "action": "Reset Two-Factor Authentication",
-            "confirm": {
-              "title": "Are you sure you want to reset the user's two-factor authentication information?",
-              "content": "After resetting, the user can log in without two-factor authentication."
-            }
-          }
-        }
-      },
-      "client_ip": "Client IP",
-      "reason": "Reason",
-      "user_agent": "User Agent",
-      "login_at": "Login Time",
-      "no_spaces_allowed": "Spaces are not allowed",
-      "new_user_result": "User created successfully",
-      "locked_type": "Lock type",
-      "locked_type_username": "Account locked",
-      "locked_type_ip": "IP lock",
-      "last_login_at": "Last login time",
-      "available": "Optional User",
-      "selected": "Selected users",
-      "phone": "Phone number",
-      "source": "Source",
+      "phone": "Phone",
       "sources": {
         "local": "Local",
         "ldap": "LDAP",
         "wechat": "WeCom",
         "oidc": "OIDC"
       },
-      "department": "Department",
-      "select_department": "Please select a department."
+      "status": "Account Status",
+      "recording": "Recording Status",
+      "watermark": "Watermark Status",
+      "public_key": "Public Key",
+      "select_department": "Please select department",
+      "options": {
+        "reset": {
+          "password": {
+            "confirm": {}
+          },
+          "otp": {
+            "confirm": {}
+          }
+        }
+      },
+      "no_spaces_allowed": "No spaces allowed",
+      "new_user_result": "User created successfully",
+      "last_login_at": "Last Login",
+      "available": "Available Users",
+      "selected": "Selected Users",
+      "reset_password": {
+        "action": "Reset Password",
+        "success": "Password reset successfully",
+        "new": "New Password",
+        "confirm_title": "Confirm reset user password?",
+        "confirm_content": "If no password is entered, a random one will be generated and sent by email."
+      },
+      "reset_otp": {
+        "action": "Reset 2FA",
+        "confirm_title": "Confirm reset user 2FA?",
+        "confirm_content": "After reset, user can log in without 2FA."
+      }
     },
     "options": {
-      "authorized_asset": "Authorized Assets",
       "login_policy": "Login Policy"
     },
-    "department": {
-      "parent": "Superior department",
-      "root": "Root department",
-      "weight": "Sorting",
-      "weight_tooltip": "The larger the number, the more forward it is sorted.",
-      "weight_placeholder": "Please enter the sorting value",
-      "leaders": "Responsible person",
-      "leaders_count": "Number of persons in charge",
-      "leaders_placeholder": "Please select the person in charge",
-      "name_placeholder": "Please enter the department name",
-      "parent_placeholder": "Please select the superior department",
-      "table_view": "Table View",
-      "tree_view": "Tree view",
-      "tree_structure": "Department tree structure",
-      "sub_departments": "Sub-department",
-      "manage_users": "Manage Users",
-      "user_count": "Number of members"
+    "oidc_client": {
+      "created_success": "OIDC client created successfully",
+      "created_copy_tip": "⚠️ Please copy and save the secret immediately; it won't be shown again after closing.",
+      "secret_regenerated": "Client secret regenerated successfully",
+      "new_secret_label": "New Secret",
+      "new_secret_tip": "⚠️ Please copy and save the new secret immediately; it won't be shown again after closing.",
+      "redirect_uris": "Redirect URIs",
+      "grant_types": "Grant Types",
+      "scopes": "Scopes",
+      "regenerate_secret": "Regenerate Secret",
+      "regenerate_secret_confirm": "Are you sure you want to regenerate this client's secret? The old secret will be invalid immediately.",
+      "title": "OIDC Client List",
+      "selected_count": "Selected {{count}} items",
+      "client_id_label": "Client ID",
+      "client_id_required": "Please enter Client ID",
+      "client_id_placeholder": "Please enter a unique Client ID",
+      "client_id_tooltip": "Client ID cannot be modified after creation",
+      "name_required": "Please enter name",
+      "name_placeholder": "Please enter client name",
+      "redirect_uris_required": "Please add at least one redirect URI",
+      "redirect_uris_add": "Add redirect URI",
+      "redirect_uri_required": "Please enter redirect URI",
+      "grant_types_required": "Please select at least one grant type",
+      "scopes_required": "Please select at least one scope",
+      "access_control": "Access Control",
+      "access_control_tip": "Control which users can use this OIDC client",
+      "access_all_users": "All Users",
+      "access_departments": "Specified Departments",
+      "access_users": "Specified Users",
+      "bound_users": "Authorized Users",
+      "bound_users_placeholder": "Please select users who can use this client",
+      "bound_users_required": "Please select at least one user",
+      "bound_departments": "Authorized Departments",
+      "bound_departments_placeholder": "Please select departments authorized for this client",
+      "bound_departments_required": "Please select at least one department",
+      "description_placeholder": "Please enter client description"
     }
   },
   "dw": {
-    "selected": "Selected Time Period",
-    "select": "Drag to select time period",
-    "clear": "Clear Selection",
-    "version": "Version",
-    "select_all": "Select All",
+    "selected": "Selected time range",
+    "select": "Drag to select time range",
+    "clear": "Clear selection",
+    "select_all": "Select all",
     "week": {
       "label": "Week",
       "days": {
@@ -424,121 +412,81 @@
         "friday": "Friday",
         "saturday": "Saturday"
       }
-    },
-    "time": "Time"
+    }
   },
   "authorised": {
     "strategy": {
-      "name": "Name",
-      "upload": "Upload",
       "download": "Download",
-      "edit": "Edit",
-      "remove": "Remove",
       "rename": "Rename",
-      "copy": "Copy",
       "paste": "Paste",
-      "create_dir": "Create Directory",
+      "create_dir": "Create Folder",
       "create_file": "Create File"
     },
     "command_filter": {
-      "name": "Name",
       "options": {
         "rule": "Rule"
       },
       "rule": {
-        "priority": "Priority",
         "priority_extra": "Smaller number means higher priority",
-        "ip_group": "IP Group",
-        "expiration_at": "Expiration Time",
         "type": {
           "label": "Match Type",
-          "options": {
-            "command": "Exact Match",
-            "regexp": "Regular Expression Match"
-          }
+          "options": {},
+          "command": "Exact Match",
+          "regexp": "Regex Match"
         },
         "match_content": "Match Content",
         "action": {
-          "label": "Action",
-          "options": {
-            "allow": "Allow",
-            "reject": "Reject"
-          },
-          "status": "Status",
-          "authorised_at": "Authorization Time",
-          "authorised_user": "Authorized User",
-          "expired_at": "Expiration time",
-          "never_expired": "Never expires"
-        },
-        "status": "Status",
-        "authorised_at": "Authorized At",
-        "authorised_user": "Authorized User",
-        "expired_at": "Expired At",
-        "never_expired": "Never Expires"
-      },
-      "label": {
-        "authorised": "Authorization",
-        "user": "user",
-        "user_group": "User Group",
-        "asset": "asset",
-        "command_filter": "Command Interceptor",
-        "strategy": "Strategy",
-        "expired_at": "Expiration Time",
-        "authorised_at": "Authorization Time",
-        "never_expired": "Never expires"
+          "options": {}
+        }
       }
     },
     "label": {
-      "authorised": "Authorized",
-      "user": "User",
-      "user_group": "User Group",
-      "asset": "Asset",
-      "command_filter": "Command Filter",
-      "strategy": "Strategy",
-      "expired_at": "Expiration Time",
-      "authorised_at": "Authorized Time",
-      "never_expired": "Never Expires",
-      "department": "Department",
       "asset_group": "Asset Group",
-      "website": "Web assets",
-      "website_group": "Web asset group"
-    }
+      "website_group": "Web Asset Group",
+      "strategy": "Strategy",
+      "authorised_at": "Authorized At",
+      "never_expired": "Never Expires"
+    },
+    "website_title": "Authorized Websites",
+    "authorise_failed": "Authorization failed"
   },
   "sysops": {
-    "status": "Status",
-    "spec": "Cron Expression",
-    "last_exec_at": "Last Execution Time",
-    "asset": "Asset",
+    "spec": "cron expression",
+    "spec_run": "Simulate Run",
+    "spec_run_time": "Recent 10 run times",
+    "spec_tooltip": "Supports second-level scheduling. Unlike standard cron, the first field is seconds (Quartz compatible), but the year field is not supported.",
+    "last_exec_at": "Last Run At",
     "command": "Command",
     "options": {
-      "exec": "Execute Now",
+      "exec": "Run Now",
       "logs": "View Logs"
+    },
+    "monitoring": {
+      "todo": "Not finished yet..."
     },
     "logs": {
       "label": "Logs",
-      "exec_at": "Execution Time",
+      "exec_at": "Run Time",
       "messages": "Messages",
-      "asset_status_check": "Asset status check",
+      "asset_status_check": "Asset Status Check",
       "script_execution": "Script Execution",
       "certificate_renewal": "Certificate Renewal",
-      "no_certificates_to_renew": "No need for certificate renewal",
+      "no_certificates_to_renew": "No certificates to renew",
       "asset_name": "Asset Name",
-      "used_time": "time-consuming",
-      "script": "script",
+      "used_time": "Elapsed",
+      "script": "Script",
       "result": "Result",
       "certificate_name": "Certificate Name",
       "renewed": "Renewed",
       "skipped": "Skipped",
       "reason": "Reason",
-      "clear_confirm_content": "Confirm to clear all logs? This operation cannot be undone."
+      "clear_confirm_content": "Confirm clear all logs? This action cannot be undone."
     },
     "type": {
-      "label": "Type",
       "options": {
         "check_status": "Status Check",
         "exec_command": "Command Execution",
-        "delete_log": "Log Cleanup",
-        "renew_certificate": "Renewal of Certificate"
+        "delete_log": "Log Cleanup"
       }
     },
     "mode": {
@@ -549,159 +497,125 @@
       }
     },
     "tools": {
-      "target": "Target address",
-      "target_placeholder": "Please enter the IP address or domain name.",
-      "attempts": "Times",
-      "attempts_tips": "Set the number of times the request is sent",
-      "port": "Port",
-      "testing": "Start Detection"
-    },
-    "spec_tooltip": "Supports second-level scheduled tasks, different from standard cron expressions, the first field represents seconds (compatible with Quartz expression specifications), but does not support the year field.",
-    "spec_run": "Simulation run",
-    "spec_run_time": "Last ten run times"
+      "target": "Target Address",
+      "target_placeholder": "Please enter IP or domain",
+      "attempts": "Attempts",
+      "attempts_tips": "Set number of requests",
+      "testing": "Start Test"
+    }
   },
   "audit": {
     "client_ip": "Client IP",
-    "user": "User",
-    "protocol": "Protocol",
-    "asset": "Asset",
     "connected_at": "Connected At",
     "disconnected_at": "Disconnected At",
-    "connection_duration": "Connection Duration",
+    "connection_duration": "Duration",
     "recording_size": "Recording Size",
-    "command": "Command",
-    "network": "Network Address",
     "filename": "File Name",
-    "executed_at": "Executed At",
-    "username": "Username",
     "login_at": "Login Time",
     "action": "Action Type",
     "login_status": "Login Status",
     "login_reason": "Failure Reason",
-    "user_agent": "User Agent",
-    "operation": {
-      "label": "Type",
-      "account": "Account",
-      "content": "Details",
-      "status": "Status",
-      "at": "Operation Time",
-      "options": {
-        "user_reset_password": "Reset User Password",
-        "asset_authorised": "Asset Authorization",
-        "user_add": "Create User",
-        "user_update": "Update User",
-        "user_delete": "Delete User",
-        "user_enable": "Enable User",
-        "user_disable": "Disable User",
-        "user_reset_otp": "Reset User Two-Factor Authentication"
-      }
-    },
-    "risk_level": {
-      "label": "Risk Level",
-      "options": {
-        "normal": "Normal",
-        "high_risk": "High-Risk"
-      }
-    },
-    "options": {
-      "monitor": "Monitor",
-      "playback": "Playback",
-      "disconnect": {
-        "action": "Disconnect",
-        "confirm": "Are you sure you want to disconnect this session?"
-      }
-    },
+    "user_agent": "Client",
     "accessLog": {
-      "title": "Access Log",
-      "domain": "Domain name",
-      "user": "user",
-      "method": "Request Method",
       "uri": "Request URI",
-      "statusCode": "Status code",
-      "responseSize": "Response size",
-      "clientIp": "Client IP",
-      "responseTime": "Response time",
+      "statusCode": "Status Code",
+      "responseSize": "Response Size",
+      "responseTime": "Response Time",
       "userAgent": "User-Agent",
       "createdAt": "Request Time",
       "anonymous": "Anonymous",
-      "whitelist": "IP whitelist",
-      "tempPass": "Temporary password",
+      "whitelist": "IP Whitelist",
+      "tempPass": "Temporary Password",
       "deletedUser": "Deleted User",
       "clearConfirmTitle": "Confirm Clear",
-      "clearConfirmContent": "Are you sure you want to clear all access logs? This action cannot be undone.",
+      "clearConfirmContent": "Clear all access logs? This action cannot be undone.",
       "stats": {
-        "selectWebsite": "Choose Website",
+        "title": "Website Access Stats",
+        "selectWebsite": "Select Website",
+        "allWebsites": "All Websites",
         "periods": {
           "today": "Today",
           "yesterday": "Yesterday",
-          "7days": "Last 7 days",
-          "30days": "Last 30 days"
+          "7days": "Last 7 Days",
+          "30days": "Last 30 Days"
         },
         "metrics": {
-          "pv": "PV page views",
-          "uv": "UV visitors",
-          "ip": "Unique IP count",
-          "traffic": "Traffic volume",
-          "requests": "Request Quantity",
-          "avgResponseTime": "Average Response Time"
+          "pv": "PV Page Views",
+          "uv": "UV Visitors",
+          "ip": "Unique IPs",
+          "traffic": "Traffic",
+          "requests": "Requests"
         },
         "realtime": {
-          "title": "Real-time metrics",
+          "title": "Realtime Metrics",
           "currentOnline": "Currently Online",
-          "requestsPerSecond": "requests per second",
-          "realtimeTraffic": "Real-time traffic",
-          "errorRate": "Error rate"
+          "requestsPerSecond": "Requests per second",
+          "realtimeTraffic": "Realtime Traffic",
+          "errorRate": "Error Rate"
         },
         "charts": {
-          "trafficTrend": "Traffic Trends",
-          "hourlyDistribution": "Hourly Visit Distribution",
+          "trafficTrend": "Traffic Trend",
+          "hourlyDistribution": "Hourly Distribution",
           "statusCodeDistribution": "Status Code Distribution",
-          "topPages": "Popular Pages",
-          "topReferers": "Popular Sources"
+          "topPages": "Top Pages",
+          "topReferers": "Top Referrers"
         },
         "table": {
           "pagePath": "Page Path",
-          "pv": "PV\" stands for \"PhotoVoltaic\" in English, which refers to the technology used to convert sunlight directly into electricity. However, without context, it could also mean different things such as \"Page View\" in web analytics. If you need a specific context, please provide more details.",
+          "pv": "PV",
           "uv": "UV",
-          "avgResponseTime": "Average response time",
-          "referer": "Source",
-          "visitCount": "Visit Count",
-          "directAccess": "Direct access"
+          "avgResponseTime": "Average Response Time",
+          "referer": "Referrer",
+          "visitCount": "Visits",
+          "directAccess": "Direct Access"
         },
         "tooltip": {
-          "time": "time",
-          "visitCount": "Visit Count",
-          "statusCode": "Status Code"
+          "time": "Time"
         },
         "statusCodes": {
           "success": "Success (2xx)",
           "redirect": "Redirect (3xx)",
           "clientError": "Client Error (4xx)",
           "serverError": "Server Error (5xx)"
-        },
-        "title": "Website visit statistics",
-        "allWebsites": "Entire website"
+        }
       }
-    }
+    },
+    "operation": {
+      "account": "Account",
+      "at": "Operation Time"
+    },
+    "risk_level": {
+      "label": "Risk Level",
+      "options": {
+        "normal": "Normal Command",
+        "high_risk": "High-risk Command"
+      }
+    },
+    "options": {
+      "playback": "Playback",
+      "disconnect": {
+        "action": "Disconnect",
+        "confirm": "Are you sure you want to disconnect this session?"
+      }
+    },
+    "unknown_protocol": "Unknown protocol: {{protocol}}"
   },
   "access": {
     "settings": {
       "theme": "Theme Settings",
-      "system": "System Settings",
       "font": "Font Settings",
       "font.preview": "Font Preview",
       "terminal": {
-        "font": {
-          "size": "Font Size",
-          "family": "Font Family"
-        },
+        "font": {},
         "line_height": "Line Height",
-        "search_placeholder": "Search terminal content..."
+        "search_placeholder": "Search terminal content...",
+        "font_family": "Font Family",
+        "font_size": "Font Size"
       },
       "mouse": {
-        "label": "Mouse settings",
-        "selection_copy": "Select Copy",
-        "right_click_paste": "Right-click paste"
+        "label": "Mouse Settings",
+        "selection_copy": "Copy on select",
+        "right_click_paste": "Right-click to paste"
       },
       "keyboard": {
         "label": "Keyboard Settings",
@@ -709,209 +623,255 @@
       }
     },
     "batch": {
-      "exec": "Batch Execution",
+      "exec": "Batch Execute",
       "choose_asset": "Choose Assets"
     },
     "session": {
       "share": {
         "action": "Share Session",
-        "cancel": "Cancel Sharing"
+        "cancel": "Cancel Share"
       }
     },
     "clipboard": "Clipboard",
-    "combination_key": "Combination Key",
+    "combination_key": "Key Combination",
     "toggle_full_screen": "Toggle Full Screen",
     "required_auth": "Login Parameters",
-    "reconnect": "Reconnect",
-    "filesystem": "File System",
-    "use": "Use",
     "search": "Search",
+    "snippet_expand": "Click to expand...",
     "guacamole": {
       "error_title": "Connection failed",
-      "code": "Error code",
-      "message": "Error message",
-      "clipboard_required": "Please enter the clipboard content",
+      "code": "Error Code",
+      "message": "Error Message",
+      "clipboard_required": "Please enter clipboard content",
       "clipboard_placeholder": "Paste here..."
     },
     "tabs": {
-      "closeLeft": "Close the left tab",
-      "closeRight": "Close the tab on the right",
-      "closeOthers": "Close other tabs",
-      "closeAll": "Close all tabs",
-      "reconnect": "Reconnect"
+      "closeLeft": "Close Tabs to the Left",
+      "closeRight": "Close Tabs to the Right",
+      "closeOthers": "Close Other Tabs",
+      "closeAll": "Close All Tabs"
     },
     "wol": {
-      "title": "Wake Up Asset",
-      "message": "Asset {{name}} is offline. Do you want to wake it up?",
-      "confirm": "Wake Up",
-      "waking": "Sending wake-up command...",
+      "title": "Wake-on-LAN",
+      "message": "Asset {{name}} is offline. Wake it up?",
+      "confirm": "Wake",
+      "waking": "Sending wake-up signal...",
       "countdown_message": "Waiting for device to start, time remaining:",
-      "seconds": "s",
       "checking": "Checking if asset is online...",
       "online": "Asset Online",
-      "online_desc": "Asset has been successfully woken up and is online. You can connect now.",
+      "online_desc": "Asset has been awakened and is online, you can connect now",
       "offline": "Asset Offline",
-      "offline_desc": "Asset may not have fully started yet. Please retry detection later.",
-      "failed": "Wake-up Failed",
+      "offline_desc": "Asset may not be fully started, please retry later",
+      "failed": "Wake failed",
       "check_now": "Check Now",
       "connect": "Connect Now"
+    },
+    "shell_assistant": {
+      "title": "Shell Assistant",
+      "placeholder": "Describe the shell command you need, e.g., find files larger than 100MB",
+      "use_snippets": "Prefer command snippets",
+      "shortcut_tip": "Enter to send • Shift+Enter for newline",
+      "ask": "Ask",
+      "command_label": "Shell Command",
+      "request_failed": "Request failed",
+      "request_failed_retry": "Request failed, please try again later",
+      "ready_title": "Shell Assistant Ready",
+      "ready_subtitle": "Enter your request, I'll generate a suitable command"
+    },
+    "terminal": {
+      "search": "Search terminal content",
+      "clear": "Clear Screen"
+    },
+    "playback": {
+      "shortcut_space": "Space: Play/Pause",
+      "shortcut_seek": "← →: Seek 10 seconds",
+      "shortcut_fullscreen": "F: Toggle Full Screen",
+      "seek_back": "Back 10 seconds (←)",
+      "play_pause": "Play/Pause (Space)",
+      "seek_forward": "Forward 10 seconds (→)",
+      "mute": "Mute",
+      "unmute": "Unmute",
+      "fullscreen": "Full Screen (F)",
+      "exit_fullscreen": "Exit Full Screen (F)"
     }
   },
   "account": {
-    "my_asset": "My Assets",
     "profile": "Profile",
-    "nickname": "Nickname",
     "logout": "Logout",
-    "language": "Language",
-    "public_key": "Public Key",
     "change": {
-      "info": "Change Personal Information",
+      "info": "Edit Profile",
       "password": "Change Password"
     },
     "access_token": "Access Token",
+    "access_token_create": "Create Token",
+    "access_token_type": "Token Type",
+    "access_token_once_tip": "Token is shown only once. Please keep it safe.",
+    "access_token_type_values": {
+      "session": "Login Session",
+      "api": "API Token",
+      "temporary": "Temporary Token",
+      "db_password": "Database Password"
+    },
+    "client_cert": "Client Certificate",
+    "client_cert_generate": "Generate & Download",
+    "client_cert_regenerate": "Regenerate",
+    "client_cert_revoke": "Revoke",
+    "client_cert_empty": "No client certificate",
+    "client_cert_once_tip": "The certificate can be downloaded only once. If lost, regenerate it.",
+    "client_cert_download_started": "Certificate download started",
+    "client_cert_revoke_confirm": "Revoke the client certificate?",
+    "client_cert_status_active": "Active",
+    "client_cert_status_revoked": "Revoked",
+    "client_cert_fingerprint": "Fingerprint",
+    "client_cert_serial": "Serial Number",
+    "client_cert_not_before": "Valid From",
+    "client_cert_not_after": "Valid Until",
+    "client_cert_last_used": "Last Used",
     "old_password": "Old Password",
-    "new_password": "New Password",
     "confirm_password": "Confirm Password",
-    "submit": "Submit",
-    "regen": "Regenerate",
-    "username": "Username",
-    "password": "Password",
     "captcha": "Captcha",
     "login": {
       "action": "Login",
       "methods": {
-        "passkey": "Authenticate with Passkey",
-        "password": "Authenticate with Password",
-        "otp": "Authenticate with OTP",
-        "wechat_work": "Log in using WeChat Work",
-        "oidc": "Log in using OIDC"
+        "passkey": "Use Passkey",
+        "otp": "Use OTP",
+        "wechat_work": "Sign in with WeCom",
+        "oidc": "Sign in with OIDC"
       },
-      "back": "Go back to the previous step",
+      "back": "Back",
       "processing": "Processing login...",
       "failed": "Login failed",
-      "wechat_work_error": "Enterprise WeChat login failed, please retry",
-      "back_to_login": "Return to the login page"
+      "wechat_work_error": "WeCom login failed, please try again",
+      "back_to_login": "Back to Login"
     },
-    "otp": "Two-Factor Authentication",
-    "next": "Next",
-    "retry": "Retry",
     "passkey": "Passkey",
     "enter": "Please enter",
-    "auth_failed": "Authentication Failed",
-    "otp_bind_title": "You have successfully enabled two-factor authentication",
-    "otp_bind_sub_title": "Multi-factor authentication - secondary authentication - login identity verification, more secure access control.",
-    "otp_unbind": "Disable Multi-Factor Authentication",
-    "otp_unbind_title": "Are you sure you want to disable two-factor authentication?",
-    "otp_unbind_subtitle": "Disabling it may expose your system account to brute-force attacks.",
-    "passkey_add": "Add Passkey",
-    "passkey_add_time": "Add Time",
-    "passkey_used_time": "Last Used",
-    "passkey_delete_title": "Are you sure you want to remove your passkey?",
-    "passkey_delete_content": "Passkeys provide better protection for your account and assets. It is recommended to keep them.",
-    "mfa": "Multi-Factor Authentication",
-    "mfa_authing": "Authenticating...",
-    "mfa_retry": "Retry",
-    "mfa_auth_failed": "Authentication Failed",
-    "mfa_change_way": "Change Authentication Method",
-    "otp_required": "You must enable two-factor authentication before continuing.",
-    "password_expired": "Your password has expired, please change your password.",
-    "no_mfa_title": "Please bind your security verification method first.",
-    "no_mfa_subtitle": "You have not bound any security verification methods, and therefore cannot view sensitive data.",
-    "enable_otp": "Enable OTP Authentication",
-    "enable_passkey": "Enable passkey authentication",
-    "otp_description": "Two-factor authentication (OTP) provides an extra layer of security for your account. Even if your password is compromised, an attacker cannot access your account without your mobile device.",
+    "otp_bind_title": "You have enabled two-factor authentication",
+    "otp_bind_sub_title": "Multi-factor authentication — login identity verification, safer access control.",
+    "otp_unbind": "Disable MFA",
+    "otp_unbind_title": "Are you sure you want to disable MFA?",
+    "otp_unbind_subtitle": "Disabling it may increase the risk of account compromise.",
+    "otp_description": "Two-factor authentication (OTP) provides extra protection for your account. Even if your password is leaked, attackers cannot access your account without your mobile device.",
     "otp_features": {
-      "title": "Function Features",
-      "enhanced_security": "Enhance Security: Add an Extra Layer of Security to the Login Process",
-      "offline_access": "Offline Access: Generate verification codes without an internet connection.",
-      "time_based": "Timeliness: The verification code automatically updates every 30 seconds to ensure security.",
-      "widely_supported": "Widespread support: compatible with various mainstream authentication applications"
+      "title": "Features",
+      "enhanced_security": "Enhanced security: adds an extra security layer to login",
+      "offline_access": "Offline access: generate codes without network connection",
+      "time_based": "Time-based: codes refresh every 30 seconds for security",
+      "widely_supported": "Widely supported: compatible with mainstream authenticator apps"
     },
     "otp_setup_guide": {
       "title": "Setup Guide",
       "step1": {
-        "title": "Step 1: Install the authentication app",
-        "description": "Install any of the following authentication apps on your phone:"
+        "title": "Step 1: Install an authenticator app",
+        "description": "Install any of the following apps on your phone:"
       },
       "step2": {
         "title": "Step 2: Scan the QR code",
-        "description": "Scan the QR code below with your authentication app, or manually enter the key"
+        "description": "Use the authenticator app to scan the QR code below, or enter the key manually"
       },
       "step3": {
-        "title": "Step 3: Enter the verification code",
-        "description": "Enter the 6-digit verification code displayed by the authentication app to complete the binding."
+        "title": "Step 3: Enter the code",
+        "description": "Enter the 6-digit code shown in the authenticator app to complete binding"
       }
     },
-    "otp_apps": {
-      "google_authenticator": "Google Authenticator",
-      "microsoft_authenticator": "Microsoft Authenticator",
-      "authy": "Authy",
-      "1password": "1Password",
-      "lastpass": "LastPass Authenticator"
-    },
-    "otp_manual_setup": "Manual settings",
-    "otp_manual_setup_desc": "If you are unable to scan the QR code, please manually enter the following key in your authentication app:",
-    "otp_verification_code": "Verification code",
-    "otp_verification_placeholder": "Please enter the 6-digit verification code",
-    "otp_backup_codes": {
-      "title": "Backup recovery code",
-      "description": "Please save these backup recovery codes, which you can use to log in when you cannot use your authenticator.",
-      "warning": "Each recovery code can only be used once, please keep it safe."
-    },
-    "otp_binding_title": "Bind two-factor authentication",
-    "otp_scan_qr": "Scan the QR code",
-    "otp_scan_instruction": "Please use the authentication app to scan the QR code above.",
+    "otp_manual_setup": "Manual setup",
+    "otp_manual_setup_desc": "If you can't scan the QR code, enter this key manually in your authenticator app:",
+    "otp_verification_placeholder": "Please enter the 6-digit code",
+    "otp_binding_title": "Bind Two-Factor Authentication",
+    "otp_scan_qr": "Scan QR Code",
+    "otp_scan_instruction": "Please use the authenticator app to scan the QR code above",
     "otp_verification_title": "Verify Binding",
-    "otp_verification_instruction": "Please enter the 6-digit verification code displayed by the authentication app.",
-    "otp_security_tip": "Safety Tips",
-    "otp_security_description": "After successful binding, your account will be protected by two-factor authentication. Please make sure to keep your authentication device safe.",
-    "otp_step3_description": "Enter the verification code to complete the binding",
-    "otp_step2_description": "Scan the QR code with an authentication app",
-    "otp_code_label": "OTP verification code",
-    "select_auth_type": "Please select an identity verification method.",
-    "auth_type_passkey": "Passkey",
-    "auth_type_passkey_desc": "Authenticate using biometrics or a security key",
-    "auth_type_otp": "OTP verification code",
-    "auth_type_otp_desc": "Authenticate using a dynamic verification code",
-    "auth_type_unavailable": "Not enabled"
+    "otp_verification_instruction": "Please enter the 6-digit code from your authenticator app",
+    "otp_security_tip": "Security Tip",
+    "otp_security_description": "After binding, your account will be protected by MFA. Please keep your authenticator device safe.",
+    "otp_step2_description": "Scan the QR code with the authenticator app",
+    "otp_step3_description": "Enter the code to complete binding",
+    "passkey_add": "Add Passkey",
+    "passkey_add_time": "Added At",
+    "passkey_used_time": "Last Used",
+    "passkey_delete_title": "Are you sure you want to remove your passkey?",
+    "passkey_delete_content": "Passkeys provide better protection for your account and assets; it's recommended to keep it.",
+    "mfa": "Multi-Factor Authentication",
+    "mfa_authing": "Authenticating...",
+    "mfa_retry": "Retry",
+    "mfa_auth_failed": "Authentication failed",
+    "mfa_change_way": "Change verification method",
+    "otp_required": "You must enable 2FA to continue",
+    "no_mfa_title": "Please bind a security authentication method",
+    "no_mfa_subtitle": "You haven't bound any security method and cannot view sensitive data.",
+    "enable_otp": "Enable OTP",
+    "enable_passkey": "Enable Passkey",
+    "select_auth_type": "Please select an authentication method",
+    "auth_type_passkey_desc": "Authenticate with biometrics or security key",
+    "auth_type_otp": "OTP Code",
+    "auth_type_otp_desc": "Authenticate using a dynamic code",
+    "auth_type_unavailable": "Unavailable",
+    "oidc_server_authorizations": "OIDC Authorizations",
+    "oidc_server_authorizations_desc": "Manage third-party apps authorized to access your account",
+    "oidc_server_no_authorizations": "You haven't authorized any apps",
+    "oidc_server_scopes": "Authorized Scopes",
+    "oidc_server_revoke": "Revoke Authorization",
+    "oidc_server_authorization_revoke_title": "Confirm Revocation",
+    "oidc_server_authorization_revoke_content": "Are you sure you want to revoke {{clientId}}? It will no longer access your account info.",
+    "oidc_server_authorization_revoked": "Authorization revoked successfully",
+    "oidc_consent": {
+      "title": "Authorization Request",
+      "subtitle": "Please confirm the following authorization info",
+      "current_account": "Current Account",
+      "request_access": "Requests access to your account",
+      "request_access_desc": "This app will be able to perform the following actions on your behalf",
+      "requested_scopes": "Requested Scopes",
+      "scope": {
+        "openid": "Access your basic identity info",
+        "profile": "Access your profile (nickname, username)",
+        "email": "Access your email address",
+        "offline_access": "Offline access to your account",
+        "default": "Access related information"
+      },
+      "warning": "After authorization, {{clientId}} can access the info you selected. You can revoke at any time in account settings.",
+      "load_error": "Failed to load authorization info"
+    },
+    "otp_code_required": "Please enter the code",
+    "otp_code_format": "Code must be 6 digits",
+    "mfa_passkey_prompt": "Please complete Passkey authentication in the browser popup"
   },
   "assets": {
-    "name": "Name",
+    "alias": "Alias",
+    "alias_placeholder": "Only letters, numbers, underscores or hyphens, and start with a letter",
+    "alias_invalid": "Alias must start with a letter and contain only letters, numbers, underscores or hyphens",
+    "alias_tip": "When directly connecting to SSH Server, the alias can be used as the target name.",
     "type": "Type",
     "content": "Content",
-    "status": "Status",
+    "sort": "Sort",
     "group": "Group",
+    "group_tip": "Right-click to edit/delete (except Default group)",
     "width": "Width",
     "height": "Height",
     "passphrase": "Private Key Passphrase",
-    "logo": "Logo",
+    "logo": "Icon",
     "protocol": "Protocol",
     "network": "Network",
     "tags": "Tags",
-    "owner": "Owner",
-    "last_access_at": "Last Access Time",
     "addr": "Network Address",
     "account_type": "Account Type",
     "private_key": "Private Key",
-    "ip": "IP",
-    "port": "Port",
-    "username": "Username",
     "password": "Password",
-    "credential": "Credential",
-    "agent_gateway": "Security Gateway",
-    "ssh_gateway": "SSH Gateway",
-    "gateway_tip": "Only one of Security Gateway and SSH Gateway can be selected. If both are selected, SSH Gateway will be used.",
-    "description": "Description",
+    "gateway_type": "Gateway Type",
+    "no_gateway": "No Gateway",
+    "select_gateway_type": "Please select gateway type",
+    "select_gateway_group": "Please select gateway group",
     "advanced_setting": "Advanced Settings",
-    "socks5_proxy": "Socks5 Proxy",
-    "socks5_proxy_enabled": "Socks5 Proxy",
-    "socks5_proxy_host": "Proxy Server",
-    "socks5_proxy_port": "Proxy Port",
-    "socks5_proxy_username": "Proxy Username",
-    "socks5_proxy_password": "Proxy Password",
     "display_settings": "Display Settings",
     "color_depth": "Color Depth",
-    "force_lossless": "Force Lossless Compression",
+    "force_lossless": "Force Lossless",
+    "resize_method": "Resize Method",
+    "resize_method_extra": "How the RDP server should be updated when the client display size changes.",
+    "resize_methods": {
+      "display_update": "Display Update",
+      "display_update_desc": "Use the RDP 8.1 \"Display Update\" channel to notify the server of display size changes",
+      "reconnect": "Reconnect",
+      "reconnect_desc": "Automatically disconnect and reconnect with the new size when client display size changes"
+    },
     "audio_settings": "Audio Settings",
     "disable_audio": "Disable Audio",
     "enable_audio_input": "Enable Audio Input",
@@ -922,513 +882,543 @@
     "remote_app_dir": "Remote App Directory",
     "remote_app_args": "Remote App Arguments",
     "rdp_drive": "Network Drive",
-    "rdp_enable_drive": "Enable Network Drive",
     "rdp_drive_path": "Local Storage",
-    "rdp_drive_path_extra": "If not selected, the operator's default storage space will be used",
-    "is_share": "Shared",
-    "is_default": "Default",
+    "rdp_drive_path_extra": "If not selected, the operator's default storage will be used",
+    "is_share": "Share",
     "limit_size": "Size Limit",
     "used_size": "Used Size",
+    "target_server": "Target Server",
     "domain": "Domain",
-    "domain_tip": "The domain you use to access protected assets, for example: www.example.com, needs to be resolved to the IP address of this system.",
+    "domain_tip": "The domain used to access protected assets (e.g., www.example.com) must resolve to this system's IP.",
     "scheme": "Asset Protocol",
-    "forward_host_or_ip": "Asset's IP or Domain",
+    "forward_host_or_ip": "Asset IP or Domain",
     "forward_port": "Asset Port",
-    "entrance": "Entrance Path",
-    "entrance_tip": "The entrance path is the address that is automatically opened on first access",
+    "entrance": "Entry Path",
+    "entrance_tip": "Entry path is the page opened automatically on first access",
     "change_group": "Change Group",
+    "change_gateway": "Configure Gateway",
+    "select_agent_gateway": "Please select security gateway",
+    "select_ssh_gateway": "Please select SSH gateway",
     "general": "General",
-    "header": "Header",
-    "custom_header": "Custom Header",
+    "preserve_host": "Preserve Hostname",
+    "preserve_host_tip": "Preserve the Host header as the original request host, instead of the proxy server's host.",
+    "disable_access_log": "Disable Access Log",
+    "disable_access_log_tip": "When enabled, access requests to this website will not be recorded in access logs",
+    "custom_header": "Custom Headers",
+    "custom_header_tip": "You can add multiple headers in the format: Key: Value.",
+    "custom_certificate": "Custom Certificate",
     "header_key": "Key",
     "header_value": "Value",
-    "basic_auth": "Basic Authentication",
-    "basic_auth_enabled": "Asset requires basic authentication",
-    "basic_auth_username": "Username",
-    "basic_auth_password": "Password",
-    "website_tip": "Before using this feature, please ensure that you have enabled the reverse proxy function on the system settings page.",
     "active": "Active",
-    "inactive": "Inactive",
     "access": "Access",
     "import": "Import Assets",
-    "copy": "Copy Assets",
-    "download_sample": "Download Sample",
-    "import_asset_tip": "When importing assets, either account and password or private key and passphrase can be provided. If both are provided, private key and passphrase will be preferred.",
-    "import_asset_success": "Import Assets Successful",
-    "import_asset_error": "Import Assets Failed",
-    "import_asset_error_title": "Please check the imported file. The following assets failed to import:",
-    "bind_user": "Bind User",
-    "bind_user_group": "Bind User Group",
-    "up": "Move Up",
-    "down": "Move Down",
+    "copy": "Copy Asset",
+    "import_asset_tip": "When importing assets, account/password and key/passphrase are mutually exclusive; if both are provided, key/passphrase takes precedence.",
+    "import_asset_success": "Assets imported successfully",
+    "import_asset_error": "Failed to import assets",
+    "import_asset_error_title": "Please check the import file; the following assets failed to import:",
     "copy_public_key": "Copy Public Key",
-    "filesystem": "File System",
-    "website_entrance": "The entrance is the path where users enter the Web Asset.",
-    "conn_test": "Connection Test",
-    "generate_private_key": "Generate private key",
-    "cert": "certificate",
-    "public": "Public access",
-    "limit_ip": "IP Access Restrictions",
-    "limit_ip_tip": "Restrict users to access assets only from specified IP addresses. Supports CIDR format IP addresses, such as: 192.168.1.0/24. Supports hyphen-separated IP addresses, such as: 192.168.1.0-192.168.1.255. Separate multiple IP addresses with commas.",
-    "limit_time_enabled": "Expiration limit",
-    "limit_time": "Expiration time",
-    "limit_password": "Password access restriction",
-    "limit_password_tip": "Only the correct password grants access to assets.",
-    "ungrouped": "Ungrouped",
-    "modify_response_enabled": "Enable response modification",
-    "response_match_url": "Match URL (optional)",
-    "response_match_url_tip": "Only apply modification when response URL matches (supports regex).",
-    "response_match_content_type": "Match Content-Type (optional)",
-    "response_match_content_type_tip": "E.g., text/html, application/json",
-    "modify_rules": "Modification Rules",
-    "modify_type": "Type",
-    "pattern": "Match Pattern",
-    "replacement": "Replacement",
-    "modify_response_tip": "You can define multiple modification rules, applied in order.",
-    "modify_response_compression_support": "Supports automatic decompression and recompression (e.g. gzip, deflate, br).",
-    "preserve_host": "Retain hostname",
-    "custom_certificate": "Custom Certificate",
+    "filesystem": "Filesystem",
+    "conn_test": "Network Connectivity Test",
+    "generate_private_key": "Generate Private Key",
+    "cert": "Certificate",
+    "public": "Public Access",
+    "temp_allow": "Temporary IP Allowlist",
+    "public_tip": "Restriction applies only to anonymous users.",
+    "limit_ip": "IP Access Restriction",
+    "limit_ip_tip": "Restrict users to access assets only from specified IPs. CIDR supported, e.g., 192.168.1.0/24. Dash ranges supported, e.g., 192.168.1.0-192.168.1.255. Multiple IPs separated by commas.",
+    "limit_country": "Country Restriction",
+    "limit_country_tip": "Restrict anonymous access to specified countries; supports Chinese or English names.",
+    "limit_country_placeholder": "E.g., China",
+    "limit_province": "Province/State Restriction",
+    "limit_province_tip": "Restrict anonymous access to specified provinces/states; supports Chinese or English names.",
+    "limit_province_placeholder": "E.g., Guangdong or California",
+    "limit_city": "City Restriction",
+    "limit_city_tip": "Restrict anonymous access to specified cities; supports Chinese or English names.",
+    "limit_city_placeholder": "E.g., Shenzhen or San Francisco",
+    "limit_geo_input_tip": "Press Enter to add a tag; you can add multiple.",
+    "limit_time_enabled": "Expiry Time Restriction",
+    "limit_time": "Expiry Time",
+    "limit_password": "Passcode Access Restriction",
+    "limit_password_tip": "Access asset only with correct passcode.",
+    "temp_allow_enabled": "Temporary IP Allowlist",
+    "temp_allow_duration": "Validity (minutes)",
+    "temp_allow_duration_tip": "After clicking the button, the current IP is allowed for the duration.",
+    "temp_allow_auto_renew": "Auto Renew",
+    "temp_allow_auto_renew_tip": "When enabled, each request extends the validity.",
+    "temp_allow_action": "Allow IP",
+    "temp_allow_success": "IP allowed for {{minutes}} minutes.",
+    "temp_allow_expires": "Expires At",
+    "temp_allow_remaining": "Remaining",
+    "modify_response": "Modify Response",
     "certificates": {
-      "common_name": "Domain name",
-      "certificate": "certificate",
-      "private_key": "Private key",
       "type": "Certificate Type",
       "self_signed": "Self-signed",
-      "issued": "Online Application",
+      "self_signed_tip_title": "Tip: You can replace the root certificate yourself; take effect after restart.",
+      "self_signed_root_ca_cert_path": "Root Certificate Path",
+      "self_signed_root_ca_key_path": "Root Private Key Path",
+      "issued": "Online Request",
       "imported": "Local Import",
-      "not_after": "Expiration Time",
-      "issuer": "Issuing Authority",
-      "issuedStatus": "Status",
-      "issuedPending": "In progress",
-      "issuedSuccess": "Successfully",
-      "issuedFailed": "Failed",
-      "is_default": "Default",
-      "is_default_tooltip": "The default certificate refers to the certificate used when no other certificates match.",
+      "not_after": "Expiry Time",
+      "issuer": "Issuer",
+      "issuedStatus": "Issue Status",
+      "issuedPending": "Issuing",
+      "issuedSuccess": "Issued",
+      "issuedFailed": "Issue Failed",
+      "is_default": "Default Certificate",
+      "is_default_tooltip": "Default certificate is used when no other certificate matches.",
       "set_as_default": "Set as Default",
       "download": "Download Certificate",
+      "download_client": "Download Client Certificate",
       "renew": "Renew Certificate",
-      "renew_confirm": "Confirm certificate renewal?",
-      "renew_confirm_content": "The certificate will be reapplied and updated. Do you want to continue?",
-      "issued_log": "Certificate application log",
-      "self_signed_tip_title": "Tip: You can replace the root certificate yourself, and the change will take effect after a restart.",
-      "self_signed_root_ca_cert_path": "Root certificate file path",
-      "self_signed_root_ca_key_path": "Root certificate private key path",
-      "renew_before": "Renewal lead time",
+      "renew_confirm": "Confirm renew certificate?",
+      "renew_confirm_content": "The certificate will be re-issued and updated. Continue?",
+      "issued_log": "Certificate Request Logs",
+      "renew_before": "Renewal Lead Time",
+      "require_client_auth": "Require Client Certificate",
       "log_viewer": {
-        "title": "Certificate Log Viewer",
         "status": {
-          "realtime": "Real-time reception",
-          "paused": "Suspended",
+          "realtime": "Realtime",
+          "paused": "Paused",
           "auto_scroll_disabled": "Disabled"
         },
         "actions": {
-          "pause": "Pause receiving logs",
-          "resume": "Continue receiving logs",
-          "download": "Download Logs",
-          "clear": "Clear Log",
-          "scroll_to_bottom": "Scroll to the bottom"
+          "pause": "Pause logs",
+          "resume": "Resume logs",
+          "download": "Download logs",
+          "scroll_to_bottom": "Scroll to bottom"
         },
         "stats": {
-          "total_logs": "Log entry",
-          "errors": "error",
-          "warnings": "Warning",
-          "info": "information",
-          "last_update": "Last Updated",
+          "total_logs": "Logs",
+          "warnings": "Warnings",
+          "info": "Info",
+          "last_update": "Last Update",
           "auto_scroll": "Auto Scroll",
-          "no_data": "No log data available",
-          "no_data_desc": "The log will display in real-time during certificate operations."
+          "no_data": "No log data",
+          "no_data_desc": "Logs will be displayed in realtime during certificate operations"
         }
       }
     },
     "dns_providers": {
-      "label": "DNS provider",
-      "set": "Set DNS provider",
-      "remove": "Remove DNS provider",
-      "remove_confirm_title": "Remove DNS Provider Settings",
-      "remove_confirm_content": "Once removed, it will no longer be possible to apply for a certificate.",
-      "type": "Supplier Type",
+      "set": "Set DNS Provider",
+      "remove": "Remove DNS Provider",
+      "remove_confirm_title": "Remove DNS provider settings",
+      "remove_confirm_content": "After removal, certificates cannot be requested",
+      "type": "Provider Type",
       "tencentcloud": "Tencent Cloud",
       "alidns": "Alibaba Cloud",
       "huaweicloud": "Huawei Cloud",
       "cloudflare": "Cloudflare"
     },
-    "dns_provider_config": "DNS provider configuration",
-    "dns_provider_config_tip": "Please fill in the configuration information according to the supplier's requirements.",
-    "modify_response": "Modify Response",
-    "add_rule": "Add Rule",
-    "public_tip": "The restriction only applies to anonymous users.",
-    "group_tip": "Right-click to edit/delete (except for the Default group)",
+    "dns_provider_config": "DNS Provider Config",
     "terminal_settings": "Terminal Settings",
-    "disable_alive_check": "Disable keepalive checks when connecting",
-    "disable_alive_check_extra": "The front-end will periodically send heartbeat packets to maintain an active connection, while the back-end will send requests to the target server and request a response.",
-    "env": "environment variable",
-    "env_placeholder": "Format: name=value, one per line.",
-    "basic_settings": "Basic Settings",
-    "target_server": "Target server",
-    "preserve_host_tip": "It will retain the hostname in the request header as the hostname of the original request, rather than the hostname of the proxy server.",
-    "custom_header_tip": "Multiple custom request headers can be added, in the format: key: value.",
-    "resize_method": "Window adjustment method",
-    "resize_method_extra": "A method for updating the RDP server when the client display width or height changes.",
-    "resize_methods": {
-      "display_update": "Display Update",
-      "display_update_desc": "Use the 'Display Update' channel of RDP 8.1 to notify the server that the client display size has changed",
-      "reconnect": "Reconnect",
-      "reconnect_desc": "Automatically disconnect the RDP session when the client display size changes, and reconnect with the new size."
-    },
-    "disable_detect_os": "Disable operating system auto recognition",
-    "disable_detect_os_extra": "When the asset's Logo is empty, the system will automatically identify the type of operating system of the asset and set an appropriate Logo.",
+    "disable_alive_check": "Disable Keepalive Check",
+    "disable_alive_check_extra": "Frontend sends heartbeats to keep connection alive, and backend requests the target server to respond.",
+    "disable_detect_os": "Disable OS Auto-detection",
+    "disable_detect_os_extra": "When asset logo is empty, the system auto-detects the OS and sets an appropriate logo.",
+    "env": "Environment Variables",
+    "env_placeholder": "Format: name=value per line.",
     "wol": {
-      "settings": "WOL Wake-up Configuration",
-      "enabled": "Enable WOL Wake-up",
-      "mac_addr": "MAC address",
-      "mac_addr_placeholder": "Please enter the MAC address in the format: AA:BB:CC:DD:EE:FF.",
-      "mac_addr_invalid": "MAC address format is incorrect",
+      "settings": "WOL Settings",
+      "enabled": "Enable WOL",
+      "mac_addr": "MAC Address",
+      "mac_addr_placeholder": "Please enter MAC address, format: AA:BB:CC:DD:EE:FF",
+      "mac_addr_invalid": "Invalid MAC address format",
       "broadcast": "Broadcast Address",
-      "broadcast_placeholder": "Please enter the broadcast address, default: 255.255.255.255",
-      "wakeup_delay": "Wake-up delay",
-      "wakeup_delay_placeholder": "Wake-up wait time (seconds)",
-      "wakeup_delay_tooltip": "The time to wait for the device to start after sending the wake-up packet"
+      "broadcast_placeholder": "Please enter broadcast address, default: 255.255.255.255",
+      "wakeup_delay": "Wake Delay",
+      "wakeup_delay_placeholder": "Wait time after wake-up (seconds)",
+      "wakeup_delay_tooltip": "Time to wait after sending wake packet"
     },
     "security": {
-      "settings": "Safety Certification",
-      "mode": "Safe Mode",
-      "mode_extra": "The security mode used by RDP connections determines the data encryption method and authentication type.",
-      "ignore_cert": "Ignore certificate validation",
-      "ignore_cert_extra": "Ignore the certificate returned by the server, even if the certificate cannot be verified (such as a self-signed certificate).",
-      "cert_tofu": "First Trust Certificate",
-      "cert_tofu_extra": "Enable the \"Trust On First Use\" (TOFU) policy for FreeRDP, which trusts unknown certificates on the first connection.",
-      "cert_fingerprints": "Certificate Fingerprint",
-      "cert_fingerprints_extra": "A list of certificate fingerprints and hash combinations separated by commas, which will be used to verify the server's certificate upon connection.",
-      "cert_fingerprints_placeholder": "For example: sha256:1234567890abcdef...",
-      "disable_auth": "Disabled Authentication",
-      "disable_auth_extra": "Disable authentication when connecting (does not affect login authentication in Remote Desktop sessions).",
+      "settings": "Security Authentication",
+      "mode": "Security Mode",
+      "mode_extra": "Security mode for RDP connection, determines encryption and auth type.",
+      "ignore_cert": "Ignore Certificate Validation",
+      "ignore_cert_extra": "Ignore server certificate even if invalid (e.g., self-signed).",
+      "cert_tofu": "Trust On First Use",
+      "cert_tofu_extra": "Enable FreeRDP TOFU policy: trust unknown certificates on first use.",
+      "cert_fingerprints": "Certificate Fingerprints",
+      "cert_fingerprints_extra": "Comma-separated list of certificate fingerprints and hashes; server cert will be verified.",
+      "cert_fingerprints_placeholder": "e.g., sha256:1234567890abcdef...",
+      "disable_auth": "Disable Authentication",
+      "disable_auth_extra": "Disable authentication during connection (does not affect login within remote desktop session).",
       "modes": {
-        "any": "Auto Select",
-        "any_desc": "Automatically select a secure mode based on security protocols supported by the client and server (default)",
+        "any": "Auto",
+        "any_desc": "Automatically choose based on client and server supported security protocols (default)",
         "nla": "Network Level Authentication (NLA)",
-        "nla_desc": "Using TLS encryption requires providing a username and password in advance.",
-        "nla_ext": "Expand network-level identity authentication",
-        "nla_ext_desc": "Same as NLA, but requires the server to send an additional 'early user authorization result'",
-        "tls": "TLS authentication",
-        "tls_desc": "RDP authentication and encryption through TLS, mainly used for load balancing configuration",
-        "vmconnect": "VMConnect mode",
-        "vmconnect_desc": "Automatically select safe mode, but only for protocols supported by Hyper-V/VMConnect",
-        "rdp": "Traditional RDP encryption",
-        "rdp_desc": "Traditional RDP encryption mode, commonly used for older Windows servers"
+        "nla_desc": "Use TLS encryption; requires username and password",
+        "nla_ext": "Extended NLA",
+        "nla_ext_desc": "Same as NLA, but requires server to send additional \"early user authorization result\"",
+        "tls": "TLS Authentication",
+        "tls_desc": "RDP authentication and encryption via TLS, mainly for load balancer setups",
+        "vmconnect": "VMConnect Mode",
+        "vmconnect_desc": "Auto select security mode, limited to Hyper-V/VMConnect supported protocols",
+        "rdp": "Legacy RDP Encryption",
+        "rdp_desc": "Legacy RDP encryption mode, typically for older Windows servers"
       }
     },
-    "sort": "Sort",
-    "disable_access_log": "Disable access logs",
-    "disable_access_log_tip": "When enabled, access requests to this website will not be recorded in the access log.",
-    "gateway_type": "Gateway Type",
-    "no_gateway": "Do not use a gateway",
-    "gateway_group": "Gateway Group",
-    "select_gateway_type": "Please select the gateway type.",
-    "select_gateway_group": "Please select a gateway group.",
-    "change_gateway": "Configure gateway",
-    "select_agent_gateway": "Please select a security gateway.",
-    "select_ssh_gateway": "Please select an SSH gateway."
+    "website_response_modify": {
+      "save_success": "Save successful",
+      "save_success_desc": "HTTP response modification rules saved successfully",
+      "save_failed": "Save failed, please try again",
+      "header_key_required": "Please enter key",
+      "header_value_required": "Please enter value",
+      "rule_name_required": "Please enter rule name",
+      "rule_name_placeholder": "Rule name",
+      "match_conditions": "Match Conditions",
+      "match_path": "Request Path",
+      "match_path_tip": "Path to match, e.g., /api/data (empty matches all paths)",
+      "match_method": "Request Method",
+      "match_method_tip": "HTTP method to match (empty matches all methods)",
+      "match_method_placeholder": "Select request method",
+      "match_status": "Response Status Code",
+      "match_status_tip": "HTTP status code to match, e.g., 200, 404 (0 matches all status codes)",
+      "actions_title": "Modification Actions",
+      "header_operations": "Header Operations",
+      "set_headers_label": "Set Headers",
+      "set_headers_tip": "Set or override response headers",
+      "add_headers_label": "Add Headers",
+      "add_headers_tip": "Add response headers (if not exist)",
+      "add_set_headers": "Add Set Header",
+      "add_add_headers": "Add Add Header",
+      "remove_headers_label": "Remove Headers",
+      "remove_headers_tip": "Response headers to remove (header names only)",
+      "remove_header_name_required": "Please enter header name",
+      "remove_header_name_placeholder": "Header name to remove",
+      "add_remove_header_button": "Add header to remove",
+      "body_replace_title": "Body Replacement",
+      "replace_rule_title": "Replace Rule {{index}}",
+      "search_text_label": "Search Text",
+      "search_text_required": "Please enter search text",
+      "search_text_placeholder": "Text to search",
+      "use_regex_label": "Use Regular Expression",
+      "use_regex_tip": "Whether to treat search text as a regex",
+      "replace_text_label": "Replacement Text",
+      "replace_text_required": "Please enter replacement text",
+      "replace_text_placeholder": "Replace with this text",
+      "add_replace_rule": "Add Replace Rule",
+      "add_modify_rule": "Add Modification Rule"
+    },
+    "snippet": {
+      "visibility": "Visibility",
+      "visibility_public": "Public",
+      "visibility_private": "Private"
+    },
+    "website_load_failed": "Failed to load website data"
+  },
+  "websites": {
+    "group_tip": "Drag to reorder",
+    "add_group": "Add Group",
+    "edit_group": "Edit Group",
+    "group_name_required": "Group name is required"
+  },
+  "gateway_group": {
+    "name": "Group Name",
+    "name_placeholder": "Please enter group name",
+    "description_placeholder": "Please enter description",
+    "selection_mode": "Selection Mode",
+    "mode_priority": "Priority Mode",
+    "mode_latency": "Latency Mode",
+    "mode_random": "Random Mode",
+    "members": "Gateway Members",
+    "member": "Member",
+    "add_member": "Add Gateway Member",
+    "priority_tooltip": "Smaller number means higher priority",
+    "create": "Create Gateway Group",
+    "edit": "Edit Gateway Group"
   },
   "gateways": {
-    "name": "Name",
     "port": "Port",
-    "os": "OS",
-    "arch": "Arch",
-    "status": "Status",
     "version": "Version",
-    "connected": "Connected",
-    "disconnected": "Disconnected",
-    "register-agent-gateway": "Register Security Gateway",
-    "rpc-addr": "RPC Address",
-    "download-addr": "Download Address",
+    "config_mode": "Config Mode",
+    "config_mode_direct": "Direct Config",
+    "config_mode_credential": "Use Credential",
+    "config_mode_asset": "Use Asset",
+    "ssh_asset": "SSH Asset",
     "username": "Username",
     "account_type": {},
-    "endpoint": "Endpoint",
-    "token": "Token",
-    "select_token": "Please select a token",
-    "token_manage": "Token Management",
-    "online": "Online",
-    "offline": "Offline",
     "register": "Register",
-    "free_limit_tip": "Free edition can register only 1 security gateway. Upgrade to unlock more.",
+    "free_limit_tip": "Free edition supports only 1 security gateway. Upgrade for more.",
+    "token_manage": "Token Management",
+    "install_shell": "Install Script",
+    "download_binary": "Download Binary",
     "stat": {
-      "label": "statistical data",
-      "uptime": "Run time",
-      "cpu": "Processor",
+      "uptime": "Uptime",
+      "cpu": "CPU",
       "memory": "Memory",
-      "disk": "disk",
-      "disk_io": "Disk I/O",
-      "network": "network",
+      "disk": "Disk",
       "network_io": "Network I/O",
       "load": "Load",
-      "host": "Host machine",
-      "process": "process",
-      "system": "System",
-      "model": "model number",
-      "logical_cores": "Logical core",
-      "physical_cores": "Physical core",
-      "percent": "Usage Rate",
-      "total": "Total size",
+      "model": "Model",
+      "logical_cores": "Logical Cores",
+      "physical_cores": "Physical Cores",
+      "percent": "Usage",
+      "total": "Total",
       "used": "Used",
-      "connections": "Network connection",
-      "tcp_states": "TCP connection status",
-      "ping": "Network latency",
-      "external_ip": "External IP",
-      "internal_ips": "Internal network IP"
-    },
-    "install_shell": "Installation script",
-    "download_binary": "Download binary file",
-    "install_service": "Install service",
-    "install_service_admin": "Install service (Open CMD with administrator privileges)",
-    "start_service": "Start service",
-    "ssh_status": {
-      "disconnected": "Not Connected",
-      "connecting": "Connecting",
-      "connected": "Connected",
-      "error": "Connection failed"
+      "ping": "Latency",
+      "system_version": "System Version",
+      "available": "Available",
+      "free": "Free",
+      "swap": "Swap"
     },
     "load": {
-      "normal": "System idle",
-      "moderate": "Lightly busy",
-      "busy": "Resource紧张\" should be translated as \"Resource strain\" or \"Tight resources\". However, the most accurate and commonly used translation is:\n\n\"Tight resources"
+      "normal": "System Idle",
+      "moderate": "Moderately Busy",
+      "busy": "Resource Constrained"
     },
-    "sort": "Sorting",
-    "sort_success": "Sorting successful",
     "add_token": "Add Token",
     "edit_token_remark": "Edit Token Remark",
-    "method_auto": "Method 1: Automatic Installation (Recommended)",
-    "method_manual": "Method 2: Manual Installation",
-    "run_register_command": "Run register command (Automatically install and start service)",
-    "run_register_command_admin": "Run register command (Open CMD with administrator privileges)",
-    "register_tip": "This command will automatically generate configuration file, install and start the system service",
-    "config_mode": "Configuration Mode",
-    "config_mode_direct": "Direct configuration",
-    "config_mode_credential": "Citation credentials",
-    "config_mode_asset": "Referenced asset",
-    "ssh_asset": "SSH assets"
+    "monitor": {
+      "title": "Gateway Monitor",
+      "system_info": "System Info",
+      "load_1m": "Load (1 min)",
+      "load_5m": "Load (5 min)",
+      "load_15m": "Load (15 min)",
+      "disk_io_rate": "Disk I/O Rate",
+      "network_io_rate": "Network I/O Rate",
+      "total_traffic": "Total Traffic",
+      "ip_address": "IP Address",
+      "external": "External",
+      "internal": "Internal",
+      "items": "items",
+      "collection_errors": "Collection Errors",
+      "action": "Monitor"
+    },
+    "register_title": "Register Gateway",
+    "server_address": "Server Address",
+    "register_token": "Register Token",
+    "register_token_placeholder": "Please select register token",
+    "install_auto": "Automatic Install",
+    "install_manual": "Manual Install",
+    "install_step_rename": "Rename and add execute permission",
+    "install_step_rename_windows": "Rename file",
+    "install_step_register": "Run registration command",
+    "install_step_register_admin": "Run registration command as administrator",
+    "install_windows_service_tip": "After registration, it will be installed as a Windows service and started automatically",
+    "install_system_service_tip": "After registration, it will be installed as a system service and started automatically"
   },
   "settings": {
     "system": {
-      "setting": "System Settings",
       "name": "System Name",
       "logo": "System Logo",
-      "copyright": "System Copyright",
-      "icp": "ICP License",
-      "login": {
-        "background_color": "Login Background Color",
-        "background_image": "Login Background Image"
-      },
+      "copyright": "Copyright",
+      "icp": "ICP Filing No.",
       "ip": {
-        "extractor": "IP Address Extraction Method",
-        "extractor_direct": "Network Address",
-        "trust_list": "Trusted IP Addresses (CIDR format)",
-        "trust_placeholder": "Press Enter to confirm after input",
-        "trust_error": "Please enter a valid CIDR format. For example: 192.168.1.0/24"
+        "extractor": "IP Address Extraction",
+        "trust_list": "Trusted IPs (CIDR)",
+        "trust_placeholder": "Press Enter to confirm"
       },
       "watermark": {
-        "setting": "Watermark Settings",
-        "status": "Watermark Status",
+        "setting": "Access Watermark",
         "content": "Watermark Content",
-        "append": {
-          "user": "Append User to Watermark",
-          "asset": "Append Asset to Watermark"
-        },
-        "font": {
-          "color": "Watermark Font Color",
-          "size": "Watermark Font Size"
-        }
+        "append": {},
+        "font": {},
+        "append_user": "Append User",
+        "append_asset": "Append Asset",
+        "font_color": "Font Color",
+        "font_size": "Font Size",
+        "size_small": "Small",
+        "size_medium": "Medium",
+        "size_large": "Large",
+        "size_xlarge": "Extra Large"
       },
-      "access": {
-        "max_idle_second": "Maximum Idle Time for Terminal Access",
-        "second": "Seconds"
-      }
+      "basic_info_title": "Basic Info"
     },
     "security": {
       "setting": "Security Settings",
       "protection": "Login Protection",
       "captcha": "Captcha",
-      "force_otp": "Force Multi-Factor Authentication",
-      "access_require_mfa": "Access to Assets Requires Multi-Factor Authentication",
+      "force_otp": "Force MFA",
+      "access_require_mfa": "MFA required for asset access",
+      "access_mfa_expires_at": "Asset access MFA validity",
+      "disable_password_login": "Disable password login",
       "devices": "Devices",
-      "minute": "Minutes",
       "session": {
-        "duration": "Session Duration",
-        "count_custom": "Custom Session Count",
-        "count_limit": "Session Count Limit"
+        "duration": "Session duration",
+        "count_custom": "Custom max sessions",
+        "count_limit": "Session limit"
       },
+      "client_cert_valid_days": "Client certificate validity",
       "password": {
         "complexity": "Password Complexity",
         "recommend": "Recommended",
-        "customize": "Customize",
-        "expiration_period": "Password Expiration Period",
+        "customize": "Custom",
+        "expiration_period": "Password Expiration",
         "too_short": "Password length cannot be less than",
-        "too_simple": "Password must contain at least ? types of characters: uppercase letters, lowercase letters, numbers, special characters",
+        "too_simple": "Password must contain at least {{count}} of uppercase, lowercase, numbers, special characters",
         "cannot_contain_username": "Password cannot contain username",
         "cannot_be_palindrome": "Password cannot be a palindrome",
         "cannot_be_weak": "Weak passwords are not allowed",
-        "character": "Characters",
-        "type": "Type"
+        "character": "characters"
       },
       "login_lock": {
         "setting": "Login Lock",
-        "tip": "When enabled, after consecutive login failures within a specified time, the account or IP will be locked. To unlock, please visit",
-        "enabled": "Login Failure Lock",
-        "failed_duration": "Login Failure Statistics Duration",
-        "failed_times": "Login Failure Statistics Count",
-        "account_duration": "Account Lock Duration",
-        "ip_duration": "IP Lock Duration"
+        "tip": "When enabled, continuous failures within the specified time will lock account or IP. To lift the restriction, please visit",
+        "enabled": "Lock on login failures",
+        "failed_duration": "Failure count window",
+        "failed_times": "Failure count",
+        "account_duration": "Account lock duration",
+        "ip_duration": "IP lock duration"
       },
       "passkey": {
-        "setting": "Passkey Login Settings",
-        "enabled": "Passkey Login",
-        "domain": "External Access Domain",
-        "origins": "Allowed Origins for Passkey",
-        "origins_tip": "Do not include trailing /",
-        "origins_error": "Please enter a valid URL"
+        "enabled": "Passkey login",
+        "domain": "External access domain",
+        "origins": "Allowed origins for passkey",
+        "origins_tip": "Do not end with /"
       },
-      "disable_password_login": "Disable password login",
-      "access_mfa_expires_at": "Effective duration of multi-factor authentication for connected assets"
+      "session_management": "Session Management"
     },
     "sshd": {
       "setting": "SSH Proxy Server",
-      "tip": "When enabled, a local port will be listened on, allowing access to authorized SSH assets using an SSH client with the same account and password as this system.",
+      "tip": "When enabled, a local port will be listened on. You can use an SSH client to access authorized SSH assets with the same account and password as this system.",
       "enabled": "SSH Service",
       "addr": "Listen Address",
-      "private_key": "Authentication Private Key",
-      "generate_private_key": "Generate Private Key",
+      "private_key": "Auth Private Key",
+      "private_key_button": "Set Private Key",
+      "private_key_status_set": "Set",
+      "private_key_status_empty": "Not set",
+      "private_key_modal_title": "Set SSH Private Key",
+      "private_key_modal_tip": "Generate or paste your private key.",
       "port_forwarding": {
         "enabled": "Enable Tunneling",
-        "host_port": "Allowed Tunnel Forwarding IP and Port"
+        "host_port": "Allowed tunnel forwarding IP/ports"
       },
-      "usage": "Usage",
-      "mode_proxy": "Proxy",
-      "mode_direct": "Direct Connection",
-      "disable_password_auth": "Disable password authentication",
-      "direct_proxy": "Direct Connection Mode"
-    },
-    "rp": {
-      "setting": "Reverse Proxy Server",
-      "tip": "When enabled, a local port will be listened on, allowing mapping of http/https services to this machine.",
-      "enabled": "Reverse Proxy Service",
-      "addr": "Listen Address",
-      "redirect_to_https": "Automatically Redirect to HTTPS",
-      "auto_tls": "Automatically Apply for HTTPS Certificate",
-      "cert": "Certificate",
-      "cert_key": "Certificate Private Key",
-      "self_proxy": "Proxy Self System",
-      "domain": "Domain",
-      "system_root": "System Root Path",
-      "system_root_extra": "When accessing the reverse proxy website, it needs to verify if the current logged-in user has permission, and will redirect to the system's authorization page. This configuration item is the root URL path of your current login."
+      "usage": "Usage Example",
+      "mode_proxy": "Proxy Mode",
+      "direct_proxy": "Direct Mode",
+      "disable_password_auth": "Disable password auth"
     },
     "rdp": {
       "setting": "RDP Settings",
       "enable": {
         "wallpaper": "Enable Wallpaper",
-        "theming": "Enable Theming",
+        "theming": "Enable Themes",
         "font_smoothing": "Enable Font Smoothing",
-        "full_window_drag": "Enable Full Window Drag",
+        "full_window_drag": "Enable Window Drag",
         "desktop_composition": "Enable Desktop Composition",
         "menu_animations": "Enable Menu Animations"
       },
       "disable": {
         "bitmap_caching": "Disable Bitmap Caching",
-        "offscreen_caching": "Disable Offscreen Caching"
+        "offscreen_caching": "Disable Off-screen Caching"
       }
     },
     "vnc": {
       "setting": "VNC Settings",
       "cursor": {
         "setting": "Cursor Settings",
-        "local": "Local",
         "remote": "Remote"
       },
-      "swap_red_blue": "Swap Red and Blue",
-      "color_depth": "Color Depth"
+      "swap_red_blue": "Swap Red/Blue"
     },
     "mail": {
       "setting": "Email Settings",
       "enabled": "Email Service",
-      "host": "Email Server",
-      "port": "Email Port",
-      "username": "Email Account",
-      "from": "Email Sender",
-      "password": "Email Password",
-      "tip": "You need to enable email service to send test emails.",
+      "host": "Mail Server",
+      "port": "Mail Port",
+      "username": "Mail Account",
+      "from": "Sender",
+      "password": "Mail Password",
+      "tip": "You need to enable email before sending test email.",
       "mail": "Email Address",
-      "title": "Email Title",
-      "content": "Email Content",
+      "title": "Email Subject",
+      "content": "Email Body",
       "send": "Send Email"
     },
+    "webauthn": {
+      "setting": "WebAuthn"
+    },
     "ldap": {
-      "setting": "LDAP Authentication",
+      "setting": "LDAP Auth",
       "tip": "When enabled, LDAP will be used for user authentication.",
       "url": "LDAP URL",
       "user": "LDAP User",
       "password": "LDAP Password",
       "base_dn": "LDAP Base DN",
-      "filter": "LDAP Filter",
       "user_search": {
-        "size_limit": "LDAP Maximum Search Results",
-        "size_limit_tooltip": "LDAP maximum search results, 0 means no limit.",
-        "filter": "LDAP User Search Filter",
-        "filter_tooltip": "LDAP user search filter, for example: (objectClass=person)."
+        "size_limit": "LDAP max results",
+        "size_limit_tooltip": "LDAP max search results, 0 means unlimited.",
+        "filter": "LDAP user search filter",
+        "filter_tooltip": "LDAP user search filter, e.g., (objectClass=person)."
       },
-      "user_property_mapping": "LDAP User Property Mapping"
+      "user_property_mapping": "LDAP user attribute mapping"
+    },
+    "wechat_work": {
+      "setting": "WeCom Auth",
+      "tip": "When enabled, users can log in via WeCom QR code.",
+      "enabled": "Enable WeCom login",
+      "corp_id": "Corp ID",
+      "corp_id_placeholder": "Please enter WeCom Corp ID",
+      "agent_id": "App ID",
+      "agent_id_placeholder": "Please enter WeCom App ID",
+      "secret": "App Secret",
+      "redirect_uri_placeholder": "https://your-domain.com/wechat-work/callback"
+    },
+    "oidc": {
+      "setting": "OIDC Auth",
+      "tip": "When enabled, users can log in with an OIDC identity provider.",
+      "enabled": "Enable OIDC login",
+      "issuer": "Issuer",
+      "issuer_placeholder": "Please enter OIDC Issuer URL",
+      "client_id": "Client ID",
+      "client_id_placeholder": "Please enter OIDC Client ID",
+      "client_secret": "Client Secret",
+      "redirect_uri_placeholder": "https://your-domain.com/oidc/callback",
+      "scopes": "Scopes",
+      "scopes_placeholder": "Please enter scopes, separated by spaces, e.g., openid profile email",
+      "department": "Default Department",
+      "department_placeholder": "Please select default department"
     },
     "log": {
       "setting": "Log Settings",
-      "recording": {
-        "enabled": "Recording Status"
-      },
       "session": {
-        "saved_limit_days": "Session Save Limit"
+        "saved_limit_days": "Session retention days"
       },
       "login_log": {
-        "saved_limit_days": "Login Log Save Limit"
+        "saved_limit_days": "Login log retention days"
       },
       "cron_log": {
-        "saved_limit_days": "Scheduled Task Log Save Limit"
+        "saved_limit_days": "Scheduled task log retention days"
       },
       "access_log": {
-        "saved_limit_days": "Access log retention limit"
+        "saved_limit_days": "Access log retention days"
       }
     },
     "backup": {
-      "setting": "Backup and Recovery",
-      "tip": "When recovering data, if there are users with the same login account, the data in the original system will be retained. Additionally, since login passwords are irreversibly encrypted, the recovered account passwords will be randomly generated.",
-      "recovery": "Recover Backup"
+      "setting": "Backup \u0026 Restore",
+      "tip": "When restoring data, if users with the same login account exist, the original system data will be kept. Since passwords are irreversible, restored account passwords will be random.",
+      "recovery": "Restore Backup",
+      "restore_success": "Restore successful"
     },
     "license": {
       "setting": "License",
-      "device": "Device Information",
+      "device": "Device Info",
       "machine_id": "Machine ID",
       "import": "Import License",
       "request": "Update License",
       "binding": "Bind License",
-      "info": "License Information",
+      "info": "License Info",
       "max": {
-        "asset_count": "Maximum Asset Count",
-        "concurrent_count": "Maximum Concurrent Count",
-        "user_count": "Maximum User Count"
+        "asset_count": "Max Asset Count",
+        "database_count": "Max Database Count",
+        "concurrent_count": "Max Concurrent",
+        "user_count": "Max User Count"
       },
-      "expired_at": "License Expiration Time",
-      "no_limit": "No Limit",
+      "expired_at": "License Expiry",
       "type": {
         "label": "License Type",
-        "options": {
-          "test": "Trial Version",
-          "premium": "Premium Version",
-          "enterprise": "Enterprise Version",
-          "free": "Free version"
-        }
+        "options": {},
+        "free": "Free",
+        "test": "Trial Pro",
+        "premium": "Pro",
+        "enterprise": "Enterprise"
       },
-      "func_disabled": "This function is not enabled for your current license.",
       "restricted": {
-        "label": "Access restricted",
-        "content": "Your license does not support this feature.",
-        "pay": "Buy now"
-      },
-      "test_warning": "You are currently on a Professional version trial, which expires on"
+        "label": "Restricted Access",
+        "content": "Current license doesn't support this feature.",
+        "pay": "Buy Now"
+      }
     },
     "logo": {
       "setting": "Asset Logo",
@@ -1439,124 +1429,127 @@
       "setting": "About",
       "current_version": "Current Version",
       "latest_version": "Latest Version",
-      "update_content": "Update Content",
+      "update_content": "Update Notes",
       "upgrade": {
         "action": "Update Now",
         "title": "Upgrade System",
         "content": "Are you sure you want to upgrade the system version?",
-        "success": "Update Successful",
-        "success_content": "Update successful. Do you want to refresh the page now?",
-        "failed": "Update failed"
+        "failed": "Update failed",
+        "success": "Update successful",
+        "success_content": "Update successful. Refresh now?"
       }
     },
-    "identity": {
-      "setting": "Identity"
+    "llm": {
+      "title": "LLM Settings",
+      "base_config": "Base Config",
+      "enable": "Enable LLM",
+      "api_key": "API Key",
+      "api_key_placeholder": "Enter your API Key",
+      "api_key_required": "Please enter API Key",
+      "base_url": "Base URL",
+      "base_url_required": "Please enter Base URL",
+      "proxy_url": "Proxy",
+      "proxy_url_placeholder": "E.g., http://127.0.0.1:7890",
+      "model": "Model",
+      "model_required": "Please enter model name",
+      "temperature": "Temperature",
+      "max_tokens": "Max Tokens",
+      "shell_config": "Shell Assistant Config",
+      "shell_enable": "Enable Shell Assistant",
+      "shell_prompt": "Shell Assistant Prompt",
+      "shell_prompt_placeholder": "Enter shell assistant prompt...",
+      "shell_prompt_default": "You are an IT operations assistant responsible for converting user requests directly into Linux shell commands.\n\nRules:\n\n1. **Output commands only**, no explanations, no Markdown, no extra text.\n2. If multiple ways exist, output the most common and safe one.\n3. Use Bash syntax compatible with common distros like Ubuntu/Debian/CentOS.\n4. For dangerous operations (e.g., `rm -rf /`, `:(){:|:\u0026};:`), output: \"This operation is risky, please proceed with caution\".\n5. If the user input is incomplete, auto-complete to the most common reasonable full command.",
+      "audit_prompt_default": "You are a professional system audit assistant. Please analyze the provided logs, operation records, or system information and give professional audit advice.\n\nAnalysis focus:\n1. Security risk identification\n2. Abnormal behavior detection\n3. Compliance checks\n4. Performance issue analysis\n5. Recommendations and improvements\n\nPlease analyze the information comprehensively and provide a detailed audit report."
     },
-    "webauthn": {
-      "setting": "WebAuthn"
+    "oidc_server": {
+      "description": "Configure OIDC Server to make Next Terminal an OpenID Connect provider, allowing other apps to use this system for SSO.",
+      "manage_tip_prefix": "After enabling, you can manage apps in \"",
+      "manage_link": "Identity - OIDC Clients",
+      "manage_tip_suffix": "\".",
+      "endpoints_title": "Standard Endpoints:",
+      "endpoint": {
+        "discovery": "Discovery",
+        "jwks": "JWKS",
+        "authorization": "Authorization",
+        "token": "Token",
+        "userinfo": "UserInfo"
+      },
+      "enable_label": "Enable OIDC Server",
+      "issuer_label": "Issuer URL",
+      "issuer_tooltip": "OIDC issuer identifier, usually Next Terminal access address + /api",
+      "issuer_required": "Please enter Issuer URL",
+      "ttl_required": "Please enter validity",
+      "access_token_ttl_label": "Access Token TTL (seconds)",
+      "access_token_ttl_tooltip": "Access Token validity, default 3600 seconds (1 hour)",
+      "refresh_token_ttl_label": "Refresh Token TTL (seconds)",
+      "refresh_token_ttl_tooltip": "Refresh Token validity, default 604800 seconds (7 days)",
+      "id_token_ttl_label": "ID Token TTL (seconds)",
+      "id_token_ttl_tooltip": "ID Token validity, default 3600 seconds (1 hour)",
+      "auth_code_ttl_label": "Authorization Code TTL (seconds)",
+      "auth_code_ttl_tooltip": "Authorization code validity, default 600 seconds (10 minutes)"
     },
-    "wechat_work": {
-      "setting": "Enterprise WeChat Verification",
-      "tip": "After activation, users can scan the QR code with Enterprise WeChat to log in to the system.",
-      "enabled": "Enable WeChat Work Login",
-      "corp_id": "Enterprise ID",
-      "corp_id_placeholder": "Please enter the Enterprise WeChat Enterprise ID",
-      "agent_id": "Application ID",
-      "agent_id_placeholder": "Please enter the Enterprise WeChat application ID.",
-      "secret": "Apply Secret",
-      "redirect_uri": "Callback URL",
-      "redirect_uri_placeholder": "https://your-domain.com/wechat-work/callback",
-      "department": "Default Department",
-      "department_placeholder": "Please select the user's default department"
+    "identity_methods": "Authentication Methods",
+    "identity_source": {
+      "setting": "Identity Service"
     },
-    "oidc": {
-      "setting": "OIDC Authentication",
-      "tip": "After enabling, users can log in to the system using an OIDC identity provider.",
-      "enabled": "Enable OIDC Login",
-      "issuer": "Identity provider address",
-      "issuer_placeholder": "Please enter the Issuer URL of the OIDC identity provider",
-      "client_id": "Client ID",
-      "client_id_placeholder": "Please enter the OIDC client ID.",
-      "client_secret": "Client Key",
-      "redirect_uri": "Callback Address",
-      "redirect_uri_placeholder": "https://your-domain.com/oidc/callback",
-      "scopes": "Scope of authority",
-      "scopes_placeholder": "Please enter the scope of permissions, multiple ones separated by spaces, such as: openid profile email",
-      "department": "Default Department",
-      "department_placeholder": "Please select the user's default department"
+    "network": {
+      "setting": "Network Settings",
+      "not_detected": "Not Detected",
+      "trust_ip_tip": "Configure trusted proxy IPs, CIDR supported"
     }
   },
-  "errors": {
-    "1000": "Invalid token",
-    "1001": "Setup required",
-    "10000": "Record not found",
-    "10001": "Name already exists",
-    "10002": "Invalid parameter",
-    "10003": "You cannot operate on your own account",
-    "10004": "Incorrect account or password",
-    "10005": "Account is disabled",
-    "10006": "Incorrect captcha",
-    "10007": "Too many login failures",
-    "10008": "Two-factor authentication code required",
-    "10009": "Incorrect two-factor authentication code",
-    "10010": "Your IP address is not allowed to log in",
-    "10011": "Login not allowed at this time",
-    "10012": "Email configuration is incomplete",
-    "10013": "Default data cannot be deleted",
-    "10014": "Permission denied",
-    "10015": "Not SSH protocol",
-    "10016": "Unsupported protocol",
-    "10017": "Session closed",
-    "10018": "File system disabled",
-    "10019": "Website not found",
-    "10020": "Website disabled",
-    "10021": "Incorrect original password",
-    "20000": "Failed to obtain license",
-    "20001": "The current system does not match your bound machine code. Please replace it promptly.",
-    "20002": "Your license has expired. Please renew.",
-    "20003": "Your online sessions exceed the license limit.",
-    "20004": "Your user count exceeds the license limit.",
-    "20005": "Your asset count exceeds the license limit.",
-    "30000": "Gateway is not online",
-    "30001": "Tunnel does not exist",
-    "40000": "Reverse proxy is disabled",
-    "40001": "Failed to import assets",
-    "50000": "System is under attack",
-    "50001": "System passkey is disabled",
-    "50002": "User two-factor authentication is disabled",
-    "50003": "Image is too large",
-    "60001": "Password is too short",
-    "60002": "Password complexity too low",
-    "60003": "Password cannot contain username",
-    "60004": "Weak passwords are not allowed",
-    "60005": "Password cannot be a palindrome",
-    "10022": "Password login has been disabled."
-  },
-  "websites": {
-    "group": "grouping",
-    "group_tip": "Drag and drop can adjust the order.",
-    "add_group": "New Group",
-    "edit_group": "Edit Group",
-    "group_name": "Group Name",
-    "group_name_placeholder": "Please enter the group name",
-    "group_name_required": "Group name cannot be empty"
-  },
-  "gateway_group": {
-    "name": "Group Name",
-    "name_placeholder": "Please enter a group name",
-    "description": "Description",
-    "description_placeholder": "Please enter a description",
-    "selection_mode": "Select Mode",
-    "mode_priority": "Priority Mode",
-    "mode_latency": "Delay Mode",
-    "mode_random": "Random Mode",
-    "members": "Gateway member",
-    "member": "Member",
-    "add_member": "Add gateway member",
-    "priority": "Priority",
-    "priority_tooltip": "The smaller the number, the higher the priority; takes effect in priority mode.",
-    "enabled": "Enable",
-    "create": "Create Gateway Group",
-    "edit": "Edit Gateway Group"
+  "db": {
+    "asset": {
+      "type": "Database Type",
+      "type_mysql": "MySQL",
+      "type_pg": "PostgreSQL",
+      "host": "Host",
+      "database": "Database"
+    },
+    "work_order": {
+      "new": "New Work Order",
+      "reason": "Execution Reason",
+      "reason_placeholder": "Please enter reason for executing this SQL",
+      "database_placeholder": "Please enter target database name",
+      "requester": "Requester",
+      "approver": "Approver",
+      "approve": "Approve",
+      "approve_confirm": "Confirm approve?",
+      "reject_reason": "Please enter rejection reason",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "executed": "Executed",
+        "failed": "Failed"
+      }
+    },
+    "sql_log": {
+      "sql": "SQL",
+      "duration_ms": "Duration (ms)",
+      "rows_affected": "Rows Affected",
+      "saved_limit_days": "SQL log retention days",
+      "status": {
+        "blocked": "Blocked"
+      },
+      "source": {
+        "proxy": "Proxy",
+        "work_order": "Work Order"
+      }
+    },
+    "proxy": {
+      "setting": "Database Proxy",
+      "enabled": "Enable Database Proxy",
+      "block_dml": "Block DML/DDL",
+      "block_dml_tip": "When enabled, only read-only SQL is allowed.",
+      "tip": "Enable proxy to allow client connections and execute SQL.",
+      "usage_title": "Usage",
+      "usage_client": "Client Connection",
+      "usage_select": "Select Database Asset",
+      "password_label": "Database Password",
+      "password_tip_prefix": "Go to ",
+      "password_tip_link": "Profile - Access Token",
+      "password_tip_suffix": " to generate a database password."
+    }
   }
 }

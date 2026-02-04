@@ -157,14 +157,14 @@ const AssetPage = () => {
             afterId: afterIndex < newDataSource.length - 1 ? newDataSource[afterIndex + 1].id : ''
         };
 
-        console.log('排序请求', req);
+        console.log('Sort request', req);
 
         // 服务器更新
         updateSortMutation.mutate(req);
     };
 
     const importExampleContent = <>
-        <NButton onClick={downloadImportExampleCsv}>{t('assets.download_sample')}</NButton>
+        <NButton onClick={downloadImportExampleCsv}>{t('actions.download_import_sample')}</NButton>
         <div>{t('assets.import_asset_tip')}</div>
     </>
 
@@ -202,7 +202,7 @@ const AssetPage = () => {
             }
         },
         {
-            title: t('assets.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             sorter: true,
             width: isMobile ? 120 : 200,
@@ -222,6 +222,13 @@ const AssetPage = () => {
                     )}
                 </div>
             },
+        },
+        {
+            title: t('assets.alias'),
+            dataIndex: 'alias',
+            sorter: true,
+            width: isMobile ? 80 : 140,
+            hideInTable: isMobile,
         },
         {
             title: t('assets.group'),
@@ -318,7 +325,7 @@ const AssetPage = () => {
             },
         },
         {
-            title: t('assets.status'),
+            title: t('general.status'),
             dataIndex: 'status',
             key: 'status',
             sorter: true,
@@ -336,7 +343,7 @@ const AssetPage = () => {
                     case 'inactive':
                         return (
                             <Tooltip title={record.statusText}>
-                                <Badge status="error" text={t('assets.inactive')}/>
+                                <Badge status="error" text={t('general.offline')}/>
                             </Tooltip>
                         )
                 }
@@ -349,13 +356,13 @@ const AssetPage = () => {
                 return (
                     <Select>
                         <Select.Option value="active">{t('assets.active')}</Select.Option>
-                        <Select.Option value="inactive">{t('assets.inactive')}</Select.Option>
+                        <Select.Option value="inactive">{t('general.offline')}</Select.Option>
                     </Select>
                 );
             },
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: isMobile ? 80 : 120,
@@ -395,7 +402,7 @@ const AssetPage = () => {
                                     break;
                                 case 'delete':
                                     modal.confirm({
-                                        title: t('general.delete_confirm'),
+                                        title: t('general.confirm_delete'),
                                         okText: t('actions.delete'),
                                         onOk: async () => {
                                             if (queryState.assetId === record.id) {
@@ -418,7 +425,7 @@ const AssetPage = () => {
                             {key: 'edit', name: t('actions.edit')},
                             {
                                 key: 'view-authorised-asset',
-                                name: `${t('authorised.label.authorised')}${t('authorised.label.user')}`
+                                name: `${t('actions.authorized')}${t('menus.identity.submenus.user')}`
                             },
                             {key: 'delete', name: t('actions.delete'), danger: true},
                         ]}
@@ -487,6 +494,7 @@ const AssetPage = () => {
                 sortOrder: sortOrder,
                 sortField: sortField,
                 name: params.name,
+                alias: params.alias,
                 type: params.type,
                 protocol: params.protocol,
                 active: params.active,
@@ -544,7 +552,7 @@ const AssetPage = () => {
                         danger={true}
                         onClick={async () => {
                             modal.confirm({
-                                title: t('general.delete_confirm'),
+                                title: t('general.confirm_delete'),
                                 onOk: async () => {
                                     await api.deleteById(selectedRowKeys.join(','));
                                     actionRef.current?.reload();
@@ -573,14 +581,14 @@ const AssetPage = () => {
                     color={'purple'}
                     variant={'dashed'}
                 >
-                    {t('authorised.label.authorised')}
+                    {t('actions.authorized')}
                 </Button>,
                 groupId && (
                     <Button
                         key="group-auth"
                         onClick={() => navigate(`/authorised-asset?assetGroupId=${groupId}`)}
                     >
-                        {`${t('authorised.label.asset_group')}${t('authorised.label.authorised')}`}
+                        {`${t('authorised.label.asset_group')}${t('actions.authorized')}`}
                     </Button>
                 ),
                 <Button key="add"

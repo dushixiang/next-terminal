@@ -317,9 +317,9 @@ const GuacdPlayback = () => {
                     <div className="text-center px-4">
                         {renderPlayButton('h-16 w-16 cursor-pointer text-white md:h-28 md:w-28 mb-4')}
                         <div className="text-white/60 text-xs md:text-sm mt-4 space-y-1">
-                            <div>空格键: 播放/暂停</div>
-                            <div className="hidden sm:block">← →: 快退/快进 10秒</div>
-                            <div className="hidden sm:block">F: 全屏切换</div>
+                            <div>{t('access.playback.shortcut_space')}</div>
+                            <div className="hidden sm:block">{t('access.playback.shortcut_seek')}</div>
+                            <div className="hidden sm:block">{t('access.playback.shortcut_fullscreen')}</div>
                         </div>
                     </div>
                 </div>
@@ -330,7 +330,7 @@ const GuacdPlayback = () => {
             >
                 {/* 后退按钮 - 在小屏幕上隐藏 */}
                 <div className={'flex-none hidden sm:block'}>
-                    <Tooltip title="后退 10秒 (←)">
+                    <Tooltip title={t('access.playback.seek_back')}>
                         <SkipBack className="h-4 w-4 cursor-pointer text-white/80 hover:text-white transition-colors" 
                                  onClick={() => seekRelative(-10000)} />
                     </Tooltip>
@@ -338,14 +338,14 @@ const GuacdPlayback = () => {
                 
                 {/* 播放/暂停按钮 */}
                 <div className={'flex-none'}>
-                    <Tooltip title="播放/暂停 (空格)">
+                    <Tooltip title={t('access.playback.play_pause')}>
                         {renderPlayButton('h-4 w-4 md:h-5 md:w-5 cursor-pointer text-white')}
                     </Tooltip>
                 </div>
                 
                 {/* 前进按钮 - 在小屏幕上隐藏 */}
                 <div className={'flex-none hidden sm:block'}>
-                    <Tooltip title="前进 10秒 (→)">
+                    <Tooltip title={t('access.playback.seek_forward')}>
                         <SkipForward className="h-4 w-4 cursor-pointer text-white/80 hover:text-white transition-colors" 
                                     onClick={() => seekRelative(10000)} />
                     </Tooltip>
@@ -408,7 +408,7 @@ const GuacdPlayback = () => {
                 <div className={'flex-none hidden lg:block relative'} 
                      onMouseEnter={handleVolumeMouseEnter}
                      onMouseLeave={handleVolumeMouseLeave}>
-                    <Tooltip title={isMuted ? "取消静音" : "静音"}>
+                    <Tooltip title={isMuted ? t('access.playback.unmute') : t('access.playback.mute')}>
                         <div className="cursor-pointer" onClick={toggleMute}>
                             {isMuted || volume === 0 ? 
                                 <VolumeX className="h-4 w-4 text-white/80 hover:text-white transition-colors" /> :
@@ -449,7 +449,7 @@ const GuacdPlayback = () => {
                 
                 {/* 全屏按钮 */}
                 <div className={'flex-none'}>
-                    <Tooltip title={isFullscreen ? "退出全屏 (F)" : "全屏 (F)"}>
+                    <Tooltip title={isFullscreen ? t('access.playback.exit_fullscreen') : t('access.playback.fullscreen')}>
                         {isFullscreen ? 
                             <Minimize className="h-3 w-3 md:h-4 md:w-4 cursor-pointer text-white/80 hover:text-white transition-colors" 
                                      onClick={toggleFullscreen} /> :

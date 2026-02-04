@@ -21,6 +21,7 @@ export interface AssetUser {
     id: string;
     logo: string;
     name: string;
+    alias?: string;
     address: string;
     protocol: string;
     tags: string[];
@@ -31,6 +32,20 @@ export interface AssetUser {
     groupId: string; // 分组ID
     users: string[];
     attrs?: Record<string, any>; // 资产属性，包含 WOL 配置等
+}
+
+export interface DatabaseAssetUser {
+    id: string;
+    name: string;
+    type: string;
+    host: string;
+    port: number;
+    database: string;
+    username: string;
+    description: string;
+    status: string;
+    statusText: string;
+    tags: string[];
 }
 
 export interface Stats {
@@ -132,6 +147,11 @@ class PortalApi {
         return await requests.get(`/${this.group}/assets${params}`) as AssetUser[];
     }
 
+    databaseAssets = async (type?: string) => {
+        const params = type ? `?type=${type}` : '';
+        return await requests.get(`/${this.group}/database-assets${params}`) as DatabaseAssetUser[];
+    }
+
     getAssetsTree = async (protocol?: string, keyword?: string) => {
         if (!protocol) {
             protocol = '';
@@ -192,6 +212,10 @@ class PortalApi {
     accessWebsite = async (id: string) => {
         const data = await requests.get(`/${this.group}/website/access?websiteId=${id}`);
         return data['url'] as string;
+    }
+
+    allowWebsiteIP = async (websiteId: string) => {
+        return await requests.post(`/${this.group}/website/allow-ip`, {websiteId});
     }
 
     wakeOnLan = async (assetId: string) => {

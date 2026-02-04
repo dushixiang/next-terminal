@@ -10,9 +10,12 @@ import {
     CoffeeOutlined,
     ControlOutlined,
     DashboardOutlined,
+    DatabaseOutlined,
     DesktopOutlined,
     DisconnectOutlined,
     FileTextOutlined,
+    FileSearchOutlined,
+    FormOutlined,
     ForkOutlined,
     GlobalOutlined,
     HddOutlined,
@@ -49,6 +52,11 @@ export const getMenus = (t: any) => {
                     icon: <DesktopOutlined/>,
                 },
                 {
+                    key: 'database-asset',
+                    label: t('menus.resource.submenus.database_asset'),
+                    icon: <DatabaseOutlined/>,
+                },
+                {
                     key: 'credential',
                     label: t('menus.resource.submenus.credential'),
                     icon: <IdcardOutlined/>,
@@ -72,6 +80,11 @@ export const getMenus = (t: any) => {
                     key: 'certificate',
                     label: t('menus.resource.submenus.certificate'),
                     icon: <SafetyCertificateOutlined />,
+                },
+                {
+                    key: 'db-work-order',
+                    label: t('menus.resource.submenus.db_work_order'),
+                    icon: <FormOutlined/>,
                 },
             ]
         },
@@ -137,6 +150,11 @@ export const getMenus = (t: any) => {
                     label: t('menus.log_audit.submenus.operation_log'),
                     icon: <CoffeeOutlined/>,
                 },
+                {
+                    key: 'database-sql-log',
+                    label: t('menus.log_audit.submenus.database_sql_log'),
+                    icon: <FileSearchOutlined/>,
+                },
             ]
         },
         {
@@ -193,7 +211,7 @@ export const getMenus = (t: any) => {
                 },
                 {
                     key: 'oidc-client',
-                    label: 'OIDC 客户端',
+                    label: t('menus.identity.submenus.oidc_client'),
                     icon: <ApiOutlined/>,
                 },
             ]
@@ -222,6 +240,11 @@ export const getMenus = (t: any) => {
                     key: 'authorised-website',
                     label: t('menus.authorised.submenus.authorised_website'),
                     icon: <GlobalOutlined/>,
+                },
+                {
+                    key: 'authorised-database-asset',
+                    label: t('menus.authorised.submenus.authorised_database_asset'),
+                    icon: <DatabaseOutlined/>,
                 },
             ]
         },

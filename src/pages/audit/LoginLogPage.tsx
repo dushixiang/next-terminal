@@ -28,7 +28,7 @@ const LoginLogPage = () => {
             width: 48,
         },
         {
-            title: t('audit.username'),
+            title: t('gateways.username'),
             dataIndex: 'username',
             key: 'username'
         },

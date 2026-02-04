@@ -52,7 +52,7 @@ const StrategyModal = ({open, handleOk, handleCancel, confirmLoading, id}: Strat
 
                 <Space direction={'vertical'}>
                     <Space>
-                        <ProFormSwitch name={'upload'} label={t('authorised.strategy.upload')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
+                        <ProFormSwitch name={'upload'} label={t('general.upload')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
                         <ProFormSwitch name={'download'} label={t('authorised.strategy.download')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
                     </Space>
 
@@ -62,14 +62,14 @@ const StrategyModal = ({open, handleOk, handleCancel, confirmLoading, id}: Strat
                     </Space>
 
                     <Space>
-                        <ProFormSwitch name={'edit'} label={t('authorised.strategy.edit')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
-                        <ProFormSwitch name={'delete'} label={t('authorised.strategy.remove')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
+                        <ProFormSwitch name={'edit'} label={t('actions.edit')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
+                        <ProFormSwitch name={'delete'} label={t('actions.delete')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
                         <ProFormSwitch name={'rename'} label={t('authorised.strategy.rename')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
                     </Space>
 
 
                     <Space>
-                        <ProFormSwitch name={'copy'} label={t('authorised.strategy.copy')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
+                        <ProFormSwitch name={'copy'} label={t('actions.copy')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
                         <ProFormSwitch name={'paste'} label={t('authorised.strategy.paste')} checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
                     </Space>
                 </Space>

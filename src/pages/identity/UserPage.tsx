@@ -55,14 +55,14 @@ const UserPage = () => {
                 title: t('identity.user.new_user_result'),
                 content: <div>
                     <div>{t('identity.user.nickname')}: {result.nickname}</div>
-                    <div>{t('identity.user.username')}: {result.username}</div>
-                    <div>{t('identity.user.password')}: {result.password}</div>
+                    <div>{t('gateways.username')}: {result.username}</div>
+                    <div>{t('assets.password')}: {result.password}</div>
                 </div>,
                 okText: t('actions.copy'),
                 onOk: () => {
                     copy(`${t('identity.user.nickname')}: ${result.nickname}
-${t('identity.user.username')}: ${result.username}
-${t('identity.user.password')}: ${result.password}`)
+${t('gateways.username')}: ${result.username}
+${t('assets.password')}: ${result.password}`)
                     message.success(t('general.copy_success'));
                 }
             })
@@ -86,9 +86,9 @@ ${t('identity.user.password')}: ${result.password}`)
         onSuccess: (newPassword) => {
             setResetPasswordOpen(false);
             modal.success({
-                title: t('identity.user.options.reset.password.success'),
+                title: t('identity.user.reset_password.success'),
                 content: <div>
-                    <div>{t('identity.user.options.reset.password.new')}: {newPassword}</div>
+                    <div>{t('identity.user.reset_password.new')}: {newPassword}</div>
                 </div>,
                 okText: t('actions.copy'),
                 onOk: () => {
@@ -113,7 +113,7 @@ ${t('identity.user.password')}: ${result.password}`)
             },
         },
         {
-            title: t('identity.user.username'),
+            title: t('gateways.username'),
             dataIndex: 'username',
             key: 'username',
             sorter: true,
@@ -145,7 +145,7 @@ ${t('identity.user.password')}: ${result.password}`)
             }
         },
         {
-            title: t('identity.user.source'),
+            title: t('audit.accessLog.stats.table.referer'),
             dataIndex: 'source',
             key: 'source',
             hideInSearch: true,
@@ -188,13 +188,13 @@ ${t('identity.user.password')}: ${result.password}`)
             }
         },
         {
-            title: t('identity.user.login'),
+            title: t('audit.login_status'),
             dataIndex: 'online',
             key: 'online',
             valueType: 'radio',
             valueEnum: {
-                true: {text: t('identity.user.logins.online'), status: 'success'},
-                false: {text: t('identity.user.logins.offline'), status: 'default'},
+                true: {text: t('general.online'), status: 'success'},
+                false: {text: t('general.offline'), status: 'default'},
             },
             hideInSearch: true,
         },
@@ -216,7 +216,7 @@ ${t('identity.user.password')}: ${result.password}`)
             width: 180,
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: 160,
@@ -234,7 +234,7 @@ ${t('identity.user.password')}: ${result.password}`)
                 ,
                 <Popconfirm
                     key={'delete-confirm'}
-                    title={t('general.delete_confirm')}
+                    title={t('general.confirm_delete')}
                     onConfirm={async () => {
                         await api.deleteById(record.id);
                         actionRef.current?.reload();
@@ -268,10 +268,10 @@ ${t('identity.user.password')}: ${result.password}`)
                     }}
                     menus={[
                         {key: 'detail', name: t('actions.detail')},
-                        {key: 'view-authorised-asset', name: `${t('authorised.label.asset')}${t('authorised.label.authorised')}`},
-                        {key: 'view-authorised-website', name: `${t('authorised.label.website')}${t('authorised.label.authorised')}`},
-                        {key: 'reset-password', name: t('identity.user.options.reset.password.action')},
-                        {key: 'reset-totp', name: t('identity.user.options.reset.otp.action')},
+                        {key: 'view-authorised-asset', name: `${t('menus.resource.submenus.asset')}${t('actions.authorized')}`},
+                        {key: 'view-authorised-website', name: `${t('menus.resource.submenus.website')}${t('actions.authorized')}`},
+                        {key: 'reset-password', name: t('identity.user.reset_password.action')},
+                        {key: 'reset-totp', name: t('identity.user.reset_otp.action')},
                         {key: 'login-policy', name: t('identity.options.login_policy')},
                     ]}
                 />,
@@ -293,8 +293,8 @@ ${t('identity.user.password')}: ${result.password}`)
 
     const bulkResetTOTP = (keys: string[]) => {
         modal.confirm({
-            title: t('identity.user.options.reset.otp.confirm.title'),
-            content: t('identity.user.options.reset.otp.confirm.content'),
+            title: t('identity.user.reset_otp.confirm_title'),
+            content: t('identity.user.reset_otp.confirm_content'),
             onOk() {
                 userApi.resetTOTP(keys).then(showSuccess)
             },
@@ -331,13 +331,13 @@ ${t('identity.user.password')}: ${result.password}`)
                                bulkResetPassword(selectedRowKeys as string[])
                            }}
                         >
-                            {t('identity.user.options.reset.password.action')}
+                            {t('identity.user.reset_password.action')}
                         </a>
                         <a className='danger'
                            onClick={() => {
                                bulkResetTOTP(selectedRowKeys as string[])
                            }}>
-                            {t('identity.user.options.reset.otp.action')}
+                            {t('identity.user.reset_otp.action')}
                         </a>
                     </Space>
                 );

@@ -6,6 +6,7 @@ export interface Asset {
     id: string;
     logo: string;
     name: string;
+    alias?: string;
     protocol: string;
     ip: string;
     port: number;

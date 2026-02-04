@@ -1,9 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Terminal} from "@xterm/xterm";
-import {CleanTheme, useTerminalTheme} from "@/hook/use-terminal-theme";
+import {CleanTheme, useTerminalTheme} from "@/pages/access/hooks/use-terminal-theme";
 import {FitAddon} from "@xterm/addon-fit";
 import {debounce} from "@/utils/debounce";
-import {useAccessContentSize} from "@/hook/use-access-size";
+import {useAccessContentSize} from "@/pages/access/hooks/use-access-size";
 import {useInterval, useWindowSize} from "react-use";
 import {Message, MessageTypeData, MessageTypeKeepAlive, MessageTypeResize} from "@/pages/access/Terminal";
 import portalApi, {ExportSession} from "@/api/portal-api";

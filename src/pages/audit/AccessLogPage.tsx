@@ -38,7 +38,7 @@ const AccessLogPage = () => {
 
     const columns: ProColumns<AccessLog>[] = [
         {
-            title: t('audit.accessLog.domain'),
+            title: t('assets.domain'),
             key: 'domain',
             dataIndex: 'domain',
             width: 150,
@@ -47,7 +47,7 @@ const AccessLogPage = () => {
             fixed: !isMobile ? 'left' : undefined,
         },
         {
-            title: t('audit.accessLog.user'),
+            title: t('menus.identity.submenus.user'),
             key: 'accountName',
             dataIndex: 'accountName',
             hideInSearch: true,
@@ -92,7 +92,7 @@ const AccessLogPage = () => {
             fixed: !isMobile ? 'left' : undefined,
         },
         {
-            title: t('audit.accessLog.method'),
+            title: t('assets.website_response_modify.match_method'),
             key: 'method',
             dataIndex: 'method',
             valueType: 'select',
@@ -132,7 +132,7 @@ const AccessLogPage = () => {
             render: (text: number) => renderSize(text)
         },
         {
-            title: t('audit.accessLog.clientIp'),
+            title: t('audit.client_ip'),
             key: 'clientIp',
             dataIndex: 'clientIp',
             width: 140,
@@ -210,7 +210,7 @@ const AccessLogPage = () => {
                     showSizeChanger: true
                 }}
                 dateFormatter="string"
-                headerTitle={t('audit.accessLog.title')}
+                headerTitle={t('menus.log_audit.submenus.access_log')}
                 toolBarRender={() => [
                     <Button key="clear"
                             type="primary"

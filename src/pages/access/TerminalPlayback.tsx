@@ -83,7 +83,7 @@ const TerminalPlayback = () => {
 
     const cmdColumns: ColumnsType<SessionCommand> = [
         {
-            title: t('audit.executed_at'),
+            title: t('sysops.logs.exec_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',
             width: 170,
@@ -92,7 +92,7 @@ const TerminalPlayback = () => {
             }
         },
         {
-            title: t('audit.command'),
+            title: t('sysops.command'),
             dataIndex: 'command',
             width: 300,
             ellipsis: true,
@@ -102,7 +102,7 @@ const TerminalPlayback = () => {
     const items: TabsProps['items'] = [
         {
             key: 'cmd',
-            label: t('audit.command'),
+            label: t('sysops.command'),
             children: <Table
                 // virtual
                 rowKey={'path'}
@@ -137,17 +137,17 @@ const TerminalPlayback = () => {
                     },
                     {
                         key: 'userAccount',
-                        label: t('audit.user'),
+                        label: t('menus.identity.submenus.user'),
                         children: session?.userAccount,
                     },
                     {
                         key: 'assetName',
-                        label: t('audit.asset'),
+                        label: t('menus.resource.submenus.asset'),
                         children: session?.assetName,
                     },
                     {
                         key: 'addr',
-                        label: t('audit.network'),
+                        label: t('assets.addr'),
                         children: `${session?.protocol} ${session?.username}@${session?.ip}:${session?.port}`,
                     },
                     {

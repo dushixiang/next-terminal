@@ -1,9 +1,8 @@
-import React, {useRef, useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {App, Button, Popconfirm, Tag} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {ProColumns, ProTable} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
-import {getSort} from "@/utils/sort";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import NButton from "@/components/NButton";
 import SnippetUserModal from "@/pages/facade/SnippetUserModal";
 import snippetUserApi from "@/api/snippet-user-api";
@@ -11,6 +10,7 @@ import {Snippet} from "@/api/snippet-api";
 import {useMobile} from "@/hook/use-mobile";
 import {cn} from "@/lib/utils";
 import {getCurrentUser} from "@/utils/permission";
+import FacadeSearchBar from "@/pages/facade/components/FacadeSearchBar";
 
 const api = snippetUserApi;
 
@@ -18,12 +18,29 @@ const SnippetUserPage = () => {
 
     const {t} = useTranslation();
     const {isMobile} = useMobile();
-    const actionRef = useRef<ActionType>(null);
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
+    const [keyword, setKeyword] = useState<string>('');
     const currentUser = getCurrentUser();
 
     const {message} = App.useApp();
+
+    const snippetsQuery = useQuery({
+        queryKey: ['user-snippets'],
+        queryFn: () => api.getAll(),
+    });
+
+    const filteredSnippets = useMemo(() => {
+        const list = snippetsQuery.data || [];
+        const value = keyword.trim().toLowerCase();
+        if (!value) {
+            return list;
+        }
+        return list.filter((item) => {
+            return item.name?.toLowerCase().includes(value)
+                || item.content?.toLowerCase().includes(value);
+        });
+    }, [snippetsQuery.data, keyword]);
 
     const postOrUpdate = async (values: any) => {
         if (values['id']) {
@@ -36,9 +53,9 @@ const SnippetUserPage = () => {
     let mutation = useMutation({
         mutationFn: postOrUpdate,
         onSuccess: () => {
-            actionRef.current?.reload();
             setOpen(false);
             setSelectedRowKey(undefined);
+            snippetsQuery.refetch();
             showSuccess();
         }
     });
@@ -58,7 +75,7 @@ const SnippetUserPage = () => {
             hideInTable: isMobile, // 移动端隐藏序号列
         },
         {
-            title: t('assets.name'),
+            title: t('general.name'),
             dataIndex: 'name',
             width: isMobile ? 100 : undefined, // 移动端固定宽度
         },
@@ -71,15 +88,15 @@ const SnippetUserPage = () => {
             width: isMobile ? 150 : undefined, // 移动端固定宽度
         },
         {
-            title: '可见性',
+            title: t('assets.snippet.visibility'),
             dataIndex: 'visibility',
             key: 'visibility',
             width: isMobile ? 70 : 100,
             hideInSearch: true,
             render: (_, record) => {
                 return record.visibility === 'public'
-                    ? <Tag color="green">公开</Tag>
-                    : <Tag color="default">私有</Tag>;
+                    ? <Tag color="green">{t('assets.snippet.visibility_public')}</Tag>
+                    : <Tag color="default">{t('assets.snippet.visibility_private')}</Tag>;
             }
         },
         {
@@ -91,7 +108,7 @@ const SnippetUserPage = () => {
             hideInTable: isMobile, // 移动端隐藏创建时间
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             valueType: 'option',
             key: 'option',
             width: isMobile ? 80 : undefined, // 移动端固定宽度
@@ -115,10 +132,10 @@ const SnippetUserPage = () => {
                     </NButton>,
                     <Popconfirm
                         key={'delete-confirm'}
-                        title={t('general.delete_confirm')}
+                        title={t('general.confirm_delete')}
                         onConfirm={async () => {
                             await api.deleteById(record.id);
-                            actionRef.current?.reload();
+                            snippetsQuery.refetch();
                         }}
                     >
                         <NButton
@@ -134,48 +151,37 @@ const SnippetUserPage = () => {
     ];
 
     return (<div className={cn('px-4 lg:px-20', isMobile && 'px-2')}>
-        <div className={cn('py-6 flex', isMobile && 'py-3')}>
-            <div className={cn('flex-grow font-bold', isMobile ? 'text-lg' : 'text-xl')}>
-                {t('menus.resource.submenus.snippet')}
+        <div className={cn('py-6', isMobile && 'p-4')}>
+            <div className={'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'}>
+                <div className={'flex flex-col gap-1'}>
+                    <div className={'text-xl font-bold text-slate-900 dark:text-slate-100'}>
+                        {t('menus.resource.submenus.snippet')}
+                    </div>
+                </div>
+            </div>
+            <div className={'pt-4'}>
+                <FacadeSearchBar
+                    value={keyword}
+                    onChange={setKeyword}
+                    resultCount={filteredSnippets.length}
+                    totalCount={snippetsQuery.data?.length || 0}
+                />
             </div>
         </div>
         <ProTable
+            className={'border rounded-md'}
             columns={columns}
-            actionRef={actionRef}
-            request={async (params = {}, sort, filter) => {
-                let [sortOrder, sortField] = getSort(sort);
-                
-                let queryParams = {
-                    pageIndex: params.current,
-                    pageSize: params.pageSize,
-                    sortOrder: sortOrder,
-                    sortField: sortField,
-                    name: params.name,
-                }
-                let result = await api.getPaging(queryParams);
-                return {
-                    data: result['items'],
-                    success: true,
-                    total: result['total']
-                };
-            }}
+            dataSource={filteredSnippets}
+            loading={snippetsQuery.isFetching}
             rowKey="id"
-            search={{
-                labelWidth: 'auto',
-                collapsed: isMobile, // 移动端默认折叠搜索
-                collapseRender: false, // 移动端不显示展开/收起按钮
-            }}
-            pagination={{
-                defaultPageSize: 10,
-                showSizeChanger: !isMobile, // 移动端隐藏分页大小选择器
-                simple: isMobile, // 移动端使用简单分页
-            }}
+            search={false}
+            pagination={false}
             dateFormatter="string"
-            headerTitle={isMobile ? null : t('menus.resource.submenus.snippet')} // 移动端隐藏标题
+            headerTitle={null}
             toolBarRender={() => [
-                <Button 
-                    key="button" 
-                    type="primary" 
+                <Button
+                    key="button"
+                    type="primary"
                     size={isMobile ? 'middle' : 'middle'}
                     onClick={() => {
                         setOpen(true)
@@ -184,13 +190,10 @@ const SnippetUserPage = () => {
                     {t('actions.new')}
                 </Button>,
             ]}
-            tableStyle={{
-                padding: isMobile ? '0' : undefined,
-            }}
             options={{
                 density: !isMobile, // 移动端隐藏密度设置
                 fullScreen: !isMobile, // 移动端隐藏全屏按钮
-                reload: true,
+                reload: false,
                 setting: !isMobile, // 移动端隐藏列设置
             }}
         />

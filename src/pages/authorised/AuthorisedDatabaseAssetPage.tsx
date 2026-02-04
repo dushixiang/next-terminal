@@ -1,0 +1,221 @@
+import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import {useTranslation} from "react-i18next";
+import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import type {ProFormInstance} from "@ant-design/pro-components";
+import {Button} from "antd";
+import authorisedDatabaseAssetApi, {AuthorisedDatabaseAsset} from "@/api/authorised-database-asset-api";
+import {DepartmentSelect, UserSelect, DatabaseAssetSelect} from "@/components/shared/QuerySelects";
+import NButton from "@/components/NButton";
+import NLink from "@/components/NLink";
+import dayjs from "dayjs";
+import {useNavigate, useSearchParams} from "react-router-dom";
+
+const AuthorisedDatabaseAssetPage = () => {
+
+    const {t} = useTranslation();
+    const actionRef = useRef<ActionType>(null);
+    const formRef = useRef<ProFormInstance>(null);
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const urlState = useMemo(() => ({
+        userId: searchParams.get('userId') || undefined,
+        departmentId: searchParams.get('departmentId') || undefined,
+        assetId: searchParams.get('assetId') || undefined,
+    }), [searchParams]);
+
+    const tableParams = useMemo(() => {
+        const filtered = Object.fromEntries(
+            Object.entries(urlState).filter(([, value]) => value)
+        );
+        return filtered;
+    }, [urlState]);
+
+    useEffect(() => {
+        formRef.current?.setFieldsValue(urlState);
+    }, [urlState]);
+
+    const syncUrl = useCallback((values: Record<string, any>) => {
+        const next: Record<string, string> = {};
+        Object.entries(values).forEach(([key, value]) => {
+            if (value) {
+                next[key] = String(value);
+            }
+        });
+        const sameSize = Object.keys(next).length === Object.keys(urlState).length;
+        const isSame = sameSize && Object.entries(next).every(([key, value]) => urlState[key as keyof typeof urlState] === value);
+        if (isSame) {
+            return;
+        }
+        setSearchParams(next);
+    }, [setSearchParams, urlState]);
+
+    const columns: ProColumns<AuthorisedDatabaseAsset>[] = [
+        {
+            dataIndex: 'index',
+            valueType: 'indexBorder',
+            width: 48,
+        },
+        {
+            title: t('menus.identity.submenus.user'),
+            dataIndex: 'userName',
+            formItemProps: {
+                name: 'userId',
+            },
+            renderFormItem: (_, {type, ...rest}) => {
+                if (type === 'form') {
+                    return null;
+                }
+                return <UserSelect {...rest} />;
+            },
+            render: ((text: any, record: any) => {
+                if (text === '-') {
+                    return '-';
+                }
+                return <NLink to={`/user/${record.userId}`}>{text}</NLink>
+            })
+        },
+        {
+            title: t('menus.identity.submenus.department'),
+            dataIndex: 'departmentName',
+            formItemProps: {
+                name: 'departmentId',
+            },
+            renderFormItem: (_, {type, ...rest}) => {
+                if (type === 'form') {
+                    return null;
+                }
+                return <DepartmentSelect {...rest} />;
+            },
+            render: ((text: any, record: any) => {
+                if (text === '-') {
+                    return '-';
+                }
+                return <NLink to={`/department/${record.departmentId}`}>{text}</NLink>
+            })
+        },
+        {
+            title: t('menus.resource.submenus.database_asset'),
+            dataIndex: 'assetName',
+            formItemProps: {
+                name: 'assetId',
+            },
+            renderFormItem: (_, {type, ...rest}) => {
+                if (type === 'form') {
+                    return null;
+                }
+                return <DatabaseAssetSelect {...rest} />;
+            },
+            render: ((text, record) => {
+                if (text === '-') {
+                    return '-';
+                }
+                return <NLink to={`/database-asset`}>{text}</NLink>
+            })
+        },
+        {
+            title: t('assets.limit_time'),
+            key: 'expiredAt',
+            dataIndex: 'expiredAt',
+            hideInSearch: true,
+            render: (text, record) => {
+                if (record.expiredAt === 0) {
+                    return '-';
+                }
+                const expiredAt = dayjs(record.expiredAt);
+                const now = dayjs();
+                const daysDifference = expiredAt.diff(now, 'day');
+
+                let statusClass = '';
+                if (daysDifference > 7) {
+                    statusClass = 'text-green-500';
+                } else if (daysDifference > 0) {
+                    statusClass = 'text-yellow-500';
+                } else {
+                    statusClass = 'text-red-500';
+                }
+                return <div className={statusClass}>
+                    {expiredAt.format('YYYY-MM-DD HH:mm:ss')}
+                </div>;
+            },
+            width: 180,
+        },
+        {
+            title: t('authorised.label.authorised_at'),
+            key: 'createdAt',
+            dataIndex: 'createdAt',
+            valueType: 'dateTime',
+            hideInSearch: true,
+            width: 180,
+        },
+        {
+            title: t('actions.label'),
+            valueType: 'option',
+            key: 'option',
+            width: 50,
+            render: (text, record) => [
+                <NButton
+                    key="unbind"
+                    danger
+                    onClick={async () => {
+                        await authorisedDatabaseAssetApi.deleteById(record['id']);
+                        actionRef.current?.reload();
+                    }}
+                >
+                    {t('actions.unbind')}
+                </NButton>
+                ,
+            ],
+        },
+    ];
+
+    return (
+        <div>
+            <ProTable
+                columns={columns}
+                actionRef={actionRef}
+                formRef={formRef}
+                params={tableParams}
+                form={{
+                    initialValues: urlState,
+                }}
+                onSubmit={(values) => syncUrl(values)}
+                onReset={() => syncUrl({})}
+                request={async (params = {}) => {
+                    const queryParams = {
+                        pageIndex: params.current,
+                        pageSize: params.pageSize,
+                        userId: params.userId,
+                        departmentId: params.departmentId,
+                        assetId: params.assetId,
+                    };
+                    const result = await authorisedDatabaseAssetApi.paging(queryParams);
+                    return {
+                        data: result['items'],
+                        success: true,
+                        total: result['total']
+                    };
+                }}
+                rowKey="id"
+                search={{
+                    labelWidth: 'auto',
+                }}
+                pagination={{
+                    defaultPageSize: 10,
+                    showSizeChanger: true
+                }}
+                dateFormatter="string"
+                headerTitle={t('actions.authorized')}
+                toolBarRender={() => [
+                    <Button key="button" type="primary" onClick={() => {
+                        navigate('/authorised-database-asset/post')
+                    }}>
+                        {t('actions.authorized')}
+                    </Button>
+                ]}
+            />
+        </div>
+    );
+};
+
+export default AuthorisedDatabaseAssetPage;

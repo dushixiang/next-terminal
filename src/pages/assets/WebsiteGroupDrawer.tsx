@@ -72,7 +72,7 @@ const WebsiteGroupDrawer: React.FC<WebsiteGroupDrawerProps> = ({
 
     return (
         <Drawer
-            title={t('websites.group')}
+            title={t('assets.group')}
             open={open}
             onClose={handleCancel}
         >

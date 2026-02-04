@@ -63,7 +63,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({status, onReconnect}) => 
                     onClick={onReconnect}
                     className="mt-4 self-end bg-gradient-to-tr from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium px-6 py-2 rounded-xl shadow-lg transform hover:-translate-y-0.5 transition-all duration-200"
                 >
-                    {t('access.reconnect', 'Reconnect')}
+                    {t('assets.resize_methods.reconnect', 'Reconnect')}
                 </button>
             )}
         </div>

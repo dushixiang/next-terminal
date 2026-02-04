@@ -95,7 +95,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
                         </Paragraph>
                         {record.remark && (
                             <div className="px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded text-xs text-gray-600 dark:text-gray-400 border-l-2 border-blue-200 dark:border-blue-700">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">备注：</span>
+                                <span className="font-medium text-gray-700 dark:text-gray-300">{t('general.remark_label')}</span>
                                 {record.remark}
                             </div>
                         )}
@@ -113,7 +113,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
             }
         },
         {
-            title: t('actions.option'),
+            title: t('actions.label'),
             key: 'action',
             width: 150,
             render: (_, record) => (
@@ -127,7 +127,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
                     </Button>
                     <Popconfirm
                         key={'delete-confirm'}
-                        title={t('general.delete_confirm')}
+                        title={t('general.confirm_delete')}
                         onConfirm={async () => {
                             await agentGatewayTokenApi.deleteById(record.id);
                             tokenQuery.refetch();
@@ -152,7 +152,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
                         type="primary"
                         onClick={() => setCreateModalOpen(true)}
                     >
-                        {t('actions.add')}
+                        {t('actions.new')}
                     </Button>
                 }
             >

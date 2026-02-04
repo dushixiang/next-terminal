@@ -46,7 +46,7 @@ const ControlButtons: React.FC<Props> = ({hasFileSystem, onOpenFS, onShare, onCl
         <FloatButton.Group shape="circle" open={open} trigger="click" icon={<ToolOutlined/>}
                            onClick={() => setOpen(!open)}>
             {hasFileSystem &&
-                <FloatButton icon={<FolderOutlined/>} tooltip={t('access.filesystem')} onClick={onOpenFS}/>}
+                <FloatButton icon={<FolderOutlined/>} tooltip={t('assets.filesystem')} onClick={onOpenFS}/>}
             <FloatButton icon={<ShareAltOutlined/>} tooltip={t('access.session.share.action')} onClick={onShare}/>
             <FloatButton icon={<CopyOutlined/>} tooltip={t('access.clipboard')} onClick={onClipboard}/>
             <Dropdown menu={{items: comboMenu, onClick: handleMenuClick}} trigger={['click']} placement="bottomLeft">

@@ -166,7 +166,7 @@ const SnippetSheet = ({open, onClose, onUse, placement, mask, maskClosable}: Pro
                                             className="text-blue-400 hover:text-blue-300 cursor-pointer mt-2 text-xs"
                                             onClick={() => toggleExpand(item.id)}
                                         >
-                                            点击展开...
+                                            {t('access.snippet_expand')}
                                         </div>
                                     )}
                                 </div>

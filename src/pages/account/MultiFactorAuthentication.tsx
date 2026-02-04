@@ -12,6 +12,7 @@ export interface Props {
     open: boolean
     handleOk: (securityToken: string) => void
     handleCancel: () => void
+    forceReauth?: boolean
 }
 
 interface Error {
@@ -19,7 +20,7 @@ interface Error {
     message?: string
 }
 
-const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
+const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = false}: Props) => {
     const {t} = useTranslation();
 
     const [authType, setAuthType] = useState<AuthType>('');
@@ -41,7 +42,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
         {
             key: 'passkey' as const,
             icon: <SafetyOutlined style={{fontSize: 32}}/>,
-            title: t('account.auth_type_passkey'),
+            title: t('account.passkey'),
             description: t('account.auth_type_passkey_desc'),
         },
         {
@@ -168,11 +169,11 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
     }, [authType, showSelector, open]);
 
     useEffect(() => {
-        if (open) {
+        if (open && !forceReauth) {
             // 检查是否有存储的 securityToken
             validateSecurityToken();
         }
-    }, [open]);
+    }, [open, forceReauth]);
 
     // 渲染选择器
     const renderSelector = () => (
@@ -283,7 +284,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
     const renderOTP = () => (
         <div className={'flex items-center justify-center'}>
             <div className={'space-y-4'}>
-                <div className={'font-bold'}>{t('account.otp_code_label')}</div>
+                <div className={'font-bold'}>{t('account.auth_type_otp')}</div>
                 <InputOTP
                     key={otpKey}
                     maxLength={6}
@@ -343,7 +344,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel}: Props) => {
         <div className={'space-y-3 text-center'}>
             <div className={'text-lg font-medium'}>{t('account.mfa_authing')}</div>
             <div className={'text-sm text-gray-500'}>
-                {t('account.mfa_passkey_prompt', '请在浏览器弹出的窗口中完成 Passkey 认证')}
+                {t('account.mfa_passkey_prompt')}
             </div>
             {renderSwitchButton()}
         </div>

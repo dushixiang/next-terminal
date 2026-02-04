@@ -19,7 +19,7 @@ const LogSetting = ({get, set}: SettingProps) => {
                 }
             }}>
                 <ProFormSwitch name="recording-enabled"
-                               label={t('settings.log.recording.enabled')}
+                               label={t('identity.user.recording')}
                                rules={[{required: true}]}
                                checkedChildren={t('general.enabled')}
                                unCheckedChildren={t('general.disabled')}

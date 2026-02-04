@@ -1,4 +1,4 @@
-import zhCN from "./zh-CN";
+import zhCN from "./zh-CN.json";
 import enUS from "./en-US.json";
 import zhTW from "./zh-TW.json";
 import jaJP from "./ja-JP.json";

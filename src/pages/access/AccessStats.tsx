@@ -136,7 +136,7 @@ const AccessStats = ({sessionId, open}: Props) => {
                                     <span
                                         className={'bg-[#313131] rounded-lg py-1 px-1.5 text-center text-blue-500'}>
                                         {stats.info?.upDays}
-                                        {t('stat.days')}
+                                        {t('general.days')}
                                     </span>
                                 </div>
                                 <div className={'flex gap-1 items-center'}>
@@ -216,7 +216,7 @@ const AccessStats = ({sessionId, open}: Props) => {
                 <div className={'border rounded-md p-4'}>
                     <div className={'flex gap-2 items-center'}>
                         <MemoryStickIcon className={'w-4 h-4 text-blue-500'}/>
-                        <div className={'font-medium'}>{t('stat.memory.label')}</div>
+                        <div className={'font-medium'}>{t('gateways.stat.memory')}</div>
                         <div className={'text-xs space-x-1'}>
                         <span
                             className={'text-blue-500'}>{renderSize(stats.memory?.memUsed)}</span>
@@ -229,7 +229,7 @@ const AccessStats = ({sessionId, open}: Props) => {
                         <div className={'space-y-1.5'}>
                             <div className={'flex gap-2 items-center'}>
                                 <span className={'w-1.5 h-1.5 rounded-md bg-red-500'}/>
-                                <span>{t('stat.memory.used')}</span>
+                                <span>{t('gateways.stat.used')}</span>
                             </div>
                             <div>
                                 {renderSize(stats.memory?.memUsed, 0)}
@@ -264,7 +264,7 @@ const AccessStats = ({sessionId, open}: Props) => {
                                 <Pie
                                     data={[
                                         {
-                                            name: t('stat.memory.used'),
+                                            name: t('gateways.stat.used'),
                                             value: stats.memory?.memTotal - stats.memory?.memAvailable,
                                             fill: "#EF4444"
                                         },
@@ -283,7 +283,7 @@ const AccessStats = ({sessionId, open}: Props) => {
                 <div className={'border rounded-md p-4'}>
                     <div className={'flex gap-2 items-center'}>
                         <ArrowUpDownIcon className={'w-4 h-4 text-blue-500'}/>
-                        <div className={'font-medium flex-grow'}>{t('stat.network.label')}</div>
+                        <div className={'font-medium flex-grow'}>{t('assets.network')}</div>
 
                         <div>
                             {hideVNic ?
@@ -340,7 +340,7 @@ const AccessStats = ({sessionId, open}: Props) => {
                 <div className={'border rounded-md p-4'}>
                     <div className={'flex gap-2 items-center'}>
                         <HardDriveIcon className={'w-4 h-4 text-blue-500'}/>
-                        <div className={'font-medium'}>{t('stat.disk.label')}</div>
+                        <div className={'font-medium'}>{t('gateways.stat.disk')}</div>
                     </div>
 
                     <Table className={'mt-2 text-xs text-center'}>
