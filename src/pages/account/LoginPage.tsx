@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Divider, Form, Input, Select, Space, Spin, Typography} from "antd";
+import React, {useEffect, useRef, useState} from 'react';
+import {Button, ConfigProvider, Divider, Form, Input, Select, Space, Spin, Typography} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
@@ -11,10 +11,13 @@ import {useTranslation} from "react-i18next";
 import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {startAuthentication} from "@simplewebauthn/browser";
-import {LanguagesIcon} from "lucide-react";
+import {LanguagesIcon, Moon, Sun} from "lucide-react";
 import i18n from "i18next";
 import wechatWorkApi from "@/api/wechat-work-api";
 import oidcApi from "@/api/oidc-api";
+import {useNTTheme} from "@/hook/use-theme";
+import {translateI18nToAntdLocale} from "@/helper/lang";
+import {useThemeToggle} from "@/layout/hooks/use-theme-toggle";
 
 const {Title} = Typography;
 
@@ -27,6 +30,9 @@ export enum LoginStep {
 const LoginPage = () => {
     const [optForm] = Form.useForm();
     let {t} = useTranslation();
+    const themeToggleRef = useRef<HTMLButtonElement>(null);
+    const {isDarkMode, toggleDarkMode} = useThemeToggle(themeToggleRef);
+    const [ntTheme] = useNTTheme();
 
     const [step, setStep] = useState<LoginStep>(LoginStep.Default);
     let [loading, setLoading] = useState<boolean>(false);
@@ -325,13 +331,28 @@ const LoginPage = () => {
 
     return (
         <StyleProvider hashPriority="high">
-            <div className={'h-screen w-screen relative flex items-center justify-center'}>
+            <ConfigProvider
+                theme={{
+                    algorithm: ntTheme.algorithm,
+                }}
+                locale={translateI18nToAntdLocale(i18n.language)}
+            >
+                <div className={'h-screen w-screen relative flex items-center justify-center'}>
                 <div className={'w-96 md:border rounded-lg p-8'}>
                     <div className={'font-medium mb-4 text-lg'}>{brandingQuery.data?.name}</div>
                     {renderLoginForm()}
                 </div>
 
-                <div className={'absolute top-8 right-8 cursor-pointer'}>
+                <div className={'absolute top-8 right-8 flex items-center gap-2'}>
+                    <button
+                        ref={themeToggleRef}
+                        type="button"
+                        onClick={() => toggleDarkMode(!isDarkMode)}
+                        className="h-8 w-8 rounded-md border border-slate-200/60 bg-white/80 text-slate-700 transition-colors hover:bg-white dark:border-slate-700/60 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-900"
+                        aria-label="切换主题"
+                    >
+                        {isDarkMode ? <Sun className="h-4 w-4 mx-auto"/> : <Moon className="h-4 w-4 mx-auto"/>}
+                    </button>
                     <Select
                         placeholder="Language"
                         variant="borderless"
@@ -355,7 +376,8 @@ const LoginPage = () => {
                 <div className={'absolute bottom-12 text-blue-500'}>
                     <a href="https://beian.miit.gov.cn" rel="noopener" target="_blank">{brandingQuery.data?.icp}</a>
                 </div>
-            </div>
+                </div>
+            </ConfigProvider>
         </StyleProvider>
 
     );

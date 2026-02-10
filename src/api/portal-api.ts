@@ -40,11 +40,8 @@ export interface DatabaseAssetUser {
     type: string;
     host: string;
     port: number;
-    database: string;
     username: string;
     description: string;
-    status: string;
-    statusText: string;
     tags: string[];
 }
 

@@ -17,7 +17,7 @@ const FacadeCardSkeleton: React.FC<FacadeCardSkeletonProps> = React.memo(({ coun
                     className="animate-in fade-in duration-500"
                     style={{ animationDelay: `${index * 50}ms` }}
                 >
-                    <div className="rounded-xl ring-1 ring-slate-200/60 dark:ring-slate-700/60 bg-white dark:bg-slate-900 shadow-sm dark:shadow-md p-4 space-y-3">
+                    <div className="rounded-xl ring-1 ring-slate-200/60 dark:ring-slate-700/60 bg-white dark:bg-[#141414] shadow-sm dark:shadow-md p-4 space-y-3">
                         {/* Logo 和标题区域 */}
                         <div className="flex gap-3">
                             {/* Logo 骨架 */}

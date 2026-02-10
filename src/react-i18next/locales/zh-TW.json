@@ -40,6 +40,7 @@
     "not_found_subtitle": "抱歉，您似乎到達了預期之外的頁面。",
     "my_assets": "我的資產",
     "home_admin": "後台首頁",
+    "all": "全部",
     "leave_confirm": "你確定要離開這個頁面嗎？",
     "loading_detail": "正在努力載入中...",
     "status": "狀態",
@@ -112,8 +113,14 @@
   },
   "facade": {
     "asset_placeholder": "資產名稱、協議、標籤、網路位址",
+    "database_asset_placeholder": "資產名稱、帳號、標籤、類型",
+    "database_access_title": "連線與存取",
+    "database_access_tip": "使用資料庫代理連線，或透過 SQL 工單提交執行。",
+    "database_access_proxy_tip": "代理位址請向管理員取得。",
+    "database_access_work_order": "前往 SQL 工單",
+    "database_asset_name_tip": "asset_name 請使用下方清單中的資產名稱。",
     "accessing": "接入中",
-    "website_placeholder": "網站名稱、標籤、地址",
+    "website_placeholder": "網站名稱、標籤、類型",
     "processing": "處理中...",
     "in_use": "使用中",
     "clear_search": "清除搜尋"
@@ -667,15 +674,15 @@
       "connect": "立即連線"
     },
     "shell_assistant": {
-      "title": "Shell 助手",
-      "placeholder": "描述您需要的 Shell 命令功能，例如：查找大於 100MB 的檔案",
+      "title": "運維助手",
+      "placeholder": "描述您需要的運維命令功能，例如：查找大於 100MB 的檔案",
       "use_snippets": "優先使用命令片段",
       "shortcut_tip": "Enter 發送 • Shift+Enter 換行",
       "ask": "詢問",
-      "command_label": "Shell 命令",
+      "command_label": "運維命令",
       "request_failed": "請求失敗",
       "request_failed_retry": "請求失敗，請稍後重試",
-      "ready_title": "Shell 助手準備就緒",
+      "ready_title": "運維助手準備就緒",
       "ready_subtitle": "輸入您的需求，我會為您生成合適的命令"
     },
     "terminal": {
@@ -1105,7 +1112,13 @@
       "visibility_public": "公開",
       "visibility_private": "私有"
     },
-    "website_load_failed": "載入網站資料失敗"
+    "website_load_failed": "載入網站資料失敗",
+    "public_header_whitelist": "請求頭白名單",
+    "public_header_whitelist_tip": "攜帶任一指定請求頭即放行，大小寫不敏感。",
+    "public_header_whitelist_placeholder": "如：X-Bypass-Token",
+    "public_path_whitelist": "路徑白名單",
+    "public_path_whitelist_tip": "匹配任一路径即放行，支援正則表示式。",
+    "public_path_whitelist_placeholder": "例如：^/public/.* 或 /health"
   },
   "websites": {
     "group_tip": "拖曳可以調整順序",
@@ -1454,10 +1467,10 @@
       "model_required": "請輸入模型名稱",
       "temperature": "Temperature",
       "max_tokens": "Max Tokens",
-      "shell_config": "Shell 助手設定",
-      "shell_enable": "啟用 Shell 助手",
-      "shell_prompt": "Shell 助手提示詞",
-      "shell_prompt_placeholder": "輸入 Shell 助手的提示詞...",
+      "shell_config": "運維助手設定",
+      "shell_enable": "啟用運維助手",
+      "shell_prompt": "運維助手提示詞",
+      "shell_prompt_placeholder": "輸入運維助手的提示詞...",
       "shell_prompt_default": "你是一個 IT 運維助手，負責將使用者的需求直接轉換為 Linux shell 命令。\n\n規則：\n\n1. **只輸出命令**，不要加任何說明、解釋、Markdown 包裹或額外文字。\n2. 如果存在多種寫法，只輸出最常用且安全的一種。\n3. 使用 Bash 語法，確保在 Ubuntu/Debian/CentOS 等常見發行版中通用。\n4. 對危險操作（如 `rm -rf /`、`:(){:|:\u0026};:` 等），直接輸出：\"該操作有風險，請謹慎執行\"。\n5. 如果使用者輸入不完整，自動補全為最常見、合理的完整命令。",
       "audit_prompt_default": "你是一個專業的系統審計助手。請分析提供的日誌、操作記錄或系統資訊，並給出專業的審計意見。\n\n分析重點：\n1. 安全風險識別\n2. 異常行為偵測\n3. 合規性檢查\n4. 效能問題分析\n5. 操作建議和改進方案\n\n請對提供的資訊進行全面分析，並提供詳細的審計報告。"
     },
@@ -1504,6 +1517,7 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "主機",
+      "username": "帳號",
       "database": "資料庫"
     },
     "work_order": {

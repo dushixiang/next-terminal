@@ -149,72 +149,75 @@ const DatabaseWorkOrderUserPage = () => {
     return (
         <div className={cn('px-4 lg:px-20', isMobile && 'px-2')}>
             <div className={cn('py-6', isMobile && 'p-4')}>
-                <div className={'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'}>
-                    <div className={'flex flex-col gap-1'}>
-                        <div className={'text-xl font-bold text-slate-900 dark:text-slate-100'}>
-                            {t('menus.resource.submenus.db_work_order')}
+                <div className={'rounded-2xl border border-slate-200/70 dark:border-slate-700/70 p-4 lg:p-5'}>
+                    <div className={'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'}>
+                        <div className={'flex flex-col gap-1'}>
+                            <div className={'text-xl font-bold text-slate-900 dark:text-slate-100'}>
+                                {t('menus.resource.submenus.db_work_order')}
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className={'pt-4'}>
-                    <FacadeSearchBar
-                        value={keyword}
-                        onChange={(value) => {
-                            setKeyword(value);
-                            reloadTable();
-                        }}
-                    />
+                    <div className={'pt-3'}>
+                        <FacadeSearchBar
+                            value={keyword}
+                            onChange={(value) => {
+                                setKeyword(value);
+                                reloadTable();
+                            }}
+                        />
+                    </div>
                 </div>
             </div>
-            <ProTable
-                className={'border rounded-md'}
-                columns={columns}
-                actionRef={actionRef}
-                request={async (params = {}, sort) => {
-                    const [sortOrder, sortField] = getSort(sort);
-                    const queryParams = {
-                        pageIndex: params.current,
-                        pageSize: params.pageSize,
-                        sortOrder: sortOrder,
-                        sortField: sortField,
-                        keyword: keyword.trim() || undefined,
-                    };
-                    const result = await dbWorkOrderApi.paging(queryParams);
-                    return {
-                        data: result['items'],
-                        success: true,
-                        total: result['total']
-                    };
-                }}
-                rowKey="id"
-                search={false}
-                pagination={{
-                    defaultPageSize: 10,
-                    showSizeChanger: !isMobile,
-                    simple: isMobile,
-                }}
-                scroll={{
-                    x: 'max-content',
-                }}
-                dateFormatter="string"
-                headerTitle={null}
-                toolBarRender={() => [
-                    <Button
-                        key="button"
-                        type="primary"
-                        size={isMobile ? 'middle' : 'middle'}
-                        onClick={() => setOpen(true)}
-                    >
-                        {t('db.work_order.new')}
-                    </Button>,
-                ]}
-                options={{
-                    density: !isMobile,
-                    fullScreen: !isMobile,
-                    reload: true,
-                    setting: !isMobile,
-                }}
-            />
+            <div className={'rounded-xl ring-1 ring-slate-200/60 dark:ring-slate-700/60 p-1'}>
+                <ProTable
+                    columns={columns}
+                    actionRef={actionRef}
+                    request={async (params = {}, sort) => {
+                        const [sortOrder, sortField] = getSort(sort);
+                        const queryParams = {
+                            pageIndex: params.current,
+                            pageSize: params.pageSize,
+                            sortOrder: sortOrder,
+                            sortField: sortField,
+                            keyword: keyword.trim() || undefined,
+                        };
+                        const result = await dbWorkOrderApi.paging(queryParams);
+                        return {
+                            data: result['items'],
+                            success: true,
+                            total: result['total']
+                        };
+                    }}
+                    rowKey="id"
+                    search={false}
+                    pagination={{
+                        defaultPageSize: 10,
+                        showSizeChanger: !isMobile,
+                        simple: isMobile,
+                    }}
+                    scroll={{
+                        x: 'max-content',
+                    }}
+                    dateFormatter="string"
+                    headerTitle={null}
+                    toolBarRender={() => [
+                        <Button
+                            key="button"
+                            type="primary"
+                            size={isMobile ? 'middle' : 'middle'}
+                            onClick={() => setOpen(true)}
+                        >
+                            {t('db.work_order.new')}
+                        </Button>,
+                    ]}
+                    options={{
+                        density: !isMobile,
+                        fullScreen: !isMobile,
+                        reload: true,
+                        setting: !isMobile,
+                    }}
+                />
+            </div>
 
             <DatabaseWorkOrderModal
                 open={open}

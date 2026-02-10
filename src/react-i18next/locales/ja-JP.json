@@ -40,6 +40,7 @@
     "not_found_subtitle": "申し訳ありません。予期しないページに到達したようです。",
     "my_assets": "マイ資産",
     "home_admin": "管理ホーム",
+    "all": "すべて",
     "leave_confirm": "このページを離れますか？",
     "loading_detail": "読み込み中...",
     "status": "状態",
@@ -112,8 +113,14 @@
   },
   "facade": {
     "asset_placeholder": "資産名、プロトコル、タグ、ネットワークアドレス",
+    "database_asset_placeholder": "資産名、ユーザー名、タグ、タイプ",
+    "database_access_title": "接続とアクセス",
+    "database_access_tip": "データベースプロキシで接続するか、SQL ワークオーダーで実行を申請します。",
+    "database_access_proxy_tip": "プロキシのアドレスは管理者に確認してください。",
+    "database_access_work_order": "SQL ワークオーダーへ",
+    "database_asset_name_tip": "asset_name には下の一覧の資産名を使用します。",
     "accessing": "接続中",
-    "website_placeholder": "サイト名、タグ、住所",
+    "website_placeholder": "サイト名、タグ、タイプ",
     "processing": "処理中…",
     "in_use": "使用中",
     "clear_search": "検索をクリア"
@@ -667,15 +674,15 @@
       "connect": "今すぐ接続"
     },
     "shell_assistant": {
-      "title": "Shell アシスタント",
-      "placeholder": "必要なShellコマンドの内容を説明してください（例：100MB以上のファイルを検索）",
+      "title": "運用アシスタント",
+      "placeholder": "必要な運用コマンドの内容を説明してください（例：100MB以上のファイルを検索）",
       "use_snippets": "コマンドスニペットを優先",
       "shortcut_tip": "Enter で送信 • Shift+Enter で改行",
       "ask": "質問",
-      "command_label": "Shell コマンド",
+      "command_label": "運用コマンド",
       "request_failed": "リクエスト失敗",
       "request_failed_retry": "リクエストに失敗しました。しばらくしてから再試行してください",
-      "ready_title": "Shell アシスタント準備完了",
+      "ready_title": "運用アシスタント準備完了",
       "ready_subtitle": "要件を入力すると適切なコマンドを生成します"
     },
     "terminal": {
@@ -1105,7 +1112,13 @@
       "visibility_public": "公開",
       "visibility_private": "非公開"
     },
-    "website_load_failed": "サイトデータの読み込みに失敗しました"
+    "website_load_failed": "サイトデータの読み込みに失敗しました",
+    "public_header_whitelist": "リクエストヘッダーのホワイトリスト",
+    "public_header_whitelist_tip": "いずれかの指定されたリクエストヘッダーを含んでいれば許可され、大文字・小文字は区別されません。",
+    "public_header_whitelist_placeholder": "例：X-Bypass-Token",
+    "public_path_whitelist": "パスホワイトリスト",
+    "public_path_whitelist_tip": "いずれかのパスに一致すれば許可され、正規表現をサポートしています。",
+    "public_path_whitelist_placeholder": "例：^/public/.* または /health"
   },
   "websites": {
     "group_tip": "ドラッグで順序変更",
@@ -1454,10 +1467,10 @@
       "model_required": "モデル名を入力してください",
       "temperature": "Temperature",
       "max_tokens": "Max Tokens",
-      "shell_config": "Shell アシスタント設定",
-      "shell_enable": "Shell アシスタントを有効化",
-      "shell_prompt": "Shell アシスタントのプロンプト",
-      "shell_prompt_placeholder": "Shell アシスタントのプロンプトを入力...",
+      "shell_config": "運用アシスタント設定",
+      "shell_enable": "運用アシスタントを有効化",
+      "shell_prompt": "運用アシスタントのプロンプト",
+      "shell_prompt_placeholder": "運用アシスタントのプロンプトを入力...",
       "shell_prompt_default": "あなたは IT 運用アシスタントです。ユーザーの要件を直接 Linux shell コマンドに変換します。\n\nルール：\n\n1. **コマンドのみ出力**。説明、解説、Markdown、余計な文字は不要。\n2. 複数の書き方がある場合は、最も一般的で安全なものを出力。\n3. Bash 構文を使用し、Ubuntu/Debian/CentOS など主要ディストリビューションで通用するようにする。\n4. 危険な操作（例：`rm -rf /`、`:(){:|:\u0026};:`）の場合は、\"この操作は危険です。慎重に実行してください\" と出力。\n5. 入力が不完全な場合は、最も一般的で合理的な完全コマンドに補完する。",
       "audit_prompt_default": "あなたはプロのシステム監査アシスタントです。提供されたログ、操作記録、またはシステム情報を分析し、専門的な監査意見を提示してください。\n\n分析の重点：\n1. セキュリティリスクの特定\n2. 異常行動の検知\n3. コンプライアンスチェック\n4. パフォーマンス問題の分析\n5. 改善提案\n\n提供された情報を包括的に分析し、詳細な監査レポートを作成してください。"
     },
@@ -1504,6 +1517,7 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "ホスト",
+      "username": "ユーザー名",
       "database": "データベース"
     },
     "work_order": {

@@ -94,7 +94,6 @@ const TerminalPlayback = () => {
         {
             title: t('sysops.command'),
             dataIndex: 'command',
-            width: 300,
             ellipsis: true,
         },
     ];
@@ -175,19 +174,20 @@ const TerminalPlayback = () => {
     ];
 
     return (
-        <div className={'flex w-screen h-screen items-center justify-center'}>
-            <div id='player'
-                 className={'w-full h-full bg-[#191919] overflow-hidden'}
-            >
+        <div className={'fixed inset-0 flex items-center justify-center overflow-hidden bg-[#191919]'}>
+            <div
+                id='player'
+                className={'w-full h-full overflow-hidden'}
+            />
 
+            <div className={'absolute top-5 right-5 z-10'}>
+                <Button
+                        type={'link'}
+                        size={'small'}
+                        onClick={() => setOpen(true)}>
+                    <TerminalSquare className="h-4 w-4"/>
+                </Button>
             </div>
-
-            <Button className={'absolute top-5 right-5'}
-                    type={'link'}
-                    size={'small'}
-                    onClick={() => setOpen(true)}>
-                <TerminalSquare className="h-4 w-4"/>
-            </Button>
 
             <ConfigProvider theme={{
                 algorithm: theme.darkAlgorithm,

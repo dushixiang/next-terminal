@@ -5,8 +5,6 @@ import agentGatewayApi from "@/api/agent-gateway-api";
 import {
     Cpu,
     Server,
-    MemoryStick,
-    HardDrive,
     Network,
     ArrowUp,
     ArrowDown,
@@ -42,7 +40,10 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                 <div className="flex items-center gap-2">
                     <Activity className="h-5 w-5"/>
                     <span>{t('gateways.monitor.title')}</span>
-                    {data?.ping && (
+                    {data?.host?.hostname && (
+                        <span className="text-sm text-gray-500">{data.host.hostname}</span>
+                    )}
+                    {data?.ping !== undefined && (
                         <Tag color="green">{t('gateways.stat.ping')}: {data.ping}ms</Tag>
                     )}
                 </div>
@@ -52,7 +53,6 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
             width={Math.min(1200, window.innerWidth - 100)}
         >
             <div className="flex flex-col gap-4">
-                {/* 系统信息卡片 */}
                 <Card
                     size="small"
                     title={
@@ -86,7 +86,11 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                     {data?.load && (
                         <>
                             <Divider className="my-3"/>
-                            <div className="grid grid-cols-3 gap-4">
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                <div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.stat.ping')}</div>
+                                    <div className="font-medium">{data.ping !== undefined ? `${data.ping} ms` : '-'}</div>
+                                </div>
                                 <div>
                                     <div className="text-gray-500 text-sm">{t('gateways.monitor.load_1m')}</div>
                                     <div className="font-medium">{data.load.load_1?.toFixed(2) || '-'}</div>
@@ -104,37 +108,24 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                     )}
                 </Card>
 
-                {/* 资源使用情况 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* CPU 卡片 */}
-                    <Card
-                        size="small"
-                        title={
-                            <div className="flex items-center gap-2">
-                                <Cpu className="h-4 w-4"/>
-                                <span>{t('gateways.stat.cpu')}</span>
-                            </div>
-                        }
-                    >
-                        <div className="space-y-3">
-                            <div>
-                                <div className="text-gray-500 text-sm mb-1">{t('gateways.stat.model')}</div>
-                                <div className="text-xs font-mono">{data?.cpu.model || '-'}</div>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.physical_cores')}</div>
-                                    <div className="font-medium">{data?.cpu.physical_cores || 0}</div>
-                                </div>
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.logical_cores')}</div>
-                                    <div className="font-medium">{data?.cpu.logical_cores || 0}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-gray-500 text-sm">{t('gateways.stat.percent')}</span>
-                                    <span className="font-medium">{data?.cpu.percent?.toFixed(1) || 0}%</span>
+                <Card
+                    size="small"
+                    title={
+                        <div className="flex items-center gap-2">
+                            <Cpu className="h-4 w-4"/>
+                            <span>{t('gateways.stat.cpu')} / {t('gateways.stat.memory')} / {t('gateways.stat.disk')}</span>
+                        </div>
+                    }
+                >
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="rounded-md border border-slate-200/70 dark:border-slate-700 px-3 py-2">
+                                <div className="text-xs text-gray-500 mb-1">{t('gateways.stat.cpu')}</div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-semibold">{data?.cpu.percent?.toFixed(1) || 0}%</span>
+                                    <span className="text-xs text-gray-400">
+                                        {t('gateways.stat.logical_cores')}: {data?.cpu.logical_cores || 0}
+                                    </span>
                                 </div>
                                 <Progress
                                     percent={data?.cpu.percent || 0}
@@ -144,221 +135,130 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                             (data?.cpu.percent || 0) > 60 ? '#faad14' : '#52c41a'
                                     }
                                 />
+                                <div className="text-xs text-gray-500 mt-1">{data?.cpu.model || '-'}</div>
                             </div>
-                        </div>
-                    </Card>
-
-                    {/* 内存卡片 */}
-                    <Card
-                        size="small"
-                        title={
-                            <div className="flex items-center gap-2">
-                                <MemoryStick className="h-4 w-4"/>
-                                <span>{t('gateways.stat.memory')}</span>
-                            </div>
-                        }
-                    >
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.total')}</div>
-                                    <div className="font-medium">{renderSize(data?.memory.total)}</div>
+                            <div className="rounded-md border border-slate-200/70 dark:border-slate-700 px-3 py-2">
+                                <div className="text-xs text-gray-500 mb-1">{t('gateways.stat.memory')}</div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-semibold">{data?.memory.percent?.toFixed(1) || 0}%</span>
+                                    <Tag color="blue" bordered={false} className="!m-0">
+                                        {renderSize(data?.memory.used)} / {renderSize(data?.memory.total)}
+                                    </Tag>
                                 </div>
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.used')}</div>
-                                    <div className="font-medium">{renderSize(data?.memory.used)}</div>
+                                <div className="text-xs text-gray-500 mt-2">
+                                    {t('gateways.stat.available')}: {renderSize(data?.memory.available)} · {t('gateways.stat.free')}: {renderSize(data?.memory.free)}
                                 </div>
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.available')}</div>
-                                    <div className="font-medium">{renderSize(data?.memory.available)}</div>
-                                </div>
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.free')}</div>
-                                    <div className="font-medium">{renderSize(data?.memory.free)}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-gray-500 text-sm">{t('gateways.stat.percent')}</span>
-                                    <span className="font-medium">{data?.memory.percent?.toFixed(1) || 0}%</span>
-                                </div>
-                                <Progress
-                                    percent={data?.memory.percent || 0}
-                                    showInfo={false}
-                                    strokeColor={
-                                        (data?.memory.percent || 0) > 80 ? '#f5222d' :
-                                            (data?.memory.percent || 0) > 70 ? '#faad14' : '#52c41a'
-                                    }
-                                />
-                            </div>
-                            {data?.memory.swap_total > 0 && (
-                                <div className="pt-2 border-t">
-                                    <div className="text-gray-500 text-sm mb-1">{t('gateways.stat.swap')}</div>
-                                    <div className="flex justify-between text-xs">
-                                        <span>{t('gateways.stat.total')}: {renderSize(data.memory.swap_total)}</span>
-                                        <span>{t('gateways.stat.free')}: {renderSize(data.memory.swap_free)}</span>
+                                {data?.memory.swap_total > 0 && (
+                                    <div className="text-xs text-gray-500 mt-1">
+                                        {t('gateways.stat.swap')}: {renderSize(data.memory.swap_total)} / {renderSize(data.memory.swap_free)}
                                     </div>
-                                </div>
-                            )}
-                        </div>
-                    </Card>
-                </div>
-
-                {/* 磁盘和网络 */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* 磁盘卡片 */}
-                    <Card
-                        size="small"
-                        title={
-                            <div className="flex items-center gap-2">
-                                <HardDrive className="h-4 w-4"/>
-                                <span>{t('gateways.stat.disk')}</span>
+                                )}
                             </div>
-                        }
-                    >
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.total')}</div>
-                                    <div className="font-medium">{renderSize(data?.disk.total)}</div>
+                            <div className="rounded-md border border-slate-200/70 dark:border-slate-700 px-3 py-2">
+                                <div className="text-xs text-gray-500 mb-1">{t('gateways.stat.disk')}</div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-lg font-semibold">{data?.disk.percent?.toFixed(1) || 0}%</span>
+                                    <Tag color="gold" bordered={false} className="!m-0">
+                                        {renderSize(data?.disk.used)} / {renderSize(data?.disk.total)}
+                                    </Tag>
                                 </div>
-                                <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.used')}</div>
-                                    <div className="font-medium">{renderSize(data?.disk.used)}</div>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-gray-500 text-sm">{t('gateways.stat.percent')}</span>
-                                    <span className="font-medium">{data?.disk.percent?.toFixed(1) || 0}%</span>
-                                </div>
-                                <Progress
-                                    percent={data?.disk.percent || 0}
-                                    showInfo={false}
-                                    strokeColor={
-                                        (data?.disk.percent || 0) > 90 ? '#f5222d' :
-                                            (data?.disk.percent || 0) > 70 ? '#faad14' : '#52c41a'
-                                    }
-                                />
-                            </div>
-                            <Divider className="my-2"/>
-                            <div>
-                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.disk_io_rate')}</div>
-                                <div className="grid grid-cols-2 gap-2">
+                                <div className="grid grid-cols-2 gap-2 mt-2 text-xs">
                                     <div className={clsx(
-                                        'flex items-center gap-2 px-3 py-2 rounded',
+                                        'flex items-center gap-2 px-2 py-1 rounded',
                                         'bg-green-50 dark:bg-green-900/20'
                                     )}>
-                                        <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400"/>
-                                        <div>
-                                            <div className="text-xs text-gray-500">{t('general.read')}</div>
-                                            <div className="font-medium text-green-600 dark:text-green-400">
-                                                {renderSize(data?.disk_io.read_bytes)}/s
-                                            </div>
-                                        </div>
+                                        <ArrowUp className="h-3 w-3 text-green-600 dark:text-green-400"/>
+                                        <span className="text-green-600 dark:text-green-400">
+                                            {renderSize(data?.disk_io.read_bytes)}/s
+                                        </span>
                                     </div>
                                     <div className={clsx(
-                                        'flex items-center gap-2 px-3 py-2 rounded',
+                                        'flex items-center gap-2 px-2 py-1 rounded',
                                         'bg-red-50 dark:bg-red-900/20'
                                     )}>
-                                        <ArrowDown className="h-4 w-4 text-red-600 dark:text-red-400"/>
-                                        <div>
-                                            <div className="text-xs text-gray-500">{t('general.write')}</div>
-                                            <div className="font-medium text-red-600 dark:text-red-400">
-                                                {renderSize(data?.disk_io.write_bytes)}/s
-                                            </div>
-                                        </div>
+                                        <ArrowDown className="h-3 w-3 text-red-600 dark:text-red-400"/>
+                                        <span className="text-red-600 dark:text-red-400">
+                                            {renderSize(data?.disk_io.write_bytes)}/s
+                                        </span>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </Card>
+                    </div>
+                </Card>
 
-                    {/* 网络卡片 */}
-                    <Card
-                        size="small"
-                        title={
-                            <div className="flex items-center gap-2">
-                                <Network className="h-4 w-4"/>
-                                <span>{t('assets.network')}</span>
-                            </div>
-                        }
-                    >
-                        <div className="space-y-3">
-                            <div>
-                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.network_io_rate')}</div>
-                                <div className="grid grid-cols-2 gap-2">
-                                    <div className={clsx(
-                                        'flex items-center gap-2 px-3 py-2 rounded',
-                                        'bg-green-50 dark:bg-green-900/20'
-                                    )}>
-                                        <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400"/>
-                                        <div>
-                                            <div className="text-xs text-gray-500">{t('general.upload')}</div>
-                                            <div className="font-medium text-green-600 dark:text-green-400">
-                                                {renderSize(data?.network.tx_sec)}/s
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className={clsx(
-                                        'flex items-center gap-2 px-3 py-2 rounded',
-                                        'bg-blue-50 dark:bg-blue-900/20'
-                                    )}>
-                                        <ArrowDown className="h-4 w-4 text-blue-600 dark:text-blue-400"/>
-                                        <div>
-                                            <div className="text-xs text-gray-500">{t('authorised.strategy.download')}</div>
-                                            <div className="font-medium text-blue-600 dark:text-blue-400">
-                                                {renderSize(data?.network.rx_sec)}/s
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.total_traffic')}</div>
-                                <div className="grid grid-cols-2 gap-4 text-xs">
+                <Card
+                    size="small"
+                    title={
+                        <div className="flex items-center gap-2">
+                            <Network className="h-4 w-4"/>
+                            <span>{t('assets.network')}</span>
+                        </div>
+                    }
+                >
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <div className="text-gray-500 text-sm">{t('gateways.monitor.network_io_rate')}</div>
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className={clsx(
+                                    'flex items-center gap-2 px-3 py-2 rounded',
+                                    'bg-green-50 dark:bg-green-900/20'
+                                )}>
+                                    <ArrowUp className="h-4 w-4 text-green-600 dark:text-green-400"/>
                                     <div>
-                                        <span className="text-gray-500">{t('general.upload')}: </span>
-                                        <span className="font-medium">{renderSize(data?.network.tx)}</span>
+                                        <div className="text-xs text-gray-500">{t('general.upload')}</div>
+                                        <div className="font-medium text-green-600 dark:text-green-400">
+                                            {renderSize(data?.network.tx_sec)}/s
+                                        </div>
                                     </div>
+                                </div>
+                                <div className={clsx(
+                                    'flex items-center gap-2 px-3 py-2 rounded',
+                                    'bg-blue-50 dark:bg-blue-900/20'
+                                )}>
+                                    <ArrowDown className="h-4 w-4 text-blue-600 dark:text-blue-400"/>
                                     <div>
-                                        <span className="text-gray-500">{t('authorised.strategy.download')}: </span>
-                                        <span className="font-medium">{renderSize(data?.network.rx)}</span>
+                                        <div className="text-xs text-gray-500">{t('authorised.strategy.download')}</div>
+                                        <div className="font-medium text-blue-600 dark:text-blue-400">
+                                            {renderSize(data?.network.rx_sec)}/s
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <Divider className="my-2"/>
-                            <div>
-                                <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.ip_address')}</div>
-                                <div className="space-y-2">
-                                    {data?.network.external_ip && (
-                                        <div className="flex items-center gap-2">
-                                            <Tag color="blue">{t('gateways.monitor.external')}</Tag>
-                                            <span className="font-mono text-sm">{data.network.external_ip}</span>
-                                        </div>
-                                    )}
-                                    {data?.network.internal_ips && data.network.internal_ips.length > 0 && (
-                                        <div>
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <Tag color="green">{t('gateways.monitor.internal')}</Tag>
-                                                <span className="text-xs text-gray-500">
-                                                    ({data.network.internal_ips.length} {t('gateways.monitor.items')})
-                                                </span>
-                                            </div>
-                                            <div className="pl-16 space-y-1">
-                                                {data.network.internal_ips.map((ip, index) => (
-                                                    <div key={index} className="font-mono text-xs text-gray-600 dark:text-gray-400">
-                                                        {ip}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
+                            <div className="text-xs text-gray-500">
+                                {t('gateways.monitor.total_traffic')}：{t('general.upload')} {renderSize(data?.network.tx)} · {t('authorised.strategy.download')} {renderSize(data?.network.rx)}
                             </div>
                         </div>
-                    </Card>
-                </div>
+                        <div>
+                            <div className="text-gray-500 text-sm mb-2">{t('gateways.monitor.ip_address')}</div>
+                            <div className="space-y-2">
+                                {data?.network.external_ip && (
+                                    <div className="flex items-center gap-2">
+                                        <Tag color="blue">{t('gateways.monitor.external')}</Tag>
+                                        <span className="font-mono text-sm">{data.network.external_ip}</span>
+                                    </div>
+                                )}
+                                {data?.network.internal_ips && data.network.internal_ips.length > 0 && (
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <Tag color="green">{t('gateways.monitor.internal')}</Tag>
+                                            <span className="text-xs text-gray-500">
+                                                ({data.network.internal_ips.length} {t('gateways.monitor.items')})
+                                            </span>
+                                        </div>
+                                        <div className="pl-16 space-y-1">
+                                            {data.network.internal_ips.map((ip, index) => (
+                                                <div key={index} className="font-mono text-xs text-gray-600 dark:text-gray-400">
+                                                    {ip}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </Card>
 
                 {/* 错误信息 */}
                 {data?.errors && Object.keys(data.errors).length > 0 && (

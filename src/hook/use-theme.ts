@@ -18,7 +18,7 @@ export const DefaultTheme: ConfigTheme = {
 export const DarkTheme: ConfigTheme = {
     isDark: true,
     algorithm: theme.darkAlgorithm,
-    backgroundColor: '#09090B',
+    backgroundColor: '#141414',
     // backgroundColor: '#101217',
 }
 

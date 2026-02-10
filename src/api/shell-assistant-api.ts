@@ -33,7 +33,21 @@ class ShellAssistantApi {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                let errorMessage = `HTTP error! status: ${response.status}`;
+                try {
+                    const text = await response.text();
+                    if (text) {
+                        try {
+                            const parsed = JSON.parse(text) as { error?: string; message?: string };
+                            errorMessage = parsed.error || parsed.message || text || errorMessage;
+                        } catch {
+                            errorMessage = text;
+                        }
+                    }
+                } catch {
+                    // keep default errorMessage
+                }
+                throw new Error(errorMessage);
             }
 
             const reader = response.body?.getReader();
@@ -61,7 +75,11 @@ class ShellAssistantApi {
                     if (line.startsWith('data: ')) {
                         try {
                             const data = JSON.parse(line.slice(6));
-                            onMessage(data as StreamResponse);
+                            const parsed = data as StreamResponse;
+                            onMessage(parsed);
+                            if (parsed.success === false) {
+                                return;
+                            }
                         } catch (e) {
                             console.error('Failed to parse SSE data:', e);
                         }

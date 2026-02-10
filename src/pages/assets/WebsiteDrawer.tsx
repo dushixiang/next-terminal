@@ -66,6 +66,8 @@ const WebsiteDrawer: React.FC<WebsiteDrawerProps> = ({
                     countries: [],
                     provinces: [],
                     cities: [],
+                    headerWhitelist: [],
+                    pathWhitelist: [],
                 },
                 tempAllow: { enabled: false, durationMinutes: 5, autoRenew: false },
             };

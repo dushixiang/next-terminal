@@ -92,12 +92,13 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
             await shellAssistantApi.askStream(
                 {question: currentQuestion, useSnippets: useSnippets},
                 (streamResponse: StreamResponse) => {
-                    if (!streamResponse.success) {
+                    if (streamResponse.success === false) {
                         // 处理错误
+                        const errorMessage = streamResponse.error || t('access.shell_assistant.request_failed_retry');
                         setResponses(prev =>
                             prev.map(r =>
                                 r.id === responseId
-                                    ? {...r, success: false, error: streamResponse.error, isComplete: true}
+                                    ? {...r, success: false, error: errorMessage, isComplete: true, content: ''}
                                     : r
                             )
                         );
@@ -134,10 +135,11 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                 },
                 (error: Error) => {
                     console.error('Shell assistant request failed:', error);
+                    const errorMessage = error?.message || t('access.shell_assistant.request_failed_retry');
                     setResponses(prev =>
                         prev.map(r =>
                             r.id === responseId
-                                ? {...r, success: false, error: t('access.shell_assistant.request_failed_retry'), isComplete: true}
+                                ? {...r, success: false, error: errorMessage, isComplete: true}
                                 : r
                         )
                     );
@@ -145,10 +147,11 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
             );
         } catch (error) {
             console.error('Shell assistant request failed:', error);
+            const errorMessage = (error as Error)?.message || t('access.shell_assistant.request_failed_retry');
             setResponses(prev =>
                 prev.map(r =>
                     r.id === responseId
-                        ? {...r, success: false, error: t('access.shell_assistant.request_failed_retry'), isComplete: true}
+                        ? {...r, success: false, error: errorMessage, isComplete: true}
                         : r
                 )
             );

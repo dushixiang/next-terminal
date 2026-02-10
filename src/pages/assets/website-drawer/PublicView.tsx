@@ -81,6 +81,22 @@ const PublicView: React.FC<PublicViewProps> = ({ timeLimit, onTimeLimitChange, e
                                         tooltip={t('assets.limit_geo_input_tip')}
                                     />
                                 </div>
+                                <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+                                    <ProFormSelect
+                                        label={t('assets.public_header_whitelist')}
+                                        name={['public', 'headerWhitelist']}
+                                        extra={t('assets.public_header_whitelist_tip')}
+                                        placeholder={t('assets.public_header_whitelist_placeholder')}
+                                        fieldProps={{ mode: 'tags', tokenSeparators: [','] }}
+                                    />
+                                    <ProFormSelect
+                                        label={t('assets.public_path_whitelist')}
+                                        name={['public', 'pathWhitelist']}
+                                        extra={t('assets.public_path_whitelist_tip')}
+                                        placeholder={t('assets.public_path_whitelist_placeholder')}
+                                        fieldProps={{ mode: 'tags', tokenSeparators: [','] }}
+                                    />
+                                </div>
                                 <ProFormCheckbox
                                     label={t('assets.limit_time_enabled')}
                                     name={['public', 'timeLimit']}

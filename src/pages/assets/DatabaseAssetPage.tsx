@@ -114,28 +114,6 @@ const DatabaseAssetPage = () => {
             },
         },
         {
-            title: t('general.status'),
-            dataIndex: 'status',
-            render: (text, record) => {
-                if (text === 'active') {
-                    return <Tag color="success">{t('assets.active')}</Tag>;
-                }
-                if (text === 'inactive') {
-                    return <Tag color="error">{t('general.offline')}</Tag>;
-                }
-                if (text === 'checking') {
-                    return <Tag color="processing">{t('assets.conn_test')}</Tag>;
-                }
-                return <Tag>{text}</Tag>;
-            },
-            valueEnum: {
-                active: {text: t('assets.active')},
-                inactive: {text: t('general.offline')},
-                checking: {text: t('assets.conn_test')},
-            },
-            width: 120,
-        },
-        {
             title: t('general.created_at'),
             dataIndex: 'createdAt',
             valueType: 'dateTime',
@@ -187,7 +165,6 @@ const DatabaseAssetPage = () => {
                         keyword: params.keyword,
                         name: params.name,
                         type: params.type,
-                        status: params.status,
                     };
                     const result = await api.getPaging(queryParams);
                     return {

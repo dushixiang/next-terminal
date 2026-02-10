@@ -89,6 +89,10 @@ const UserHeader = () => {
             title: t('menus.resource.submenus.website'),
         },
         {
+            key: '/x-database-asset',
+            title: t('menus.resource.submenus.database_asset'),
+        },
+        {
             key: '/x-snippet',
             title: t('menus.resource.submenus.snippet'),
         },

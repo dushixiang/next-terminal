@@ -93,9 +93,6 @@ const WebsiteFacadePage = () => {
                 if (item.name.toLowerCase().includes(search)) {
                     return true;
                 }
-                if (item.address.toLowerCase().includes(search)) {
-                    return true;
-                }
                 if (item.protocol.toLowerCase().includes(search)) {
                     return true;
                 }
@@ -118,7 +115,7 @@ const WebsiteFacadePage = () => {
         <div className="pb-6">
             <div className={'lg:px-20 px-4'}>
                 <div className={'lg:py-6 py-4'}>
-                    <div className={''}>
+                    <div className={'rounded-2xl border border-slate-200/70 dark:border-slate-700/70 p-4 lg:p-5'}>
                         <div className={'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'}>
                             <div className={'flex flex-col gap-1'}>
                                 <div className={'text-xl font-bold text-slate-900 dark:text-slate-100'}>
@@ -134,7 +131,7 @@ const WebsiteFacadePage = () => {
                             </div>
                         </div>
 
-                        <div className={'pt-4'}>
+                        <div className={'pt-3'}>
                             <FacadeSearchBar
                                 value={search}
                                 onChange={handleSearch}

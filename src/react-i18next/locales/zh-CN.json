@@ -40,6 +40,7 @@
     "not_found_subtitle": "抱歉，您似乎到达了预期之外的页面。",
     "my_assets": "我的资产",
     "home_admin": "后台首页",
+    "all": "全部",
     "leave_confirm": "你确定要离开这个页面吗？",
     "loading_detail": "正在努力加载中...",
     "status": "状态",
@@ -112,7 +113,13 @@
   },
   "facade": {
     "asset_placeholder": "资产名称、协议、标签、网络地址",
-    "website_placeholder": "网站名称、标签、地址",
+    "database_asset_placeholder": "资产名称、账号、标签、类型",
+    "database_access_title": "连接与访问",
+    "database_access_tip": "使用数据库代理连接，或通过 SQL 工单提交执行。",
+    "database_access_proxy_tip": "代理地址请联系管理员获取。",
+    "database_access_work_order": "前往 SQL 工单",
+    "database_asset_name_tip": "asset_name 使用下方列表中的资产名称。",
+    "website_placeholder": "网站名称、标签、类型",
     "processing": "处理中...",
     "in_use": "使用中",
     "clear_search": "清除搜索"
@@ -666,15 +673,15 @@
       "connect": "立即连接"
     },
     "shell_assistant": {
-      "title": "Shell 助手",
-      "placeholder": "描述您需要的Shell命令功能，例如：查找大于100MB的文件",
+      "title": "运维助手",
+      "placeholder": "描述您需要的运维命令功能，例如：查找大于100MB的文件",
       "use_snippets": "优先使用命令片段",
       "shortcut_tip": "Enter 发送 • Shift+Enter 换行",
       "ask": "询问",
-      "command_label": "Shell 命令",
+      "command_label": "运维命令",
       "request_failed": "请求失败",
       "request_failed_retry": "请求失败，请稍后重试",
-      "ready_title": "Shell 助手准备就绪",
+      "ready_title": "运维助手准备就绪",
       "ready_subtitle": "输入您的需求，我会为您生成合适的命令"
     },
     "terminal": {
@@ -1104,7 +1111,13 @@
       "visibility_public": "公开",
       "visibility_private": "私有"
     },
-    "website_load_failed": "加载网站数据失败"
+    "website_load_failed": "加载网站数据失败",
+    "public_header_whitelist": "请求头白名单",
+    "public_header_whitelist_tip": "携带任一指定请求头即放行，大小写不敏感。",
+    "public_header_whitelist_placeholder": "如：X-Bypass-Token",
+    "public_path_whitelist": "路径白名单",
+    "public_path_whitelist_tip": "匹配任一路径即放行，支持正则表达式。",
+    "public_path_whitelist_placeholder": "如：^/public/.* 或 /health"
   },
   "websites": {
     "group_tip": "拖拽可以调整顺序",
@@ -1453,10 +1466,10 @@
       "model_required": "请输入模型名称",
       "temperature": "Temperature",
       "max_tokens": "Max Tokens",
-      "shell_config": "Shell助手配置",
-      "shell_enable": "启用Shell助手",
-      "shell_prompt": "Shell助手提示词",
-      "shell_prompt_placeholder": "输入Shell助手的提示词...",
+      "shell_config": "运维助手配置",
+      "shell_enable": "启用运维助手",
+      "shell_prompt": "运维助手提示词",
+      "shell_prompt_placeholder": "输入运维助手的提示词...",
       "shell_prompt_default": "你是一个 IT 运维助手，负责将用户的需求直接转换为 Linux shell 命令。\n\n规则：\n\n1. **只输出命令**，不要加任何说明、解释、Markdown 包裹或额外文字。\n2. 如果存在多种写法，只输出最常用且安全的一种。\n3. 使用 Bash 语法，确保在 Ubuntu/Debian/CentOS 等常见发行版中通用。\n4. 对危险操作（如 `rm -rf /`、`:(){:|:&};:` 等），直接输出：\"该操作有风险，请谨慎执行\"。\n5. 如果用户输入不完整，自动补全为最常见、合理的完整命令。",
       "audit_prompt_default": "你是一个专业的系统审计助手。请分析提供的日志、操作记录或系统信息，并给出专业的审计意见。\n\n分析重点：\n1. 安全风险识别\n2. 异常行为检测\n3. 合规性检查\n4. 性能问题分析\n5. 操作建议和改进方案\n\n请对提供的信息进行全面分析，并提供详细的审计报告。"
     },
@@ -1503,6 +1516,7 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "主机",
+      "username": "账号",
       "database": "数据库"
     },
     "work_order": {

@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useTranslation} from "react-i18next";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import type {ProFormInstance} from "@ant-design/pro-components";
-import {Button} from "antd";
+import {Button, Popconfirm, Table} from "antd";
 import authorisedDatabaseAssetApi, {AuthorisedDatabaseAsset} from "@/api/authorised-database-asset-api";
 import {DepartmentSelect, UserSelect, DatabaseAssetSelect} from "@/components/shared/QuerySelects";
 import NButton from "@/components/NButton";
@@ -154,16 +154,18 @@ const AuthorisedDatabaseAssetPage = () => {
             key: 'option',
             width: 50,
             render: (text, record) => [
-                <NButton
-                    key="unbind"
-                    danger
-                    onClick={async () => {
+                <Popconfirm
+                    key="unbind-confirm"
+                    title={t('general.confirm_delete')}
+                    onConfirm={async () => {
                         await authorisedDatabaseAssetApi.deleteById(record['id']);
                         actionRef.current?.reload();
                     }}
                 >
-                    {t('actions.unbind')}
-                </NButton>
+                    <NButton key="unbind" danger>
+                        {t('actions.unbind')}
+                    </NButton>
+                </Popconfirm>
                 ,
             ],
         },
@@ -200,6 +202,22 @@ const AuthorisedDatabaseAssetPage = () => {
                 search={{
                     labelWidth: 'auto',
                 }}
+                rowSelection={{
+                    selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                }}
+                tableAlertOptionRender={({selectedRowKeys}) => (
+                    <Popconfirm
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await Promise.all(selectedRowKeys.map((id) => authorisedDatabaseAssetApi.deleteById(String(id))));
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton danger>
+                            {t('actions.unbind')}
+                        </NButton>
+                    </Popconfirm>
+                )}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true

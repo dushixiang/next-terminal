@@ -40,6 +40,7 @@
     "not_found_subtitle": "Sorry, it seems you've reached an unexpected page.",
     "my_assets": "My Assets",
     "home_admin": "Admin Home",
+    "all": "All",
     "leave_confirm": "Are you sure you want to leave this page?",
     "loading_detail": "Loading...",
     "status": "Status",
@@ -112,8 +113,14 @@
   },
   "facade": {
     "asset_placeholder": "Asset name, protocol, tags, network address",
+    "database_asset_placeholder": "Asset name, username, tag, type",
+    "database_access_title": "Connection & Access",
+    "database_access_tip": "Connect via the database proxy or submit SQL with work orders.",
+    "database_access_proxy_tip": "Ask an administrator for the proxy address.",
+    "database_access_work_order": "Go to SQL Work Orders",
+    "database_asset_name_tip": "Use the asset name below for asset_name.",
     "accessing": "Connecting",
-    "website_placeholder": "Website name, tag, address",
+    "website_placeholder": "Website name, tag, type",
     "processing": "Processing...",
     "in_use": "In use",
     "clear_search": "Clear search"
@@ -667,15 +674,15 @@
       "connect": "Connect Now"
     },
     "shell_assistant": {
-      "title": "Shell Assistant",
-      "placeholder": "Describe the shell command you need, e.g., find files larger than 100MB",
+      "title": "IT Operations Assistant",
+      "placeholder": "Describe the operations command you need, e.g., find files larger than 100MB",
       "use_snippets": "Prefer command snippets",
       "shortcut_tip": "Enter to send • Shift+Enter for newline",
       "ask": "Ask",
-      "command_label": "Shell Command",
+      "command_label": "Operations Command",
       "request_failed": "Request failed",
       "request_failed_retry": "Request failed, please try again later",
-      "ready_title": "Shell Assistant Ready",
+      "ready_title": "IT Operations Assistant Ready",
       "ready_subtitle": "Enter your request, I'll generate a suitable command"
     },
     "terminal": {
@@ -713,7 +720,7 @@
       "db_password": "Database Password"
     },
     "client_cert": "Client Certificate",
-    "client_cert_generate": "Generate & Download",
+    "client_cert_generate": "Generate \u0026 Download",
     "client_cert_regenerate": "Regenerate",
     "client_cert_revoke": "Revoke",
     "client_cert_empty": "No client certificate",
@@ -1105,7 +1112,13 @@
       "visibility_public": "Public",
       "visibility_private": "Private"
     },
-    "website_load_failed": "Failed to load website data"
+    "website_load_failed": "Failed to load website data",
+    "public_header_whitelist": "Request Header Allowlist",
+    "public_header_whitelist_tip": "Allow requests carrying any of the specified headers, case-insensitive.",
+    "public_header_whitelist_placeholder": "For example: X-Bypass-Token",
+    "public_path_whitelist": "Path whitelist",
+    "public_path_whitelist_tip": "Allow traffic if it matches any path; regular expressions are supported.",
+    "public_path_whitelist_placeholder": "For example: ^/public/.* or /health"
   },
   "websites": {
     "group_tip": "Drag to reorder",
@@ -1454,10 +1467,10 @@
       "model_required": "Please enter model name",
       "temperature": "Temperature",
       "max_tokens": "Max Tokens",
-      "shell_config": "Shell Assistant Config",
-      "shell_enable": "Enable Shell Assistant",
-      "shell_prompt": "Shell Assistant Prompt",
-      "shell_prompt_placeholder": "Enter shell assistant prompt...",
+      "shell_config": "IT Operations Assistant Config",
+      "shell_enable": "Enable IT Operations Assistant",
+      "shell_prompt": "IT Operations Assistant Prompt",
+      "shell_prompt_placeholder": "Enter IT operations assistant prompt...",
       "shell_prompt_default": "You are an IT operations assistant responsible for converting user requests directly into Linux shell commands.\n\nRules:\n\n1. **Output commands only**, no explanations, no Markdown, no extra text.\n2. If multiple ways exist, output the most common and safe one.\n3. Use Bash syntax compatible with common distros like Ubuntu/Debian/CentOS.\n4. For dangerous operations (e.g., `rm -rf /`, `:(){:|:\u0026};:`), output: \"This operation is risky, please proceed with caution\".\n5. If the user input is incomplete, auto-complete to the most common reasonable full command.",
       "audit_prompt_default": "You are a professional system audit assistant. Please analyze the provided logs, operation records, or system information and give professional audit advice.\n\nAnalysis focus:\n1. Security risk identification\n2. Abnormal behavior detection\n3. Compliance checks\n4. Performance issue analysis\n5. Recommendations and improvements\n\nPlease analyze the information comprehensively and provide a detailed audit report."
     },
@@ -1504,6 +1517,7 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "Host",
+      "username": "Username",
       "database": "Database"
     },
     "work_order": {

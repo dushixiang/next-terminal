@@ -152,51 +152,54 @@ const SnippetUserPage = () => {
 
     return (<div className={cn('px-4 lg:px-20', isMobile && 'px-2')}>
         <div className={cn('py-6', isMobile && 'p-4')}>
-            <div className={'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'}>
-                <div className={'flex flex-col gap-1'}>
-                    <div className={'text-xl font-bold text-slate-900 dark:text-slate-100'}>
-                        {t('menus.resource.submenus.snippet')}
+            <div className={'rounded-2xl border border-slate-200/70 dark:border-slate-700/70 p-4 lg:p-5'}>
+                <div className={'flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3'}>
+                    <div className={'flex flex-col gap-1'}>
+                        <div className={'text-xl font-bold text-slate-900 dark:text-slate-100'}>
+                            {t('menus.resource.submenus.snippet')}
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div className={'pt-4'}>
-                <FacadeSearchBar
-                    value={keyword}
-                    onChange={setKeyword}
-                    resultCount={filteredSnippets.length}
-                    totalCount={snippetsQuery.data?.length || 0}
-                />
+                <div className={'pt-3'}>
+                    <FacadeSearchBar
+                        value={keyword}
+                        onChange={setKeyword}
+                        resultCount={filteredSnippets.length}
+                        totalCount={snippetsQuery.data?.length || 0}
+                    />
+                </div>
             </div>
         </div>
-        <ProTable
-            className={'border rounded-md'}
-            columns={columns}
-            dataSource={filteredSnippets}
-            loading={snippetsQuery.isFetching}
-            rowKey="id"
-            search={false}
-            pagination={false}
-            dateFormatter="string"
-            headerTitle={null}
-            toolBarRender={() => [
-                <Button
-                    key="button"
-                    type="primary"
-                    size={isMobile ? 'middle' : 'middle'}
-                    onClick={() => {
-                        setOpen(true)
-                    }}
-                >
-                    {t('actions.new')}
-                </Button>,
-            ]}
-            options={{
-                density: !isMobile, // 移动端隐藏密度设置
-                fullScreen: !isMobile, // 移动端隐藏全屏按钮
-                reload: false,
-                setting: !isMobile, // 移动端隐藏列设置
-            }}
-        />
+        <div className={'rounded-xl ring-1 ring-slate-200/60 dark:ring-slate-700/60 p-1'}>
+            <ProTable
+                columns={columns}
+                dataSource={filteredSnippets}
+                loading={snippetsQuery.isFetching}
+                rowKey="id"
+                search={false}
+                pagination={false}
+                dateFormatter="string"
+                headerTitle={null}
+                toolBarRender={() => [
+                    <Button
+                        key="button"
+                        type="primary"
+                        size={isMobile ? 'middle' : 'middle'}
+                        onClick={() => {
+                            setOpen(true)
+                        }}
+                    >
+                        {t('actions.new')}
+                    </Button>,
+                ]}
+                options={{
+                    density: !isMobile, // 移动端隐藏密度设置
+                    fullScreen: !isMobile, // 移动端隐藏全屏按钮
+                    reload: false,
+                    setting: !isMobile, // 移动端隐藏列设置
+                }}
+            />
+        </div>
 
         <SnippetUserModal
             id={selectedRowKey}

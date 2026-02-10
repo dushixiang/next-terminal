@@ -40,6 +40,8 @@ export interface WebsiteFormData {
         countries?: string[];
         provinces?: string[];
         cities?: string[];
+        headerWhitelist?: string[];
+        pathWhitelist?: string[];
     };
     tempAllow?: {
         enabled: boolean;

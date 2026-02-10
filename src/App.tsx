@@ -73,6 +73,7 @@ const UserLayout = lazy(() => import("@/layout/UserLayout"));
 const DashboardPage = lazy(() => import("@/pages/dashboard/DashboardPage"));
 const UserInfoPage = lazy(() => import("@/pages/facade/UserInfoPage"));
 const SnippetUserPage = lazy(() => import("@/pages/facade/SnippetUserPage"));
+const DatabaseAssetFacadePage = lazy(() => import("@/pages/facade/DatabaseAssetFacadePage"));
 const SystemMonitorPage = lazy(() => import("@/pages/sysops/SystemMonitorPage"));
 const SetupPage = lazy(() => import("@/pages/identity/SetupPage"));
 const DatabaseWorkOrderPage = lazy(() => import("@/pages/dbproxy/DatabaseWorkOrderPage"));
@@ -98,6 +99,7 @@ const router = createBrowserRouter([
         element: <UserLayout/>,
         children: [
             {path: "/x-asset", element: <FacadePage/>,},
+            {path: "/x-database-asset", element: <DatabaseAssetFacadePage/>,},
             {path: "/x-website", element: <WebsiteFacadePage/>,},
             {path: "/x-snippet", element: <SnippetUserPage/>,},
             {path: "/x-info", element: <UserInfoPage/>,},

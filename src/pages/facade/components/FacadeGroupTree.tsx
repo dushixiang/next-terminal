@@ -37,7 +37,7 @@ const FacadeGroupTree: React.FC<FacadeGroupTreeProps> = React.memo(({
     };
 
     return (
-        <div className="hidden lg:block rounded-2xl border-2 border-slate-200/70 dark:border-slate-700/70 bg-gradient-to-br from-white via-white to-slate-50/30 dark:from-slate-900/95 dark:via-slate-900/90 dark:to-slate-800/80 backdrop-blur-sm p-5 shadow-xl shadow-slate-200/50 dark:shadow-black/40">
+        <div className="hidden lg:block rounded-2xl border border-slate-200/70 dark:border-slate-700/70 p-5 shadow-xl shadow-slate-200/50 dark:shadow-black/40">
             <div className="mb-3 pb-3 border-b border-slate-200/60 dark:border-slate-700/60">
                 <h3 className="text-sm font-bold text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 dark:from-slate-100 dark:to-slate-300">
                     {title}

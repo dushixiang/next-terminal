@@ -54,7 +54,7 @@ const FacadeCard: React.FC<FacadeCardProps> = React.memo(({
             'relative overflow-hidden h-full flex flex-col',
             'rounded-xl',
             // 背景 - 纯色简洁设计
-            'bg-white dark:bg-slate-900',
+            'bg-white dark:bg-[#141414]',
             // 边框 - 更细的边框
             'ring-1 ring-slate-200/60 dark:ring-slate-700/60',
             // 阴影 - 柔和且有层次
@@ -70,13 +70,19 @@ const FacadeCard: React.FC<FacadeCardProps> = React.memo(({
             {/* 顶部状态栏 */}
             <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 z-10">
                 {type === 'asset' && renderUserBadge()}
-                <span className={clsx(
-                    'px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase',
-                    'text-white shadow-sm',
-                    getProtocolColor(item.protocol)
-                )}>
-                    {item.protocol}
-                </span>
+                {type === 'asset' ? (
+                    <span className={clsx(
+                        'px-1.5 py-0.5 rounded text-[9px] font-bold tracking-wider uppercase',
+                        'text-white shadow-sm',
+                        getProtocolColor(item.protocol)
+                    )}>
+                        {item.protocol}
+                    </span>
+                ) : (
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-semibold uppercase text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800">
+                        {item.protocol}
+                    </span>
+                )}
             </div>
 
             {/* 主内容区 */}
@@ -109,11 +115,13 @@ const FacadeCard: React.FC<FacadeCardProps> = React.memo(({
                         )}
 
                         {/* 地址 */}
-                        <Tooltip title={item.address}>
-                            <p className="text-xs text-slate-500 dark:text-slate-500 truncate font-mono">
-                                {item.address}
-                            </p>
-                        </Tooltip>
+                        {type === 'asset' && (
+                            <Tooltip title={item.address}>
+                                <p className="text-xs text-slate-500 dark:text-slate-500 truncate font-mono">
+                                    {item.address}
+                                </p>
+                            </Tooltip>
+                        )}
                     </div>
                 </div>
 
@@ -153,10 +161,10 @@ const FacadeCard: React.FC<FacadeCardProps> = React.memo(({
 
                 {/* 按钮区域 - 仅网站模式 */}
                 {type === 'website' && (
-                    <div className="flex items-center gap-1.5 pt-2.5 mt-auto border-t border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-1.5 pt-3 mt-auto border-t border-slate-100 dark:border-slate-800">
                         <button
                             onClick={() => onOpen?.(item.id)}
-                            className="cursor-pointer flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-[#1D79F0] hover:bg-[#1D79F0]/90 shadow-sm transition-all duration-150"
+                            className="cursor-pointer flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all duration-150"
                         >
                             <ExternalLink className="w-3.5 h-3.5" />
                             {t('assets.access')}

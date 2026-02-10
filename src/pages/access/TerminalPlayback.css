@@ -3,3 +3,9 @@
     align-items: center;
     justify-content: center;
 }
+
+#player .ap-wrapper,
+#player .ap-player {
+    width: 100%;
+    height: 100%;
+}

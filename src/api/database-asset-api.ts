@@ -27,8 +27,9 @@ class DatabaseAssetApi extends Api<DatabaseAsset> {
         super("admin/database-assets");
     }
 
-    decrypt = async (id: string) => {
-        return await requests.get(`/${this.group}/${id}/decrypted`) as DatabaseAsset;
+    decrypt = async (id: string, securityToken?: string) => {
+        const query = securityToken ? `?securityToken=${encodeURIComponent(securityToken)}` : '';
+        return await requests.get(`/${this.group}/${id}/decrypted${query}`) as DatabaseAsset;
     }
 
     getAll = async (type?: string) => {

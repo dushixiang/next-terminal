@@ -1,5 +1,5 @@
-import React, {useMemo, useRef} from 'react';
-import {Button, Drawer} from "antd";
+import React, {useEffect, useRef, useState} from 'react';
+import {Button, Drawer, Space} from "antd";
 import {
     ProForm,
     ProFormDependency,
@@ -15,6 +15,7 @@ import sshGatewayApi from "@/api/ssh-gateway-api";
 import agentGatewayApi from "@/api/agent-gateway-api";
 import gatewayGroupApi from "@/api/gateway-group-api";
 import {EyeInvisibleOutlined, EyeTwoTone} from "@ant-design/icons";
+import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 
 const api = databaseAssetApi;
 
@@ -35,7 +36,16 @@ const DatabaseAssetModal = ({
                             }: DatabaseAssetModalProps) => {
     const {t} = useTranslation();
     const formRef = useRef<ProFormInstance>(null);
-    const drawerWidth = useMemo(() => Math.min(window.innerWidth - 160, 880), []);
+    const drawerWidth = 1200;
+    const [decrypted, setDecrypted] = useState(false);
+    const [mfaOpen, setMfaOpen] = useState(false);
+
+    useEffect(() => {
+        if (!open) {
+            setDecrypted(false);
+            setMfaOpen(false);
+        }
+    }, [open]);
 
     const get = async () => {
         if (id) {
@@ -72,9 +82,32 @@ const DatabaseAssetModal = ({
         }));
     };
 
+    const handleSave = () => {
+        formRef.current?.validateFields()
+            .then(async values => {
+                if (!values.gatewayType) {
+                    values.gatewayType = '';
+                    values.gatewayId = '';
+                }
+                handleOk(values);
+            });
+    };
+
+    const drawerExtra = (
+        <Space size={8}>
+            <Button onClick={handleCancel}>
+                {t('actions.cancel')}
+            </Button>
+            <Button type="primary" loading={confirmLoading} onClick={handleSave}>
+                {t('actions.save')}
+            </Button>
+        </Space>
+    );
+
     return (
         <Drawer
             title={id ? t('actions.edit') : t('actions.new')}
+            extra={drawerExtra}
             onClose={handleCancel}
             open={open}
             width={drawerWidth}
@@ -110,28 +143,37 @@ const DatabaseAssetModal = ({
                             </div>
                         </div>
 
-                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <ProFormText name={'host'} label={t('db.asset.host')} rules={[{required: true}]}/>
-                            <ProFormDigit
-                                name={'port'}
-                                label={t('gateways.port')}
-                                min={1}
-                                max={65535}
-                                rules={[{required: true}]}
-                            />
-                            <ProFormText name={'username'} label={t('menus.identity.submenus.user')} rules={[{required: true}]}/>
-                            <div className="md:col-span-1">
-                                <ProFormText.Password
-                                    label={t('assets.password')}
-                                    name='password'
-                                    fieldProps={{
-                                        iconRender: (visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>),
-                                    }}
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="md:col-span-2">
+                                    <ProFormText name={'host'} label={t('db.asset.host')} rules={[{required: true}]}/>
+                                </div>
+                                <ProFormDigit
+                                    name={'port'}
+                                    label={t('gateways.port')}
+                                    min={1}
+                                    max={65535}
+                                    rules={[{required: true}]}
                                 />
                             </div>
+                            <ProFormText name={'username'} label={t('menus.identity.submenus.user')} rules={[{required: true}]}/>
+                            <ProFormText.Password
+                                label={t('assets.password')}
+                                name='password'
+                                fieldProps={{
+                                    iconRender: (visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>),
+                                    visibilityToggle: {
+                                        onVisibleChange: (visible) => {
+                                            if (id && visible && !decrypted) {
+                                                setMfaOpen(true);
+                                            }
+                                        }
+                                    }
+                                }}
+                            />
                         </div>
 
-                        <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                             <ProFormSelect
                                 label={t('assets.gateway_type')}
                                 name='gatewayType'
@@ -189,24 +231,23 @@ const DatabaseAssetModal = ({
                         </div>
                     </ProForm>
                 </div>
-                <div className="pt-3 border-t flex justify-end gap-2">
-                    <Button onClick={handleCancel}>
-                        {t('actions.cancel')}
-                    </Button>
-                    <Button type="primary" loading={confirmLoading} onClick={() => {
-                        formRef.current?.validateFields()
-                            .then(async values => {
-                                if (!values.gatewayType) {
-                                    values.gatewayType = '';
-                                    values.gatewayId = '';
-                                }
-                                handleOk(values);
-                            });
-                    }}>
-                        {t('actions.save')}
-                    </Button>
-                </div>
             </div>
+
+            <MultiFactorAuthentication
+                open={mfaOpen}
+                handleOk={async (securityToken) => {
+                    if (!id) {
+                        return;
+                    }
+                    const res = await api.decrypt(id, securityToken);
+                    formRef.current?.setFieldsValue({
+                        password: res.password,
+                    });
+                    setDecrypted(true);
+                    setMfaOpen(false);
+                }}
+                handleCancel={() => setMfaOpen(false)}
+            />
         </Drawer>
     );
 };

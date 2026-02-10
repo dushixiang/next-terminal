@@ -102,13 +102,22 @@ const AgentGatewayPage = () => {
         updateSortMutation.mutate(req);
     };
 
-    const JudgeLoadBusy = (load: number, cores: number) => {
+    const renderLoadStatus = (load?: number, cores?: number) => {
+        if (load === undefined || load === null || !cores) return null;
         const ratio = load / cores;
+        if (ratio < 0.7) return {color: 'green', text: t('gateways.load.normal')};
+        if (ratio < 1.0) return {color: 'orange', text: t('gateways.load.moderate')};
+        return {color: 'red', text: t('gateways.load.busy')};
+    };
 
-        if (ratio < 0.7) return <div className={'text-green-400'}>{t('gateways.load.normal')}</div>;      // 系统空闲
-        if (ratio < 1.0) return <div className={'text-orange-400'}>{t('gateways.load.moderate')}</div>;     // 轻度繁忙
-        return <div className={'text-red-400'}>{t('gateways.load.busy')}</div>;                         // 资源紧张
-    }
+    const renderPingTag = (ping?: number) => {
+        if (ping === undefined || ping === null) return '-';
+        let color = 'green';
+        if (ping >= 200) color = 'red';
+        else if (ping >= 120) color = 'orange';
+        else if (ping >= 60) color = 'gold';
+        return <Tag color={color} bordered={false} className="!m-0">{ping} ms</Tag>;
+    };
 
     let columns: ProColumns<AgentGateway>[] = [
         {
@@ -122,7 +131,7 @@ const AgentGatewayPage = () => {
             title: t('general.name'),
             dataIndex: 'name',
             className: 'drag-visible',
-            width: 200,
+            width: 260,
             render: (text, record) => {
                 let osImg = '';
                 switch (record.os) {
@@ -136,18 +145,50 @@ const AgentGatewayPage = () => {
                         osImg = macosImg;
                         break;
                 }
-                return <Tooltip title={
-                    <div className="text-xs">
-                        <div>{t('gateways.version')}: {record.version || '-'}</div>
-                        <div>{t('gateways.stat.ping')}: {record.stat?.ping || '-'} ms</div>
-                        <div>{t('gateways.stat.uptime')}: {formatUptime(record.stat?.host.uptime)}</div>
+                return (
+                    <div className="flex items-center gap-3">
+                        <div className="h-9 w-9 rounded-lg bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                            <img src={osImg} className="w-5 h-5" alt="os"/>
+                        </div>
+                        <div className="min-w-0">
+                            <div className="flex items-center gap-2">
+                                <span className="truncate font-medium">{record.name}</span>
+                                {record.version && (
+                                    <Tag color="blue" bordered={false} className="!m-0">v{record.version}</Tag>
+                                )}
+                            </div>
+                            <div className="text-xs text-gray-500 flex items-center gap-2">
+                                <span className="font-mono">{record.ip || '-'}</span>
+                                <span className="text-gray-300">•</span>
+                                <span>{record.os}/{record.arch}</span>
+                            </div>
+                        </div>
                     </div>
-                }>
-                    <div className={'flex items-center gap-2'}>
-                        <img src={osImg} className={'w-4 h-4'} alt={'os'}/>
-                        <span className="truncate">{record.name}</span>
-                    </div>
-                </Tooltip>
+                );
+            }
+        },
+        {
+            title: t('general.status'),
+            dataIndex: 'online',
+            key: 'online',
+            hideInSearch: true,
+            width: 90,
+            render: (text, record) => {
+                if (record.online === false) {
+                    return <Tag bordered={false} className="!m-0">{t('general.offline')}</Tag>;
+                }
+                return <Tag color="green" bordered={false} className="!m-0">{t('general.online')}</Tag>;
+            }
+        },
+        {
+            title: t('gateways.stat.ping'),
+            dataIndex: 'stat.ping',
+            key: 'stat.ping',
+            hideInSearch: true,
+            width: 90,
+            render: (text, record) => {
+                if (record.online === false) return '-';
+                return renderPingTag(record.stat?.ping);
             }
         },
         {
@@ -155,14 +196,21 @@ const AgentGatewayPage = () => {
             dataIndex: 'stat.load',
             key: 'stat.load',
             hideInSearch: true,
-            width: 80,
+            width: 120,
             render: (text, record) => {
                 if (record.online === false) {
                     return '-';
                 }
-                return <div>
-                    {JudgeLoadBusy(record.stat?.load.load_1, record.stat?.cpu.logical_cores)}
-                </div>
+                const load1 = record.stat?.load?.load_1;
+                const load = `${record.stat?.load?.load_1?.toFixed(2) || '-'}, ${record.stat?.load?.load_5?.toFixed(2) || '-'}, ${record.stat?.load?.load_15?.toFixed(2) || '-'}`;
+                const cores = record.stat?.cpu?.logical_cores;
+                const status = renderLoadStatus(load1, cores);
+                return (
+                    <div className="flex flex-col gap-1">
+                        <div className="text-xs text-gray-500">{load}</div>
+                        {status ? <Tag color={status.color} bordered={false} className="!m-0 w-fit">{status.text}</Tag> : '-'}
+                    </div>
+                );
             }
         },
         {

@@ -2,7 +2,7 @@ import React, {useCallback, useEffect, useMemo, useRef} from 'react';
 import {useTranslation} from "react-i18next";
 import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
 import type {ProFormInstance} from "@ant-design/pro-components";
-import {Button} from "antd";
+import {Button, Popconfirm, Table} from "antd";
 import authorisedAssetApi, {Authorised} from "@/api/authorised-asset-api";
 import {UserSelect, DepartmentSelect, AssetGroupSelect, AssetSelect} from "@/components/shared/QuerySelects";
 import NButton from "@/components/NButton";
@@ -175,16 +175,18 @@ const AuthorisedAssetPage = () => {
             key: 'option',
             width: 50,
             render: (text, record, _, action) => [
-                <NButton
-                    key="unbind"
-                    danger
-                    onClick={async () => {
+                <Popconfirm
+                    key="unbind-confirm"
+                    title={t('general.confirm_delete')}
+                    onConfirm={async () => {
                         await authorisedAssetApi.deleteById(record['id']);
                         actionRef.current?.reload();
                     }}
                 >
-                    {t('actions.unbind')}
-                </NButton>
+                    <NButton key="unbind" danger>
+                        {t('actions.unbind')}
+                    </NButton>
+                </Popconfirm>
                 ,
             ],
         },
@@ -223,6 +225,22 @@ const AuthorisedAssetPage = () => {
                 search={{
                     labelWidth: 'auto',
                 }}
+                rowSelection={{
+                    selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
+                }}
+                tableAlertOptionRender={({selectedRowKeys}) => (
+                    <Popconfirm
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await Promise.all(selectedRowKeys.map((id) => authorisedAssetApi.deleteById(String(id))));
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton danger>
+                            {t('actions.unbind')}
+                        </NButton>
+                    </Popconfirm>
+                )}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true
