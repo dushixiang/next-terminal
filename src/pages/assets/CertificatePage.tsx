@@ -72,6 +72,7 @@ const CertificatePage = () => {
         {
             title: t('assets.domain'),
             dataIndex: 'commonName',
+            hideInSearch: true,
         },
         {
             title: t('assets.certificates.type'),
@@ -91,6 +92,19 @@ const CertificatePage = () => {
             }
         },
         {
+            title: 'mTLS',
+            dataIndex: 'requireClientAuth',
+            key: 'requireClientAuth',
+            hideInSearch: true,
+            width: 100,
+            render: (type, record) => {
+                if (record.requireClientAuth) {
+                    return <Tag bordered={false} color="green-inverse">{t('general.yes')}</Tag>;
+                }
+                return <Tag bordered={false} color="gray">{t('general.no')}</Tag>;
+            },
+        },
+        {
             title: t('assets.certificates.is_default'),
             dataIndex: 'isDefault',
             key: 'isDefault',
@@ -107,6 +121,7 @@ const CertificatePage = () => {
         {
             title: t('assets.certificates.issuer'),
             dataIndex: 'issuer',
+            hideInSearch: true,
             ellipsis: true,
         },
         {
@@ -234,7 +249,7 @@ const CertificatePage = () => {
                     pageSize: params.pageSize,
                     sortOrder: sortOrder,
                     sortField: sortField,
-                    name: params.name,
+                    keyword: params.keyword,
                 }
                 let result = await api.getPaging(queryParams);
                 return {
@@ -244,9 +259,10 @@ const CertificatePage = () => {
                 };
             }}
             rowKey="id"
-            search={{
-                labelWidth: 'auto',
+            options={{
+                search: true,
             }}
+            search={false}
             pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true

@@ -242,6 +242,7 @@ const WebsitePage = () => {
         {
             title: t('general.name'),
             dataIndex: 'name',
+            hideInSearch: true,
             width: 120,
             render: (text, record) => {
                 return (
@@ -292,6 +293,7 @@ const WebsitePage = () => {
             title: t('assets.domain'),
             dataIndex: 'domain',
             key: 'domain',
+            hideInSearch: true,
             width: isMobile ? 150 : 300,
             render: (text, record) => {
                 return <div>
@@ -389,7 +391,7 @@ const WebsitePage = () => {
                 pageSize: params.pageSize,
                 sortOrder: sortOrder,
                 sortField: sortField,
-                name: params.name,
+                keyword: params.keyword,
                 groupId: groupId || undefined,
             }
             let result = await api.getPaging(queryParams);
@@ -430,9 +432,10 @@ const WebsitePage = () => {
             );
         },
         rowKey: "id" as const,
-        search: {
-            labelWidth: 'auto' as const,
+        options: {
+            search: true,
         },
+        search: false as const,
         pagination: {
             defaultPageSize: 10,
             showSizeChanger: !isMobile // 移动端隐藏页面大小选择器
@@ -489,7 +492,7 @@ const WebsitePage = () => {
                     "grid gap-4 transition-all duration-300",
                     isTreeCollapsed ? "grid-cols-[48px_1fr]" : "grid-cols-[240px_1fr]"
                 )}>
-                    <div className="relative border rounded-md dark:bg-[#141414]">
+                    <div className="relative rounded-md bg-gray-50 dark:bg-[#141414]">
                         {!isTreeCollapsed && (
                             <WebsiteTree
                                 selected={groupId}
@@ -511,7 +514,7 @@ const WebsitePage = () => {
                             )}
                         </div>
                     </div>
-                    <div className="overflow-hidden rounded-md border">
+                    <div className="overflow-hidden rounded-md">
                         <DragSortTable {...tableProps}
                                        scroll={{
                                            x: 'max-content'
@@ -568,7 +571,7 @@ const WebsitePage = () => {
             onCancel={closeTempAllowManager}
             footer={null}
             width={720}
-            destroyOnClose
+            destroyOnHidden={true}
         >
             <Table
                 rowKey={(record) => `${record.websiteId}-${record.ip}`}

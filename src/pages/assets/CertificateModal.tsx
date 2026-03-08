@@ -91,7 +91,7 @@ const CertificateModal = ({
                                     </div>
                                     <ProFormSwitch
                                         name="requireClientAuth"
-                                        label={t('assets.certificates.require_client_auth')}
+                                        label={'mTLS'}
                                     />
                                 </>
                             case 'issued':

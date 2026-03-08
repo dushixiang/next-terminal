@@ -71,7 +71,8 @@
     "batch_delete": "批量删除",
     "refresh": "刷新",
     "confirm": "确认",
-    "back": "返回上一页"
+    "back": "返回上一页",
+    "more": "更多"
   },
   "dashboard": {
     "login_times": "登录次数",
@@ -590,21 +591,28 @@
       "account": "账户",
       "at": "操作时间"
     },
-    "risk_level": {
-      "label": "风险等级",
-      "options": {
-        "normal": "普通命令",
-        "high_risk": "高危命令"
-      }
-    },
     "options": {
       "playback": "回放",
+      "audit": "审计",
       "disconnect": {
         "action": "断开",
         "confirm": "您确认要断开此会话吗？"
       }
     },
-    "unknown_protocol": "未知协议：{{protocol}}"
+    "audit_analyzing": "正在分析录屏内容，请稍候...",
+    "audit_failed": "审计失败",
+    "audit_no_result": "暂无审计结果",
+    "unknown_protocol": "未知协议：{{protocol}}",
+    "audit_status": {
+      "label": "审计状态",
+      "pending": "分析中",
+      "completed": "已完成",
+      "failed": "失败",
+      "start": "开始分析",
+      "pending_tip": "AI 正在后台分析录屏内容，完成后请刷新页面查看结果",
+      "view": "查看报告",
+      "retry": "重新分析"
+    }
   },
   "access": {
     "settings": {
@@ -981,7 +989,6 @@
       "renew_confirm_content": "将会重新申请并更新证书，确认继续吗？",
       "issued_log": "证书申请日志",
       "renew_before": "续签提前时间",
-      "require_client_auth": "需要客户端证书",
       "log_viewer": {
         "status": {
           "realtime": "实时接收",
@@ -1112,6 +1119,8 @@
       "visibility_private": "私有"
     },
     "website_load_failed": "加载网站数据失败",
+    "auto_fetch_favicon": "自动获取图标",
+    "auto_fetch_favicon_failed": "获取图标失败，请检查目标地址是否正确",
     "public_header_whitelist": "请求头白名单",
     "public_header_whitelist_tip": "携带任一指定请求头即放行，大小写不敏感。",
     "public_header_whitelist_placeholder": "如：X-Bypass-Token",
@@ -1471,7 +1480,18 @@
       "shell_prompt": "运维助手提示词",
       "shell_prompt_placeholder": "输入运维助手的提示词...",
       "shell_prompt_default": "你是一个 IT 运维助手，负责将用户的需求直接转换为 Linux shell 命令。\n\n规则：\n\n1. **只输出命令**，不要加任何说明、解释、Markdown 包裹或额外文字。\n2. 如果存在多种写法，只输出最常用且安全的一种。\n3. 使用 Bash 语法，确保在 Ubuntu/Debian/CentOS 等常见发行版中通用。\n4. 对危险操作（如 `rm -rf /`、`:(){:|:&};:` 等），直接输出：\"该操作有风险，请谨慎执行\"。\n5. 如果用户输入不完整，自动补全为最常见、合理的完整命令。",
-      "audit_prompt_default": "你是一个专业的系统审计助手。请分析提供的日志、操作记录或系统信息，并给出专业的审计意见。\n\n分析重点：\n1. 安全风险识别\n2. 异常行为检测\n3. 合规性检查\n4. 性能问题分析\n5. 操作建议和改进方案\n\n请对提供的信息进行全面分析，并提供详细的审计报告。"
+      "audit_config": "SSH/Telnet 审计助手配置",
+      "audit_config_desc": "分析 SSH/Telnet 会话的 asciinema 终端录屏，识别高危命令与安全风险",
+      "audit_enable": "启用 SSH/Telnet 审计助手",
+      "audit_prompt": "SSH/Telnet 审计提示词",
+      "audit_prompt_placeholder": "输入 SSH/Telnet 审计助手的提示词...",
+      "audit_prompt_default": "你是一位专业的 **Linux/Unix 运维行为审计专家**，擅长分析 **用户在终端中执行的命令行为**。\n\n以下是一段 **SSH/Telnet 会话记录**（来源于终端 asciinema 录屏，已去除 ANSI 控制字符）。\n\n请重点分析 **用户输入执行的命令及操作行为**，还原用户的操作过程，并识别其中可能存在的关键或高风险操作。\n\n请生成一份 **Markdown 格式的命令行为审计报告**。\n\n---\n\n# SSH 会话命令行为审计报告\n\n## 一、操作摘要\n\n简要总结本次会话中 **用户的主要操作行为**，包括：\n\n* 用户主要做了哪些事情（如：查看日志、修改配置、删除文件、安装软件等）\n* 是否存在明显的高风险操作\n* 整体操作性质（如：日常运维 / 故障排查 / 系统维护 / 可疑行为）\n\n用 **2–4 句话总结**。\n\n---\n\n## 二、时间轴操作事件\n\n按时间顺序梳理 **用户执行的关键命令和行为**。\n\n| 序号 | 用户命令 | 操作类型 | 行为说明 |\n| -- | ---- | ---- | ---- |\n| 1  |      |      |      |\n| 2  |      |      |      |\n| 3  |      |      |      |\n\n说明：\n\n* **用户命令**：记录用户输入的命令\n* **操作类型**：如文件操作 / 系统管理 / 网络访问 / 权限操作 / 软件安装等\n* **行为说明**：解释该命令的作用\n\n如果有明显的 **连续操作行为（如批量删除、批量下载）**，可以合并描述。\n\n---\n\n## 三、关键操作分析\n\n识别本次会话中的 **重要或高风险操作**，并进行重点分析。\n\n|  风险等级  | 用户命令 | 操作说明 | 风险分析 |\n| :----: | :--- | :--- | :--- |\n| 🔴 高风险 |      |      |      |\n| 🟠 中风险 |      |      |      |\n| 🟡 低风险 |      |      |      |\n\n重点关注：\n\n* **权限提升**\n\n  * sudo\n  * su\n  * 修改 sudoers\n  * 修改用户密码\n\n* **危险文件操作**\n\n  * rm -rf\n  * 覆盖文件\n  * 批量删除\n\n* **关键系统配置修改**\n\n  * /etc/passwd\n  * /etc/shadow\n  * /etc/sudoers\n  * crontab\n  * SSH 配置\n\n* **外部下载或执行**\n\n  * curl\n  * wget\n  * 下载并执行脚本\n\n* **敏感信息访问**\n\n  * 私钥\n  * .env\n  * 数据库配置\n\n* **数据打包或传输**\n\n  * tar\n  * scp\n  * rsync\n  * 数据库导出\n\n如果未发现明显风险操作，请说明。\n\n---\n\n## 审计原则\n\n1. **只分析用户执行的命令行为，不分析系统漏洞或主机安全配置。**\n2. **不要臆测用户意图，仅基于命令行为进行分析。**\n3. **如果信息不足，请明确说明\"信息不足\"。**\n4. 保持描述 **客观、专业、简洁**。",
+      "audit_rdp_config": "RDP/VNC 审计助手配置",
+      "audit_rdp_config_desc": "分析 RDP/VNC 图形化远程桌面会话，识别可疑操作与安全风险",
+      "audit_rdp_enable": "启用 RDP/VNC 审计助手",
+      "audit_rdp_prompt": "RDP/VNC 审计提示词",
+      "audit_rdp_prompt_placeholder": "输入 RDP/VNC 审计助手的提示词...",
+      "audit_rdp_prompt_default": "你是一位专业的桌面远程运维安全审计专家。以下是一段 RDP/VNC 图形化远程桌面会话的相关信息。\n\n请对本次会话进行安全审计，并输出一份 Markdown 格式的审计报告，结构如下：\n\n## 一、执行摘要\n- **整体风险等级**：低 / 中 / 高 / 严重\n- **核心发现**：2–3 句话概括\n\n## 二、操作行为分析\n分析可识别的操作行为，包括：\n- 应用程序使用（浏览器、编辑器、终端、管理工具等）\n- 文件管理操作（复制、移动、删除、下载等）\n- 系统配置变更\n- 网络访问与传输行为\n\n## 三、安全风险清单\n| 风险等级 | 具体行为 | 风险说明 |\n|:-------:|:--------|:--------|\n| 🔴 高危 | | |\n| 🟠 中危 | | |\n| 🟡 低危 | | |\n\n## 四、合规性评估\n指出违规操作，给出改进建议。\n\n## 五、审计结论\n总体评价与处置建议。\n\n注意：信息不足时请注明，不要臆测。"
     },
     "oidc_server": {
       "description": "配置 OIDC Server 使 Next Terminal 成为 OpenID Connect 身份提供者，允许其他应用使用此系统进行单点登录认证。",

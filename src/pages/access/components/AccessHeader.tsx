@@ -30,12 +30,12 @@ const AccessHeader = React.memo(({
 
     return (
         <div className={'text-white h-10 bg-[#313131] flex items-center gap-6'}>
-            <div className={'flex items-center px-2 gap-2'}>
+            <a className={'flex items-center px-2 gap-2 cursor-pointer'} href={'/'} target={'_blank'}>
                 <img src={brandingApi.getLogo()} alt='logo' className={'h-6 w-6 rounded'}/>
-                <div className={'font-bold'}>
+                <div className={'font-bold text-white'}>
                     {brandingQuery.data?.name}
                 </div>
-            </div>
+            </a>
 
             <div className={'flex items-center gap-6 text-white'}>
                 <Tooltip title={t('access.settings.theme')} placement={'right'}>

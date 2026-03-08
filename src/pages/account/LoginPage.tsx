@@ -8,8 +8,6 @@ import {removeToken, setToken} from "@/api/core/requests.ts";
 import {StyleProvider} from '@ant-design/cssinjs';
 import brandingApi from "@/api/branding-api";
 import {useTranslation} from "react-i18next";
-import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
-import {REGEXP_ONLY_DIGITS} from "input-otp";
 import {startAuthentication} from "@simplewebauthn/browser";
 import {LanguagesIcon, Moon, Sun} from "lucide-react";
 import i18n from "i18next";
@@ -288,21 +286,15 @@ const LoginPage = () => {
                     <Form form={optForm} onFinish={validateTOTP.mutate} className="login-form" layout="vertical">
                         <Form.Item label={t('identity.user.otp')} name='totp'
                                    rules={[{required: true}]}>
-                            <InputOTP maxLength={6}
-                                      pattern={REGEXP_ONLY_DIGITS}
-                                      onComplete={handleOTPChange}
-                                      autoFocus={true}
-                                      autoComplete={'one-time-code'}
-                            >
-                                <InputOTPGroup>
-                                    <InputOTPSlot index={0}/>
-                                    <InputOTPSlot index={1}/>
-                                    <InputOTPSlot index={2}/>
-                                    <InputOTPSlot index={3}/>
-                                    <InputOTPSlot index={4}/>
-                                    <InputOTPSlot index={5}/>
-                                </InputOTPGroup>
-                            </InputOTP>
+                            <Input.OTP
+                                length={6}
+                                autoFocus
+                                onChange={(value) => {
+                                    if (value.length === 6) {
+                                        handleOTPChange(value);
+                                    }
+                                }}
+                            />
                         </Form.Item>
                         <Form.Item>
                             <Button type="primary"

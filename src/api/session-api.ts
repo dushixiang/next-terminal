@@ -20,6 +20,7 @@ export interface Session {
     recording: string;
     recordingSize: number;
     commandCount: number;
+    auditStatus: string;
 }
 
 export interface SessionWatermark {
@@ -43,6 +44,16 @@ export interface SessionSharer {
     url: string
 }
 
+export interface SessionAudit {
+    id: string;
+    sessionId: string;
+    status: 'pending' | 'completed' | 'failed';
+    content: string;
+    error: string;
+    createdAt: number;
+    updatedAt: number;
+}
+
 class SessionApi extends Api<Session> {
     constructor() {
         super("admin/sessions");
@@ -54,6 +65,18 @@ class SessionApi extends Api<Session> {
 
     clear = async () => {
         await requests.post(`/${this.group}/clear`);
+    }
+
+    auditEnabled = async (): Promise<{ terminalEnabled: boolean }> => {
+        return await requests.get(`/${this.group}/audit-enabled`);
+    }
+
+    triggerAudit = async (sessionId: string): Promise<SessionAudit> => {
+        return await requests.post(`/${this.group}/${sessionId}/audit`);
+    }
+
+    getAudit = async (sessionId: string): Promise<SessionAudit | null> => {
+        return await requests.get(`/${this.group}/${sessionId}/audit`);
     }
 }
 

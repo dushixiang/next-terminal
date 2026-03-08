@@ -11,6 +11,8 @@ import {baseWebSocketUrl, getToken} from "@/api/core/requests";
 import qs from "qs";
 import eventEmitter from "@/api/core/event-emitter";
 import {clsx} from "clsx";
+import {Popconfirm} from "antd";
+import {XIcon} from "lucide-react";
 
 interface Props {
     assetId: string;
@@ -60,7 +62,11 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, tabId, onClo
         const handleMessage = (message: string) => {
             // 检查 websocket 是否存在且已连接
             if (websocket?.readyState === WebSocket.OPEN) {
-                websocket?.send(new Message(MessageTypeData, message + '\n').toString());
+                if (message !== '\r') {
+                    message += '\r';
+                }
+                websocket?.send(new Message(MessageTypeData, message).toString());
+                terminal.current?.scrollToBottom();
             }
         }
         eventEmitter.on(eventName, handleMessage);
@@ -215,22 +221,30 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, tabId, onClo
 
     return (
         <div className={clsx(
-            'rounded border',
-            isFocus && 'border-[#1063FF]',
+            'rounded-lg border shadow-sm transition-all duration-200',
+            isFocus ? 'border-blue-500 shadow-md shadow-blue-500/20' : 'border-gray-700',
         )}>
-            <div className={'flex items-center justify-between px-2 py-1 border-b '}>
-                <div className={'font-medium'}>
-                    {session?.assetName}
+            <div
+                className={'flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-800/50 rounded-t-lg'}>
+                <div className={'font-medium text-sm truncate flex-1 text-gray-200'}>
+                    {session?.assetName || '连接中...'}
                 </div>
-                {/*<XIcon className={'h-4 w-4 cursor-pointer'}*/}
-                {/*       onClick={() => {*/}
-                {/*           websocket?.close();*/}
-                {/*           onClose?.();*/}
-                {/*       }}*/}
-                {/*/>*/}
+                <Popconfirm
+                    title="关闭终端"
+                    description="确定要关闭此终端吗？"
+                    onConfirm={() => {
+                        websocket?.close();
+                        onClose?.();
+                    }}
+                    okText="确定"
+                    cancelText="取消"
+                >
+                    <XIcon
+                        className={'h-4 w-4 cursor-pointer text-gray-400 hover:text-red-400 transition-colors flex-shrink-0 ml-2'}/>
+                </Popconfirm>
             </div>
             <div ref={terminalRef}
-                 className={'p-2 rounded-md'}
+                 className={'p-2 rounded-b-lg'}
                  style={{
                      background: accessTheme?.theme?.value.background,
                  }}

@@ -71,7 +71,8 @@
     "batch_delete": "Batch Delete",
     "refresh": "Refresh",
     "confirm": "Confirm",
-    "back": "Back"
+    "back": "Back",
+    "more": "More"
   },
   "dashboard": {
     "login_times": "Login Times",
@@ -591,21 +592,28 @@
       "account": "Account",
       "at": "Operation Time"
     },
-    "risk_level": {
-      "label": "Risk Level",
-      "options": {
-        "normal": "Normal Command",
-        "high_risk": "High-risk Command"
-      }
-    },
     "options": {
       "playback": "Playback",
+      "audit": "Audit",
       "disconnect": {
         "action": "Disconnect",
         "confirm": "Are you sure you want to disconnect this session?"
       }
     },
-    "unknown_protocol": "Unknown protocol: {{protocol}}"
+    "audit_analyzing": "Analyzing session recording, please wait...",
+    "audit_failed": "Audit failed",
+    "audit_no_result": "No audit result available",
+    "unknown_protocol": "Unknown protocol: {{protocol}}",
+    "audit_status": {
+      "label": "Audit Status",
+      "pending": "Analyzing",
+      "completed": "Completed",
+      "failed": "Failed",
+      "start": "Start Analysis",
+      "pending_tip": "AI is analyzing the session recording in the background. Refresh the page to see the result.",
+      "view": "View Report",
+      "retry": "Retry"
+    }
   },
   "access": {
     "settings": {
@@ -720,7 +728,7 @@
       "db_password": "Database Password"
     },
     "client_cert": "Client Certificate",
-    "client_cert_generate": "Generate \u0026 Download",
+    "client_cert_generate": "Generate & Download",
     "client_cert_regenerate": "Regenerate",
     "client_cert_revoke": "Revoke",
     "client_cert_empty": "No client certificate",
@@ -982,7 +990,6 @@
       "renew_confirm_content": "The certificate will be re-issued and updated. Continue?",
       "issued_log": "Certificate Request Logs",
       "renew_before": "Renewal Lead Time",
-      "require_client_auth": "Require Client Certificate",
       "log_viewer": {
         "status": {
           "realtime": "Realtime",
@@ -1113,6 +1120,8 @@
       "visibility_private": "Private"
     },
     "website_load_failed": "Failed to load website data",
+    "auto_fetch_favicon": "Auto Fetch Icon",
+    "auto_fetch_favicon_failed": "Failed to fetch icon, please check if the target address is correct",
     "public_header_whitelist": "Request Header Allowlist",
     "public_header_whitelist_tip": "Allow requests carrying any of the specified headers, case-insensitive.",
     "public_header_whitelist_placeholder": "For example: X-Bypass-Token",
@@ -1399,7 +1408,7 @@
       }
     },
     "backup": {
-      "setting": "Backup \u0026 Restore",
+      "setting": "Backup & Restore",
       "tip": "When restoring data, if users with the same login account exist, the original system data will be kept. Since passwords are irreversible, restored account passwords will be random.",
       "recovery": "Restore Backup",
       "restore_success": "Restore successful"
@@ -1471,8 +1480,19 @@
       "shell_enable": "Enable IT Operations Assistant",
       "shell_prompt": "IT Operations Assistant Prompt",
       "shell_prompt_placeholder": "Enter IT operations assistant prompt...",
-      "shell_prompt_default": "You are an IT operations assistant responsible for converting user requests directly into Linux shell commands.\n\nRules:\n\n1. **Output commands only**, no explanations, no Markdown, no extra text.\n2. If multiple ways exist, output the most common and safe one.\n3. Use Bash syntax compatible with common distros like Ubuntu/Debian/CentOS.\n4. For dangerous operations (e.g., `rm -rf /`, `:(){:|:\u0026};:`), output: \"This operation is risky, please proceed with caution\".\n5. If the user input is incomplete, auto-complete to the most common reasonable full command.",
-      "audit_prompt_default": "You are a professional system audit assistant. Please analyze the provided logs, operation records, or system information and give professional audit advice.\n\nAnalysis focus:\n1. Security risk identification\n2. Abnormal behavior detection\n3. Compliance checks\n4. Performance issue analysis\n5. Recommendations and improvements\n\nPlease analyze the information comprehensively and provide a detailed audit report."
+      "shell_prompt_default": "You are an IT operations assistant responsible for converting user requests directly into Linux shell commands.\n\nRules:\n\n1. **Output commands only**, no explanations, no Markdown, no extra text.\n2. If multiple ways exist, output the most common and safe one.\n3. Use Bash syntax compatible with common distros like Ubuntu/Debian/CentOS.\n4. For dangerous operations (e.g., `rm -rf /`, `:(){:|:&};:`), output: \"This operation is risky, please proceed with caution\".\n5. If the user input is incomplete, auto-complete to the most common reasonable full command.",
+      "audit_config": "SSH/Telnet Audit Assistant Config",
+      "audit_config_desc": "Analyzes SSH/Telnet session asciinema recordings to identify dangerous commands and security risks",
+      "audit_enable": "Enable SSH/Telnet Audit Assistant",
+      "audit_prompt": "SSH/Telnet Audit Prompt",
+      "audit_prompt_placeholder": "Enter SSH/Telnet audit assistant prompt...",
+      "audit_prompt_default": "You are a professional **Linux/Unix operations behavior audit expert**, specializing in analyzing **command-line actions executed by users in the terminal**.\n\nThe following is a **SSH/Telnet session recording** (from asciinema terminal recording, ANSI control characters have been removed).\n\nPlease focus on analyzing **the commands executed and operations performed by the user**, reconstructing the user's operation process, and identifying any critical or high-risk operations.\n\nPlease generate a **Markdown-formatted command behavior audit report**.\n\n---\n\n# SSH Session Command Behavior Audit Report\n\n## 1. Operation Summary\n\nBriefly summarize the **user's main operational behaviors** in this session, including:\n\n* What the user mainly did (e.g., viewing logs, modifying configurations, deleting files, installing software)\n* Whether there are obvious high-risk operations\n* Overall nature of operations (e.g., routine maintenance / troubleshooting / system maintenance / suspicious behavior)\n\nSummarize in **2–4 sentences**.\n\n---\n\n## 2. Timeline of Operations\n\nList **key commands and behaviors executed by the user** in chronological order.\n\n| No. | User Command | Operation Type | Description |\n| -- | ---- | ---- | ---- |\n| 1  |      |      |      |\n| 2  |      |      |      |\n| 3  |      |      |      |\n\nNotes:\n\n* **User Command**: Record the commands entered by the user\n* **Operation Type**: e.g., file operation / system management / network access / privilege operation / software installation\n* **Description**: Explain what the command does\n\nIf there are obvious **consecutive operations (e.g., bulk deletion, bulk download)**, they can be merged.\n\n---\n\n## 3. Key Operation Analysis\n\nIdentify **important or high-risk operations** in this session and analyze them in detail.\n\n| Risk Level | User Command | Operation Description | Risk Analysis |\n| :----: | :--- | :--- | :--- |\n| 🔴 High Risk |      |      |      |\n| 🟠 Medium Risk |      |      |      |\n| 🟡 Low Risk |      |      |      |\n\nKey areas to focus on:\n\n* **Privilege Escalation**\n\n  * sudo\n  * su\n  * Modifying sudoers\n  * Changing user passwords\n\n* **Dangerous File Operations**\n\n  * rm -rf\n  * Overwriting files\n  * Bulk deletion\n\n* **Critical System Configuration Changes**\n\n  * /etc/passwd\n  * /etc/shadow\n  * /etc/sudoers\n  * crontab\n  * SSH configuration\n\n* **External Downloads or Execution**\n\n  * curl\n  * wget\n  * Downloading and executing scripts\n\n* **Sensitive Information Access**\n\n  * Private keys\n  * .env files\n  * Database configurations\n\n* **Data Packaging or Transfer**\n\n  * tar\n  * scp\n  * rsync\n  * Database exports\n\nIf no obvious risk operations are found, please state so.\n\n---\n\n## Audit Principles\n\n1. **Only analyze user command behaviors; do not analyze system vulnerabilities or host security configurations.**\n2. **Do not speculate on user intent; analyze only based on command behaviors.**\n3. **If information is insufficient, explicitly state \"Insufficient Information\".**\n4. Keep descriptions **objective, professional, and concise**.",
+      "audit_rdp_config": "RDP/VNC Audit Assistant Config",
+      "audit_rdp_config_desc": "Analyzes RDP/VNC graphical remote desktop sessions to identify suspicious behavior and security risks",
+      "audit_rdp_enable": "Enable RDP/VNC Audit Assistant",
+      "audit_rdp_prompt": "RDP/VNC Audit Prompt",
+      "audit_rdp_prompt_placeholder": "Enter RDP/VNC audit assistant prompt...",
+      "audit_rdp_prompt_default": "You are a professional remote desktop security auditor. The following contains information from an RDP/VNC graphical remote session.\n\nPlease perform a security audit and output a Markdown audit report with the following structure:\n\n## 1. Executive Summary\n- **Overall Risk Level**: Low / Medium / High / Critical\n- **Key Findings**: 2–3 sentence summary\n\n## 2. Behavior Analysis\nAnalyze identifiable behaviors including:\n- Applications used (browsers, editors, terminals, admin tools)\n- File management (copy, move, delete, download)\n- System configuration changes\n- Network access and data transfer\n\n## 3. Security Risk Matrix\n| Risk Level | Behavior | Description |\n|:----------:|:--------|:------------|\n| 🔴 Critical | | |\n| 🟠 High | | |\n| 🟡 Medium | | |\n\n## 4. Compliance Assessment\nIdentify policy violations and provide improvement recommendations.\n\n## 5. Audit Conclusion\nOverall evaluation and remediation recommendations.\n\nNote: If information is insufficient, state so explicitly. Do not speculate."
     },
     "oidc_server": {
       "description": "Configure OIDC Server to make Next Terminal an OpenID Connect provider, allowing other apps to use this system for SSO.",

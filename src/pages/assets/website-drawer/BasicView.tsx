@@ -1,5 +1,5 @@
-import React from 'react';
-import { Card } from "antd";
+import React, { useState } from 'react';
+import { Button, Card, message } from "antd";
 import {
     ProFormDependency,
     ProFormDigit,
@@ -10,7 +10,7 @@ import {
     ProFormTreeSelect
 } from "@ant-design/pro-components";
 import { useTranslation } from "react-i18next";
-import { ServerIcon } from "lucide-react";
+import { RefreshCwIcon, ServerIcon } from "lucide-react";
 
 import websiteApi from "@/api/website-api";
 import agentGatewayApi from "@/api/agent-gateway-api";
@@ -27,6 +27,7 @@ interface BasicViewProps {
 
 const BasicView: React.FC<BasicViewProps> = ({ logo, onLogoChange, logosData }) => {
     const { t } = useTranslation();
+    const [fetchingFavicon, setFetchingFavicon] = useState(false);
 
     const schemeOptions = [
         { value: 'http', label: 'HTTP' },
@@ -68,6 +69,24 @@ const BasicView: React.FC<BasicViewProps> = ({ logo, onLogoChange, logosData }) 
     const groupsRequest = async () => {
         const groups = await websiteApi.getGroups();
         return transformGroupData(groups);
+    };
+
+    const handleFetchFavicon = async (scheme: string, host: string, port: number) => {
+        if (!host) {
+            message.warning(t('assets.forward_host_or_ip') + ' ' + t('general.required'));
+            return;
+        }
+        const targetUrl = `${scheme || 'http'}://${host}${port ? ':' + port : ''}`;
+        setFetchingFavicon(true);
+        try {
+            const dataUrl = await websiteApi.getFavicon(targetUrl);
+            onLogoChange(dataUrl);
+            message.success(t('general.success'));
+        } catch {
+            message.error(t('assets.auto_fetch_favicon_failed'));
+        } finally {
+            setFetchingFavicon(false);
+        }
     };
 
     return (
@@ -145,12 +164,26 @@ const BasicView: React.FC<BasicViewProps> = ({ logo, onLogoChange, logosData }) 
             </div>
 
             <Card size="small" className="bg-slate-50/60 dark:bg-slate-900/40">
-                <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-3">
-                        <ServerIcon className="h-4 w-4 text-blue-600" />
-                        <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                            {t('assets.target_server')}
-                        </span>
+                <div className="">
+                    <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                            <ServerIcon className="h-4 w-4 text-blue-600" />
+                            <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
+                                {t('assets.target_server')}
+                            </span>
+                        </div>
+                        <ProFormDependency name={['scheme', 'host', 'port']}>
+                            {({ scheme, host, port }) => (
+                                <Button
+                                    size="small"
+                                    icon={<RefreshCwIcon className="h-3.5 w-3.5" />}
+                                    loading={fetchingFavicon}
+                                    onClick={() => handleFetchFavicon(scheme, host, port)}
+                                >
+                                    {t('assets.auto_fetch_favicon')}
+                                </Button>
+                            )}
+                        </ProFormDependency>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-3">
@@ -160,6 +193,11 @@ const BasicView: React.FC<BasicViewProps> = ({ logo, onLogoChange, logosData }) 
                                 name="scheme"
                                 options={schemeOptions}
                                 rules={[{ required: true }]}
+                                formItemProps={{
+                                    style: {
+                                        margin: 0,
+                                    },
+                                }}
                             />
                         </div>
 
@@ -169,6 +207,11 @@ const BasicView: React.FC<BasicViewProps> = ({ logo, onLogoChange, logosData }) 
                                 name="host"
                                 rules={[{ required: true }]}
                                 placeholder="192.168.1.100"
+                                formItemProps={{
+                                    style: {
+                                        margin: 0,
+                                    },
+                                }}
                             />
                         </div>
 
@@ -181,6 +224,11 @@ const BasicView: React.FC<BasicViewProps> = ({ logo, onLogoChange, logosData }) 
                                 fieldProps={{ precision: 0 }}
                                 placeholder="80"
                                 rules={[{ required: true }]}
+                                formItemProps={{
+                                    style: {
+                                        margin: 0,
+                                    },
+                                }}
                             />
                         </div>
                     </div>

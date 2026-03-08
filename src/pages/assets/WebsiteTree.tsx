@@ -6,6 +6,7 @@ import {useQuery} from "@tanstack/react-query";
 import websiteApi from "@/api/website-api";
 import {useTranslation} from "react-i18next";
 import {CogIcon, PackagePlusIcon, PlusIcon, TrashIcon} from "lucide-react";
+import {useNTTheme} from "@/hook/use-theme.ts";
 
 type OP = 'add' | 'edit';
 
@@ -32,6 +33,7 @@ const WebsiteTree = ({selected, onSelect}: Props) => {
     let [expandedKeys, setExpandedKeys] = useState([]);
 
     let [selectedKeys, setSelectedKeys] = useState<React.Key[]>([selected]);
+    let [theme] = useNTTheme();
 
     let query = useQuery({
         queryKey: ['websites/tree'],
@@ -248,7 +250,7 @@ const WebsiteTree = ({selected, onSelect}: Props) => {
                 expandedKeys={expandedKeys}
                 onExpand={setExpandedKeys}
                 style={{
-                    // backgroundColor: '#FFF',
+                    backgroundColor: theme.isDark ? theme.backgroundColor : '#F9FAFB',
                     padding: 8,
                 }}
                 selectedKeys={selectedKeys}

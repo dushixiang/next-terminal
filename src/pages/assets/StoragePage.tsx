@@ -56,6 +56,7 @@ const StoragePage = () => {
         {
             title: t('general.name'),
             dataIndex: 'name',
+            hideInSearch: true,
             ellipsis: true,
             width: 100,
         },
@@ -172,7 +173,7 @@ const StoragePage = () => {
                     pageSize: params.pageSize,
                     sortOrder: sortOrder,
                     sortField: sortField,
-                    name: params.name,
+                    keyword: params.keyword,
                 }
                 let result = await api.getPaging(queryParams);
                 return {
@@ -182,9 +183,10 @@ const StoragePage = () => {
                 };
             }}
             rowKey="id"
-            search={{
-                labelWidth: 'auto',
+            options={{
+                search: true,
             }}
+            search={false}
             pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true

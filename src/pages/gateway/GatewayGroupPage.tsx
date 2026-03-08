@@ -1,16 +1,16 @@
-import React, { useRef, useState } from 'react';
-import { App, Button, Drawer, Input, Popconfirm, Space, Table, Tag } from 'antd';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { ProTable } from '@ant-design/pro-components';
-import { PlusOutlined } from '@ant-design/icons';
-import { useTranslation } from 'react-i18next';
-import gatewayGroupApi, { GatewayGroup } from '@/api/gateway-group-api';
+import React, {useRef, useState} from 'react';
+import {App, Button, Popconfirm, Tag} from 'antd';
+import type {ActionType, ProColumns} from '@ant-design/pro-components';
+import {ProTable} from '@ant-design/pro-components';
+import {PlusOutlined} from '@ant-design/icons';
+import {useTranslation} from 'react-i18next';
+import gatewayGroupApi, {GatewayGroup} from '@/api/gateway-group-api';
 import GatewayGroupDrawer from './GatewayGroupDrawer';
 
 const GatewayGroupPage: React.FC = () => {
-    const { t } = useTranslation();
-    const { message } = App.useApp();
-    const actionRef = useRef<ActionType>();
+    const {t} = useTranslation();
+    const {message} = App.useApp();
+    const actionRef = useRef<ActionType>(null);
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [currentGroup, setCurrentGroup] = useState<GatewayGroup | undefined>();
@@ -47,6 +47,7 @@ const GatewayGroupPage: React.FC = () => {
         {
             title: t('gateway_group.name'),
             dataIndex: 'name',
+            hideInSearch: true,
             width: 200,
         },
         {
@@ -55,11 +56,11 @@ const GatewayGroupPage: React.FC = () => {
             width: 120,
             render: (_, record) => {
                 const modeMap: Record<string, { text: string; color: string }> = {
-                    priority: { text: t('gateway_group.mode_priority'), color: 'blue' },
-                    latency: { text: t('gateway_group.mode_latency'), color: 'green' },
-                    random: { text: t('gateway_group.mode_random'), color: 'orange' },
+                    priority: {text: t('gateway_group.mode_priority'), color: 'blue'},
+                    latency: {text: t('gateway_group.mode_latency'), color: 'green'},
+                    random: {text: t('gateway_group.mode_random'), color: 'orange'},
                 };
-                const mode = modeMap[record.selectionMode] || { text: record.selectionMode, color: 'default' };
+                const mode = modeMap[record.selectionMode] || {text: record.selectionMode, color: 'default'};
                 return <Tag color={mode.color}>{mode.text}</Tag>;
             },
         },
@@ -76,6 +77,7 @@ const GatewayGroupPage: React.FC = () => {
         {
             title: t('general.description'),
             dataIndex: 'description',
+            hideInSearch: true,
             ellipsis: true,
         },
         {
@@ -121,7 +123,7 @@ const GatewayGroupPage: React.FC = () => {
                     const result = await gatewayGroupApi.getPaging({
                         pageIndex: params.current || 1,
                         pageSize: params.pageSize || 10,
-                        name: params.name,
+                        keyword: params.keyword,
                     });
                     return {
                         data: result.items,
@@ -130,9 +132,11 @@ const GatewayGroupPage: React.FC = () => {
                     };
                 }}
                 rowKey="id"
-                search={{
-                    labelWidth: 'auto',
+                headerTitle={t('menus.gateway.submenus.gateway_group')}
+                options={{
+                    search: true,
                 }}
+                search={false}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true,
@@ -141,7 +145,7 @@ const GatewayGroupPage: React.FC = () => {
                     <Button
                         key="create"
                         type="primary"
-                        icon={<PlusOutlined />}
+                        icon={<PlusOutlined/>}
                         onClick={handleCreate}
                     >
                         {t('actions.new')}

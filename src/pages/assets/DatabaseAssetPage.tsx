@@ -45,11 +45,13 @@ const DatabaseAssetPage = () => {
         {
             title: t('general.name'),
             dataIndex: 'name',
+            hideInSearch: true,
             ellipsis: true,
         },
         {
             title: t('db.asset.type'),
             dataIndex: 'type',
+            hideInSearch: true,
             render: (text) => {
                 if (text === 'mysql') {
                     return <Tag color="blue">{t('db.asset.type_mysql')}</Tag>;
@@ -58,10 +60,6 @@ const DatabaseAssetPage = () => {
                     return <Tag color="purple">{t('db.asset.type_pg')}</Tag>;
                 }
                 return <Tag>{text}</Tag>;
-            },
-            valueEnum: {
-                mysql: {text: t('db.asset.type_mysql')},
-                pg: {text: t('db.asset.type_pg')},
             },
             width: 120,
         },
@@ -163,8 +161,6 @@ const DatabaseAssetPage = () => {
                         sortOrder: sortOrder,
                         sortField: sortField,
                         keyword: params.keyword,
-                        name: params.name,
-                        type: params.type,
                     };
                     const result = await api.getPaging(queryParams);
                     return {
@@ -174,9 +170,10 @@ const DatabaseAssetPage = () => {
                     };
                 }}
                 rowKey="id"
-                search={{
-                    labelWidth: 'auto',
+                options={{
+                    search: true,
                 }}
+                search={false}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true

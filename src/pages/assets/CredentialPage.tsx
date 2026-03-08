@@ -56,6 +56,7 @@ const CredentialPage = () => {
         {
             title: t('general.name'),
             dataIndex: 'name',
+            hideInSearch: true,
         }, {
             title: t('assets.type'),
             dataIndex: 'type',
@@ -138,7 +139,7 @@ const CredentialPage = () => {
                     pageSize: params.pageSize,
                     sortOrder: sortOrder,
                     sortField: sortField,
-                    name: params.name,
+                    keyword: params.keyword,
                 }
                 let result = await api.getPaging(queryParams);
                 return {
@@ -148,9 +149,10 @@ const CredentialPage = () => {
                 };
             }}
             rowKey="id"
-            search={{
-                labelWidth: 'auto',
+            options={{
+                search: true,
             }}
+            search={false}
             pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true

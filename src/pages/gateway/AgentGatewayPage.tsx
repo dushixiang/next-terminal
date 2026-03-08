@@ -130,6 +130,7 @@ const AgentGatewayPage = () => {
         {
             title: t('general.name'),
             dataIndex: 'name',
+            hideInSearch: true,
             className: 'drag-visible',
             width: 260,
             render: (text, record) => {
@@ -362,9 +363,10 @@ const AgentGatewayPage = () => {
                 columns={columns}
                 actionRef={actionRef}
                 rowKey="id"
-                search={{
-                    labelWidth: 'auto',
+                options={{
+                    search: true,
                 }}
+                search={false}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true
@@ -381,7 +383,7 @@ const AgentGatewayPage = () => {
                         pageSize: params.pageSize,
                         sortOrder: sortOrder,
                         sortField: sortField,
-                        name: params.name,
+                        keyword: params.keyword,
                     }
                     let result = await api.getPaging(queryParams);
                     // 直接使用后端返回的数据，包含 sortOrder 字段

@@ -54,6 +54,7 @@ const SshGatewayPage = () => {
         {
             title: t('general.name'),
             dataIndex: 'name',
+            hideInSearch: true,
         },
         {
             title: t('gateways.config_mode'),
@@ -153,7 +154,7 @@ const SshGatewayPage = () => {
                         pageSize: params.pageSize,
                         sortOrder: sortOrder,
                         sortField: sortField,
-                        name: params.name,
+                        keyword: params.keyword,
                     }
                     let result = await api.getPaging(queryParams);
                     return {
@@ -163,9 +164,10 @@ const SshGatewayPage = () => {
                     };
                 }}
                 rowKey="id"
-                search={{
-                    labelWidth: 'auto',
+                options={{
+                    search: true,
                 }}
+                search={false}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true

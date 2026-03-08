@@ -1,39 +1,127 @@
-import React, {useRef, useState} from 'react';
-import {useTranslation} from "react-i18next";
-import {getSort} from "@/utils/sort";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Button, Drawer, Popconfirm, Select, Space, Table, Typography} from "antd";
-import sessionApi, {Session} from "@/api/session-api";
-import {renderSize} from "@/utils/utils";
-import SessionCommandPage from "@/pages/audit/SessionCommandPage";
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from "react-i18next";
+import { getSort } from "@/utils/sort";
+import { ActionType, ProColumns, ProTable } from "@ant-design/pro-components";
+import { App, Button, Popconfirm, Select, Space, Table, Tag, Tooltip, Typography } from "antd";
+import { SyncOutlined } from "@ant-design/icons";
+import sessionApi, { Session } from "@/api/session-api";
+import { renderSize } from "@/utils/utils";
+import SessionAuditDrawer from "@/pages/audit/SessionAuditDrawer";
 import NButton from "@/components/NButton";
-import {useMutation} from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import clsx from "clsx";
-import {getProtocolColor} from "@/helper/asset-helper";
+import { getProtocolColor } from "@/helper/asset-helper";
 
 
 const OfflineSessionPage = () => {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
     const actionRef = useRef<ActionType>(null);
 
-    let [selectedRowKey, setSelectedRowKey] = useState('');
-    let [sessionCommandOpen, setSessionCommandOpen] = useState(false);
+    const [terminalAuditEnabled, setTerminalAuditEnabled] = useState(false);
+    const [auditSessionId, setAuditSessionId] = useState('');
+    const [auditOpen, setAuditOpen] = useState(false);
+    const [analyzingIds, setAnalyzingIds] = useState<Set<string>>(new Set());
 
-    const {message, modal} = App.useApp();
+    const { modal, message } = App.useApp();
 
-    let batchDeleteMutation = useMutation({
+    useEffect(() => {
+        sessionApi.auditEnabled()
+            .then(({ terminalEnabled }) => setTerminalAuditEnabled(terminalEnabled))
+            .catch(() => setTerminalAuditEnabled(false));
+    }, []);
+
+    const viewAudit = (sessionId: string) => {
+        setAuditSessionId(sessionId);
+        setAuditOpen(true);
+    };
+
+    const triggerAnalysis = async (sessionId: string) => {
+        setAnalyzingIds(prev => new Set(prev).add(sessionId));
+        try {
+            await sessionApi.triggerAudit(sessionId);
+            actionRef.current?.reload();
+        } catch {
+            message.error(t('audit.audit_failed'));
+        } finally {
+            setAnalyzingIds(prev => {
+                const next = new Set(prev);
+                next.delete(sessionId);
+                return next;
+            });
+        }
+    };
+
+    const batchDeleteMutation = useMutation({
         mutationFn: sessionApi.deleteById,
-        onSuccess: () => {
-            actionRef.current?.reload();
-        }
+        onSuccess: () => actionRef.current?.reload(),
     });
 
-    let clearMutation = useMutation({
+    const clearMutation = useMutation({
         mutationFn: sessionApi.clear,
-        onSuccess: () => {
-            actionRef.current?.reload();
-        }
+        onSuccess: () => actionRef.current?.reload(),
     });
+
+    const renderAuditStatus = (record: Session) => {
+        const isTerminal = record.protocol === 'ssh' || record.protocol === 'telnet';
+        const canAudit = record.recordingSize > 0 && isTerminal && terminalAuditEnabled;
+        const isAnalyzing = analyzingIds.has(record.id);
+
+        switch (record.auditStatus) {
+            case 'pending':
+                return (
+                    <Tooltip title={t('audit.audit_status.pending_tip')}>
+                        <Tag icon={<SyncOutlined spin />} color="processing">
+                            {t('audit.audit_status.pending')}
+                        </Tag>
+                    </Tooltip>
+                );
+            case 'completed':
+                return (
+                    <Space size={4}>
+                        <Tag color="success">{t('audit.audit_status.completed')}</Tag>
+                        <Button
+                            type="link"
+                            size="small"
+                            style={{ padding: 0 }}
+                            onClick={() => viewAudit(record.id)}
+                        >
+                            {t('audit.audit_status.view')}
+                        </Button>
+                    </Space>
+                );
+            case 'failed':
+                return (
+                    <Space size={4}>
+                        <Tag color="error">{t('audit.audit_status.failed')}</Tag>
+                        {canAudit && (
+                            <Button
+                                type="link"
+                                size="small"
+                                danger
+                                loading={isAnalyzing}
+                                style={{ padding: 0 }}
+                                onClick={() => triggerAnalysis(record.id)}
+                            >
+                                {t('audit.audit_status.retry')}
+                            </Button>
+                        )}
+                    </Space>
+                );
+            default:
+                if (!canAudit) return null;
+                return (
+                    <Button
+                        type="link"
+                        size="small"
+                        loading={isAnalyzing}
+                        style={{ padding: 0 }}
+                        onClick={() => triggerAnalysis(record.id)}
+                    >
+                        {t('audit.audit_status.start')}
+                    </Button>
+                );
+        }
+    };
 
     const columns: ProColumns<Session>[] = [
         {
@@ -46,45 +134,38 @@ const OfflineSessionPage = () => {
             dataIndex: 'assetName',
             key: 'assetName',
             render: (text, record) => {
-                let view = <div>{text}</div>;
                 const title = `${record['protocol']} ${record.username}@${record.ip}:${record.port}`;
                 return <div>
-                    {view}
+                    <div>{text}</div>
                     <Typography.Text type="secondary">{title}</Typography.Text>
-                </div>
+                </div>;
             },
         },
         {
             title: t('audit.client_ip'),
             dataIndex: 'clientIp',
             key: 'clientIp',
-            render: (text, record) => {
-                let view = <div>{text}</div>;
-                const title = record.region;
-                return <div className={'flex items-center gap-2'}>
-                    {view}
-                    <Typography.Text type="secondary">{title}</Typography.Text>
+            render: (text, record) => (
+                <div className={'flex items-center gap-2'}>
+                    <div>{text}</div>
+                    <Typography.Text type="secondary">{record.region}</Typography.Text>
                 </div>
-            },
+            ),
         },
-
         {
             title: t('assets.protocol'),
             dataIndex: 'protocol',
             key: 'protocol',
             sorter: true,
-            render: (text, record) => {
-                return <span
+            render: (text, record) => (
+                <span
                     className={clsx('rounded-md px-1.5 py-1 text-white font-bold', getProtocolColor(record.protocol))}
-                    style={{fontSize: 9,}}>
-                        {record.protocol.toUpperCase()}
-                    </span>
-            },
-            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
-                if (type === 'form') {
-                    return null;
-                }
-
+                    style={{ fontSize: 9 }}>
+                    {record.protocol.toUpperCase()}
+                </span>
+            ),
+            renderFormItem: (item, { type }) => {
+                if (type === 'form') return null;
                 return (
                     <Select>
                         <Select.Option value="rdp">RDP</Select.Option>
@@ -96,37 +177,52 @@ const OfflineSessionPage = () => {
                 );
             },
         },
-
         {
             title: t('audit.connected_at'),
             dataIndex: 'connectedAt',
             key: 'connectedAt',
             hideInSearch: true,
-            valueType: "dateTime"
-        }, {
+            valueType: "dateTime",
+        },
+        {
             title: t('audit.connection_duration'),
             dataIndex: 'connectionDuration',
             key: 'connectionDuration',
             hideInSearch: true,
-        }, {
+        },
+        {
             title: t('audit.recording_size'),
             dataIndex: 'recordingSize',
             key: 'recordingSize',
-            render: (text, record) => {
-                return renderSize(record['recordingSize']);
-            },
             hideInSearch: true,
+            render: (text, record) => {
+                const count = record['commandCount'];
+                return <div>
+                    <div>{renderSize(record['recordingSize'])}</div>
+                    {count > 0 && (
+                        <Typography.Text type="secondary">
+                            {t('sysops.command')} × {count}
+                        </Typography.Text>
+                    )}
+                </div>;
+            },
+        },
+        {
+            title: t('audit.audit_status.label'),
+            dataIndex: 'auditStatus',
+            key: 'auditStatus',
+            hideInSearch: true,
+            render: (text, record) => renderAuditStatus(record),
         },
         {
             title: t('actions.label'),
             valueType: 'option',
             key: 'option',
-            render: (text, record, _, action) => {
-                let disablePlayback = record.recordingSize <= 0;
-                let disableCmdRecord = record['commandCount'] === 0;
+            render: (text, record) => {
+                const disablePlayback = record.recordingSize <= 0;
                 return [
                     <Button
-                        key='monitor'
+                        key='playback'
                         disabled={disablePlayback}
                         type="link"
                         size='small'
@@ -134,40 +230,27 @@ const OfflineSessionPage = () => {
                             switch (record.protocol) {
                                 case 'ssh':
                                 case 'telnet':
-                                    window.open(`/terminal-playback?sessionId=${record['id']}`, '_blank')
+                                    window.open(`/terminal-playback?sessionId=${record['id']}`, '_blank');
                                     break;
                                 case 'rdp':
                                 case 'vnc':
-                                    window.open(`/graphics-playback?sessionId=${record['id']}`, '_blank')
+                                    window.open(`/graphics-playback?sessionId=${record['id']}`, '_blank');
                                     break;
-                                default:
-                                    message.warning(t('audit.unknown_protocol', {protocol: record.protocol}));
                             }
                         }}>
                         {t('audit.options.playback')}
                     </Button>,
-                    <Button
-                        key='command'
-                        disabled={disableCmdRecord}
-                        type="link"
-                        size='small'
-                        onClick={() => {
-                            setSelectedRowKey(record.id);
-                            setSessionCommandOpen(true);
-                        }}>
-                        {t('sysops.command')}({record['commandCount']})
-                    </Button>,
                     <Popconfirm
-                        key={'delete-confirm'}
+                        key='delete-confirm'
                         title={t('general.confirm_delete')}
                         onConfirm={async () => {
                             await sessionApi.deleteById(record.id);
                             actionRef.current?.reload();
                         }}
                     >
-                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                        <NButton danger={true}>{t('actions.delete')}</NButton>
                     </Popconfirm>,
-                ]
+                ];
             },
         },
     ];
@@ -178,85 +261,62 @@ const OfflineSessionPage = () => {
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
-                    request={async (params = {}, sort, filter) => {
-                        let [sortOrder, sortField] = getSort(sort);
-                        
-                        let queryParams = {
+                request={async (params = {}, sort) => {
+                    const [sortOrder, sortField] = getSort(sort);
+                    const result = await sessionApi.getPaging({
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sortOrder: sortOrder,
-                        sortField: sortField,
+                        sortOrder,
+                        sortField,
                         status: 'disconnected',
                         clientIp: params.clientIp,
                         protocol: params.protocol,
                         assetName: params.assetName,
                         userAccount: params.userAccount,
-                    }
-                    let result = await sessionApi.getPaging(queryParams);
+                    });
                     return {
                         data: result['items'],
                         success: true,
-                        total: result['total']
+                        total: result['total'],
                     };
                 }}
                 rowKey="id"
-                search={{
-                    labelWidth: 'auto',
-                }}
-                pagination={{
-                    defaultPageSize: 10,
-                    showSizeChanger: true
-                }}
+                search={{ labelWidth: 'auto' }}
+                pagination={{ defaultPageSize: 10, showSizeChanger: true }}
                 dateFormatter="string"
                 headerTitle={t('menus.log_audit.submenus.offline_session')}
                 rowSelection={{
                     selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
                 }}
-                tableAlertOptionRender={({selectedRowKeys}) => {
-                    return (
-                        <Space size={16}>
-                            <NButton
-                                danger={true}
-                                loading={batchDeleteMutation.isPending}
-                                onClick={async () => {
-                                    batchDeleteMutation.mutate(selectedRowKeys.join(','))
-                                }}
-                            >{t('actions.delete')}
-                            </NButton>
-                        </Space>
-                    );
-                }}
+                tableAlertOptionRender={({ selectedRowKeys }) => (
+                    <Space size={16}>
+                        <NButton
+                            danger={true}
+                            loading={batchDeleteMutation.isPending}
+                            onClick={() => batchDeleteMutation.mutate(selectedRowKeys.join(','))}
+                        >
+                            {t('actions.delete')}
+                        </NButton>
+                    </Space>
+                )}
                 toolBarRender={() => [
-                    <Button key="clear"
-                            type="primary"
-                            danger
-                            onClick={() => {
-                                modal.confirm({
-                                    title: t('general.clear_confirm'),
-                                    onOk: async () => {
-                                        return clearMutation.mutate();
-                                    }
-                                })
-                            }}>
+                    <Button key="clear" type="primary" danger onClick={() => {
+                        modal.confirm({
+                            title: t('general.clear_confirm'),
+                            onOk: () => clearMutation.mutate(),
+                        });
+                    }}>
                         {t('actions.clear')}
                     </Button>,
                 ]}
+                polling={5000}
             />
 
-            <Drawer title={t('sysops.command')}
-                    placement="right"
-                    width={window.innerWidth * 0.9}
-                    onClose={() => {
-                        setSelectedRowKey('');
-                        setSessionCommandOpen(false);
-                    }}
-                    open={sessionCommandOpen}
-            >
-                <SessionCommandPage
-                    open={sessionCommandOpen}
-                    sessionId={selectedRowKey}
-                />
-            </Drawer>
+            <SessionAuditDrawer
+                open={auditOpen}
+                sessionId={auditSessionId}
+                onClose={() => setAuditOpen(false)}
+            />
         </div>
     );
 };

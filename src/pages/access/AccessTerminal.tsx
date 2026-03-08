@@ -98,6 +98,7 @@ const AccessTerminal = ({assetId}: Props) => {
 
     // 搜索相关状态
     let [searchOpen, setSearchOpen] = useState(false);
+    const isSearchingRef = useRef(false);
     let [searchTerm, setSearchTerm] = useState('');
     let [searchMatchIndex, setSearchMatchIndex] = useState(0);
     let [searchMatchCount, setSearchMatchCount] = useState(0);
@@ -175,6 +176,10 @@ const AccessTerminal = ({assetId}: Props) => {
             // console.log(`on selection change`, accessSetting)
             if (accessSetting?.selectionCopy !== true) {
                 return
+            }
+            // 搜索跳转时会触发 selection change，跳过避免将搜索结果自动复制
+            if (isSearchingRef.current) {
+                return;
             }
             if (terminalRef.current?.hasSelection()) {
                 let selection = terminalRef.current?.getSelection();
@@ -583,11 +588,13 @@ const AccessTerminal = ({assetId}: Props) => {
 
             // 执行第一次搜索
             if (totalMatches > 0) {
+                isSearchingRef.current = true;
                 const result = searchRef.current.findNext(term, {
                     caseSensitive: false, // 大小写敏感
                     wholeWord: false,
                     regex: false
                 });
+                isSearchingRef.current = false;
                 setSearchMatchIndex(result ? 1 : 0);
             } else {
                 setSearchMatchIndex(0);
@@ -612,12 +619,14 @@ const AccessTerminal = ({assetId}: Props) => {
 
     const handleSearchNext = () => {
         if (!searchRef.current || !searchTerm) return;
+        isSearchingRef.current = true;
         const result = searchRef.current.findNext(searchTerm, {
             caseSensitive: false,
             wholeWord: false,
             regex: false,
             decorations: decorations,
         });
+        isSearchingRef.current = false;
         if (result && searchMatchCount > 0) {
             setSearchMatchIndex(prev => prev < searchMatchCount ? prev + 1 : 1);
         }
@@ -625,12 +634,14 @@ const AccessTerminal = ({assetId}: Props) => {
 
     const handleSearchPrevious = () => {
         if (!searchRef.current || !searchTerm) return;
+        isSearchingRef.current = true;
         const result = searchRef.current.findPrevious(searchTerm, {
             caseSensitive: false,
             wholeWord: false,
             regex: false,
             decorations: decorations,
         });
+        isSearchingRef.current = false;
         if (result && searchMatchCount > 0) {
             setSearchMatchIndex(prev => prev > 1 ? prev - 1 : searchMatchCount);
         }

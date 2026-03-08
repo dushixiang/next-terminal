@@ -1,6 +1,6 @@
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
-import {App, Badge, Button, Popover, Select, Space, Table, Tag, Tooltip, Upload} from "antd";
+import {App, Badge, Button, Popover, Space, Table, Tag, Tooltip, Upload} from "antd";
 import {useNavigate, useSearchParams} from "react-router-dom";
 import {ActionType, DragSortTable, ProColumns, TableDropdown} from "@ant-design/pro-components";
 import {useMutation, useQuery} from "@tanstack/react-query";
@@ -69,6 +69,7 @@ const AssetPage = () => {
     let [groupId, setGroupId] = useState(searchParams.get('groupId') || '');
     let [dataSource, setDataSource] = useState<Asset[]>([]);
 
+    let [selectedTags, setSelectedTags] = useState<string[]>([]);
     let [groupChooserOpen, setGroupChooserOpen] = useState(false);
     let [gatewayChooserOpen, setGatewayChooserOpen] = useState(false);
     let [params, setParams] = useState<PostParams>({
@@ -121,11 +122,17 @@ const AssetPage = () => {
 
     }, [applyQueryPatch, groupId]);
 
-    let tagsQuery = useQuery({
+    const tagsQuery = useQuery({
         queryKey: ['tags'],
         queryFn: assetsApi.getTags,
         refetchOnWindowFocus: false,
     });
+    const tags = (tagsQuery.data ?? []).filter(t => t !== '-');
+
+    useEffect(() => {
+        actionRef.current?.setPageInfo({current: 1});
+        actionRef.current?.reload();
+    }, [selectedTags]);
 
     let testingMutation = useMutation({
         mutationFn: assetsApi.checking,
@@ -185,6 +192,7 @@ const AssetPage = () => {
             width: 60,
             className: 'drag-visible',
             hideInSearch: true,
+            fixed: 'left',
         },
         {
             title: t('assets.logo'),
@@ -199,12 +207,14 @@ const AssetPage = () => {
                     </div>
                 }
                 return <img src={record.logo} alt={record['name']} className={'w-6 h-6'}/>;
-            }
+            },
+            fixed: 'left',
         },
         {
             title: t('general.name'),
             dataIndex: 'name',
             sorter: true,
+            hideInSearch: true,
             width: isMobile ? 120 : 200,
             render: (text, record) => {
                 const handleOpen = () => openAssetEditor(record.id, {groupId: record.groupId});
@@ -222,11 +232,13 @@ const AssetPage = () => {
                     )}
                 </div>
             },
+            fixed: 'left',
         },
         {
             title: t('assets.alias'),
             dataIndex: 'alias',
             sorter: true,
+            hideInSearch: true,
             width: isMobile ? 80 : 140,
             hideInTable: isMobile,
         },
@@ -255,6 +267,7 @@ const AssetPage = () => {
             dataIndex: 'protocol',
             key: 'protocol',
             sorter: true,
+            hideInSearch: true,
             width: isMobile ? 60 : 80,
             render: (text, record) => {
                 return <span
@@ -263,28 +276,14 @@ const AssetPage = () => {
                         {record.protocol.toUpperCase()}
                     </span>
             },
-            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
-                if (type === 'form') {
-                    return null;
-                }
-
-                return (
-                    <Select>
-                        <Select.Option value="rdp">RDP</Select.Option>
-                        <Select.Option value="ssh">SSH</Select.Option>
-                        <Select.Option value="telnet">Telnet</Select.Option>
-                        <Select.Option value="vnc">VNC</Select.Option>
-                        {/*<Select.Option value="kubernetes">Kubernetes</Select.Option>*/}
-                    </Select>
-                );
-            },
         },
         {
             title: t('assets.network'),
             dataIndex: 'network',
             key: 'network',
+            hideInSearch: true,
             width: isMobile ? 90 : 160,
-            hideInTable: isMobile, // 移动端隐藏网络列
+            hideInTable: isMobile,
             render: (text, record) => {
                 return `${record['ip'] + ':' + record['port']}`;
             }
@@ -293,8 +292,9 @@ const AssetPage = () => {
             title: t('assets.tags'),
             dataIndex: 'tags',
             key: 'tags',
+            hideInSearch: true,
             width: isMobile ? 80 : 120,
-            hideInTable: isMobile, // 移动端隐藏标签列
+            hideInTable: isMobile,
             render: tags => {
                 if (tags == '-') {
                     return undefined;
@@ -304,31 +304,13 @@ const AssetPage = () => {
                     return items?.map(tag => <Tag key={tag}>{tag}</Tag>);
                 }
             },
-            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
-                if (type === 'form') {
-                    return null;
-                }
-
-                return (
-                    <Select mode="multiple"
-                            allowClear>
-                        {
-                            tagsQuery.data?.map(tag => {
-                                if (tag === '-') {
-                                    return undefined;
-                                }
-                                return <Select.Option key={tag}>{tag}</Select.Option>
-                            })
-                        }
-                    </Select>
-                );
-            },
         },
         {
             title: t('general.status'),
             dataIndex: 'status',
             key: 'status',
             sorter: true,
+            hideInSearch: true,
             width: isMobile ? 70 : 100,
             render: (status, record) => {
                 switch (status) {
@@ -347,18 +329,6 @@ const AssetPage = () => {
                             </Tooltip>
                         )
                 }
-            },
-            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
-                if (type === 'form') {
-                    return null;
-                }
-
-                return (
-                    <Select>
-                        <Select.Option value="active">{t('assets.active')}</Select.Option>
-                        <Select.Option value="inactive">{t('general.offline')}</Select.Option>
-                    </Select>
-                );
             },
         },
         {
@@ -471,17 +441,6 @@ const AssetPage = () => {
         columns,
         actionRef,
         request: async (params: any = {}, sort: any, filter: any) => {
-            let ip: string, port: string;
-            if (params.network) {
-                let split = params.network.split(':');
-                if (split.length >= 2) {
-                    ip = split[0];
-                    port = split[1];
-                } else {
-                    ip = split[0];
-                }
-            }
-
             let [sortOrder, sortField] = getSort(sort);
             if (sortOrder === "" && sortField === "") {
                 sortOrder = "desc";  // 使用降序，让最大的 sort 显示在最上面
@@ -493,16 +452,9 @@ const AssetPage = () => {
                 pageSize: params.pageSize,
                 sortOrder: sortOrder,
                 sortField: sortField,
-                name: params.name,
-                alias: params.alias,
-                type: params.type,
-                protocol: params.protocol,
-                active: params.active,
-                tags: params.tags?.join(','),
-                ip: ip,
-                port: port,
+                keyword: params.keyword,
+                tags: selectedTags.length > 0 ? selectedTags.join(',') : undefined,
                 groupId: groupId,
-                status: params.status,
             }
             let result = await api.getPaging(queryParams);
             setDataSource(result['items']);
@@ -522,6 +474,10 @@ const AssetPage = () => {
         rowSelection: {
             selections: [Table.SELECTION_ALL, Table.SELECTION_INVERT],
         },
+        options:{
+            search: true,
+        },
+        search: false as const,
         tableAlertOptionRender: ({selectedRowKeys}: any) => {
             return (
                 <Space size={16}>
@@ -618,35 +574,52 @@ const AssetPage = () => {
         }
     };
 
+    const tagFilter = tags.length === 0 ? null : (
+        <div className="flex items-center flex-wrap pt-4 pb-0 px-[24px]">
+            <span className="text-gray-500 text-sm">{t('assets.tags')}：</span>
+            <Tag.CheckableTag
+                checked={selectedTags.length === 0}
+                onChange={() => setSelectedTags([])}
+            >
+                {t('general.all')}
+            </Tag.CheckableTag>
+            {tags.map((tag) => (
+                <Tag.CheckableTag
+                    key={tag}
+                    checked={selectedTags.includes(tag)}
+                    onChange={(checked) => {
+                        setSelectedTags(prev =>
+                            checked ? [...prev, tag] : prev.filter(t => t !== tag)
+                        );
+                    }}
+                >
+                    {tag}
+                </Tag.CheckableTag>
+            ))}
+        </div>
+    );
+
     return (<div>
         <div className={cn('px-4', isMobile && 'px-2')}>
-            {/* 移动端网站树 - 在表格上方显示 */}
-            {isMobile && (
+            {isMobile ? (
+                /* 移动端：垂直布局，树在上，标签过滤 + 表格在下 */
                 <>
                     <div className="mb-4 bg-white dark:bg-gray-800 rounded-lg">
-                        <AssetTree
-                            selected={groupId}
-                            onSelect={setGroupId}
-                        />
+                        <AssetTree selected={groupId} onSelect={setGroupId}/>
                     </div>
+                    {tagFilter}
                     <DragSortTable {...tableProps}/>
                 </>
-            )}
-
-            {/* 桌面端使用 Grid 布局 */}
-            {!isMobile && (
+            ) : (
+                /* 桌面端：Grid 布局，左侧树 + 右侧内容 */
                 <div className={cn(
                     "grid gap-4 transition-all duration-300",
                     isTreeCollapsed ? "grid-cols-[48px_1fr]" : "grid-cols-[240px_1fr]"
                 )}>
-                    <div className="relative border rounded-md dark:bg-[#141414]">
+                    <div className="relative rounded-md bg-gray-50 dark:bg-[#141414]">
                         {!isTreeCollapsed && (
-                            <AssetTree
-                                selected={groupId}
-                                onSelect={setGroupId}
-                            />
+                            <AssetTree selected={groupId} onSelect={setGroupId}/>
                         )}
-
                         <div
                             className={cn(
                                 'absolute top-4 bg-gray-100 p-1.5 rounded dark:bg-gray-800 cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors',
@@ -661,16 +634,12 @@ const AssetPage = () => {
                             )}
                         </div>
                     </div>
-                    <div className="overflow-hidden rounded-md border">
-                        <DragSortTable {...tableProps}
-                                       scroll={{
-                                           x: 'max-content'
-                                       }}
-                        />
+                    <div className="overflow-hidden">
+                        {tagFilter}
+                        <DragSortTable {...tableProps} scroll={{x: 'max-content'}}/>
                     </div>
                 </div>
             )}
-
         </div>
 
         <AssetTreeChoose

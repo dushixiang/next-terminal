@@ -93,6 +93,10 @@ class WebsiteApi extends Api<Website> {
     updateSortPosition = async (req: SortPositionRequest) => {
         return await requests.post(`/${this.group}/sort`, req);
     }
+
+    getFavicon = async (url: string): Promise<string> => {
+        return await requests.get(`/${this.group}/favicon?url=${encodeURIComponent(url)}`);
+    }
 }
 
 const websiteApi = new WebsiteApi();

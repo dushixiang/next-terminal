@@ -6,6 +6,7 @@ import {useQuery} from "@tanstack/react-query";
 import assetApi from "@/api/asset-api";
 import {useTranslation} from "react-i18next";
 import {CogIcon, PackagePlusIcon, PlusIcon, TrashIcon} from "lucide-react";
+import {useNTTheme} from "@/hook/use-theme.ts";
 
 interface Props {
     selected: string
@@ -30,6 +31,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
     let [expandedKeys, setExpandedKeys] = useState([]);
 
     let [selectedKeys, setSelectedKeys] = useState<React.Key[]>([selected]);
+    const [theme] = useNTTheme();
 
     let query = useQuery({
         queryKey: ['assets/tree'],
@@ -246,7 +248,7 @@ const AssetTree = ({selected, onSelect}: Props) => {
                 expandedKeys={expandedKeys}
                 onExpand={setExpandedKeys}
                 style={{
-                    // backgroundColor: '#FFF',
+                    backgroundColor: theme.isDark ? theme.backgroundColor : '#F9FAFB',
                     padding: 8,
                 }}
                 selectedKeys={selectedKeys}
@@ -259,7 +261,6 @@ const AssetTree = ({selected, onSelect}: Props) => {
                     }
                 }}
                 onRightClick={handleRightClick}
-                // showLine={true}
             />
 
             {contextMenu && (

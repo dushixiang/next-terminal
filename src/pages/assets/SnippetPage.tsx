@@ -53,6 +53,7 @@ const SnippetPage = () => {
         {
             title: t('general.name'),
             dataIndex: 'name',
+            hideInSearch: true,
             width: 200,
             ellipsis: true,
         },
@@ -60,6 +61,7 @@ const SnippetPage = () => {
             title: t('assets.content'),
             dataIndex: 'content',
             key: 'content',
+            hideInSearch: true,
             copyable: true,
             ellipsis: true
         },
@@ -132,7 +134,7 @@ const SnippetPage = () => {
                     pageSize: params.pageSize,
                     sortOrder: sortOrder,
                     sortField: sortField,
-                    name: params.name,
+                    keyword: params.keyword,
                 }
                 let result = await api.getPaging(queryParams);
                 return {
@@ -142,9 +144,10 @@ const SnippetPage = () => {
                 };
             }}
             rowKey="id"
-            search={{
-                labelWidth: 'auto',
+            options={{
+                search: true,
             }}
+            search={false}
             pagination={{
                 defaultPageSize: 10,
                 showSizeChanger: true

@@ -1,9 +1,7 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import {Button, Card, Modal, Result, Space, Spin} from "antd";
+import {Button, Card, Input, Modal, Result, Space, Spin} from "antd";
 import accountApi, {AuthType} from "@/api/account-api";
 import {startAuthentication} from "@simplewebauthn/browser";
-import {REGEXP_ONLY_DIGITS} from "input-otp";
-import {InputOTP, InputOTPGroup, InputOTPSlot} from "@/components/ui/input-otp";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {KeyOutlined, SafetyOutlined} from "@ant-design/icons";
@@ -285,23 +283,20 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
         <div className={'flex items-center justify-center'}>
             <div className={'space-y-4'}>
                 <div className={'font-bold'}>{t('account.auth_type_otp')}</div>
-                <InputOTP
+                <Input.OTP
                     key={otpKey}
-                    maxLength={6}
-                    pattern={REGEXP_ONLY_DIGITS}
-                    onComplete={handleOTPComplete}
+                    length={6}
                     autoFocus
                     value={otpValue}
-                    onChange={(newValue) => {
-                        setOtpValue(newValue);
+                    onChange={(value) => {
+                        setOtpValue(value);
                         setError(null);
+                        if (value.length === 6) {
+                            handleOTPComplete(value);
+                        }
                     }}
                     disabled={validateOTP.isPending}
-                >
-                    <InputOTPGroup>
-                        {[...Array(6)].map((_, i) => <InputOTPSlot key={i} index={i}/>)}
-                    </InputOTPGroup>
-                </InputOTP>
+                />
                 {renderError()}
                 {renderSwitchButton()}
             </div>

@@ -71,7 +71,8 @@
     "batch_delete": "批次刪除",
     "refresh": "重新整理",
     "confirm": "確認",
-    "back": "返回上一頁"
+    "back": "返回上一頁",
+    "more": "更多"
   },
   "dashboard": {
     "login_times": "登入次數",
@@ -591,21 +592,28 @@
       "account": "帳戶",
       "at": "操作時間"
     },
-    "risk_level": {
-      "label": "風險等級",
-      "options": {
-        "normal": "一般命令",
-        "high_risk": "高危命令"
-      }
-    },
     "options": {
       "playback": "回放",
       "disconnect": {
         "action": "斷開",
         "confirm": "您確認要斷開此會話嗎？"
-      }
+      },
+      "audit": "審計"
     },
-    "unknown_protocol": "未知協議：{{protocol}}"
+    "audit_analyzing": "正在分析錄屏內容，請稍候...",
+    "audit_failed": "審計失敗",
+    "audit_no_result": "暫無審計結果",
+    "unknown_protocol": "未知協議：{{protocol}}",
+    "audit_status": {
+      "label": "審計狀態",
+      "pending": "分析中",
+      "completed": "已完成",
+      "failed": "失敗",
+      "start": "開始分析",
+      "pending_tip": "AI 正在後台分析錄屏內容，完成後請刷新頁面查看結果",
+      "view": "查看報告",
+      "retry": "重新分析"
+    }
   },
   "access": {
     "settings": {
@@ -982,7 +990,6 @@
       "renew_confirm_content": "將會重新申請並更新證書，確認繼續嗎？",
       "issued_log": "證書申請日誌",
       "renew_before": "續簽提前時間",
-      "require_client_auth": "需要用戶端證書",
       "log_viewer": {
         "status": {
           "realtime": "即時接收",
@@ -1113,6 +1120,8 @@
       "visibility_private": "私有"
     },
     "website_load_failed": "載入網站資料失敗",
+    "auto_fetch_favicon": "自動獲取圖示",
+    "auto_fetch_favicon_failed": "獲取圖示失敗，請檢查目標地址是否正確",
     "public_header_whitelist": "請求頭白名單",
     "public_header_whitelist_tip": "攜帶任一指定請求頭即放行，大小寫不敏感。",
     "public_header_whitelist_placeholder": "如：X-Bypass-Token",
@@ -1471,8 +1480,19 @@
       "shell_enable": "啟用運維助手",
       "shell_prompt": "運維助手提示詞",
       "shell_prompt_placeholder": "輸入運維助手的提示詞...",
-      "shell_prompt_default": "你是一個 IT 運維助手，負責將使用者的需求直接轉換為 Linux shell 命令。\n\n規則：\n\n1. **只輸出命令**，不要加任何說明、解釋、Markdown 包裹或額外文字。\n2. 如果存在多種寫法，只輸出最常用且安全的一種。\n3. 使用 Bash 語法，確保在 Ubuntu/Debian/CentOS 等常見發行版中通用。\n4. 對危險操作（如 `rm -rf /`、`:(){:|:\u0026};:` 等），直接輸出：\"該操作有風險，請謹慎執行\"。\n5. 如果使用者輸入不完整，自動補全為最常見、合理的完整命令。",
-      "audit_prompt_default": "你是一個專業的系統審計助手。請分析提供的日誌、操作記錄或系統資訊，並給出專業的審計意見。\n\n分析重點：\n1. 安全風險識別\n2. 異常行為偵測\n3. 合規性檢查\n4. 效能問題分析\n5. 操作建議和改進方案\n\n請對提供的資訊進行全面分析，並提供詳細的審計報告。"
+      "shell_prompt_default": "你是一個 IT 運維助手，負責將使用者的需求直接轉換為 Linux shell 命令。\n\n規則：\n\n1. **只輸出命令**，不要加任何說明、解釋、Markdown 包裹或額外文字。\n2. 如果存在多種寫法，只輸出最常用且安全的一種。\n3. 使用 Bash 語法，確保在 Ubuntu/Debian/CentOS 等常見發行版中通用。\n4. 對危險操作（如 `rm -rf /`、`:(){:|:&};:` 等），直接輸出：\"該操作有風險，請謹慎執行\"。\n5. 如果使用者輸入不完整，自動補全為最常見、合理的完整命令。",
+      "audit_config": "SSH/Telnet 審計助手設定",
+      "audit_config_desc": "分析 SSH/Telnet 會話的 asciinema 終端錄屏，識別高危命令與安全風險",
+      "audit_enable": "啟用 SSH/Telnet 審計助手",
+      "audit_prompt": "SSH/Telnet 審計提示詞",
+      "audit_prompt_placeholder": "輸入 SSH/Telnet 審計助手的提示詞...",
+      "audit_prompt_default": "你是一位專業的 **Linux/Unix 運維行為審計專家**，擅長分析 **使用者在終端機中執行的命令行為**。\n\n以下是一段 **SSH/Telnet 會話記錄**（來源於終端機 asciinema 錄屏，已去除 ANSI 控制字元）。\n\n請重點分析 **使用者輸入執行的命令及操作行為**，還原使用者的操作過程，並識別其中可能存在的關鍵或高風險操作。\n\n請生成一份 **Markdown 格式的命令行為審計報告**。\n\n---\n\n# SSH 會話命令行為審計報告\n\n## 一、操作摘要\n\n簡要總結本次會話中 **使用者的主要操作行為**，包括：\n\n* 使用者主要做了哪些事情（如：查看日誌、修改設定、刪除檔案、安裝軟體等）\n* 是否存在明顯的高風險操作\n* 整體操作性質（如：日常運維 / 故障排查 / 系統維護 / 可疑行為）\n\n用 **2–4 句話總結**。\n\n---\n\n## 二、時間軸操作事件\n\n按時間順序梳理 **使用者執行的關鍵命令和行為**。\n\n| 序號 | 使用者命令 | 操作類型 | 行為說明 |\n| -- | ---- | ---- | ---- |\n| 1  |      |      |      |\n| 2  |      |      |      |\n| 3  |      |      |      |\n\n說明：\n\n* **使用者命令**：記錄使用者輸入的命令\n* **操作類型**：如檔案操作 / 系統管理 / 網路存取 / 權限操作 / 軟體安裝等\n* **行為說明**：解釋該命令的作用\n\n如果有明顯的 **連續操作行為（如批量刪除、批量下載）**，可以合併描述。\n\n---\n\n## 三、關鍵操作分析\n\n識別本次會話中的 **重要或高風險操作**，並進行重點分析。\n\n|  風險等級  | 使用者命令 | 操作說明 | 風險分析 |\n| :----: | :--- | :--- | :--- |\n| 🔴 高風險 |      |      |      |\n| 🟠 中風險 |      |      |      |\n| 🟡 低風險 |      |      |      |\n\n重點關注：\n\n* **權限提升**\n\n  * sudo\n  * su\n  * 修改 sudoers\n  * 修改使用者密碼\n\n* **危險檔案操作**\n\n  * rm -rf\n  * 覆蓋檔案\n  * 批量刪除\n\n* **關鍵系統設定修改**\n\n  * /etc/passwd\n  * /etc/shadow\n  * /etc/sudoers\n  * crontab\n  * SSH 設定\n\n* **外部下載或執行**\n\n  * curl\n  * wget\n  * 下載並執行腳本\n\n* **敏感資訊存取**\n\n  * 私鑰\n  * .env\n  * 資料庫設定\n\n* **資料打包或傳輸**\n\n  * tar\n  * scp\n  * rsync\n  * 資料庫匯出\n\n如果未發現明顯風險操作，請說明。\n\n---\n\n## 審計原則\n\n1. **只分析使用者執行的命令行為，不分析系統漏洞或主機安全設定。**\n2. **不要臆測使用者意圖，僅基於命令行為進行分析。**\n3. **如果資訊不足，請明確說明「資訊不足」。**\n4. 保持描述 **客觀、專業、簡潔**。",
+      "audit_rdp_config": "RDP/VNC 審計助手設定",
+      "audit_rdp_config_desc": "分析 RDP/VNC 圖形化遠端桌面會話，識別可疑操作與安全風險",
+      "audit_rdp_enable": "啟用 RDP/VNC 審計助手",
+      "audit_rdp_prompt": "RDP/VNC 審計提示詞",
+      "audit_rdp_prompt_placeholder": "輸入 RDP/VNC 審計助手的提示詞...",
+      "audit_rdp_prompt_default": "你是一位專業的桌面遠端運維安全審計專家。以下是一段 RDP/VNC 圖形化遠端桌面會話的相關資訊。\n\n請對本次會話進行安全審計，並輸出一份 Markdown 格式的審計報告，結構如下：\n\n## 一、執行摘要\n- **整體風險等級**：低 / 中 / 高 / 嚴重\n- **核心發現**：2–3 句話概括\n\n## 二、操作行為分析\n分析可識別的操作行為，包括：\n- 應用程式使用（瀏覽器、編輯器、終端、管理工具等）\n- 檔案管理操作（複製、移動、刪除、下載等）\n- 系統設定變更\n- 網路存取與傳輸行為\n\n## 三、安全風險清單\n| 風險等級 | 具體行為 | 風險說明 |\n|:-------:|:--------|:--------|\n| 🔴 高危 | | |\n| 🟠 中危 | | |\n| 🟡 低危 | | |\n\n## 四、合規性評估\n指出違規操作，給出改進建議。\n\n## 五、審計結論\n總體評價與處置建議。\n\n注意：資訊不足時請注明，不要臆測。"
     },
     "oidc_server": {
       "description": "配置 OIDC Server 使 Next Terminal 成為 OpenID Connect 身分提供者，允許其他應用使用此系統進行單一登入認證。",

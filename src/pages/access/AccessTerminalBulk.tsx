@@ -22,9 +22,9 @@ const AccessTerminalBulk = ({assetIds, securityToken}: Props) => {
     let [snippetOpen, setSnippetOpen] = useState(false);
 
     const handleCommand = () => {
-        // alert(`qqq-[${inputValue}]`)
+        // console.log(`input [${inputValue}]`)
         if (inputValue === '') {
-            eventEmitter.emit(`WS:MESSAGE:${tabId}`, '\n');
+            eventEmitter.emit(`WS:MESSAGE:${tabId}`, '\r');
             return
         }
         setInputValue('');
@@ -65,16 +65,14 @@ const AccessTerminalBulk = ({assetIds, securityToken}: Props) => {
             <ScrollArea style={{
                 height: height - 164,
             }}>
-                {/*{JSON.stringify(hiddenAssetIds)}*/}
                 <div className={'grid grid-cols-2 gap-4'}>
                     {assetIds.filter(assetId => !hiddenAssetIds.includes(assetId)).map((assetId: string) => {
-                        return <div>
+                        return <div key={assetId}>
                             <AccessTerminalBulkItem assetId={assetId}
                                                     securityToken={securityToken}
                                                     tabId={tabId}
                                                     onClose={() => {
-                                                        // console.log(`close`, assetId)
-                                                        // handleClose(assetId)
+                                                        handleClose(assetId)
                                                     }}
                             />
                         </div>;
