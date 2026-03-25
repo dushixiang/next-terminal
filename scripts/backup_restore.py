@@ -76,6 +76,7 @@ I18N = {
         "error_compose_not_found": "错误：未找到可用的 Docker Compose 命令。请安装 docker compose 或 docker-compose，或通过 --compose-cmd 指定。",
         "error_pg_dump_failed": "错误：pg_dump 执行失败，退出码 {code}",
         "error_pg_restore_failed": "错误：psql 恢复失败，退出码 {code}",
+        "hint_restore_conflict": "提示：目标数据库可能已存在同名对象。建议先清空后恢复，或先重新执行备份（默认会包含 --clean --if-exists）。",
         "backup_done": "备份完成：{archive}",
         "restore_done": "恢复完成，共提取 {count} 个条目。",
         "error_archive_not_found": "错误：归档文件不存在：{archive}",
@@ -110,6 +111,7 @@ I18N = {
         "error_compose_not_found": "Error: no usable Docker Compose command found. Install docker compose/docker-compose or set --compose-cmd.",
         "error_pg_dump_failed": "Error: pg_dump failed with exit code {code}",
         "error_pg_restore_failed": "Error: psql restore failed with exit code {code}",
+        "hint_restore_conflict": "Hint: target DB may already contain objects. Clean DB first, or re-run backup (default now includes --clean --if-exists).",
         "backup_done": "Backup completed: {archive}",
         "restore_done": "Restore completed, extracted {count} member(s).",
         "error_archive_not_found": "Error: archive file does not exist: {archive}",
@@ -220,6 +222,10 @@ def resolve_item_paths(workdir, data_dir, item_key):
     return []
 
 
+def can_run_pg_dump(args, lang):
+    return resolve_compose_command(args, lang, quiet=True) is not None
+
+
 def collect_available_items(workdir, data_dir, args, command, lang):
     available = {}
     for key in ITEM_ORDER:
@@ -306,10 +312,6 @@ def resolve_archive_path(workdir, archive_arg, for_backup):
     return get_latest_archive(workdir)
 
 
-def can_run_pg_dump(args, lang):
-    return resolve_compose_command(args, lang, quiet=True) is not None
-
-
 def run_pg_dump_to_file(args, lang, output_path, workdir):
     compose_cmd = resolve_compose_command(args, lang, quiet=False)
     if not compose_cmd:
@@ -317,8 +319,7 @@ def run_pg_dump_to_file(args, lang, output_path, workdir):
 
     print(tr(lang, "compose_using", cmd=" ".join(compose_cmd)))
     print(tr(lang, "pg_dump_running", service=args.pg_service))
-    shell_cmd = args.pg_dump_cmd
-    cmd = compose_cmd + ["exec", "-T", args.pg_service, "sh", "-lc", shell_cmd]
+    cmd = compose_cmd + ["exec", "-T", args.pg_service, "sh", "-lc", args.pg_dump_cmd]
     with open(output_path, "wb") as f:
         code = subprocess.call(cmd, cwd=workdir, stdout=f)
     if code != 0:
@@ -334,12 +335,12 @@ def run_psql_restore_from_file(args, lang, input_path, workdir):
 
     print(tr(lang, "compose_using", cmd=" ".join(compose_cmd)))
     print(tr(lang, "pg_restore_running", service=args.pg_service))
-    shell_cmd = args.pg_restore_cmd
-    cmd = compose_cmd + ["exec", "-T", args.pg_service, "sh", "-lc", shell_cmd]
+    cmd = compose_cmd + ["exec", "-T", args.pg_service, "sh", "-lc", args.pg_restore_cmd]
     with open(input_path, "rb") as f:
         code = subprocess.call(cmd, cwd=workdir, stdin=f)
     if code != 0:
         print(tr(lang, "error_pg_restore_failed", code=code))
+        print(tr(lang, "hint_restore_conflict"))
         return 2
     return 0
 
@@ -544,8 +545,16 @@ def build_parser():
         sub.add_argument("--list", action="store_true", help="List selectable items and exit")
         sub.add_argument("--compose-cmd", default="auto", help="Compose command, e.g. auto / 'docker compose' / docker-compose")
         sub.add_argument("--pg-service", default="postgresql", help="PostgreSQL service name in compose (for exec)")
-        sub.add_argument("--pg-dump-cmd", default='pg_dump -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-postgres}"', help="Command executed inside container for dump")
-        sub.add_argument("--pg-restore-cmd", default='psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-postgres}"', help="Command executed inside container for restore (reads SQL from stdin)")
+        sub.add_argument(
+            "--pg-dump-cmd",
+            default='pg_dump --clean --if-exists --no-owner --no-privileges -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-postgres}"',
+            help="Command executed inside container for dump",
+        )
+        sub.add_argument(
+            "--pg-restore-cmd",
+            default='psql -v ON_ERROR_STOP=1 -U "${POSTGRES_USER:-postgres}" "${POSTGRES_DB:-postgres}"',
+            help="Command executed inside container for restore (reads SQL from stdin)",
+        )
 
     backup_parser = subparsers.add_parser("backup", help="Create backup archive")
     add_common_options(backup_parser)
