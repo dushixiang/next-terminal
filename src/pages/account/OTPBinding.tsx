@@ -93,7 +93,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                                 />
                                 <div className="w-full text-left">
                                     <Alert
-                                        message={t('account.otp_scan_instruction')}
+                                        title={t('account.otp_scan_instruction')}
                                         type="info"
                                         showIcon
                                     />
@@ -148,7 +148,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                         <div className="p-4">
                             <div className="mb-4">
                                 <Alert
-                                    message={t('account.otp_verification_instruction')}
+                                    title={t('account.otp_verification_instruction')}
                                     type="warning"
                                     showIcon
                                 />
@@ -191,7 +191,7 @@ const OTPBinding = ({refetch}: Binding2faProps) => {
                             <Divider/>
 
                             <Alert
-                                message={t('account.otp_security_tip')}
+                                title={t('account.otp_security_tip')}
                                 description={t('account.otp_security_description')}
                                 type="success"
                                 showIcon

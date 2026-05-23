@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Form, Popover, Upload, App} from "antd";
+import {Form, Popover, Upload, App, Space} from "antd";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {TrashIcon, UploadIcon} from "lucide-react";
@@ -9,9 +9,10 @@ import assetsApi from "../../../api/asset-api";
 interface AssetLogoProps {
     value?: string;
     onChange?: (value: string) => void;
+    extra?: React.ReactNode;
 }
 
-const AssetLogo: React.FC<AssetLogoProps> = ({value, onChange}) => {
+const AssetLogo: React.FC<AssetLogoProps> = ({value, onChange, extra}) => {
     const {t} = useTranslation();
     const {message} = App.useApp();
     const [logo, setLogo] = useState<string>(value || '');
@@ -89,12 +90,15 @@ const AssetLogo: React.FC<AssetLogoProps> = ({value, onChange}) => {
 
     return (
         <Form.Item name={'logo'} label={t('assets.logo')}>
-            <Popover placement="rightTop" content={logoPopover()}>
-                <div
-                    className={'w-10 h-10 border border-dashed rounded-lg p-2 flex items-center justify-center cursor-pointer hover:border-blue-500'}>
-                    {logo ? <img className={''} src={logo} alt="logo"/> : ''}
-                </div>
-            </Popover>
+            <Space align="center" size={12}>
+                <Popover placement="rightTop" content={logoPopover()}>
+                    <div
+                        className={'w-10 h-10 border border-dashed rounded-lg p-2 flex items-center justify-center cursor-pointer hover:border-blue-500'}>
+                        {logo ? <img className={''} src={logo} alt="logo"/> : ''}
+                    </div>
+                </Popover>
+                {extra}
+            </Space>
         </Form.Item>
     );
 };

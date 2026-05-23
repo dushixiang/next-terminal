@@ -1,6 +1,11 @@
 import React, {useRef, useState} from 'react';
-import {App, Button, Popconfirm} from "antd";
-import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
+import {
+    App,
+    Button,
+    Dropdown,
+    Popconfirm,
+    Space} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {useNavigate} from "react-router-dom";
 import commandFilterApi, {CommandFilter} from '@/api/command-filter-api';
 import CommandFilterModal from "@/pages/authorised/CommandFilterModal";
@@ -15,7 +20,7 @@ const api = commandFilterApi;
 const CommandFilterPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -48,7 +53,7 @@ const CommandFilterPage = () => {
 
     let navigate = useNavigate();
 
-    const columns: ProColumns<CommandFilter>[] = [
+    const columns: NColumn<CommandFilter>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -75,52 +80,58 @@ const CommandFilterPage = () => {
             title: t('actions.label'),
             valueType: 'option',
             key: 'option',
-            render: (text, record, _, action) => [
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record['id']);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>
-                ,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>
-                ,
-                <TableDropdown
-                    key="actionGroup"
-                    onSelect={(key) => {
-                        switch (key) {
-                            case 'command-filter-detail':
-                                navigate(`/command-filter/${record['id']}?activeKey=info`);
-                                break;
-                            case 'command-filter-rule':
-                                navigate(`/command-filter/${record['id']}?activeKey=rules`);
-                                break;
-                        }
-                    }}
-                    menus={[
-                        {key: 'command-filter-detail', name: t('actions.detail')},
-                        {key: 'command-filter-rule', name: t('authorised.command_filter.options.rule')},
-                    ]}
-                />,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record['id']);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                    <Dropdown
+                        key="actionGroup"
+                        menu={{
+                            items: [
+                                {key: 'command-filter-detail', label: t('actions.detail')},
+                                {key: 'command-filter-rule', label: t('authorised.command_filter.options.rule')},
+                            ],
+                            onClick: ({key}) => {
+                                switch (key) {
+                                    case 'command-filter-detail':
+                                        navigate(`/command-filter/${record['id']}?activeKey=info`);
+                                        break;
+                                    case 'command-filter-rule':
+                                        navigate(`/command-filter/${record['id']}?activeKey=rules`);
+                                        break;
+                                }
+                            }
+                        }}
+                    >
+                        <Button type="link" size="small" style={{padding: 0}}>
+                            {t('actions.more')}
+                        </Button>
+                    </Dropdown>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {

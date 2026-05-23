@@ -136,6 +136,12 @@ export interface PingResponse {
     usedTimeStr: string;
 }
 
+export type AssetAccessMode = 'access-page' | 'standalone-page';
+
+export interface AccessPreferences {
+    assetAccessMode: AssetAccessMode;
+}
+
 class PortalApi {
     group = "portal";
 
@@ -147,6 +153,16 @@ class PortalApi {
     databaseAssets = async (type?: string) => {
         const params = type ? `?type=${type}` : '';
         return await requests.get(`/${this.group}/database-assets${params}`) as DatabaseAssetUser[];
+    }
+
+    getDbProxyInfo = async () => {
+        const data = await requests.get(`/${this.group}/db-proxy-info`);
+        return data as { host: string; port: string };
+    }
+
+    getAccessPreferences = async () => {
+        const data = await requests.get(`/${this.group}/access-preferences`);
+        return data as AccessPreferences;
     }
 
     getAssetsTree = async (protocol?: string, keyword?: string) => {

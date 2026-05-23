@@ -68,7 +68,7 @@ const AssetTree = React.memo(({
                         >
                             {renderLogo(node)}
                             <div className={cn(node.extra?.status === 'inactive' && 'text-gray-500')}>
-                                <span>{strTitle}</span>
+                                <span className={'inline-block whitespace-nowrap'}>{strTitle}</span>
                             </div>
                         </div>
                     </Tooltip>

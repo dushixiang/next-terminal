@@ -1,6 +1,11 @@
 import React, {useRef} from 'react';
-import {App, Button, Tag, Tooltip, Typography} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {
+    App,
+    Button,
+    Tag,
+    Tooltip,
+    Typography} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
 import databaseSQLLogApi, {DatabaseSQLLog} from "@/api/database-sql-log-api";
@@ -30,7 +35,7 @@ const stripAppComment = (sql?: string) => {
 
 const DatabaseSQLLogPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
     const {modal} = App.useApp();
 
     const clearMutation = useMutation({
@@ -57,7 +62,7 @@ const DatabaseSQLLogPage = () => {
         return <Tag color={item.color}>{item.label}</Tag>;
     };
 
-    const columns: ProColumns<DatabaseSQLLog>[] = [
+    const columns: NColumn<DatabaseSQLLog>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -172,7 +177,7 @@ const DatabaseSQLLogPage = () => {
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort) => {

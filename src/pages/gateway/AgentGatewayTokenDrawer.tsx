@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from 'react';
-import {Drawer, Popconfirm, Table, TableProps, Typography, Button, Modal, Form, Input, message} from "antd";
+import {App, Button, Drawer, Form, Input, Modal, Popconfirm, Table, TableProps, Typography} from "antd";
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
 import agentGatewayTokenApi, {AgentGatewayToken} from "@/api/agent-gateway-token-api";
 import dayjs from "dayjs";
 import NButton from "@/components/NButton";
-import i18n from '@/react-i18next/i18n';
 
 interface Props {
     open: boolean;
@@ -22,6 +21,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [editModalOpen, setEditModalOpen] = useState(false);
     const [editingToken, setEditingToken] = useState<AgentGatewayToken | null>(null);
+    let {message} = App.useApp();
 
     let tokenQuery = useQuery({
         queryKey: ['agent-gateway-tokens'],
@@ -34,12 +34,12 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
         }
     }, [open]);
 
-    const handleCreateToken = async (values: {remark: string}) => {
+    const handleCreateToken = async (values: { remark: string }) => {
         try {
             const tokenData = {
                 remark: values.remark,
             } as AgentGatewayToken;
-            
+
             await agentGatewayTokenApi.create(tokenData);
             message.success(t('general.success'));
             setCreateModalOpen(false);
@@ -50,15 +50,15 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
         }
     };
 
-    const handleEditToken = async (values: {remark: string}) => {
+    const handleEditToken = async (values: { remark: string }) => {
         if (!editingToken) return;
-        
+
         try {
             const updatedToken = {
                 ...editingToken,
                 remark: values.remark,
             };
-            
+
             await agentGatewayTokenApi.updateById(editingToken.id, updatedToken);
             message.success(t('general.success'));
             setEditModalOpen(false);
@@ -86,16 +86,18 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
             render: (text, record) => {
                 return (
                     <div className="flex flex-col gap-2">
-                        <Paragraph 
-                            copyable 
-                            style={{marginBottom: 0}} 
+                        <Paragraph
+                            copyable
+                            style={{marginBottom: 0}}
                             className="font-mono text-sm"
                         >
                             {text}
                         </Paragraph>
                         {record.remark && (
-                            <div className="px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded text-xs text-gray-600 dark:text-gray-400 border-l-2 border-blue-200 dark:border-blue-700">
-                                <span className="font-medium text-gray-700 dark:text-gray-300">{t('general.remark_label')}</span>
+                            <div
+                                className="px-2 py-1 bg-gray-50 dark:bg-gray-800 rounded text-xs text-gray-600 dark:text-gray-400 border-l-2 border-blue-200 dark:border-blue-700">
+                                <span
+                                    className="font-medium text-gray-700 dark:text-gray-300">{t('general.remark_label')}</span>
                                 {record.remark}
                             </div>
                         )}
@@ -142,11 +144,11 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
 
     return (
         <>
-            <Drawer 
+            <Drawer
                 title={t('gateways.token_manage')}
                 onClose={onClose}
                 open={open}
-                width={window.innerWidth * 0.6}
+                size={window.innerWidth * 0.6}
                 extra={
                     <Button
                         type="primary"
@@ -189,7 +191,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
                             },
                         ]}
                     >
-                        <Input placeholder={t('general.enter_remark')} />
+                        <Input placeholder={t('general.enter_remark')}/>
                     </Form.Item>
                 </Form>
             </Modal>
@@ -213,14 +215,9 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
                     <Form.Item
                         label={t('general.remark')}
                         name="remark"
-                        rules={[
-                            {
-                                required: true,
-                                message: t('general.required'),
-                            },
-                        ]}
+                        required={true}
                     >
-                        <Input placeholder={t('general.enter_remark')} />
+                        <Input placeholder={t('general.enter_remark')}/>
                     </Form.Item>
                 </Form>
             </Modal>

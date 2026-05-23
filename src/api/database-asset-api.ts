@@ -36,6 +36,10 @@ class DatabaseAssetApi extends Api<DatabaseAsset> {
         const query = type ? `?type=${encodeURIComponent(type)}` : '';
         return await requests.get(`/${this.group}${query}`) as DatabaseAsset[];
     }
+
+    test = async (values: Partial<DatabaseAsset>) => {
+        return await requests.post(`/${this.group}/test`, values);
+    }
 }
 
 const databaseAssetApi = new DatabaseAssetApi();

@@ -3,7 +3,7 @@ import {useSearchParams} from 'react-router-dom';
 // @ts-ignore
 import * as AsciinemaPlayer from 'asciinema-player';
 import 'asciinema-player/dist/bundle/asciinema-player.css';
-import {baseUrl, getToken} from "@/api/core/requests";
+import {baseUrl} from "@/api/core/requests";
 import {Button, ConfigProvider, Descriptions, Drawer, Table, Tabs, TabsProps, theme} from "antd";
 import {TerminalSquare} from "lucide-react";
 import {maybe} from "@/utils/maybe";
@@ -15,7 +15,6 @@ import {StyleProvider} from '@ant-design/cssinjs';
 import {renderSize} from "@/utils/utils";
 import times from "@/components/time/times";
 import {useTranslation} from "react-i18next";
-import strings from "@/utils/strings";
 import './TerminalPlayback.css';
 
 const TerminalPlayback = () => {
@@ -24,7 +23,6 @@ const TerminalPlayback = () => {
 
     const [searchParams] = useSearchParams();
     const sessionId = maybe(searchParams.get('sessionId'), '');
-    let token = maybe(searchParams.get('token'), '');
 
     let [open, setOpen] = useState(false);
     let [cmds, setCmds] = useState<SessionCommand[]>([]);
@@ -33,12 +31,7 @@ const TerminalPlayback = () => {
     let [player, setPlayer] = useState();
 
     useEffect(() => {
-        let authToken = getToken();
-        if (strings.hasText(token)) {
-            authToken = token;
-        }
-
-        let url = `${baseUrl()}/admin/sessions/${sessionId}/recording?X-Auth-Token=${authToken}`;
+        let url = `${baseUrl()}/admin/sessions/${sessionId}/recording`;
         let playerElement = document.getElementById('player');
         let player = AsciinemaPlayer.create(url, playerElement, {
             fit: 'both',
@@ -207,7 +200,7 @@ const TerminalPlayback = () => {
                             onClose={() => setOpen(false)}
                             open={open}
                             mask={false}
-                            width={400}
+                            size={400}
                     >
                         <Tabs defaultActiveKey="cmd" items={items}/>
                     </Drawer>

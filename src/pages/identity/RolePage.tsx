@@ -1,8 +1,12 @@
 import React, {useRef, useState} from 'react';
 
-import {App, Button, Popconfirm} from "antd";
+import {
+    App,
+    Button,
+    Popconfirm,
+    Space} from "antd";
 import {Link} from "react-router-dom";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import RoleModal from "./RoleModal";
 import roleApi, {Role} from "../../api/role-api";
 import {useTranslation} from "react-i18next";
@@ -19,7 +23,7 @@ const RolePage = () => {
 
     let { license } = useLicense();
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -51,7 +55,7 @@ const RolePage = () => {
         });
     }
 
-    const columns: ProColumns<Role>[] = [
+    const columns: NColumn<Role>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -90,39 +94,38 @@ const RolePage = () => {
             valueType: 'option',
             key: 'option',
             width: 160,
-            render: (text, record, _, action) => [
-                <NButton key="info">
-                    <Link key="get" to={`/role/${record['id']}`}>{t('actions.detail')}</Link>
-                </NButton>
-                ,
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record['id']);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>
-                ,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>
-                ,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <NButton key="info">
+                        <Link key="get" to={`/role/${record['id']}`}>{t('actions.detail')}</Link>
+                    </NButton>
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record['id']);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (<div>
         <Disabled disabled={license.isFree()}>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {

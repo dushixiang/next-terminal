@@ -10,10 +10,16 @@ import databaseAssetApi, {DatabaseAsset} from "@/api/database-asset-api";
 interface SelectProps {
     value?: string;
     onChange?: (value: string) => void;
+    style?: React.CSSProperties;
 }
 
+const selectStyle = (style?: React.CSSProperties) => ({
+    minWidth: 200,
+    ...style,
+});
+
 // 用户查询组件
-export const UserSelect = ({value, onChange}: SelectProps) => {
+export const UserSelect = ({value, onChange, style}: SelectProps) => {
     const {t} = useTranslation();
     const [options, setOptions] = useState<{label: string, value: string}[]>([]);
     const [loading, setLoading] = useState(false);
@@ -49,12 +55,13 @@ export const UserSelect = ({value, onChange}: SelectProps) => {
             filterOption={(input, option) =>
                 (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
             }
+            style={selectStyle(style)}
         />
     );
 };
 
 // 部门查询组件
-export const DepartmentSelect = ({value, onChange}: SelectProps) => {
+export const DepartmentSelect = ({value, onChange, style}: SelectProps) => {
     const {t} = useTranslation();
     const [options, setOptions] = useState<{label: string, value: string}[]>([]);
     const [loading, setLoading] = useState(false);
@@ -90,12 +97,13 @@ export const DepartmentSelect = ({value, onChange}: SelectProps) => {
             filterOption={(input, option) =>
                 (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
             }
+            style={selectStyle(style)}
         />
     );
 };
 
 // 资产组查询组件
-export const AssetGroupSelect = ({value, onChange}: SelectProps) => {
+export const AssetGroupSelect = ({value, onChange, style}: SelectProps) => {
     const {t} = useTranslation();
     const [options, setOptions] = useState<{label: string, value: string}[]>([]);
     const [loading, setLoading] = useState(false);
@@ -142,12 +150,13 @@ export const AssetGroupSelect = ({value, onChange}: SelectProps) => {
             filterOption={(input, option) =>
                 (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
             }
+            style={selectStyle(style)}
         />
     );
 };
 
 // 资产查询组件
-export const AssetSelect = ({value, onChange}: SelectProps) => {
+export const AssetSelect = ({value, onChange, style}: SelectProps) => {
     const {t} = useTranslation();
     const [options, setOptions] = useState<{label: string, value: string}[]>([]);
     const [loading, setLoading] = useState(false);
@@ -183,12 +192,13 @@ export const AssetSelect = ({value, onChange}: SelectProps) => {
             filterOption={(input, option) =>
                 (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
             }
+            style={selectStyle(style)}
         />
     );
 };
 
 // 网站组查询组件
-export const WebsiteGroupSelect = ({value, onChange}: SelectProps) => {
+export const WebsiteGroupSelect = ({value, onChange, style}: SelectProps) => {
     const {t} = useTranslation();
     const [options, setOptions] = useState<{label: string, value: string}[]>([]);
     const [loading, setLoading] = useState(false);
@@ -235,12 +245,13 @@ export const WebsiteGroupSelect = ({value, onChange}: SelectProps) => {
             filterOption={(input, option) =>
                 (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
             }
+            style={selectStyle(style)}
         />
     );
 };
 
 // 数据库资产查询组件
-export const DatabaseAssetSelect = ({value, onChange}: SelectProps) => {
+export const DatabaseAssetSelect = ({value, onChange, style}: SelectProps) => {
     const {t} = useTranslation();
     const [options, setOptions] = useState<{label: string, value: string}[]>([]);
     const [loading, setLoading] = useState(false);
@@ -276,12 +287,13 @@ export const DatabaseAssetSelect = ({value, onChange}: SelectProps) => {
             filterOption={(input, option) =>
                 (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
             }
+            style={selectStyle(style)}
         />
     );
 };
 
 // 网站查询组件
-export const WebsiteSelect = ({value, onChange}: SelectProps) => {
+export const WebsiteSelect = ({value, onChange, style}: SelectProps) => {
     const {t} = useTranslation();
     const [options, setOptions] = useState<{label: string, value: string}[]>([]);
     const [loading, setLoading] = useState(false);
@@ -317,6 +329,7 @@ export const WebsiteSelect = ({value, onChange}: SelectProps) => {
             filterOption={(input, option) =>
                 (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
             }
+            style={selectStyle(style)}
         />
     );
 };

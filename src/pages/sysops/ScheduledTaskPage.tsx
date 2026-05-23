@@ -1,8 +1,8 @@
 import React, {useRef, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Button, Popconfirm, Switch, Tag} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
+import {App, Button, Popconfirm, Space, Switch, Tag} from "antd";
 import {useMutation} from "@tanstack/react-query";
 import scheduledTaskApi, {ScheduledTask} from "@/api/scheduled-task-api";
 import ScheduledTaskModal from "@/pages/sysops/ScheduledTaskModal";
@@ -16,7 +16,7 @@ const api = scheduledTaskApi;
 
 const ScheduledTaskPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
     let [open, setOpen] = useState<boolean>(false);
     let [logOpen, setLogOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>('');
@@ -51,7 +51,7 @@ const ScheduledTaskPage = () => {
         });
     }
 
-    const columns: ProColumns<ScheduledTask>[] = [
+    const columns: NColumn<ScheduledTask>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -84,13 +84,13 @@ const ScheduledTaskPage = () => {
             render: (func, record) => {
                 switch (func) {
                     case "asset-check-status":
-                        return <Tag color="blue" bordered={false}>{t('sysops.type.options.check_status')}</Tag>;
+                        return <Tag color="blue" variant="filled">{t('sysops.type.options.check_status')}</Tag>;
                     case "asset-exec-command":
-                        return <Tag color="red" bordered={false}>{t('sysops.type.options.exec_command')}</Tag>;
+                        return <Tag color="red" variant="filled">{t('sysops.type.options.exec_command')}</Tag>;
                     case "delete-history-log":
-                        return <Tag color="green" bordered={false}>{t('sysops.type.options.delete_log')}</Tag>;
+                        return <Tag color="green" variant="filled">{t('sysops.type.options.delete_log')}</Tag>;
                     case "renew-certificate":
-                        return <Tag color="orange" bordered={false}>{t('assets.certificates.renew')}</Tag>;
+                        return <Tag color="orange" variant="filled">{t('assets.certificates.renew')}</Tag>;
                     default:
                         return '';
                 }
@@ -120,40 +120,42 @@ const ScheduledTaskPage = () => {
             valueType: 'option',
             key: 'option',
             width: 200,
-            render: (text, record, index, action) => [
-                <NButton
-                    key="exec"
-                    // disabled={execLoading[index]}
-                    onClick={() => handleExec(record.id, index)}
-                >
-                    {t('sysops.options.exec')}
-                </NButton>,
-                <NButton
-                    key="logs"
-                    onClick={() => handleShowLog(record.id)}
-                >
-                    {t('sysops.options.logs')}
-                </NButton>,
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record.id);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>,
-            ],
+            render: (text, record, index, action) => (
+                <Space>
+                    <NButton
+                        key="exec"
+                        // disabled={execLoading[index]}
+                        onClick={() => handleExec(record.id, index)}
+                    >
+                        {t('sysops.options.exec')}
+                    </NButton>
+                    <NButton
+                        key="logs"
+                        onClick={() => handleShowLog(record.id)}
+                    >
+                        {t('sysops.options.logs')}
+                    </NButton>
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record.id);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
@@ -180,7 +182,7 @@ const ScheduledTaskPage = () => {
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {

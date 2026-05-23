@@ -4,16 +4,14 @@ import {maybe} from "@/utils/maybe";
 import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit";
 import "@xterm/xterm/css/xterm.css";
-import {baseWebSocketUrl, getToken} from "@/api/core/requests";
+import {baseWebSocketUrl} from "@/api/core/requests";
 import qs from "qs";
-import strings from "@/utils/strings";
 import {Message, MessageTypeData, MessageTypeExit, MessageTypeJoin} from "@/pages/access/Terminal";
 
 const TerminalMonitor = () => {
 
     const [searchParams, setSearchParams] = useSearchParams();
     let sessionId = maybe(searchParams.get('sessionId'), '');
-    let token = maybe(searchParams.get('token'), '');
 
     const writeErrorMessage = (term: Terminal, message: string) => {
         term.writeln(`\x1B[1;3;31m${message}\x1B[0m `);
@@ -33,14 +31,9 @@ const TerminalMonitor = () => {
         term.writeln('trying to connect to the server ...');
         let cols = term.cols;
         let rows = term.rows;
-        let authToken = getToken();
-        if (strings.hasText(token)) {
-            authToken = token;
-        }
         let params = {
             'cols': cols,
             'rows': rows,
-            'X-Auth-Token': authToken,
             'sessionId': sessionId,
         };
 

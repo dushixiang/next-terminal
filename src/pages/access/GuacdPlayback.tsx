@@ -2,10 +2,9 @@ import React, {useEffect, useRef, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 // @ts-ignore
 import Guacamole from '@dushixiang/guacamole-common-js';
-import {baseUrl, getToken} from "@/api/core/requests";
+import {baseUrl} from "@/api/core/requests";
 import times from '@/components/time/times';
 import {useTranslation} from "react-i18next";
-import strings from "@/utils/strings";
 import './GuacdPlayback.css';
 import {ConfigProvider, Select, Slider, theme, Tooltip} from "antd";
 import {Pause, Play, Maximize, Minimize, SkipBack, SkipForward, Volume2, VolumeX} from "lucide-react";
@@ -34,7 +33,6 @@ const GuacdPlayback = () => {
 
     const [searchParams] = useSearchParams();
     const sessionId = searchParams.get('sessionId');
-    const token = searchParams.get('token');
 
     let {t} = useTranslation();
 
@@ -104,11 +102,7 @@ const GuacdPlayback = () => {
     }, [sessionId]);
 
     const init = (sessionId: string) => {
-        let authToken = getToken();
-        if (strings.hasText(token)) {
-            authToken = token;
-        }
-        let url = `${baseUrl()}/admin/sessions/${sessionId}/recording?X-Auth-Token=${authToken}`;
+        let url = `${baseUrl()}/admin/sessions/${sessionId}/recording`;
         const tunnel = new Guacamole.StaticHTTPTunnel(url);
         const recording = new Guacamole.SessionRecording(tunnel);
 

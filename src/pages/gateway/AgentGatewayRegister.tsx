@@ -163,7 +163,7 @@ const AgentGatewayRegister = ({
         <Modal
             title={t('gateways.register_title')}
             open={open}
-            maskClosable={false}
+            mask={{closable: false}}
             destroyOnHidden={true}
             footer={false}
             onCancel={() => {
@@ -227,7 +227,9 @@ const AgentGatewayRegister = ({
             <div className={'grid grid-cols-3 p-4'}>
                 {options.map((item) => {
                     return (
-                        <div className={'flex items-center justify-center cursor-pointer'}
+                        <div
+                            key={item.key}
+                            className={'flex items-center justify-center cursor-pointer'}
                              onClick={() => {
                                  setOS(item.key);
                              }}

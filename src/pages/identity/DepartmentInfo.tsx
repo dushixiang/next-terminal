@@ -1,10 +1,10 @@
 import React from 'react';
 import departmentApi from "../../api/department-api";
-import {ProDescriptions} from "@ant-design/pro-components";
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
-import {Space, Tag} from "antd";
+import {Descriptions, Space, Spin, Tag} from "antd";
 import NLink from "@/components/NLink";
+import times from "@/components/time/times";
 
 const api = departmentApi;
 
@@ -32,60 +32,38 @@ const DepartmentInfo = ({active, id}: DepartmentInfoProps) => {
     
 
     return (
-        <ProDescriptions
-            column={1}
-            title={t('actions.detail')}
-            dataSource={department}
-            columns={[
-                {
-                    title: t('general.name'),
-                    dataIndex: 'name',
-                    copyable: true,
-                },
-                {
-                    title: t('identity.department.parent'),
-                    dataIndex: 'parentId',
-                    render: () => {
-                        if (!department?.parentId) {
-                            return <Tag color="green">{t('identity.department.root')}</Tag>;
-                        }
-                        return parentDepartment ? (
-                            <Tag color="blue">{parentDepartment.name}</Tag>
-                        ) : (
-                            <Tag color="default">{department.parentId}</Tag>
-                        );
-                    },
-                },
-                {
-                    title: t('assets.sort'),
-                    dataIndex: 'weight',
-                },
-                {
-                    title: t('general.created_at'),
-                    dataIndex: 'createdAt',
-                    valueType: 'dateTime',
-                },
-                {
-                    title: 'ID',
-                    dataIndex: 'id',
-                    copyable: true,
-                },
-                {
-                    title: t('actions.authorized'),
-                    dataIndex: 'authorisedLinks',
-                    render: () => (
-                        <Space size={12} wrap>
-                            <NLink to={`/authorised-asset?departmentId=${id}`}>
-                                {`${t('menus.resource.submenus.asset')}${t('actions.authorized')}`}
-                            </NLink>
-                            <NLink to={`/authorised-website?departmentId=${id}`}>
-                                {`${t('menus.resource.submenus.website')}${t('actions.authorized')}`}
-                            </NLink>
-                        </Space>
-                    ),
-                },
-            ]}
-        />
+        <Spin spinning={!department && active}>
+            <Descriptions
+                column={1}
+                title={t('actions.detail')}
+            >
+                <Descriptions.Item label={t('general.name')}>{department?.name}</Descriptions.Item>
+                <Descriptions.Item label={t('identity.department.parent')}>
+                    {!department?.parentId ? (
+                        <Tag color="green">{t('identity.department.root')}</Tag>
+                    ) : parentDepartment ? (
+                        <Tag color="blue">{parentDepartment.name}</Tag>
+                    ) : (
+                        <Tag color="default">{department.parentId}</Tag>
+                    )}
+                </Descriptions.Item>
+                <Descriptions.Item label={t('assets.sort')}>{department?.weight}</Descriptions.Item>
+                <Descriptions.Item label={t('general.created_at')}>
+                    {department?.createdAt ? times.format(department.createdAt) : '-'}
+                </Descriptions.Item>
+                <Descriptions.Item label="ID">{department?.id}</Descriptions.Item>
+                <Descriptions.Item label={t('actions.authorized')}>
+                    <Space size={12} wrap>
+                        <NLink to={`/authorised-asset?departmentId=${id}`}>
+                            {`${t('menus.resource.submenus.asset')}${t('actions.authorized')}`}
+                        </NLink>
+                        <NLink to={`/authorised-website?departmentId=${id}`}>
+                            {`${t('menus.resource.submenus.website')}${t('actions.authorized')}`}
+                        </NLink>
+                    </Space>
+                </Descriptions.Item>
+            </Descriptions>
+        </Spin>
     );
 };
 

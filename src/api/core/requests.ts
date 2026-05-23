@@ -1,16 +1,10 @@
 import eventEmitter from "@/api/core/event-emitter";
 
 export const baseUrl = () => {
-    if (import.meta.env.DEV) {
-        return 'http://localhost:8888/api';
-    }
-    return window.location.protocol + '//' + window.location.host + '/api';
+    return '/api';
 }
 
 export const baseWebSocketUrl = () => {
-    if (import.meta.env.DEV) {
-        return 'ws://localhost:8888/api';
-    }
     let https = 'https:' == document.location.protocol;
     if (https) {
         return 'wss://' + window.location.host + '/api';
@@ -19,19 +13,8 @@ export const baseWebSocketUrl = () => {
     }
 }
 
-const Token = 'X-Auth-Token';
-
-export const getToken = () => {
-    return localStorage.getItem(Token) || "";
-}
-
-export const setToken = (token: string) => {
-    localStorage.setItem(Token, token);
-}
-
-export const removeToken = () => {
-    localStorage.removeItem(Token);
-}
+// 清理 localStorage 中的残留 token
+localStorage.removeItem('X-Auth-Token');
 
 const handleError = async (error: any, url?: string) => {
     if (error instanceof TypeError) {
@@ -45,7 +28,7 @@ const handleError = async (error: any, url?: string) => {
 
     let noerr = url?.includes('noerr');
 
-    if (!noerr &&error.status === 418) {
+    if (!noerr && error.status === 418) {
         eventEmitter.emit("API:REDIRECT", "/setup");
         return Promise.reject({
             status: error.status,
@@ -54,7 +37,7 @@ const handleError = async (error: any, url?: string) => {
             code: 418,
         });
     }
-    if (!noerr &&error.status === 401) {
+    if (!noerr && error.status === 401) {
         eventEmitter.emit("API:UN_AUTH");
         return Promise.reject({
             status: error.status,
@@ -102,12 +85,8 @@ const handleResponse = (response: Response) => {
 
 class request {
     async get(url: string) {
-        let token = getToken();
         return fetch(baseUrl() + url, {
             method: "GET",
-            headers: {
-                'X-Auth-Token': token
-            }
         }).then(response => {
             return handleResponse(response);
         }).catch(async error => {
@@ -116,12 +95,10 @@ class request {
     }
 
     async post(url: string, body?: any | undefined) {
-        let token = getToken();
         return fetch(baseUrl() + url, {
             method: "POST",
             headers: {
                 'content-type': 'application/json',
-                'X-Auth-Token': token
             },
             body: JSON.stringify(body),
         }).then(response => {
@@ -132,13 +109,8 @@ class request {
     }
 
     async postForm(url: string, body?: any | undefined) {
-        let token = getToken();
         return fetch(baseUrl() + url, {
             method: "POST",
-            headers: {
-                // 'content-type': 'multipart/form-data',
-                'X-Auth-Token': token,
-            },
             body: body,
         }).then(response => {
             return handleResponse(response);
@@ -148,12 +120,10 @@ class request {
     }
 
     async put(url: string, body?: any | undefined) {
-        let token = getToken();
         return fetch(baseUrl() + url, {
             method: "PUT",
             headers: {
                 'content-type': 'application/json',
-                'X-Auth-Token': token
             },
             body: JSON.stringify(body),
         }).then(response => {
@@ -164,12 +134,10 @@ class request {
     }
 
     async patch(url: string, body?: any | undefined) {
-        let token = getToken();
         return fetch(baseUrl() + url, {
             method: "PATCH",
             headers: {
                 'content-type': 'application/json',
-                'X-Auth-Token': token
             },
             body: JSON.stringify(body),
         }).then(response => {
@@ -180,12 +148,8 @@ class request {
     }
 
     async delete(url: string) {
-        let token = getToken();
         return fetch(baseUrl() + url, {
             method: "DELETE",
-            headers: {
-                'X-Auth-Token': token
-            }
         }).then(response => {
             return handleResponse(response);
         }).catch(async error => {

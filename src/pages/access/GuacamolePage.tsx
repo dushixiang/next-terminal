@@ -13,12 +13,12 @@ import {useSearchParams} from "react-router-dom";
 import {maybe} from "@/utils/maybe";
 import RenderState from "@/pages/access/guacamole/RenderState";
 import {duplicateKeys} from "@/pages/access/guacamole/keys";
+import strings from "@/utils/strings";
 
 const GuacamolePage = () => {
 
     const [searchParams] = useSearchParams();
-    let token = maybe(searchParams.get('token'), '');
-    let sharer = maybe(searchParams.get('sharer'), false);
+    let sharerToken = maybe(searchParams.get('sharerToken'), '');
     let sessionId = searchParams.get('sessionId');
 
     const terminalRef = useRef<HTMLDivElement>(null);
@@ -155,14 +155,15 @@ const GuacamolePage = () => {
 
         let dpi = 96 * 2;
         let {width, height} = getContainerSize();
-        let params = {
+        let params: Record<string, any> = {
             'width': width,
             'height': height,
             'dpi': dpi,
             'sessionId': session.id,
-            'X-Auth-Token': token,
-            'sharer': sharer,
         };
+        if (strings.hasText(sharerToken)) {
+            params['sharerToken'] = sharerToken;
+        }
 
         let paramStr = qs.stringify(params);
         client.connect(paramStr);

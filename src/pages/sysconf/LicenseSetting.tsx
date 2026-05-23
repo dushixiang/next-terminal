@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {App, Button, Card, Col, Descriptions, Row, Space, Spin, Typography} from "antd";
 import dayjs from "dayjs";
 import {useMutation, useQuery} from "@tanstack/react-query";
@@ -12,11 +12,11 @@ const {Title, Text} = Typography;
 
 const LicenseSetting = () => {
 
-    const { isMobile } = useMobile();
+    const {isMobile} = useMobile();
     const {message} = App.useApp();
     let {t} = useTranslation();
 
-    let { license: licence, refetch: licenseRefetch } = useLicense();
+    let {license: licence, refetch: licenseRefetch} = useLicense();
 
     let queryMachineId = useQuery({
         queryKey: ['machine-id'],
@@ -97,6 +97,10 @@ const LicenseSetting = () => {
         </>;
     }
 
+    const hasText = (value: string | undefined) => {
+        return !!value && value.trim().length > 0;
+    }
+
     const handleImportLicense = () => {
         let files = (document.getElementById('import-license') as HTMLInputElement)?.files;
         if (!files || files.length === 0) {
@@ -126,16 +130,17 @@ const LicenseSetting = () => {
                                 </Descriptions.Item>
                             </Descriptions>
 
+                            <input type="file" id="import-license" style={{display: 'none'}}
+                                   onChange={handleImportLicense}/>
+
                             <Space className={cn('mt-4', isMobile && 'flex-wrap')} size={isMobile ? 'small' : 'middle'}>
-                                <Button color="default" variant={'filled'} 
+                                <Button color="default" variant={'filled'}
                                         size={isMobile ? 'small' : 'middle'}
                                         onClick={() => {
                                             window.document.getElementById('import-license')?.click();
                                         }}>
                                     {t('settings.license.import')}
                                 </Button>
-                                <input type="file" id="import-license" style={{display: 'none'}}
-                                       onChange={handleImportLicense}/>
 
                                 {!licence.isOEM() &&
                                     <Button color="primary" variant="filled"
@@ -145,8 +150,8 @@ const LicenseSetting = () => {
                                         {t('settings.license.binding')}
                                     </Button>
                                 }
-                                
-                                <Button color="purple" variant="filled" 
+
+                                <Button color="purple" variant="filled"
                                         size={isMobile ? 'small' : 'middle'}
                                         loading={requestLicense.isPending}
                                         onClick={() => requestLicense.mutate()}
@@ -172,6 +177,16 @@ const LicenseSetting = () => {
                                 <Descriptions.Item label={t('settings.license.type.label')}>
                                     <Text strong>{renderType(queryLicense.data?.type)}</Text>
                                 </Descriptions.Item>
+                                {hasText(queryLicense.data?.name) &&
+                                    <Descriptions.Item label={t('settings.license.name')}>
+                                        <Text strong>{queryLicense.data?.name}</Text>
+                                    </Descriptions.Item>
+                                }
+                                {hasText(queryLicense.data?.userName) &&
+                                    <Descriptions.Item label={t('settings.license.user_name')}>
+                                        <Text strong>{queryLicense.data?.userName}</Text>
+                                    </Descriptions.Item>
+                                }
                                 <Descriptions.Item label={t('settings.license.machine_id')}>
                                     <Text strong>{queryLicense.data?.machineId}</Text>
                                 </Descriptions.Item>

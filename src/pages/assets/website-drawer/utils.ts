@@ -17,3 +17,15 @@ export const validateFileSize = (file: RcFile): boolean => {
     }
     return true;
 };
+
+export const normalizePublicIPRules = (ipRules?: string): string => {
+    if (!ipRules) {
+        return '';
+    }
+
+    return ipRules
+        .split(/[,;\r\n]+/)
+        .map(item => item.trim())
+        .filter(Boolean)
+        .join('\n');
+};

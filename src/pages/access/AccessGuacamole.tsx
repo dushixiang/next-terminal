@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {baseWebSocketUrl, getToken} from "@/api/core/requests";
+import {baseWebSocketUrl} from "@/api/core/requests";
 import qs from "qs";
 // @ts-ignore
 import Guacamole from '@dushixiang/guacamole-common-js';
@@ -26,9 +26,11 @@ import {duplicateKeys} from "@/pages/access/guacamole/keys";
 
 interface Props {
     assetId: string;
+    tabKey?: string;
+    standalone?: boolean;
 }
 
-const AccessGuacamole = ({assetId}: Props) => {
+const AccessGuacamole = ({assetId, tabKey, standalone = false}: Props) => {
 
     let [requiredOpen, setRequiredOpen] = useState<boolean>(false);
     let [requiredParameters, setRequiredParameters] = useState<string[]>();
@@ -58,14 +60,14 @@ const AccessGuacamole = ({assetId}: Props) => {
 
     let [mfaOpen, setMfaOpen] = useState(false);
     let [fixedSize, setFixedSize] = useState(false);
+    const containerHeight = standalone ? height : height - 77.5;
 
     let windowFocus = useWindowFocus();
 
     // 判断当前 tab
     useEffect(() => {
-        const current = accessTab.split('_')[1];
-        setActive(current === assetId);
-    }, [accessTab, assetId]);
+        setActive(standalone || accessTab === tabKey);
+    }, [accessTab, tabKey, standalone]);
 
     useEffect(() => {
         if (windowFocus && active) {
@@ -175,6 +177,9 @@ const AccessGuacamole = ({assetId}: Props) => {
         try {
             session = await portalApi.createSessionByAssetsId(assetId, securityToken);
             setSession(session);
+            if (standalone && session.assetName) {
+                document.title = session.assetName;
+            }
         } catch (e) {
             console.error('create session err', e);
             return
@@ -277,7 +282,6 @@ const AccessGuacamole = ({assetId}: Props) => {
         };
 
 
-        let authToken = getToken();
         const dpi = computeDPI();
         let {width, height} = getContainerSize();
         let params = {
@@ -285,7 +289,6 @@ const AccessGuacamole = ({assetId}: Props) => {
             'height': height * dpi,
             'dpi': dpi * 96,
             'sessionId': session.id,
-            'X-Auth-Token': authToken
         };
         if (session.width > 0 && session.height > 0) {
             params['width'] = session.width;
@@ -357,7 +360,7 @@ const AccessGuacamole = ({assetId}: Props) => {
     return (
         <div className={'w-full'}
              style={{
-                 height: height - 77.5,
+                 height: containerHeight,
              }}
              ref={containerRef}
         >

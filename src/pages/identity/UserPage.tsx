@@ -1,8 +1,19 @@
 import React, {useEffect, useRef, useState} from 'react';
 
-import {App, Button, Popconfirm, Popover, Space, Switch, Table, Tag, Upload} from "antd";
-import {useNavigate, useSearchParams} from "react-router-dom";
-import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
+import {
+    App,
+    Button,
+    Dropdown,
+    Popconfirm,
+    Popover,
+    Space,
+    Switch,
+    Table,
+    Tag,
+    Upload} from "antd";
+import {useNavigate,
+    useSearchParams} from "react-router-dom";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import userApi, {CreateUserResult, User} from "@/api/user-api";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
@@ -27,7 +38,7 @@ function downloadImportExampleCsv() {
 
 const UserPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -99,7 +110,7 @@ ${t('assets.password')}: ${result.password}`)
         }
     });
 
-    const columns: ProColumns<User>[] = [
+    const columns: NColumn<User>[] = [
         {
             title: t('identity.user.nickname'),
             dataIndex: 'nickname',
@@ -221,61 +232,68 @@ ${t('assets.password')}: ${result.password}`)
             key: 'option',
             width: 160,
             fixed: 'right',
-            render: (text, record, _, action) => [
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record.id);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>
-                ,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>,
-                <TableDropdown
-                    key="actionGroup"
-                    onSelect={(key) => {
-                        switch (key) {
-                            case 'detail':
-                                navigate(`/user/${record['id']}?activeKey=info`);
-                                break;
-                            case 'view-authorised-asset':
-                                navigate(`/authorised-asset?userId=${record['id']}`);
-                                break;
-                            case 'view-authorised-website':
-                                navigate(`/authorised-website?userId=${record['id']}`);
-                                break;
-                            case 'reset-password':
-                                bulkResetPassword([record['id']])
-                                break;
-                            case 'reset-totp':
-                                bulkResetTOTP([record['id']])
-                                break;
-                            case 'login-policy':
-                                navigate(`/user/${record['id']}?activeKey=login-policy`);
-                                break;
-                        }
-                    }}
-                    menus={[
-                        {key: 'detail', name: t('actions.detail')},
-                        {key: 'view-authorised-asset', name: `${t('menus.resource.submenus.asset')}${t('actions.authorized')}`},
-                        {key: 'view-authorised-website', name: `${t('menus.resource.submenus.website')}${t('actions.authorized')}`},
-                        {key: 'reset-password', name: t('identity.user.reset_password.action')},
-                        {key: 'reset-totp', name: t('identity.user.reset_otp.action')},
-                        {key: 'login-policy', name: t('identity.options.login_policy')},
-                    ]}
-                />,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record.id);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                    <Dropdown
+                        key="actionGroup"
+                        menu={{
+                            items: [
+                                {key: 'detail', label: t('actions.detail')},
+                                {key: 'view-authorised-asset', label: `${t('menus.resource.submenus.asset')}${t('actions.authorized')}`},
+                                {key: 'view-authorised-website', label: `${t('menus.resource.submenus.website')}${t('actions.authorized')}`},
+                                {key: 'reset-password', label: t('identity.user.reset_password.action')},
+                                {key: 'reset-totp', label: t('identity.user.reset_otp.action')},
+                                {key: 'login-policy', label: t('identity.options.login_policy')},
+                            ],
+                            onClick: ({key}) => {
+                                switch (key) {
+                                    case 'detail':
+                                        navigate(`/user/${record['id']}?activeKey=info`);
+                                        break;
+                                    case 'view-authorised-asset':
+                                        navigate(`/authorised-asset?userId=${record['id']}`);
+                                        break;
+                                    case 'view-authorised-website':
+                                        navigate(`/authorised-website?userId=${record['id']}`);
+                                        break;
+                                    case 'reset-password':
+                                        bulkResetPassword([record['id']])
+                                        break;
+                                    case 'reset-totp':
+                                        bulkResetTOTP([record['id']])
+                                        break;
+                                    case 'login-policy':
+                                        navigate(`/user/${record['id']}?activeKey=login-policy`);
+                                        break;
+                                }
+                            }
+                        }}
+                    >
+                        <Button type="link" size="small" style={{padding: 0}}>
+                            {t('actions.more')}
+                        </Button>
+                    </Dropdown>
+                </Space>
+            ),
         },
     ];
 
@@ -313,7 +331,7 @@ ${t('assets.password')}: ${result.password}`)
     }
 
     return (<div>
-        <ProTable
+        <NTable
             columns={columns}
             actionRef={actionRef}
             columnsState={{

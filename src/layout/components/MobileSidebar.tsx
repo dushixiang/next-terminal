@@ -35,7 +35,7 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
             styles={{
                 body: {padding: 0}
             }}
-            width={280}
+            size={280}
             className="mobile-menu-drawer"
         >
             <div className={'flex flex-col h-full'}>

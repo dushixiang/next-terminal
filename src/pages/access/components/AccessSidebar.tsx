@@ -1,8 +1,7 @@
 import React, {Key, useEffect, useState} from 'react';
 import {Input} from 'antd';
-import {ChevronLeft, ChevronRight} from 'lucide-react';
 import {ResizablePanel} from '@/components/ui/resizable';
-import {ScrollArea} from '@/components/ui/scroll-area';
+import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
 import {cn} from '@/lib/utils';
 import {ImperativePanelHandle} from 'react-resizable-panels';
 import {useTranslation} from 'react-i18next';
@@ -10,11 +9,17 @@ import {useQuery} from '@tanstack/react-query';
 import portalApi, {TreeDataNodeWithExtra} from '@/api/portal-api';
 import AssetTree from '@/pages/access/components/AssetTree';
 import {LocalStorage, STORAGE_KEYS} from '@/utils/storage';
+import {
+    ACCESS_SIDEBAR_COLLAPSED_MIN_WIDTH,
+    ACCESS_SIDEBAR_COLLAPSED_SIZE,
+    ACCESS_SIDEBAR_DEFAULT_SIZE,
+    ACCESS_SIDEBAR_EXPANDED_MIN_WIDTH,
+    ACCESS_SIDEBAR_MAX_SIZE,
+} from '@/pages/access/constants';
 
 interface AccessSidebarProps {
     isCollapsed: boolean;
     leftPanelSize: number;
-    height: number;
     onResize: (size: number) => void;
     leftRef: React.RefObject<ImperativePanelHandle>;
     onNodeDoubleClick: (node: TreeDataNodeWithExtra) => void;
@@ -22,13 +27,12 @@ interface AccessSidebarProps {
 
 /**
  * AccessSidebar 组件
- * 左侧资产面板，包含搜索框、折叠按钮和资产树
+ * 左侧资产面板，包含搜索框和资产树
  * 内部管理树数据查询和状态
  */
 const AccessSidebar = React.memo(({
                                       isCollapsed,
                                       leftPanelSize,
-                                      height,
                                       onResize,
                                       leftRef,
                                       onNodeDoubleClick,
@@ -46,6 +50,7 @@ const AccessSidebar = React.memo(({
     const treeQuery = useQuery({
         queryKey: ['assets/tree/portal', searchValue],
         queryFn: () => portalApi.getAssetsTree('', searchValue),
+        refetchOnWindowFocus: true,
     });
 
     useEffect(() => {
@@ -77,58 +82,34 @@ const AccessSidebar = React.memo(({
     return (
         <ResizablePanel
             defaultSize={leftPanelSize}
-            minSize={15}
-            maxSize={20}
-            style={{
-                maxHeight: height - 40,
-            }}
+            minSize={ACCESS_SIDEBAR_DEFAULT_SIZE}
+            maxSize={ACCESS_SIDEBAR_MAX_SIZE}
             collapsible={true}
-            collapsedSize={2}
+            collapsedSize={ACCESS_SIDEBAR_COLLAPSED_SIZE}
             onResize={onResize}
             className={cn(
-                "bg-[#141414] transition-all duration-300 ease-in-out",
-                isCollapsed && "min-w-[48px]",
-                !isCollapsed && "min-w-[240px]",
+                "flex h-full flex-col overflow-hidden bg-[#141414] transition-all duration-300 ease-in-out",
             )}
+            style={{
+                minWidth: isCollapsed ? ACCESS_SIDEBAR_COLLAPSED_MIN_WIDTH : ACCESS_SIDEBAR_EXPANDED_MIN_WIDTH,
+            }}
             ref={leftRef}
         >
-            <ScrollArea
-                className={'py-2'}
-                style={{
-                    height: height - 40,
-                }}
-            >
-                <div className={'px-2 pb-2 flex items-center gap-2'}>
-                    {!isCollapsed && (
-                        <Input.Search
-                            placeholder={t('access.search')}
-                            value={searchInput}
-                            onChange={handleSearchInputChange}
-                            onSearch={(value) => {
-                                setSearchValue(value);
-                            }}
-                            allowClear
-                        />
-                    )}
-
-                    <div
-                        className={'flex items-center justify-center h-8 w-8 rounded border bg-border cursor-pointer'}
-                        onClick={() => {
-                            if (leftRef.current?.isCollapsed()) {
-                                leftRef.current?.expand();
-                            } else {
-                                leftRef.current?.collapse();
-                            }
+            {!isCollapsed && (
+                <div className={'p-2'}>
+                    <Input.Search
+                        placeholder={t('access.search')}
+                        value={searchInput}
+                        onChange={handleSearchInputChange}
+                        onSearch={(value) => {
+                            setSearchValue(value);
                         }}
-                    >
-                        {isCollapsed ? (
-                            <ChevronRight className={'h-4 w-4'}/>
-                        ) : (
-                            <ChevronLeft className="h-4 w-4"/>
-                        )}
-                    </div>
+                        allowClear
+                    />
                 </div>
+            )}
 
+            <ScrollArea className={'flex-1 py-2'}>
                 {!isCollapsed && (
                     <AssetTree
                         treeData={treeQuery.data || []}
@@ -137,6 +118,7 @@ const AccessSidebar = React.memo(({
                         onNodeDoubleClick={onNodeDoubleClick}
                     />
                 )}
+                <ScrollBar orientation="horizontal" />
             </ScrollArea>
         </ResizablePanel>
     );

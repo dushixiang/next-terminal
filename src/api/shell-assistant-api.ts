@@ -1,4 +1,4 @@
-import { baseUrl, getToken } from "./core/requests";
+import { baseUrl } from "./core/requests";
 
 export interface ShellAssistantRequest {
     question: string;
@@ -27,7 +27,6 @@ class ShellAssistantApi {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Auth-Token': getToken() || '',
                 },
                 body: JSON.stringify(request),
             });

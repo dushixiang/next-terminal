@@ -1,6 +1,11 @@
-import {App, Button, Tag, Tooltip} from 'antd';
-import React, {useRef} from 'react';
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {
+    App,
+    Button,
+    Tag,
+    Tooltip} from 'antd';
+import React,
+    {useRef} from 'react';
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
@@ -9,7 +14,7 @@ import operationLogApi, {OperationLog} from "@/api/operation-log-api";
 const OperationLogPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let {modal} = App.useApp();
 
@@ -20,7 +25,7 @@ const OperationLogPage = () => {
         }
     });
 
-    const columns: ProColumns<OperationLog>[] = [
+    const columns: NColumn<OperationLog>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -43,7 +48,7 @@ const OperationLogPage = () => {
                 } else if (record.action.includes('delete')) {
                     color = 'red';
                 }
-                return <Tag bordered={false}
+                return <Tag variant="filled"
                             color={color}>{t('audit.operation.options.' + record.action.replaceAll('-', '_'))}</Tag>;
             },
             hideInSearch: true
@@ -101,7 +106,7 @@ const OperationLogPage = () => {
 
     return (
         <div>
-            <ProTable
+            <NTable
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}

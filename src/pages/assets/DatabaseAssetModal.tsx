@@ -1,15 +1,9 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Button, Drawer, Space} from "antd";
-import {
-    ProForm,
-    ProFormDependency,
-    ProFormDigit,
-    ProFormInstance,
-    ProFormSelect,
-    ProFormText,
-    ProFormTextArea,
-} from "@ant-design/pro-components";
+import {useFormRequest} from "@/hook/use-antd-form-query";
+import QuerySelect from "@/components/QuerySelect";
+import React, {useEffect, useState} from 'react';
+import {App, Button, Col, Form, Input, InputNumber, Modal, Radio, Row, Select, Space} from 'antd';
 import {useTranslation} from "react-i18next";
+import {useMutation} from "@tanstack/react-query";
 import databaseAssetApi from "@/api/database-asset-api";
 import sshGatewayApi from "@/api/ssh-gateway-api";
 import agentGatewayApi from "@/api/agent-gateway-api";
@@ -32,13 +26,15 @@ const DatabaseAssetModal = ({
                                 handleOk,
                                 handleCancel,
                                 confirmLoading,
-                                id,
+                                id
                             }: DatabaseAssetModalProps) => {
     const {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>(null);
-    const drawerWidth = 1200;
+    const {message} = App.useApp();
+    const [form] = Form.useForm();
+    const gatewayType = Form.useWatch('gatewayType', form);
     const [decrypted, setDecrypted] = useState(false);
     const [mfaOpen, setMfaOpen] = useState(false);
+    const formItemStyle = {marginBottom: 12};
 
     useEffect(() => {
         if (!open) {
@@ -46,7 +42,6 @@ const DatabaseAssetModal = ({
             setMfaOpen(false);
         }
     }, [open]);
-
     const get = async () => {
         if (id) {
             return await api.getById(id);
@@ -54,202 +49,206 @@ const DatabaseAssetModal = ({
         return {
             type: 'mysql',
             port: 3306,
-            tags: [],
+            gatewayType: '',
+            tags: []
         };
     };
-
     const sshGatewayRequest = async () => {
         const items = await sshGatewayApi.getAll();
         return items.map(item => ({
             label: item.name,
-            value: item.id,
+            value: item.id
         }));
     };
-
     const agentGatewayRequest = async () => {
         const items = await agentGatewayApi.getAll();
         return items.map(item => ({
             label: item.name,
-            value: item.id,
+            value: item.id
         }));
     };
-
     const gatewayGroupRequest = async () => {
         const items = await gatewayGroupApi.getAll();
         return items.map(item => ({
             label: item.name,
-            value: item.id,
+            value: item.id
         }));
     };
-
     const handleSave = () => {
-        formRef.current?.validateFields()
-            .then(async values => {
-                if (!values.gatewayType) {
-                    values.gatewayType = '';
-                    values.gatewayId = '';
-                }
-                handleOk(values);
-            });
+        form.validateFields().then(async values => {
+            if (!values.gatewayType) {
+                values.gatewayType = '';
+                values.gatewayId = '';
+            }
+            handleOk(values);
+        });
     };
+    const testMutation = useMutation({
+        mutationFn: api.test,
+        onSuccess: () => {
+            message.success(t('general.success'));
+        }
+    });
+    const handleTest = () => {
+        form.validateFields().then(values => {
+            if (!values.gatewayType) {
+                values.gatewayType = '';
+                values.gatewayId = '';
+            }
+            testMutation.mutate(values);
+        });
+    };
+    const footer = <Space size={8}>
+        <Button onClick={handleCancel}>
+            {t('actions.cancel')}
+        </Button>
+        <Button onClick={handleTest} loading={testMutation.isPending}>
+            {t('actions.test_connection')}
+        </Button>
+        <Button type="primary" loading={confirmLoading} onClick={handleSave}>
+            {t('actions.save')}
+        </Button>
+    </Space>;
 
-    const drawerExtra = (
-        <Space size={8}>
-            <Button onClick={handleCancel}>
-                {t('actions.cancel')}
-            </Button>
-            <Button type="primary" loading={confirmLoading} onClick={handleSave}>
-                {t('actions.save')}
-            </Button>
-        </Space>
-    );
+    useFormRequest(form, ["form-request", "web/src/pages/assets/DatabaseAssetModal.tsx", open, id], get, open);
+    return <Modal title={id ? t('actions.edit') : t('actions.new')}
+                  open={open}
+                  onCancel={handleCancel}
+                  destroyOnHidden={true}
+                  mask={{
+                      closable: true,
+                  }}
+                  footer={footer}
+    >
+        <Form form={form} layout="vertical">
+            <Form.Item hidden={true} name={'id'}>
+                <Input/>
+            </Form.Item>
+            <Space orientation="vertical" size={8} style={{width: '100%'}}>
+                <Form.Item name={'name'} label={t('general.name')} rules={[{required: true}]} style={formItemStyle}>
+                    <Input/>
+                </Form.Item>
 
-    return (
-        <Drawer
-            title={id ? t('actions.edit') : t('actions.new')}
-            extra={drawerExtra}
-            onClose={handleCancel}
-            open={open}
-            width={drawerWidth}
-            destroyOnHidden={true}
-        >
-            <div className="flex h-full flex-col">
-                <div className="flex-1 overflow-auto pr-1">
-                    <ProForm formRef={formRef} request={get} submitter={false}>
-                        <ProFormText hidden={true} name={'id'}/>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="md:col-span-2">
-                                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
-                            </div>
-                            <ProFormSelect
-                                label={t('db.asset.type')}
-                                name='type'
-                                rules={[{required: true}]}
-                                options={[
-                                    {label: t('db.asset.type_mysql'), value: 'mysql'},
-                                    {label: t('db.asset.type_pg'), value: 'pg', disabled: true},
-                                ]}
-                            />
-                            <ProFormSelect
-                                label={t('assets.tags')}
-                                name='tags'
-                                fieldProps={{
-                                    mode: 'tags',
-                                }}
-                                showSearch
-                            />
-                            <div className="md:col-span-2">
-                                <ProFormTextArea label={t('general.remark')} name='description' fieldProps={{rows: 3}}/>
-                            </div>
-                        </div>
+                <Row gutter={12}>
+                    <Col span={12}>
+                        <Form.Item label={t('db.asset.type')} name='type' rules={[{required: true}]}
+                                   style={formItemStyle}>
+                            <Select options={[{
+                                label: t('db.asset.type_mysql'),
+                                value: 'mysql'
+                            }, {
+                                label: t('db.asset.type_pg'),
+                                value: 'pg',
+                                disabled: true
+                            }]}/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item label={t('assets.tags')} name='tags' style={formItemStyle}>
+                            <Select
+                                mode='tags'
+                                showSearch/>
+                        </Form.Item>
+                    </Col>
+                    <Col span={24}>
+                        <Form.Item label={t('general.remark')} name='description' style={formItemStyle}>
+                            <Input.TextArea rows={3}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
 
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="md:col-span-2">
-                                    <ProFormText name={'host'} label={t('db.asset.host')} rules={[{required: true}]}/>
-                                </div>
-                                <ProFormDigit
-                                    name={'port'}
-                                    label={t('gateways.port')}
-                                    min={1}
-                                    max={65535}
-                                    rules={[{required: true}]}
-                                />
-                            </div>
-                            <ProFormText name={'username'} label={t('menus.identity.submenus.user')} rules={[{required: true}]}/>
-                            <ProFormText.Password
-                                label={t('assets.password')}
-                                name='password'
-                                fieldProps={{
-                                    iconRender: (visible) => (visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>),
-                                    visibilityToggle: {
-                                        onVisibleChange: (visible) => {
-                                            if (id && visible && !decrypted) {
-                                                setMfaOpen(true);
-                                            }
+                <Row gutter={12}>
+                    <Col xs={24} md={16}>
+                        <Form.Item name={'host'} label={t('db.asset.host')} rules={[{required: true}]}
+                                   style={formItemStyle}>
+                            <Input/>
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={8}>
+                        <Form.Item name={'port'} label={t('gateways.port')} rules={[{required: true}]}
+                                   style={formItemStyle}>
+                            <InputNumber min={1} max={65535} style={{width: '100%'}}/>
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item name={'username'} label={t('menus.identity.submenus.user')}
+                                   rules={[{required: true}]} style={formItemStyle}>
+                            <Input autoComplete='off'/>
+                        </Form.Item>
+                    </Col>
+                    <Col xs={24} md={12}>
+                        <Form.Item label={t('assets.password')} name='password' style={formItemStyle}>
+                            <Input.Password
+                                autoComplete='new-password'
+                                iconRender={visible => visible ? <EyeTwoTone/> : <EyeInvisibleOutlined/>}
+                                visibilityToggle={{
+                                    onVisibleChange: visible => {
+                                        if (id && visible && !decrypted) {
+                                            setMfaOpen(true);
                                         }
                                     }
-                                }}
-                            />
-                        </div>
+                                }}/>
+                        </Form.Item>
+                    </Col>
+                </Row>
 
-                        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <ProFormSelect
-                                label={t('assets.gateway_type')}
-                                name='gatewayType'
-                                options={[
-                                    {label: t('assets.no_gateway'), value: ''},
-                                    {label: t('menus.gateway.submenus.ssh_gateway'), value: 'ssh'},
-                                    {label: t('menus.gateway.submenus.agent_gateway'), value: 'agent'},
-                                    {label: t('menus.gateway.submenus.gateway_group'), value: 'group'},
-                                ]}
-                                fieldProps={{
-                                    allowClear: true,
-                                }}
-                            />
-                            <ProFormDependency name={['gatewayType']}>
-                                {({gatewayType}) => {
-                                    if (gatewayType === 'ssh') {
-                                        return (
-                                            <ProFormSelect
-                                                key="ssh"
-                                                label={t('menus.gateway.submenus.ssh_gateway')}
-                                                name='gatewayId'
-                                                request={sshGatewayRequest}
-                                                showSearch
-                                                rules={[{required: true}]}
-                                            />
-                                        );
-                                    }
-                                    if (gatewayType === 'agent') {
-                                        return (
-                                            <ProFormSelect
-                                                key="agent"
-                                                label={t('menus.gateway.submenus.agent_gateway')}
-                                                name='gatewayId'
-                                                request={agentGatewayRequest}
-                                                showSearch
-                                                rules={[{required: true}]}
-                                            />
-                                        );
-                                    }
-                                    if (gatewayType === 'group') {
-                                        return (
-                                            <ProFormSelect
-                                                key="group"
-                                                label={t('menus.gateway.submenus.gateway_group')}
-                                                name='gatewayId'
-                                                request={gatewayGroupRequest}
-                                                showSearch
-                                                rules={[{required: true}]}
-                                            />
-                                        );
-                                    }
-                                    return <div />;
-                                }}
-                            </ProFormDependency>
-                        </div>
-                    </ProForm>
-                </div>
-            </div>
+                <Form.Item label={t('assets.gateway_type')} name='gatewayType' style={formItemStyle}>
+                    <Radio.Group options={[{
+                        label: t('assets.no_gateway'),
+                        value: ''
+                    }, {
+                        label: t('menus.gateway.submenus.ssh_gateway'),
+                        value: 'ssh'
+                    }, {
+                        label: t('menus.gateway.submenus.agent_gateway'),
+                        value: 'agent'
+                    }, {
+                        label: t('menus.gateway.submenus.gateway_group'),
+                        value: 'group'
+                    }]}/>
+                </Form.Item>
 
-            <MultiFactorAuthentication
-                open={mfaOpen}
-                handleOk={async (securityToken) => {
-                    if (!id) {
-                        return;
-                    }
-                    const res = await api.decrypt(id, securityToken);
-                    formRef.current?.setFieldsValue({
-                        password: res.password,
-                    });
-                    setDecrypted(true);
-                    setMfaOpen(false);
-                }}
-                handleCancel={() => setMfaOpen(false)}
-            />
-        </Drawer>
-    );
+                {gatewayType === 'ssh' && <Form.Item label={t('menus.gateway.submenus.ssh_gateway')} name='gatewayId'
+                                                      rules={[{required: true}]}
+                                                      style={formItemStyle}>
+                    <QuerySelect showSearch params={{
+                        gatewayType
+                    }} request={sshGatewayRequest}/>
+                </Form.Item>}
+                {gatewayType === 'agent' && <Form.Item label={t('menus.gateway.submenus.agent_gateway')}
+                                                       name='gatewayId'
+                                                       rules={[{required: true}]}
+                                                       style={formItemStyle}>
+                    <QuerySelect showSearch params={{
+                        gatewayType
+                    }} request={agentGatewayRequest}/>
+                </Form.Item>}
+                {gatewayType === 'group' && <Form.Item label={t('menus.gateway.submenus.gateway_group')}
+                                                       name='gatewayId'
+                                                       rules={[{required: true}]}
+                                                       style={formItemStyle}>
+                    <QuerySelect showSearch params={{
+                        gatewayType
+                    }} request={gatewayGroupRequest}/>
+                </Form.Item>}
+            </Space>
+        </Form>
+
+        <MultiFactorAuthentication
+            open={mfaOpen}
+            handleOk={async securityToken => {
+                if (!id) {
+                    return;
+                }
+                const res = await api.decrypt(id, securityToken);
+                form.setFieldsValue({
+                    password: res.password
+                });
+                setDecrypted(true);
+                setMfaOpen(false);
+            }}
+            handleCancel={() => setMfaOpen(false)}
+        />
+    </Modal>;
 };
-
 export default DatabaseAssetModal;

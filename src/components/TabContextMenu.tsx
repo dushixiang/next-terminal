@@ -1,5 +1,5 @@
 import React from 'react';
-import { Dropdown, Menu } from 'antd';
+import {Dropdown} from 'antd';
 import { useTranslation } from 'react-i18next';
 
 interface TabContextMenuProps {
@@ -12,6 +12,8 @@ interface TabContextMenuProps {
   onCloseAll: () => void;
   onCloseOthers: (key: string) => void;
   onReconnect: (key: string) => void;
+  onDuplicateSession: (key: string) => void;
+  canDuplicateSession?: boolean;
 }
 
 const TabContextMenu: React.FC<TabContextMenuProps> = ({
@@ -24,6 +26,8 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
   onCloseAll,
   onCloseOthers,
   onReconnect,
+  onDuplicateSession,
+  canDuplicateSession = false,
 }) => {
   const { t } = useTranslation();
 
@@ -61,6 +65,11 @@ const TabContextMenu: React.FC<TabContextMenuProps> = ({
     {
       type: 'divider' as const,
     },
+    ...(canDuplicateSession ? [{
+      key: 'copy-session',
+      label: t('access.tabs.copySession'),
+      onClick: () => onDuplicateSession(tabKey),
+    }] : []),
     {
       key: 'reconnect',
       label: t('assets.resize_methods.reconnect'),

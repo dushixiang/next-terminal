@@ -1,17 +1,7 @@
-import React, {useRef, useState} from 'react';
-import {App, Collapse, Form, Input, InputNumber, Space, theme, TreeDataNode,} from "antd";
-import {
-    ProForm,
-    ProFormDependency,
-    ProFormInstance,
-    ProFormRadio,
-    ProFormSegmented,
-    ProFormSelect,
-    ProFormText,
-    ProFormTextArea,
-    ProFormTreeSelect
-} from "@ant-design/pro-components";
-import {CaretRightOutlined} from '@ant-design/icons';
+import {useFormRequest} from "@/hook/use-antd-form-query";
+import QuerySelect from "@/components/QuerySelect";
+import React, {forwardRef, useImperativeHandle, useState} from 'react';
+import {App, Button, Form, Input, InputNumber, Radio, Segmented, Space, Tabs, TreeDataNode} from 'antd';
 import {useMutation} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import assetsApi, {Asset} from "../../api/asset-api";
@@ -22,30 +12,78 @@ import gatewayGroupApi from "@/api/gateway-group-api";
 import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 import AssetLogo from "./components/AssetLogo";
 import AccountTypeForm from "./components/AccountTypeForm";
-import AssetAdvancedSettings from "./components/AssetAdvancedSettings";
+import {AssetAdvancedSection, getAssetAdvancedItems} from "./components/AssetAdvancedSettings";
+import ProFormTreeSelect from "@/components/ProFormTreeSelect";
 
-const formItemLayout = {
-    labelCol: {span: 4},
-    wrapperCol: {span: 10},
-}
+const protocolOptions = [
+    {
+        label: 'SSH',
+        value: 'ssh'
+    }, {
+        label: 'RDP',
+        value: 'rdp'
+    }, {
+        label: 'VNC',
+        value: 'vnc'
+    }, {
+        label: 'Telnet',
+        value: 'telnet'
+    }
+];
 
 interface AssetsInfoProps {
-    assetId?: string
-    groupId?: string
-    copy?: boolean
-    onClose?: () => void
+    hideLogo?: boolean;
+    assetId?: string;
+    groupId?: string;
+    copy?: boolean;
+    onClose?: () => void;
+    onSuccess?: (asset?: Asset) => void;
+    showAdvanced?: boolean;
+    canDetectOS?: boolean;
+    detectOSLoading?: boolean;
+    onDetectOS?: () => void;
+    canWOL?: boolean;
+    wolLoading?: boolean;
+    onWOL?: () => void;
 }
 
-const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps) {
+export interface AssetsPostRef {
+    refreshLogo: () => Promise<void>;
+}
 
+const AssetsPost = forwardRef(function ({
+                                            hideLogo,
+                                            assetId,
+                                            groupId,
+                                            copy,
+                                            onClose,
+                                            onSuccess,
+                                            showAdvanced = true,
+                                            canDetectOS,
+                                            detectOSLoading,
+                                            onDetectOS,
+                                            canWOL,
+                                            wolLoading,
+                                            onWOL
+                                        }: AssetsInfoProps, ref: React.ForwardedRef<AssetsPostRef>) {
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>(null);
-
+    const [form] = Form.useForm();
+    const protocol = Form.useWatch('protocol', form);
+    const accountType = Form.useWatch('accountType', form);
+    const gatewayType = Form.useWatch('gatewayType', form);
     let [logo, setLogo] = useState<string>();
     let [decrypted, setDecrypted] = useState(false);
     let [mfaOpen, setMfaOpen] = useState(false);
-
     let {message} = App.useApp();
+
+    useImperativeHandle(ref, () => ({
+        refreshLogo: async () => {
+            if (assetId) {
+                const asset = await assetsApi.getById(assetId);
+                setLogo(strings.hasText(asset.logo) ? asset.logo : undefined);
+            }
+        }
+    }));
 
     const get = async () => {
         if (assetId) {
@@ -65,83 +103,221 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
             protocol: 'ssh',
             port: 22,
             accountType: 'password',
+            gatewayType: '',
             attrs: {
                 "disable-audio": true,
                 "enable-drive": true,
                 "security": "any",
-                "ignore-cert": true,
+                "ignore-cert": true
             },
-            groupId: groupId,
+            groupId: groupId
         } as Asset;
-    }
-
+    };
     const postOrUpdate = async (values: any) => {
         values['logo'] = logo;
         if (!copy && values['id']) {
             await assetsApi.updateById(values['id'], values);
+            return undefined;
         } else {
-            delete values['id']
-            await assetsApi.create(values);
+            delete values['id'];
+            return await assetsApi.create(values);
         }
-    }
-
+    };
     let mutation = useMutation({
         mutationFn: postOrUpdate,
-        onSuccess: () => {
+        onSuccess: (asset) => {
             message.success(t('general.success'));
+            onSuccess?.(asset);
             if (onClose) {
                 onClose();
             }
         }
     });
 
-    const wrapSet = async (values: any) => {
-        formRef.current?.validateFields()
-            .then(() => {
-                mutation.mutate(values);
-            })
-    }
+    type AssetSection = 'basic' | AssetAdvancedSection;
 
-    const renderProtocol = (protocol: string) => {
-        switch (protocol) {
-            case "telnet":
-                return null;
-            default:
-                return (
-                    <>
-                        <ProFormRadio.Group
-                            label={t('assets.account_type')} name='accountType' rules={[{required: true}]}
-                            options={[
-                                {label: t('assets.password'), value: 'password'},
-                                {label: t('assets.private_key'), value: 'private-key', disabled: protocol !== 'ssh'},
-                                {label: t('menus.resource.submenus.credential'), value: 'credential'},
-                            ]}
-                        />
-                        <ProFormDependency name={['accountType']}>
-                            {({accountType}) => (
-                                <AccountTypeForm
-                                    accountType={accountType}
-                                    protocol={protocol}
-                                    assetId={assetId}
-                                    copy={copy}
-                                    decrypted={decrypted}
-                                    setDecrypted={setDecrypted}
-                                    setMfaOpen={setMfaOpen}
-                                    formRef={formRef}
-                                />
-                            )}
-                        </ProFormDependency>
-                    </>
-                );
+    const sectionFields: Record<AssetSection, any[]> = {
+        basic: [
+            'logo',
+            'name',
+            'alias',
+            'protocol',
+            'ip',
+            'port',
+            'accountType',
+            'credentialId',
+            'username',
+            'password',
+            'privateKey',
+            'passphrase',
+            'gatewayType',
+            'gatewayId',
+            'tags',
+            'groupId',
+            'description'
+        ],
+        security_settings: [
+            ['attrs', 'security'],
+            ['attrs', 'ignore-cert'],
+            ['attrs', 'cert-tofu'],
+            ['attrs', 'cert-fingerprints'],
+            ['attrs', 'disable-auth']
+        ],
+        display_settings: [
+            ['attrs', 'color-depth'],
+            ['attrs', 'force-lossless'],
+            ['attrs', 'width'],
+            ['attrs', 'height'],
+            ['attrs', 'resize-method']
+        ],
+        audio_settings: [
+            ['attrs', 'disable-audio'],
+            ['attrs', 'enable-audio-input']
+        ],
+        domain: [
+            ['attrs', 'domain']
+        ],
+        PDU: [
+            ['attrs', 'preconnection-id'],
+            ['attrs', 'preconnection-blob']
+        ],
+        'remote-app': [
+            ['attrs', 'remote-app'],
+            ['attrs', 'remote-app-dir'],
+            ['attrs', 'remote-app-args']
+        ],
+        'rdp-drive': [
+            ['attrs', 'enable-drive'],
+            ['attrs', 'drive-path']
+        ],
+        terminal_settings: [
+            ['attrs', 'disableAliveCheck'],
+            ['attrs', 'disableDetectOS'],
+            ['attrs', 'env']
+        ],
+        'wol-settings': [
+            ['attrs', 'wol-enabled'],
+            ['attrs', 'wol-mac-addr'],
+            ['attrs', 'wol-broadcast'],
+            ['attrs', 'wol-wakeup-delay']
+        ]
+    };
+
+    const saveSection = async (section: AssetSection) => {
+        await form.validateFields(sectionFields[section]);
+        const values = form.getFieldsValue(true) as Asset;
+
+        if (section === 'basic') {
+            values.logo = logo || '';
+            if (values.id) {
+                await assetsApi.updateBasic(values.id, values);
+                return undefined;
+            }
+            delete (values as any).id;
+            return await assetsApi.create(values);
         }
-    }
 
+        if (!assetId) {
+            return undefined;
+        }
+        await assetsApi.updateAdvanced(assetId, {attrs: values.attrs || {}});
+        return undefined;
+    };
+
+    const sectionMutation = useMutation({
+        mutationFn: saveSection,
+        onSuccess: (asset) => {
+            message.success(t('general.success'));
+            onSuccess?.(asset);
+            if (asset?.id && onClose) {
+                onClose();
+            }
+        }
+    });
+
+    const wrapSet = async (values: any) => {
+        form.validateFields().then(() => {
+            mutation.mutate(values);
+        });
+    };
+    const renderProtocol = (protocol?: string) => {
+        if (protocol === 'telnet') {
+            return null;
+        }
+
+        const accountTypeOptions = [
+            {
+                label: t('assets.password'),
+                value: 'password'
+            },
+            {
+                label: t('assets.private_key'),
+                value: 'private-key',
+                disabled: protocol !== 'ssh'
+            },
+            {
+                label: t('menus.resource.submenus.credential'),
+                value: 'credential'
+            }
+        ];
+
+        return (
+            <>
+                <Form.Item label={t('assets.account_type')} name='accountType' required={true}>
+                    <Radio.Group options={accountTypeOptions}/>
+                </Form.Item>
+                <AccountTypeForm
+                    accountType={accountType}
+                    protocol={protocol || ''}
+                    assetId={assetId}
+                    copy={copy}
+                    decrypted={decrypted}
+                    setDecrypted={setDecrypted}
+                    setMfaOpen={setMfaOpen}
+                    form={form}
+                />
+            </>
+        );
+    };
+    const renderGateway = () => {
+        if (gatewayType === 'ssh') {
+            return <Form.Item key="ssh" label={t('menus.gateway.submenus.ssh_gateway')} name='gatewayId'
+                              rules={[{
+                                  required: true
+                              }]}>
+                <QuerySelect showSearch params={{
+                    gatewayType
+                }} request={sshGatewayRequest}/>
+            </Form.Item>;
+        }
+        if (gatewayType === 'agent') {
+            return <Form.Item key="agent" label={t('menus.gateway.submenus.agent_gateway')} name='gatewayId'
+                              rules={[{
+                                  required: true
+                              }]}>
+                <QuerySelect showSearch params={{
+                    gatewayType
+                }} request={agentGatewayRequest}/>
+            </Form.Item>;
+        }
+        if (gatewayType === 'group') {
+            return <Form.Item key="group" label={t('menus.gateway.submenus.gateway_group')} name='gatewayId'
+                              rules={[{
+                                  required: true
+                              }]}>
+                <QuerySelect showSearch params={{
+                    gatewayType
+                }} request={gatewayGroupRequest}/>
+            </Form.Item>;
+        }
+        return null;
+    };
     const transformData = (data: TreeDataNode[]) => {
         return data.map(item => {
             const newItem = {
                 title: item.title,
                 value: item.key as string,
-                children: [],
+                children: []
             };
             if (item.children) {
                 newItem.children = transformData(item.children);
@@ -150,243 +326,234 @@ const AssetsPost = function ({assetId, groupId, copy, onClose}: AssetsInfoProps)
         });
     };
 
-    const {token} = theme.useToken();
-
-    const panelStyle: React.CSSProperties = {
-        marginBottom: 24,
-        background: token.colorFillAlter,
-        borderRadius: token.borderRadiusLG,
-        border: 'none',
-    };
 
     const sshGatewayRequest = async () => {
         const items = await sshGatewayApi.getAll();
         return items.map(item => ({
             label: item.name,
-            value: item.id,
+            value: item.id
         }));
     };
-
     const agentGatewayRequest = async () => {
         const items = await agentGatewayApi.getAll();
         return items.map(item => ({
             label: item.name,
-            value: item.id,
+            value: item.id
         }));
     };
-
     const gatewayGroupRequest = async () => {
         const items = await gatewayGroupApi.getAll();
         return items.map(item => ({
             label: item.name,
-            value: item.id,
+            value: item.id
         }));
     };
+    useFormRequest(form, ["form-request", "web/src/pages/assets/AssetPost.tsx", assetId, groupId, copy], get);
 
-    return (
-        <div className="px-4">
-            <ProForm {...formItemLayout}
-                     formRef={formRef} layout={'horizontal'}
-                     request={get} onFinish={wrapSet}
-            >
-                <ProFormText hidden={true} name={'id'}/>
+    const renderSectionActions = (section: AssetSection) => {
+        if (!showAdvanced) {
+            return null;
+        }
+        return (
+            <Form.Item className="mt-6 mb-0">
+                <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                        type="primary"
+                        loading={sectionMutation.isPending && sectionMutation.variables === section}
+                        onClick={() => sectionMutation.mutate(section)}
+                    >
+                        {t('actions.save')}
+                    </Button>
+                    {section === 'wol-settings' && canWOL && (
+                        <Button loading={wolLoading} onClick={onWOL}>
+                            {t('assets.wol_send')}
+                        </Button>
+                    )}
+                </div>
+            </Form.Item>
+        );
+    };
 
-                <AssetLogo value={logo} onChange={setLogo}/>
+    const renderPane = (section: AssetSection, children: React.ReactNode) => (
+        <div className="min-h-130 pr-2">
+            {children}
+            {renderSectionActions(section)}
+        </div>
+    );
 
-                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
+    const basicFields = (
+        <>
+            <Form.Item hidden={true} name={'id'}>
+                <Input/>
+            </Form.Item>
 
-                <ProFormText
-                    name={'alias'}
-                    label={t('assets.alias')}
-                    placeholder={t('assets.alias_placeholder')}
-                    extra={t('assets.alias_tip')}
-                    rules={[
-                        {
-                            pattern: /^[A-Za-z][A-Za-z0-9_-]*$/,
-                            message: t('assets.alias_invalid'),
-                        },
-                    ]}
+            {hideLogo ? null : (
+                <AssetLogo
+                    value={logo}
+                    onChange={setLogo}
+                    extra={canDetectOS && (
+                        <Button size="small" loading={detectOSLoading} onClick={onDetectOS}>
+                            {t('assets.auto_detect_logo')}
+                        </Button>
+                    )}
                 />
+            )}
 
-                <ProFormSegmented
-                    label={t('assets.protocol')} name='protocol' rules={[{required: true}]}
-                    valueEnum={{
-                        ssh: 'SSH',
-                        rdp: 'RDP',
-                        vnc: 'VNC',
-                        telnet: 'Telnet',
-                    }}
-                    fieldProps={{
-                        onChange: (value) => {
-                            let port = 0;
-                            switch (value) {
-                                case 'rdp':
-                                    port = 3389;
-                                    break;
-                                case 'vnc':
-                                    port = 5900;
-                                    break;
-                                case 'ssh':
-                                    port = 22;
-                                    break;
-                                case 'telnet':
-                                    port = 23;
-                                    break;
-                            }
-                            formRef.current.setFieldsValue({
-                                port: port
-                            })
-                        }
-                    }}
-                />
-
-                <Form.Item label={t('assets.addr')} className={'nesting-form-item'}>
-                    <Space.Compact block>
-                        <Form.Item noStyle name='ip'
-                                   rules={[{required: true}]}>
-                            <Input style={{width: '70%'}}
-                                   placeholder="127.0.0.1"
-                                   onKeyDown={(e) => {
-                                       if (e.key === " ") {
-                                           e.preventDefault(); // 阻止输入空格
-                                       }
-                                   }}
-                            />
-                        </Form.Item>
-
-                        <Form.Item noStyle name='port' rules={[{required: true}]}>
-                            <InputNumber style={{width: '30%'}} min={1} max={65535} placeholder='0'/>
-                        </Form.Item>
-                    </Space.Compact>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <Form.Item name={'name'} label={t('general.name')} required={true}>
+                    <Input/>
                 </Form.Item>
 
-                <ProFormDependency name={['protocol']}>
-                    {({protocol}) => renderProtocol(protocol)}
-                </ProFormDependency>
+                <Form.Item name={'alias'} label={t('assets.alias')}
+                           tooltip={t('assets.alias_tip')}
+                           rules={[{
+                               pattern: /^[A-Za-z][A-Za-z0-9_-]*$/,
+                               message: t('assets.alias_invalid')
+                           }]}>
+                    <Input placeholder={t('assets.alias_placeholder')}/>
+                </Form.Item>
 
-                <ProFormRadio.Group
-                    label={t('assets.gateway_type')}
-                    name='gatewayType'
-                    options={[
-                        {label: t('assets.no_gateway'), value: ''},
-                        {label: t('menus.gateway.submenus.ssh_gateway'), value: 'ssh'},
-                        {label: t('menus.gateway.submenus.agent_gateway'), value: 'agent'},
-                        {label: t('menus.gateway.submenus.gateway_group'), value: 'group'},
-                    ]}
+                <ProFormTreeSelect name="groupId" label={t('assets.group')}
+                                   allowClear
+                                   request={async () => {
+                                       let tree = await assetsApi.getGroups();
+                                       return transformData(tree);
+                                   }}
+                                   fieldProps={{
+                                       treeDefaultExpandAll: true,
+                                       style: {
+                                           width: '100%'
+                                       }
+                                   }}
                 />
+            </div>
 
-                <ProFormDependency name={['gatewayType']}>
-                    {({gatewayType}) => {
-                        if (gatewayType === 'ssh') {
-                            return (
-                                <ProFormSelect
-                                    key="ssh"
-                                    label={t('menus.gateway.submenus.ssh_gateway')}
-                                    name='gatewayId'
-                                    request={sshGatewayRequest}
-                                    params={{gatewayType}}
-                                    showSearch
-                                    rules={[{required: true}]}
-                                />
-                            );
-                        } else if (gatewayType === 'agent') {
-                            return (
-                                <ProFormSelect
-                                    key="agent"
-                                    label={t('menus.gateway.submenus.agent_gateway')}
-                                    name='gatewayId'
-                                    request={agentGatewayRequest}
-                                    params={{gatewayType}}
-                                    showSearch
-                                    rules={[{required: true}]}
-                                />
-                            );
-                        } else if (gatewayType === 'group') {
-                            return (
-                                <ProFormSelect
-                                    key="group"
-                                    label={t('menus.gateway.submenus.gateway_group')}
-                                    name='gatewayId'
-                                    request={gatewayGroupRequest}
-                                    params={{gatewayType}}
-                                    showSearch
-                                    rules={[{required: true}]}
-                                />
-                            );
-                        }
-                        return null;
-                    }}
-                </ProFormDependency>
+            <div>
+                <Space>
+                    <Form.Item label={t('assets.protocol')} name='protocol' required={true}>
+                        <Segmented
+                            options={protocolOptions}
+                            onChange={value => {
+                                let port = 0;
+                                switch (value) {
+                                    case 'rdp':
+                                        port = 3389;
+                                        break;
+                                    case 'vnc':
+                                        port = 5900;
+                                        break;
+                                    case 'ssh':
+                                        port = 22;
+                                        break;
+                                    case 'telnet':
+                                        port = 23;
+                                        break;
+                                }
+                                form.setFieldsValue({
+                                    port: port
+                                });
+                            }}
+                        />
+                    </Form.Item>
 
-                <ProFormSelect
-                    label={t('assets.tags')} name='tags'
-                    fieldProps={{
-                        mode: 'tags'
-                    }}
-                    request={async () => {
-                        let tags = await assetsApi.getTags();
-                        return tags.map(tag => ({
-                            label: tag,
-                            value: tag,
-                        }));
-                    }}
-                    showSearch
+                    <Form.Item label={t('assets.addr')} className={'nesting-form-item'}>
+                        <Space.Compact block>
+                            <Form.Item noStyle name='ip' required={true}>
+                                <Input style={{
+                                    width: 'calc(100% - 120px)'
+                                }} placeholder="127.0.0.1" onKeyDown={e => {
+                                    if (e.key === " ") {
+                                        e.preventDefault(); // 阻止输入空格
+                                    }
+                                }}/>
+                            </Form.Item>
+
+                            <Form.Item noStyle name='port' required={true}>
+                                <InputNumber style={{
+                                    width: '120px'
+                                }} min={1} max={65535} placeholder='0'/>
+                            </Form.Item>
+                        </Space.Compact>
+                    </Form.Item>
+                </Space>
+            </div>
+
+
+            {renderProtocol(protocol)}
+
+            <Form.Item label={t('assets.gateway_type')} name='gatewayType'>
+                <Radio.Group options={[
+                    {
+                        label: t('assets.no_gateway'),
+                        value: ''
+                    }, {
+                        label: t('menus.gateway.submenus.ssh_gateway'),
+                        value: 'ssh'
+                    }, {
+                        label: t('menus.gateway.submenus.agent_gateway'),
+                        value: 'agent'
+                    }, {
+                        label: t('menus.gateway.submenus.gateway_group'),
+                        value: 'group'
+                    }
+                ]}/>
+            </Form.Item>
+
+            {renderGateway()}
+
+            <Form.Item label={t('assets.tags')} name='tags'>
+                <QuerySelect mode={'tags'} showSearch request={async () => {
+                    let tags = await assetsApi.getTags();
+                    return tags.map(tag => ({
+                        label: tag,
+                        value: tag
+                    }));
+                }}/>
+            </Form.Item>
+
+
+            <Form.Item label={t('general.remark')} name='description'>
+                <Input.TextArea rows={4}/>
+            </Form.Item>
+        </>
+    );
+
+    const advancedTabs = getAssetAdvancedItems(protocol || '', t).map(item => ({
+        ...item,
+        children: renderPane(item.key as AssetAdvancedSection, item.children)
+    }));
+
+    const tabsItems = [
+        {
+            key: 'basic',
+            label: t('assets.general'),
+            children: renderPane('basic', basicFields),
+            forceRender: true
+        },
+        ...advancedTabs
+    ];
+
+    return <div>
+        <Form layout="vertical" onFinish={wrapSet} form={form}>
+            {showAdvanced ? (
+                <Tabs
+                    tabPlacement="start"
+                    items={tabsItems}
+                    defaultActiveKey="basic"
                 />
+            ) : basicFields}
+        </Form>
 
-                <ProFormTreeSelect
-                    name="groupId"
-                    label={t('assets.group')}
-                    allowClear
-                    request={async () => {
-                        let tree = await assetsApi.getGroups();
-                        return transformData(tree)
-                    }}
-                    fieldProps={{
-                        treeDefaultExpandAll: true,
-                    }}
-                />
-
-                <ProFormTextArea label={t('general.remark')} name='description'
-                                 fieldProps={{rows: 4}}/>
-
-                <Collapse
-                    defaultActiveKey={['advanced_setting']}
-                    ghost
-                    expandIcon={({isActive}) => <CaretRightOutlined rotate={isActive ? 90 : 0}/>}
-                    style={{background: token.colorBgContainer}}
-                    items={[
-                        {
-                            label: t('assets.advanced_setting'),
-                            key: 'advanced_setting',
-                            children: (
-                                <ProFormDependency name={['protocol']}>
-                                    {({protocol}) => (
-                                        <AssetAdvancedSettings protocol={protocol}/>
-                                    )}
-                                </ProFormDependency>
-                            ),
-                            style: panelStyle,
-                        }
-                    ]}
-                />
-            </ProForm>
-
-            <MultiFactorAuthentication
-                open={mfaOpen}
-                handleOk={async (securityToken) => {
-                    const res = await assetsApi.decrypt(assetId, securityToken);
-                    formRef.current?.setFieldsValue({
-                        'password': res.password,
-                        'privateKey': res.privateKey,
-                        'passphrase': res.passphrase,
-                    });
-                    setDecrypted(true);
-                    setMfaOpen(false);
-                }}
-                handleCancel={() => setMfaOpen(false)}
-            />
-        </div>
-    )
-}
-
+        <MultiFactorAuthentication open={mfaOpen} handleOk={async securityToken => {
+            const res = await assetsApi.decrypt(assetId, securityToken);
+            form.setFieldsValue({
+                'password': res.password,
+                'privateKey': res.privateKey,
+                'passphrase': res.passphrase
+            });
+            setDecrypted(true);
+            setMfaOpen(false);
+        }} handleCancel={() => setMfaOpen(false)}/>
+    </div>;
+});
 export default AssetsPost;

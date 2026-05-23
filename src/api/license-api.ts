@@ -2,6 +2,8 @@ import requests from "./core/requests";
 
 export interface License {
     type: string;
+    name?: string;
+    userName?: string;
     machineId: string;
     asset: number;
     database?: number;

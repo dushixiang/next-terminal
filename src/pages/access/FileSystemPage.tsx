@@ -26,6 +26,7 @@ import {
     Tag,
     Tooltip
 } from "antd";
+import type {DrawerProps} from "antd";
 import {
     Download,
     DownloadIcon,
@@ -54,7 +55,7 @@ import {useQuery} from "@tanstack/react-query";
 import dayjs from "dayjs";
 import strings from "@/utils/strings";
 import {useTranslation} from "react-i18next";
-import {baseUrl, getToken} from "@/api/core/requests";
+import {baseUrl} from "@/api/core/requests";
 import PromptModal from "@/components/PromptModal";
 import FileEditor from "@/pages/access/FileEditor";
 import {useFileEditor} from "@/pages/access/hooks/use-file-editor";
@@ -65,6 +66,7 @@ import {cn} from "@/lib/utils";
 import {Strategy} from "@/api/strategy-api";
 import {Base64} from 'js-base64';
 import {useLicense} from "@/hook/LicenseContext";
+import {isMobileByMediaQuery} from "@/utils/utils";
 
 declare module 'react' {
     interface InputHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -85,6 +87,7 @@ interface Props {
     onClose: () => void
     mask?: boolean
     maskClosable?: boolean
+    getContainer?: DrawerProps['getContainer']
 }
 
 interface TransmissionRecord {
@@ -99,6 +102,8 @@ interface TransmissionRecord {
     speed: number,
     xhr?: XMLHttpRequest,
     intervalId?: NodeJS.Timeout,
+    file?: File,
+    dir?: string,
 }
 
 
@@ -125,6 +130,12 @@ interface ContextMenu {
     pageX: number,
     pageY: number,
     file: FileInfo,
+}
+
+interface ImagePreviewState {
+    open: boolean
+    file?: FileInfo
+    src: string
 }
 
 // 传输记录的 reducer
@@ -173,9 +184,33 @@ function transmissionReducer(state: TransmissionRecord[], action: TransmissionAc
 
 const iconClassName = 'h-4 w-4'
 
+const previewableImageExtensions = new Set([
+    'avif',
+    'bmp',
+    'gif',
+    'ico',
+    'jpg',
+    'jpeg',
+    'png',
+    'svg',
+    'webp',
+]);
+
+function getFileExtension(fileName: string) {
+    return fileName.split('.').pop()?.toLowerCase();
+}
+
+function isPreviewableImageFile(file?: FileInfo) {
+    if (!file || file.isDir) {
+        return false;
+    }
+    const extension = getFileExtension(file.name);
+    return !!extension && previewableImageExtensions.has(extension);
+}
+
 function getFileIconFromFileName(fileName: string) {
     let icon = <File className={iconClassName}/>
-    const extension = fileName.split('.').pop()?.toLowerCase();
+    const extension = getFileExtension(fileName);
     switch (extension) {
         case "bmp":
         case "jpg":
@@ -221,10 +256,12 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                                           open,
                                                           onClose,
                                                           mask,
-                                                          maskClosable
+                                                          maskClosable,
+                                                          getContainer = false
                                                       }: Props, ref) => {
 
     let {t} = useTranslation();
+    const isMobile = isMobileByMediaQuery();
 
     let fileUploadRef = useRef<HTMLInputElement>(null);
     let dirUploadRef = useRef<HTMLInputElement>(null);
@@ -263,6 +300,10 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     const [modal, contextHolder] = Modal.useModal();
     const [messageApi, messageContextHolder] = message.useMessage();
     const [contextMenu, setContextMenu] = useState<ContextMenu>(null);
+    const [imagePreview, setImagePreview] = useState<ImagePreviewState>({
+        open: false,
+        src: '',
+    });
     let { license } = useLicense();
     const dragUploadHint = t('fs.drag_upload_hint');
     const dragUploadDisabledMessage = t('fs.drag_upload_disabled');
@@ -271,6 +312,10 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     if (license.isFree()) {
         editLabel += ` (${t('settings.license.type.premium')})`;
     }
+
+    const getFileDownloadUrl = useCallback((filename: string) => {
+        return `${baseUrl()}/${fileSystemApi.group}/${fsId}/download?filename=${encodeURIComponent(filename)}`;
+    }, [fsId]);
 
     const items: MenuProps['items'] = [
         {
@@ -295,6 +340,20 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 } finally {
                     messageApi.destroy(loadingKey);
                 }
+            },
+        },
+        {
+            label: t('fs.operations.preview_image'),
+            key: 'preview-image',
+            icon: <FileImage className={iconClassName}/>,
+            disabled: !isPreviewableImageFile(contextMenu?.file),
+            onClick: () => {
+                let file = contextMenu.file;
+                setImagePreview({
+                    open: true,
+                    file,
+                    src: getFileDownloadUrl(file.path),
+                });
             },
         },
         {
@@ -330,8 +389,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
             disabled: contextMenu?.file?.isDir,
             onClick: () => {
                 let file = contextMenu.file;
-                let url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/download?filename=${file.path}&X-Auth-Token=${getToken()}`;
-                browserDownload(url);
+                browserDownload(getFileDownloadUrl(file.path));
             },
         },
         {
@@ -464,6 +522,34 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         },
     ];
 
+    const handleRetryUpload = async (record: TransmissionRecord) => {
+        if (!record.file || !record.dir) {
+            return;
+        }
+
+        setUploading(true);
+        transmissionDispatch({
+            type: 'UPDATE_RECORD',
+            id: record.id,
+            updates: {
+                loaded: 0,
+                percent: 0,
+                status: 'preparing',
+                error: '',
+                speed: 0,
+                xhr: undefined,
+                intervalId: undefined,
+            }
+        });
+
+        try {
+            await uploadFile(record.id, record.file, record.dir, fsId);
+            filesQuery.refetch();
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const tranColumns: ColumnsType<TransmissionRecord> = [
         {
             title: t('audit.filename'),
@@ -541,7 +627,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         {
             title: t('actions.label'),
             key: 'actions',
-            width: 60,
+            width: 96,
             render: (_, record) => (
                 <div className="flex gap-1">
                     {(record.status === 'uploading' || record.status === 'transmitting') && (
@@ -551,6 +637,16 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                 size="small"
                                 icon={<XCircle className="h-3 w-3"/>}
                                 onClick={() => transmissionDispatch({type: 'CANCEL_UPLOAD', id: record.id})}
+                            />
+                        </Tooltip>
+                    )}
+                    {record.status === 'error' && (
+                        <Tooltip title={t('actions.retry')}>
+                            <Button
+                                type="text"
+                                size="small"
+                                icon={<ReloadOutlined className="h-3 w-3"/>}
+                                onClick={() => handleRetryUpload(record)}
                             />
                         </Tooltip>
                     )}
@@ -608,7 +704,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
         return new Promise((resolve, reject) => {
             const {size} = file;
             const name = getFileName(file);
-            const url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/upload?X-Auth-Token=${getToken()}&dir=${dir}&id=${id}`;
+            const url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/upload?dir=${dir}&id=${id}`;
 
             const xhr = new XMLHttpRequest();
             let intervalId: NodeJS.Timeout | undefined;
@@ -909,6 +1005,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 status: "preparing",
                 error: "",
                 speed: 0,
+                file,
+                dir: currentDirectory + '/' + relativePath.substring(0, relativePath.length - file.name.length),
             });
         }
 
@@ -951,6 +1049,8 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 status: "preparing",
                 error: "",
                 speed: 0,
+                file,
+                dir: currentDirectory,
             });
         }
 
@@ -1123,18 +1223,19 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
     if (license.isFree()) {
         batchDownloadLabel += ` (${t('settings.license.type.premium')})`;
     }
+    const fileTableScrollY = Math.max(window.innerHeight - 240, 240);
 
     return (
         <div>
             <Drawer title="FileSystem"
-                    placement="right"
+                    placement={isMobile ? 'bottom' : 'right'}
                     onClose={onClose}
                     open={open}
-                    width={720}
+                    size={isMobile ? '86svh' : 720}
                     mask={mask}
                     maskClosable={maskClosable}
                     push={false}
-                    getContainer={false}
+                    getContainer={getContainer}
                     extra={
                         <div>
                             <div className={'flex items-center gap-4'}>
@@ -1214,7 +1315,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                                                 }
                                                 let filenames = JSON.stringify(selectedRowKeys);
                                                 let b64 = Base64.encode(filenames, true);
-                                                let url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/batch/download?filenames=${b64}&X-Auth-Token=${getToken()}`;
+                                                let url = `${baseUrl()}/${fileSystemApi.group}/${fsId}/batch/download?filenames=${b64}`;
                                                 browserDownload(url);
                                             }}
                                         />
@@ -1314,7 +1415,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     )}
                     <Table
                         virtual
-                        // scroll={{y: window.innerHeight - 240}}
+                        scroll={{y: fileTableScrollY}}
                         rowKey={'path'}
                         columns={fileColumns}
                         rowSelection={rowSelection}
@@ -1379,7 +1480,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                     placement={'bottom'}
                     onClose={() => setFileTransmitterOpen(false)}
                     open={fileTransmitterOpen}
-                    getContainer={false}
+                    getContainer={getContainer}
                     mask={false}
                     extra={<div>
                         <Button
@@ -1514,6 +1615,31 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                 </Modal>
 
 
+                <Modal
+                    title={imagePreview.file?.name || t('fs.operations.preview_image')}
+                    open={imagePreview.open}
+                    onCancel={() => {
+                        setImagePreview({
+                            open: false,
+                            src: '',
+                        });
+                    }}
+                    footer={null}
+                    width={'80vw'}
+                    centered
+                    destroyOnHidden={true}
+                >
+                    <div className="flex max-h-[70vh] items-center justify-center overflow-auto rounded p-4">
+                        {imagePreview.src && (
+                            <img
+                                src={imagePreview.src}
+                                alt={imagePreview.file?.name || t('fs.operations.preview_image')}
+                                className="max-h-[calc(70vh-32px)] max-w-full object-contain"
+                            />
+                        )}
+                    </div>
+                </Modal>
+
                 {contextHolder}
                 {messageContextHolder}
 
@@ -1525,10 +1651,12 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
                         open={true}
                         trigger={['contextMenu']}
                         onOpenChange={(visible) => !visible && setContextMenu(null)}
-                        overlayStyle={{
-                            position: 'absolute',
-                            left: contextMenu.pageX,
-                            top: contextMenu.pageY,
+                        styles={{
+                            root: {
+                                position: 'absolute',
+                                left: contextMenu.pageX,
+                                top: contextMenu.pageY,
+                            }
                         }}
                     >
                         <div style={{

@@ -1,12 +1,36 @@
-import {useCallback, useState} from 'react';
+import {cloneElement, isValidElement, useCallback, useState} from 'react';
 import type {DragEndEvent} from '@dnd-kit/core';
 import {arrayMove} from '@dnd-kit/sortable';
+import {generateRandomId} from '@/utils/utils';
 
 interface TabItem {
     key: string;
     label: string;
     children: React.ReactNode;
+    meta?: {
+        type?: 'session';
+        assetId?: string;
+        recreate?: (key: string) => React.ReactNode;
+    };
 }
+
+interface AddTabOptions {
+    meta?: TabItem['meta'];
+}
+
+const buildSessionTabKey = (assetId: string) => `${generateRandomId()}_${assetId}`;
+
+const recreateTabChildren = (tab: TabItem, newKey: string) => {
+    if (tab.meta?.recreate) {
+        return tab.meta.recreate(newKey);
+    }
+
+    if (isValidElement(tab.children)) {
+        return cloneElement(tab.children);
+    }
+
+    return tab.children;
+};
 
 /**
  * 标签页操作管理 Hook
@@ -16,13 +40,13 @@ export function useTabOperations(activeKey: string, setActiveKey: (key: string) 
     const [items, setItems] = useState<TabItem[]>([]);
 
     // 添加标签页
-    const addTab = useCallback((key: string, label: string, children: React.ReactNode) => {
+    const addTab = useCallback((key: string, label: string, children: React.ReactNode, options?: AddTabOptions) => {
         setItems(prev => {
             const exists = prev.some(item => item.key === key);
             if (exists) {
                 return prev;
             }
-            return [...prev, {label, children, key}];
+            return [...prev, {label, children, key, meta: options?.meta}];
         });
         setActiveKey(key);
     }, [setActiveKey]);
@@ -106,14 +130,47 @@ export function useTabOperations(activeKey: string, setActiveKey: (key: string) 
             const targetTab = prev.find(item => item.key === targetKey);
             if (!targetTab) return prev;
 
-            // 通过更新 key 来强制重新渲染
-            const newKey = targetKey + '_refresh_' + Date.now();
-            const newTab = {...targetTab, key: newKey};
+            const newKey = targetTab.meta?.type === 'session' && targetTab.meta.assetId
+                ? buildSessionTabKey(targetTab.meta.assetId)
+                : targetKey + '_refresh_' + Date.now();
+            const newTab = {
+                ...targetTab,
+                key: newKey,
+                children: recreateTabChildren(targetTab, newKey),
+            };
 
             setActiveKey(newKey);
             return prev.map(item =>
                 item.key === targetKey ? newTab : item
             );
+        });
+    }, [setActiveKey]);
+
+    // 复制会话标签页
+    const handleDuplicateSession = useCallback((targetKey: string) => {
+        setItems(prev => {
+            const targetIndex = prev.findIndex(item => item.key === targetKey);
+            if (targetIndex < 0) return prev;
+
+            const targetTab = prev[targetIndex];
+            if (targetTab.meta?.type !== 'session' || !targetTab.meta.assetId) {
+                return prev;
+            }
+
+            const newKey = buildSessionTabKey(targetTab.meta.assetId);
+            const newTab: TabItem = {
+                ...targetTab,
+                key: newKey,
+                children: recreateTabChildren(targetTab, newKey),
+            };
+
+            setActiveKey(newKey);
+
+            return [
+                ...prev.slice(0, targetIndex + 1),
+                newTab,
+                ...prev.slice(targetIndex + 1),
+            ];
         });
     }, [setActiveKey]);
 
@@ -137,6 +194,7 @@ export function useTabOperations(activeKey: string, setActiveKey: (key: string) 
         handleCloseAll,
         handleCloseOthers,
         handleReconnect,
+        handleDuplicateSession,
         onDragEnd,
     };
 }

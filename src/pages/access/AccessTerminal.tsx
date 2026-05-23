@@ -45,7 +45,7 @@ import FileSystemPage from "@/pages/access/FileSystemPage";
 import {App, Watermark} from "antd";
 import {useAccessContentSize} from "@/pages/access/hooks/use-access-size";
 import {cn} from "@/lib/utils";
-import {baseWebSocketUrl, getToken} from "@/api/core/requests";
+import {baseWebSocketUrl} from "@/api/core/requests";
 import qs from "qs";
 import MultiFactorAuthentication from "@/pages/account/MultiFactorAuthentication";
 import {isMac, isMobileByMediaQuery} from "@/utils/utils";
@@ -55,11 +55,13 @@ import accessSettingApi, {Setting} from "@/api/access-setting-api";
 
 interface Props {
     assetId: string;
+    tabKey?: string;
+    standalone?: boolean;
 }
 
 let _isMac = isMac();
 
-const AccessTerminal = ({assetId}: Props) => {
+const AccessTerminal = ({assetId, tabKey, standalone = false}: Props) => {
 
     let {t} = useTranslation();
 
@@ -69,6 +71,9 @@ const AccessTerminal = ({assetId}: Props) => {
     const searchRef = useRef<SearchAddon>(null);
     const webglRef = useRef<WebglAddon>(null);
     const canvasRef = useRef<CanvasAddon>(null);
+    const rootRef = useRef<HTMLDivElement>(null);
+    const mobileTopControlsRef = useRef<HTMLDivElement>(null);
+    const mobileBottomControlsRef = useRef<HTMLDivElement>(null);
 
     let websocketRef = useRef<WebSocket>(null); // 使用 ref 来存储 websocket
     let [session, setSession] = useState<ExportSession>();
@@ -90,6 +95,9 @@ const AccessTerminal = ({assetId}: Props) => {
 
     let [reconnected, setReconnected] = useState('');
     let [contentSize] = useAccessContentSize();
+    const active = standalone || accessTab === tabKey;
+    let isMobile = isMobileByMediaQuery();
+    const getEffectiveTerminalFontSize = (fontSize: number) => isMobile ? Math.min(fontSize, 12) : fontSize;
 
     let {notification, message} = App.useApp();
     const fsRef = useRef(null);
@@ -142,8 +150,7 @@ const AccessTerminal = ({assetId}: Props) => {
     }, 1000);
 
     useEffect(() => {
-        let current = accessTab.split('_')[1];
-        if (current === assetId) {
+        if (active) {
             setTimeout(() => {
                 terminalRef.current?.focus();
             }, 100);
@@ -152,7 +159,7 @@ const AccessTerminal = ({assetId}: Props) => {
         } else {
             setFileSystemOpen(false);
         }
-    }, [accessTab]);
+    }, [active, preFileSystemOpen]);
 
     useEffect(() => {
         if (accessTheme && terminalRef) {
@@ -161,11 +168,19 @@ const AccessTerminal = ({assetId}: Props) => {
                 let cleanTheme = CleanTheme(accessTheme);
                 options.theme = cleanTheme?.theme?.value;
                 options.fontFamily = cleanTheme.fontFamily;
-                options.fontSize = cleanTheme.fontSize;
+                options.fontSize = getEffectiveTerminalFontSize(cleanTheme.fontSize);
                 options.lineHeight = cleanTheme.lineHeight;
+                setTimeout(() => fitRef.current?.fit(), 0);
             }
         }
-    }, [accessTheme]);
+    }, [accessTheme, isMobile]);
+
+    useEffect(() => {
+        let options = terminalRef.current?.options;
+        if (options && _isMac) {
+            options.macOptionIsMeta = accessSetting?.macOptionIsMeta === true;
+        }
+    }, [accessSetting?.macOptionIsMeta]);
 
     useEffect(() => {
         if (!terminalRef.current) {
@@ -245,10 +260,11 @@ const AccessTerminal = ({assetId}: Props) => {
         let term = new Terminal({
             theme: cleanTheme?.theme?.value,
             fontFamily: cleanTheme.fontFamily,
-            fontSize: cleanTheme.fontSize,
+            fontSize: getEffectiveTerminalFontSize(cleanTheme.fontSize),
             lineHeight: cleanTheme.lineHeight,
             allowProposedApi: true,
             cursorBlink: true,
+            macOptionIsMeta: _isMac && accessSetting?.macOptionIsMeta === true,
             // WebGL 渲染器性能优化配置
             convertEol: true, // 启用自动换行符转换
             fastScrollModifier: 'alt', // 启用快速滚动
@@ -331,6 +347,9 @@ const AccessTerminal = ({assetId}: Props) => {
         try {
             session = await portalApi.createSessionByAssetsId(assetId, securityToken);
             setSession(session);
+            if (standalone && session.assetName) {
+                document.title = session.assetName;
+            }
         } catch (e) {
             terminalRef.current?.writeln(`\x1b[41m ERROR \x1b[0m : ${e.message}`);
             return;
@@ -338,11 +357,9 @@ const AccessTerminal = ({assetId}: Props) => {
 
         let cols = terminalRef.current.cols;
         let rows = terminalRef.current.rows;
-        let authToken = getToken();
         let params = {
             'cols': cols,
             'rows': rows,
-            'X-Auth-Token': authToken,
             'sessionId': session.id,
         };
 
@@ -350,7 +367,8 @@ const AccessTerminal = ({assetId}: Props) => {
         let websocket = new WebSocket(`${baseWebSocketUrl()}/access/terminal?${paramStr}`);
 
         websocket.onopen = (e => {
-            terminalRef.current?.clear();
+            terminalRef.current?.reset();
+            terminalRef.current?.write('\x1b[?25h'); // 显式恢复光标可见
             setPingDelay(null);
         });
 
@@ -362,6 +380,8 @@ const AccessTerminal = ({assetId}: Props) => {
         }
 
         websocket.onclose = (e) => {
+            terminalRef.current?.reset();
+            terminalRef.current?.write('\x1b[?25h'); // 显式恢复光标可见
             if (e.code === 3886) {
                 terminalRef.current?.writeln('');
                 terminalRef.current?.writeln('');
@@ -533,6 +553,8 @@ const AccessTerminal = ({assetId}: Props) => {
 
             const ws = websocketRef.current;
             if (!ws) {
+                // 忽略鼠标上报，避免鼠标移动就触发重连（残留的鼠标追踪模式可能仍在生成上报）
+                if (data.startsWith('\x1b[<') || data.startsWith('\x1b[M')) return;
                 setReconnected(new Date().toString());
             } else if (ws.readyState === WebSocket.OPEN) {
                 ws.send(new Message(MessageTypeData, data).toString());
@@ -659,13 +681,87 @@ const AccessTerminal = ({assetId}: Props) => {
         terminalRef.current?.clear();
     };
 
-    let isMobile = isMobileByMediaQuery();
+    const [mobileViewportHeight, setMobileViewportHeight] = useState(height);
+    const [mobileTerminalBodyHeight, setMobileTerminalBodyHeight] = useState<number>();
+    const terminalHeight = isMobile
+        ? (standalone ? height : Math.max(0, height - 77.5))
+        : (standalone ? height : height - 77.5);
+
+    useEffect(() => {
+        if (!isMobile) {
+            return;
+        }
+
+        const originalBodyOverflow = document.body.style.overflow;
+
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.body.style.overflow = originalBodyOverflow;
+        };
+    }, [isMobile]);
+
+    useEffect(() => {
+        if (!isMobile) {
+            setMobileViewportHeight(height);
+            return;
+        }
+
+        const updateViewportHeight = () => {
+            setMobileViewportHeight(window.visualViewport?.height || window.innerHeight);
+        };
+
+        updateViewportHeight();
+        window.visualViewport?.addEventListener('resize', updateViewportHeight);
+        window.visualViewport?.addEventListener('scroll', updateViewportHeight);
+        window.addEventListener('resize', updateViewportHeight);
+
+        return () => {
+            window.visualViewport?.removeEventListener('resize', updateViewportHeight);
+            window.visualViewport?.removeEventListener('scroll', updateViewportHeight);
+            window.removeEventListener('resize', updateViewportHeight);
+        };
+    }, [height, isMobile]);
 
     useEffect(() => {
         if (isMobile) {
-            document.body.style.overflow = 'hidden';
+            fitFit();
         }
-    }, [isMobile]);
+    }, [isMobile, mobileTerminalBodyHeight, mobileViewportHeight, searchOpen]);
+
+    useEffect(() => {
+        if (!isMobile) {
+            setMobileTerminalBodyHeight(undefined);
+            return;
+        }
+
+        const updateMobileTerminalBodyHeight = () => {
+            const containerHeight = rootRef.current?.clientHeight || terminalHeight;
+            const topControlsHeight = mobileTopControlsRef.current?.offsetHeight || 0;
+            const bottomControlsHeight = mobileBottomControlsRef.current?.offsetHeight || 0;
+
+            setMobileTerminalBodyHeight(Math.max(0, containerHeight - topControlsHeight - bottomControlsHeight));
+        };
+
+        updateMobileTerminalBodyHeight();
+
+        let resizeObserver: ResizeObserver | undefined;
+        if ('ResizeObserver' in window) {
+            resizeObserver = new ResizeObserver(updateMobileTerminalBodyHeight);
+            [rootRef.current, mobileTopControlsRef.current, mobileBottomControlsRef.current]
+                .filter(Boolean)
+                .forEach((element) => resizeObserver?.observe(element as Element));
+        }
+
+        window.addEventListener('resize', updateMobileTerminalBodyHeight);
+        window.visualViewport?.addEventListener('resize', updateMobileTerminalBodyHeight);
+
+        return () => {
+            resizeObserver?.disconnect();
+            window.removeEventListener('resize', updateMobileTerminalBodyHeight);
+            window.visualViewport?.removeEventListener('resize', updateMobileTerminalBodyHeight);
+        };
+    }, [isMobile, searchOpen, terminalHeight]);
 
     const pingColorClass = pingDelay === null
         ? 'text-gray-400'
@@ -674,17 +770,121 @@ const AccessTerminal = ({assetId}: Props) => {
             : pingDelay < 200
                 ? 'text-yellow-400'
                 : 'text-red-400';
+    const drawerGetContainer = (standalone || isMobile) ? () => document.body : false;
+    const mobileShortcutKeys = [
+        {label: 'ESC', data: '\x1b', title: 'Escape'},
+        {label: '⇥', data: '\x09', title: 'Tab'},
+        {label: 'CTRL+B', data: '\x02', title: 'Ctrl+B'},
+        {label: 'CTRL+C', data: '\x03', title: 'Ctrl+C'},
+        {label: '↑', data: '\x1b[A', title: 'Arrow Up'},
+        {label: '↓', data: '\x1b[B', title: 'Arrow Down'},
+    ];
+
+    const sendTerminalData = (data: string) => {
+        const ws = websocketRef.current;
+        if (ws?.readyState === WebSocket.OPEN) {
+            ws.send(new Message(MessageTypeData, data).toString());
+        }
+        terminalRef.current?.focus();
+    };
+
+    const handleMobileShortcutPointerDown = (event: React.PointerEvent<HTMLButtonElement>, data: string) => {
+        event.preventDefault();
+        sendTerminalData(data);
+    };
+
+    const handleMobileShortcutClick = (event: React.MouseEvent<HTMLButtonElement>, data: string) => {
+        if (event.detail !== 0) {
+            return;
+        }
+        sendTerminalData(data);
+    };
+
+    const renderSearchBox = (mobile = false) => (
+        <div
+            className={cn(
+                'bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg flex items-center',
+                mobile ? 'w-full min-w-0 gap-1 p-1' : 'min-w-[240px] gap-1.5 p-1.5'
+            )}
+        >
+            <SearchIcon className="h-3.5 w-3.5 shrink-0 text-gray-500"/>
+            <input
+                type="search"
+                inputMode="search"
+                enterKeyHint="search"
+                value={searchTerm}
+                onChange={(e) => {
+                    setSearchTerm(e.target.value);
+                    handleSearch(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                        if (e.shiftKey) {
+                            handleSearchPrevious();
+                        } else {
+                            handleSearchNext();
+                        }
+                    } else if (e.key === 'Escape') {
+                        clearSearch();
+                    }
+                }}
+                placeholder={t('access.settings.terminal.search_placeholder')}
+                className={cn(
+                    'min-w-0 flex-1 px-1.5 py-0.5 border-none outline-none bg-transparent text-gray-900 dark:text-gray-100',
+                    mobile ? 'text-[11px]' : 'text-xs'
+                )}
+                autoFocus
+            />
+            {searchMatchCount > 0 && (
+                <span className="shrink-0 text-[10px] text-gray-500 whitespace-nowrap">
+                    {searchMatchIndex}/{searchMatchCount}
+                </span>
+            )}
+            <div className="flex shrink-0 items-center gap-0.5">
+                <button
+                    type="button"
+                    onClick={handleSearchPrevious}
+                    disabled={!searchTerm || searchMatchCount === 0}
+                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <ChevronUpIcon className="h-3 w-3"/>
+                </button>
+                <button
+                    type="button"
+                    onClick={handleSearchNext}
+                    disabled={!searchTerm || searchMatchCount === 0}
+                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <ChevronDownIcon className="h-3 w-3"/>
+                </button>
+                <button
+                    type="button"
+                    onClick={clearSearch}
+                    className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+                >
+                    <XIcon className="h-3 w-3"/>
+                </button>
+            </div>
+        </div>
+    );
 
     return (
-        <div>
+        <div
+            ref={rootRef}
+            className={cn(
+                'relative overflow-hidden',
+                standalone ? 'h-svh w-screen' : 'h-full w-full',
+            )}
+            style={!isMobile ? undefined : standalone ? undefined : {height: terminalHeight}}
+        >
             <div className={cn(
-                'flex',
-                isMobile && 'h-screen',
+                'flex min-h-0 w-full',
+                isMobile && 'h-full',
                 !isMobile && 'h-full',
             )}
             >
-                <ResizablePanelGroup direction="horizontal">
-                    <ResizablePanel order={1} onResize={(curr, prev) => {
+                <ResizablePanelGroup direction="horizontal" className="min-h-0">
+                    <ResizablePanel order={1} className="h-full min-w-0" onResize={(curr, prev) => {
                         fitFit();
                     }}>
                         <Watermark content={session?.watermark?.content}
@@ -694,150 +894,144 @@ const AccessTerminal = ({assetId}: Props) => {
                                    }}
                                    zIndex={session?.watermark?.enabled ? 9 : -1}
                                    style={{
-                                       background: 'transparent'
+                                       background: 'transparent',
+                                       height: '100%',
                                    }}
                         >
-                            <div className={'flex flex-col transition duration-100'}
+                            <div className={'flex min-h-0 flex-col overflow-hidden transition duration-100'}
                                  style={{
-                                     height: isMobile ? height : height - 77.5,
+                                     height: isMobile ? '100%' : terminalHeight,
                                  }}
                             >
-
-                                {isMobile &&
+                                {isMobile && (
                                     <div
-                                        className={'h-[40px] bg-[#1b1b1b] grid grid-cols-6 text-white text-center items-center'}>
-                                        <div onClick={() => {
-                                            const ws = websocketRef.current;
-                                            if (ws?.readyState === WebSocket.OPEN) {
-                                                ws.send(new Message(MessageTypeData, '\x1b').toString());
-                                            }
-                                            terminalRef.current?.focus();
-                                        }}>
-                                            ESC
-                                        </div>
-                                        <div onClick={() => {
-                                            const ws = websocketRef.current;
-                                            if (ws?.readyState === WebSocket.OPEN) {
-                                                ws.send(new Message(MessageTypeData, '\x09').toString());
-                                            }
-                                            terminalRef.current?.focus();
-                                        }}>
-                                            ⇥
-                                        </div>
-                                        <div onClick={() => {
-                                            const ws = websocketRef.current;
-                                            if (ws?.readyState === WebSocket.OPEN) {
-                                                ws.send(new Message(MessageTypeData, '\x02').toString());
-                                            }
-                                            terminalRef.current?.focus();
-                                        }}>
-                                            CTRL+B
-                                        </div>
-                                        <div onClick={() => {
-                                            const ws = websocketRef.current;
-                                            if (ws?.readyState === WebSocket.OPEN) {
-                                                ws.send(new Message(MessageTypeData, '\x03').toString());
-                                            }
-                                            terminalRef.current?.focus();
-                                        }}>
-                                            CTRL+C
-                                        </div>
-
-                                        <div onClick={() => {
-                                            const ws = websocketRef.current;
-                                            if (ws?.readyState === WebSocket.OPEN) {
-                                                ws.send(new Message(MessageTypeData, '\x1b[A').toString());
-                                            }
-                                            terminalRef.current?.focus();
-                                        }}>
-                                            ↑
-                                        </div>
-                                        <div onClick={() => {
-                                            const ws = websocketRef.current;
-                                            if (ws?.readyState === WebSocket.OPEN) {
-                                                ws.send(new Message(MessageTypeData, '\x1b[B').toString());
-                                            }
-                                            terminalRef.current?.focus();
-                                        }}>
-                                            ↓
-                                        </div>
-                                    </div>
-                                }
-
-                                <div className={'p-2 flex-grow h-full relative'}
-                                     style={{
-                                         backgroundColor: accessTheme?.theme?.value['background'],
-                                     }}
-                                >
-                                    <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-2">
-                                        <div
-                                            className="flex items-center gap-1 rounded bg-white/80 px-2 py-1 text-[11px] text-gray-700 shadow dark:bg-black/60 dark:text-gray-200"
-                                        >
-                                            <span>Ping</span>
-                                            <span className={clsx('font-semibold', pingColorClass)}>
-                                                {pingDelay === null ? '--' : `${pingDelay} ms`}
-                                            </span>
-                                        </div>
-                                        {/* 搜索框 */}
-                                        {searchOpen && (
+                                        ref={mobileTopControlsRef}
+                                        className="shrink-0 border-b border-white/10 bg-[#1E1F22] px-1.5 py-1 text-white"
+                                    >
+                                        <div className="flex h-8 items-center gap-1.5">
                                             <div
-                                                className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg p-1.5 flex items-center gap-1.5 min-w-[240px]"
+                                                className="flex shrink-0 items-center gap-1 rounded bg-black/40 px-1.5 py-0.5 text-[10px] text-gray-200 shadow"
                                             >
-                                                <SearchIcon className="h-3.5 w-3.5 text-gray-500"/>
-                                                <input
-                                                    type="text"
-                                                    value={searchTerm}
-                                                    onChange={(e) => {
-                                                        setSearchTerm(e.target.value);
-                                                        handleSearch(e.target.value);
+                                                <span>Ping</span>
+                                                <span className={clsx('font-semibold', pingColorClass)}>
+                                                    {pingDelay === null ? '--' : `${pingDelay} ms`}
+                                                </span>
+                                            </div>
+                                            <div className="ml-auto flex shrink-0 items-center gap-1">
+                                                <button
+                                                    type="button"
+                                                    title={t('access.terminal.search')}
+                                                    className={cn(
+                                                        'flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white transition-colors active:bg-white/20',
+                                                        searchOpen && 'text-blue-400'
+                                                    )}
+                                                    onClick={() => setSearchOpen(!searchOpen)}
+                                                >
+                                                    <SearchIcon className="h-4 w-4"/>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title={t('access.terminal.clear')}
+                                                    className="flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white transition-colors active:bg-white/20"
+                                                    onClick={handleClearTerminal}
+                                                >
+                                                    <EraserIcon className="h-4 w-4"/>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title={t('access.session.share.action')}
+                                                    className="flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white transition-colors active:bg-white/20"
+                                                    onClick={() => setSharerOpen(true)}
+                                                >
+                                                    <Share2Icon className="h-4 w-4"/>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title="FileSystem"
+                                                    className="flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white transition-colors active:bg-white/20"
+                                                    onClick={() => {
+                                                        setFileSystemOpen(true);
+                                                        setPreFileSystemOpen(true);
                                                     }}
-                                                    onKeyDown={(e) => {
-                                                        if (e.key === 'Enter') {
-                                                            if (e.shiftKey) {
-                                                                handleSearchPrevious();
-                                                            } else {
-                                                                handleSearchNext();
-                                                            }
-                                                        } else if (e.key === 'Escape') {
-                                                            clearSearch();
-                                                        }
-                                                    }}
-                                                    placeholder={t('access.settings.terminal.search_placeholder')}
-                                                    className="flex-1 px-1.5 py-0.5 text-xs border-none outline-none bg-transparent text-gray-900 dark:text-gray-100"
-                                                    autoFocus
-                                                />
-                                                {searchMatchCount > 0 && (
-                                                    <span className="text-[10px] text-gray-500 whitespace-nowrap">
-                                                        {searchMatchIndex}/{searchMatchCount}
-                                                    </span>
+                                                >
+                                                    <FolderIcon className="h-4 w-4"/>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    title={t('menus.resource.submenus.snippet')}
+                                                    className="flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white transition-colors active:bg-white/20"
+                                                    onClick={() => setSnippetOpen(true)}
+                                                >
+                                                    <FolderCode className="h-4 w-4"/>
+                                                </button>
+                                                {shellAssistantEnabled && (
+                                                    <button
+                                                        type="button"
+                                                        title={t('access.shell_assistant.title')}
+                                                        className="flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white transition-colors active:bg-white/20"
+                                                        onClick={() => setShellAssistantOpen(true)}
+                                                    >
+                                                        <BotIcon className="h-4 w-4"/>
+                                                    </button>
                                                 )}
-                                                <div className="flex items-center gap-0.5">
-                                                    <button
-                                                        onClick={handleSearchPrevious}
-                                                        disabled={!searchTerm || searchMatchCount === 0}
-                                                        className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        <ChevronUpIcon className="h-3 w-3"/>
-                                                    </button>
-                                                    <button
-                                                        onClick={handleSearchNext}
-                                                        disabled={!searchTerm || searchMatchCount === 0}
-                                                        className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded disabled:opacity-50 disabled:cursor-not-allowed"
-                                                    >
-                                                        <ChevronDownIcon className="h-3 w-3"/>
-                                                    </button>
-                                                    <button
-                                                        onClick={clearSearch}
-                                                        className="p-0.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
-                                                    >
-                                                        <XIcon className="h-3 w-3"/>
-                                                    </button>
-                                                </div>
+                                            </div>
+                                        </div>
+                                        {searchOpen && (
+                                            <div className="mt-1">
+                                                {renderSearchBox(true)}
                                             </div>
                                         )}
                                     </div>
-                                    <div className={'h-full'} ref={divRef}/>
+                                )}
+
+                                <div className={cn(
+                                    'relative min-h-0 overflow-hidden',
+                                    isMobile && mobileTerminalBodyHeight !== undefined ? 'flex-none' : 'flex-1',
+                                    isMobile ? 'p-1' : 'p-2'
+                                )}
+                                     style={{
+                                         backgroundColor: accessTheme?.theme?.value['background'],
+                                         height: isMobile && mobileTerminalBodyHeight !== undefined ? mobileTerminalBodyHeight : undefined,
+                                     }}
+                                >
+                                    {!isMobile && (
+                                        <div className="absolute top-2 right-2 z-10 flex flex-col items-end gap-2">
+                                            <div
+                                                className="flex items-center gap-1 rounded bg-white/80 px-2 py-1 text-[11px] text-gray-700 shadow dark:bg-black/60 dark:text-gray-200"
+                                            >
+                                                <span>Ping</span>
+                                                <span className={clsx('font-semibold', pingColorClass)}>
+                                                    {pingDelay === null ? '--' : `${pingDelay} ms`}
+                                                </span>
+                                            </div>
+                                            {searchOpen && renderSearchBox()}
+                                        </div>
+                                    )}
+                                    <div className={'h-full min-h-0 w-full overflow-hidden'} ref={divRef}/>
                                 </div>
+
+                                {isMobile && (
+                                    <div
+                                        ref={mobileBottomControlsRef}
+                                        className="shrink-0 border-t border-white/10 bg-[#1b1b1b] px-1.5 py-1"
+                                        style={{paddingBottom: 'max(env(safe-area-inset-bottom), 4px)'}}
+                                    >
+                                        <div className="grid grid-cols-6 gap-1">
+                                            {mobileShortcutKeys.map((item) => (
+                                                <button
+                                                    key={item.title}
+                                                    type="button"
+                                                    title={item.title}
+                                                    className="flex h-8 min-w-0 items-center justify-center rounded bg-white/10 px-1 text-center text-[10px] font-medium leading-none text-white transition-colors active:bg-white/20"
+                                                    onPointerDown={(event) => handleMobileShortcutPointerDown(event, item.data)}
+                                                    onClick={(event) => handleMobileShortcutClick(event, item.data)}
+                                                >
+                                                    {item.label}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                         </Watermark>
@@ -861,26 +1055,6 @@ const AccessTerminal = ({assetId}: Props) => {
                     }
 
                 </ResizablePanelGroup>
-
-                {isMobile &&
-                    <div
-                        className={cn('absolute right-4 top-4 p-2 rounded bg-[#1E1F22] flex gap-2', isMobile && 'top-12')}>
-                        <div title={t('access.terminal.search')}>
-                            <SearchIcon
-                                className={cn('h-4 w-4', isMobile && 'text-white', searchOpen && 'text-blue-400')}
-                                onClick={() => setSearchOpen(!searchOpen)}
-                            />
-                        </div>
-                        <div title={t('access.terminal.clear')}>
-                            <EraserIcon
-                                className={cn('h-4 w-4', isMobile && 'text-white')}
-                                onClick={handleClearTerminal}
-                            />
-                        </div>
-                        <Share2Icon className={cn('h-4 w-4', isMobile && 'text-white')}
-                                    onClick={() => setSharerOpen(true)}/>
-                    </div>
-                }
 
                 {!isMobile &&
                     <div className={'w-10 bg-[#1E1F22] flex flex-col items-center border'}>
@@ -921,6 +1095,7 @@ const AccessTerminal = ({assetId}: Props) => {
                 }}
                 open={snippetOpen}
                 mask={false}
+                getContainer={drawerGetContainer}
             />
             <ShellAssistantSheet
                 onClose={() => setShellAssistantOpen(false)}
@@ -933,6 +1108,7 @@ const AccessTerminal = ({assetId}: Props) => {
                 }}
                 open={shellAssistantOpen}
                 mask={false}
+                getContainer={drawerGetContainer}
             />
             <SessionSharerModal sessionId={session?.id} open={sharerOpen}
                                 onClose={() => setSharerOpen(false)}/>
@@ -947,6 +1123,7 @@ const AccessTerminal = ({assetId}: Props) => {
                                 setPreFileSystemOpen(false);
                             }}
                             ref={fsRef}
+                            getContainer={drawerGetContainer}
             />
 
             <MultiFactorAuthentication

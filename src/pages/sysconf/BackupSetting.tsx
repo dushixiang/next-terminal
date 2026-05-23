@@ -31,13 +31,10 @@ const BackupSetting = () => {
 
     return (
         <div>
-            <Title level={5} style={{ marginTop: 0 }}>{t('settings.backup.setting')}</Title>
+            <Title level={5} style={{marginTop: 0}}>{t('settings.backup.setting')}</Title>
 
-            <Space direction="vertical">
-                <Alert
-                    message={t('settings.backup.tip')}
-                    type="info"
-                />
+            <Space orientation="vertical">
+                <Alert title={t('settings.backup.tip')} type="info"/>
 
                 <Space>
                     {/*<Button type="primary" onClick={() => {*/}

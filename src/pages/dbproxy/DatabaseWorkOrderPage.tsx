@@ -1,6 +1,17 @@
-import React, {useRef, useState} from 'react';
-import {App, Input, Modal, Popconfirm, Select, Tag, Tooltip, Typography} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import React, {useState} from 'react';
+import {
+    App,
+    Button,
+    Input,
+    Modal,
+    Popconfirm,
+    Select,
+    Space,
+    Table,
+    type TableProps,
+    Tag,
+    Tooltip,
+    Typography} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {DatabaseWorkOrder, dbWorkOrderAdminApi} from "@/api/db-work-order-api";
@@ -8,17 +19,22 @@ import NButton from "@/components/NButton";
 import {getSort} from "@/utils/sort";
 import {UserSelect} from "@/components/shared/QuerySelects";
 import portalApi from "@/api/portal-api";
+import dayjs from "dayjs";
 
 const {Text} = Typography;
 
 const DatabaseWorkOrderPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
     const {modal, message} = App.useApp();
 
     const [rejectOpen, setRejectOpen] = useState(false);
     const [rejectReason, setRejectReason] = useState('');
     const [rejectId, setRejectId] = useState<string | undefined>(undefined);
+    const [pagination, setPagination] = useState({current: 1, pageSize: 10});
+    const [sort, setSort] = useState<Record<string, string | null>>({});
+    const [status, setStatus] = useState<string>();
+    const [assetId, setAssetId] = useState<string>();
+    const [requesterId, setRequesterId] = useState<string>();
 
     const databaseAssetsQuery = useQuery({
         queryKey: ['portal-database-assets'],
@@ -26,10 +42,36 @@ const DatabaseWorkOrderPage = () => {
         refetchOnWindowFocus: false,
     });
 
+    const workOrderPagingQuery = useQuery({
+        queryKey: ['admin-db-work-orders', pagination.current, pagination.pageSize, sort, status, assetId, requesterId],
+        queryFn: async () => {
+            const [sortOrder, sortField] = getSort(sort);
+            const queryParams = {
+                pageIndex: pagination.current,
+                pageSize: pagination.pageSize,
+                sortOrder: sortOrder,
+                sortField: sortField,
+                status: status || undefined,
+                assetId: assetId || undefined,
+                requesterId: requesterId || undefined,
+            };
+            return dbWorkOrderAdminApi.paging(queryParams);
+        },
+        refetchOnWindowFocus: false,
+    });
+
+    const reloadTable = () => {
+        workOrderPagingQuery.refetch();
+    };
+
+    const resetTableToFirstPage = () => {
+        setPagination((prev) => ({...prev, current: 1}));
+    };
+
     const approveMutation = useMutation({
         mutationFn: (id: string) => dbWorkOrderAdminApi.approve(id),
         onSuccess: () => {
-            actionRef.current?.reload();
+            reloadTable();
             message.success(t('general.success'));
         }
     });
@@ -37,7 +79,7 @@ const DatabaseWorkOrderPage = () => {
     const rejectMutation = useMutation({
         mutationFn: (payload: { id: string, reason: string }) => dbWorkOrderAdminApi.reject(payload.id, payload.reason),
         onSuccess: () => {
-            actionRef.current?.reload();
+            reloadTable();
             setRejectOpen(false);
             setRejectReason('');
             setRejectId(undefined);
@@ -48,7 +90,7 @@ const DatabaseWorkOrderPage = () => {
     const deleteMutation = useMutation({
         mutationFn: (id: string) => dbWorkOrderAdminApi.deleteById(id),
         onSuccess: () => {
-            actionRef.current?.reload();
+            reloadTable();
             message.success(t('general.success'));
         }
     });
@@ -72,47 +114,41 @@ const DatabaseWorkOrderPage = () => {
         return <Tag color={item.color}>{item.label}</Tag>;
     };
 
-    const columns: ProColumns<DatabaseWorkOrder>[] = [
+    const handleTableChange: TableProps<DatabaseWorkOrder>['onChange'] = (nextPagination, filters, sorter) => {
+        const activeSorter = Array.isArray(sorter) ? sorter.find((item) => item.order) : sorter;
+        const field = activeSorter?.field;
+        const fieldName = Array.isArray(field) ? field.join('.') : field ? String(field) : '';
+        setSort(activeSorter?.order && fieldName ? {[fieldName]: activeSorter.order} : {});
+        setPagination((prev) => ({
+            ...prev,
+            current: nextPagination.current || 1,
+            pageSize: nextPagination.pageSize || prev.pageSize,
+        }));
+    };
+
+    const statusOptions = [
+        {value: 'pending', label: t('db.work_order.status.pending')},
+        {value: 'approved', label: t('db.work_order.status.approved')},
+        {value: 'rejected', label: t('db.work_order.status.rejected')},
+        {value: 'executed', label: t('db.work_order.status.executed')},
+        {value: 'failed', label: t('db.work_order.status.failed')},
+    ];
+
+    const columns: TableProps<DatabaseWorkOrder>['columns'] = [
         {
             title: t('menus.resource.submenus.database_asset'),
             dataIndex: 'assetName',
-            formItemProps: {
-                name: 'assetId',
-            },
-            renderFormItem: (_, {type, ...rest}) => {
-                if (type === 'form') {
-                    return null;
-                }
-                return (
-                    <Select
-                        allowClear
-                        showSearch
-                        placeholder={t('menus.resource.submenus.database_asset')}
-                        loading={databaseAssetsQuery.isLoading}
-                        options={(databaseAssetsQuery.data || []).map(item => ({
-                            label: item.name,
-                            value: item.id,
-                        }))}
-                        filterOption={(input, option) =>
-                            (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-                        }
-                        {...rest}
-                    />
-                );
-            },
             ellipsis: true,
-            fixed: 'left'
+            fixed: 'left',
         },
         {
             title: t('db.asset.database'),
             dataIndex: 'database',
-            hideInSearch: true,
             ellipsis: true,
         },
         {
             title: t('db.sql_log.sql'),
             dataIndex: 'sql',
-            hideInSearch: true,
             render: (text) => {
                 if (!text) {
                     return '-';
@@ -127,7 +163,6 @@ const DatabaseWorkOrderPage = () => {
         {
             title: t('db.work_order.reason'),
             dataIndex: 'requestReason',
-            hideInSearch: true,
             render: (text) => {
                 if (!text) {
                     return '-';
@@ -142,64 +177,43 @@ const DatabaseWorkOrderPage = () => {
         {
             title: t('db.work_order.requester'),
             dataIndex: 'requesterName',
-            formItemProps: {
-                name: 'requesterId',
-            },
-            renderFormItem: (_, {type, ...rest}) => {
-                if (type === 'form') {
-                    return null;
-                }
-                return <UserSelect {...rest} />;
-            },
             render: (text) => text || '-',
         },
         {
             title: t('general.status'),
             dataIndex: 'status',
-            valueEnum: {
-                pending: {text: t('db.work_order.status.pending')},
-                approved: {text: t('db.work_order.status.approved')},
-                rejected: {text: t('db.work_order.status.rejected')},
-                executed: {text: t('db.work_order.status.executed')},
-                failed: {text: t('db.work_order.status.failed')},
-            },
             render: (_, record) => statusTag(record.status, record.errorMessage || record.reason),
             width: 120,
         },
         {
             title: t('db.sql_log.rows_affected'),
             dataIndex: 'rowsAffected',
-            hideInSearch: true,
             width: 120,
         },
         {
             title: t('db.work_order.approver'),
             dataIndex: 'approverName',
-            hideInSearch: true,
             width: 120,
         },
         {
             title: t('general.created_at'),
             dataIndex: 'createdAt',
-            valueType: 'dateTime',
-            hideInSearch: true,
             sorter: true,
             width: 180,
+            render: (value: number) => value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-',
         },
         {
             title: t('sysops.logs.exec_at'),
             dataIndex: 'executedAt',
-            valueType: 'dateTime',
-            hideInSearch: true,
             width: 180,
+            render: (value: number) => value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-',
         },
         {
             title: t('actions.label'),
-            valueType: 'option',
             key: 'option',
             width: 160,
             fixed: 'right',
-            render: (text, record) => {
+            render: (_text, record) => {
                 const actions = [] as React.ReactNode[];
                 if (record.status === 'pending') {
                     actions.push(
@@ -234,48 +248,77 @@ const DatabaseWorkOrderPage = () => {
                         </Popconfirm>
                     );
                 }
-                return actions;
+                return <Space size={8}>{actions}</Space>;
             },
         },
     ];
 
     return (
         <div>
-            <ProTable
-                columns={columns}
-                actionRef={actionRef}
-                request={async (params = {}, sort) => {
-                    const [sortOrder, sortField] = getSort(sort);
-                    const queryParams = {
-                        pageIndex: params.current,
-                        pageSize: params.pageSize,
-                        sortOrder: sortOrder,
-                        sortField: sortField,
-                        status: params.status,
-                        assetId: params.assetId,
-                        requesterId: params.requesterId,
-                    };
-                    const result = await dbWorkOrderAdminApi.paging(queryParams);
-                    return {
-                        data: result['items'],
-                        success: true,
-                        total: result['total']
-                    };
-                }}
-                rowKey="id"
-                search={{
-                    labelWidth: 'auto',
-                }}
-                pagination={{
-                    defaultPageSize: 10,
-                    showSizeChanger: true
-                }}
-                scroll={{
-                    x: 'max-content',
-                }}
-                dateFormatter="string"
-                headerTitle={t('menus.resource.submenus.db_work_order')}
-            />
+            <div className="overflow-hidden rounded-md bg-white dark:bg-[#141414]">
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                    <div className="font-medium">{t('menus.resource.submenus.db_work_order')}</div>
+                    <Space wrap>
+                        <Select
+                            allowClear
+                            showSearch
+                            placeholder={t('menus.resource.submenus.database_asset')}
+                            loading={databaseAssetsQuery.isLoading}
+                            value={assetId}
+                            style={{width: 220}}
+                            options={(databaseAssetsQuery.data || []).map(item => ({
+                                label: item.name,
+                                value: item.id,
+                            }))}
+                            filterOption={(input, option) =>
+                                (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                            }
+                            onChange={(value) => {
+                                setAssetId(value);
+                                resetTableToFirstPage();
+                            }}
+                        />
+                        <UserSelect
+                            value={requesterId}
+                            onChange={(value) => {
+                                setRequesterId(value);
+                                resetTableToFirstPage();
+                            }}
+                        />
+                        <Select
+                            allowClear
+                            placeholder={t('general.status')}
+                            value={status}
+                            style={{width: 160}}
+                            options={statusOptions}
+                            onChange={(value) => {
+                                setStatus(value);
+                                resetTableToFirstPage();
+                            }}
+                        />
+                        <Button loading={workOrderPagingQuery.isFetching} onClick={reloadTable}>
+                            {t('actions.refresh')}
+                        </Button>
+                    </Space>
+                </div>
+                <Table<DatabaseWorkOrder>
+                    columns={columns}
+                    dataSource={workOrderPagingQuery.data?.items || []}
+                    loading={workOrderPagingQuery.isFetching}
+                    rowKey="id"
+                    pagination={{
+                        current: pagination.current,
+                        pageSize: pagination.pageSize,
+                        total: workOrderPagingQuery.data?.total || 0,
+                        showSizeChanger: true
+                    }}
+                    onChange={handleTableChange}
+                    scroll={{
+                        x: 'max-content',
+                    }}
+                    size="small"
+                />
+            </div>
 
             <Modal
                 title={t('identity.policy.action.reject')}

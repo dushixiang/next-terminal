@@ -1,10 +1,9 @@
-import React, {CSSProperties} from 'react';
+import React, {CSSProperties, forwardRef} from 'react';
 import {Button} from "antd";
 
 export interface NButtonProps {
     href?: string;
     target?: string;
-    key?: string
     danger?: boolean;
     disabled?: boolean;
     children?: React.ReactNode;
@@ -14,16 +13,27 @@ export interface NButtonProps {
     loading?: boolean
 }
 
-const NButton = ({classNames, href, target, danger, disabled, children, onClick, style, loading}: NButtonProps) => {
+const NButton = forwardRef<HTMLButtonElement | HTMLAnchorElement, NButtonProps>(({
+    classNames,
+    href,
+    target,
+    danger,
+    disabled,
+    children,
+    onClick,
+    style,
+    loading,
+}, ref) => {
     // if (href) {
     //     classNames?.push('underline');
     // }
 
-    if(!style){
+    if (!style) {
         style = {padding: 0}
     }
     return (
         <Button
+            ref={ref}
             className={classNames?.join(' ')}
             type={'link'}
             size={'small'}
@@ -38,6 +48,8 @@ const NButton = ({classNames, href, target, danger, disabled, children, onClick,
             {children}
         </Button>
     );
-};
+});
+
+NButton.displayName = 'NButton';
 
 export default NButton;

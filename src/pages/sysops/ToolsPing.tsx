@@ -1,6 +1,6 @@
 import {Button, Form, Input, InputNumber} from 'antd';
 import React, {useState} from 'react';
-import {baseUrl, getToken} from "@/api/core/requests";
+import {baseUrl} from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 
 const ToolsPing = () => {
@@ -17,7 +17,7 @@ const ToolsPing = () => {
         setRunning(true);
         setLogs([]);
 
-        eventSource = new EventSource(`${baseUrl()}/admin/tools/ping?X-Auth-Token=${getToken()}&host=${host}&attempts=${attempts}`);
+        eventSource = new EventSource(`${baseUrl()}/admin/tools/ping?host=${host}&attempts=${attempts}`);
 
         eventSource.onmessage = (event) => {
             setLogs((prevLogs) => [...prevLogs, event.data]);

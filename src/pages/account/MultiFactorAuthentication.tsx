@@ -316,7 +316,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
                         variant={'solid'}
                         onClick={authenticateWithPasskey}
                     >
-                        {t('account.mfa_retry')}
+                        {t('actions.retry')}
                     </Button>
                     {supportedAuthTypes.length > 1 && (
                         <Button
@@ -365,12 +365,12 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
         <Modal
             title={t('account.mfa')}
             open={open}
-            maskClosable={false}
+            mask={{closable: false}}
             destroyOnHidden
             footer={null}
             onCancel={handleCancel}
         >
-            <Spin tip={t('account.mfa_authing')} spinning={loading}>
+            <Spin description={t('account.mfa_authing')} spinning={loading}>
                 <div className={'min-h-72 w-full flex items-center justify-center py-4'}>
                     <div className={'space-y-4 w-full px-4'}>
                         {renderContent()}

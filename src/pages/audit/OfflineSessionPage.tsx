@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useTranslation } from "react-i18next";
+import {useTranslation } from "react-i18next";
 import { getSort } from "@/utils/sort";
-import { ActionType, ProColumns, ProTable } from "@ant-design/pro-components";
-import { App, Button, Popconfirm, Select, Space, Table, Tag, Tooltip, Typography } from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
+import { App, Button, Popconfirm, Space, Table, Tag, Tooltip, Typography } from "antd";
 import { SyncOutlined } from "@ant-design/icons";
 import sessionApi, { Session } from "@/api/session-api";
 import { renderSize } from "@/utils/utils";
@@ -15,7 +15,7 @@ import { getProtocolColor } from "@/helper/asset-helper";
 
 const OfflineSessionPage = () => {
     const { t } = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     const [terminalAuditEnabled, setTerminalAuditEnabled] = useState(false);
     const [auditSessionId, setAuditSessionId] = useState('');
@@ -92,7 +92,7 @@ const OfflineSessionPage = () => {
             case 'failed':
                 return (
                     <Space size={4}>
-                        <Tag color="error">{t('audit.audit_status.failed')}</Tag>
+                        <Tag color="error">{t('general.failed')}</Tag>
                         {canAudit && (
                             <Button
                                 type="link"
@@ -123,7 +123,7 @@ const OfflineSessionPage = () => {
         }
     };
 
-    const columns: ProColumns<Session>[] = [
+    const columns: NColumn<Session>[] = [
         {
             title: t('menus.identity.submenus.user'),
             dataIndex: 'userAccount',
@@ -164,18 +164,6 @@ const OfflineSessionPage = () => {
                     {record.protocol.toUpperCase()}
                 </span>
             ),
-            renderFormItem: (item, { type }) => {
-                if (type === 'form') return null;
-                return (
-                    <Select>
-                        <Select.Option value="rdp">RDP</Select.Option>
-                        <Select.Option value="ssh">SSH</Select.Option>
-                        <Select.Option value="telnet">Telnet</Select.Option>
-                        <Select.Option value="vnc">VNC</Select.Option>
-                        <Select.Option value="kubernetes">Kubernetes</Select.Option>
-                    </Select>
-                );
-            },
         },
         {
             title: t('audit.connected_at'),
@@ -257,7 +245,7 @@ const OfflineSessionPage = () => {
 
     return (
         <div>
-            <ProTable
+            <NTable
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
@@ -269,10 +257,7 @@ const OfflineSessionPage = () => {
                         sortOrder,
                         sortField,
                         status: 'disconnected',
-                        clientIp: params.clientIp,
-                        protocol: params.protocol,
-                        assetName: params.assetName,
-                        userAccount: params.userAccount,
+                        keyword: params.keyword,
                     });
                     return {
                         data: result['items'],
@@ -281,7 +266,10 @@ const OfflineSessionPage = () => {
                     };
                 }}
                 rowKey="id"
-                search={{ labelWidth: 'auto' }}
+                options={{
+                    search: true,
+                }}
+                search={false}
                 pagination={{ defaultPageSize: 10, showSizeChanger: true }}
                 dateFormatter="string"
                 headerTitle={t('menus.log_audit.submenus.offline_session')}

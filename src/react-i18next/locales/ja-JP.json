@@ -50,7 +50,9 @@
     "upload": "アップロード",
     "offline": "オフライン",
     "online": "オンライン",
-    "search_placeholder": "キーワード検索"
+    "search_placeholder": "キーワード検索",
+    "selected_items": "{{count}} 件選択済み",
+    "toggle_theme": "テーマ切替"
   },
   "actions": {
     "new": "新規",
@@ -68,11 +70,13 @@
     "cancel": "キャンセル",
     "save": "保存",
     "label": "操作",
+    "more": "その他",
     "batch_delete": "一括削除",
     "refresh": "更新",
+    "retry": "再試行",
     "confirm": "確認",
     "back": "前のページへ",
-    "more": "もっと"
+    "test_connection": "接続テスト"
   },
   "dashboard": {
     "login_times": "ログイン回数",
@@ -115,12 +119,8 @@
   "facade": {
     "asset_placeholder": "資産名、プロトコル、タグ、ネットワークアドレス",
     "database_asset_placeholder": "資産名、ユーザー名、タグ、タイプ",
-    "database_access_title": "接続とアクセス",
     "database_access_tip": "データベースプロキシで接続するか、SQL ワークオーダーで実行を申請します。",
-    "database_access_proxy_tip": "プロキシのアドレスは管理者に確認してください。",
     "database_access_work_order": "SQL ワークオーダーへ",
-    "database_asset_name_tip": "asset_name には下の一覧の資産名を使用します。",
-    "accessing": "接続中",
     "website_placeholder": "サイト名、タグ、タイプ",
     "processing": "処理中…",
     "in_use": "使用中",
@@ -203,6 +203,7 @@
       "create_dir": "フォルダ作成",
       "upload_file": "ファイルアップロード",
       "upload_dir": "フォルダアップロード",
+      "preview_image": "画像プレビュー",
       "chmod": "権限設定"
     },
     "attributes": {
@@ -532,7 +533,9 @@
       "userAgent": "User-Agent",
       "createdAt": "リクエスト時刻",
       "anonymous": "匿名",
+      "publicAllow": "公開許可",
       "whitelist": "IP ホワイトリスト",
+      "tempAllow": "一時許可",
       "tempPass": "一時パスワード",
       "deletedUser": "削除済みユーザー",
       "clearConfirmTitle": "クリア確認",
@@ -602,13 +605,11 @@
     },
     "audit_analyzing": "セッション録画を分析中、お待ちください...",
     "audit_failed": "監査に失敗しました",
-    "audit_no_result": "監査結果がありません",
     "unknown_protocol": "不明なプロトコル：{{protocol}}",
     "audit_status": {
       "label": "監査ステータス",
       "pending": "分析中",
       "completed": "完了",
-      "failed": "失敗",
       "start": "分析開始",
       "pending_tip": "AIがバックグラウンドで録画を分析しています。完了後、ページを更新して結果を確認してください。",
       "view": "レポートを見る",
@@ -634,7 +635,8 @@
       },
       "keyboard": {
         "label": "キーボード設定",
-        "intercept_search_shortcut": "検索ショートカットを無効化 (Ctrl/Cmd+F)"
+        "intercept_search_shortcut": "検索ショートカットを無効化 (Ctrl/Cmd+F)",
+        "mac_option_is_meta": "macOS Option キーを Meta キーとして使用"
       }
     },
     "batch": {
@@ -661,6 +663,7 @@
       "clipboard_placeholder": "ここに貼り付け..."
     },
     "tabs": {
+      "copySession": "セッションを複製",
       "closeLeft": "左側のタブを閉じる",
       "closeRight": "右側のタブを閉じる",
       "closeOthers": "他のタブを閉じる",
@@ -695,7 +698,10 @@
     },
     "terminal": {
       "search": "端末内容を検索",
-      "clear": "画面クリア"
+      "clear": "画面クリア",
+      "connecting": "接続中...",
+      "close_title": "端末を閉じる",
+      "close_confirm": "この端末を閉じてもよろしいですか？"
     },
     "playback": {
       "shortcut_space": "スペース: 再生/一時停止",
@@ -720,12 +726,17 @@
     "access_token": "アクセストークン",
     "access_token_create": "トークン作成",
     "access_token_type": "トークン種別",
+    "access_token_source": "発行元",
+    "access_token_source_manual": "手動作成",
+    "access_token_expires_at": "有効期限",
+    "access_token_expires_never": "無期限",
     "access_token_once_tip": "トークンは1度だけ表示されます。安全に保管してください。",
     "access_token_type_values": {
       "session": "ログインセッション",
       "api": "API トークン",
       "temporary": "一時トークン",
-      "db_password": "データベースパスワード"
+      "db_password": "データベースパスワード",
+      "oauth": "OAuth 認可"
     },
     "client_cert": "クライアント証明書",
     "client_cert_generate": "生成してダウンロード",
@@ -737,18 +748,18 @@
     "client_cert_revoke_confirm": "クライアント証明書を失効しますか？",
     "client_cert_status_active": "有効",
     "client_cert_status_revoked": "失効済み",
-    "client_cert_fingerprint": "フィンガープリント",
+    "client_cert_fingerprint": "証明書フィンガープリント",
     "client_cert_serial": "シリアル番号",
     "client_cert_not_before": "有効開始",
     "client_cert_not_after": "有効期限",
-    "client_cert_last_used": "最終使用",
+    "client_cert_last_used": "証明書の最終使用",
     "old_password": "古いパスワード",
     "confirm_password": "パスワード確認",
     "captcha": "キャプチャ",
     "login": {
       "action": "ログイン",
       "methods": {
-        "passkey": "パスキーで認証",
+        "passkey": "Passkey で認証",
         "otp": "OTP で認証",
         "wechat_work": "企業微信でログイン",
         "oidc": "OIDC でログイン"
@@ -759,7 +770,23 @@
       "wechat_work_error": "企業微信ログインに失敗しました。再試行してください",
       "back_to_login": "ログインページに戻る"
     },
-    "passkey": "パスキー",
+    "passkey": "Passkey",
+    "ssh_key": "SSH キー",
+    "ssh_key_desc": "デスクトップクライアントが踏み台ホストへログインする際に使用する SSH 公開鍵を管理します。",
+    "ssh_key_add": "SSH キーを追加",
+    "ssh_key_empty": "SSH キーはありません",
+    "ssh_key_name": "名前",
+    "ssh_key_name_tip": "任意です。空の場合、サーバーがコメントまたはフィンガープリントから名前を生成します。",
+    "ssh_key_name_placeholder": "例：MacBook-Pro",
+    "ssh_key_algorithm": "アルゴリズム",
+    "ssh_key_fingerprint": "キーのフィンガープリント",
+    "ssh_key_comment": "コメント",
+    "ssh_key_last_used": "キーの最終使用",
+    "ssh_key_public_key_tip": "OpenSSH 形式の公開鍵を 1 つ貼り付けてください。秘密鍵は使用できません。",
+    "ssh_key_public_key_required": "公開鍵を入力してください",
+    "ssh_key_public_key_placeholder": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... desktop@macbook",
+    "ssh_key_delete_title": "SSH キーを削除しますか？",
+    "ssh_key_delete_content": "SSH キー {{name}} を削除しますか？",
     "enter": "入力してください",
     "otp_bind_title": "二要素認証が有効になりました",
     "otp_bind_sub_title": "多要素認証—ログイン本人確認でアクセス制御を強化します。",
@@ -801,21 +828,20 @@
     "otp_security_description": "連携が完了すると、アカウントは二要素認証で保護されます。認証デバイスを大切に保管してください。",
     "otp_step2_description": "認証アプリで QR コードをスキャン",
     "otp_step3_description": "コードを入力して連携を完了",
-    "passkey_add": "パスキーを追加",
+    "passkey_add": "Passkey を追加",
     "passkey_add_time": "追加日時",
     "passkey_used_time": "最終使用",
-    "passkey_delete_title": "パスキーを削除しますか？",
-    "passkey_delete_content": "パスキーはアカウントと資産をより安全に保護します。保持を推奨します。",
+    "passkey_delete_title": "Passkey を削除しますか？",
+    "passkey_delete_content": "Passkey はアカウントと資産をより安全に保護します。保持を推奨します。",
     "mfa": "多要素認証",
     "mfa_authing": "認証中...",
-    "mfa_retry": "再試行",
     "mfa_auth_failed": "認証に失敗しました",
     "mfa_change_way": "検証方法を切り替える",
     "otp_required": "続行するには二次認証を有効にする必要があります",
     "no_mfa_title": "先に認証方式を連携してください",
     "no_mfa_subtitle": "認証方式が未連携のため、機密データを表示できません。",
     "enable_otp": "OTP 認証を有効化",
-    "enable_passkey": "パスキー認証を有効化",
+    "enable_passkey": "Passkey 認証を有効化",
     "select_auth_type": "認証方式を選択してください",
     "auth_type_passkey_desc": "生体認証またはセキュリティキーで認証",
     "auth_type_otp": "OTP コード",
@@ -846,6 +872,23 @@
       "warning": "認可後、{{clientId}} は選択した情報にアクセスできます。アカウント設定からいつでも取り消せます。",
       "load_error": "認可情報を読み込めません"
     },
+    "oauth_consent": {
+      "title": "外部アプリの認可",
+      "subtitle": "{{name}} がアカウントへのアクセスを要求しています",
+      "request_access": "{{host}} への接続を要求",
+      "requested_scopes": "次の権限を付与します",
+      "allow": "認可",
+      "deny": "拒否",
+      "warning": "認可すると、{{name}} は 1 年間アクセストークンを保持します。アクセストークンページからいつでも取り消せます。",
+      "load_error": "認可情報を読み込めません。再度認可フローを開始してください",
+      "scope": {
+        "account.read": "アカウントの基本情報を読み取る",
+        "ssh_keys.manage": "SSH 公開鍵を管理する",
+        "assets.read": "アクセス可能なアセット一覧を読み取る",
+        "snippets.read": "コードスニペットを読み取る",
+        "token.revoke_self": "このアクセストークンを失効させる（切断時に使用）"
+      }
+    },
     "otp_code_required": "コードを入力してください",
     "otp_code_format": "コードは 6 桁である必要があります",
     "mfa_passkey_prompt": "ブラウザのポップアップで Passkey 認証を完了してください"
@@ -859,6 +902,9 @@
     "content": "内容",
     "sort": "並び順",
     "group": "グループ",
+    "new_group": "グループ作成",
+    "expand_group_tree": "グループを展開",
+    "collapse_group_tree": "グループを折りたたむ",
     "group_tip": "右クリックで編集/削除（Default グループを除く）",
     "width": "幅",
     "height": "高さ",
@@ -869,13 +915,13 @@
     "tags": "タグ",
     "addr": "ネットワークアドレス",
     "account_type": "アカウント種別",
+    "asset_count": "資産数",
     "private_key": "秘密鍵",
     "password": "パスワード",
     "gateway_type": "ゲートウェイ種別",
     "no_gateway": "ゲートウェイなし",
     "select_gateway_type": "ゲートウェイ種別を選択してください",
     "select_gateway_group": "ゲートウェイグループを選択してください",
-    "advanced_setting": "詳細設定",
     "display_settings": "表示設定",
     "color_depth": "色深度",
     "force_lossless": "ロスレス圧縮",
@@ -902,7 +948,6 @@
     "is_share": "共有",
     "limit_size": "サイズ制限",
     "used_size": "使用済みサイズ",
-    "target_server": "ターゲットサーバー",
     "domain": "ドメイン",
     "domain_tip": "保護された資産にアクセスするためのドメイン（例：www.example.com）は本システムの IP に解決される必要があります。",
     "scheme": "資産プロトコル",
@@ -915,10 +960,6 @@
     "select_agent_gateway": "セキュリティゲートウェイを選択してください",
     "select_ssh_gateway": "SSH ゲートウェイを選択してください",
     "general": "一般",
-    "preserve_host": "ホスト名を保持",
-    "preserve_host_tip": "プロキシサーバーのホスト名ではなく、元のリクエストのホスト名を保持します。",
-    "disable_access_log": "アクセスログを無効化",
-    "disable_access_log_tip": "有効にすると、このサイトへのアクセスはアクセスログに記録されません",
     "custom_header": "カスタムヘッダー",
     "custom_header_tip": "複数のカスタムヘッダーを追加できます。形式：キー: 値。",
     "custom_certificate": "カスタム証明書",
@@ -941,7 +982,7 @@
     "temp_allow": "一時 IP 許可",
     "public_tip": "制限は匿名ユーザーのみに適用されます。",
     "limit_ip": "IP アクセス制限",
-    "limit_ip_tip": "指定 IP からのみアクセスを許可します。CIDR 形式対応（例：192.168.1.0/24）。ハイフン範囲対応（例：192.168.1.0-192.168.1.255）。複数 IP はカンマ区切り。",
+    "limit_ip_tip": "指定 IP からのみアクセスを許可します。CIDR 形式対応（例：192.168.1.0/24）。ハイフン範囲対応（例：192.168.1.0-192.168.1.255）。複数 IP は改行、カンマ、またはセミコロンで区切れます。",
     "limit_country": "国制限",
     "limit_country_tip": "匿名ユーザーのアクセスを指定国に限定します。中国語/英語名に対応。",
     "limit_country_placeholder": "例：中国 または China",
@@ -956,7 +997,6 @@
     "limit_time": "有効期限",
     "limit_password": "パスフレーズ制限",
     "limit_password_tip": "正しいパスフレーズでのみ資産にアクセスできます。",
-    "temp_allow_enabled": "一時 IP 許可",
     "temp_allow_duration": "有効期間（分）",
     "temp_allow_duration_tip": "ボタン操作後、現在の IP を期間内で許可します。",
     "temp_allow_auto_renew": "自動更新",
@@ -984,7 +1024,6 @@
       "is_default_tooltip": "デフォルト証明書は他の証明書に一致しない場合に使用されます。",
       "set_as_default": "デフォルトに設定",
       "download": "証明書をダウンロード",
-      "download_client": "クライアント証明書をダウンロード",
       "renew": "証明書を更新",
       "renew_confirm": "証明書を更新しますか？",
       "renew_confirm_content": "証明書を再申請して更新します。続行しますか？",
@@ -1127,7 +1166,13 @@
     "public_header_whitelist_placeholder": "例：X-Bypass-Token",
     "public_path_whitelist": "パスホワイトリスト",
     "public_path_whitelist_tip": "いずれかのパスに一致すれば許可され、正規表現をサポートしています。",
-    "public_path_whitelist_placeholder": "例：^/public/.* または /health"
+    "public_path_whitelist_placeholder": "例：^/public/.* または /health",
+    "auto_detect_logo": "アイコン自動識別",
+    "detect_os_success": "OS検出成功、アイコンを更新しました",
+    "detect_os_failed": "OS検出に失敗しました",
+    "wol_send": "WOL送信",
+    "wol_send_success": "WOLマジックパケットを送信しました",
+    "wol_send_failed": "WOLパケットの送信に失敗しました"
   },
   "websites": {
     "group_tip": "ドラッグで順序変更",
@@ -1152,7 +1197,6 @@
   },
   "gateways": {
     "port": "ポート",
-    "version": "バージョン",
     "config_mode": "設定モード",
     "config_mode_direct": "直接設定",
     "config_mode_credential": "認証情報を参照",
@@ -1172,11 +1216,7 @@
       "disk": "ディスク",
       "network_io": "ネットワーク I/O",
       "load": "負荷",
-      "model": "モデル",
       "logical_cores": "論理コア",
-      "physical_cores": "物理コア",
-      "percent": "使用率",
-      "total": "合計",
       "used": "使用済み",
       "ping": "レイテンシ",
       "system_version": "システムバージョン",
@@ -1197,7 +1237,6 @@
       "load_1m": "負荷 (1分)",
       "load_5m": "負荷 (5分)",
       "load_15m": "負荷 (15分)",
-      "disk_io_rate": "ディスク I/O 率",
       "network_io_rate": "ネットワーク I/O 率",
       "total_traffic": "累積トラフィック",
       "ip_address": "IP アドレス",
@@ -1205,7 +1244,8 @@
       "internal": "内部",
       "items": "件",
       "collection_errors": "収集エラー",
-      "action": "監視"
+      "action": "監視",
+      "last_heartbeat": "最終ハートビート"
     },
     "register_title": "ゲートウェイ登録",
     "server_address": "サーバーアドレス",
@@ -1231,6 +1271,12 @@
         "trust_list": "信頼済み IP（CIDR 形式）",
         "trust_placeholder": "入力後 Enter で確定"
       },
+      "asset_access": {
+        "setting": "資産アクセス",
+        "mode": "資産アクセス方式",
+        "access_page": "アクセスページ",
+        "standalone_page": "独立タブ"
+      },
       "watermark": {
         "setting": "接続ウォーターマーク",
         "content": "ウォーターマーク内容",
@@ -1239,11 +1285,7 @@
         "append_user": "ユーザーを追加",
         "append_asset": "資産を追加",
         "font_color": "文字色",
-        "font_size": "文字サイズ",
-        "size_small": "小",
-        "size_medium": "中",
-        "size_large": "大",
-        "size_xlarge": "特大"
+        "font_size": "文字サイズ"
       },
       "basic_info_title": "システム基本情報"
     },
@@ -1284,10 +1326,12 @@
         "ip_duration": "IP ロック期間"
       },
       "passkey": {
-        "enabled": "パスキーログイン",
+        "enabled": "Passkey ログイン",
         "domain": "外部アクセスドメイン",
-        "origins": "パスキーを許可するオリジン",
-        "origins_tip": "末尾に / を付けないでください"
+        "origins": "Passkey を許可するオリジン",
+        "origins_tip": "末尾に / を付けないでください",
+        "origins_error": "有効なオリジンを入力してください",
+        "auto_detect": "自動検出"
       },
       "session_management": "セッション管理"
     },
@@ -1303,13 +1347,20 @@
       "private_key_modal_title": "SSH 秘密鍵を設定",
       "private_key_modal_tip": "生成するか、秘密鍵を貼り付けてください。",
       "port_forwarding": {
-        "enabled": "トンネルを有効化",
-        "host_port": "許可するトンネル転送 IP/ポート"
+        "enabled": "SSH ポート転送を許可",
+        "host_port": "転送を許可する接続先",
+        "host_port_tip": "複数の接続先はカンマで区切り、host:port 形式で入力します。port に * を指定すると任意のポートを許可します。VS Code Remote-SSH では 127.0.0.1:* を許可してください。"
       },
       "usage": "使用例",
+      "usage_tip": "SSH サービスはアセット選択画面を開くことも、接続時に指定したアセットへ直接接続することもできます。",
       "mode_proxy": "プロキシモード",
+      "mode_proxy_tip": "まず踏み台アカウントでログインし、端末のアセット一覧から接続先を選択します。",
       "direct_proxy": "直結モード",
-      "disable_password_auth": "パスワード認証を無効化"
+      "direct_proxy_tip": "接続時に接続先アセットを指定し、認証後すぐにそのアセットへ入ります。asset-name はアセット名、asset-alias は推奨されるアセット別名です。",
+      "direct_proxy_cli": "コマンドラインクライアント:",
+      "direct_proxy_vscode": "VS Code Remote-SSH の ssh config 推奨設定:",
+      "disable_password_auth": "パスワード認証を無効化",
+      "private_key_required_to_enable": "SSH サービスを有効にする前に認証秘密鍵を設定してください"
     },
     "rdp": {
       "setting": "RDP 設定",
@@ -1349,7 +1400,7 @@
       "send": "メール送信"
     },
     "webauthn": {
-      "setting": "WebAuthn"
+      "setting": "Passkey 設定"
     },
     "ldap": {
       "setting": "LDAP 認証",
@@ -1421,6 +1472,8 @@
       "request": "ライセンス更新",
       "binding": "ライセンス紐付け",
       "info": "ライセンス情報",
+      "name": "ライセンス名",
+      "user_name": "ライセンス所有ユーザー名",
       "max": {
         "asset_count": "最大資産数",
         "database_count": "最大データベース数",
@@ -1492,6 +1545,12 @@
       "audit_rdp_enable": "RDP/VNC 監査アシスタントを有効化",
       "audit_rdp_prompt": "RDP/VNC 監査プロンプト",
       "audit_rdp_prompt_placeholder": "RDP/VNC 監査アシスタントのプロンプトを入力...",
+      "test": "接続テスト",
+      "test_button": "接続をテスト",
+      "test_tip": "現在のフォーム値（API Key / Base URL / モデルなど）で LLM に短いリクエストを送信し、設定が有効か検証します。",
+      "test_failed": "テスト失敗",
+      "test_response": "モデルの応答",
+      "test_response_empty": "モデルから応答がありませんでした。",
       "audit_rdp_prompt_default": "あなたはプロのリモートデスクトップセキュリティ監査専門家です。以下は RDP/VNC グラフィカルリモートデスクトップセッションの情報です。\n\nセキュリティ監査を行い、以下の構造で Markdown 形式のレポートを出力してください。\n\n## 1. エグゼクティブサマリー\n- **全体リスクレベル**：低 / 中 / 高 / 重大\n- **主な発見事項**：2〜3 文で概要\n\n## 2. 操作行動分析\n識別可能な操作の分析：\n- 使用アプリケーション（ブラウザ、エディタ、ターミナル、管理ツール等）\n- ファイル管理（コピー、移動、削除、ダウンロード等）\n- システム設定変更\n- ネットワークアクセスとデータ転送\n\n## 3. セキュリティリスク一覧\n| リスクレベル | 具体的な行動 | 説明 |\n|:----------:|:-----------|:----|\n| 🔴 重大 | | |\n| 🟠 高 | | |\n| 🟡 中 | | |\n\n## 4. コンプライアンス評価\nポリシー違反の指摘と改善提案。\n\n## 5. 監査結論\n全体評価と対応推奨事項。\n\n注意：情報が不足している場合はその旨を明記し、推測しないこと。"
     },
     "oidc_server": {
@@ -1537,7 +1596,6 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "ホスト",
-      "username": "ユーザー名",
       "database": "データベース"
     },
     "work_order": {
@@ -1579,11 +1637,10 @@
       "tip": "プロキシを有効化してクライアント接続と SQL 実行を許可します。",
       "usage_title": "使用方法",
       "usage_client": "クライアント接続",
-      "usage_select": "データベース資産を選択",
-      "password_label": "データベースパスワード",
       "password_tip_prefix": "次へ進み、",
       "password_tip_link": "プロフィール - アクセストークン",
-      "password_tip_suffix": "でデータベースパスワードを作成してください。"
+      "password_tip_suffix": "でデータベースパスワードを作成してください。",
+      "external_quick_access_tip": "外部アクセス Host/Port は一般ユーザー向けのクイックアクセス表示用で、実際のプロキシ待受アドレスには影響しません。"
     }
   }
 }

@@ -1,14 +1,13 @@
 import React, {useRef, useState} from 'react';
 
-import {Button, message, Tag, Tree} from "antd";
-import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
+import {Button, Dropdown, message, Space, Tag, Tree} from "antd";
+import NTable, {type NColumn, type NTableActionType} from "@/components/NTable";
 import DepartmentModal from "./DepartmentModal";
 import {useNavigate} from "react-router-dom";
 import departmentApi, {Department} from '@/api/department-api';
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import NLink from "@/components/NLink";
 import NButton from "@/components/NButton";
 import DepartmentUserModal from "@/pages/identity/DepartmentUserModal";
 
@@ -17,7 +16,7 @@ const api = departmentApi;
 const DepartmentPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -75,7 +74,7 @@ const DepartmentPage = () => {
         });
     }
 
-    const columns: ProColumns<Department>[] = [
+    const columns: NColumn<Department>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -128,50 +127,64 @@ const DepartmentPage = () => {
             valueType: 'option',
             key: 'option',
             width: 160,
-            render: (text, record, _, action) => [
-                <NButton key="edit" onClick={() => {
-                    setSelectedRowKey(record.id);
-                    setOpen(true);
-                }}>
-                    {t('actions.edit')}
-                </NButton>,
-                <NButton key="manage-users" onClick={() => {
-                    setSelectedDepartment(record);
-                    setUserModalOpen(true);
-                }}>
-                    {t('identity.department.manage_users')}
-                </NButton>,
-                <NButton key="delete"
-                         onClick={() => {
-                             deleteMutation.mutate(record.id);
-                         }}
-                         danger={true}
-                >
-                    {t('actions.delete')}
-                </NButton>,
-                <TableDropdown
-                    key="more"
-                    onSelect={(key) => {
-                        switch (key) {
-                            case 'view-authorised-asset':
-                                navigate(`/authorised-asset?departmentId=${record.id}`);
-                                break;
-                            case 'view-authorised-website':
-                                navigate(`/authorised-website?departmentId=${record.id}`);
-                                break;
-                        }
-                    }}
-                    menus={[
-                        {key: 'view-authorised-asset', name: `${t('menus.resource.submenus.asset')}${t('actions.authorized')}`},
-                        {key: 'view-authorised-website', name: `${t('menus.resource.submenus.website')}${t('actions.authorized')}`},
-                    ]}
-                />,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <NButton key="edit" onClick={() => {
+                        setSelectedRowKey(record.id);
+                        setOpen(true);
+                    }}>
+                        {t('actions.edit')}
+                    </NButton>
+                    <NButton key="manage-users" onClick={() => {
+                        setSelectedDepartment(record);
+                        setUserModalOpen(true);
+                    }}>
+                        {t('identity.department.manage_users')}
+                    </NButton>
+                    <NButton key="delete"
+                             onClick={() => {
+                                 deleteMutation.mutate(record.id);
+                             }}
+                             danger={true}
+                    >
+                        {t('actions.delete')}
+                    </NButton>
+                    <Dropdown
+                        key="more"
+                        menu={{
+                            items: [
+                                {
+                                    key: 'view-authorised-asset',
+                                    label: `${t('menus.resource.submenus.asset')}${t('actions.authorized')}`
+                                },
+                                {
+                                    key: 'view-authorised-website',
+                                    label: `${t('menus.resource.submenus.website')}${t('actions.authorized')}`
+                                },
+                            ],
+                            onClick: ({key}) => {
+                                switch (key) {
+                                    case 'view-authorised-asset':
+                                        navigate(`/authorised-asset?departmentId=${record.id}`);
+                                        break;
+                                    case 'view-authorised-website':
+                                        navigate(`/authorised-website?departmentId=${record.id}`);
+                                        break;
+                                }
+                            }
+                        }}
+                    >
+                        <Button type="link" size="small" style={{padding: 0}}>
+                            {t('actions.more')}
+                        </Button>
+                    </Dropdown>
+                </Space>
+            ),
         },
     ];
 
     return (<div>
-        <div style={{marginLeft: 16}}>
+        <div className="mb-4">
             <Button.Group>
                 <Button
                     type={viewMode === 'table' ? 'primary' : 'default'}
@@ -189,7 +202,7 @@ const DepartmentPage = () => {
         </div>
 
         {viewMode === 'table' ? (
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
@@ -228,7 +241,7 @@ const DepartmentPage = () => {
                 ]}
             />
         ) : (
-            <div style={{background: '#fff', padding: 24, borderRadius: 8}}>
+            <div>
                 <div style={{marginBottom: 16, display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
                     <h3>{t('identity.department.tree_structure')}</h3>
                     <Button type="primary" onClick={() => setOpen(true)}>

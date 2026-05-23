@@ -1,7 +1,11 @@
 import React, {useRef, useState} from 'react';
-import {App, Button, Popconfirm, Tag} from 'antd';
-import type {ActionType, ProColumns} from '@ant-design/pro-components';
-import {ProTable} from '@ant-design/pro-components';
+import {
+    App,
+    Button,
+    Popconfirm,
+    Space,
+    Tag} from 'antd';
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {PlusOutlined} from '@ant-design/icons';
 import {useTranslation} from 'react-i18next';
 import gatewayGroupApi, {GatewayGroup} from '@/api/gateway-group-api';
@@ -10,7 +14,7 @@ import GatewayGroupDrawer from './GatewayGroupDrawer';
 const GatewayGroupPage: React.FC = () => {
     const {t} = useTranslation();
     const {message} = App.useApp();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     const [drawerOpen, setDrawerOpen] = useState(false);
     const [currentGroup, setCurrentGroup] = useState<GatewayGroup | undefined>();
@@ -43,7 +47,7 @@ const GatewayGroupPage: React.FC = () => {
         }
     };
 
-    const columns: ProColumns<GatewayGroup>[] = [
+    const columns: NColumn<GatewayGroup>[] = [
         {
             title: t('gateway_group.name'),
             dataIndex: 'name',
@@ -92,31 +96,33 @@ const GatewayGroupPage: React.FC = () => {
             width: 150,
             fixed: 'right',
             valueType: 'option',
-            render: (_, record) => [
-                <Button
-                    key="edit"
-                    type="link"
-                    size="small"
-                    onClick={() => handleEdit(record)}
-                >
-                    {t('actions.edit')}
-                </Button>,
-                <Popconfirm
-                    key="delete"
-                    title={t('general.confirm_delete')}
-                    onConfirm={() => handleDelete(record.id)}
-                >
-                    <Button type="link" size="small" danger>
-                        {t('actions.delete')}
+            render: (_, record) => (
+                <Space>
+                    <Button
+                        key="edit"
+                        type="link"
+                        size="small"
+                        onClick={() => handleEdit(record)}
+                    >
+                        {t('actions.edit')}
                     </Button>
-                </Popconfirm>,
-            ],
+                    <Popconfirm
+                        key="delete"
+                        title={t('general.confirm_delete')}
+                        onConfirm={() => handleDelete(record.id)}
+                    >
+                        <Button type="link" size="small" danger>
+                            {t('actions.delete')}
+                        </Button>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (
         <>
-            <ProTable<GatewayGroup>
+            <NTable<GatewayGroup>
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params) => {

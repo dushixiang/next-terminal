@@ -3,7 +3,7 @@ import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
 import dashboardApi from "@/api/dashboard-api";
 import sessionApi from "@/api/session-api";
-import CountUp from "react-countup";
+import CountUpModule from "react-countup";
 import {GlobeIcon, RouteIcon, ServerIcon, ShieldBanIcon, TerminalIcon, UsersIcon} from "lucide-react";
 import {
     ChartConfig,
@@ -41,6 +41,9 @@ const chartConfig2 = {
         color: "var(--chart-5)",
     },
 } satisfies ChartConfig
+
+// 兼容 Vite 8
+const CountUp = (CountUpModule as unknown as { default?: typeof CountUpModule }).default ?? CountUpModule;
 
 const DashboardPage = () => {
 
@@ -139,7 +142,7 @@ const DashboardPage = () => {
     ];
 
     return (
-        <div className={cn('px-4 space-y-4', isMobile && 'px-2')}>
+        <div className={'space-y-4'}>
             <div className={'font-medium'}>{t('menus.dashboard.label')}</div>
             <div className={cn(
                 'grid gap-4',
@@ -163,7 +166,7 @@ const DashboardPage = () => {
                             'mt-2 font-bold',
                             isMobile ? 'text-base' : 'text-lg'
                         )}>
-                            <CountUp delay={2} end={item.value}/>
+                            <CountUp delay={2} end={item.value ?? 0}/>
                         </div>
                     </div>
                 })}
@@ -295,7 +298,7 @@ const DashboardPage = () => {
                                             <TableCell className={cn('text-center', isMobile ? 'p-1.5 text-xs' : 'p-2.5')}>{session.userAccount}</TableCell>
                                             <TableCell className={cn('text-center', isMobile ? 'p-1.5 text-xs' : 'p-2.5')}>{session.protocol}</TableCell>
                                             <TableCell className={cn('text-center', isMobile ? 'p-1.5 text-xs' : 'p-2.5')}>
-                                                {isMobile ? 
+                                                {isMobile ?
                                                     <div className="line-clamp-2">
                                                         {session.username}@{session.ip}
                                                     </div> :

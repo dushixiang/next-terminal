@@ -22,6 +22,7 @@ const PUBLIC_PATHS = [
     '/wechat-work/callback',
     '/oidc/callback',
     '/oidc/server/consent',
+    '/oauth/consent',
 ];
 
 /**

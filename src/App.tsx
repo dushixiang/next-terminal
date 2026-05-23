@@ -21,7 +21,8 @@ const LoginPage = lazy(() => import("@/pages/account/LoginPage"));
 const WechatWorkCallback = lazy(() => import("@/pages/account/WechatWorkCallback"));
 const OidcCallback = lazy(() => import("@/pages/account/OidcCallback"));
 const OidcServerConsent = lazy(() => import("@/pages/account/OidcServerConsent"));
-const MobileAccessTerminal = lazy(() => import("@/pages/access/MobileAccessTerminal"));
+const OAuthConsent = lazy(() => import("@/pages/account/OAuthConsent"));
+const StandaloneAssetAccessPage = lazy(() => import("@/pages/access/StandaloneAssetAccessPage"));
 const UserPage = lazy(() => import("@/pages/identity/UserPage"));
 const UserDetailPage = lazy(() => import("@/pages/identity/UserDetailPage"));
 const SettingPage = lazy(() => import("@/pages/sysconf/SettingPage"));
@@ -36,6 +37,7 @@ const LoginPolicyPostPage = lazy(() => import("@/pages/identity/LoginPolicyPostP
 const LoginPolicyDetailPage = lazy(() => import("@/pages/identity/LoginPolicyDetailPage"));
 const OidcClientPage = lazy(() => import("@/pages/identity/OidcClientPage"));
 const AssetsPage = lazy(() => import("@/pages/assets/AssetPage"));
+const AssetInfo = lazy(() => import("@/pages/assets/AssetInfo"));
 const DatabaseAssetPage = lazy(() => import("@/pages/assets/DatabaseAssetPage"));
 const CredentialPage = lazy(() => import("@/pages/assets/CredentialPage"));
 const CertificatePage = lazy(() => import("@/pages/assets/CertificatePage"));
@@ -65,6 +67,7 @@ const GatewayGroupPage = lazy(() => import("@/pages/gateway/GatewayGroupPage"));
 const ErrorPage = lazy(() => import("@/components/ErrorPage"));
 const StoragePage = lazy(() => import("@/pages/assets/StoragePage"));
 const WebsitePage = lazy(() => import("@/pages/assets/WebsitePage"));
+const WebsiteInfo = lazy(() => import("@/pages/assets/WebsiteInfo"));
 const BrowserPage = lazy(() => import("@/pages/access/BrowserPage"));
 const FacadePage = lazy(() => import("@/pages/facade/AssetFacadePage.tsx"));
 const WebsiteFacadePage = lazy(() => import("@/pages/facade/WebsiteFacadePage"));
@@ -86,12 +89,13 @@ const router = createBrowserRouter([
     {path: "/wechat-work/callback", element: <WechatWorkCallback/>},
     {path: "/oidc/callback", element: <OidcCallback/>},
     {path: "/oidc/server/consent", element: <OidcServerConsent/>},
+    {path: "/oauth/consent", element: <OAuthConsent/>},
     {path: "/terminal-playback", element: <TerminalPlayback/>},
     {path: "/terminal-monitor", element: <TerminalMonitor/>},
     {path: "/graphics-playback", element: <GuacdPlayback/>},
     {path: "/graphics-monitor", element: <GuacdMonitor/>},
     {path: "/terminal", element: <TerminalPage/>,},
-    {path: "/mobile-terminal", element: <MobileAccessTerminal/>,},
+    {path: "/standalone-access", element: <StandaloneAssetAccessPage/>,},
     {path: "/graphics", element: <GuacamolePage/>,},
     {path: "/browser", element: <BrowserPage/>,},
     {path: "/", element: <RedirectPage/>, errorElement: <ErrorPage/>,},
@@ -125,11 +129,13 @@ const router = createBrowserRouter([
             {path: "/operation-log", element: <OperationLogPage/>},
 
             {path: "/asset", element: <AssetsPage/>},
+            {path: "/asset/:assetId", element: <AssetInfo/>},
             {path: "/database-asset", element: <DatabaseAssetPage/>},
             {path: "/credential", element: <CredentialPage/>},
             {path: "/snippet", element: <SnippetPage/>},
             {path: "/storage", element: <StoragePage/>},
             {path: "/website", element: <WebsitePage/>},
+            {path: "/website/:websiteId", element: <WebsiteInfo/>},
             {path: "/certificate", element: <CertificatePage/>},
             {path: "/db-work-order", element: <DatabaseWorkOrderPage/>},
 

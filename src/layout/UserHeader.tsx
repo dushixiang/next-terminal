@@ -229,7 +229,7 @@ const UserHeader = () => {
                         background: isDark ? '#0b1220' : '#ffffff',
                     }
                 }}
-                width={280}
+                size={280}
                 className={clsx("[&_.ant-drawer-body]:p-0", isDark ? "text-slate-100" : "text-slate-900")}
             >
                 <div className={'flex flex-col h-full'}>

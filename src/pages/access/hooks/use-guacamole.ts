@@ -1,7 +1,7 @@
 import React, {MutableRefObject, useCallback, useEffect, useRef, useState} from 'react';
 import Guacamole from '@dushixiang/guacamole-common-js';
 import portalApi, {ExportSession} from '@/api/portal-api';
-import {baseWebSocketUrl, getToken} from '@/api/core/requests';
+import {baseWebSocketUrl} from '@/api/core/requests';
 import qs from 'qs';
 
 interface Options {
@@ -59,13 +59,11 @@ export function useGuacamole({
         // …绑定键盘鼠标事件，省略
 
         // 发送连接参数
-        const authToken = getToken();
         const params = {
             sessionId: sess.id,
             width: sess.width || window.innerWidth,
             height: sess.height || window.innerHeight,
             dpi: 192,
-            'X-Auth-Token': authToken
         };
         client.connect(qs.stringify(params));
     }, [assetId, tiger]);

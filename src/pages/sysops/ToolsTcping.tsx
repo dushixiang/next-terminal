@@ -1,6 +1,6 @@
 import {Button, Form, Input, InputNumber, Space} from 'antd';
 import React, {useState} from 'react';
-import {baseUrl, getToken} from "@/api/core/requests";
+import {baseUrl} from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 
 const ToolsTcping = () => {
@@ -19,7 +19,7 @@ const ToolsTcping = () => {
         setRunning(true);
         setLogs([]);
 
-        eventSource = new EventSource(`${baseUrl()}/admin/tools/tcping?X-Auth-Token=${getToken()}&host=${host}&port=${port}&attempts=${attempts}`);
+        eventSource = new EventSource(`${baseUrl()}/admin/tools/tcping?host=${host}&port=${port}&attempts=${attempts}`);
 
         eventSource.onmessage = (event) => {
             setLogs((prevLogs) => [...prevLogs, event.data]);

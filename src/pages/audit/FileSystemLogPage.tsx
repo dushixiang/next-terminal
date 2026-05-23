@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
 import {Link} from "react-router-dom";
@@ -11,7 +11,7 @@ import {useMutation} from "@tanstack/react-query";
 const FileSystemLogPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
     let {modal} = App.useApp();
 
     let clearMutation = useMutation({
@@ -21,7 +21,7 @@ const FileSystemLogPage = () => {
         }
     });
 
-    const columns: ProColumns<FileSystemLog>[] = [
+    const columns: NColumn<FileSystemLog>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -60,7 +60,7 @@ const FileSystemLogPage = () => {
                 'create-dir': {text: t('authorised.strategy.create_dir'),},
                 'create-file': {text: t('authorised.strategy.create_file'),},
             },
-            width: 100,
+            width: 140,
         },
         {
             title: t('audit.filename'),
@@ -79,7 +79,7 @@ const FileSystemLogPage = () => {
 
     return (
         <div>
-            <ProTable
+            <NTable
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}

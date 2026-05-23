@@ -20,7 +20,7 @@ const About = () => {
     let {modal} = App.useApp();
 
     let [canUpgrade, setCanUpgrade] = useState(false);
-    let { license } = useLicense();
+    let {license} = useLicense();
     let brandingQuery = useQuery({
         queryKey: ['branding'],
         queryFn: brandingApi.getBranding,

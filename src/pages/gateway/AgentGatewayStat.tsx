@@ -14,14 +14,25 @@ import {
 import {formatUptime, renderSize} from "@/utils/utils";
 import clsx from "clsx";
 import {useTranslation} from "react-i18next";
+import dayjs from "dayjs";
 
 interface Props {
     open: boolean;
     id: string;
+    updatedAt?: number;
     onClose: () => void;
 }
 
-const AgentGatewayStat = ({open, id, onClose}: Props) => {
+const renderPingTag = (ping?: number) => {
+    if (ping === undefined || ping === null) return <span>-</span>;
+    let color = 'green';
+    if (ping >= 200) color = 'red';
+    else if (ping >= 120) color = 'orange';
+    else if (ping >= 60) color = 'gold';
+    return <Tag color={color} variant="filled" className="!m-0">{ping} ms</Tag>;
+};
+
+const AgentGatewayStat = ({open, id, updatedAt, onClose}: Props) => {
     const {t} = useTranslation();
     let query = useQuery({
         queryKey: ['agent-gateway', id, 'stat'],
@@ -44,13 +55,16 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                         <span className="text-sm text-gray-500">{data.host.hostname}</span>
                     )}
                     {data?.ping !== undefined && (
-                        <Tag color="green">{t('gateways.stat.ping')}: {data.ping}ms</Tag>
+                        <span className="flex items-center gap-1 text-sm font-normal text-gray-500">
+                            <span>{t('gateways.stat.ping')}:</span>
+                            {renderPingTag(data.ping)}
+                        </span>
                     )}
                 </div>
             }
             onClose={onClose}
             open={open}
-            width={Math.min(1200, window.innerWidth - 100)}
+            size={Math.min(1200, window.innerWidth - 100)}
         >
             <div className="flex flex-col gap-4">
                 <Card
@@ -88,8 +102,10 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                             <Divider className="my-3"/>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <div>
-                                    <div className="text-gray-500 text-sm">{t('gateways.stat.ping')}</div>
-                                    <div className="font-medium">{data.ping !== undefined ? `${data.ping} ms` : '-'}</div>
+                                    <div className="text-gray-500 text-sm">{t('gateways.monitor.last_heartbeat')}</div>
+                                    <div className="font-medium">
+                                        {updatedAt ? dayjs(updatedAt).format('YYYY-MM-DD HH:mm:ss') : '-'}
+                                    </div>
                                 </div>
                                 <div>
                                     <div className="text-gray-500 text-sm">{t('gateways.monitor.load_1m')}</div>
@@ -141,7 +157,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                 <div className="text-xs text-gray-500 mb-1">{t('gateways.stat.memory')}</div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-lg font-semibold">{data?.memory.percent?.toFixed(1) || 0}%</span>
-                                    <Tag color="blue" bordered={false} className="!m-0">
+                                    <Tag color="blue" variant="filled" className="!m-0">
                                         {renderSize(data?.memory.used)} / {renderSize(data?.memory.total)}
                                     </Tag>
                                 </div>
@@ -158,7 +174,7 @@ const AgentGatewayStat = ({open, id, onClose}: Props) => {
                                 <div className="text-xs text-gray-500 mb-1">{t('gateways.stat.disk')}</div>
                                 <div className="flex items-center justify-between">
                                     <span className="text-lg font-semibold">{data?.disk.percent?.toFixed(1) || 0}%</span>
-                                    <Tag color="gold" bordered={false} className="!m-0">
+                                    <Tag color="gold" variant="filled" className="!m-0">
                                         {renderSize(data?.disk.used)} / {renderSize(data?.disk.total)}
                                     </Tag>
                                 </div>

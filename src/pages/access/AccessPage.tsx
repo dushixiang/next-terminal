@@ -5,7 +5,6 @@ import {ResizableHandle, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ThemeProvider} from '@/components/theme-provider';
 import AccessTheme from '@/pages/access/AccessTheme';
 import AccessSetting from '@/pages/access/AccessSetting';
-import {useWindowSize} from 'react-use';
 import {useAccessTab} from '@/pages/access/hooks/use-access-tab';
 import {StyleProvider} from '@ant-design/cssinjs';
 import {beforeUnload, generateRandomId, handleKeyDown} from '@/utils/utils';
@@ -29,6 +28,12 @@ import {useTranslation} from 'react-i18next';
 import {LocalStorage, STORAGE_KEYS} from '@/utils/storage';
 import AccessTerminal from '@/pages/access/AccessTerminal';
 import AccessGuacamole from '@/pages/access/AccessGuacamole';
+import {
+    ACCESS_HEADER_HEIGHT,
+    ACCESS_SIDEBAR_COLLAPSED_SIZE,
+    ACCESS_SIDEBAR_DEFAULT_SIZE,
+    ACCESS_SIDEBAR_MAX_SIZE,
+} from '@/pages/access/constants';
 
 export interface AccessTabSyncMessage {
     id: string;
@@ -40,11 +45,20 @@ export interface AccessTabSyncMessage {
 
 const AccessPage = () => {
     const {t} = useTranslation();
-    const {height} = useWindowSize();
     const [activeKey, setActiveKey] = useAccessTab();
     const [_, setContentSize] = useAccessContentSize();
     const [searchParams, setSearchParams] = useSearchParams();
     const leftRef = useRef<ImperativePanelHandle>(null);
+    const initialCollapsed = LocalStorage.get(STORAGE_KEYS.COLLAPSED_STATE, false);
+    const savedPanelSizes = LocalStorage.get(STORAGE_KEYS.PANEL_SIZES, {
+        left: ACCESS_SIDEBAR_DEFAULT_SIZE,
+        right: 100 - ACCESS_SIDEBAR_DEFAULT_SIZE,
+    });
+    const initialExpandedLeftPanelSize = Math.min(
+        ACCESS_SIDEBAR_MAX_SIZE,
+        Math.max(ACCESS_SIDEBAR_DEFAULT_SIZE, savedPanelSizes.left || ACCESS_SIDEBAR_DEFAULT_SIZE)
+    );
+    const lastExpandedPanelSizeRef = useRef(initialExpandedLeftPanelSize);
 
     // 标签页操作
     const {
@@ -56,44 +70,58 @@ const AccessPage = () => {
         handleCloseAll,
         handleCloseOthers,
         handleReconnect,
+        handleDuplicateSession,
         onDragEnd,
     } = useTabOperations(activeKey, setActiveKey);
 
     // 打开资产标签页
     const openAssetTab = useCallback((msg: AccessTabSyncMessage) => {
-        const randomId = generateRandomId();
-        const key = randomId + '_' + msg.id;
+        const key = generateRandomId() + '_' + msg.id;
+        const createSessionTab = (tabKey: string) => {
+            switch (msg.protocol) {
+                case "ssh":
+                case "telnet":
+                    return <AccessTerminal assetId={msg.id} tabKey={tabKey}/>;
+                case "rdp":
+                    return <AccessGuacamole assetId={msg.id} tabKey={tabKey}/>;
+                default:
+                    return <AccessGuacamole assetId={msg.id} tabKey={tabKey}/>;
+            }
+        };
 
-        switch (msg.protocol) {
-            case "ssh":
-            case "telnet":
-                addTab(key, msg.name, <AccessTerminal assetId={msg.id}/>);
-                break;
-            case "rdp":
-                addTab(key, msg.name, <AccessGuacamole assetId={msg.id}/>);
-                break;
-            default:
-                addTab(key, msg.name, <AccessGuacamole assetId={msg.id}/>);
-                break;
-        }
+        addTab(
+            key,
+            msg.name,
+            createSessionTab(key),
+            {
+                meta: {
+                    type: 'session',
+                    assetId: msg.id,
+                    recreate: createSessionTab,
+                },
+            }
+        );
     }, [addTab]);
 
     // 面板状态管理
     const [isCollapsed, setIsCollapsed] = useState(() => {
-        return LocalStorage.get(STORAGE_KEYS.COLLAPSED_STATE, false);
+        return initialCollapsed;
     });
 
     const [leftPanelSize, setLeftPanelSize] = useState(() => {
-        const savedSizes = LocalStorage.get(STORAGE_KEYS.PANEL_SIZES, {left: 15, right: 85});
-        return savedSizes.left;
+        return initialCollapsed ? ACCESS_SIDEBAR_COLLAPSED_SIZE : initialExpandedLeftPanelSize;
     });
 
     const handlePanelResize = useCallback((size: number) => {
         setLeftPanelSize(size);
-        const panelSizes = {left: size, right: 100 - size};
-        LocalStorage.set(STORAGE_KEYS.PANEL_SIZES, panelSizes);
 
-        const collapsed = size === 2;
+        const collapsed = size === ACCESS_SIDEBAR_COLLAPSED_SIZE;
+        if (!collapsed) {
+            lastExpandedPanelSizeRef.current = size;
+            const panelSizes = {left: size, right: 100 - size};
+            LocalStorage.set(STORAGE_KEYS.PANEL_SIZES, panelSizes);
+        }
+
         if (collapsed !== isCollapsed) {
             setIsCollapsed(collapsed);
             LocalStorage.set(STORAGE_KEYS.COLLAPSED_STATE, collapsed);
@@ -192,6 +220,14 @@ const AccessPage = () => {
         setSSHChooserOpen(true);
     }, []);
 
+    const handleSidebarToggle = useCallback(() => {
+        if (isCollapsed) {
+            leftRef.current?.resize(lastExpandedPanelSizeRef.current);
+            return;
+        }
+        leftRef.current?.collapse();
+    }, [isCollapsed]);
+
     // 处理 SSH 选择器确认
     const handleSSHChooserOk = useCallback(async (values: string[]) => {
         const required = await portalApi.getAccessRequireMFA();
@@ -247,41 +283,45 @@ const AccessPage = () => {
                 <StyleProvider hashPriority="high">
                     <div className={'h-screen w-screen overflow-hidden'}>
                         <AccessHeader
+                            isSidebarCollapsed={isCollapsed}
+                            onToggleSidebar={handleSidebarToggle}
                             onThemeClick={handleThemeClick}
                             onSettingClick={handleSettingClick}
                             onBatchSSHClick={handleBatchSSHClick}
                         />
 
                         <ThemeProvider defaultTheme="dark" storageKey="nt-ui-theme">
-                            <ResizablePanelGroup direction="horizontal">
-                                <AccessSidebar
-                                    isCollapsed={isCollapsed}
-                                    leftPanelSize={leftPanelSize}
-                                    height={height}
-                                    onResize={handlePanelResize}
-                                    leftRef={leftRef}
-                                    onNodeDoubleClick={handleNodeDoubleClick}
-                                />
+                            <div style={{height: `calc(100vh - ${ACCESS_HEADER_HEIGHT}px)`}}>
+                                <ResizablePanelGroup direction="horizontal">
+                                    <AccessSidebar
+                                        isCollapsed={isCollapsed}
+                                        leftPanelSize={leftPanelSize}
+                                        onResize={handlePanelResize}
+                                        leftRef={leftRef}
+                                        onNodeDoubleClick={handleNodeDoubleClick}
+                                    />
 
-                                <ResizableHandle withHandle/>
+                                    {!isCollapsed && <ResizableHandle withHandle/>}
 
-                                <AccessTabContainer
-                                    items={items}
-                                    activeKey={activeKey}
-                                    leftPanelSize={leftPanelSize}
-                                    onChange={setActiveKey}
-                                    onRemove={removeTab}
-                                    onDragEnd={onDragEnd}
-                                    onContentResize={setContentSize}
-                                    tabOperations={{
-                                        handleCloseLeft,
-                                        handleCloseRight,
-                                        handleCloseAll,
-                                        handleCloseOthers,
-                                        handleReconnect,
-                                    }}
-                                />
-                            </ResizablePanelGroup>
+                                    <AccessTabContainer
+                                        items={items}
+                                        activeKey={activeKey}
+                                        leftPanelSize={leftPanelSize}
+                                        onChange={setActiveKey}
+                                        onRemove={removeTab}
+                                        onDragEnd={onDragEnd}
+                                        onContentResize={setContentSize}
+                                        tabOperations={{
+                                            handleCloseLeft,
+                                            handleCloseRight,
+                                            handleCloseAll,
+                                            handleCloseOthers,
+                                            handleReconnect,
+                                            handleDuplicateSession,
+                                        }}
+                                    />
+                                </ResizablePanelGroup>
+                            </div>
 
                             {/* 对话框 */}
                             <AccessSshChooser

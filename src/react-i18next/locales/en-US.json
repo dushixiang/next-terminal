@@ -50,7 +50,9 @@
     "upload": "Upload",
     "offline": "Offline",
     "online": "Online",
-    "search_placeholder": "Search keyword"
+    "search_placeholder": "Search keyword",
+    "selected_items": "{{count}} selected",
+    "toggle_theme": "Toggle theme"
   },
   "actions": {
     "new": "New",
@@ -68,11 +70,13 @@
     "cancel": "Cancel",
     "save": "Save",
     "label": "Actions",
+    "more": "More",
     "batch_delete": "Batch Delete",
     "refresh": "Refresh",
+    "retry": "Retry",
     "confirm": "Confirm",
     "back": "Back",
-    "more": "More"
+    "test_connection": "Test Connection"
   },
   "dashboard": {
     "login_times": "Login Times",
@@ -115,12 +119,8 @@
   "facade": {
     "asset_placeholder": "Asset name, protocol, tags, network address",
     "database_asset_placeholder": "Asset name, username, tag, type",
-    "database_access_title": "Connection & Access",
     "database_access_tip": "Connect via the database proxy or submit SQL with work orders.",
-    "database_access_proxy_tip": "Ask an administrator for the proxy address.",
     "database_access_work_order": "Go to SQL Work Orders",
-    "database_asset_name_tip": "Use the asset name below for asset_name.",
-    "accessing": "Connecting",
     "website_placeholder": "Website name, tag, type",
     "processing": "Processing...",
     "in_use": "In use",
@@ -203,6 +203,7 @@
       "create_dir": "Create Folder",
       "upload_file": "Upload File",
       "upload_dir": "Upload Folder",
+      "preview_image": "Preview Image",
       "chmod": "Permissions"
     },
     "attributes": {
@@ -532,7 +533,9 @@
       "userAgent": "User-Agent",
       "createdAt": "Request Time",
       "anonymous": "Anonymous",
+      "publicAllow": "Public Allow",
       "whitelist": "IP Whitelist",
+      "tempAllow": "Temporary Allow",
       "tempPass": "Temporary Password",
       "deletedUser": "Deleted User",
       "clearConfirmTitle": "Confirm Clear",
@@ -602,13 +605,11 @@
     },
     "audit_analyzing": "Analyzing session recording, please wait...",
     "audit_failed": "Audit failed",
-    "audit_no_result": "No audit result available",
     "unknown_protocol": "Unknown protocol: {{protocol}}",
     "audit_status": {
       "label": "Audit Status",
       "pending": "Analyzing",
       "completed": "Completed",
-      "failed": "Failed",
       "start": "Start Analysis",
       "pending_tip": "AI is analyzing the session recording in the background. Refresh the page to see the result.",
       "view": "View Report",
@@ -634,7 +635,8 @@
       },
       "keyboard": {
         "label": "Keyboard Settings",
-        "intercept_search_shortcut": "Intercept search shortcut (Ctrl/Cmd+F)"
+        "intercept_search_shortcut": "Intercept search shortcut (Ctrl/Cmd+F)",
+        "mac_option_is_meta": "macOS Option as Meta key"
       }
     },
     "batch": {
@@ -661,6 +663,7 @@
       "clipboard_placeholder": "Paste here..."
     },
     "tabs": {
+      "copySession": "Duplicate Session",
       "closeLeft": "Close Tabs to the Left",
       "closeRight": "Close Tabs to the Right",
       "closeOthers": "Close Other Tabs",
@@ -695,7 +698,10 @@
     },
     "terminal": {
       "search": "Search terminal content",
-      "clear": "Clear Screen"
+      "clear": "Clear Screen",
+      "connecting": "Connecting...",
+      "close_title": "Close terminal",
+      "close_confirm": "Are you sure you want to close this terminal?"
     },
     "playback": {
       "shortcut_space": "Space: Play/Pause",
@@ -720,12 +726,17 @@
     "access_token": "Access Token",
     "access_token_create": "Create Token",
     "access_token_type": "Token Type",
+    "access_token_source": "Source",
+    "access_token_source_manual": "Manual",
+    "access_token_expires_at": "Expires At",
+    "access_token_expires_never": "Never expires",
     "access_token_once_tip": "Token is shown only once. Please keep it safe.",
     "access_token_type_values": {
       "session": "Login Session",
       "api": "API Token",
       "temporary": "Temporary Token",
-      "db_password": "Database Password"
+      "db_password": "Database Password",
+      "oauth": "OAuth Grant"
     },
     "client_cert": "Client Certificate",
     "client_cert_generate": "Generate & Download",
@@ -737,11 +748,11 @@
     "client_cert_revoke_confirm": "Revoke the client certificate?",
     "client_cert_status_active": "Active",
     "client_cert_status_revoked": "Revoked",
-    "client_cert_fingerprint": "Fingerprint",
+    "client_cert_fingerprint": "Certificate Fingerprint",
     "client_cert_serial": "Serial Number",
     "client_cert_not_before": "Valid From",
     "client_cert_not_after": "Valid Until",
-    "client_cert_last_used": "Last Used",
+    "client_cert_last_used": "Certificate Last Used",
     "old_password": "Old Password",
     "confirm_password": "Confirm Password",
     "captcha": "Captcha",
@@ -760,6 +771,22 @@
       "back_to_login": "Back to Login"
     },
     "passkey": "Passkey",
+    "ssh_key": "SSH Key",
+    "ssh_key_desc": "Manage SSH public keys used by desktop clients to log in to the bastion host.",
+    "ssh_key_add": "Add SSH Key",
+    "ssh_key_empty": "No SSH keys",
+    "ssh_key_name": "Name",
+    "ssh_key_name_tip": "Optional. If empty, the server will generate a name from the key comment or fingerprint.",
+    "ssh_key_name_placeholder": "For example: MacBook-Pro",
+    "ssh_key_algorithm": "Algorithm",
+    "ssh_key_fingerprint": "Key Fingerprint",
+    "ssh_key_comment": "Comment",
+    "ssh_key_last_used": "Key Last Used",
+    "ssh_key_public_key_tip": "Paste a single OpenSSH-format public key. Private keys are not accepted.",
+    "ssh_key_public_key_required": "Please enter the public key",
+    "ssh_key_public_key_placeholder": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... desktop@macbook",
+    "ssh_key_delete_title": "Remove SSH key?",
+    "ssh_key_delete_content": "Are you sure you want to remove SSH key {{name}}?",
     "enter": "Please enter",
     "otp_bind_title": "You have enabled two-factor authentication",
     "otp_bind_sub_title": "Multi-factor authentication — login identity verification, safer access control.",
@@ -804,11 +831,10 @@
     "passkey_add": "Add Passkey",
     "passkey_add_time": "Added At",
     "passkey_used_time": "Last Used",
-    "passkey_delete_title": "Are you sure you want to remove your passkey?",
-    "passkey_delete_content": "Passkeys provide better protection for your account and assets; it's recommended to keep it.",
+    "passkey_delete_title": "Remove Passkey?",
+    "passkey_delete_content": "Passkey provides better protection for your account and assets; it's recommended to keep it.",
     "mfa": "Multi-Factor Authentication",
     "mfa_authing": "Authenticating...",
-    "mfa_retry": "Retry",
     "mfa_auth_failed": "Authentication failed",
     "mfa_change_way": "Change verification method",
     "otp_required": "You must enable 2FA to continue",
@@ -846,6 +872,23 @@
       "warning": "After authorization, {{clientId}} can access the info you selected. You can revoke at any time in account settings.",
       "load_error": "Failed to load authorization info"
     },
+    "oauth_consent": {
+      "title": "External App Authorization",
+      "subtitle": "{{name}} is requesting access to your account",
+      "request_access": "Requesting to connect to {{host}}",
+      "requested_scopes": "The following permissions will be granted",
+      "allow": "Authorize",
+      "deny": "Deny",
+      "warning": "Once approved, {{name}} will hold an access token for one year. You can revoke it anytime from the Access Tokens page.",
+      "load_error": "Unable to load authorization info. Please restart the flow.",
+      "scope": {
+        "account.read": "Read basic account information",
+        "ssh_keys.manage": "Manage your SSH public keys",
+        "assets.read": "Read the list of accessible assets",
+        "snippets.read": "Read your code snippets",
+        "token.revoke_self": "Revoke this access token (used when disconnecting)"
+      }
+    },
     "otp_code_required": "Please enter the code",
     "otp_code_format": "Code must be 6 digits",
     "mfa_passkey_prompt": "Please complete Passkey authentication in the browser popup"
@@ -859,6 +902,9 @@
     "content": "Content",
     "sort": "Sort",
     "group": "Group",
+    "new_group": "New group",
+    "expand_group_tree": "Expand groups",
+    "collapse_group_tree": "Collapse groups",
     "group_tip": "Right-click to edit/delete (except Default group)",
     "width": "Width",
     "height": "Height",
@@ -869,13 +915,13 @@
     "tags": "Tags",
     "addr": "Network Address",
     "account_type": "Account Type",
+    "asset_count": "Asset Count",
     "private_key": "Private Key",
     "password": "Password",
     "gateway_type": "Gateway Type",
     "no_gateway": "No Gateway",
     "select_gateway_type": "Please select gateway type",
     "select_gateway_group": "Please select gateway group",
-    "advanced_setting": "Advanced Settings",
     "display_settings": "Display Settings",
     "color_depth": "Color Depth",
     "force_lossless": "Force Lossless",
@@ -902,7 +948,6 @@
     "is_share": "Share",
     "limit_size": "Size Limit",
     "used_size": "Used Size",
-    "target_server": "Target Server",
     "domain": "Domain",
     "domain_tip": "The domain used to access protected assets (e.g., www.example.com) must resolve to this system's IP.",
     "scheme": "Asset Protocol",
@@ -915,10 +960,6 @@
     "select_agent_gateway": "Please select security gateway",
     "select_ssh_gateway": "Please select SSH gateway",
     "general": "General",
-    "preserve_host": "Preserve Hostname",
-    "preserve_host_tip": "Preserve the Host header as the original request host, instead of the proxy server's host.",
-    "disable_access_log": "Disable Access Log",
-    "disable_access_log_tip": "When enabled, access requests to this website will not be recorded in access logs",
     "custom_header": "Custom Headers",
     "custom_header_tip": "You can add multiple headers in the format: Key: Value.",
     "custom_certificate": "Custom Certificate",
@@ -941,7 +982,7 @@
     "temp_allow": "Temporary IP Allowlist",
     "public_tip": "Restriction applies only to anonymous users.",
     "limit_ip": "IP Access Restriction",
-    "limit_ip_tip": "Restrict users to access assets only from specified IPs. CIDR supported, e.g., 192.168.1.0/24. Dash ranges supported, e.g., 192.168.1.0-192.168.1.255. Multiple IPs separated by commas.",
+    "limit_ip_tip": "Restrict users to access assets only from specified IPs. CIDR supported, e.g., 192.168.1.0/24. Dash ranges supported, e.g., 192.168.1.0-192.168.1.255. Multiple IPs can be entered on separate lines, or separated by commas or semicolons.",
     "limit_country": "Country Restriction",
     "limit_country_tip": "Restrict anonymous access to specified countries; supports Chinese or English names.",
     "limit_country_placeholder": "E.g., China",
@@ -956,7 +997,6 @@
     "limit_time": "Expiry Time",
     "limit_password": "Passcode Access Restriction",
     "limit_password_tip": "Access asset only with correct passcode.",
-    "temp_allow_enabled": "Temporary IP Allowlist",
     "temp_allow_duration": "Validity (minutes)",
     "temp_allow_duration_tip": "After clicking the button, the current IP is allowed for the duration.",
     "temp_allow_auto_renew": "Auto Renew",
@@ -984,7 +1024,6 @@
       "is_default_tooltip": "Default certificate is used when no other certificate matches.",
       "set_as_default": "Set as Default",
       "download": "Download Certificate",
-      "download_client": "Download Client Certificate",
       "renew": "Renew Certificate",
       "renew_confirm": "Confirm renew certificate?",
       "renew_confirm_content": "The certificate will be re-issued and updated. Continue?",
@@ -1127,7 +1166,13 @@
     "public_header_whitelist_placeholder": "For example: X-Bypass-Token",
     "public_path_whitelist": "Path whitelist",
     "public_path_whitelist_tip": "Allow traffic if it matches any path; regular expressions are supported.",
-    "public_path_whitelist_placeholder": "For example: ^/public/.* or /health"
+    "public_path_whitelist_placeholder": "For example: ^/public/.* or /health",
+    "auto_detect_logo": "Auto Detect Icon",
+    "detect_os_success": "OS detected and icon updated",
+    "detect_os_failed": "OS detection failed",
+    "wol_send": "Send WOL",
+    "wol_send_success": "WOL magic packet sent",
+    "wol_send_failed": "Failed to send WOL packet"
   },
   "websites": {
     "group_tip": "Drag to reorder",
@@ -1152,7 +1197,6 @@
   },
   "gateways": {
     "port": "Port",
-    "version": "Version",
     "config_mode": "Config Mode",
     "config_mode_direct": "Direct Config",
     "config_mode_credential": "Use Credential",
@@ -1172,11 +1216,7 @@
       "disk": "Disk",
       "network_io": "Network I/O",
       "load": "Load",
-      "model": "Model",
       "logical_cores": "Logical Cores",
-      "physical_cores": "Physical Cores",
-      "percent": "Usage",
-      "total": "Total",
       "used": "Used",
       "ping": "Latency",
       "system_version": "System Version",
@@ -1197,7 +1237,6 @@
       "load_1m": "Load (1 min)",
       "load_5m": "Load (5 min)",
       "load_15m": "Load (15 min)",
-      "disk_io_rate": "Disk I/O Rate",
       "network_io_rate": "Network I/O Rate",
       "total_traffic": "Total Traffic",
       "ip_address": "IP Address",
@@ -1205,7 +1244,8 @@
       "internal": "Internal",
       "items": "items",
       "collection_errors": "Collection Errors",
-      "action": "Monitor"
+      "action": "Monitor",
+      "last_heartbeat": "Last Heartbeat"
     },
     "register_title": "Register Gateway",
     "server_address": "Server Address",
@@ -1231,6 +1271,12 @@
         "trust_list": "Trusted IPs (CIDR)",
         "trust_placeholder": "Press Enter to confirm"
       },
+      "asset_access": {
+        "setting": "Asset Access",
+        "mode": "Asset Access Mode",
+        "access_page": "Access Page",
+        "standalone_page": "Standalone Tab"
+      },
       "watermark": {
         "setting": "Access Watermark",
         "content": "Watermark Content",
@@ -1239,11 +1285,7 @@
         "append_user": "Append User",
         "append_asset": "Append Asset",
         "font_color": "Font Color",
-        "font_size": "Font Size",
-        "size_small": "Small",
-        "size_medium": "Medium",
-        "size_large": "Large",
-        "size_xlarge": "Extra Large"
+        "font_size": "Font Size"
       },
       "basic_info_title": "Basic Info"
     },
@@ -1286,8 +1328,10 @@
       "passkey": {
         "enabled": "Passkey login",
         "domain": "External access domain",
-        "origins": "Allowed origins for passkey",
-        "origins_tip": "Do not end with /"
+        "origins": "Allowed origins for Passkey",
+        "origins_tip": "Do not end with /",
+        "origins_error": "Please enter a valid origin",
+        "auto_detect": "Auto Detect"
       },
       "session_management": "Session Management"
     },
@@ -1303,13 +1347,20 @@
       "private_key_modal_title": "Set SSH Private Key",
       "private_key_modal_tip": "Generate or paste your private key.",
       "port_forwarding": {
-        "enabled": "Enable Tunneling",
-        "host_port": "Allowed tunnel forwarding IP/ports"
+        "enabled": "Allow SSH port forwarding",
+        "host_port": "Allowed forwarding targets",
+        "host_port_tip": "Separate targets with commas, using host:port. Use * as the port to allow any port. VS Code Remote-SSH requires 127.0.0.1:*."
       },
       "usage": "Usage Example",
+      "usage_tip": "The SSH service can open the asset picker or connect directly to a specified asset.",
       "mode_proxy": "Proxy Mode",
+      "mode_proxy_tip": "Log in with the bastion account first, then choose a target asset from the terminal asset list.",
       "direct_proxy": "Direct Mode",
-      "disable_password_auth": "Disable password auth"
+      "direct_proxy_tip": "Specify the target asset during connection and enter it immediately after authentication. asset-name is the asset name; asset-alias is the recommended asset alias.",
+      "direct_proxy_cli": "Command-line clients:",
+      "direct_proxy_vscode": "Recommended for VS Code Remote-SSH ssh config:",
+      "disable_password_auth": "Disable password auth",
+      "private_key_required_to_enable": "Set an auth private key before enabling SSH service."
     },
     "rdp": {
       "setting": "RDP Settings",
@@ -1349,7 +1400,7 @@
       "send": "Send Email"
     },
     "webauthn": {
-      "setting": "WebAuthn"
+      "setting": "Passkey Settings"
     },
     "ldap": {
       "setting": "LDAP Auth",
@@ -1421,6 +1472,8 @@
       "request": "Update License",
       "binding": "Bind License",
       "info": "License Info",
+      "name": "License Name",
+      "user_name": "Licensed User Name",
       "max": {
         "asset_count": "Max Asset Count",
         "database_count": "Max Database Count",
@@ -1492,6 +1545,12 @@
       "audit_rdp_enable": "Enable RDP/VNC Audit Assistant",
       "audit_rdp_prompt": "RDP/VNC Audit Prompt",
       "audit_rdp_prompt_placeholder": "Enter RDP/VNC audit assistant prompt...",
+      "test": "Connection Test",
+      "test_button": "Test Connection",
+      "test_tip": "Sends a short request to the LLM with the current form values (API key / base URL / model) to verify the configuration.",
+      "test_failed": "Test failed",
+      "test_response": "Model response",
+      "test_response_empty": "The model returned no content.",
       "audit_rdp_prompt_default": "You are a professional remote desktop security auditor. The following contains information from an RDP/VNC graphical remote session.\n\nPlease perform a security audit and output a Markdown audit report with the following structure:\n\n## 1. Executive Summary\n- **Overall Risk Level**: Low / Medium / High / Critical\n- **Key Findings**: 2–3 sentence summary\n\n## 2. Behavior Analysis\nAnalyze identifiable behaviors including:\n- Applications used (browsers, editors, terminals, admin tools)\n- File management (copy, move, delete, download)\n- System configuration changes\n- Network access and data transfer\n\n## 3. Security Risk Matrix\n| Risk Level | Behavior | Description |\n|:----------:|:--------|:------------|\n| 🔴 Critical | | |\n| 🟠 High | | |\n| 🟡 Medium | | |\n\n## 4. Compliance Assessment\nIdentify policy violations and provide improvement recommendations.\n\n## 5. Audit Conclusion\nOverall evaluation and remediation recommendations.\n\nNote: If information is insufficient, state so explicitly. Do not speculate."
     },
     "oidc_server": {
@@ -1537,7 +1596,6 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "Host",
-      "username": "Username",
       "database": "Database"
     },
     "work_order": {
@@ -1579,11 +1637,10 @@
       "tip": "Enable proxy to allow client connections and execute SQL.",
       "usage_title": "Usage",
       "usage_client": "Client Connection",
-      "usage_select": "Select Database Asset",
-      "password_label": "Database Password",
       "password_tip_prefix": "Go to ",
       "password_tip_link": "Profile - Access Token",
-      "password_tip_suffix": " to generate a database password."
+      "password_tip_suffix": " to generate a database password.",
+      "external_quick_access_tip": "External Host/Port is only for quick access entry for regular users and does not affect the actual proxy listen address."
     }
   }
 }

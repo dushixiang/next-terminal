@@ -42,6 +42,8 @@ const AccessToken = () => {
                 return t('account.access_token_type_values.session');
             case 'temporary':
                 return t('account.access_token_type_values.temporary');
+            case 'oauth':
+                return t('account.access_token_type_values.oauth');
             default:
                 return type;
         }
@@ -57,6 +59,8 @@ const AccessToken = () => {
                 return 'green';
             case 'temporary':
                 return 'orange';
+            case 'oauth':
+                return 'purple';
             default:
                 return 'default';
         }
@@ -72,6 +76,22 @@ const AccessToken = () => {
             title: t('account.access_token_type'),
             dataIndex: 'type',
             render: (value: string) => <Tag color={tokenTypeColor(value)}>{tokenTypeLabel(value)}</Tag>
+        },
+        {
+            title: t('account.access_token_source'),
+            dataIndex: 'sourceName',
+            render: (_: string, record: AccessTokenItem) => (
+                record.sourceName
+                    ? record.sourceName
+                    : <Typography.Text type="secondary">{t('account.access_token_source_manual')}</Typography.Text>
+            )
+        },
+        {
+            title: t('account.access_token_expires_at'),
+            dataIndex: 'expiresAt',
+            render: (value?: number) => (
+                value ? times.format(value) : <Typography.Text type="secondary">{t('account.access_token_expires_never')}</Typography.Text>
+            )
         },
         {
             title: t('general.created_at'),
@@ -124,7 +144,7 @@ const AccessToken = () => {
                 onOk={() => setCreatedToken(null)}
                 okText={t('actions.confirm')}
             >
-                <Space direction="vertical" size={8}>
+                <Space orientation="vertical" size={8}>
                     <Typography.Text type="secondary">{t('account.access_token_once_tip')}</Typography.Text>
                     <Typography.Text strong copyable>
                         {createdToken?.token}

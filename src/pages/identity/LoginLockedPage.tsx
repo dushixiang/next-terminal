@@ -1,6 +1,6 @@
 import React, {useRef} from 'react';
-import {Popconfirm, Tag} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {Popconfirm, Space, Tag} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import loginLockedApi, {LoginLocked} from "../../api/login-locked-api";
 import {useTranslation} from "react-i18next";
 import NButton from "../../components/NButton";
@@ -9,9 +9,9 @@ import {getSort} from "@/utils/sort";
 const LoginLockedPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
-    const columns: ProColumns<LoginLocked>[] = [
+    const columns: NColumn<LoginLocked>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -36,9 +36,9 @@ const LoginLockedPage = () => {
             render: (text, record) => {
                 switch (record.type) {
                     case 'username':
-                        return <Tag bordered={false} color={'purple'}>{t('identity.user.locked_type_username')}</Tag>;
+                        return <Tag variant="filled" color={'purple'}>{t('identity.user.locked_type_username')}</Tag>;
                     case 'ip':
-                        return <Tag bordered={false} color={'red'}>{t('identity.user.locked_type_ip')}</Tag>;
+                        return <Tag variant="filled" color={'red'}>{t('identity.user.locked_type_ip')}</Tag>;
                 }
             }
         },
@@ -62,24 +62,26 @@ const LoginLockedPage = () => {
             title: t('actions.label'),
             valueType: 'option',
             key: 'option',
-            render: (text, record, _, action) => [
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await loginLockedApi.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>
-            ],
+            render: (text, record) => (
+                <Space>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await loginLockedApi.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {

@@ -40,10 +40,6 @@ Next Terminal 是一个简洁、安全、易用的运维审计系统，支持多
 
 - 本项目 CDN 加速及安全防护由 [Tencent EdgeOne](https://edgeone.ai/zh?from=github) 赞助
 
-- **[SharonNetworks](https://sharon.io/)**
-
-  亚太数据中心提供顶级的中国优化网络接入 · 低延时&高带宽&提供Tbps级本地清洗高防服务, 为您的业务保驾护航, 为您的客户提供极致体验.
-
 - **[莱卡云-专业云计算服务器提供商](https://www.lcayun.com/actcloud.html?from=next-terminal)**
 
     <img src="images/lcayun.png" width="200" height="auto"/>

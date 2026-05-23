@@ -1,8 +1,8 @@
 import React, {useRef} from 'react';
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Popconfirm, Select, Typography} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
+import {App, Popconfirm, Space, Typography} from "antd";
 import sessionApi, {Session} from "@/api/session-api";
 import NButton from "@/components/NButton";
 import clsx from "clsx";
@@ -10,11 +10,11 @@ import {getProtocolColor} from "@/helper/asset-helper";
 
 const OnlineSessionPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     const {message} = App.useApp();
 
-    const columns: ProColumns<Session>[] = [
+    const columns: NColumn<Session>[] = [
         {
             title: t('menus.identity.submenus.user'),
             dataIndex: 'userAccount',
@@ -59,21 +59,6 @@ const OnlineSessionPage = () => {
                         {record.protocol.toUpperCase()}
                     </span>
             },
-            renderFormItem: (item, {type, defaultRender, ...rest}, form) => {
-                if (type === 'form') {
-                    return null;
-                }
-
-                return (
-                    <Select>
-                        <Select.Option value="rdp">RDP</Select.Option>
-                        <Select.Option value="ssh">SSH</Select.Option>
-                        <Select.Option value="telnet">Telnet</Select.Option>
-                        <Select.Option value="vnc">VNC</Select.Option>
-                        <Select.Option value="kubernetes">Kubernetes</Select.Option>
-                    </Select>
-                );
-            },
         },
         {
             title: t('audit.connected_at'),
@@ -91,42 +76,44 @@ const OnlineSessionPage = () => {
             title: t('actions.label'),
             valueType: 'option',
             key: 'option',
-            render: (text, record, _, action) => [
-                <NButton
-                    key='monitor'
-                    onClick={() => {
-                        switch (record.protocol) {
-                            case 'ssh':
-                                window.open(`/terminal-monitor?sessionId=${record.id}`, '_blank')
-                                break;
-                            case 'rdp':
-                            case 'vnc':
-                                window.open(`/graphics-monitor?sessionId=${record.id}`, '_blank')
-                                break;
-                            default:
-                                message.warning(t('audit.unknown_protocol', {protocol: record.protocol}));
-                        }
-                    }}
-                >
-                    {t('gateways.monitor.action')}
-                </NButton>,
-                <Popconfirm
-                    key={'confirm-disconnect'}
-                    title={t('audit.options.disconnect.confirm')}
-                    onConfirm={async () => {
-                        await sessionApi.disconnect(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger>{t('audit.options.disconnect.action')}</NButton>
-                </Popconfirm>,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <NButton
+                        key='monitor'
+                        onClick={() => {
+                            switch (record.protocol) {
+                                case 'ssh':
+                                    window.open(`/terminal-monitor?sessionId=${record.id}`, '_blank')
+                                    break;
+                                case 'rdp':
+                                case 'vnc':
+                                    window.open(`/graphics-monitor?sessionId=${record.id}`, '_blank')
+                                    break;
+                                default:
+                                    message.warning(t('audit.unknown_protocol', {protocol: record.protocol}));
+                            }
+                        }}
+                    >
+                        {t('gateways.monitor.action')}
+                    </NButton>
+                    <Popconfirm
+                        key={'confirm-disconnect'}
+                        title={t('audit.options.disconnect.confirm')}
+                        onConfirm={async () => {
+                            await sessionApi.disconnect(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger>{t('audit.options.disconnect.action')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
-            <ProTable
+            <NTable
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}
@@ -139,10 +126,7 @@ const OnlineSessionPage = () => {
                         sortOrder: sortOrder,
                         sortField: sortField,
                         status: 'connected',
-                        clientIp: params.clientIp,
-                        protocol: params.protocol,
-                        assetName: params.assetName,
-                        userAccount: params.userAccount,
+                        keyword: params.keyword,
                     }
                     let result = await sessionApi.getPaging(queryParams);
                     return {
@@ -152,9 +136,10 @@ const OnlineSessionPage = () => {
                     };
                 }}
                 rowKey="id"
-                search={{
-                    labelWidth: 'auto',
+                options={{
+                    search: true,
                 }}
+                search={false}
                 pagination={{
                     defaultPageSize: 10,
                     showSizeChanger: true

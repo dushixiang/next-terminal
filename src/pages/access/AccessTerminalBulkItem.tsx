@@ -7,12 +7,13 @@ import {useAccessContentSize} from "@/pages/access/hooks/use-access-size";
 import {useInterval, useWindowSize} from "react-use";
 import {Message, MessageTypeData, MessageTypeKeepAlive, MessageTypeResize} from "@/pages/access/Terminal";
 import portalApi, {ExportSession} from "@/api/portal-api";
-import {baseWebSocketUrl, getToken} from "@/api/core/requests";
+import {baseWebSocketUrl} from "@/api/core/requests";
 import qs from "qs";
 import eventEmitter from "@/api/core/event-emitter";
 import {clsx} from "clsx";
 import {Popconfirm} from "antd";
 import {XIcon} from "lucide-react";
+import {useTranslation} from "react-i18next";
 
 interface Props {
     assetId: string;
@@ -22,6 +23,7 @@ interface Props {
 }
 
 const AccessTerminalBulkItem = React.memo(({assetId, securityToken, tabId, onClose}: Props) => {
+    let {t} = useTranslation();
 
     const terminalRef = React.useRef<HTMLDivElement>(null);
     const terminal = useRef<Terminal>(null);
@@ -143,11 +145,9 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, tabId, onClo
 
         let cols = terminal.current?.cols;
         let rows = terminal.current?.rows;
-        let authToken = getToken();
         let params = {
             'cols': cols,
             'rows': rows,
-            'X-Auth-Token': authToken,
             'sessionId': session.id,
         };
 
@@ -227,17 +227,17 @@ const AccessTerminalBulkItem = React.memo(({assetId, securityToken, tabId, onClo
             <div
                 className={'flex items-center justify-between px-3 py-2 border-b border-gray-700 bg-gray-800/50 rounded-t-lg'}>
                 <div className={'font-medium text-sm truncate flex-1 text-gray-200'}>
-                    {session?.assetName || '连接中...'}
+                    {session?.assetName || t('access.terminal.connecting')}
                 </div>
                 <Popconfirm
-                    title="关闭终端"
-                    description="确定要关闭此终端吗？"
+                    title={t('access.terminal.close_title')}
+                    description={t('access.terminal.close_confirm')}
                     onConfirm={() => {
                         websocket?.close();
                         onClose?.();
                     }}
-                    okText="确定"
-                    cancelText="取消"
+                    okText={t('actions.confirm')}
+                    cancelText={t('actions.cancel')}
                 >
                     <XIcon
                         className={'h-4 w-4 cursor-pointer text-gray-400 hover:text-red-400 transition-colors flex-shrink-0 ml-2'}/>

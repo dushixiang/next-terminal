@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Button, Drawer, Space, Tooltip, Typography} from "antd";
 import {DownloadOutlined, PauseOutlined, PlayCircleOutlined} from "@ant-design/icons";
-import {baseUrl, getToken} from "@/api/core/requests";
+import {baseUrl} from "@/api/core/requests";
 import {useTranslation} from "react-i18next";
 
 const {Text} = Typography;
@@ -121,7 +121,7 @@ const CertificateIssuedLog = ({open, onClose}: Props) => {
         if (!open) {
             return;
         }
-        const eventSource = new EventSource(`${baseUrl()}/admin/certificates/issued/log?X-Auth-Token=${getToken()}`);
+        const eventSource = new EventSource(`${baseUrl()}/admin/certificates/issued/log`);
 
         eventSource.onmessage = (event) => {
             if (!isPaused) {
@@ -210,7 +210,7 @@ const CertificateIssuedLog = ({open, onClose}: Props) => {
             }
             onClose={onClose}
             open={open}
-            width={window.innerWidth * 0.85}
+            size={window.innerWidth * 0.85}
             styles={{
                 body: { padding: 0 }
             }}

@@ -1,15 +1,15 @@
+import {useFormRequest} from "@/hook/use-antd-form-query";
 import React, {useRef} from 'react';
-import {Modal} from "antd";
+import {Form, FormInstance, Input, Modal} from "antd";
 import {useTranslation} from "react-i18next";
-import {ProForm, ProFormInstance, ProFormText} from "@ant-design/pro-components";
 import {WebauthnCredential} from "@/api/account-api";
 
 export interface Props {
-    open: boolean
-    handleOk: (values: any) => void
-    handleCancel: () => void
-    confirmLoading: boolean
-    credential: WebauthnCredential
+    open: boolean;
+    handleOk: (values: any) => void;
+    handleCancel: () => void;
+    confirmLoading: boolean;
+    credential?: WebauthnCredential;
 }
 
 const PasskeyModal = ({
@@ -17,40 +17,35 @@ const PasskeyModal = ({
                           handleOk,
                           handleCancel,
                           confirmLoading,
-                          credential,
+                          credential
                       }: Props) => {
-
     let {t} = useTranslation();
-    const formRef = useRef<ProFormInstance>(null);
+    const formRef = useRef<FormInstance>(null);
     const get = async () => {
-        return credential;
-    }
+        return credential ?? {};
+    };
+    useFormRequest(formRef, ["form-request", "web/src/pages/account/PasskeyModal.tsx", open, credential?.id], get, open);
+    return <Modal title={''}
+                  open={open} mask={{closable: false}}
+                  destroyOnHidden={true}
+                  onOk={() => {
+                      formRef.current?.validateFields().then(async values => {
+                          handleOk(values);
+                      });
+                  }}
+                  onCancel={() => {
+                      handleCancel();
+                  }}
+                  confirmLoading={confirmLoading}>
 
-    return (
-        <Modal
-            title={''}
-            open={open}
-            maskClosable={false}
-            destroyOnHidden={true}
-            onOk={() => {
-                formRef.current?.validateFields()
-                    .then(async values => {
-                        handleOk(values);
-                        
-                    });
-            }}
-            onCancel={() => {
-                
-                handleCancel();
-            }}
-            confirmLoading={confirmLoading}
-        >
-            <ProForm formRef={formRef} request={get} submitter={false}>
-                <ProFormText hidden={true} name={'id'}/>
-                <ProFormText name={'name'} label={t('general.name')} rules={[{required: true}]}/>
-            </ProForm>
-        </Modal>
-    );
+        <Form ref={formRef} layout="vertical">
+            <Form.Item hidden={true} name={'id'}>
+                <Input/>
+            </Form.Item>
+            <Form.Item name={'name'} label={t('general.name')} required={true}>
+                <Input/>
+            </Form.Item>
+        </Form>
+    </Modal>;
 };
-
 export default PasskeyModal;

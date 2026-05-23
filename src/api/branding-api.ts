@@ -1,6 +1,4 @@
 import requests, {baseUrl} from "./core/requests";
-import {global} from "@/utils/global";
-import strings from "@/utils/strings";
 
 export interface Branding {
     copyright: string;

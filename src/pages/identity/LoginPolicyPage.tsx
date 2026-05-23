@@ -1,6 +1,11 @@
 import React, {useRef} from 'react';
-import {Button, Popconfirm, Tag} from "antd";
-import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
+import {
+    Button,
+    Dropdown,
+    Popconfirm,
+    Space,
+    Tag} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {Link, useNavigate} from "react-router-dom";
 import {SafetyCertificateOutlined, StopOutlined} from "@ant-design/icons";
 import loginPolicyApi, {LoginPolicy} from "../../api/login-policy-api";
@@ -16,12 +21,12 @@ const api = loginPolicyApi;
 const LoginPolicyPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let navigate = useNavigate();
     let { license } = useLicense();
 
-    const columns: ProColumns<LoginPolicy>[] = [
+    const columns: NColumn<LoginPolicy>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -56,11 +61,11 @@ const LoginPolicyPage = () => {
             hideInSearch: true,
             render: (text => {
                 if (text === 'allow') {
-                    return <Tag icon={<SafetyCertificateOutlined/>} color="success" bordered={false}>
+                    return <Tag icon={<SafetyCertificateOutlined/>} color="success" variant="filled">
                         {t('identity.policy.action.allow')}
                     </Tag>;
                 } else {
-                    return <Tag icon={<StopOutlined/>} color="error" bordered={false}>
+                    return <Tag icon={<StopOutlined/>} color="error" variant="filled">
                         {t('identity.policy.action.reject')}
                     </Tag>;
                 }
@@ -90,49 +95,55 @@ const LoginPolicyPage = () => {
             valueType: 'option',
             key: 'option',
             width: 160,
-            render: (text, record, _, action) => [
-                <Link to={`/login-policy/new?loginPolicyId=${record.id}`}>
-                    <NButton key="edit">
-                        {t('actions.edit')}
-                    </NButton>
-                </Link>
-                ,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>
-                ,
-                <TableDropdown
-                    key="actionGroup"
-                    onSelect={(key) => {
-                        switch (key) {
-                            case 'login-policy-detail':
-                                navigate(`/login-policy/${record['id']}?activeKey=info`);
-                                break;
-                            case 'login-policy-bind-user':
-                                navigate(`/login-policy/${record['id']}?activeKey=bind-user`);
-                                break;
-                        }
-                    }}
-                    menus={[
-                        {key: 'login-policy-detail', name: t('actions.detail')},
-                        {key: 'login-policy-bind-user', name: t('actions.binding')},
-                    ]}
-                />,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <Link to={`/login-policy/new?loginPolicyId=${record.id}`}>
+                        <NButton key="edit">
+                            {t('actions.edit')}
+                        </NButton>
+                    </Link>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                    <Dropdown
+                        key="actionGroup"
+                        menu={{
+                            items: [
+                                {key: 'login-policy-detail', label: t('actions.detail')},
+                                {key: 'login-policy-bind-user', label: t('actions.binding')},
+                            ],
+                            onClick: ({key}) => {
+                                switch (key) {
+                                    case 'login-policy-detail':
+                                        navigate(`/login-policy/${record['id']}?activeKey=info`);
+                                        break;
+                                    case 'login-policy-bind-user':
+                                        navigate(`/login-policy/${record['id']}?activeKey=bind-user`);
+                                        break;
+                                }
+                            }
+                        }}
+                    >
+                        <Button type="link" size="small" style={{padding: 0}}>
+                            {t('actions.more')}
+                        </Button>
+                    </Dropdown>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
             <Disabled disabled={license.isFree()}>
-                <ProTable
+                <NTable
                     columns={columns}
                     actionRef={actionRef}
                     request={async (params = {}, sort, filter) => {

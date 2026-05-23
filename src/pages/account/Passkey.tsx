@@ -52,11 +52,15 @@ const Passkey = () => {
 
     let mutation = useMutation({
         mutationFn: async (values: any) => {
+            if (!selected?.id) {
+                return;
+            }
             await accountApi.updateWebauthnCredentials(selected.id, values);
         },
         onSuccess: () => {
             webauthnCredentialsQuery.refetch();
             setOpen(false);
+            setSelected(undefined);
         }
     });
 
@@ -116,7 +120,7 @@ const Passkey = () => {
                 <List
                     itemLayout="horizontal"
                     dataSource={webauthnCredentialsQuery.data}
-                    renderItem={(item, index) => (
+                    renderItem={(item) => (
                         <div className={'border rounded-md p-4 flex items-center justify-between mb-2'}>
                             <div className={'space-y-2'}>
                                 <div className={'flex items-center gap-4'}>
@@ -126,7 +130,8 @@ const Passkey = () => {
 
                                 <div
                                     className={'ml-8'}>{t('account.passkey_add_time')}：{dayjs(item.createdAt).format('YYYY-MM-DD HH:mm:ss')}</div>
-                                <div className={'ml-8'}>{t('account.passkey_used_time')}：{renderUsedTime(item.usedAt)}</div>
+                                <div
+                                    className={'ml-8'}>{t('account.passkey_used_time')}：{renderUsedTime(item.usedAt)}</div>
                             </div>
 
                             <div className={'flex items-center cursor-pointer gap-4'}>
@@ -158,8 +163,9 @@ const Passkey = () => {
                 handleOk={mutation.mutate}
                 handleCancel={() => {
                     setOpen(false);
+                    setSelected(undefined);
                 }}
-                confirmLoading={false}
+                confirmLoading={mutation.isPending}
                 credential={selected}
             />
 

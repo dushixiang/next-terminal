@@ -7,6 +7,10 @@
     margin: 0 !important;
     border: none !important;
     background-color: transparent !important;
+    width: 160px;
+    min-width: 160px;
+    max-width: 160px;
+    box-sizing: border-box;
     /*padding-left: 4px !important;*/
     /*padding-right: 8px !important;*/
     border-bottom: 2px solid transparent !important;
@@ -25,4 +29,19 @@
 
 .access-container .ant-tabs-nav-list .ant-tabs-tab-btn{
     color: #6B7280 !important;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+.access-container .ant-tabs-nav-list .ant-tabs-tab-remove {
+    flex-shrink: 0;
+}
+
+.access-container .access-tab-label {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }

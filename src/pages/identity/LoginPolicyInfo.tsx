@@ -1,22 +1,23 @@
 import React from 'react';
-import {ProDescriptions} from "@ant-design/pro-components";
-import loginPolicyApi, {LoginPolicy} from "../../api/login-policy-api";
+import loginPolicyApi from "../../api/login-policy-api";
 import strings from "../../utils/strings";
-import {TimePeriod, WeekMapping} from "../../components/drag-weektime/DragWeekTime";
+import {WeekMapping} from "../../components/drag-weektime/DragWeekTime";
 import {useTranslation} from "react-i18next";
-import {Tag} from "antd";
+import {Descriptions, Spin, Tag} from "antd";
 import {SafetyCertificateOutlined, StopOutlined} from "@ant-design/icons";
+import {useQuery} from "@tanstack/react-query";
+import times from "@/components/time/times";
 
 const LoginPolicyInfo = ({id}: any) => {
 
     let {t} = useTranslation();
-    const get = async () => {
-        let data = await loginPolicyApi.getById(id);
-        return {
-            success: true,
-            data: data
-        }
-    }
+    const loginPolicyQuery = useQuery({
+        queryKey: ['login-policy', id],
+        queryFn: () => loginPolicyApi.getById(id),
+        enabled: !!id,
+    });
+
+    const loginPolicy = loginPolicyQuery.data;
 
     const weekMapping: WeekMapping = {
         0: t('dw.week.days.sunday'),
@@ -30,46 +31,44 @@ const LoginPolicyInfo = ({id}: any) => {
 
     return (
         <div className={'page-detail-info'}>
-            <ProDescriptions<LoginPolicy> column={1} request={get}>
-                <ProDescriptions.Item label={t('general.name')} dataIndex="name"/>
-                <ProDescriptions.Item label={t('identity.policy.priority')} dataIndex="priority"/>
-                <ProDescriptions.Item label={t('identity.policy.ip_group')} dataIndex="ipGroup"/>
-                <ProDescriptions.Item
-                    label={t('identity.policy.time_period')} dataIndex="timePeriod"
-                    render={(timePeriod, entity) => {
-                        if (!timePeriod) {
-                            return;
-                        }
-                        const items = timePeriod as TimePeriod[];
-                        return items.map(t => {
-                            if (!strings.hasText(t.value)) {
-                                return;
-                            }
-                            return <>{`${weekMapping[t.key]} ：${t.value}`}<br/></>;
-                        })
-                    }}>
-                </ProDescriptions.Item>
-                <ProDescriptions.Item
-                    label={t('identity.policy.action.label')} dataIndex="rule"
-                    render={(text) => {
-                        if (text === 'allow') {
-                            return <Tag icon={<SafetyCertificateOutlined/>} color="success" bordered={false}>
+            <Spin spinning={loginPolicyQuery.isLoading}>
+                <Descriptions column={1}>
+                    <Descriptions.Item label={t('general.name')}>{loginPolicy?.name}</Descriptions.Item>
+                    <Descriptions.Item label={t('identity.policy.priority')}>{loginPolicy?.priority}</Descriptions.Item>
+                    <Descriptions.Item label={t('identity.policy.ip_group')}>{loginPolicy?.ipGroup}</Descriptions.Item>
+                    <Descriptions.Item label={t('identity.policy.time_period')}>
+                        {loginPolicy?.timePeriod
+                            ?.map(t => {
+                                if (!strings.hasText(t.value)) {
+                                    return;
+                                }
+                                return <React.Fragment key={t.key}>{`${weekMapping[t.key]} ：${t.value}`}<br/></React.Fragment>;
+                            })
+                            .filter(Boolean) || '-'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label={t('identity.policy.action.label')}>
+                        {loginPolicy?.rule === 'allow' ? (
+                            <Tag icon={<SafetyCertificateOutlined/>} color="success" variant="filled">
                                 {t('identity.policy.action.allow')}
-                            </Tag>;
-                        } else {
-                            return <Tag icon={<StopOutlined/>} color="error" bordered={false}>
+                            </Tag>
+                        ) : (
+                            <Tag icon={<StopOutlined/>} color="error" variant="filled">
                                 {t('identity.policy.action.reject')}
-                            </Tag>;
-                        }
-                    }}/>
-                <ProDescriptions.Item label={t('general.status')} dataIndex="enabled"
-                                      valueEnum={{
-                                          true: {text: t('general.enabled'), status: 'success'},
-                                          false: {text: t('general.disabled'), status: 'default'},
-                                      }}
-                />
-                <ProDescriptions.Item label={t('general.created_at')} dataIndex="createdAt" valueType='dateTime'/>
-            </ProDescriptions>
+                            </Tag>
+                        )}
+                    </Descriptions.Item>
+                    <Descriptions.Item label={t('general.status')}>
+                        {loginPolicy?.enabled ? (
+                            <Tag color="success">{t('general.enabled')}</Tag>
+                        ) : (
+                            <Tag>{t('general.disabled')}</Tag>
+                        )}
+                    </Descriptions.Item>
+                    <Descriptions.Item label={t('general.created_at')}>
+                        {loginPolicy?.createdAt ? times.format(loginPolicy.createdAt) : '-'}
+                    </Descriptions.Item>
+                </Descriptions>
+            </Spin>
         </div>
     );
 };

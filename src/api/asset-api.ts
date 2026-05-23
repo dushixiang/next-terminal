@@ -112,6 +112,22 @@ class AssetApi extends Api<Asset> {
     updateSortPosition = async (req: SortPositionRequest) => {
         return await requests.post(`/${this.group}/sort`, req);
     }
+
+    updateBasic = async (id: string, data: Partial<Asset>) => {
+        return await requests.patch(`/${this.group}/${id}/basic`, data);
+    }
+
+    updateAdvanced = async (id: string, data: { attrs?: any }) => {
+        return await requests.patch(`/${this.group}/${id}/advanced`, data);
+    }
+
+    detectOS = async (id: string) => {
+        return await requests.post(`/${this.group}/${id}/detect-os`);
+    }
+
+    wol = async (id: string) => {
+        return await requests.post(`/${this.group}/${id}/wol`);
+    }
 }
 
 const assetApi = new AssetApi();

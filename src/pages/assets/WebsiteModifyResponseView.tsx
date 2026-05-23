@@ -229,7 +229,7 @@ const WebsiteModifyResponseView = () => {
 
                                     <Col span={12}>
                                         <Card title={t('assets.website_response_modify.actions_title')} size="small">
-                                            <Divider orientation="left" style={{margin: '12px 0'}}>
+                                            <Divider titlePlacement="left" style={{margin: '12px 0'}}>
                                                 <Text strong>{t('assets.website_response_modify.header_operations')}</Text>
                                             </Divider>
 
@@ -303,7 +303,7 @@ const WebsiteModifyResponseView = () => {
                                                 )}
                                             </Form.List>
 
-                                            <Divider orientation="left" style={{margin: '12px 0'}}>
+                                            <Divider titlePlacement="left" style={{margin: '12px 0'}}>
                                                 <Text strong>{t('assets.website_response_modify.body_replace_title')}</Text>
                                             </Divider>
 

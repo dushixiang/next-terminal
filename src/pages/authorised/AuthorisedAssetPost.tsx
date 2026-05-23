@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ProForm, ProFormInstance, ProFormSelect, ProFormTreeSelect} from "@ant-design/pro-components";
+import QuerySelect from "@/components/QuerySelect";
+import React, {useEffect, useRef, useState} from "react";
 import commandFilterApi from "@/api/command-filter-api";
 import strategyApi from "@/api/strategy-api";
-import {Checkbox, DatePicker, Form, message, Space} from "antd";
+import {Button, Checkbox, DatePicker, Form, FormInstance, message, Space} from "antd";
 import dayjs from "dayjs";
 import {useTranslation} from "react-i18next";
 import userApi from "@/api/user-api";
@@ -11,13 +11,14 @@ import {RangePickerProps} from "antd/es/date-picker";
 import assetApi from "@/api/asset-api";
 import authorisedAssetApi from "@/api/authorised-asset-api";
 import {useNavigate} from "react-router-dom";
+import ProFormTreeSelect from "@/components/ProFormTreeSelect";
 
 const AuthorisedAssetPost = () => {
-    const formRef = useRef<ProFormInstance>(null);
-    let {t} = useTranslation();
+    const formRef = useRef<FormInstance>(null);
+    const {t} = useTranslation();
     const [expiredAtDayjs, setExpiredAtDayjs] = useState<dayjs.Dayjs>();
     const [expiredAtNoLimit, setExpiredAtNoLimit] = useState<boolean>(true);
-    let navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!open) {
@@ -26,73 +27,87 @@ const AuthorisedAssetPost = () => {
         }
     }, [open]);
 
-    const handleNoTimeLimit = (e) => {
+    const handleNoTimeLimit = e => {
         setExpiredAtNoLimit(e.target.checked);
         if (e.target.checked === true) {
             setExpiredAtDayjs(dayjs(0));
         } else {
             setExpiredAtDayjs(dayjs());
         }
-    }
+    };
 
     const handleTimeLimitChange = (date, dateString) => {
         console.log(date, dateString);
         setExpiredAtDayjs(date);
-    }
+    };
 
-    const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    const disabledDate: RangePickerProps["disabledDate"] = current => {
         // Can not select days before today and today
-        return current && current < dayjs().endOf('day');
+        return current && current < dayjs().endOf("day");
     };
 
     return (
-        <div className={'px-4'}>
-            <div className={'mb-4 font-bold text-lg'}>{t('menus.authorised.submenus.authorised_asset')}</div>
-            <ProForm formRef={formRef} onFinish={async (values) => {
-                if (expiredAtDayjs) {
-                    values['expiredAt'] = expiredAtDayjs.valueOf();
-                } else {
-                    values['expiredAt'] = 0;
-                }
-                await authorisedAssetApi.post(values);
-                message.success(t('general.success'));
-                formRef.current?.resetFields();
-                navigate('/authorised-asset')
-            }}>
-                <ProFormSelect
-                    label={t('menus.identity.submenus.user')} name='userIds'
-                    fieldProps={{mode: 'multiple', showSearch: true}}
-                    request={async () => {
-                        let items = await userApi.getAll();
-                        return items.map(item => {
-                            return {
-                                label: item.nickname,
-                                value: item.id,
-                            }
-                        });
-                    }}
-                />
+        <div>
+            <div className="mb-4 font-bold text-lg">
+                {t("menus.authorised.submenus.authorised_asset")}
+            </div>
+            <Form
+                ref={formRef}
+                layout="vertical"
+                onFinish={async values => {
+                    if (expiredAtDayjs) {
+                        values["expiredAt"] = expiredAtDayjs.valueOf();
+                    } else {
+                        values["expiredAt"] = 0;
+                    }
+                    await authorisedAssetApi.post(values);
+                    message.success(t("general.success"));
+                    formRef.current?.resetFields();
+                    navigate("/authorised-asset");
+                }}
+            >
+                <Form.Item label={t("menus.identity.submenus.user")} name="userIds">
+                    <QuerySelect
+                        mode="multiple"
+                        showSearch={true}
+                        request={async () => {
+                            const items = await userApi.getAll();
+                            return items.map(item => {
+                                return {
+                                    label: item.nickname,
+                                    value: item.id
+                                };
+                            });
+                        }}
+                    />
+                </Form.Item>
+
                 <ProFormTreeSelect
-                    label={t('menus.identity.submenus.department')} name='departmentIds'
-                    fieldProps={{showSearch: true, multiple: true, treeDefaultExpandAll: true}}
+                    label={t("menus.identity.submenus.department")}
+                    name="departmentIds"
+                    fieldProps={{
+                        showSearch: true,
+                        multiple: true,
+                        treeDefaultExpandAll: true
+                    }}
                     request={async () => {
-                        let items = await departmentApi.getTree();
+                        const items = await departmentApi.getTree();
                         // let selected = await authorisedAssetApi.selected('departmentId', '', '', assetId);
                         return items;
                     }}
                 />
 
                 <ProFormTreeSelect
-                    label={t('authorised.label.asset_group')}
-                    name='assetGroupIds'
+                    label={t("authorised.label.asset_group")}
+                    name="assetGroupIds"
                     fieldProps={{
                         multiple: true,
                         showSearch: true,
                         treeDefaultExpandAll: true,
-                        treeNodeFilterProp: "title",
+                        treeNodeFilterProp: "title"
                     }}
                     request={async () => {
-                        let items = await assetApi.getGroups();
+                        const items = await assetApi.getGroups();
                         // let selected = await authorisedAssetApi.selected('assetId', userId, userGroupId, '');
                         // 递归把 key 字段设置为 value，并且非叶子节点全部 disabled
                         function setKeyAndDisabled(item: any) {
@@ -117,16 +132,16 @@ const AuthorisedAssetPost = () => {
                 />
 
                 <ProFormTreeSelect
-                    label={t('menus.resource.submenus.asset')}
-                    name='assetIds'
+                    label={t("menus.resource.submenus.asset")}
+                    name="assetIds"
                     fieldProps={{
                         multiple: true,
                         showSearch: true,
                         treeDefaultExpandAll: true,
-                        treeNodeFilterProp: "title",
+                        treeNodeFilterProp: "title"
                     }}
                     request={async () => {
-                        let items = await assetApi.tree();
+                        const items = await assetApi.tree();
                         // let selected = await authorisedAssetApi.selected('assetId', userId, userGroupId, '');
 
                         // 递归把 key 字段设置为 value，并且非叶子节点全部 disabled
@@ -139,7 +154,7 @@ const AuthorisedAssetPost = () => {
                                     item.children.forEach(setKeyAndDisabled);
                                 }
                             } else {
-                                item.title = item.title + ' (' + item.extra?.network + ')';
+                                item.title = item.title + " (" + item.extra?.network + ")";
                             }
                             // if (selected.includes(item.key)) {
                             //     item.disabled = true;
@@ -154,52 +169,63 @@ const AuthorisedAssetPost = () => {
                     }}
                 />
 
-                <ProFormSelect
-                    label={t('menus.authorised.submenus.command_filter')} name='commandFilterId'
-                    fieldProps={{showSearch: true}}
-                    request={async () => {
-                        let items = await commandFilterApi.getAll();
-                        return items.map(item => {
-                            return {
-                                label: item.name,
-                                value: item.id,
-                            }
-                        });
-                    }}
-                />
+                <Form.Item label={t("menus.authorised.submenus.command_filter")} name="commandFilterId">
+                    <QuerySelect
+                        showSearch={true}
+                        request={async () => {
+                            const items = await commandFilterApi.getAll();
+                            return items.map(item => {
+                                return {
+                                    label: item.name,
+                                    value: item.id
+                                };
+                            });
+                        }}
+                    />
+                </Form.Item>
 
-                <ProFormSelect
-                    label={t('authorised.label.strategy')} name='strategyId'
-                    fieldProps={{showSearch: true}}
-                    request={async () => {
-                        let items = await strategyApi.getAll();
-                        return items.map(item => {
-                            return {
-                                label: item.name,
-                                value: item.id,
-                            }
-                        });
-                    }}
-                />
+                <Form.Item label={t("authorised.label.strategy")} name="strategyId">
+                    <QuerySelect
+                        showSearch={true}
+                        request={async () => {
+                            const items = await strategyApi.getAll();
+                            return items.map(item => {
+                                return {
+                                    label: item.name,
+                                    value: item.id
+                                };
+                            });
+                        }}
+                    />
+                </Form.Item>
 
-                <Form.Item label={t('assets.limit_time')} name="expiredAt">
+                <Form.Item label={t("assets.limit_time")} name="expiredAt">
                     <Space>
-                        <Checkbox onChange={handleNoTimeLimit}
-                                  checked={expiredAtNoLimit}>
-                            {t('authorised.label.never_expired')}
+                        <Checkbox onChange={handleNoTimeLimit} checked={expiredAtNoLimit}>
+                            {t("authorised.label.never_expired")}
                         </Checkbox>
-                        {!expiredAtNoLimit &&
-                            <DatePicker onChange={handleTimeLimitChange}
-                                        value={expiredAtDayjs}
-                                        format="YYYY-MM-DD HH:mm:ss"
-                                        disabledDate={disabledDate}
-                                // disabledTime={disabledDateTime}
-                                        showTime={{defaultValue: dayjs('00:00:00', 'HH:mm:ss')}}
+                        {!expiredAtNoLimit && (
+                            <DatePicker
+                                onChange={handleTimeLimitChange}
+                                value={expiredAtDayjs}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                disabledDate={disabledDate}
+                                showTime={{
+                                    defaultValue: dayjs("00:00:00", "HH:mm:ss")
+                                }}
                             />
-                        }
+                        )}
                     </Space>
                 </Form.Item>
-            </ProForm>
+
+                <Form.Item>
+                    <Space>
+                        <Button type="primary" htmlType="submit">
+                            {t("actions.save")}
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </Form>
         </div>
     );
 };

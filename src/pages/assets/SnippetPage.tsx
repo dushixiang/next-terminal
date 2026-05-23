@@ -1,23 +1,53 @@
-import React, {useRef, useState} from 'react';
-import {App, Button, Popconfirm, Tag} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import React, {useState} from 'react';
+import {
+    App,
+    Button,
+    Input,
+    Popconfirm,
+    Space,
+    Table,
+    type TableProps,
+    Tag,
+    Typography} from "antd";
 import snippetApi, {Snippet} from "../../api/snippet-api";
 import SnippetModal from "./SnippetModal";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 import NButton from "@/components/NButton";
+import dayjs from "dayjs";
 
 const api = snippetApi;
 
 const SnippetPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
+    let [pagination, setPagination] = useState({current: 1, pageSize: 10});
+    let [sort, setSort] = useState<Record<string, string | null>>({});
+    let [keyword, setKeyword] = useState('');
 
     const {message} = App.useApp();
+
+    const snippetPagingQuery = useQuery({
+        queryKey: ['snippets', pagination.current, pagination.pageSize, sort, keyword],
+        queryFn: async () => {
+            let [sortOrder, sortField] = getSort(sort);
+            return api.getPaging({
+                pageIndex: pagination.current,
+                pageSize: pagination.pageSize,
+                sortOrder: sortOrder,
+                sortField: sortField,
+                keyword: keyword || undefined,
+            });
+        },
+        refetchOnWindowFocus: false,
+    });
+
+    const reloadTable = () => {
+        snippetPagingQuery.refetch();
+    };
 
     const postOrUpdate = async (values: any) => {
         if (values['id']) {
@@ -30,7 +60,7 @@ const SnippetPage = () => {
     let mutation = useMutation({
         mutationFn: postOrUpdate,
         onSuccess: () => {
-            actionRef.current?.reload();
+            reloadTable();
             setOpen(false);
             setSelectedRowKey(undefined);
             showSuccess();
@@ -44,16 +74,30 @@ const SnippetPage = () => {
         });
     }
 
-    const columns: ProColumns<Snippet>[] = [
+    const handleTableChange: TableProps<Snippet>['onChange'] = (nextPagination, filters, sorter) => {
+        const activeSorter = Array.isArray(sorter) ? sorter.find((item) => item.order) : sorter;
+        const field = activeSorter?.field;
+        const fieldName = Array.isArray(field) ? field.join('.') : field ? String(field) : '';
+        setSort(activeSorter?.order && fieldName ? {[fieldName]: activeSorter.order} : {});
+        setPagination((prev) => ({
+            ...prev,
+            current: nextPagination.current || 1,
+            pageSize: nextPagination.pageSize || prev.pageSize,
+        }));
+    };
+
+    const columns: TableProps<Snippet>['columns'] = [
         {
-            dataIndex: 'index',
-            valueType: 'indexBorder',
+            title: '#',
+            key: 'index',
             width: 48,
+            render: (_value, _record, index) => {
+                return ((pagination.current - 1) * pagination.pageSize) + index + 1;
+            },
         },
         {
             title: t('general.name'),
             dataIndex: 'name',
-            hideInSearch: true,
             width: 200,
             ellipsis: true,
         },
@@ -61,16 +105,18 @@ const SnippetPage = () => {
             title: t('assets.content'),
             dataIndex: 'content',
             key: 'content',
-            hideInSearch: true,
-            copyable: true,
-            ellipsis: true
+            ellipsis: true,
+            render: (value: string) => (
+                <Typography.Text copyable={{text: value}} ellipsis>
+                    {value}
+                </Typography.Text>
+            ),
         },
         {
             title: t('assets.snippet.visibility'),
             dataIndex: 'visibility',
             key: 'visibility',
             width: 100,
-            hideInSearch: true,
             render: (_, record) => {
                 return record.visibility === 'public'
                     ? <Tag color="green">{t('assets.snippet.visibility_public')}</Tag>
@@ -81,7 +127,6 @@ const SnippetPage = () => {
             title: t('general.creator'),
             key: 'creator',
             dataIndex: 'creator',
-            hideInSearch: true,
             width: 200,
             ellipsis: true,
         },
@@ -89,79 +134,77 @@ const SnippetPage = () => {
             title: t('general.created_at'),
             key: 'createdAt',
             dataIndex: 'createdAt',
-            hideInSearch: true,
-            valueType: 'dateTime',
+            sorter: true,
             width: 191,
+            render: (value: number) => value ? dayjs(value).format('YYYY-MM-DD HH:mm:ss') : '-',
         },
         {
             title: t('actions.label'),
-            valueType: 'option',
             key: 'option',
             width: 100,
-            render: (text, record, _, action) => [
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record['id']);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>,
-            ],
+            render: (_text, record) => (
+                <Space size={8}>
+                    <NButton
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record['id']);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            reloadTable();
+                        }}
+                    >
+                        <NButton danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (<div>
-        <ProTable
-            columns={columns}
-            actionRef={actionRef}
-            request={async (params = {}, sort, filter) => {
-                let [sortOrder, sortField] = getSort(sort);
-
-                let queryParams = {
-                    pageIndex: params.current,
-                    pageSize: params.pageSize,
-                    sortOrder: sortOrder,
-                    sortField: sortField,
-                    keyword: params.keyword,
-                }
-                let result = await api.getPaging(queryParams);
-                return {
-                    data: result['items'],
-                    success: true,
-                    total: result['total']
-                };
-            }}
-            rowKey="id"
-            options={{
-                search: true,
-            }}
-            search={false}
-            pagination={{
-                defaultPageSize: 10,
-                showSizeChanger: true
-            }}
-            dateFormatter="string"
-            headerTitle={t('menus.resource.submenus.snippet')}
-            toolBarRender={() => [
-                <Button key="snippet-add" type="primary" onClick={() => {
-                    setOpen(true)
-                }}>
-                    {t('actions.new')}
-                </Button>
-            ]}
-        />
+        <div className="overflow-hidden rounded-md bg-white dark:bg-[#141414]">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-100 pb-3 dark:border-gray-800">
+                <div className="font-medium">{t('menus.resource.submenus.snippet')}</div>
+                <Space wrap>
+                    <Input.Search
+                        allowClear
+                        placeholder={t('general.search_placeholder')}
+                        onSearch={(value) => {
+                            setKeyword(value.trim());
+                            setPagination((prev) => ({...prev, current: 1}));
+                        }}
+                        style={{width: 240}}
+                    />
+                    <Button loading={snippetPagingQuery.isFetching} onClick={reloadTable}>
+                        {t('actions.refresh')}
+                    </Button>
+                    <Button type="primary" onClick={() => {
+                        setOpen(true)
+                    }}>
+                        {t('actions.new')}
+                    </Button>
+                </Space>
+            </div>
+            <Table<Snippet>
+                columns={columns}
+                dataSource={snippetPagingQuery.data?.items || []}
+                loading={snippetPagingQuery.isFetching}
+                rowKey="id"
+                pagination={{
+                    current: pagination.current,
+                    pageSize: pagination.pageSize,
+                    total: snippetPagingQuery.data?.total || 0,
+                    showSizeChanger: true
+                }}
+                onChange={handleTableChange}
+                size="small"
+            />
+        </div>
 
         <SnippetModal
             id={selectedRowKey}

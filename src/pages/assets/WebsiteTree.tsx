@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
+import {Button, Dropdown, MenuProps, Tooltip, Tree, TreeDataNode, TreeProps} from "antd";
 import WebsiteTreeModal from "@/pages/assets/WebsiteTreeModal";
 import {generateRandomId} from "@/utils/utils";
 import {useQuery} from "@tanstack/react-query";
@@ -221,25 +221,27 @@ const WebsiteTree = ({selected, onSelect}: Props) => {
     return (
         <div>
             <div className={'px-4 pt-4 flex items-center justify-between'}>
-                <div className={'font-medium text-[15px] flex items-center gap-2'}>
-                    <Tooltip title={t('actions.new')}>
-                        <PackagePlusIcon className={'h-4 w-4 cursor-pointer'}
-                                         onClick={() => {
-                                             setSelectedRowKey(undefined);
-                                             setSelectedNode(undefined);
-                                             setOpen(true);
-                                             setOP('add');
-                                         }}
-                        />
-                    </Tooltip>
-
+                <div className={'font-medium text-[15px]'}>
                     <Tooltip title={t('websites.group_tip')}>
                         <div className={'cursor-pointer'}>
                             {t('assets.group')}
                         </div>
                     </Tooltip>
-
                 </div>
+
+                <Button
+                    type="primary"
+                    size="small"
+                    icon={<PackagePlusIcon className={'h-4 w-4'}/>}
+                    onClick={() => {
+                        setSelectedRowKey(undefined);
+                        setSelectedNode(undefined);
+                        setOpen(true);
+                        setOP('add');
+                    }}
+                >
+                    {t('websites.add_group')}
+                </Button>
             </div>
 
             <Tree
@@ -274,10 +276,12 @@ const WebsiteTree = ({selected, onSelect}: Props) => {
                     open={true}
                     trigger={['contextMenu']}
                     onOpenChange={(visible) => !visible && setContextMenu(null)}
-                    overlayStyle={{
-                        position: 'absolute',
-                        left: contextMenu.pageX,
-                        top: contextMenu.pageY,
+                    styles={{
+                        root: {
+                            position: 'absolute',
+                            left: contextMenu.pageX,
+                            top: contextMenu.pageY,
+                        }
                     }}
                 >
                     <div style={{

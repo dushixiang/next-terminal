@@ -14,6 +14,7 @@ export interface User {
     lastLoginAt: number;
     departments?: SimpleDepartment[];
     remark?: string;
+    enabledTotp?: boolean;
 }
 
 interface SimpleDepartment {

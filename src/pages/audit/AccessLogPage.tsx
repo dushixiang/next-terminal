@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
 import {Link} from "react-router-dom";
@@ -7,12 +7,11 @@ import accessLogApi, {AccessLog} from "@/api/access-log-api";
 import {App, Button, Tag, Typography} from "antd";
 import {useMutation} from "@tanstack/react-query";
 import {renderSize} from "@/utils/utils";
-import {useWindowSize} from 'react-use';
 import {useMobile} from "@/hook/use-mobile";
 
 const AccessLogPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
     let {modal} = App.useApp();
 
     let clearMutation = useMutation({
@@ -36,7 +35,7 @@ const AccessLogPage = () => {
         return 'default';
     };
 
-    const columns: ProColumns<AccessLog>[] = [
+    const columns: NColumn<AccessLog>[] = [
         {
             title: t('assets.domain'),
             key: 'domain',
@@ -65,10 +64,24 @@ const AccessLogPage = () => {
                     return <Tag color="blue">{t('audit.accessLog.anonymous')}</Tag>;
                 }
 
+                if (accountId.startsWith('public-allow-')) {
+                    const ip = accountId.replace('public-allow-', '');
+                    return <Tag color="green" title={ip}>
+                        {t('audit.accessLog.publicAllow')}
+                    </Tag>;
+                }
+
                 if (accountId.startsWith('whitelist-')) {
                     const ip = accountId.replace('whitelist-', '');
                     return <Tag color="green" title={ip}>
                         {t('audit.accessLog.whitelist')}
+                    </Tag>;
+                }
+
+                if (accountId.startsWith('temp-allow-')) {
+                    const ip = accountId.replace('temp-allow-', '');
+                    return <Tag color="cyan" title={ip}>
+                        {t('audit.accessLog.tempAllow')}
                     </Tag>;
                 }
 
@@ -112,9 +125,20 @@ const AccessLogPage = () => {
             key: 'uri',
             dataIndex: 'uri',
             hideInSearch: true,
-            ellipsis: true,
             width: 300,
-            render: (text) => <code className="text-xs">{text}</code>
+            render: (text) => {
+                const value = String(text || '-');
+                return (
+                    <Typography.Text
+                        className="text-xs font-mono"
+                        ellipsis={{tooltip: value}}
+                        style={{display: 'block', width: '100%'}}
+                        copyable={text ? {text: String(text)} : false}
+                    >
+                        {value}
+                    </Typography.Text>
+                );
+            }
         },
         {
             title: t('audit.accessLog.statusCode'),
@@ -159,9 +183,20 @@ const AccessLogPage = () => {
             key: 'userAgent',
             dataIndex: 'userAgent',
             hideInSearch: true,
-            ellipsis: true,
             width: 250,
-            render: (text) => <span className="text-xs" title={String(text || '')}>{text}</span>
+            render: (text) => {
+                const value = String(text || '-');
+                return (
+                    <Typography.Text
+                        className="text-xs"
+                        ellipsis={{tooltip: value}}
+                        style={{display: 'block', width: '100%'}}
+                        copyable={text ? {text: String(text)} : false}
+                    >
+                        {value}
+                    </Typography.Text>
+                );
+            }
         },
         {
             title: t('audit.accessLog.createdAt'),
@@ -175,7 +210,7 @@ const AccessLogPage = () => {
 
     return (
         <div>
-            <ProTable
+            <NTable
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}

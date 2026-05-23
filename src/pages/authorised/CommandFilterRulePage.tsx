@@ -1,6 +1,12 @@
 import React, {useRef, useState} from 'react';
-import {App, Badge, Button, Popconfirm, Tag} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {
+    App,
+    Badge,
+    Button,
+    Popconfirm,
+    Space,
+    Tag} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import commandFilterRuleApi, {CommandFilterRule} from "../../api/command-filter-rule-api.js";
 import CommandFilterRuleModal from "./CommandFilterRuleModal";
 import {useTranslation} from "react-i18next";
@@ -17,7 +23,7 @@ interface Props {
 const CommandFilterRulePage = ({id}: Props) => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -50,7 +56,7 @@ const CommandFilterRulePage = ({id}: Props) => {
         });
     }
 
-    const columns: ProColumns<CommandFilterRule>[] = [
+    const columns: NColumn<CommandFilterRule>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -113,35 +119,35 @@ const CommandFilterRulePage = ({id}: Props) => {
             title: t('actions.label'),
             valueType: 'option',
             key: 'option',
-            render: (text, record, _, action) => [
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record['id']);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>
-                ,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>
-                ,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record['id']);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {

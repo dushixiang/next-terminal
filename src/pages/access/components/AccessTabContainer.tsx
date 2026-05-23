@@ -36,6 +36,9 @@ interface TabItem {
     key: string;
     label: string;
     children: React.ReactNode;
+    meta?: {
+        type?: 'session';
+    };
 }
 
 interface AccessTabContainerProps {
@@ -52,6 +55,7 @@ interface AccessTabContainerProps {
         handleCloseAll: () => void;
         handleCloseOthers: (key: string) => void;
         handleReconnect: (key: string) => void;
+        handleDuplicateSession: (key: string) => void;
     };
 }
 
@@ -96,8 +100,12 @@ const AccessTabContainer = React.memo(({
                             onCloseAll={tabOperations.handleCloseAll}
                             onCloseOthers={tabOperations.handleCloseOthers}
                             onReconnect={tabOperations.handleReconnect}
+                            onDuplicateSession={tabOperations.handleDuplicateSession}
+                            canDuplicateSession={item.meta?.type === 'session'}
                         >
-                            {item.label}
+                            <span className={'access-tab-label'} title={item.label}>
+                                {item.label}
+                            </span>
                         </TabContextMenu>
                     ),
                     children: item.children,

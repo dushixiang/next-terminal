@@ -50,7 +50,9 @@
     "upload": "上传",
     "offline": "离线",
     "online": "在线",
-    "search_placeholder": "关键词搜索"
+    "search_placeholder": "关键词搜索",
+    "selected_items": "已选择 {{count}} 项",
+    "toggle_theme": "切换主题"
   },
   "actions": {
     "new": "新建",
@@ -68,11 +70,13 @@
     "cancel": "取消",
     "save": "保存",
     "label": "操作",
+    "more": "更多",
     "batch_delete": "批量删除",
     "refresh": "刷新",
+    "retry": "重试",
     "confirm": "确认",
     "back": "返回上一页",
-    "more": "更多"
+    "test_connection": "测试连接"
   },
   "dashboard": {
     "login_times": "登录次数",
@@ -115,11 +119,8 @@
   "facade": {
     "asset_placeholder": "资产名称、协议、标签、网络地址",
     "database_asset_placeholder": "资产名称、账号、标签、类型",
-    "database_access_title": "连接与访问",
     "database_access_tip": "使用数据库代理连接，或通过 SQL 工单提交执行。",
-    "database_access_proxy_tip": "代理地址请联系管理员获取。",
     "database_access_work_order": "前往 SQL 工单",
-    "database_asset_name_tip": "asset_name 使用下方列表中的资产名称。",
     "website_placeholder": "网站名称、标签、类型",
     "processing": "处理中...",
     "in_use": "使用中",
@@ -202,6 +203,7 @@
       "create_dir": "创建文件夹",
       "upload_file": "上传文件",
       "upload_dir": "上传目录",
+      "preview_image": "预览图片",
       "chmod": "权限设置"
     },
     "attributes": {
@@ -531,7 +533,9 @@
       "userAgent": "User-Agent",
       "createdAt": "请求时间",
       "anonymous": "匿名",
+      "publicAllow": "公开放行",
       "whitelist": "IP白名单",
+      "tempAllow": "临时放行",
       "tempPass": "临时密码",
       "deletedUser": "已删除用户",
       "clearConfirmTitle": "确认清空",
@@ -601,13 +605,11 @@
     },
     "audit_analyzing": "正在分析录屏内容，请稍候...",
     "audit_failed": "审计失败",
-    "audit_no_result": "暂无审计结果",
     "unknown_protocol": "未知协议：{{protocol}}",
     "audit_status": {
       "label": "审计状态",
       "pending": "分析中",
       "completed": "已完成",
-      "failed": "失败",
       "start": "开始分析",
       "pending_tip": "AI 正在后台分析录屏内容，完成后请刷新页面查看结果",
       "view": "查看报告",
@@ -633,7 +635,8 @@
       },
       "keyboard": {
         "label": "键盘设置",
-        "intercept_search_shortcut": "拦截搜索快捷键 (Ctrl/Cmd+F)"
+        "intercept_search_shortcut": "拦截搜索快捷键 (Ctrl/Cmd+F)",
+        "mac_option_is_meta": "macOS Option 键作为 Meta 键"
       }
     },
     "batch": {
@@ -660,6 +663,7 @@
       "clipboard_placeholder": "粘贴到此处..."
     },
     "tabs": {
+      "copySession": "复制会话",
       "closeLeft": "关闭左侧标签页",
       "closeRight": "关闭右侧标签页",
       "closeOthers": "关闭其他标签页",
@@ -694,7 +698,10 @@
     },
     "terminal": {
       "search": "搜索终端内容",
-      "clear": "清屏"
+      "clear": "清屏",
+      "connecting": "连接中...",
+      "close_title": "关闭终端",
+      "close_confirm": "确定要关闭此终端吗？"
     },
     "playback": {
       "shortcut_space": "空格键: 播放/暂停",
@@ -719,12 +726,17 @@
     "access_token": "授权令牌",
     "access_token_create": "创建令牌",
     "access_token_type": "令牌类型",
+    "access_token_source": "来源",
+    "access_token_source_manual": "手动创建",
+    "access_token_expires_at": "过期时间",
+    "access_token_expires_never": "永不过期",
     "access_token_once_tip": "令牌仅显示一次，请妥善保存。",
     "access_token_type_values": {
       "session": "登录会话",
       "api": "API 令牌",
       "temporary": "临时令牌",
-      "db_password": "数据库密码"
+      "db_password": "数据库密码",
+      "oauth": "OAuth 授权"
     },
     "client_cert": "客户端证书",
     "client_cert_generate": "生成并下载",
@@ -736,18 +748,18 @@
     "client_cert_revoke_confirm": "确认吊销客户端证书？",
     "client_cert_status_active": "有效",
     "client_cert_status_revoked": "已吊销",
-    "client_cert_fingerprint": "指纹",
+    "client_cert_fingerprint": "证书指纹",
     "client_cert_serial": "序列号",
     "client_cert_not_before": "生效时间",
     "client_cert_not_after": "过期时间",
-    "client_cert_last_used": "最近使用",
+    "client_cert_last_used": "证书最近使用",
     "old_password": "旧的密码",
     "confirm_password": "确认密码",
     "captcha": "验证码",
     "login": {
       "action": "登录",
       "methods": {
-        "passkey": "使用通行密钥认证",
+        "passkey": "使用 Passkey 认证",
         "otp": "使用OTP认证",
         "wechat_work": "使用企业微信登录",
         "oidc": "使用OIDC登录"
@@ -758,7 +770,23 @@
       "wechat_work_error": "企业微信登录失败，请重试",
       "back_to_login": "返回登录页面"
     },
-    "passkey": "通行密钥",
+    "passkey": "Passkey",
+    "ssh_key": "SSH 密钥",
+    "ssh_key_desc": "管理桌面客户端登录堡垒机时使用的 SSH 公钥。",
+    "ssh_key_add": "添加 SSH 密钥",
+    "ssh_key_empty": "暂无 SSH 密钥",
+    "ssh_key_name": "名称",
+    "ssh_key_name_tip": "可选，不填时服务端会根据注释或指纹自动生成名称。",
+    "ssh_key_name_placeholder": "例如：MacBook-Pro",
+    "ssh_key_algorithm": "算法",
+    "ssh_key_fingerprint": "密钥指纹",
+    "ssh_key_comment": "注释",
+    "ssh_key_last_used": "密钥最近使用",
+    "ssh_key_public_key_tip": "请粘贴一条 OpenSSH 格式公钥，不支持私钥内容。",
+    "ssh_key_public_key_required": "请输入公钥",
+    "ssh_key_public_key_placeholder": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... desktop@macbook",
+    "ssh_key_delete_title": "确认移除 SSH 密钥？",
+    "ssh_key_delete_content": "确定要移除 SSH 密钥 {{name}} 吗？",
     "enter": "请输入",
     "otp_bind_title": "您已成功开启双因素认证",
     "otp_bind_sub_title": "多因素认证-二次认证-登录身份鉴别,访问控制更安全。",
@@ -800,21 +828,20 @@
     "otp_security_description": "绑定成功后，您的账户将受到双因素认证保护。请确保妥善保管您的身份验证设备。",
     "otp_step2_description": "使用身份验证应用扫描二维码",
     "otp_step3_description": "输入验证码完成绑定",
-    "passkey_add": "添加通行密钥",
+    "passkey_add": "添加 Passkey",
     "passkey_add_time": "添加时间",
     "passkey_used_time": "上次使用",
-    "passkey_delete_title": "您确定要移除您的通行密钥吗？",
-    "passkey_delete_content": "通行密钥可为您的账户和资产提供更好的保护，建议予以保留。",
+    "passkey_delete_title": "您确定要移除您的 Passkey 吗？",
+    "passkey_delete_content": "Passkey 可为您的账户和资产提供更好的保护，建议予以保留。",
     "mfa": "多重身份认证",
     "mfa_authing": "正在认证...",
-    "mfa_retry": "重试",
     "mfa_auth_failed": "认证失败",
     "mfa_change_way": "切换验证方式",
     "otp_required": "您必须开启二次验证后才能继续操作",
     "no_mfa_title": "请先绑定安全认证方式",
     "no_mfa_subtitle": "您尚未绑定任何安全认证方式，无法查看敏感数据。",
     "enable_otp": "启用OTP认证",
-    "enable_passkey": "启用通行密钥认证",
+    "enable_passkey": "启用 Passkey 认证",
     "select_auth_type": "请选择身份认证方式",
     "auth_type_passkey_desc": "使用生物识别或安全密钥进行认证",
     "auth_type_otp": "OTP 验证码",
@@ -845,6 +872,23 @@
       "warning": "授权后，{{clientId}} 将能够访问您选择的信息。您可以随时在账户设置中撤销此授权。",
       "load_error": "无法加载授权信息"
     },
+    "oauth_consent": {
+      "title": "外部应用授权",
+      "subtitle": "{{name}} 请求访问您的账户",
+      "request_access": "请求连接到 {{host}}",
+      "requested_scopes": "将授予以下权限",
+      "allow": "允许授权",
+      "deny": "拒绝",
+      "warning": "授权后，{{name}} 将在一年内持有访问令牌。您可以随时在授权令牌页面撤销。",
+      "load_error": "无法加载授权信息，请重新发起授权",
+      "scope": {
+        "account.read": "读取账户基本信息",
+        "ssh_keys.manage": "管理您的 SSH 公钥",
+        "assets.read": "读取可访问的资产列表",
+        "snippets.read": "读取代码片段",
+        "token.revoke_self": "吊销该授权令牌（用于断开连接）"
+      }
+    },
     "otp_code_required": "请输入验证码",
     "otp_code_format": "验证码必须是6位数字",
     "mfa_passkey_prompt": "请在浏览器弹出的窗口中完成 Passkey 认证"
@@ -858,6 +902,9 @@
     "content": "内容",
     "sort": "排序",
     "group": "分组",
+    "new_group": "新建分组",
+    "expand_group_tree": "展开分组",
+    "collapse_group_tree": "收起分组",
     "group_tip": "右键可编辑/删除（Default 分组除外）",
     "width": "宽度",
     "height": "高度",
@@ -868,13 +915,13 @@
     "tags": "标签",
     "addr": "网络地址",
     "account_type": "账户类型",
+    "asset_count": "资产数量",
     "private_key": "私钥",
     "password": "密码",
     "gateway_type": "网关类型",
     "no_gateway": "不使用网关",
     "select_gateway_type": "请选择网关类型",
     "select_gateway_group": "请选择网关分组",
-    "advanced_setting": "高级设置",
     "display_settings": "显示设置",
     "color_depth": "色彩深度",
     "force_lossless": "无损压缩",
@@ -901,7 +948,6 @@
     "is_share": "共享",
     "limit_size": "大小限制",
     "used_size": "已使用大小",
-    "target_server": "目标服务器",
     "domain": "域名",
     "domain_tip": "您用于访问受保护资产的域名（例如：www.example.com）需解析至本系统IP地址。",
     "scheme": "资产协议",
@@ -914,10 +960,6 @@
     "select_agent_gateway": "请选择安全网关",
     "select_ssh_gateway": "请选择SSH网关",
     "general": "常规",
-    "preserve_host": "保留主机名",
-    "preserve_host_tip": "会将请求头中的主机名保留为原始请求的主机名，而不是代理服务器的主机名。",
-    "disable_access_log": "禁用访问日志",
-    "disable_access_log_tip": "启用后，该网站的访问请求将不会被记录到访问日志中",
     "custom_header": "自定义请求头",
     "custom_header_tip": "可以添加多个自定义请求头，格式为：键: 值。",
     "custom_certificate": "自定义证书",
@@ -940,7 +982,7 @@
     "temp_allow": "临时白名单",
     "public_tip": "限制只针对匿名用户生效。",
     "limit_ip": "IP访问限制",
-    "limit_ip_tip": "限制用户只能从指定的IP地址访问资产。支持CIDR格式的IP地址，例如：192.168.1.0/24。支持-号分隔的IP地址，例如：192.168.1.0-192.168.1.255。多个IP地址请用逗号分隔。",
+    "limit_ip_tip": "限制用户只能从指定的IP地址访问资产。支持CIDR格式的IP地址，例如：192.168.1.0/24。支持-号分隔的IP地址，例如：192.168.1.0-192.168.1.255。多个IP地址可换行输入，也可用逗号或分号分隔。",
     "limit_country": "国家限制",
     "limit_country_tip": "限制匿名用户仅允许来自指定国家访问，支持中文或英文名称。",
     "limit_country_placeholder": "如：中国 或 China",
@@ -955,7 +997,6 @@
     "limit_time": "失效时间",
     "limit_password": "口令访问限制",
     "limit_password_tip": "使用正确的口令才能访问资产。",
-    "temp_allow_enabled": "临时白名单",
     "temp_allow_duration": "有效期（分钟）",
     "temp_allow_duration_tip": "用户点击按钮后，当前 IP 将在有效期内可访问。",
     "temp_allow_auto_renew": "自动续期",
@@ -983,7 +1024,6 @@
       "is_default_tooltip": "默认证书指的是在匹配不到其他证书的时候使用的证书。",
       "set_as_default": "设为默认",
       "download": "下载证书",
-      "download_client": "下载客户端证书",
       "renew": "续签证书",
       "renew_confirm": "确认续签证书？",
       "renew_confirm_content": "将会重新申请并更新证书，确认继续吗？",
@@ -1126,7 +1166,13 @@
     "public_header_whitelist_placeholder": "如：X-Bypass-Token",
     "public_path_whitelist": "路径白名单",
     "public_path_whitelist_tip": "匹配任一路径即放行，支持正则表达式。",
-    "public_path_whitelist_placeholder": "如：^/public/.* 或 /health"
+    "public_path_whitelist_placeholder": "如：^/public/.* 或 /health",
+    "auto_detect_logo": "自动识别图标",
+    "detect_os_success": "操作系统检测成功，图标已更新",
+    "detect_os_failed": "操作系统检测失败",
+    "wol_send": "发送 WOL",
+    "wol_send_success": "WOL 唤醒包已发送",
+    "wol_send_failed": "WOL 唤醒包发送失败"
   },
   "websites": {
     "group_tip": "拖拽可以调整顺序",
@@ -1151,7 +1197,6 @@
   },
   "gateways": {
     "port": "端口",
-    "version": "版本",
     "config_mode": "配置模式",
     "config_mode_direct": "直接配置",
     "config_mode_credential": "引用凭据",
@@ -1171,11 +1216,7 @@
       "disk": "磁盘",
       "network_io": "网络 I/O",
       "load": "负载",
-      "model": "型号",
       "logical_cores": "逻辑核心",
-      "physical_cores": "物理核心",
-      "percent": "使用率",
-      "total": "总大小",
       "used": "已使用",
       "ping": "网络延迟",
       "system_version": "系统版本",
@@ -1196,7 +1237,6 @@
       "load_1m": "负载 (1分钟)",
       "load_5m": "负载 (5分钟)",
       "load_15m": "负载 (15分钟)",
-      "disk_io_rate": "磁盘 I/O 速率",
       "network_io_rate": "网络 I/O 速率",
       "total_traffic": "累计流量",
       "ip_address": "IP 地址",
@@ -1204,7 +1244,8 @@
       "internal": "内部",
       "items": "个",
       "collection_errors": "采集错误",
-      "action": "监控"
+      "action": "监控",
+      "last_heartbeat": "最后心跳"
     },
     "register_title": "注册网关",
     "server_address": "服务端地址",
@@ -1230,6 +1271,12 @@
         "trust_list": "信任的IP地址（CIDR格式）",
         "trust_placeholder": "输入后请回车确认"
       },
+      "asset_access": {
+        "setting": "资产接入",
+        "mode": "资产接入方式",
+        "access_page": "接入页面",
+        "standalone_page": "独立标签页"
+      },
       "watermark": {
         "setting": "接入水印",
         "content": "水印内容",
@@ -1238,11 +1285,7 @@
         "append_user": "水印追加用户",
         "append_asset": "水印追加资产",
         "font_color": "水印字体颜色",
-        "font_size": "水印字体大小",
-        "size_small": "小",
-        "size_medium": "中",
-        "size_large": "大",
-        "size_xlarge": "特大"
+        "font_size": "水印字体大小"
       },
       "basic_info_title": "系统基本信息"
     },
@@ -1283,10 +1326,12 @@
         "ip_duration": "IP地址锁定持续时间"
       },
       "passkey": {
-        "enabled": "通行令牌登陆",
+        "enabled": "Passkey 登录",
         "domain": "外部访问域名",
-        "origins": "允许使用通行令牌的来源",
-        "origins_tip": "结尾不要包含 /"
+        "origins": "允许使用 Passkey 的来源",
+        "origins_tip": "结尾不要包含 /",
+        "origins_error": "请输入有效的来源地址",
+        "auto_detect": "自动识别"
       },
       "session_management": "会话管理"
     },
@@ -1302,13 +1347,20 @@
       "private_key_modal_title": "设置 SSH 私钥",
       "private_key_modal_tip": "可生成或自行粘贴私钥。",
       "port_forwarding": {
-        "enabled": "开启隧道",
-        "host_port": "允许隧道转发的IP端口"
+        "enabled": "允许 SSH 端口转发",
+        "host_port": "允许转发到的目标地址",
+        "host_port_tip": "多个目标用英文逗号分隔，格式为 host:port。port 可写 * 表示任意端口。VS Code Remote-SSH 需要允许 127.0.0.1:*。"
       },
       "usage": "使用示例",
+      "usage_tip": "SSH 服务支持进入资产选择界面，也支持在连接时直接指定资产。",
       "mode_proxy": "代理模式",
+      "mode_proxy_tip": "只登录堡垒机账号，连接后在终端资产列表中选择目标资产。",
       "direct_proxy": "直连模式",
-      "disable_password_auth": "禁用密码认证"
+      "direct_proxy_tip": "连接时指定目标资产，认证成功后直接进入该资产。asset-name 可以填写资产名称，asset-alias 建议填写资产别名。",
+      "direct_proxy_cli": "命令行客户端：",
+      "direct_proxy_vscode": "VS Code Remote-SSH 推荐写入 ssh config：",
+      "disable_password_auth": "禁用密码认证",
+      "private_key_required_to_enable": "开启 SSH 服务前请先设置认证私钥"
     },
     "rdp": {
       "setting": "RDP 设置",
@@ -1348,7 +1400,7 @@
       "send": "发送邮件"
     },
     "webauthn": {
-      "setting": "WebAuthn"
+      "setting": "Passkey 设置"
     },
     "ldap": {
       "setting": "LDAP 认证",
@@ -1420,6 +1472,8 @@
       "request": "更新授权",
       "binding": "绑定授权",
       "info": "许可证信息",
+      "name": "授权名称",
+      "user_name": "授权所属用户名称",
       "max": {
         "asset_count": "最大资产数",
         "database_count": "最大数据库数",
@@ -1491,6 +1545,12 @@
       "audit_rdp_enable": "启用 RDP/VNC 审计助手",
       "audit_rdp_prompt": "RDP/VNC 审计提示词",
       "audit_rdp_prompt_placeholder": "输入 RDP/VNC 审计助手的提示词...",
+      "test": "连接测试",
+      "test_button": "测试连接",
+      "test_tip": "将使用当前表单值（API Key / Base URL / 模型等）向 LLM 发送一次简短请求，验证配置是否可用。",
+      "test_failed": "测试失败",
+      "test_response": "模型回复",
+      "test_response_empty": "模型未返回任何内容",
       "audit_rdp_prompt_default": "你是一位专业的桌面远程运维安全审计专家。以下是一段 RDP/VNC 图形化远程桌面会话的相关信息。\n\n请对本次会话进行安全审计，并输出一份 Markdown 格式的审计报告，结构如下：\n\n## 一、执行摘要\n- **整体风险等级**：低 / 中 / 高 / 严重\n- **核心发现**：2–3 句话概括\n\n## 二、操作行为分析\n分析可识别的操作行为，包括：\n- 应用程序使用（浏览器、编辑器、终端、管理工具等）\n- 文件管理操作（复制、移动、删除、下载等）\n- 系统配置变更\n- 网络访问与传输行为\n\n## 三、安全风险清单\n| 风险等级 | 具体行为 | 风险说明 |\n|:-------:|:--------|:--------|\n| 🔴 高危 | | |\n| 🟠 中危 | | |\n| 🟡 低危 | | |\n\n## 四、合规性评估\n指出违规操作，给出改进建议。\n\n## 五、审计结论\n总体评价与处置建议。\n\n注意：信息不足时请注明，不要臆测。"
     },
     "oidc_server": {
@@ -1536,7 +1596,6 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "主机",
-      "username": "账号",
       "database": "数据库"
     },
     "work_order": {
@@ -1578,11 +1637,10 @@
       "tip": "启用代理以允许客户端连接并执行 SQL。",
       "usage_title": "使用说明",
       "usage_client": "客户端连接",
-      "usage_select": "选择数据库资产",
-      "password_label": "数据库密码",
       "password_tip_prefix": "请前往",
       "password_tip_link": "个人中心-授权令牌",
-      "password_tip_suffix": "生成数据库密码。"
+      "password_tip_suffix": "生成数据库密码。",
+      "external_quick_access_tip": "外部访问 Host/Port 仅用于给普通用户提供快速访问入口，不影响数据库代理实际监听地址。"
     }
   }
 }

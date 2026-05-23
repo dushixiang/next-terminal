@@ -1,5 +1,5 @@
 import {Api} from "./core/api";
-import requests, {baseUrl, getToken} from "./core/requests";
+import requests, {baseUrl} from "./core/requests";
 import {browserDownload} from "@/utils/utils";
 
 export interface Certificate {
@@ -30,7 +30,7 @@ class CertificateApi extends Api<Certificate> {
     }
 
     download = async (id: string, commonName: string) => {
-        let u = `${baseUrl()}/${this.group}/${id}/download?X-Auth-Token=${getToken()}`
+        let u = `${baseUrl()}/${this.group}/${id}/download`
         browserDownload(u)
     }
 

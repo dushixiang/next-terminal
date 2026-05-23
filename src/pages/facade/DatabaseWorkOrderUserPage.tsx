@@ -1,6 +1,11 @@
-import React, {useMemo, useRef, useState} from 'react';
-import {App, Button, Tag, Tooltip, Typography} from "antd";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import React, {useRef, useState} from 'react';
+import {
+    App,
+    Button,
+    Tag,
+    Tooltip,
+    Typography} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
 import {DatabaseWorkOrder, dbWorkOrderApi} from "@/api/db-work-order-api";
@@ -17,13 +22,13 @@ const DatabaseWorkOrderUserPage = () => {
     const {t} = useTranslation();
     const {isMobile} = useMobile();
     const {message} = App.useApp();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
     const [open, setOpen] = useState(false);
     const [keyword, setKeyword] = useState<string>('');
 
-    const reloadTable = useMemo(() => debounce(() => {
+    const reloadTable = debounce(() => {
         actionRef.current?.reload();
-    }, 300), []);
+    }, 300);
 
     const createMutation = useMutation({
         mutationFn: dbWorkOrderApi.create,
@@ -53,7 +58,7 @@ const DatabaseWorkOrderUserPage = () => {
         return <Tag color={item.color}>{item.label}</Tag>;
     };
 
-    const columns: ProColumns<DatabaseWorkOrder>[] = [
+    const columns: NColumn<DatabaseWorkOrder>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -169,7 +174,7 @@ const DatabaseWorkOrderUserPage = () => {
                 </div>
             </div>
             <div className={'rounded-xl ring-1 ring-slate-200/60 dark:ring-slate-700/60 p-1'}>
-                <ProTable
+                <NTable
                     columns={columns}
                     actionRef={actionRef}
                     request={async (params = {}, sort) => {

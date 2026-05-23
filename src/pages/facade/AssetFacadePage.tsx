@@ -1,9 +1,8 @@
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {useQuery} from "@tanstack/react-query";
-import portalApi, {AssetUser} from "@/api/portal-api";
+import portalApi, {AssetAccessMode, AssetUser} from "@/api/portal-api";
 import strings from "@/utils/strings";
 import {useTranslation} from "react-i18next";
-import {isMobileByMediaQuery} from "@/utils/utils";
 import {safeEncode} from "@/utils/codec";
 import {checkItemInGroups, findNode, getAllKeys, getGroupAndChildIds} from './utils/facade-utils';
 import FacadeSearchBar from './components/FacadeSearchBar';
@@ -31,6 +30,12 @@ const AssetFacadePage = () => {
         queryKey: ['my-assets-group-tree'],
         queryFn: () => portalApi.getAssetsGroupTree(),
         staleTime: 10 * 60 * 1000,    // 10 分钟(分组变化较少)
+    });
+
+    let queryAccessPreferences = useQuery({
+        queryKey: ['access-preferences'],
+        queryFn: () => portalApi.getAccessPreferences(),
+        staleTime: 5 * 60 * 1000,
     });
 
     useEffect(() => {
@@ -101,19 +106,20 @@ const AssetFacadePage = () => {
     // 渲染访问链接的函数
     const renderAccessLink = useCallback((item: AssetUser) => {
         const id = item.id;
-        const protocol = item.protocol;
+        const protocol = item.protocol?.toLowerCase();
+        const accessMode: AssetAccessMode = queryAccessPreferences.data?.assetAccessMode || 'access-page';
 
         // 构建访问链接
         let href = '';
         if (protocol === 'http') {
             href = `/browser?websiteId=${id}&t=${new Date().getTime()}`;
-        } else if (isMobileByMediaQuery() && protocol === 'ssh') {
-            href = `/mobile-terminal?assetId=${id}&t=${new Date().getTime()}`;
+        } else if (accessMode === 'standalone-page') {
+            href = `/standalone-access?assetId=${id}&protocol=${protocol}&t=${new Date().getTime()}`;
         } else {
             const msg = {
                 id: id,
                 name: item.name,
-                protocol: item.protocol,
+                protocol: protocol,
                 status: item.status,
                 wolEnabled: item.attrs?.['wol-enabled'] || false,
             };
@@ -134,7 +140,7 @@ const AssetFacadePage = () => {
                 />
             </a>
         );
-    }, []);
+    }, [queryAccessPreferences.data?.assetAccessMode]);
 
     return (
         <div className="pb-6">

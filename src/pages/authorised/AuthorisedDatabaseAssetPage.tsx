@@ -1,8 +1,7 @@
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useTranslation} from "react-i18next";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import type {ProFormInstance} from "@ant-design/pro-components";
-import {Button, Popconfirm, Table} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
+import { FormInstance, Button, Popconfirm, Space, Table } from 'antd';
 import authorisedDatabaseAssetApi, {AuthorisedDatabaseAsset} from "@/api/authorised-database-asset-api";
 import {DepartmentSelect, UserSelect, DatabaseAssetSelect} from "@/components/shared/QuerySelects";
 import NButton from "@/components/NButton";
@@ -13,29 +12,26 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 const AuthorisedDatabaseAssetPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
-    const formRef = useRef<ProFormInstance>(null);
+    const actionRef = useRef<NTableActionType>(null);
+    const formRef = useRef<FormInstance>(null);
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const urlState = useMemo(() => ({
+    const urlState = {
         userId: searchParams.get('userId') || undefined,
         departmentId: searchParams.get('departmentId') || undefined,
         assetId: searchParams.get('assetId') || undefined,
-    }), [searchParams]);
+    };
 
-    const tableParams = useMemo(() => {
-        const filtered = Object.fromEntries(
-            Object.entries(urlState).filter(([, value]) => value)
-        );
-        return filtered;
-    }, [urlState]);
+    const tableParams = Object.fromEntries(
+        Object.entries(urlState).filter(([, value]) => value)
+    );
 
     useEffect(() => {
         formRef.current?.setFieldsValue(urlState);
-    }, [urlState]);
+    }, [urlState.userId, urlState.departmentId, urlState.assetId]);
 
-    const syncUrl = useCallback((values: Record<string, any>) => {
+    const syncUrl = (values: Record<string, any>) => {
         const next: Record<string, string> = {};
         Object.entries(values).forEach(([key, value]) => {
             if (value) {
@@ -48,9 +44,9 @@ const AuthorisedDatabaseAssetPage = () => {
             return;
         }
         setSearchParams(next);
-    }, [setSearchParams, urlState]);
+    };
 
-    const columns: ProColumns<AuthorisedDatabaseAsset>[] = [
+    const columns: NColumn<AuthorisedDatabaseAsset>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -153,27 +149,28 @@ const AuthorisedDatabaseAssetPage = () => {
             valueType: 'option',
             key: 'option',
             width: 50,
-            render: (text, record) => [
-                <Popconfirm
-                    key="unbind-confirm"
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await authorisedDatabaseAssetApi.deleteById(record['id']);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key="unbind" danger>
-                        {t('actions.unbind')}
-                    </NButton>
-                </Popconfirm>
-                ,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <Popconfirm
+                        key="unbind-confirm"
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await authorisedDatabaseAssetApi.deleteById(record['id']);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key="unbind" danger>
+                            {t('actions.unbind')}
+                        </NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 formRef={formRef}

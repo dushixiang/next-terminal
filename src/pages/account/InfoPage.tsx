@@ -12,6 +12,7 @@ import {cn} from "@/lib/utils";
 import Passkey from "@/pages/account/Passkey";
 import OidcServerAuthorizations from "@/pages/account/OidcServerAuthorizations";
 import ClientCertificate from "@/pages/account/ClientCertificate";
+import SSHKey from "@/pages/account/SSHKey";
 
 const InfoPage = () => {
 
@@ -44,6 +45,11 @@ const InfoPage = () => {
             label: t('account.passkey'),
             key: 'passkey',
             children: <Passkey/>
+        },
+        {
+            label: t('account.ssh_key'),
+            key: 'ssh-key',
+            children: <SSHKey/>
         },
         {
             label: t('account.access_token'),

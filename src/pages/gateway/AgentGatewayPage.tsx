@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
-import {ActionType, DragSortTable, ProColumns} from "@ant-design/pro-components";
-import {App, Button, Popconfirm, Progress, Tag, Tooltip} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
+import {App, Button, Popconfirm, Progress, Space, Tag, Tooltip} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import agentGatewayApi, {AgentGateway, SortPositionRequest} from "@/api/agent-gateway-api";
@@ -13,6 +13,7 @@ import {ArrowDown, ArrowUp} from "lucide-react";
 import {formatUptime, getColor, renderSize} from "@/utils/utils";
 import AgentGatewayStat from "@/pages/gateway/AgentGatewayStat";
 import {getSort} from "@/utils/sort";
+import {DragHandle} from "@/components/DraggableTable";
 
 const api = agentGatewayApi;
 
@@ -23,7 +24,7 @@ const macosImg = new URL('@/assets/images/macos.png', import.meta.url).href;
 const AgentGatewayPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [registerOpen, setRegisterOpen] = useState<boolean>(false);
@@ -33,6 +34,8 @@ const AgentGatewayPage = () => {
 
     let [tokenManageOpen, setTokenManageOpen] = useState<boolean>(false);
     let [statOpen, setStatOpen] = useState<boolean>(false);
+
+    const selectedGateway = selectedRowKey ? dataSource.find(item => item.id === selectedRowKey) : undefined;
 
     const {message} = App.useApp();
 
@@ -96,8 +99,6 @@ const AgentGatewayPage = () => {
             afterId: afterIndex < newDataSource.length - 1 ? newDataSource[afterIndex + 1].id : ''
         };
 
-        console.log('Sort request', req);
-
         // 服务器更新
         updateSortMutation.mutate(req);
     };
@@ -116,16 +117,18 @@ const AgentGatewayPage = () => {
         if (ping >= 200) color = 'red';
         else if (ping >= 120) color = 'orange';
         else if (ping >= 60) color = 'gold';
-        return <Tag color={color} bordered={false} className="!m-0">{ping} ms</Tag>;
+        return <Tag color={color} variant="filled" className="!m-0">{ping} ms</Tag>;
     };
 
-    let columns: ProColumns<AgentGateway>[] = [
+    let columns: NColumn<AgentGateway>[] = [
         {
             title: t('assets.sort'),
             dataIndex: 'sort',
-            width: 50,
+            width: 60,
             className: 'drag-visible',
             hideInSearch: true,
+            fixed: 'left',
+            render: () => <DragHandle title={t('assets.sort')}/>,
         },
         {
             title: t('general.name'),
@@ -133,6 +136,7 @@ const AgentGatewayPage = () => {
             hideInSearch: true,
             className: 'drag-visible',
             width: 260,
+            fixed: 'left',
             render: (text, record) => {
                 let osImg = '';
                 switch (record.os) {
@@ -155,7 +159,7 @@ const AgentGatewayPage = () => {
                             <div className="flex items-center gap-2">
                                 <span className="truncate font-medium">{record.name}</span>
                                 {record.version && (
-                                    <Tag color="blue" bordered={false} className="!m-0">v{record.version}</Tag>
+                                    <Tag color="blue" variant="filled" className="!m-0">v{record.version}</Tag>
                                 )}
                             </div>
                             <div className="text-xs text-gray-500 flex items-center gap-2">
@@ -176,9 +180,9 @@ const AgentGatewayPage = () => {
             width: 90,
             render: (text, record) => {
                 if (record.online === false) {
-                    return <Tag bordered={false} className="!m-0">{t('general.offline')}</Tag>;
+                    return <Tag variant="filled" className="!m-0">{t('general.offline')}</Tag>;
                 }
-                return <Tag color="green" bordered={false} className="!m-0">{t('general.online')}</Tag>;
+                return <Tag color="green" variant="filled" className="!m-0">{t('general.online')}</Tag>;
             }
         },
         {
@@ -209,7 +213,7 @@ const AgentGatewayPage = () => {
                 return (
                     <div className="flex flex-col gap-1">
                         <div className="text-xs text-gray-500">{load}</div>
-                        {status ? <Tag color={status.color} bordered={false} className="!m-0 w-fit">{status.text}</Tag> : '-'}
+                        {status ? <Tag color={status.color} variant="filled" className="!m-0 w-fit">{status.text}</Tag> : '-'}
                     </div>
                 );
             }
@@ -288,36 +292,38 @@ const AgentGatewayPage = () => {
             key: 'option',
             width: 100,
             fixed: 'right',
-            render: (text, record, _, action) => [
-                <NButton
-                    key="stat"
-                    onClick={() => {
-                        setStatOpen(true);
-                        setSelectedRowKey(record.id);
-                    }}
-                >
-                    {t('gateways.monitor.action')}
-                </NButton>,
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record.id);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <NButton
+                        key="stat"
+                        onClick={() => {
+                            setStatOpen(true);
+                            setSelectedRowKey(record.id);
+                        }}
+                    >
+                        {t('gateways.monitor.action')}
+                    </NButton>
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record.id);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
@@ -351,12 +357,12 @@ const AgentGatewayPage = () => {
 
     return (
         <div className={'w-full'}>
-            <DragSortTable
+            <NTable
                 headerTitle={
                     <div className={'flex items-center gap-2'}>
                         <span>{t('menus.gateway.submenus.agent_gateway')}</span>
                         {versionData?.version && (
-                            <Tag color="blue" bordered={false}>v{versionData.version}</Tag>
+                            <Tag color="blue" variant="filled">v{versionData.version}</Tag>
                         )}
                     </div>
                 }
@@ -445,6 +451,7 @@ const AgentGatewayPage = () => {
             <AgentGatewayStat
                 open={statOpen}
                 id={selectedRowKey}
+                updatedAt={selectedGateway?.updatedAt}
                 onClose={() => {
                     setStatOpen(false);
                 }}

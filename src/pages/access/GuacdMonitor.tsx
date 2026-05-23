@@ -2,10 +2,8 @@ import React, {useEffect, useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 // @ts-ignore
 import Guacamole from '@dushixiang/guacamole-common-js';
-import {baseWebSocketUrl, getToken} from "@/api/core/requests";
+import {baseWebSocketUrl} from "@/api/core/requests";
 import {debounce} from "@/utils/debounce";
-import qs from "qs";
-import strings from "@/utils/strings";
 import {GuacamoleStatus} from "@/pages/access/guacamole/ErrorAlert";
 import RenderState from "@/pages/access/guacamole/RenderState";
 
@@ -13,7 +11,6 @@ const GuacdMonitor = () => {
 
     const [searchParams, _] = useSearchParams();
     const sessionId = searchParams.get('sessionId');
-    const token = searchParams.get('token');
 
     let [state, setState] = useState<number>();
     let [status, setStatus] = useState<GuacamoleStatus>();
@@ -52,17 +49,7 @@ const GuacdMonitor = () => {
         const element = client.getDisplay().getElement();
         display.appendChild(element);
 
-        let authToken = getToken();
-        if (strings.hasText(token)) {
-            authToken = token;
-        }
-
-        let params = {
-            'X-Auth-Token': authToken
-        };
-
-        let paramStr = qs.stringify(params);
-        client.connect(paramStr);
+        client.connect("");
         return client;
     }
 

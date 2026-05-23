@@ -153,7 +153,7 @@ const AccessWolDialog: React.FC<AccessWolDialogProps> = ({
                 );
             case 'countdown':
                 return (
-                    <Space direction="vertical" style={{width: '100%', alignItems: 'center'}} size="large">
+                    <Space orientation="vertical" style={{width: '100%', alignItems: 'center'}} size="large">
                         <Text>{t('access.wol.countdown_message')}</Text>
                         <div style={{textAlign: 'center', fontSize: 48, fontWeight: 'bold', color: '#1890ff'}}>
                             {countdown} {t('general.second')}
@@ -167,7 +167,7 @@ const AccessWolDialog: React.FC<AccessWolDialogProps> = ({
             case 'online':
                 return (
                     <Alert
-                        message={t('access.wol.online')}
+                        title={t('access.wol.online')}
                         description={t('access.wol.online_desc')}
                         type="success"
                         showIcon
@@ -176,7 +176,7 @@ const AccessWolDialog: React.FC<AccessWolDialogProps> = ({
             case 'offline':
                 return (
                     <Alert
-                        message={t('access.wol.offline')}
+                        title={t('access.wol.offline')}
                         description={t('access.wol.offline_desc')}
                         type="warning"
                         showIcon
@@ -185,7 +185,7 @@ const AccessWolDialog: React.FC<AccessWolDialogProps> = ({
             case 'failed':
                 return (
                     <Alert
-                        message={t('access.wol.failed')}
+                        title={t('access.wol.failed')}
                         description={errorMessage}
                         type="error"
                         showIcon
@@ -242,7 +242,7 @@ const AccessWolDialog: React.FC<AccessWolDialogProps> = ({
             open={open}
             onCancel={handleCancel}
             footer={renderFooter()}
-            maskClosable={false}
+            mask={{closable: false}}
         >
             {renderContent()}
         </Modal>

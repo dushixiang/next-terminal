@@ -1,4 +1,4 @@
-import requests, {baseUrl, getToken} from "./core/requests";
+import requests, {baseUrl} from "./core/requests";
 import {setCurrentUser} from "@/utils/permission";
 import eventEmitter from "@/api/core/event-emitter";
 import {browserDownload} from "@/utils/utils";
@@ -11,7 +11,25 @@ export interface AccessTokenItem {
     id: string;
     token: string;
     type: string;
+    source?: string;
+    sourceName?: string;
+    createdFrom?: string;
+    expiresAt?: number;
     createdAt: number;
+}
+
+export interface OAuthScope {
+    key: string;
+}
+
+export interface OAuthConsentPageData {
+    name: string;
+    callback: string;
+    scopes: OAuthScope[];
+}
+
+export interface OAuthConsentResult {
+    redirectUrl: string;
 }
 
 export interface AccessTokenCreateResult {
@@ -32,6 +50,18 @@ export interface UserClientCertInfo {
     revokedAt: number;
     lastUsedAt: number;
     createdAt: number;
+}
+
+export interface AccountSSHKeyItem {
+    id: string;
+    name: string;
+    fingerprint: string;
+    algorithm: string;
+    publicKey: string;
+    comment: string;
+    lastUsedAt: number;
+    createdAt: number;
+    updatedAt: number;
 }
 
 export interface PasswordPolicy {
@@ -148,7 +178,7 @@ class AccountApi {
     }
 
     logout = async () => {
-        return await requests.post('/account/logout')
+        return await requests.post('/logout')
     }
 
     getLoginStatus = async () => {
@@ -188,8 +218,21 @@ class AccountApi {
         return await requests.get(`/${this.group}/client-cert`) as UserClientCertInfo | null;
     }
 
+    getSSHKeys = async () => {
+        return await requests.get(`/${this.group}/ssh-keys`) as AccountSSHKeyItem[];
+    }
+
+    createSSHKey = async (values: { name?: string; publicKey: string; securityToken?: string }) => {
+        return await requests.post(`/${this.group}/ssh-keys`, values) as AccountSSHKeyItem;
+    }
+
+    deleteSSHKey = async (id: string, securityToken?: string) => {
+        const query = securityToken ? `?securityToken=${encodeURIComponent(securityToken)}` : '';
+        return await requests.delete(`/${this.group}/ssh-keys/${encodeURIComponent(id)}${query}`);
+    }
+
     downloadClientCert = async () => {
-        let u = `${baseUrl()}/${this.group}/client-cert/download?X-Auth-Token=${getToken()}`
+        let u = `${baseUrl()}/${this.group}/client-cert/download`
         browserDownload(u)
     }
 
@@ -309,6 +352,20 @@ class AccountApi {
     // 撤销 OIDC Server 授权
     revokeOidcServerConsent = async (clientId: string) => {
         return await requests.delete(`/${this.group}/oidc-server-consents/${clientId}`);
+    }
+
+    // 第三方 OAuth 授权流程：获取同意页元数据
+    getOAuthConsentPage = async (authorizeId: string) => {
+        const data = await requests.get(`/oauth/consent?authorize_id=${encodeURIComponent(authorizeId)}`);
+        return data as OAuthConsentPageData;
+    }
+
+    // 第三方 OAuth 授权流程：提交同意 / 拒绝
+    submitOAuthConsent = async (authorizeId: string, approve: boolean): Promise<OAuthConsentResult> => {
+        return await requests.post(`/oauth/consent`, {
+            authorizeId: authorizeId,
+            approve: approve,
+        });
     }
 }
 

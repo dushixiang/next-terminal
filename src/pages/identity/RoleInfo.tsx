@@ -1,11 +1,11 @@
-import {Tree} from "antd";
+import {Descriptions, Spin, Tree} from "antd";
 import roleApi, {TreeNode} from "../../api/role-api";
 import {useQuery} from "@tanstack/react-query";
-import {ProDescriptions} from "@ant-design/pro-components";
 import React, {useState} from "react";
 import {useTranslation} from "react-i18next";
 import {useNTTheme} from "@/hook/use-theme";
 import strings from "@/utils/strings";
+import times from "@/components/time/times";
 
 const api = roleApi;
 
@@ -31,8 +31,8 @@ const RoleInfo = ({id}: RoleInfoProps) => {
             if (menus[i].isLeaf) {
                 menus[i].title = t('permissions.' + menus[i].key);
             } else {
-                let parentKey = parent.replaceAll('-', '_');
-                let key = menus[i].key.replaceAll('-', '_');
+                let parentKey = parent.replace(/-/g, '_');
+                let key = menus[i].key.replace(/-/g, '_');
                 if (strings.hasText(parent)) {
                     menus[i].title = t(`menus.${parentKey}.submenus.${key}`);
                 } else {
@@ -50,38 +50,45 @@ const RoleInfo = ({id}: RoleInfoProps) => {
         queryFn: wrapGetMenu,
     });
 
-    const get = async () => {
-        let data = await api.getById(id);
-        let strings = data.menus?.filter(item => item.checked === true).map(item => item.key);
-        setRoleMenus(strings);
-        return {
-            success: true,
-            data: data
-        }
-    }
+    const roleQuery = useQuery({
+        queryKey: ['role', id],
+        queryFn: async () => {
+            let data = await api.getById(id);
+            let strings = data.menus?.filter(item => item.checked === true).map(item => item.key);
+            setRoleMenus(strings);
+            return data;
+        },
+        enabled: !!id,
+    });
+
+    const role = roleQuery.data;
 
     return (
         <div className={'page-detail-info'}>
-            <ProDescriptions column={1} request={get}>
-                <ProDescriptions.Item label={t('general.name')} dataIndex="name"/>
-                <ProDescriptions.Item label={t('identity.role.permission')} dataIndex="menus" render={() => {
-                    if (menusQuery.isLoading) {
-                        return <div>Loading</div>
-                    }
-                    return <Tree
-                        checkable
-                        disabled={true}
-                        checkedKeys={roleMenus}
-                        treeData={menusQuery.data}
-                        style={{
-                            backgroundColor: theme.backgroundColor,
-                        }}
-                    />
-                }}>
-
-                </ProDescriptions.Item>
-                <ProDescriptions.Item label={t('general.created_at')} dataIndex="createdAt" valueType='dateTime'/>
-            </ProDescriptions>
+            <Spin spinning={roleQuery.isLoading}>
+                <Descriptions column={1}>
+                    <Descriptions.Item label={t('general.name')}>{role?.name}</Descriptions.Item>
+                    <Descriptions.Item label={t('identity.role.permission')}>
+                        {(() => {
+                            if (menusQuery.isLoading) {
+                                return <div>Loading</div>
+                            }
+                            return <Tree
+                                checkable
+                                disabled={true}
+                                checkedKeys={roleMenus}
+                                treeData={menusQuery.data}
+                                style={{
+                                    backgroundColor: theme.backgroundColor,
+                                }}
+                            />
+                        })()}
+                    </Descriptions.Item>
+                    <Descriptions.Item label={t('general.created_at')}>
+                        {role?.createdAt ? times.format(role.createdAt) : '-'}
+                    </Descriptions.Item>
+                </Descriptions>
+            </Spin>
         </div>
     );
 }

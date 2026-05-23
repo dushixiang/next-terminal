@@ -1,6 +1,7 @@
 import {Api} from "@/api/core/api";
 import requests from "@/api/core/requests";
 import type { TreeDataNode } from 'antd';
+import type {WebsiteFormData, WebsiteOriginHostMode} from "@/pages/assets/website-drawer/types";
 
 export interface Website {
     id: string;
@@ -18,11 +19,14 @@ export interface Website {
     statusText: string;
     gatewayType: string;
     gatewayId: string;
+    originHostMode?: WebsiteOriginHostMode;
+    originHostCustom?: string;
     basicAuth: BasicAuth;
     headers?: any;
     cert: Cert;
     public: Public;
     tempAllow?: TempAllow;
+    modifyRules?: any[];
     createdAt: number;
     groupId?: string;
     sort: string;  // LexoRank 排序字段
@@ -38,6 +42,12 @@ interface Public {
     ip: string;
     expiredAt: number;
     password: string;
+    timeLimit?: boolean;
+    countries?: string[];
+    provinces?: string[];
+    cities?: string[];
+    headerWhitelist?: string[];
+    pathWhitelist?: string[];
 }
 
 interface TempAllow {
@@ -62,6 +72,20 @@ export interface SortPositionRequest {
     id: string;        // 被拖拽的项 ID
     beforeId: string;  // 目标位置的前一项 ID (空字符串表示移到最前)
     afterId: string;   // 目标位置的后一项 ID (空字符串表示移到最后)
+}
+
+export interface WebsiteBasicUpdateRequest {
+    logo?: string;
+    name: string;
+    domain: string;
+    entrance?: string;
+    targetUrl: string;
+    groupId?: string;
+    gatewayType?: string;
+    gatewayId?: string;
+    originHostMode?: WebsiteOriginHostMode;
+    originHostCustom?: string;
+    headers?: Array<{ name: string; value: string }>;
 }
 
 class WebsiteApi extends Api<Website> {
@@ -96,6 +120,34 @@ class WebsiteApi extends Api<Website> {
 
     getFavicon = async (url: string): Promise<string> => {
         return await requests.get(`/${this.group}/favicon?url=${encodeURIComponent(url)}`);
+    }
+
+    updateEnabled = async (id: string, enabled: boolean) => {
+        return await requests.patch(`/${this.group}/${id}/enabled`, {enabled});
+    }
+
+    updateBasic = async (id: string, data: WebsiteBasicUpdateRequest) => {
+        return await requests.patch(`/${this.group}/${id}/basic`, data);
+    }
+
+    updatePublic = async (id: string, data: { public?: WebsiteFormData['public'] }) => {
+        return await requests.patch(`/${this.group}/${id}/public`, data);
+    }
+
+    updateTempAllow = async (id: string, data: { tempAllow?: WebsiteFormData['tempAllow'] }) => {
+        return await requests.patch(`/${this.group}/${id}/temp-allow`, data);
+    }
+
+    updateHeaders = async (id: string, data: { headers?: Website['headers'] }) => {
+        return await requests.patch(`/${this.group}/${id}/headers`, data);
+    }
+
+    updateCert = async (id: string, data: { cert?: WebsiteFormData['cert'] }) => {
+        return await requests.patch(`/${this.group}/${id}/cert`, data);
+    }
+
+    updateModifyResponse = async (id: string, data: { modifyRules?: any[] }) => {
+        return await requests.patch(`/${this.group}/${id}/modify-response`, data);
     }
 }
 

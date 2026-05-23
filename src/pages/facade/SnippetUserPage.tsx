@@ -1,6 +1,10 @@
-import React, {useMemo, useState} from 'react';
-import {App, Button, Popconfirm, Tag} from "antd";
-import {ProColumns, ProTable} from "@ant-design/pro-components";
+import React, {useState} from 'react';
+import {
+    App,
+    Button,
+    Popconfirm,
+    Tag} from "antd";
+import NTable, {type NColumn} from "@/components/NTable";
 import {useTranslation} from "react-i18next";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import NButton from "@/components/NButton";
@@ -30,17 +34,12 @@ const SnippetUserPage = () => {
         queryFn: () => api.getAll(),
     });
 
-    const filteredSnippets = useMemo(() => {
-        const list = snippetsQuery.data || [];
-        const value = keyword.trim().toLowerCase();
-        if (!value) {
-            return list;
-        }
-        return list.filter((item) => {
-            return item.name?.toLowerCase().includes(value)
-                || item.content?.toLowerCase().includes(value);
-        });
-    }, [snippetsQuery.data, keyword]);
+    const list = snippetsQuery.data || [];
+    const value = keyword.trim().toLowerCase();
+    const filteredSnippets = value ? list.filter((item) => {
+        return item.name?.toLowerCase().includes(value)
+            || item.content?.toLowerCase().includes(value);
+    }) : list;
 
     const postOrUpdate = async (values: any) => {
         if (values['id']) {
@@ -67,7 +66,7 @@ const SnippetUserPage = () => {
         });
     }
 
-    const columns: ProColumns<Snippet>[] = [
+    const columns: NColumn<Snippet>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -112,7 +111,7 @@ const SnippetUserPage = () => {
             valueType: 'option',
             key: 'option',
             width: isMobile ? 80 : undefined, // 移动端固定宽度
-            render: (text, record, _, action) => {
+            render: (text, record) => {
                 // 只有创建者才能编辑和删除
                 const isOwner = record.createdBy === currentUser.id;
 
@@ -171,7 +170,7 @@ const SnippetUserPage = () => {
             </div>
         </div>
         <div className={'rounded-xl ring-1 ring-slate-200/60 dark:ring-slate-700/60 p-1'}>
-            <ProTable
+            <NTable
                 columns={columns}
                 dataSource={filteredSnippets}
                 loading={snippetsQuery.isFetching}

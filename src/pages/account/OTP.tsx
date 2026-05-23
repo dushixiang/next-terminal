@@ -184,7 +184,7 @@ const OTP = () => {
             </Title>
             
             <Alert
-                message={t('account.otp_description')}
+                title={t('account.otp_description')}
                 type="info"
                 showIcon
                 style={{marginBottom: 24}}

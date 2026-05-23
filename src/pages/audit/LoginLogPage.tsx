@@ -1,6 +1,11 @@
-import {App, Button, Tag, Typography} from 'antd';
-import React, {useRef} from 'react';
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
+import {
+    App,
+    Button,
+    Tag,
+    Typography} from 'antd';
+import React,
+    {useRef} from 'react';
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import loginLogApi from "@/api/login-log-api";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
@@ -10,7 +15,7 @@ import {LoginLog} from "@/api/user-api";
 const LoginLogPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let {modal} = App.useApp();
 
@@ -21,7 +26,7 @@ const LoginLogPage = () => {
         }
     });
 
-    const columns: ProColumns<LoginLog>[] = [
+    const columns: NColumn<LoginLog>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -85,7 +90,7 @@ const LoginLogPage = () => {
 
     return (
         <div>
-            <ProTable
+            <NTable
                 defaultSize={'small'}
                 columns={columns}
                 actionRef={actionRef}

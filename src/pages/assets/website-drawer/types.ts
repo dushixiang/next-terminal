@@ -1,5 +1,7 @@
 import { Dayjs } from "dayjs";
 
+export type WebsiteOriginHostMode = 'origin' | 'service' | 'custom';
+
 export interface ParsedURL {
     scheme: string;
     host: string;
@@ -18,8 +20,10 @@ export interface WebsiteFormData {
     targetUrl: string;
     logo?: string;
     groupId?: string;
+    gatewayType?: string;
     gatewayId?: string;
-    preserveHost?: boolean;
+    originHostMode?: WebsiteOriginHostMode;
+    originHostCustom?: string;
     disableAccessLog?: boolean;
     headers?: Array<{ name: string; value: string }>;
     basicAuth?: {
@@ -48,6 +52,7 @@ export interface WebsiteFormData {
         durationMinutes?: number;
         autoRenew?: boolean;
     };
+    modifyRules?: any[];
 }
 
 export interface LogoItem {

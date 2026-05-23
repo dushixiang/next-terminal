@@ -13,7 +13,7 @@ import propertyApi from "../../api/property-api";
 import {useTranslation} from "react-i18next";
 import {maybe} from "@/utils/maybe.ts";
 import accountApi from "@/api/account-api";
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery} from "@tanstack/react-query";
 
 import SystemSetting from "@/pages/sysconf/SystemSetting";
 import About from "@/pages/sysconf/About";
@@ -39,6 +39,11 @@ type PendingSet = {
     reject: (reason?: any) => void;
 };
 
+type SetPropertiesPayload = {
+    values: any;
+    securityToken?: string;
+};
+
 const SettingPage = () => {
 
     const { isMobile } = useMobile();
@@ -58,6 +63,13 @@ const SettingPage = () => {
         queryFn: accountApi.getUserInfo,
     });
 
+    const setMutation = useMutation({
+        mutationFn: ({values, securityToken}: SetPropertiesPayload) => propertyApi.set(values, securityToken),
+        onSuccess: () => {
+            messageApi.success(t('general.success'));
+        },
+    });
+
     const handleTagChange = (key: string) => {
         setActiveKey(key);
         setSearchParams({'activeKey': key});
@@ -72,7 +84,7 @@ const SettingPage = () => {
     };
 
     const set = async (values: any) => {
-        if (pendingSet) {
+        if (pendingSet || setMutation.isPending) {
             return false;
         }
         const mfaEnabled = await ensureMfaEnabled();
@@ -82,8 +94,7 @@ const SettingPage = () => {
                 setMfaOpen(true);
             });
         }
-        await propertyApi.set(values);
-        messageApi.success(t('general.success'));
+        await setMutation.mutateAsync({values});
         return true;
     }
 
@@ -94,8 +105,7 @@ const SettingPage = () => {
         }
         const {values, resolve, reject} = pendingSet;
         try {
-            await propertyApi.set(values, securityToken);
-            messageApi.success(t('general.success'));
+            await setMutation.mutateAsync({values, securityToken});
             resolve(true);
         } catch (err) {
             reject(err);
@@ -206,12 +216,12 @@ const SettingPage = () => {
     }
 
     return (
-        <div className={cn('px-4', isMobile && 'px-2')}>
-            <Tabs 
-                tabPosition={isMobile ? 'top' : 'left'} 
+        <div>
+            <Tabs
+                tabPlacement={isMobile ? 'top' : 'start'}
                 activeKey={activeKey} 
                 onChange={handleTagChange} 
-                tabBarStyle={isMobile ? {} : {width: 150}}
+                // tabBarStyle={isMobile ? {} : {width: 150}}
                 items={items}
                 size={isMobile ? 'small' : 'middle'}
                 className={cn(

@@ -1,8 +1,7 @@
-import React, {useCallback, useEffect, useMemo, useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import {useTranslation} from "react-i18next";
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import type {ProFormInstance} from "@ant-design/pro-components";
-import {Button, Popconfirm, Table} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
+import { FormInstance, Button, Popconfirm, Space, Table } from 'antd';
 import authorisedWebsiteApi, {AuthorisedWebsite} from "@/api/authorised-website-api";
 import {UserSelect, DepartmentSelect, WebsiteSelect, WebsiteGroupSelect} from "@/components/shared/QuerySelects";
 import NButton from "@/components/NButton";
@@ -13,30 +12,27 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 const AuthorisedWebsitePage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
-    const formRef = useRef<ProFormInstance>(null);
+    const actionRef = useRef<NTableActionType>(null);
+    const formRef = useRef<FormInstance>(null);
     let navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const urlState = useMemo(() => ({
+    const urlState = {
         userId: searchParams.get('userId') || undefined,
         departmentId: searchParams.get('departmentId') || undefined,
         websiteGroupId: searchParams.get('websiteGroupId') || undefined,
         websiteId: searchParams.get('websiteId') || undefined,
-    }), [searchParams]);
+    };
 
-    const tableParams = useMemo(() => {
-        const filtered = Object.fromEntries(
-            Object.entries(urlState).filter(([, value]) => value)
-        );
-        return filtered;
-    }, [urlState]);
+    const tableParams = Object.fromEntries(
+        Object.entries(urlState).filter(([, value]) => value)
+    );
 
     useEffect(() => {
         formRef.current?.setFieldsValue(urlState);
-    }, [urlState]);
+    }, [urlState.userId, urlState.departmentId, urlState.websiteGroupId, urlState.websiteId]);
 
-    const syncUrl = useCallback((values: Record<string, any>) => {
+    const syncUrl = (values: Record<string, any>) => {
         const next: Record<string, string> = {};
         Object.entries(values).forEach(([key, value]) => {
             if (value) {
@@ -49,9 +45,9 @@ const AuthorisedWebsitePage = () => {
             return;
         }
         setSearchParams(next);
-    }, [setSearchParams, urlState]);
+    };
 
-    const columns: ProColumns<AuthorisedWebsite>[] = [
+    const columns: NColumn<AuthorisedWebsite>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -174,27 +170,28 @@ const AuthorisedWebsitePage = () => {
             valueType: 'option',
             key: 'option',
             width: 50,
-            render: (text, record, _, action) => [
-                <Popconfirm
-                    key="unbind-confirm"
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await authorisedWebsiteApi.deleteById(record['id']);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key="unbind" danger>
-                        {t('actions.unbind')}
-                    </NButton>
-                </Popconfirm>
-                ,
-            ],
+            render: (text, record) => (
+                <Space>
+                    <Popconfirm
+                        key="unbind-confirm"
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await authorisedWebsiteApi.deleteById(record['id']);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key="unbind" danger>
+                            {t('actions.unbind')}
+                        </NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 formRef={formRef}

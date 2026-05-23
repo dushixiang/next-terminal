@@ -3,7 +3,6 @@ import {Result, Spin} from 'antd';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
 import oidcApi from '@/api/oidc-api';
-import {setToken} from '@/api/core/requests';
 import {useTranslation} from 'react-i18next';
 
 const OidcCallback = () => {
@@ -14,9 +13,6 @@ const OidcCallback = () => {
     const mutation = useMutation({
         mutationFn: ({code, state}: {code: string, state?: string}) => oidcApi.login(code, state),
         onSuccess: (data) => {
-            // 设置令牌
-            setToken(data.token);
-
             // 清除会话存储
             sessionStorage.removeItem('current');
             sessionStorage.removeItem('openKeys');

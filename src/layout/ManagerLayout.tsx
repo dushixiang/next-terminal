@@ -143,9 +143,9 @@ const ManagerLayout: React.FC = () => {
 
                             {/* 主内容区域 */}
                             <Suspense fallback={<Landing/>}>
-                                <div className={clsx('flex-grow', {
-                                    'mx-2': isMobile,
-                                    'mx-4': !isMobile
+                                <div className={clsx('grow', {
+                                    'mx-4': isMobile,
+                                    'mx-8': !isMobile
                                 })}>
                                     <Outlet/>
                                 </div>

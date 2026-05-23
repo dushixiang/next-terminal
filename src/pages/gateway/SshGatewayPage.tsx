@@ -1,6 +1,6 @@
 import React, {useRef, useState} from 'react';
-import {ActionType, ProColumns, ProTable} from "@ant-design/pro-components";
-import {App, Badge, Button, Popconfirm, Tag, Tooltip} from "antd";
+import NTable, {type NColumn, type NTableActionType} from "@/components/NTable";
+import {App, Button, Popconfirm, Space, Tag} from "antd";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
 import {useMutation} from "@tanstack/react-query";
@@ -13,7 +13,7 @@ const api = sshGatewayApi;
 const SshGatewayPage = () => {
 
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -45,7 +45,7 @@ const SshGatewayPage = () => {
         });
     }
 
-    let columns: ProColumns<SSHGateway>[] = [
+    let columns: NColumn<SSHGateway>[] = [
         {
             dataIndex: 'index',
             valueType: 'indexBorder',
@@ -117,38 +117,40 @@ const SshGatewayPage = () => {
             title: t('actions.label'),
             valueType: 'option',
             key: 'option',
-            render: (text, record, _, action) => [
-                <NButton
-                    key="edit"
-                    onClick={() => {
-                        setOpen(true);
-                        setSelectedRowKey(record.id);
-                    }}
-                >
-                    {t('actions.edit')}
-                </NButton>,
-                <Popconfirm
-                    key={'delete-confirm'}
-                    title={t('general.confirm_delete')}
-                    onConfirm={async () => {
-                        await api.deleteById(record.id);
-                        actionRef.current?.reload();
-                    }}
-                >
-                    <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
-                </Popconfirm>,
-            ],
+            render: (text, record, _) => (
+                <Space>
+                    <NButton
+                        key="edit"
+                        onClick={() => {
+                            setOpen(true);
+                            setSelectedRowKey(record.id);
+                        }}
+                    >
+                        {t('actions.edit')}
+                    </NButton>
+                    <Popconfirm
+                        key={'delete-confirm'}
+                        title={t('general.confirm_delete')}
+                        onConfirm={async () => {
+                            await api.deleteById(record.id);
+                            actionRef.current?.reload();
+                        }}
+                    >
+                        <NButton key='delete' danger={true}>{t('actions.delete')}</NButton>
+                    </Popconfirm>
+                </Space>
+            ),
         },
     ];
 
     return (
         <div>
-            <ProTable
+            <NTable
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort, filter) => {
                     let [sortOrder, sortField] = getSort(sort);
-                    
+
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,

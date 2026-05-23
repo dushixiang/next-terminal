@@ -3,7 +3,6 @@ import {Result, Spin} from 'antd';
 import {useNavigate, useSearchParams} from 'react-router-dom';
 import {useMutation} from '@tanstack/react-query';
 import wechatWorkApi from '@/api/wechat-work-api';
-import {setToken} from '@/api/core/requests';
 import {useTranslation} from 'react-i18next';
 
 const WechatWorkCallback = () => {
@@ -14,9 +13,6 @@ const WechatWorkCallback = () => {
     const mutation = useMutation({
         mutationFn: wechatWorkApi.login,
         onSuccess: (data) => {
-            // 设置令牌
-            setToken(data.token);
-
             // 清除会话存储
             sessionStorage.removeItem('current');
             sessionStorage.removeItem('openKeys');

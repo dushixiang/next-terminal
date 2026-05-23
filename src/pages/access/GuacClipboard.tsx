@@ -38,7 +38,7 @@ const GuacClipboard: React.FC<Props> = ({
     return (
         <Modal
             title={t('access.clipboard')}
-            maskClosable={false}
+            mask={{closable: false}}
             open={open}
             onOk={() => form.submit()}
             onCancel={handleCancel}

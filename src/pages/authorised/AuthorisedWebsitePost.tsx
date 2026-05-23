@@ -1,6 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ProForm, ProFormInstance, ProFormSelect, ProFormTreeSelect} from "@ant-design/pro-components";
-import {Checkbox, DatePicker, Form, message, Space} from "antd";
+import QuerySelect from "@/components/QuerySelect";
+import React, {useEffect, useRef, useState} from "react";
+import {Button, Checkbox, DatePicker, Form, FormInstance, message, Space} from "antd";
 import dayjs from "dayjs";
 import {useTranslation} from "react-i18next";
 import userApi from "@/api/user-api";
@@ -9,94 +9,104 @@ import {RangePickerProps} from "antd/es/date-picker";
 import websiteApi from "@/api/website-api";
 import authorisedWebsiteApi from "@/api/authorised-website-api";
 import {useNavigate} from "react-router-dom";
+import ProFormTreeSelect from "@/components/ProFormTreeSelect";
 
 const AuthorisedWebsitePost = () => {
-    const formRef = useRef<ProFormInstance>(null);
-    let {t} = useTranslation();
+    const formRef = useRef<FormInstance>(null);
+    const {t} = useTranslation();
     const [expiredAtDayjs, setExpiredAtDayjs] = useState<dayjs.Dayjs>();
     const [expiredAtNoLimit, setExpiredAtNoLimit] = useState<boolean>(true);
-    let navigate = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setExpiredAtDayjs(undefined);
         setExpiredAtNoLimit(true);
     }, []);
 
-    const handleNoTimeLimit = (e) => {
+    const handleNoTimeLimit = e => {
         setExpiredAtNoLimit(e.target.checked);
         if (e.target.checked === true) {
             setExpiredAtDayjs(undefined);
         } else {
             setExpiredAtDayjs(dayjs());
         }
-    }
+    };
 
     const handleTimeLimitChange = (date, dateString) => {
         console.log(date, dateString);
         setExpiredAtDayjs(date);
-    }
+    };
 
-    const disabledDate: RangePickerProps['disabledDate'] = (current) => {
+    const disabledDate: RangePickerProps["disabledDate"] = current => {
         // Can not select days before today and today
-        return current && current < dayjs().endOf('day');
+        return current && current < dayjs().endOf("day");
     };
 
     return (
-        <div className={'px-4'}>
-            <div className={'mb-4 font-bold text-lg'}>{t('authorised.website_title')}</div>
-            <ProForm formRef={formRef} onFinish={async (values) => {
-                // 处理过期时间
-                if (expiredAtNoLimit || !expiredAtDayjs) {
-                    values['expiredAt'] = 0; // 永不过期
-                } else {
-                    values['expiredAt'] = expiredAtDayjs.valueOf();
-                }
-                
-                try {
-                    await authorisedWebsiteApi.authorise(values);
-                    message.success(t('general.success'));
-                    formRef.current?.resetFields();
-                    navigate('/authorised-website');
-                } catch (error) {
-                    message.error(t('authorised.authorise_failed'));
-                }
-            }}>
-                <ProFormSelect
-                    label={t('menus.identity.submenus.user')} 
-                    name='userIds'
-                    fieldProps={{mode: 'multiple', showSearch: true}}
-                    request={async () => {
-                        let items = await userApi.getAll();
-                        return items.map(item => {
-                            return {
-                                label: item.nickname,
-                                value: item.id,
-                            }
-                        });
-                    }}
-                />
-                
+        <div>
+            <div className="mb-4 font-bold text-lg">{t("authorised.website_title")}</div>
+            <Form
+                ref={formRef}
+                layout="vertical"
+                onFinish={async values => {
+                    // 处理过期时间
+                    if (expiredAtNoLimit || !expiredAtDayjs) {
+                        values["expiredAt"] = 0; // 永不过期
+                    } else {
+                        values["expiredAt"] = expiredAtDayjs.valueOf();
+                    }
+                    try {
+                        await authorisedWebsiteApi.authorise(values);
+                        message.success(t("general.success"));
+                        formRef.current?.resetFields();
+                        navigate("/authorised-website");
+                    } catch (error) {
+                        message.error(t("authorised.authorise_failed"));
+                    }
+                }}
+            >
+                <Form.Item label={t("menus.identity.submenus.user")} name="userIds">
+                    <QuerySelect
+                        mode="multiple"
+                        showSearch={true}
+                        request={async () => {
+                            const items = await userApi.getAll();
+                            return items.map(item => {
+                                return {
+                                    label: item.nickname,
+                                    value: item.id
+                                };
+                            });
+                        }}
+                    />
+                </Form.Item>
+
                 <ProFormTreeSelect
-                    label={t('menus.identity.submenus.department')} 
-                    name='departmentIds'
-                    fieldProps={{showSearch: true, multiple: true, treeDefaultExpandAll: true}}
+                    label={t("menus.identity.submenus.department")}
+                    name="departmentIds"
+                    fieldProps={{
+                        showSearch: true,
+                        multiple: true,
+                        treeDefaultExpandAll: true
+                    }}
                     request={async () => {
-                        let items = await departmentApi.getTree();
+                        const items = await departmentApi.getTree();
                         return items;
                     }}
                 />
 
                 <ProFormTreeSelect
-                    label={t('authorised.label.website_group')}
-                    name='websiteGroupIds'
+                    label={t("authorised.label.website_group")}
+                    name="websiteGroupIds"
                     fieldProps={{
                         multiple: true,
                         showSearch: true,
                         treeDefaultExpandAll: true,
-                        treeNodeFilterProp: "title",
+                        treeNodeFilterProp: "title"
                     }}
                     request={async () => {
-                        let items = await websiteApi.getGroups();
+                        const items = await websiteApi.getGroups();
+
                         // 递归把 key 字段设置为 value，并且非叶子节点全部 disabled
                         function setKeyAndDisabled(item: any) {
                             item.value = item.key;
@@ -117,44 +127,54 @@ const AuthorisedWebsitePost = () => {
                 />
 
                 <ProFormTreeSelect
-                    label={t('menus.resource.submenus.website')}
-                    name='websiteIds'
+                    label={t("menus.resource.submenus.website")}
+                    name="websiteIds"
                     fieldProps={{
                         multiple: true,
                         showSearch: true,
                         treeDefaultExpandAll: true,
-                        treeNodeFilterProp: "title",
+                        treeNodeFilterProp: "title"
                     }}
                     request={async () => {
-                        let items = await websiteApi.getAll();
-                        
+                        const items = await websiteApi.getAll();
+
                         // 转换为树形结构
                         return items.map((item: any) => ({
-                            title: item.name + ' (' + item.targetUrl + ')',
+                            title: item.name + " (" + item.targetUrl + ")",
                             key: item.id,
                             value: item.id,
-                            isLeaf: true,
+                            isLeaf: true
                         }));
                     }}
                 />
 
-                <Form.Item label={t('assets.limit_time')} name="expiredAt">
+                <Form.Item label={t("assets.limit_time")} name="expiredAt">
                     <Space>
-                        <Checkbox onChange={handleNoTimeLimit}
-                                  checked={expiredAtNoLimit}>
-                            {t('authorised.label.never_expired')}
+                        <Checkbox onChange={handleNoTimeLimit} checked={expiredAtNoLimit}>
+                            {t("authorised.label.never_expired")}
                         </Checkbox>
-                        {!expiredAtNoLimit &&
-                            <DatePicker onChange={handleTimeLimitChange}
-                                        value={expiredAtDayjs}
-                                        format="YYYY-MM-DD HH:mm:ss"
-                                        disabledDate={disabledDate}
-                                        showTime={{defaultValue: dayjs('00:00:00', 'HH:mm:ss')}}
+                        {!expiredAtNoLimit && (
+                            <DatePicker
+                                onChange={handleTimeLimitChange}
+                                value={expiredAtDayjs}
+                                format="YYYY-MM-DD HH:mm:ss"
+                                disabledDate={disabledDate}
+                                showTime={{
+                                    defaultValue: dayjs("00:00:00", "HH:mm:ss")
+                                }}
                             />
-                        }
+                        )}
                     </Space>
                 </Form.Item>
-            </ProForm>
+
+                <Form.Item>
+                    <Space>
+                        <Button type="primary" htmlType="submit">
+                            {t("actions.save")}
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </Form>
         </div>
     );
 };

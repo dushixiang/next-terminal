@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {baseWebSocketUrl, getToken} from '@/api/core/requests';
+import {baseWebSocketUrl} from '@/api/core/requests';
 import qs from "qs";
 import {Terminal} from "@xterm/xterm";
 import {FitAddon} from "@xterm/addon-fit";
@@ -19,12 +19,11 @@ export interface TerminalProps {
 
 const TerminalPage = ({}: TerminalProps) => {
 
-    const terminalRef = React.useRef<HTMLDivElement>();
-    let websocket = useRef<WebSocket>();
+    const terminalRef = React.useRef<HTMLDivElement>(null);
+    let websocket = useRef<WebSocket>(null);
 
     const [searchParams] = useSearchParams();
-    let token = maybe(searchParams.get('token'), '');
-    let sharer = maybe(searchParams.get('sharer'), false);
+    let sharerToken = maybe(searchParams.get('sharerToken'), '');
     let sessionId = searchParams.get('sessionId');
 
     let [title, setTitle] = useState('');
@@ -63,23 +62,20 @@ const TerminalPage = ({}: TerminalProps) => {
         term.writeln('trying to connect to the server ...');
         let cols = term.cols;
         let rows = term.rows;
-        let authToken = getToken();
-        if (strings.hasText(token)) {
-            authToken = token;
-        }
-        let params = {
+        let params: Record<string, any> = {
             'cols': cols,
             'rows': rows,
-            'X-Auth-Token': authToken,
-            'sharer': sharer,
             'sessionId': id,
         };
+        if (strings.hasText(sharerToken)) {
+            params['sharerToken'] = sharerToken;
+        }
 
         let paramStr = qs.stringify(params);
         websocket.current = new WebSocket(`${baseWebSocketUrl()}/access/terminal?${paramStr}`);
         websocket.current.onopen = (e => {
             term.clear();
-            if (!sharer) {
+            if (!strings.hasText(sharerToken)) {
                 term.onResize(function (evt) {
                     websocket.current.send(new Message(MessageTypeResize, `${evt.cols},${evt.rows}`).toString());
                 });

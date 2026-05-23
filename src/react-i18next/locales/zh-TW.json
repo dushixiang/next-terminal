@@ -50,7 +50,9 @@
     "upload": "上傳",
     "offline": "離線",
     "online": "線上",
-    "search_placeholder": "關鍵字搜尋"
+    "search_placeholder": "關鍵字搜尋",
+    "selected_items": "已選擇 {{count}} 項",
+    "toggle_theme": "切換主題"
   },
   "actions": {
     "new": "新增",
@@ -68,11 +70,13 @@
     "cancel": "取消",
     "save": "保存",
     "label": "操作",
+    "more": "更多",
     "batch_delete": "批次刪除",
     "refresh": "重新整理",
+    "retry": "重試",
     "confirm": "確認",
     "back": "返回上一頁",
-    "more": "更多"
+    "test_connection": "測試連線"
   },
   "dashboard": {
     "login_times": "登入次數",
@@ -115,12 +119,8 @@
   "facade": {
     "asset_placeholder": "資產名稱、協議、標籤、網路位址",
     "database_asset_placeholder": "資產名稱、帳號、標籤、類型",
-    "database_access_title": "連線與存取",
     "database_access_tip": "使用資料庫代理連線，或透過 SQL 工單提交執行。",
-    "database_access_proxy_tip": "代理位址請向管理員取得。",
     "database_access_work_order": "前往 SQL 工單",
-    "database_asset_name_tip": "asset_name 請使用下方清單中的資產名稱。",
-    "accessing": "接入中",
     "website_placeholder": "網站名稱、標籤、類型",
     "processing": "處理中...",
     "in_use": "使用中",
@@ -203,6 +203,7 @@
       "create_dir": "建立資料夾",
       "upload_file": "上傳檔案",
       "upload_dir": "上傳目錄",
+      "preview_image": "預覽圖片",
       "chmod": "權限設定"
     },
     "attributes": {
@@ -532,7 +533,9 @@
       "userAgent": "User-Agent",
       "createdAt": "請求時間",
       "anonymous": "匿名",
+      "publicAllow": "公開放行",
       "whitelist": "IP 白名單",
+      "tempAllow": "臨時放行",
       "tempPass": "臨時密碼",
       "deletedUser": "已刪除使用者",
       "clearConfirmTitle": "確認清空",
@@ -602,13 +605,11 @@
     },
     "audit_analyzing": "正在分析錄屏內容，請稍候...",
     "audit_failed": "審計失敗",
-    "audit_no_result": "暫無審計結果",
     "unknown_protocol": "未知協議：{{protocol}}",
     "audit_status": {
       "label": "審計狀態",
       "pending": "分析中",
       "completed": "已完成",
-      "failed": "失敗",
       "start": "開始分析",
       "pending_tip": "AI 正在後台分析錄屏內容，完成後請刷新頁面查看結果",
       "view": "查看報告",
@@ -634,7 +635,8 @@
       },
       "keyboard": {
         "label": "鍵盤設定",
-        "intercept_search_shortcut": "攔截搜尋快捷鍵 (Ctrl/Cmd+F)"
+        "intercept_search_shortcut": "攔截搜尋快捷鍵 (Ctrl/Cmd+F)",
+        "mac_option_is_meta": "macOS Option 鍵作為 Meta 鍵"
       }
     },
     "batch": {
@@ -661,6 +663,7 @@
       "clipboard_placeholder": "貼上到此處..."
     },
     "tabs": {
+      "copySession": "複製會話",
       "closeLeft": "關閉左側標籤頁",
       "closeRight": "關閉右側標籤頁",
       "closeOthers": "關閉其他標籤頁",
@@ -695,7 +698,10 @@
     },
     "terminal": {
       "search": "搜尋終端內容",
-      "clear": "清屏"
+      "clear": "清屏",
+      "connecting": "連線中...",
+      "close_title": "關閉終端",
+      "close_confirm": "確定要關閉此終端嗎？"
     },
     "playback": {
       "shortcut_space": "空白鍵: 播放/暫停",
@@ -720,12 +726,17 @@
     "access_token": "授權令牌",
     "access_token_create": "建立令牌",
     "access_token_type": "令牌類型",
+    "access_token_source": "來源",
+    "access_token_source_manual": "手動建立",
+    "access_token_expires_at": "過期時間",
+    "access_token_expires_never": "永不過期",
     "access_token_once_tip": "令牌僅顯示一次，請妥善保存。",
     "access_token_type_values": {
       "session": "登入會話",
       "api": "API 令牌",
       "temporary": "臨時令牌",
-      "db_password": "資料庫密碼"
+      "db_password": "資料庫密碼",
+      "oauth": "OAuth 授權"
     },
     "client_cert": "用戶端憑證",
     "client_cert_generate": "產生並下載",
@@ -737,18 +748,18 @@
     "client_cert_revoke_confirm": "確認吊銷用戶端憑證？",
     "client_cert_status_active": "有效",
     "client_cert_status_revoked": "已吊銷",
-    "client_cert_fingerprint": "指紋",
+    "client_cert_fingerprint": "憑證指紋",
     "client_cert_serial": "序號",
     "client_cert_not_before": "生效時間",
     "client_cert_not_after": "到期時間",
-    "client_cert_last_used": "最近使用",
+    "client_cert_last_used": "憑證最近使用",
     "old_password": "舊密碼",
     "confirm_password": "確認密碼",
     "captcha": "驗證碼",
     "login": {
       "action": "登入",
       "methods": {
-        "passkey": "使用通行密鑰認證",
+        "passkey": "使用 Passkey 認證",
         "otp": "使用 OTP 認證",
         "wechat_work": "使用企業微信登入",
         "oidc": "使用 OIDC 登入"
@@ -759,7 +770,23 @@
       "wechat_work_error": "企業微信登入失敗，請重試",
       "back_to_login": "返回登入頁面"
     },
-    "passkey": "通行密鑰",
+    "passkey": "Passkey",
+    "ssh_key": "SSH 金鑰",
+    "ssh_key_desc": "管理桌面用戶端登入堡壘機時使用的 SSH 公鑰。",
+    "ssh_key_add": "新增 SSH 金鑰",
+    "ssh_key_empty": "尚無 SSH 金鑰",
+    "ssh_key_name": "名稱",
+    "ssh_key_name_tip": "可選，不填時服務端會依注釋或指紋自動產生名稱。",
+    "ssh_key_name_placeholder": "例如：MacBook-Pro",
+    "ssh_key_algorithm": "演算法",
+    "ssh_key_fingerprint": "金鑰指紋",
+    "ssh_key_comment": "注釋",
+    "ssh_key_last_used": "金鑰最近使用",
+    "ssh_key_public_key_tip": "請貼上一條 OpenSSH 格式公鑰，不支援私鑰內容。",
+    "ssh_key_public_key_required": "請輸入公鑰",
+    "ssh_key_public_key_placeholder": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... desktop@macbook",
+    "ssh_key_delete_title": "確認移除 SSH 金鑰？",
+    "ssh_key_delete_content": "確定要移除 SSH 金鑰 {{name}} 嗎？",
     "enter": "請輸入",
     "otp_bind_title": "您已成功開啟雙因素認證",
     "otp_bind_sub_title": "多因素認證-二次認證-登入身分鑑別，訪問控制更安全。",
@@ -801,21 +828,20 @@
     "otp_security_description": "綁定成功後，您的帳戶將受到雙因素認證保護。請確保妥善保管您的身分驗證裝置。",
     "otp_step2_description": "使用身分驗證應用掃描二維碼",
     "otp_step3_description": "輸入驗證碼完成綁定",
-    "passkey_add": "新增通行密鑰",
+    "passkey_add": "新增 Passkey",
     "passkey_add_time": "新增時間",
     "passkey_used_time": "上次使用",
-    "passkey_delete_title": "您確定要移除您的通行密鑰嗎？",
-    "passkey_delete_content": "通行密鑰可為您的帳戶和資產提供更好的保護，建議予以保留。",
+    "passkey_delete_title": "您確定要移除您的 Passkey 嗎？",
+    "passkey_delete_content": "Passkey 可為您的帳戶和資產提供更好的保護，建議予以保留。",
     "mfa": "多重身分認證",
     "mfa_authing": "正在認證...",
-    "mfa_retry": "重試",
     "mfa_auth_failed": "認證失敗",
     "mfa_change_way": "切換驗證方式",
     "otp_required": "您必須開啟二次驗證後才能繼續操作",
     "no_mfa_title": "請先綁定安全認證方式",
     "no_mfa_subtitle": "您尚未綁定任何安全認證方式，無法查看敏感資料。",
     "enable_otp": "啟用 OTP 認證",
-    "enable_passkey": "啟用通行密鑰認證",
+    "enable_passkey": "啟用 Passkey 認證",
     "select_auth_type": "請選擇身分認證方式",
     "auth_type_passkey_desc": "使用生物識別或安全金鑰進行認證",
     "auth_type_otp": "OTP 驗證碼",
@@ -846,6 +872,23 @@
       "warning": "授權後，{{clientId}} 將能夠訪問您選擇的資訊。您可以隨時在帳戶設定中撤銷此授權。",
       "load_error": "無法載入授權資訊"
     },
+    "oauth_consent": {
+      "title": "外部應用授權",
+      "subtitle": "{{name}} 請求存取您的帳戶",
+      "request_access": "請求連線到 {{host}}",
+      "requested_scopes": "將授予下列權限",
+      "allow": "允許授權",
+      "deny": "拒絕",
+      "warning": "授權後，{{name}} 將在一年內持有存取令牌。您可以隨時於授權令牌頁面撤銷。",
+      "load_error": "無法載入授權資訊，請重新發起授權",
+      "scope": {
+        "account.read": "讀取帳戶基本資訊",
+        "ssh_keys.manage": "管理您的 SSH 公鑰",
+        "assets.read": "讀取可存取的資產清單",
+        "snippets.read": "讀取程式碼片段",
+        "token.revoke_self": "撤銷該授權令牌（用於中斷連線）"
+      }
+    },
     "otp_code_required": "請輸入驗證碼",
     "otp_code_format": "驗證碼必須是 6 位數字",
     "mfa_passkey_prompt": "請在瀏覽器彈出的視窗中完成 Passkey 認證"
@@ -859,6 +902,9 @@
     "content": "內容",
     "sort": "排序",
     "group": "分組",
+    "new_group": "新建分組",
+    "expand_group_tree": "展開分組",
+    "collapse_group_tree": "收起分組",
     "group_tip": "右鍵可編輯/刪除（Default 分組除外）",
     "width": "寬度",
     "height": "高度",
@@ -869,13 +915,13 @@
     "tags": "標籤",
     "addr": "網路位址",
     "account_type": "帳戶類型",
+    "asset_count": "資產數量",
     "private_key": "私鑰",
     "password": "密碼",
     "gateway_type": "網關類型",
     "no_gateway": "不使用網關",
     "select_gateway_type": "請選擇網關類型",
     "select_gateway_group": "請選擇網關分組",
-    "advanced_setting": "進階設定",
     "display_settings": "顯示設定",
     "color_depth": "色彩深度",
     "force_lossless": "無損壓縮",
@@ -902,7 +948,6 @@
     "is_share": "共享",
     "limit_size": "大小限制",
     "used_size": "已使用大小",
-    "target_server": "目標伺服器",
     "domain": "網域",
     "domain_tip": "您用於訪問受保護資產的網域（例如：www.example.com）需解析至本系統 IP 位址。",
     "scheme": "資產協議",
@@ -915,10 +960,6 @@
     "select_agent_gateway": "請選擇安全網關",
     "select_ssh_gateway": "請選擇 SSH 網關",
     "general": "一般",
-    "preserve_host": "保留主機名",
-    "preserve_host_tip": "會將請求頭中的主機名保留為原始請求的主機名，而不是代理伺服器的主機名。",
-    "disable_access_log": "停用訪問日誌",
-    "disable_access_log_tip": "啟用後，該網站的訪問請求將不會被記錄到訪問日誌中",
     "custom_header": "自訂請求頭",
     "custom_header_tip": "可以添加多個自訂請求頭，格式為：鍵: 值。",
     "custom_certificate": "自訂證書",
@@ -941,7 +982,7 @@
     "temp_allow": "臨時白名單",
     "public_tip": "限制只針對匿名使用者生效。",
     "limit_ip": "IP 訪問限制",
-    "limit_ip_tip": "限制使用者只能從指定的 IP 位址訪問資產。支援 CIDR 格式的 IP 位址，例如：192.168.1.0/24。支援 - 號分隔的 IP 位址，例如：192.168.1.0-192.168.1.255。多個 IP 位址請用逗號分隔。",
+    "limit_ip_tip": "限制使用者只能從指定的 IP 位址訪問資產。支援 CIDR 格式的 IP 位址，例如：192.168.1.0/24。支援 - 號分隔的 IP 位址，例如：192.168.1.0-192.168.1.255。多個 IP 位址可換行輸入，也可用逗號或分號分隔。",
     "limit_country": "國家限制",
     "limit_country_tip": "限制匿名使用者僅允許來自指定國家訪問，支援中文或英文名稱。",
     "limit_country_placeholder": "如：中國 或 China",
@@ -956,7 +997,6 @@
     "limit_time": "失效時間",
     "limit_password": "口令訪問限制",
     "limit_password_tip": "使用正確的口令才能訪問資產。",
-    "temp_allow_enabled": "臨時白名單",
     "temp_allow_duration": "有效期（分鐘）",
     "temp_allow_duration_tip": "使用者點擊按鈕後，當前 IP 將在有效期內可訪問。",
     "temp_allow_auto_renew": "自動續期",
@@ -984,7 +1024,6 @@
       "is_default_tooltip": "預設證書指的是在匹配不到其他證書的時候使用的證書。",
       "set_as_default": "設為預設",
       "download": "下載證書",
-      "download_client": "下載用戶端證書",
       "renew": "續簽證書",
       "renew_confirm": "確認續簽證書？",
       "renew_confirm_content": "將會重新申請並更新證書，確認繼續嗎？",
@@ -1127,7 +1166,13 @@
     "public_header_whitelist_placeholder": "如：X-Bypass-Token",
     "public_path_whitelist": "路徑白名單",
     "public_path_whitelist_tip": "匹配任一路径即放行，支援正則表示式。",
-    "public_path_whitelist_placeholder": "例如：^/public/.* 或 /health"
+    "public_path_whitelist_placeholder": "例如：^/public/.* 或 /health",
+    "auto_detect_logo": "自動識別圖示",
+    "detect_os_success": "作業系統偵測成功，圖示已更新",
+    "detect_os_failed": "作業系統偵測失敗",
+    "wol_send": "傳送 WOL",
+    "wol_send_success": "WOL 喚醒封包已傳送",
+    "wol_send_failed": "WOL 喚醒封包傳送失敗"
   },
   "websites": {
     "group_tip": "拖曳可以調整順序",
@@ -1152,7 +1197,6 @@
   },
   "gateways": {
     "port": "埠",
-    "version": "版本",
     "config_mode": "設定模式",
     "config_mode_direct": "直接設定",
     "config_mode_credential": "引用憑證",
@@ -1172,11 +1216,7 @@
       "disk": "磁碟",
       "network_io": "網路 I/O",
       "load": "負載",
-      "model": "型號",
       "logical_cores": "邏輯核心",
-      "physical_cores": "物理核心",
-      "percent": "使用率",
-      "total": "總大小",
       "used": "已使用",
       "ping": "網路延遲",
       "system_version": "系統版本",
@@ -1197,7 +1237,6 @@
       "load_1m": "負載 (1 分鐘)",
       "load_5m": "負載 (5 分鐘)",
       "load_15m": "負載 (15 分鐘)",
-      "disk_io_rate": "磁碟 I/O 速率",
       "network_io_rate": "網路 I/O 速率",
       "total_traffic": "累計流量",
       "ip_address": "IP 位址",
@@ -1205,7 +1244,8 @@
       "internal": "內部",
       "items": "個",
       "collection_errors": "採集錯誤",
-      "action": "監控"
+      "action": "監控",
+      "last_heartbeat": "最後心跳"
     },
     "register_title": "註冊網關",
     "server_address": "伺服器位址",
@@ -1231,6 +1271,12 @@
         "trust_list": "信任的 IP 位址（CIDR 格式）",
         "trust_placeholder": "輸入後請按 Enter 確認"
       },
+      "asset_access": {
+        "setting": "資產接入",
+        "mode": "資產接入方式",
+        "access_page": "接入頁面",
+        "standalone_page": "獨立分頁"
+      },
       "watermark": {
         "setting": "接入浮水印",
         "content": "浮水印內容",
@@ -1239,11 +1285,7 @@
         "append_user": "浮水印追加使用者",
         "append_asset": "浮水印追加資產",
         "font_color": "浮水印字體顏色",
-        "font_size": "浮水印字體大小",
-        "size_small": "小",
-        "size_medium": "中",
-        "size_large": "大",
-        "size_xlarge": "特大"
+        "font_size": "浮水印字體大小"
       },
       "basic_info_title": "系統基本資訊"
     },
@@ -1284,10 +1326,12 @@
         "ip_duration": "IP 位址鎖定持續時間"
       },
       "passkey": {
-        "enabled": "通行令牌登入",
+        "enabled": "Passkey 登入",
         "domain": "外部訪問網域",
-        "origins": "允許使用通行令牌的來源",
-        "origins_tip": "結尾不要包含 /"
+        "origins": "允許使用 Passkey 的來源",
+        "origins_tip": "結尾不要包含 /",
+        "origins_error": "請輸入有效的來源地址",
+        "auto_detect": "自動識別"
       },
       "session_management": "會話管理"
     },
@@ -1303,13 +1347,20 @@
       "private_key_modal_title": "設定 SSH 私鑰",
       "private_key_modal_tip": "可產生或自行貼上私鑰。",
       "port_forwarding": {
-        "enabled": "開啟隧道",
-        "host_port": "允許隧道轉發的 IP 埠"
+        "enabled": "允許 SSH 連接埠轉發",
+        "host_port": "允許轉發到的目標位址",
+        "host_port_tip": "多個目標請用英文逗號分隔，格式為 host:port。port 可寫 * 表示任意連接埠。VS Code Remote-SSH 需要允許 127.0.0.1:*。"
       },
       "usage": "使用範例",
+      "usage_tip": "SSH 服務支援進入資產選擇介面，也支援連線時直接指定資產。",
       "mode_proxy": "代理模式",
+      "mode_proxy_tip": "只登入堡壘機帳號，連線後在終端資產列表中選擇目標資產。",
       "direct_proxy": "直連模式",
-      "disable_password_auth": "停用密碼認證"
+      "direct_proxy_tip": "連線時指定目標資產，認證成功後直接進入該資產。asset-name 可填寫資產名稱，asset-alias 建議填寫資產別名。",
+      "direct_proxy_cli": "命令列客戶端：",
+      "direct_proxy_vscode": "VS Code Remote-SSH 建議寫入 ssh config：",
+      "disable_password_auth": "停用密碼認證",
+      "private_key_required_to_enable": "啟用 SSH 服務前請先設定認證私鑰"
     },
     "rdp": {
       "setting": "RDP 設定",
@@ -1349,7 +1400,7 @@
       "send": "發送郵件"
     },
     "webauthn": {
-      "setting": "WebAuthn"
+      "setting": "Passkey 設定"
     },
     "ldap": {
       "setting": "LDAP 認證",
@@ -1421,6 +1472,8 @@
       "request": "更新授權",
       "binding": "綁定授權",
       "info": "許可證資訊",
+      "name": "授權名稱",
+      "user_name": "授權所屬使用者名稱",
       "max": {
         "asset_count": "最大資產數",
         "database_count": "最大資料庫數",
@@ -1492,6 +1545,12 @@
       "audit_rdp_enable": "啟用 RDP/VNC 審計助手",
       "audit_rdp_prompt": "RDP/VNC 審計提示詞",
       "audit_rdp_prompt_placeholder": "輸入 RDP/VNC 審計助手的提示詞...",
+      "test": "連線測試",
+      "test_button": "測試連線",
+      "test_tip": "將使用目前表單值（API Key / Base URL / 模型等）向 LLM 發送一次簡短請求，驗證設定是否可用。",
+      "test_failed": "測試失敗",
+      "test_response": "模型回覆",
+      "test_response_empty": "模型未返回任何內容",
       "audit_rdp_prompt_default": "你是一位專業的桌面遠端運維安全審計專家。以下是一段 RDP/VNC 圖形化遠端桌面會話的相關資訊。\n\n請對本次會話進行安全審計，並輸出一份 Markdown 格式的審計報告，結構如下：\n\n## 一、執行摘要\n- **整體風險等級**：低 / 中 / 高 / 嚴重\n- **核心發現**：2–3 句話概括\n\n## 二、操作行為分析\n分析可識別的操作行為，包括：\n- 應用程式使用（瀏覽器、編輯器、終端、管理工具等）\n- 檔案管理操作（複製、移動、刪除、下載等）\n- 系統設定變更\n- 網路存取與傳輸行為\n\n## 三、安全風險清單\n| 風險等級 | 具體行為 | 風險說明 |\n|:-------:|:--------|:--------|\n| 🔴 高危 | | |\n| 🟠 中危 | | |\n| 🟡 低危 | | |\n\n## 四、合規性評估\n指出違規操作，給出改進建議。\n\n## 五、審計結論\n總體評價與處置建議。\n\n注意：資訊不足時請注明，不要臆測。"
     },
     "oidc_server": {
@@ -1537,7 +1596,6 @@
       "type_mysql": "MySQL",
       "type_pg": "PostgreSQL",
       "host": "主機",
-      "username": "帳號",
       "database": "資料庫"
     },
     "work_order": {
@@ -1579,11 +1637,10 @@
       "tip": "啟用代理以允許用戶端連線並執行 SQL。",
       "usage_title": "使用說明",
       "usage_client": "用戶端連線",
-      "usage_select": "選擇資料庫資產",
-      "password_label": "資料庫密碼",
       "password_tip_prefix": "請前往",
       "password_tip_link": "個人中心-授權令牌",
-      "password_tip_suffix": "建立資料庫密碼。"
+      "password_tip_suffix": "建立資料庫密碼。",
+      "external_quick_access_tip": "外部訪問 Host/Port 僅用於提供一般使用者快速訪問入口，不影響資料庫代理實際監聽位址。"
     }
   }
 }

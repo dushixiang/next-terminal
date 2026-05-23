@@ -1,13 +1,14 @@
 import React, {useEffect, useState} from 'react';
 import "@xterm/xterm/css/xterm.css";
 import XtermThemes from "@/color-theme/XtermThemes";
-import {CheckCard} from '@ant-design/pro-components';
 import {ScrollArea} from "@/components/ui/scroll-area";
 import {useWindowSize} from "react-use";
 import {useTerminalTheme} from "@/pages/access/hooks/use-terminal-theme";
 import {useTranslation} from 'react-i18next';
 import {useLicense} from "@/hook/LicenseContext";
 import Disabled from "@/components/Disabled";
+import {Card, Radio} from "antd";
+import {cn} from "@/lib/utils";
 
 const themes = XtermThemes;
 
@@ -87,10 +88,11 @@ const AccessTheme = () => {
                     <Disabled disabled={license.isFree()}>
                         <div className={'text-lg font-bold'}>{t('access.settings.theme')}</div>
                     </Disabled>
-                    <CheckCard.Group
+                    <Radio.Group
+                        className="w-full"
                         disabled={license.isFree()}
                         onChange={(value) => {
-                            let name = value as string;
+                            let name = value.target.value as string;
                             let v = XtermThemes.find(item => item.name == name);
                             setAccessTheme({
                                 ...accessTheme,
@@ -103,24 +105,42 @@ const AccessTheme = () => {
                         <div
                             className={'grid xl:grid-cols-4 lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-2 grid-cols-1 gap-4 mt-8 '}>
                             {themes.map(item => {
-                                return <CheckCard
+                                const checked = accessTheme.selected === item.name;
+                                return <Card
                                     key={item.name}
-                                    title={item.name}
-                                    value={item.name}
-                                    description={<div>
-                                        <div className={'p-4 rounded-lg mt-4'} style={{
+                                    size="small"
+                                    hoverable={!license.isFree()}
+                                    className={cn(
+                                        'cursor-pointer transition-colors',
+                                        checked && 'border-blue-500 shadow-sm'
+                                    )}
+                                    onClick={() => {
+                                        if (license.isFree()) {
+                                            return;
+                                        }
+                                        let v = XtermThemes.find(theme => theme.name == item.name);
+                                        setAccessTheme({
+                                            ...accessTheme,
+                                            selected: item.name,
+                                            theme: v,
+                                        });
+                                    }}
+                                >
+                                    <Radio value={item.name} disabled={license.isFree()}>
+                                        {item.name}
+                                    </Radio>
+                                    <div>
+                                        <div className={'p-4 rounded-lg mt-4 overflow-hidden'} style={{
                                             backgroundColor: item.value['background']
                                         }}>
                                             {/*<ThemeRender theme={item.value}/>*/}
                                             <ThemeRendererV2 theme={item.value} text={text}/>
                                         </div>
-                                    </div>}
-                                >
-
-                                </CheckCard>
+                                    </div>
+                                </Card>
                             })}
                         </div>
-                    </CheckCard.Group>
+                    </Radio.Group>
 
                 </div>
             </div>

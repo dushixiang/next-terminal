@@ -6,7 +6,7 @@ const Landing = () => {
     const {t} = useTranslation();
     return (
         <div className={'flex justify-center items-center h-screen'}>
-            <Spin tip={t('general.loading_detail')}>
+            <Spin description={t('general.loading_detail')}>
                 <div style={{width: 800}}></div>
             </Spin>
         </div>

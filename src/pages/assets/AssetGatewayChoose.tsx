@@ -80,9 +80,9 @@ const AssetGatewayChoose = ({resourceIds, type, open, onClose}: Props) => {
             title={t('assets.change_gateway')}
             onClose={onClose}
             open={open}
-            width={400}
+            size={400}
         >
-            <Space direction="vertical" style={{width: '100%'}} size="large">
+            <Space orientation="vertical" style={{width: '100%'}} size="large">
                 <div>
                     <div style={{marginBottom: 8}}>
                         <label>{t('assets.gateway_type')}</label>

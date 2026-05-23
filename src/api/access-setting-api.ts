@@ -10,6 +10,7 @@ export type Setting = {
     treeExpandedKeys: string[];
     useSnippets: boolean;
     interceptSearchShortcut: boolean;
+    macOptionIsMeta: boolean;
 }
 
 class AccessSettingApi {
@@ -24,6 +25,7 @@ class AccessSettingApi {
             treeExpandedKeys: record['treeExpandedKeys']?.split(','),
             useSnippets: strings.isTrue(record['useSnippets']),
             interceptSearchShortcut: strings.isTrue(record['interceptSearchShortcut']),
+            macOptionIsMeta: strings.isTrue(record['macOptionIsMeta']),
         }
         return setting;
     }

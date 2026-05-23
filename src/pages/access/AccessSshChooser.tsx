@@ -69,7 +69,7 @@ const AccessSshChooser = ({handleOk, handleCancel, open}: Props) => {
             <Modal
                 title={t('access.batch.choose_asset')}
                 open={open}
-                maskClosable={false}
+                mask={{closable: false}}
                 destroyOnHidden={true}
                 onOk={() => {
                     handleOk(sshAssetKeys);

@@ -10,6 +10,7 @@ export interface Credential {
     privateKey: string;
     passphrase: string;
     createdAt: number;
+    assetCount: number;
 }
 
 class CredentialApi extends Api<Credential> {

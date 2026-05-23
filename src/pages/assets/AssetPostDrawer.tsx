@@ -1,7 +1,8 @@
-import React, { useMemo, useRef } from 'react';
-import { Button, Drawer, Space } from "antd";
+import React, {useRef} from 'react';
+import {Modal} from "antd";
 import AssetsPost from "@/pages/assets/AssetPost";
 import {useTranslation} from "react-i18next";
+import {useNavigate} from "react-router-dom";
 
 interface Props {
     open: boolean;
@@ -14,14 +15,13 @@ interface Props {
 
 const AssetPostDrawer = ({open, onClose, assetId, groupId, copy}: Props) => {
     let {t} = useTranslation();
+    const navigate = useNavigate();
     const contentRef = useRef<HTMLDivElement>(null);
 
     let title = assetId ? t('actions.edit') : t('actions.new')
     if(copy){
         title = t('actions.copy')
     }
-
-    const drawerWidth = 1200;
 
     const handleSave = () => {
         const form = contentRef.current?.querySelector('form') as HTMLFormElement | null;
@@ -35,36 +35,37 @@ const AssetPostDrawer = ({open, onClose, assetId, groupId, copy}: Props) => {
         form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
     };
 
-    const drawerExtra = (
-        <Space size={8}>
-            <Button onClick={onClose}>
-                {t('actions.cancel')}
-            </Button>
-            <Button type="primary" onClick={handleSave}>
-                {t('actions.save')}
-            </Button>
-        </Space>
-    );
-
     return (
         <div>
-            <Drawer
+            <Modal
                 title={title}
-                extra={drawerExtra}
-                onClose={onClose}
                 open={open}
-                width={drawerWidth}
+                width={800}
                 destroyOnHidden={true}
+                okText={t('actions.save')}
+                cancelText={t('actions.cancel')}
+                onOk={handleSave}
+                onCancel={onClose}
+                mask={{
+                    closable: false
+                }}
             >
                 <div ref={contentRef}>
                     <AssetsPost
+                        hideLogo={true}
                         assetId={assetId}
                         groupId={groupId}
                         copy={copy}
+                        showAdvanced={false}
                         onClose={onClose}
+                        onSuccess={(asset) => {
+                            if (asset?.id) {
+                                navigate(`/asset/${asset.id}`);
+                            }
+                        }}
                     />
                 </div>
-            </Drawer>
+            </Modal>
         </div>
     );
 };

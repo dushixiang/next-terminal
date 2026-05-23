@@ -120,7 +120,7 @@ const OidcServerConsent: React.FC = () => {
                 padding: '16px',
             }}>
                 <Alert
-                    message={t('general.error')}
+                    title={t('general.error')}
                     description={t('account.oidc_consent.load_error')}
                     type="error"
                     showIcon
@@ -176,7 +176,7 @@ const OidcServerConsent: React.FC = () => {
 
                     {/* 应用信息 */}
                     <Alert
-                        message={
+                        title={
                             <span className="text-[13px]">
                             <strong>{data.clientID}</strong> {t('account.oidc_consent.request_access')}
                         </span>
@@ -196,7 +196,7 @@ const OidcServerConsent: React.FC = () => {
                             onChange={(values) => setSelectedScopes(values as string[])}
                             className="w-full"
                         >
-                            <Space direction="vertical" className="w-full" size={8}>
+                            <Space orientation="vertical" className="w-full" size={8}>
                                 {data.scopes.map((scope) => (
                                     <Checkbox
                                         key={scope}
@@ -216,7 +216,7 @@ const OidcServerConsent: React.FC = () => {
 
                     {/* 提示信息 */}
                     <Alert
-                        message={
+                        title={
                             <span className="text-xs">
                             {t('account.oidc_consent.warning', {clientId: data.clientID})}
                         </span>

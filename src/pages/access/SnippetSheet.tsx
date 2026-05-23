@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {App, Button, Drawer, Input, Spin} from "antd";
+import type {DrawerProps} from "antd";
 import snippetUserApi from "@/api/snippet-user-api";
 import {Snippet} from "@/api/snippet-api";
 import {useTranslation} from "react-i18next";
 import {ChevronDown, ChevronUp, CirclePlay} from "lucide-react";
 import SnippetUserModal from "@/pages/facade/SnippetUserModal";
+import {isMobileByMediaQuery} from "@/utils/utils";
 
 interface Props {
     open: boolean
@@ -14,9 +16,10 @@ interface Props {
     placement?: 'top' | 'right' | 'bottom' | 'left'
     mask?: boolean
     maskClosable?: boolean
+    getContainer?: DrawerProps['getContainer']
 }
 
-const SnippetSheet = ({open, onClose, onUse, placement, mask, maskClosable}: Props) => {
+const SnippetSheet = ({open, onClose, onUse, placement, mask, maskClosable, getContainer = false}: Props) => {
 
     let {t} = useTranslation();
     let {message} = App.useApp();
@@ -83,13 +86,19 @@ const SnippetSheet = ({open, onClose, onUse, placement, mask, maskClosable}: Pro
     if (!placement) {
         placement = 'right';
     }
+    const isMobile = isMobileByMediaQuery();
+    const drawerPlacement = isMobile ? 'bottom' : placement;
+    const drawerSizeProps = isMobile
+        ? {size: '82svh'}
+        : {size: 378};
 
     return (
         <>
             <Drawer title={t('menus.resource.submenus.snippet')}
-                    placement={placement}
+                    placement={drawerPlacement}
                     onClose={onClose}
                     open={open}
+                    {...drawerSizeProps}
                     mask={mask}
                     maskClosable={maskClosable}
                     push={false}
@@ -109,7 +118,7 @@ const SnippetSheet = ({open, onClose, onUse, placement, mask, maskClosable}: Pro
                             </Button>
                         </div>
                     }
-                    getContainer={false}
+                    getContainer={getContainer}
             >
                 <Input.Search placeholder={t('access.search')}
                               onSearch={handleSearch}

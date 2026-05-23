@@ -4,7 +4,6 @@ import {useNavigate, useSearchParams} from "react-router-dom";
 import {LockOutlined, UserOutlined} from "@ant-design/icons";
 import accountApi, {LoginResult, LoginStatus} from "../../api/account-api";
 import {useMutation, useQuery} from "@tanstack/react-query";
-import {removeToken, setToken} from "@/api/core/requests.ts";
 import {StyleProvider} from '@ant-design/cssinjs';
 import brandingApi from "@/api/branding-api";
 import {useTranslation} from "react-i18next";
@@ -80,18 +79,24 @@ const LoginPage = () => {
         }
     });
 
-    const redirect = () => {
-        // 优先检查 return_url (OIDC Server 场景，重定向到第三方系统)
-        let returnUrl = searchParams.get('return_url');
-        if (returnUrl) {
-            window.location.href = returnUrl;
-            return;
+    const isSafeRedirectUrl = (url: string): boolean => {
+        // 允许相对路径（以 / 开头，但不能是 // 开头的协议相对URL）
+        if (url.startsWith('/') && !url.startsWith('//')) {
+            return true;
         }
+        // 仅允许 http/https 协议，阻止 javascript:、data: 等
+        try {
+            const parsed = new URL(url);
+            return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+        } catch {
+            return false;
+        }
+    };
 
-        // 其次检查 redirect (普通登录重定向)
-        let redirectUrl = searchParams.get('redirect');
-        if (redirectUrl) {
-            window.location.href = redirectUrl;
+    const redirect = () => {
+        let returnUrl = searchParams.get('return_url');
+        if (returnUrl && isSafeRedirectUrl(returnUrl)) {
+            window.location.href = returnUrl;
         } else {
             navigate('/');
         }
@@ -108,7 +113,6 @@ const LoginPage = () => {
         // 跳转登录
         sessionStorage.removeItem('current');
         sessionStorage.removeItem('openKeys');
-        setToken(data.token);
 
         if (loginByPassword && data.needTotp) {
             setStep(LoginStep.OTP);
@@ -127,6 +131,17 @@ const LoginPage = () => {
             validateTOTP.mutate({
                 'totp': value,
             })
+        }
+    }
+
+    const handleBackToLogin = async () => {
+        try {
+            await accountApi.logout();
+        } finally {
+            optForm.resetFields();
+            validateTOTP.reset();
+            setStep(LoginStep.Default);
+            queryLoginStatus.refetch();
         }
     }
 
@@ -193,7 +208,7 @@ const LoginPage = () => {
                     {showPassword && (
                         <Form onFinish={handleSubmit} className="login-form" layout="vertical">
                             <Form.Item label={t('audit.operation.account')} name='username'
-                                       rules={[{required: true}]}>
+                                       required={true}>
                                 <Input size={'large'}
                                        prefix={<UserOutlined/>}
                                        placeholder={t('account.enter')}
@@ -202,18 +217,20 @@ const LoginPage = () => {
                             </Form.Item>
                             <Form.Item label={t('assets.password')}
                                        name='password'
-                                       rules={[{required: true}]}>
+                                       required={true}>
                                 <Input.Password size={'large'} prefix={<LockOutlined/>}
                                                 placeholder={t('account.enter')}/>
                             </Form.Item>
                             {queryCaptcha.data?.enabled && (
-                                <Form.Item label={t('account.captcha')} name='captcha'
-                                           rules={[{required: true}]}>
+                                <Form.Item label={t('account.captcha')}
+                                           required={true}>
                                     <Space.Compact>
-                                        <Input prefix={<LockOutlined/>}
-                                               size={'large'}
-                                               placeholder={t('account.enter')}
-                                        />
+                                        <Form.Item name='captcha' noStyle>
+                                            <Input prefix={<LockOutlined/>}
+                                                   size={'large'}
+                                                   placeholder={t('account.enter')}
+                                            />
+                                        </Form.Item>
                                         <Spin spinning={queryCaptcha.isLoading}>
                                             <div style={{width: 100}}>
                                                 <img
@@ -285,8 +302,9 @@ const LoginPage = () => {
 
                     <Form form={optForm} onFinish={validateTOTP.mutate} className="login-form" layout="vertical">
                         <Form.Item label={t('identity.user.otp')} name='totp'
-                                   rules={[{required: true}]}>
+                                   required={true}>
                             <Input.OTP
+                                size={'large'}
                                 length={6}
                                 autoFocus
                                 onChange={(value) => {
@@ -301,16 +319,13 @@ const LoginPage = () => {
                                     htmlType="submit"
                                     size={'large'}
                                     className="w-full"
-                                    loading={mutation.isPending}>
+                                    loading={validateTOTP.isPending}>
                                 {t('account.login.action')}
                             </Button>
 
                             <div className={'mt-2'}>
                                 <div className={'text-blue-500 cursor-pointer'}
-                                     onClick={() => {
-                                         removeToken();
-                                         setStep(LoginStep.Default);
-                                     }}
+                                     onClick={handleBackToLogin}
                                 >
                                     {t('account.login.back')}
                                 </div>
@@ -330,44 +345,44 @@ const LoginPage = () => {
                 locale={translateI18nToAntdLocale(i18n.language)}
             >
                 <div className={'h-screen w-screen relative flex items-center justify-center'}>
-                <div className={'w-96 md:border rounded-lg p-8'}>
-                    <div className={'font-medium mb-4 text-lg'}>{brandingQuery.data?.name}</div>
-                    {renderLoginForm()}
-                </div>
+                    <div className={'w-96 md:border rounded-lg p-8'}>
+                        <div className={'font-medium mb-4 text-lg'}>{brandingQuery.data?.name}</div>
+                        {renderLoginForm()}
+                    </div>
 
-                <div className={'absolute top-8 right-8 flex items-center gap-2'}>
-                    <button
-                        ref={themeToggleRef}
-                        type="button"
-                        onClick={() => toggleDarkMode(!isDarkMode)}
-                        className="h-8 w-8 rounded-md border border-slate-200/60 bg-white/80 text-slate-700 transition-colors hover:bg-white dark:border-slate-700/60 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-900"
-                        aria-label="切换主题"
-                    >
-                        {isDarkMode ? <Sun className="h-4 w-4 mx-auto"/> : <Moon className="h-4 w-4 mx-auto"/>}
-                    </button>
-                    <Select
-                        placeholder="Language"
-                        variant="borderless"
-                        style={{
-                            width: 120,
-                        }}
-                        prefix={<LanguagesIcon className={'w-4 h-4'}/>}
-                        options={[
-                            {value: 'en-US', label: 'English'},
-                            {value: 'zh-CN', label: t('general.language_zh_cn')},
-                            {value: 'zh-TW', label: t('general.language_zh_tw')},
-                            {value: 'ja-JP', label: t('general.language_ja_jp')},
-                        ]}
-                        value={i18n.language}
-                        onChange={(value) => {
-                            i18n.changeLanguage(value);
-                        }}
-                    />
-                </div>
+                    <div className={'absolute top-8 right-8 flex items-center gap-2'}>
+                        <button
+                            ref={themeToggleRef}
+                            type="button"
+                            onClick={() => toggleDarkMode(!isDarkMode)}
+                            className="h-8 w-8 rounded-md border border-slate-200/60 bg-white/80 text-slate-700 transition-colors hover:bg-white dark:border-slate-700/60 dark:bg-slate-900/70 dark:text-slate-100 dark:hover:bg-slate-900"
+                            aria-label={t('general.toggle_theme')}
+                        >
+                            {isDarkMode ? <Sun className="h-4 w-4 mx-auto"/> : <Moon className="h-4 w-4 mx-auto"/>}
+                        </button>
+                        <Select
+                            placeholder="Language"
+                            variant="borderless"
+                            style={{
+                                width: 120,
+                            }}
+                            prefix={<LanguagesIcon className={'w-4 h-4'}/>}
+                            options={[
+                                {value: 'en-US', label: 'English'},
+                                {value: 'zh-CN', label: t('general.language_zh_cn')},
+                                {value: 'zh-TW', label: t('general.language_zh_tw')},
+                                {value: 'ja-JP', label: t('general.language_ja_jp')},
+                            ]}
+                            value={i18n.language}
+                            onChange={(value) => {
+                                i18n.changeLanguage(value);
+                            }}
+                        />
+                    </div>
 
-                <div className={'absolute bottom-12 text-blue-500'}>
-                    <a href="https://beian.miit.gov.cn" rel="noopener" target="_blank">{brandingQuery.data?.icp}</a>
-                </div>
+                    <div className={'absolute bottom-12 text-blue-500'}>
+                        <a href="https://beian.miit.gov.cn" rel="noopener" target="_blank">{brandingQuery.data?.icp}</a>
+                    </div>
                 </div>
             </ConfigProvider>
         </StyleProvider>

@@ -1,6 +1,13 @@
 import React, {useRef, useState} from 'react';
-import {App, Button, Popconfirm, Space, Switch, Tag} from "antd";
-import {ActionType, ProColumns, ProTable, TableDropdown} from "@ant-design/pro-components";
+import {
+    App,
+    Button,
+    Dropdown,
+    Popconfirm,
+    Space,
+    Switch,
+    Tag} from "antd";
+import NTable, {type NTableActionType, type NColumn} from "@/components/NTable";
 import oidcClientApi, {OidcClient, OidcClientCreateResponse} from "@/api/oidc-client-api";
 import {useTranslation} from "react-i18next";
 import {getSort} from "@/utils/sort";
@@ -13,7 +20,7 @@ const api = oidcClientApi;
 
 const OidcClientPage = () => {
     const {t} = useTranslation();
-    const actionRef = useRef<ActionType>(null);
+    const actionRef = useRef<NTableActionType>(null);
 
     let [open, setOpen] = useState<boolean>(false);
     let [selectedRowKey, setSelectedRowKey] = useState<string>();
@@ -93,7 +100,7 @@ const OidcClientPage = () => {
         }
     });
 
-    const columns: ProColumns<OidcClient>[] = [
+    const columns: NColumn<OidcClient>[] = [
         {
             title: t('general.name'),
             dataIndex: 'name',
@@ -173,54 +180,64 @@ const OidcClientPage = () => {
             title: t('actions.label'),
             valueType: 'option',
             fixed: 'right',
-            render: (text, record) => [
-                <NButton key="edit" onClick={() => {
-                    setSelectedRowKey(record.id);
-                    setOpen(true);
-                }}>
-                    {t('actions.edit')}
-                </NButton>,
-                <Popconfirm
-                    key={'regenerate'}
-                    title={t('identity.oidc_client.regenerate_secret')}
-                    description={t('identity.oidc_client.regenerate_secret_confirm')}
-                    onConfirm={async () => {
-                        regenerateSecretMutation.mutate(record.id);
-                    }}
-                    okText={t('actions.confirm')}
-                    cancelText={t('actions.cancel')}
-                >
-                    <NButton danger>
-                        {t('identity.oidc_client.regenerate_secret')}
+            render: (text, record) => (
+                <Space>
+                    <NButton key="edit" onClick={() => {
+                        setSelectedRowKey(record.id);
+                        setOpen(true);
+                    }}>
+                        {t('actions.edit')}
                     </NButton>
-                </Popconfirm>,
-                <TableDropdown
-                    key="actionGroup"
-                    menus={[
-                        {
-                            key: 'delete',
-                            name: (
-                                <Popconfirm
-                                    title={t('general.confirm_delete')}
-                                    onConfirm={async () => {
-                                        await deleteItems([record.id]);
-                                    }}
-                                    okText={t('actions.confirm')}
-                                    cancelText={t('actions.cancel')}
-                                >
-                                    {t('actions.delete')}
-                                </Popconfirm>
-                            ),
-                        },
-                    ]}
-                />,
-            ],
+                    <Popconfirm
+                        key={'regenerate'}
+                        title={t('identity.oidc_client.regenerate_secret')}
+                        description={t('identity.oidc_client.regenerate_secret_confirm')}
+                        onConfirm={async () => {
+                            regenerateSecretMutation.mutate(record.id);
+                        }}
+                        okText={t('actions.confirm')}
+                        cancelText={t('actions.cancel')}
+                    >
+                        <NButton danger>
+                            {t('identity.oidc_client.regenerate_secret')}
+                        </NButton>
+                    </Popconfirm>
+                    <Dropdown
+                        key="actionGroup"
+                        menu={{
+                            items: [
+                                {
+                                    key: 'delete',
+                                    label: t('actions.delete'),
+                                    danger: true,
+                                },
+                            ],
+                            onClick: ({key}) => {
+                                if (key === 'delete') {
+                                    modal.confirm({
+                                        title: t('general.confirm_delete'),
+                                        okText: t('actions.confirm'),
+                                        cancelText: t('actions.cancel'),
+                                        onOk: async () => {
+                                            await deleteItems([record.id]);
+                                        },
+                                    });
+                                }
+                            },
+                        }}
+                    >
+                        <Button type="link" size="small" style={{padding: 0}}>
+                            {t('actions.more')}
+                        </Button>
+                    </Dropdown>
+                </Space>
+            ),
         },
     ];
 
     return (
         <>
-            <ProTable<OidcClient>
+            <NTable<OidcClient>
                 columns={columns}
                 actionRef={actionRef}
                 request={async (params = {}, sort) => {

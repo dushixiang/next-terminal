@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import {Button, Checkbox, Drawer, Input} from 'antd';
+import type {DrawerProps} from "antd";
 import {CirclePlay, RotateCcw, Send} from 'lucide-react';
 import {useTranslation} from "react-i18next";
 import {useWindowSize} from 'react-use';
 import {ScrollArea} from "@/components/ui/scroll-area";
 import shellAssistantApi, {StreamResponse} from "@/api/shell-assistant-api";
 import accessSettingApi from "@/api/access-setting-api";
+import {isMobileByMediaQuery} from "@/utils/utils";
 
 const {TextArea} = Input;
 
@@ -16,6 +18,7 @@ interface Props {
     placement?: 'top' | 'right' | 'bottom' | 'left'
     mask?: boolean
     maskClosable?: boolean
+    getContainer?: DrawerProps['getContainer']
 }
 
 interface StreamingResponse {
@@ -27,7 +30,7 @@ interface StreamingResponse {
     error?: string;
 }
 
-const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClosable}: Props) => {
+const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClosable, getContainer = false}: Props) => {
     const {t} = useTranslation();
     const {height} = useWindowSize();
     const [question, setQuestion] = useState<string>('');
@@ -66,6 +69,11 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
     if (!placement) {
         placement = 'right';
     }
+    const isMobile = isMobileByMediaQuery();
+    const drawerPlacement = isMobile ? 'bottom' : placement;
+    const drawerSizeProps = isMobile
+        ? {size: '82svh'}
+        : {size: 420};
 
     const handleAsk = async () => {
         if (!question.trim()) {
@@ -181,9 +189,10 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
     return (
         <Drawer
             title={<span className="text-gray-100">{t('access.shell_assistant.title')}</span>}
-            placement={placement}
+            placement={drawerPlacement}
             onClose={onClose}
             open={open}
+            {...drawerSizeProps}
             mask={mask}
             maskClosable={maskClosable}
             push={false}
@@ -208,7 +217,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
                     {t('actions.clear')}
                 </Button>
             }
-            getContainer={false}
+            getContainer={getContainer}
         >
             <div className="flex flex-col gap-4">
                 {/* 输入区域 */}
@@ -265,7 +274,7 @@ const ShellAssistantSheet = ({open, onClose, onExecute, placement, mask, maskClo
 
                 {/* 响应列表 */}
                 {responses.length > 0 && (
-                    <ScrollArea style={{height: height - 400}}>
+                    <ScrollArea style={{height: isMobile ? 'calc(82svh - 310px)' : height - 400}}>
                         <div className="space-y-4 pr-3">
                             {responses.map((response) => (
                                 <div key={response.id} className="space-y-2">

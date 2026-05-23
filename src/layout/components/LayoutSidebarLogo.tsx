@@ -1,5 +1,5 @@
 import React from 'react';
-import {Spin} from 'antd';
+import {Spin, Tooltip} from 'antd';
 import {useQuery} from '@tanstack/react-query';
 import clsx from 'clsx';
 import brandingApi from '@/api/branding-api';
@@ -29,9 +29,11 @@ const LayoutSidebarLogo: React.FC<LayoutSidebarLogoProps> = ({collapsed = false}
                     />
                 )}
                 {!collapsed && (
-                    <div className={clsx('font-bold text-lg transition duration-100 ease-in-out')}>
-                        {brandingQuery.data?.name}
-                    </div>
+                    <Tooltip title={brandingQuery.data?.name} placement="right">
+                        <div className={clsx('font-bold text-lg transition duration-100 ease-in-out truncate max-w-[160px]')}>
+                            {brandingQuery.data?.name}
+                        </div>
+                    </Tooltip>
                 )}
             </div>
         </Spin>

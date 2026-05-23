@@ -185,7 +185,7 @@ const FileEditor: React.FC<Props> = ({
         onClose();
     };
 
-    const title = <div className="flex items-center">
+    const title = <div className="flex items-center gap-2 pr-8">
         <Tooltip title={`${t('actions.save')} (Ctrl+S)`}>
             <Button
                 type="text"
@@ -222,6 +222,13 @@ const FileEditor: React.FC<Props> = ({
                 >
                     {t('fs.editor.copy_path')}
                 </Button>
+            </Tooltip>
+        )}
+        {activeFile && (
+            <Tooltip title={activeFile.key}>
+                <span className="text-xs text-gray-400 font-normal truncate flex-1 min-w-0">
+                    {activeFile.key}
+                </span>
             </Tooltip>
         )}
     </div>
