@@ -34,9 +34,7 @@ const UserLayout = () => {
             }
         }, 500);
 
-        eventEmitter.on("API:NEED_ENABLE_OPT", () => {
-            needEnableOPT()
-        })
+        eventEmitter.on("API:NEED_ENABLE_OPT", needEnableOPT);
 
         let needChangePassword = debounce(() => {
             let mustAt = '/x-info?activeKey=change-password';
@@ -52,10 +50,13 @@ const UserLayout = () => {
             }
         }, 500);
 
-        eventEmitter.on("API:NEED_CHANGE_PASSWORD", () => {
-            needChangePassword();
-        })
-    }, []);
+        eventEmitter.on("API:NEED_CHANGE_PASSWORD", needChangePassword);
+
+        return () => {
+            eventEmitter.off("API:NEED_ENABLE_OPT", needEnableOPT);
+            eventEmitter.off("API:NEED_CHANGE_PASSWORD", needChangePassword);
+        };
+    }, [modal, t]);
 
     return (
         <StyleProvider hashPriority="high">

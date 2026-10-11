@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import {baseWebSocketUrl} from '@/api/core/requests';
 import {useAccessSessionMutation} from '@/pages/access/hooks/use-access-session';
 import {maybe} from '@/utils/maybe';
@@ -41,7 +42,7 @@ const TerminalPage = () => {
             },
         });
         let cancelled = false;
-        runtime.terminal.writeln('trying to connect to the server ...');
+        runtime.terminal.writeln(i18n.t('access.terminal.connecting'));
 
         sessionMutation.mutateAsync().then((session) => {
             if (cancelled) {
@@ -67,8 +68,8 @@ const TerminalPage = () => {
                         runtime.terminal.write(message.content);
                     }
                 },
-                onError: () => runtime.terminal.writeln('\x1B[1;3;31mwebsocket error\x1B[0m '),
-                onClose: () => runtime.terminal.writeln('\x1B[1;3;31mconnection is closed.\x1B[0m '),
+                onError: () => runtime.terminal.writeln(`\x1B[1;3;31m${i18n.t('access.terminal.connection_error')}\x1B[0m `),
+                onClose: () => runtime.terminal.writeln(`\x1B[1;3;31m${i18n.t('access.terminal.connection_closed')}\x1B[0m `),
             });
             runtime.focus();
             window.addEventListener('beforeunload', handleUnload);

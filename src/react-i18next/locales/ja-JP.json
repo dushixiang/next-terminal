@@ -2,7 +2,60 @@
   "errors": {
     "10013": "組み込みデータは削除できません",
     "10028": "システム管理者ロールは編集できません",
-    "10029": "このロールはユーザーに割り当てられているため削除できません"
+    "10029": "このロールはユーザーに割り当てられているため削除できません",
+    "10004": "アカウントまたはパスワードが正しくありません",
+    "10005": "アカウントが無効になっています",
+    "10009": "OTP コードが正しくありません",
+    "10010": "接続元 IP アドレスからのログインは許可されていません",
+    "10011": "現在の時間帯はログインが許可されていません",
+    "10025": "接続元の地域からのログインは許可されていません",
+    "10026": "ID アクセスポリシーによりログインが拒否されました",
+    "10022": "パスワードによるログインは無効になっています",
+    "60001": "パスワードが現在のポリシーで必要な最小文字数を満たしていません。",
+    "60002": "パスワードの文字種が不足しています。ポリシーに従って数字、英小文字、英大文字、特殊文字を組み合わせてください。",
+    "60003": "パスワードにユーザー名を含めることはできません。",
+    "60005": "パスワードに、順方向と逆方向で同じ文字列になる回文は使用できません。",
+    "20000": "ライセンス情報を取得できません。",
+    "20002": "ライセンスの有効期限が切れています。",
+    "20003": "ライセンスの同時接続セッション数の上限に達しています。",
+    "20004": "ライセンスのユーザー数の上限に達しているため、追加できません。",
+    "20005": "ライセンスの資産数の上限に達しているため、追加できません。",
+    "20007": "現在のライセンスにはこの機能が含まれていません。",
+    "30000": "Agent ゲートウェイが接続されていません。",
+    "30001": "Agent ゲートウェイのトンネルが存在しません。",
+    "10017": "リモートセッションは終了しています。",
+    "10018": "この資産のファイルシステム機能は無効になっています。",
+    "40000": "Web サイトのリバースプロキシ機能は無効になっています。",
+    "10006": "セキュリティ認証に失敗しました。もう一度お試しください。",
+    "10007": "ログインの失敗回数が多いため、現在ログインが制限されています。",
+    "10008": "OTP コードを入力してください。",
+    "10027": "この資産にアクセスする前に追加の本人確認が必要です。",
+    "50001": "このシステムではパスキーによるログインが無効になっています。",
+    "1000": "トークンが無効です。",
+    "1001": "システムの初期設定が完了していません。",
+    "10000": "指定されたレコードが存在しません。",
+    "10001": "この名前は既に使用されています。",
+    "10002": "リクエストのパラメーターが無効です。",
+    "10003": "この操作は自分のアカウントに対して実行できません。",
+    "10012": "メールサービスの設定が不足しています。",
+    "10014": "この操作を実行する権限がありません。",
+    "10015": "この操作は SSH 資産のみ対応しています。",
+    "10016": "この接続プロトコルには対応していません。",
+    "10019": "Web サイトが存在しません。",
+    "10020": "Web サイトが無効になっています。",
+    "10024": "このドメイン名は既に使用されています。",
+    "10021": "パスワードが正しくありません。",
+    "10023": "この機能は無効になっています。",
+    "40001": "資産のインポートに失敗しました。",
+    "50000": "システムが攻撃を検出しました。",
+    "50002": "このアカウントでは OTP 認証が有効になっていません。",
+    "50003": "画像のサイズが上限を超えています。",
+    "60004": "このパスワードは安全性が低いと判定されました。",
+    "10030": "認証チャネルを利用できません。管理者に連絡してください。",
+    "10031": "認証コードのリクエストが多すぎるか、送信上限に達しました。しばらくしてから再試行してください。",
+    "10032": "コードの送信に失敗しました。設定を確認するか、後で再試行してください。",
+    "10033": "コードが不正、期限切れ、または使用済みです。新しいコードを要求してください。",
+    "10034": "連絡先の変更には認証が必要です。"
   },
   "general": {
     "created_at": "作成日時",
@@ -13,7 +66,7 @@
     "disabled": "無効",
     "yes": "はい",
     "no": "いいえ",
-    "less-zero-tip": "0 未満は無制限",
+    "less-zero-tip": "負の値を指定すると無制限になります",
     "success": "成功",
     "failed": "失敗",
     "default": "デフォルト",
@@ -25,7 +78,7 @@
     "enter_remark": "備考を入力してください",
     "required": "必須",
     "confirm_delete": "この項目を削除しますか？",
-    "clear_confirm": "データをクリアしますか？",
+    "clear_confirm": "データをすべて消去しますか？",
     "unbound": "未連携",
     "bound": "連携済み",
     "days": "日",
@@ -46,7 +99,7 @@
     "my_assets": "マイ資産",
     "all": "すべて",
     "leave_confirm": "このページを離れますか？",
-    "loading_detail": "読み込み中...",
+    "loading_detail": "読み込み中…",
     "status": "状態",
     "name": "名称",
     "read": "読み取り",
@@ -54,9 +107,10 @@
     "upload": "アップロード",
     "offline": "オフライン",
     "online": "オンライン",
-    "search_placeholder": "キーワード検索",
+    "search_placeholder": "キーワードで検索",
     "selected_items": "{{count}} 件選択済み",
-    "toggle_theme": "テーマ切替"
+    "toggle_theme": "テーマ切替",
+    "password_expired": "パスワードの更新が必要です。変更してから続行してください。"
   },
   "access_control_denied": {
     "titles": {
@@ -66,10 +120,11 @@
       "ip": "現在の IP アドレスからシステムへアクセスすることは許可されていません。",
       "time": "現在の時間帯はシステムへのアクセスが許可されていません。",
       "geo": "現在の地域からシステムへアクセスすることは許可されていません。",
-      "policy": "現在のアクセスはシステムのアクセス制御ポリシーを満たしていません。"
+      "policy": "現在のアクセスはシステムのアクセス制御ポリシーを満たしていません。",
+      "unknown": "アクセスが拒否されましたが、具体的な制限理由を確認できません。"
     },
     "hints": {
-      "account": "このアカウントに割り当てられたユーザーまたは部門のポリシーグループによって拒否されました。誤判定と思われる場合は、システム管理者に連絡してください。"
+      "account": "制限の理由やアクセス権の変更については、システム管理者にお問い合わせください。"
     },
     "retry": "再確認",
     "logout": "ログアウトしてログイン画面に戻る"
@@ -104,16 +159,16 @@
     "test_connection": "接続テスト"
   },
   "dashboard": {
-    "login_times": "ログイン回数",
-    "active_users": "アクティブユーザー",
-    "active_assets": "アクティブ資産",
+    "login_times": "ログイン試行数",
+    "active_users": "接続ユーザー数",
+    "active_assets": "接続先の資産数",
     "login_failed_times": "ログイン失敗回数",
     "user_online_count": "オンラインユーザー",
     "gateway_active_count": "オンラインゲートウェイ",
     "asset_active_count": "稼働資産",
-    "date_counter": "アクティブ統計",
+    "date_counter": "日別のアクティビティ",
     "asset_type": "資産タイプ",
-    "latest_session": "最新セッション"
+    "latest_session": "最近終了したセッション"
   },
   "stat": {
     "info": {
@@ -144,7 +199,7 @@
   "facade": {
     "asset_placeholder": "資産名、プロトコル、タグ、ネットワークアドレス",
     "database_asset_placeholder": "資産名、ユーザー名、タグ、タイプ",
-    "database_access_work_order": "SQL ワークオーダーへ",
+    "database_access_work_order": "SQL 実行申請へ",
     "website_placeholder": "サイト名、タグ、タイプ",
     "current_users": "現在のユーザー",
     "status_detail": "ステータス詳細",
@@ -154,33 +209,33 @@
   },
   "menus": {
     "dashboard": {
-      "label": "概要"
+      "label": "ダッシュボード"
     },
     "resource": {
       "label": "リソース管理",
       "submenus": {
-        "asset": "ホスト資産",
-        "database_asset": "データベース資産",
-        "credential": "アクセス認証情報",
-        "snippet": "コマンドスニペット",
+        "asset": "ホスト",
+        "database_asset": "データベース",
+        "credential": "認証情報",
+        "snippet": "コマンド集",
         "storage": "ストレージ",
-        "website": "Web 資産",
-        "ip_set": "IP アドレスセット",
+        "website": "Web サイト",
+        "ip_set": "IP アドレス集",
         "certificate": "証明書管理"
       }
     },
     "work_order": {
-      "label": "ワークオーダー管理",
+      "label": "申請・承認",
       "submenus": {
-        "db_work_order": "SQL ワークオーダー",
+        "db_work_order": "SQL 実行申請",
         "access_request": "アクセス申請"
       }
     },
     "gateway": {
-      "label": "接続ゲートウェイ",
+      "label": "ゲートウェイ",
       "submenus": {
         "ssh_gateway": "SSH ゲートウェイ",
-        "agent_gateway": "セキュリティゲートウェイ",
+        "agent_gateway": "安全ゲートウェイ",
         "gateway_group": "ゲートウェイグループ",
         "network_proxy": "プロキシサーバー"
       }
@@ -188,9 +243,9 @@
     "log_audit": {
       "label": "監査ログ",
       "submenus": {
-        "online_session": "オンラインセッション",
-        "offline_session": "オフラインセッション",
-        "filesystem_log": "ファイルログ",
+        "online_session": "接続中セッション",
+        "offline_session": "セッション履歴",
+        "filesystem_log": "ファイル操作ログ",
         "access_log": "アクセスログ",
         "access_log_stats": "アクセスログ統計",
         "login_log": "ログインログ",
@@ -202,32 +257,32 @@
     "sysops": {
       "label": "システム運用",
       "submenus": {
-        "scheduled_task": "定期タスク",
+        "scheduled_task": "スケジュールタスク",
         "tools": "ツール",
-        "monitoring": "監視",
+        "monitoring": "システム監視",
         "system_event": "システムイベント",
         "credential_rotation": "認証情報ローテーション"
       }
     },
     "identity": {
-      "label": "ID 管理",
+      "label": "ユーザー管理",
       "submenus": {
         "user": "ユーザー",
         "department": "部門",
         "role": "ロール",
-        "access_policy": "ID アクセスポリシー",
-        "login_locked": "ログインロック",
+        "access_policy": "アクセスポリシー",
+        "login_locked": "ログイン制限",
         "oidc_client": "OIDC クライアント"
       }
     },
     "authorised": {
-      "label": "リソース認可",
+      "label": "権限管理",
       "submenus": {
         "command_filter": "コマンドフィルタ",
         "strategy": "認可ポリシー",
-        "authorised_asset": "ホスト認可",
-        "authorised_website": "Web 認可",
-        "authorised_database_asset": "データベース認可"
+        "authorised_asset": "ホスト",
+        "authorised_website": "Web サイト",
+        "authorised_database_asset": "データベース"
       }
     },
     "setting": {
@@ -242,7 +297,7 @@
       "batch_download": "一括ダウンロード",
       "create_dir": "フォルダ作成",
       "upload_file": "ファイルアップロード",
-      "upload_dir": "フォルダアップロード",
+      "upload_dir": "フォルダをアップロード",
       "preview_image": "画像プレビュー",
       "chmod": "権限設定"
     },
@@ -250,24 +305,24 @@
       "path": "パス",
       "size": "サイズ",
       "last": {
-        "modified": "最終更新"
+        "modified": "最終更新日時"
       },
       "permissions": {
-        "group": "グループ",
+        "group": "所有グループ",
         "owner": "所有者",
         "group_execute": "実行",
-        "public": "公開"
+        "public": "その他のユーザー"
       }
     },
     "delete_confirm": {
-      "title": "このファイルを削除しますか？",
-      "content": "この操作はファイルを完全に削除します。続行しますか？"
+      "title": "選択したファイルまたはフォルダを削除しますか？",
+      "content": "選択したファイルとフォルダを完全に削除します。フォルダ内のすべての内容も削除されます。続行しますか？"
     },
     "navigation": {
-      "back_to_prev": "前の階層へ戻る",
+      "back_to_prev": "親フォルダに移動",
       "show_hidden_file": "隠しファイルを表示",
       "hide_hidden_file": "隠しファイルを非表示",
-      "file_tran": "ファイル転送"
+      "file_tran": "転送状況"
     },
     "editor": {
       "refetch": "再読み込み",
@@ -293,16 +348,17 @@
     },
     "drag_upload_hint": "ここにファイルをドラッグしてアップロード",
     "drag_upload_disabled": "現在のポリシーではアップロードできません",
-    "upload_initializing": "ユーザー情報を初期化しています。しばらくしてからもう一度お試しください。"
+    "upload_initializing": "ユーザー情報を初期化しています。しばらくしてからもう一度お試しください。",
+    "title": "ファイル管理"
   },
   "guacamole": {
     "state": {
-      "idle": "初期化中...",
-      "connecting": "サーバーに接続中...",
-      "waiting": "サーバー応答待ち...",
-      "connected": "サーバーに接続しました",
-      "disconnecting": "セッションを終了中...",
-      "disconnected": "セッションを終了しました",
+      "idle": "未接続",
+      "connecting": "接続中…",
+      "waiting": "サーバーの応答を待っています…",
+      "connected": "接続済み",
+      "disconnecting": "切断中…",
+      "disconnected": "切断済み",
       "unknown": "不明な状態"
     },
     "tunnel": {
@@ -314,9 +370,9 @@
   },
   "identity": {
     "setup": {
-      "user": "ユーザー初期化",
-      "go_to_login": "ログインへ",
-      "success": "ユーザーの初期化に成功しました",
+      "user": "スーパー管理者を作成",
+      "go_to_login": "ログイン画面へ",
+      "success": "スーパー管理者を作成しました",
       "password_not_same": "パスワードが一致しません",
       "already_done_title": "初期化済み",
       "already_done_subtitle": "このシステムは既に初期化されています。ログインページへ進んでください。"
@@ -343,7 +399,7 @@
       "enable_rule": "このルールを有効にする",
       "rule_enabled_extra": "無効なルールはグループ内の一致判定から除外されます。",
       "ip_group": "送信元 IP",
-      "ip_group_extra": "単一 IP、CIDR、IP 範囲に対応しています。複数の値は改行またはカンマで区切ってください。0.0.0.0/0 はすべての IP に一致します。",
+      "ip_group_extra": "単一 IP、CIDR、IP 範囲に対応し、改行またはカンマで区切れます。0.0.0.0/0 はすべての IPv4 アドレス、::/0 はすべての IPv6 アドレスに一致します。",
       "ip_group_placeholder": "送信元 IP を1行に1つ入力するか、カンマで区切ってください\n例：192.168.0.1\n192.168.1.0/24",
       "action": {
         "label": "一致時のアクション",
@@ -354,15 +410,15 @@
       "priority": "優先度",
       "priority_extra": "数値が小さいほど優先度が高い",
       "time_period": "ポリシー有効時間帯",
-      "time_period_extra": "選択した時間帯のみルールが一致します。時間帯を選択しない場合は終日一致します。",
+      "time_period_extra": "サーバー時刻で選択した時間帯を照合します。日付をまたぐ時間帯は翌日まで続きます。時間帯を選択しない場合は終日一致します。",
       "expiration_at": "ポリシー有効期限",
       "geo": "地域の制限",
-      "country": "国の制限",
-      "country_extra": "指定した国からのアクセスユーザーのみ許可します。中国語または英語の名称に対応しています。",
-      "province": "都道府県/州の制限",
-      "province_extra": "指定した都道府県または州からのアクセスユーザーのみ許可します。中国語または英語の名称に対応しています。",
-      "city": "都市の制限",
-      "city_extra": "指定した都市からのアクセスユーザーのみ許可します。中国語または英語の名称に対応しています。",
+      "country": "国・地域",
+      "country_extra": "指定した国・地域からのアクセスに一致します。中国語または英語の名称を指定できます。許可するかどうかはルールのアクションで決まります。",
+      "province": "都道府県・州",
+      "province_extra": "指定した都道府県・州からのアクセスに一致します。中国語または英語の名称を指定できます。許可するかどうかはルールのアクションで決まります。",
+      "city": "都市",
+      "city_extra": "指定した都市からのアクセスに一致します。中国語または英語の名称を指定できます。許可するかどうかはルールのアクションで決まります。",
       "binding_targets": "関連付け対象",
       "bound_users": "ユーザー",
       "bound_departments": "部門",
@@ -378,14 +434,14 @@
       "type": "ロール種別",
       "types": {
         "default": "組み込みロール",
-        "new": "新規ロール"
+        "new": "カスタムロール"
       },
       "permission": "権限"
     },
     "department": {
       "parent": "上位部門",
       "root": "ルート部門",
-      "weight_tooltip": "数値が大きいほど上位に並びます",
+      "weight_tooltip": "数値が大きいほど先に表示されます",
       "weight_placeholder": "並び順を入力してください",
       "name_placeholder": "部門名を入力してください",
       "parent_placeholder": "上位部門を選択してください",
@@ -393,14 +449,16 @@
       "tree_view": "ツリー表示",
       "tree_structure": "部門ツリー構造",
       "manage_users": "メンバー管理",
-      "user_count": "メンバー数"
+      "user_count": "メンバー数",
+      "name_required": "部門名を入力してください",
+      "name_max_length": "部門名は {{max}} 文字以内で入力してください"
     },
     "user": {
       "locked_at": "ロック時間",
       "locked_type": "ロック種別",
       "locked_type_username": "アカウントロック",
       "locked_type_ip": "IP ロック",
-      "otp": "二要素認証",
+      "otp": "OTP 認証",
       "type": "ユーザー種別",
       "types": {
         "super_admin": "スーパー管理者",
@@ -437,26 +495,26 @@
         "action": "パスワードをリセット",
         "success": "パスワードをリセットしました",
         "new": "新しいパスワード",
-        "confirm_title": "ユーザーパスワードをリセットしますか？",
-        "confirm_content": "パスワード未入力の場合はランダム生成し、メールで送信します。"
+        "confirm_title": "選択したユーザーのパスワードをリセットしますか？",
+        "confirm_content": "未入力の場合はランダムなパスワードを生成します。既存の Web ログインセッションは無効になります。メールアドレスが登録されているユーザーにはリセット通知メールを送信します。"
       },
       "reset_otp": {
-        "action": "二要素認証をリセット",
-        "confirm_title": "ユーザーの二要素認証をリセットしますか？",
-        "confirm_content": "リセット後は二要素認証なしでログインできます。確認後、管理者本人の二次認証が必要です。"
+        "action": "OTP 認証をリセット",
+        "confirm_title": "このユーザーの OTP 認証をリセットしますか？",
+        "confirm_content": "ユーザーの OTP 設定を削除します。ログインポリシーで OTP が必須の場合、次回ログイン時に再設定が必要です。続行するには管理者による追加認証が必要です。"
       },
       "clear_passkeys": {
         "action": "Passkey を削除",
         "confirm_title": "ユーザーのすべての Passkey を削除しますか？",
-        "confirm_content": "この操作は元に戻せません。Passkey がユーザーの最後のログイン方法である場合、操作は拒否されます。確認後、管理者本人の二次認証が必要です。"
+        "confirm_content": "この操作は元に戻せません。パスキーが唯一のログイン方法である場合、操作は拒否されます。続行するには管理者による追加認証が必要です。"
       },
       "external_identity": {
         "title": "外部アカウント",
-        "provider": "タイプ",
+        "provider": "ID プロバイダー",
         "provider_oidc": "OIDC",
         "provider_wechat": "企業微信",
         "provider_ldap": "LDAP",
-        "account_identifier": "アカウント識別子",
+        "account_identifier": "アカウント名",
         "display_name": "表示名",
         "identifier": "識別子",
         "last_login_at": "最終ログイン",
@@ -484,15 +542,15 @@
       "redirect_uris": "リダイレクト URI",
       "grant_types": "グラントタイプ",
       "response_types": "レスポンスタイプ",
-      "scopes": "Scopes",
+      "scopes": "スコープ",
       "regenerate_secret": "シークレットをローテーション",
       "regenerate_secret_confirm": "このクライアントのシークレットをローテーションしますか？旧シークレットは直ちに無効になります。",
       "title": "OIDC クライアント一覧",
       "selected_count": "{{count}} 件選択済み",
-      "client_id_label": "Client ID",
-      "client_id_required": "Client ID を入力してください",
-      "client_id_placeholder": "一意の Client ID を入力してください",
-      "client_id_tooltip": "Client ID は作成後に変更できません",
+      "client_id_label": "クライアント ID",
+      "client_id_required": "クライアント ID を入力してください",
+      "client_id_placeholder": "一意のクライアント ID を入力してください",
+      "client_id_tooltip": "クライアント ID は作成後に変更できません。",
       "name_required": "名称を入力してください",
       "name_placeholder": "クライアント名を入力してください",
       "redirect_uris_required": "少なくとも 1 つのリダイレクト URI を追加してください",
@@ -500,7 +558,7 @@
       "redirect_uri_required": "リダイレクト URI を入力してください",
       "grant_types_required": "少なくとも 1 つのグラントタイプを選択してください",
       "response_types_required": "少なくとも 1 つのレスポンスタイプを選択してください",
-      "scopes_required": "少なくとも 1 つの scope を選択してください",
+      "scopes_required": "スコープを 1 つ以上選択してください",
       "access_control": "アクセス制御",
       "access_control_tip": "この OIDC クライアントを利用できるユーザーを制御します",
       "access_all_users": "全ユーザー",
@@ -512,9 +570,9 @@
       "bound_departments": "認可部門",
       "bound_departments_placeholder": "このクライアントを利用できる部門を選択してください",
       "bound_departments_required": "少なくとも 1 つの部門を選択してください",
-      "skip_consent": "認証をスキップ",
-      "skip_consent_enabled": "認証スキップを有効化",
-      "skip_consent_tip": "有効にすると、ログイン済みでアクセス制御を通過したユーザーには認可確認ページを表示しません。",
+      "skip_consent": "同意確認をスキップ",
+      "skip_consent_enabled": "同意確認ページを表示しない",
+      "skip_consent_tip": "有効にしてもログインとクライアントのアクセス権限確認は必要です。同意確認ページのみ省略します。",
       "description_placeholder": "クライアントの説明を入力してください"
     }
   },
@@ -538,45 +596,50 @@
   },
   "authorised": {
     "strategy": {
-      "download": "ダウンロード",
-      "rename": "名前変更",
-      "paste": "貼り付け",
+      "download": "ファイルのダウンロード",
+      "rename": "ファイル・ディレクトリの名前変更",
+      "paste": "クリップボードからの貼り付け",
       "create_dir": "ディレクトリ作成",
-      "create_file": "ファイル作成"
+      "create_file": "ファイル作成",
+      "upload": "ファイルのアップロード",
+      "edit": "ファイルの編集",
+      "delete": "ファイル・ディレクトリの削除",
+      "copy": "クリップボードへのコピー"
     },
     "command_filter": {
       "options": {
         "rule": "ルール"
       },
       "rule": {
-        "priority_extra": "数値が小さいほど優先度が高い",
+        "priority_extra": "数値が小さいルールから照合し、最初に一致したルールで許可または拒否を決定します。どのルールにも一致しないコマンドは許可されます。",
         "type": {
-          "label": "一致方式",
+          "label": "照合方法",
           "options": {},
           "command": "完全一致",
-          "regexp": "正規表現一致"
+          "regexp": "正規表現"
         },
-        "match_content": "一致内容",
+        "match_content": "照合パターン",
         "action": {
           "options": {}
-        }
+        },
+        "match_tip": "完全一致ではコマンド全体を比較します。正規表現はコマンドの一部分にも一致するため、全体を照合するには ^ と $ を使用してください。"
       }
     },
     "label": {
       "asset_group": "資産グループ",
-      "website_group": "Web 資産グループ",
-      "strategy": "ポリシー",
+      "website_group": "Web サイトグループ",
+      "strategy": "操作権限ポリシー",
       "authorised_at": "認可日時",
       "never_expired": "無期限"
     },
-    "website_title": "認可済みサイト",
+    "website_title": "Web サイトのアクセス権限",
     "authorise_failed": "認可に失敗しました"
   },
   "sysops": {
     "spec": "cron 式",
-    "spec_run": "実行シミュレーション",
-    "spec_run_time": "直近 10 回の実行時刻",
-    "spec_tooltip": "秒単位の定期実行に対応します。標準 cron と異なり先頭フィールドは秒（Quartz 互換）ですが、年フィールドは未対応です。",
+    "spec_run": "実行予定を確認",
+    "spec_run_time": "次の 10 回の実行予定",
+    "spec_tooltip": "秒、分、時、日、月、曜日の 6 フィールドで指定します。年フィールドには対応していません。@daily などの指定も使用できます。",
     "last_exec_at": "最終実行時刻",
     "command": "コマンド",
     "system_event": {
@@ -610,16 +673,17 @@
     },
     "options": {
       "exec": "今すぐ実行",
-      "logs": "ログを見る"
+      "logs": "ログを見る",
+      "exec_tip": "スケジュール実行が無効でも、手動で 1 回実行できます。"
     },
     "monitoring": {
       "title": "システム監視",
       "description": "CPU、メモリ、ローカルストレージ、主要バックエンドサービスの状態を確認します。",
-      "generated_at": "データ時刻",
+      "generated_at": "収集日時",
       "load_failed": "監視データの読み込みに失敗しました",
       "health_title": "ヘルスチェック",
       "alert_title": "アラート概要",
-      "protocol_title": "オンラインプロトコル分布",
+      "protocol_title": "接続中セッションのプロトコル分布",
       "database_in_use": "使用中",
       "database_idle": "アイドル",
       "database_wait": "待機回数",
@@ -644,14 +708,14 @@
       "logical_cores": "論理コア",
       "available": "利用可能",
       "swap": "スワップ",
-      "service_runtime": "サービス稼働",
-      "access_runtime": "アクセス稼働",
+      "service_runtime": "サービス稼働状況",
+      "access_runtime": "アクセス稼働状況",
       "database_runtime": "データベース接続",
       "version": "バージョン",
       "goroutines": "Goroutine",
       "runtime_memory": "ランタイムメモリ",
       "last_triggered_at": "最終発生",
-      "acknowledge": "確認",
+      "acknowledge": "アラートを確認",
       "critical_alert": "重大なシステムアラートがあります",
       "critical_alert_desc": "サービス影響を避けるため、CPU、メモリ、またはローカルストレージの異常を早急に処理してください。",
       "global_critical_title": "重大なシステムアラート",
@@ -685,15 +749,15 @@
         }
       },
       "health": {
-        "gateway": "セキュリティゲートウェイ",
+        "gateway": "Agent ゲートウェイ",
         "storage": "録画ストレージ",
-        "scheduler": "定期タスク",
+        "scheduler": "タスクスケジューラー",
         "cpu": "CPU",
         "memory": "メモリ"
       },
       "health_messages": {
         "scheduler": {
-          "ok": "定期タスクは初期化済みです"
+          "ok": "タスクスケジューラーは初期化済みです"
         },
         "gateway": {
           "ok": "ゲートウェイは稼働中です",
@@ -732,7 +796,7 @@
       "renewed": "更新済み",
       "skipped": "スキップ",
       "reason": "理由",
-      "clear_confirm_content": "すべてのログをクリアしますか？この操作は元に戻せません。"
+      "clear_confirm_content": "すべてのタスクログを消去しますか？この操作は元に戻せません。"
     },
     "type": {
       "options": {
@@ -742,10 +806,10 @@
       }
     },
     "mode": {
-      "label": "モード",
+      "label": "実行対象",
       "options": {
         "all_asset": "全資産",
-        "custom_asset": "カスタム資産"
+        "custom_asset": "指定した資産"
       }
     },
     "tools": {
@@ -753,28 +817,29 @@
       "target_placeholder": "IP アドレスまたはドメインを入力してください",
       "attempts": "回数",
       "attempts_tips": "リクエスト送信回数を設定",
-      "testing": "テスト開始"
+      "testing": "テスト開始",
+      "source_tip": "テストはサーバーから実行し、サーバーと対象の間の到達性を確認します。Ping は ICMP 応答、TCP Ping は指定ポートへの接続が可能かを確認します。"
     }
   },
   "audit": {
     "client_ip": "クライアント IP",
-    "connected_at": "接続時間",
-    "disconnected_at": "切断時間",
-    "connection_duration": "継続時間",
+    "connected_at": "接続日時",
+    "disconnected_at": "切断日時",
+    "connection_duration": "接続継続時間",
     "recording_size": "録画サイズ",
     "filename": "ファイル名",
-    "login_at": "ログイン時間",
+    "login_at": "ログイン日時",
     "action": "操作種別",
-    "login_status": "ログイン状態",
+    "login_status": "ログイン結果",
     "login_reason": "失敗理由",
-    "user_agent": "クライアント",
+    "user_agent": "ユーザーエージェント",
     "exec_command": {
-      "scope_tip": "ここには SSH exec 方式で実行された非対話型コマンドのみ記録されます。例: ssh user@host asset \"ls -la\"。対話型ターミナルで入力したコマンドはオフラインセッションの再生で確認してください。",
+      "scope_tip": "SSH exec による非対話型コマンドを記録します。対話型の入力は「SSH セッションコマンド」、実行画面はセッション履歴の再生で確認できます。",
       "command": "コマンド",
       "result": "実行結果",
       "exit_code": "終了コード",
-      "duration_ms": "所要時間(ms)",
-      "started_at": "実行日時",
+      "duration_ms": "所要時間（ms）",
+      "started_at": "実行開始日時",
       "risk_level": "リスクレベル",
       "status": {
         "forbidden": "ブロック済み"
@@ -789,7 +854,7 @@
       "remote_exec_commands": "リモート実行コマンド",
       "session_scope_tip": "対話型 SSH ターミナルで送信されたコマンドを記録します。実行結果と終了コードは含まれません。",
       "input_at": "入力日時",
-      "locate_playback": "再生位置へ移動",
+      "locate_playback": "この位置から再生",
       "remote_exec_detail": "リモート実行コマンド詳細",
       "clear_remote_exec": "リモート実行記録をクリア",
       "clear_remote_exec_confirm": "すべてのリモート実行コマンド記録をクリアしますか？"
@@ -798,21 +863,21 @@
       "requestId": "リクエスト ID",
       "uri": "リクエスト URI",
       "statusCode": "ステータスコード",
-      "clientStatusCode": "クライアント状態",
-      "upstreamStatusCode": "アップストリーム状態",
-      "downstreamResponseSize": "ダウンストリームサイズ",
-      "upstreamContentLength": "アップストリーム宣言サイズ",
+      "clientStatusCode": "クライアントへの応答コード",
+      "upstreamStatusCode": "接続先の応答コード",
+      "downstreamResponseSize": "クライアントへの応答サイズ",
+      "upstreamContentLength": "接続先の Content-Length",
       "totalResponseTime": "合計時間",
-      "noUpstreamResponse": "アップストリームなし",
+      "noUpstreamResponse": "接続先からの応答なし",
       "upstreamFailed": "アップストリーム失敗",
       "responseProcessingFailed": "レスポンス処理失敗",
       "userAgent": "User-Agent",
       "createdAt": "リクエスト時刻",
       "anonymous": "匿名",
-      "publicAllow": "公開許可",
+      "publicAllow": "公開アクセス許可",
       "whitelist": "IP ホワイトリスト",
       "tempAllow": "一時許可",
-      "tempPass": "一時パスワード",
+      "tempPass": "パスコード認証",
       "deletedUser": "削除済みユーザー",
       "clearConfirmTitle": "クリア確認",
       "clearConfirmContent": "すべてのアクセスログをクリアしますか？この操作は元に戻せません。",
@@ -827,18 +892,18 @@
           "30days": "過去 30 日"
         },
         "metrics": {
-          "pv": "PV 閲覧数",
-          "uv": "UV 訪問者数",
+          "pv": "リクエスト数（PV）",
+          "uv": "ユニーク訪問者数（UV）",
           "ip": "ユニーク IP 数",
           "traffic": "トラフィック量",
           "requests": "リクエスト数"
         },
         "realtime": {
           "title": "リアルタイム指標",
-          "currentOnline": "現在オンライン",
-          "requestsPerSecond": "毎秒リクエスト",
-          "realtimeTraffic": "リアルタイムトラフィック",
-          "errorRate": "エラー率"
+          "currentOnline": "直近 5 分間のアクティブ訪問者",
+          "requestsPerSecond": "毎秒リクエスト数（1 分平均）",
+          "realtimeTraffic": "転送速度（1 分平均）",
+          "errorRate": "エラー率（直近 1 分）"
         },
         "charts": {
           "trafficTrend": "トラフィック推移",
@@ -863,7 +928,8 @@
           "success": "成功 (2xx)",
           "redirect": "リダイレクト (3xx)",
           "clientError": "クライアントエラー (4xx)",
-          "serverError": "サーバーエラー (5xx)"
+          "serverError": "サーバーエラー (5xx)",
+          "other": "その他のステータスコード"
         }
       }
     },
@@ -872,7 +938,7 @@
       "module": "モジュール",
       "resource": "リソース",
       "request": "リクエスト",
-      "at": "操作時間",
+      "at": "操作日時",
       "modules": {
         "identity": "ID",
         "assets": "資産",
@@ -882,7 +948,12 @@
         "sysconf": "システム設定",
         "sysops": "運用",
         "backup": "バックアップ",
-        "entrance": "ポータル"
+        "entrance": "ポータル",
+        "gateway": "ゲートウェイ",
+        "log_audit": "監査ログ",
+        "resource": "リソース管理",
+        "setting": "システム設定",
+        "work_order": "申請・承認"
       },
       "actions": {
         "create": "作成",
@@ -908,7 +979,7 @@
         "execute": "実行",
         "generate": "生成",
         "revoke": "取り消し",
-        "set_default": "デフォルト設定",
+        "set_default": "デフォルトに設定",
         "sync": "同期",
         "test": "テスト",
         "access": "アクセス",
@@ -916,7 +987,50 @@
         "audit": "監査",
         "reset_password": "パスワードリセット",
         "reset_otp": "OTP リセット",
-        "authorize": "認可"
+        "authorize": "認可",
+        "acknowledge": "アラートを確認",
+        "batch_update": "一括更新",
+        "cancel": "申請を取り消す",
+        "change_connection": "接続方式を変更",
+        "change_gateway": "ゲートウェイを変更",
+        "change_group": "グループを変更",
+        "change_status": "有効・無効を切り替える",
+        "check": "地理データを確認",
+        "checking": "接続ポートを確認",
+        "clear_passkeys": "パスキーを削除",
+        "connect": "セッションに接続",
+        "credential_rotation_policies": "認証情報のローテーションポリシーを作成",
+        "detect_os": "OS を検出",
+        "edit": "ファイルを編集",
+        "exec": "タスクを実行",
+        "files": "バックアップを作成",
+        "gen_private_key": "秘密鍵を生成",
+        "gen_rsa_private_key": "RSA 秘密鍵を生成",
+        "ls": "ディレクトリの内容を一覧表示",
+        "mkdir": "ディレクトリを作成",
+        "models": "AI モデル一覧を取得",
+        "monitor": "ライブセッションを閲覧",
+        "next_ten_runs": "次回の実行日時を確認",
+        "playback": "録画を再生",
+        "profiles": "AI 設定を作成",
+        "recording_convert": "録画を変換",
+        "regenerate_secret": "クライアントシークレットを再生成",
+        "rename": "ファイル・ディレクトリの名前を変更",
+        "request": "ライセンス申請を生成",
+        "reset_totp": "OTP をリセット",
+        "resize": "セッションのサイズを変更",
+        "restore": "バックアップを復元",
+        "retry": "録画のアップロードを再試行",
+        "retry_failed": "失敗した録画のアップロードを再試行",
+        "rm": "ファイル・ディレクトリを削除",
+        "rotate": "認証情報を更新",
+        "rotate_credential": "資産の認証情報を更新",
+        "rules": "ルールを作成",
+        "send_mail": "テストメールを送信",
+        "set_register_addr": "Agent の登録先アドレスを設定",
+        "test_ldap": "LDAP 認証をテスト",
+        "upload_restore": "バックアップをアップロードして復元",
+        "wol": "Wake-on-LAN リクエストを送信"
       },
       "resources": {
         "user": "ユーザー",
@@ -926,7 +1040,7 @@
         "access_token": "アクセストークン",
         "role": "ロール",
         "department": "部門",
-        "access_policy": "アクセス制御",
+        "access_policy": "アクセスポリシー",
         "login_lock": "ログインロック",
         "login_log": "ログインログ",
         "oidc_client": "OIDC クライアント",
@@ -935,7 +1049,7 @@
         "asset_group": "資産グループ",
         "database_asset": "データベース資産",
         "credential": "認証情報",
-        "snippet": "スニペット",
+        "snippet": "コマンドスニペット",
         "storage": "ストレージ",
         "website": "Web サイト",
         "website_group": "Web サイトグループ",
@@ -945,7 +1059,7 @@
         "agent_gateway": "Agent ゲートウェイ",
         "agent_gateway_token": "Agent ゲートウェイトークン",
         "gateway_group": "ゲートウェイグループ",
-        "strategy": "認可ポリシー",
+        "strategy": "操作権限ポリシー",
         "command_filter": "コマンドフィルター",
         "command_filter_rule": "コマンドフィルタールール",
         "authorised_asset": "資産認可",
@@ -955,12 +1069,12 @@
         "session_share": "セッション共有",
         "session_audit": "セッション監査",
         "filesystem": "ファイルシステム",
-        "filesystem_log": "ファイルログ",
+        "filesystem_log": "ファイル操作ログ",
         "access_setting": "アクセス設定",
         "access_log": "アクセスログ",
         "website_temp_allow": "Web サイト一時許可",
         "database_sql_log": "データベース SQL ログ",
-        "database_work_order": "データベース申請",
+        "database_work_order": "SQL 実行申請",
         "property": "システムプロパティ",
         "license": "ライセンス",
         "operation_log": "操作ログ",
@@ -968,7 +1082,19 @@
         "backup": "バックアップ",
         "job": "スケジュールジョブ",
         "job_log": "ジョブログ",
-        "tool": "ツール"
+        "tool": "ツール",
+        "access_request": "アクセス申請",
+        "credential_rotation": "認証情報のローテーション",
+        "db_work_order": "SQL 実行申請",
+        "exec_command_log": "コマンド実行ログ",
+        "ip_set": "IP アドレスセット",
+        "login_locked": "ログインロック記録",
+        "monitoring": "システム監視",
+        "network_proxy": "ネットワークプロキシ",
+        "offline_session": "終了したセッション",
+        "online_session": "接続中のセッション",
+        "scheduled_task": "定期タスク",
+        "setting": "システム設定"
       }
     },
     "options": {
@@ -993,18 +1119,39 @@
       "failed": "変換失敗",
       "start": "変換",
       "retry": "再変換",
-      "trigger_failed": "変換の送信に失敗しました"
+      "trigger_failed": "変換タスクを予約できませんでした"
     },
     "recording_upload_status": {
       "pending": "アップロード待ち",
       "uploading": "アップロード中",
       "failed": "{{target}} へのアップロードに失敗しました",
       "retry": "再アップロード",
-      "retry_submitted": "録画の再アップロードを送信しました",
+      "retry_submitted": "録画の再アップロードを予約しました",
       "retry_failed": "録画の再アップロード送信に失敗しました",
       "retry_all": "失敗したアップロードをすべて再試行（{{count}}）",
       "retry_all_confirm": "失敗した録画 {{count}} 件をすべて再アップロードしますか？",
       "retry_all_submitted": "{{accepted}} 件を再アップロードに送信し、{{skipped}} 件をスキップしました"
+    },
+    "filesystem_actions": {
+      "ls": "ディレクトリの内容を一覧表示",
+      "upload": "ファイルをアップロード",
+      "download": "ファイルをダウンロード",
+      "remove": "ファイル・ディレクトリを削除",
+      "edit": "ファイルを編集",
+      "create-dir": "ディレクトリを作成",
+      "create-file": "ファイルを作成",
+      "rename": "ファイル・ディレクトリの名前を変更",
+      "chmod": "ファイルのアクセス権を変更"
+    },
+    "login_reasons": {
+      "account_incorrect": "アカウントまたはパスワードが正しくありません",
+      "account_disabled": "アカウントが無効になっています",
+      "otp_incorrect": "OTP コードが正しくありません",
+      "ip_not_allowed": "接続元 IP アドレスからのログインは許可されていません",
+      "time_not_allowed": "現在の時間帯はログインが許可されていません",
+      "geo_not_allowed": "接続元の地域からのログインは許可されていません",
+      "policy_not_allowed": "ID アクセスポリシーによりログインが拒否されました",
+      "password_login_disabled": "パスワードによるログインは無効になっています"
     }
   },
   "access": {
@@ -1021,12 +1168,12 @@
       },
       "mouse": {
         "label": "マウス設定",
-        "selection_copy": "選択でコピー",
+        "selection_copy": "選択したテキストを自動コピー",
         "right_click_paste": "右クリックで貼り付け"
       },
       "keyboard": {
         "label": "キーボード設定",
-        "intercept_search_shortcut": "検索ショートカットを無効化 (Ctrl/Cmd+F)",
+        "intercept_search_shortcut": "Ctrl/Cmd+F でターミナルを検索",
         "mac_option_is_meta": "macOS Option キーを Meta キーとして使用"
       }
     },
@@ -1037,13 +1184,15 @@
     "session": {
       "share": {
         "action": "セッション共有",
-        "cancel": "共有を取消"
+        "cancel": "共有を取消",
+        "create": "共有リンクを作成",
+        "tip": "リンクを持つ人はこのセッションを閲覧できます。操作はできません。リンクは繰り返し使用できます。共有を停止するとリンクが無効になり、閲覧者の接続が切断されます。元のセッションは終了しません。"
       }
     },
     "clipboard": "クリップボード",
-    "combination_key": "組み合わせキー",
+    "combination_key": "キーの組み合わせを送信",
     "toggle_full_screen": "全画面切替",
-    "required_auth": "ログインパラメータ",
+    "required_auth": "接続時の認証",
     "search": "検索",
     "snippet_expand": "クリックして展開...",
     "guacamole": {
@@ -1054,7 +1203,7 @@
       "clipboard_placeholder": "ここに貼り付け..."
     },
     "tabs": {
-      "copySession": "セッションを複製",
+      "copySession": "同じ接続を新しく開く",
       "closeLeft": "左側のタブを閉じる",
       "closeRight": "右側のタブを閉じる",
       "closeOthers": "他のタブを閉じる",
@@ -1064,14 +1213,14 @@
       "title": "資産の起動",
       "message": "資産 {{name}} はオフラインです。起動しますか？",
       "confirm": "起動",
-      "waking": "起動信号を送信中...",
+      "waking": "WOL マジックパケットを送信しています...",
       "countdown_message": "デバイス起動を待機中、残り時間：",
-      "checking": "資産がオンラインか確認中...",
-      "online": "資産はオンライン",
-      "online_desc": "資産の起動に成功しました。すぐに接続できます",
-      "offline": "資産はオフライン",
-      "offline_desc": "資産の起動が完了していない可能性があります。しばらくして再試行してください",
-      "failed": "起動失敗",
+      "checking": "接続ポートへの到達を確認しています...",
+      "online": "接続ポートに到達可能",
+      "online_desc": "資産の接続ポートに到達できました。接続を試せますが、ログイン認証の成功を保証するものではありません。",
+      "offline": "接続ポートに到達できません",
+      "offline_desc": "接続ポートへの到達を確認できませんでした。端末が起動中、またはネットワークやポートが利用できない可能性があります。しばらくしてから再試行してください。",
+      "failed": "起動要求に失敗しました",
       "check_now": "今すぐ確認",
       "connect": "今すぐ接続"
     },
@@ -1101,11 +1250,14 @@
         "auth_required": "接続先の認証が必要です",
         "username": "ユーザー名",
         "password": "パスワード",
-        "passphrase": "パスフレーズ",
+        "passphrase": "秘密鍵パスフレーズ",
         "answer": "回答",
         "cancel": "キャンセル",
         "connect": "接続"
-      }
+      },
+      "bulk_command_placeholder": "コマンドを入力し、Enter で接続中のすべての端末に実行",
+      "connection_error": "接続エラー",
+      "connection_closed": "接続が閉じられました"
     },
     "playback": {
       "shortcut_space": "スペース: 再生/一時停止",
@@ -1116,9 +1268,19 @@
       "seek_forward": "10秒進む (→)",
       "fullscreen": "全画面 (F)",
       "exit_fullscreen": "全画面終了 (F)"
-    }
+    },
+    "auth_hostname": "ホスト名"
   },
   "account": {
+    "captcha_ui": {
+      "slide_hint": "スライダーを動かしてピースを空白に合わせてください。離すと自動的に認証されます。",
+      "refresh": "パズルを更新",
+      "required": "セキュリティ認証を完了してください",
+      "image": "セキュリティ認証パズル",
+      "start": "クリックして認証を開始",
+      "verified": "認証済み",
+      "title": "セキュリティ認証"
+    },
     "profile": "プロフィール",
     "logout": "ログアウト",
     "change": {
@@ -1148,26 +1310,28 @@
     "client_cert_regenerate": "再生成",
     "client_cert_revoke": "失効",
     "client_cert_empty": "クライアント証明書はありません",
-    "client_cert_once_tip": "証明書は1回のみダウンロードできます。紛失した場合は再生成してください。",
+    "client_cert_once_tip": "ダウンロードする PKCS#12 ファイルにはクライアント証明書、秘密鍵、ルート CA 証明書が含まれます。インポート用パスワードは空です。安全に保管してください。再生成すると、それまで有効だったクライアント証明書は失効します。",
     "client_cert_download_started": "証明書のダウンロードを開始しました",
     "client_cert_revoke_confirm": "クライアント証明書を失効しますか？",
-    "client_cert_status_active": "有効",
+    "client_cert_status_active": "未失効",
     "client_cert_status_revoked": "失効済み",
     "client_cert_fingerprint": "証明書フィンガープリント",
     "client_cert_serial": "シリアル番号",
     "client_cert_not_before": "有効開始",
     "client_cert_not_after": "有効期限",
-    "client_cert_last_used": "証明書の最終使用",
-    "old_password": "古いパスワード",
+    "client_cert_last_used": "最終使用日時",
+    "old_password": "現在のパスワード",
     "confirm_password": "パスワード確認",
-    "captcha": "キャプチャ",
+    "captcha": "セキュリティ認証",
     "login": {
       "action": "ログイン",
       "methods": {
         "passkey": "Passkey で認証",
-        "otp": "OTP で認証",
+        "otp": "認証コードで認証",
         "wechat_work": "企業微信でログイン",
-        "oidc": "OIDC でログイン"
+        "oidc": "OIDC でログイン",
+        "local": "ローカルアカウント",
+        "ldap": "LDAP"
       },
       "back": "前に戻る",
       "processing": "ログイン処理中...",
@@ -1179,7 +1343,26 @@
       },
       "oidc_error": "OIDC ログインに失敗しました。再試行してください",
       "wechat_work_error": "企業微信ログインに失敗しました。再試行してください",
-      "back_to_login": "ログインページに戻る"
+      "back_to_login": "ログインページに戻る",
+      "ldap_username_hint": "ユーザー名を入力",
+      "sms": {
+        "phone": "電話番号",
+        "phone_hint": "アカウントに登録済みの番号を使用してください。中国本土は 11 桁で入力でき、その他の地域は国番号が必要です。",
+        "refresh_captcha": "パズルを更新",
+        "code": "SMS 認証コード",
+        "resend_after": "{{seconds}} 秒後に再送",
+        "send": "コードを取得",
+        "sent_hint": "ログイン可能なアカウントに登録された番号の場合、コードが送信されます。有効期限は 5 分です。",
+        "password_login": "パスワードログイン",
+        "login": "SMS ログイン",
+        "phone_placeholder": "電話番号を入力",
+        "code_placeholder": "6 桁の SMS コードを入力",
+        "resend": "再送信",
+        "captcha_title": "セキュリティ認証",
+        "captcha_hint": "セキュリティ認証を完了すると、SMS 認証コードを送信します。",
+        "confirm_send": "認証して送信",
+        "send_failed": "SMS コードの送信に失敗しました"
+      }
     },
     "external_binding": {
       "title": "ローカルアカウントを連携",
@@ -1191,7 +1374,7 @@
       "nickname": "表示名",
       "password_optional": "ローカルパスワード（任意）",
       "password_mismatch": "パスワードが一致しません",
-      "totp_optional": "認証コード（有効な場合は必須）",
+      "totp_optional": "認証コード（OTP が有効な場合は必須）",
       "create_and_login": "作成してログイン",
       "bind_and_login": "連携してログイン",
       "or": "または",
@@ -1210,7 +1393,7 @@
     "ssh_key_algorithm": "アルゴリズム",
     "ssh_key_fingerprint": "キーのフィンガープリント",
     "ssh_key_comment": "コメント",
-    "ssh_key_last_used": "キーの最終使用",
+    "ssh_key_last_used": "最終使用日時",
     "ssh_key_public_key_tip": "OpenSSH 形式の公開鍵を 1 つ貼り付けてください。秘密鍵は使用できません。",
     "ssh_key_public_key_required": "公開鍵を入力してください",
     "ssh_key_public_key_placeholder": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... desktop@macbook",
@@ -1219,49 +1402,49 @@
     "enter": "入力してください",
     "otp_bind_title": "有効",
     "otp_bind_sub_title": "ログイン時に認証アプリが生成するワンタイムコードの入力が必要です。",
-    "otp_unbind": "二要素認証を解除",
-    "otp_unbind_title": "二要素認証を解除しますか？",
-    "otp_unbind_subtitle": "解除するとアカウントが攻撃されるリスクが高まります。",
-    "otp_description": "二要素認証 (OTP) はアカウントに追加の保護を提供します。パスワードが漏洩しても、モバイルデバイスがなければアクセスできません。",
-    "otp_authenticator_app_description": "以下の認証アプリのいずれかをスマホにインストールしてください：",
+    "otp_unbind": "OTP 認証を無効化",
+    "otp_unbind_title": "OTP 認証を無効にしますか？",
+    "otp_unbind_subtitle": "無効にすると OTP の登録が解除されます。システムのポリシーで OTP が必須の場合、次回のログインや操作の続行時に再登録が必要です。",
+    "otp_description": "OTP 認証はアカウントの保護を強化します。有効にすると、ログイン時にパスワードと認証アプリが生成するコードが必要になります。",
+    "otp_authenticator_app_description": "認証アプリをインストール",
     "otp_features": {
-      "offline_access": "オフラインアクセス：ネット接続なしでコード生成",
-      "time_based": "時間ベース：30 秒ごとにコード更新"
+      "offline_access": "インターネット接続なしでコードを生成",
+      "time_based": "コードは 30 秒ごとに更新"
     },
     "otp_manual_setup": "手動設定",
     "otp_manual_setup_desc": "QR コードをスキャンできない場合は、認証アプリで次のキーを手動入力してください：",
     "otp_scan_qr": "QR コードをスキャン",
     "otp_scan_instruction": "上の QR コードを認証アプリでスキャンしてください",
-    "otp_verification_title": "連携を確認",
+    "otp_verification_title": "コードを入力して設定を完了",
     "otp_verification_instruction": "認証アプリに表示された 6 桁のコードを入力してください",
     "otp_security_tip": "セキュリティのヒント",
-    "otp_security_description": "連携が完了すると、アカウントは二要素認証で保護されます。認証デバイスを大切に保管してください。",
+    "otp_security_description": "認証アプリと設定用のキーを安全に保管してください。キーを入手した人は、あなたのアカウントの認証コードを生成できます。",
     "passkey_add": "Passkey を追加",
     "passkey_add_time": "追加日時",
     "passkey_used_time": "最終使用",
-    "passkey_delete_title": "Passkey を削除しますか？",
-    "passkey_delete_content": "Passkey はアカウントと資産をより安全に保護します。保持を推奨します。",
+    "passkey_delete_title": "この Passkey を削除しますか？",
+    "passkey_delete_content": "削除すると、この Passkey でログインしたり、追加の認証を行ったりできなくなります。",
     "mfa": "多要素認証",
     "mfa_authing": "認証中...",
     "mfa_auth_failed": "認証に失敗しました",
-    "mfa_change_way": "検証方法を切り替える",
-    "otp_required": "続行するには二次認証を有効にする必要があります",
-    "no_mfa_title": "先に認証方式を連携してください",
-    "no_mfa_subtitle": "認証方式が未連携のため、機密データを表示できません。",
+    "mfa_change_way": "別の認証方式を使う",
+    "otp_required": "続行するには OTP 認証アプリを登録してください。",
+    "no_mfa_title": "認証方式を設定してください",
+    "no_mfa_subtitle": "利用可能な追加認証方法がありません。OTP またはパスキーを有効にするか、プロフィールでメールや電話番号を登録してください。メールと SMS サービスは管理者による設定が必要です。",
     "enable_otp": "OTP 認証を有効化",
     "enable_passkey": "Passkey 認証を有効化",
     "select_auth_type": "認証方式を選択してください",
     "auth_type_passkey_desc": "生体認証またはセキュリティキーで認証",
     "auth_type_otp": "OTP コード",
-    "auth_type_otp_desc": "動的コードで認証",
+    "auth_type_otp_desc": "認証アプリが生成したコードを入力",
     "auth_type_unavailable": "未有効化",
     "oidc_server_authorizations": "OIDC 認可管理",
     "oidc_server_authorizations_desc": "アカウントへのアクセスを許可したサードパーティアプリを管理",
     "oidc_server_no_authorizations": "まだ認可したアプリはありません",
-    "oidc_server_scopes": "認可範囲",
+    "oidc_server_scopes": "付与した権限",
     "oidc_server_revoke": "認可を取り消す",
     "oidc_server_authorization_revoke_title": "認可取消の確認",
-    "oidc_server_authorization_revoke_content": "アプリ {{clientId}} の認可を取り消しますか？取り消すとアカウント情報にアクセスできなくなります。",
+    "oidc_server_authorization_revoke_content": "アプリ {{clientId}} の保存済み同意を削除しますか？発行済みのアクセストークンやリフレッシュトークンは取り消されません。",
     "oidc_server_authorization_revoked": "認可を取り消しました",
     "oidc_consent": {
       "title": "認可リクエスト",
@@ -1275,7 +1458,7 @@
         "profile": "プロフィールにアクセス（ニックネーム、ユーザー名）",
         "email": "メールアドレスにアクセス",
         "phone": "電話番号にアクセス",
-        "offline_access": "オフラインでアカウントにアクセス",
+        "offline_access": "ログインしていない間も、許可した情報へのアクセスを継続",
         "default": "関連情報にアクセス"
       },
       "warning": "認可後、{{clientId}} は選択した情報にアクセスできます。アカウント設定からいつでも取り消せます。",
@@ -1288,25 +1471,80 @@
       "requested_scopes": "次の権限を付与します",
       "allow": "認可",
       "deny": "拒否",
-      "warning": "認可すると、{{name}} は 1 年間アクセストークンを保持します。アクセストークンページからいつでも取り消せます。",
+      "warning": "{{name}} を認可すると、有効期間が 1 年のアクセストークンが発行されます。「アクセストークン」ページでいつでも取り消せます。",
       "load_error": "認可情報を読み込めません。再度認可フローを開始してください",
       "scope": {
         "account.read": "アカウントの基本情報を読み取る",
         "ssh_keys.manage": "SSH 公開鍵を管理する",
-        "assets.read": "アクセス可能なアセット一覧を読み取る",
-        "snippets.read": "コードスニペットを読み取る",
-        "token.revoke_self": "このアクセストークンを失効させる（切断時に使用）"
+        "assets.read": "アクセス可能な資産一覧を読み取る",
+        "snippets.read": "コマンドスニペットを読み取る",
+        "token.revoke_self": "この認可で発行されたアクセストークンを取り消す"
       }
     },
     "otp_code_required": "コードを入力してください",
-    "otp_code_format": "コードは 6 桁である必要があります",
-    "mfa_passkey_prompt": "ブラウザのポップアップで Passkey 認証を完了してください"
+    "otp_code_format": "6 桁の数字のコードを入力してください",
+    "mfa_passkey_prompt": "ブラウザのポップアップで Passkey 認証を完了してください",
+    "profile_details": {
+      "basic": "基本情報",
+      "edit": "プロフィールを編集",
+      "not_filled": "未入力",
+      "unassigned": "未割り当て",
+      "organization": "組織とアカウント",
+      "roles": "ロール",
+      "organization_managed": "組織、ロール、アカウント状態は管理者が管理します。",
+      "session_policy": "セッションポリシー",
+      "policy_managed": "管理者が管理するユーザー設定です。実際の動作は全体、アセット、プロトコルの設定にも依存します。",
+      "security": "セキュリティ概要",
+      "mfa": "MFA 認証",
+      "force_mfa": "OTP 認証を必須にする",
+      "last_login": "最終ログイン",
+      "never_logged_in": "未ログイン",
+      "load_failed": "プロフィールの読み込みに失敗しました",
+      "notification_language": "メールと SMS の通知言語"
+    },
+    "verification": {
+      "email": "メール認証",
+      "sms": "SMS 認証",
+      "email_desc": "登録済みメールアドレスにコードを送信",
+      "sms_desc": "登録済み電話番号にコードを送信",
+      "sent_to": "{{destination}} にコードを送信しました。有効期限は {{minutes}} 分です。",
+      "resend_after": "{{seconds}} 秒後に再送信",
+      "send_code": "コードを送信",
+      "load_failed": "認証方法の読み込みに失敗しました",
+      "change_email": "メールアドレスを変更",
+      "change_phone": "電話番号を変更",
+      "contact_tip": "現在の本人確認を行ってから、新しい連絡先を確認します。確認完了までは現在の連絡先が有効です。",
+      "channel_unavailable": "このチャネルは未設定です。管理者に連絡してください。",
+      "no_identity_method": "利用可能な本人確認方法がありません。OTP またはパスキーを設定するか、管理者に連絡してください。",
+      "new_email": "新しいメールアドレス",
+      "new_phone": "新しい電話番号",
+      "phone_format": "国番号を含めてください（例：+8613800138000）。中国本土の番号は 11 桁でも入力できます。",
+      "current_password": "現在のパスワード",
+      "change_target": "送信先を変更"
+    },
+    "notifications": {
+      "title": "通知設定",
+      "mail": "受信メール",
+      "no_mail": "未登録",
+      "change_mail": "メールを変更",
+      "service_unavailable": "メールサービスが無効、または設定が不完全なため、業務メールを送信できません。",
+      "bind_first": "メールアドレスを登録すると、個別の通知チャネルを作成せずに通知を受信できます。",
+      "email_enabled": "業務通知メールを受信",
+      "access_results": "アクセス申請の承認結果",
+      "work_order_results": "SQL 作業申請の承認・実行結果",
+      "pending_approvals": "承認待ちの通知",
+      "security_unaffected": "業務通知設定は認証コードや必要なアカウントセキュリティメールに影響しません。",
+      "wecom_enabled": "WeCom 個人通知",
+      "wecom_unavailable": "WeCom アプリチャネルが無効です。管理者に連絡してください。",
+      "wecom_unbound": "メンバーが未連携です。WeCom でログインし、現在のプラットフォームアカウントに連携してください。メンバー UserId の入力は不要です。",
+      "wecom_bound": "WeCom メンバーが連携済みです。"
+    }
   },
   "assets": {
     "alias": "別名",
     "alias_placeholder": "英字・数字・アンダースコア・ハイフンのみ、かつ英字で開始",
     "alias_invalid": "別名は英字で開始し、英字・数字・アンダースコア・ハイフンのみ使用できます",
-    "alias_tip": "SSH Server 直結時、この別名をターゲット名として使用できます。",
+    "alias_tip": "SSH プロキシ経由でホストに直接接続する際に、この別名で接続先を指定できます。",
     "type": "タイプ",
     "content": "内容",
     "sort": "並び順",
@@ -1323,7 +1561,7 @@
     "network": "ネットワーク",
     "tags": "タグ",
     "addr": "ネットワークアドレス",
-    "account_type": "アカウント種別",
+    "account_type": "認証方式",
     "asset_count": "資産数",
     "private_key": "秘密鍵",
     "password": "パスワード",
@@ -1343,9 +1581,9 @@
     "gateway_type": "ゲートウェイ種別",
     "display_settings": "表示設定",
     "color_depth": "色深度",
-    "force_lossless": "ロスレス圧縮",
+    "force_lossless": "可逆圧縮を使用",
     "resize_method": "画面サイズ変更方法",
-    "resize_method_extra": "クライアントの画面サイズが変わったときに RDP サーバーを更新する方法。",
+    "resize_method_extra": "ブラウザのリモートデスクトップ表示領域に合わせて RDP の画面サイズを変更する方法です。",
     "resize_methods": {
       "display_update": "表示更新",
       "display_update_desc": "RDP 8.1 の \"表示更新\" チャネルでサーバーに画面サイズ変更を通知",
@@ -1353,30 +1591,30 @@
       "reconnect_desc": "画面サイズ変更時に RDP セッションを自動切断し、新しいサイズで再接続"
     },
     "audio_settings": "音声設定",
-    "disable_audio": "音声を無効化",
-    "enable_audio_input": "音声入力を有効化",
+    "disable_audio": "音声再生を無効化",
+    "enable_audio_input": "マイク入力を有効化",
     "rdp_domain": "ドメイン",
     "preconnection_id": "事前接続 ID",
     "preconnection_blob": "事前接続データ",
     "remote_app": "リモートアプリ",
-    "remote_app_dir": "リモートアプリディレクトリ",
-    "remote_app_args": "リモートアプリ引数",
-    "rdp_drive": "ネットワークドライブ",
-    "rdp_drive_path": "ローカルストレージ",
-    "rdp_drive_path_extra": "未選択の場合は操作者のデフォルトストレージを使用します",
-    "is_share": "共有",
-    "limit_size": "サイズ制限",
-    "used_size": "使用済みサイズ",
+    "remote_app_dir": "RemoteApp の作業ディレクトリ",
+    "remote_app_args": "RemoteApp の起動引数",
+    "rdp_drive": "ドライブリダイレクトを有効化",
+    "rdp_drive_path": "マッピングするストレージ",
+    "rdp_drive_path_extra": "リモートデスクトップに割り当てるストレージを選択します。未選択の場合は現在のユーザーの既定ストレージを使用します。",
+    "is_share": "共有ストレージ",
+    "limit_size": "容量の上限",
+    "used_size": "使用容量",
     "domain": "ドメイン",
     "domain_tip": "保護された資産にアクセスするためのドメイン（例：www.example.com）は本システムの IP に解決される必要があります。",
-    "scheme": "資産プロトコル",
-    "forward_host_or_ip": "資産の IP またはドメイン",
-    "forward_port": "資産ポート",
-    "origin_host": "オリジンホスト名",
+    "scheme": "接続先のプロトコル",
+    "forward_host_or_ip": "接続先の IP またはホスト名",
+    "forward_port": "接続先のポート",
+    "origin_host": "接続先への Host ヘッダー",
     "origin_host_follow_service": "アクセスドメインに追従",
     "origin_host_follow_origin": "オリジンに追従",
     "origin_host_custom": "ホスト名を指定",
-    "origin_host_custom_name": "カスタムオリジンホスト名",
+    "origin_host_custom_name": "カスタム Host ヘッダー",
     "origin_timeout": "オリジンタイムアウト",
     "origin_timeout_tip": "プロキシがオリジンからの応答を待つ最大時間です。超過するとエラーを返します。",
     "insecure_skip_verify": "証明書検証をスキップ",
@@ -1388,17 +1626,17 @@
     "change_group": "グループ変更",
     "batch_edit": {
       "title": "一括編集",
-      "scope_tip": "SSH ターミナルと AI 設定は選択した SSH アセットにのみ適用され、その他のプロトコルのアセットはスキップされます。接続方法は選択したすべてのアセットに適用されます。チェックしていない設定は変更されません。",
+      "scope_tip": "SSH ターミナルと AI 設定は選択した SSH 資産にのみ適用され、その他のプロトコルの資産はスキップされます。接続方法は選択したすべての資産に適用されます。チェックしていない設定は変更されません。",
       "update_connection": "接続方法を変更",
-      "success_ssh": "{{count}} 件の SSH アセットのターミナルまたは AI 設定を更新し、{{skippedCount}} 件の非 SSH アセットをスキップしました",
-      "success_connection": "{{count}} 件のアセットの接続方法を更新しました",
-      "success_ssh_connection": "{{sshCount}} 件の SSH アセットのターミナルまたは AI 設定を更新し、{{skippedCount}} 件の非 SSH アセットをスキップしました。{{connectionCount}} 件のアセットの接続方法を更新しました",
-      "no_ssh_asset": "選択したアセットに SSH アセットがないため、SSH 設定は変更されませんでした"
+      "success_ssh": "{{count}} 件の SSH 資産のターミナルまたは AI 設定を更新し、{{skippedCount}} 件の非 SSH 資産をスキップしました",
+      "success_connection": "{{count}} 件の資産の接続方法を更新しました",
+      "success_ssh_connection": "{{sshCount}} 件の SSH 資産のターミナルまたは AI 設定を更新し、{{skippedCount}} 件の非 SSH 資産をスキップしました。{{connectionCount}} 件の資産の接続方法を更新しました",
+      "no_ssh_asset": "選択した資産に SSH 資産がないため、SSH 設定は変更されませんでした"
     },
     "website_batch_edit": {
       "title": "一括編集",
-      "scope_tip": "チェックした Web アセット設定のみ更新し、未チェックの設定は変更しません。接続方法とオリジン設定は選択したすべての Web アセットに適用されます。",
-      "success": "{{count}} 件の Web アセットを更新しました"
+      "scope_tip": "チェックした Web 資産設定のみ更新し、未チェックの設定は変更しません。接続方法とオリジン設定は選択したすべての Web 資産に適用されます。",
+      "success": "{{count}} 件の Web 資産を更新しました"
     },
     "group_default_gateway": "グループ既定ゲートウェイ",
     "ssh_gateway_required_after_first_hop": "2 番目以降のホップには SSH ゲートウェイのみ指定できます",
@@ -1406,20 +1644,20 @@
     "custom_header": "カスタムヘッダー",
     "custom_header_tip": "複数のカスタムヘッダーを追加できます。形式：キー: 値。",
     "custom_certificate": "カスタム証明書",
-    "header_key": "キー",
+    "header_key": "ヘッダー名",
     "header_value": "値",
     "active": "アクティブ",
     "access": "接続",
     "rdp_proxy_access": "RDP ファイルをダウンロード",
     "import": "資産をインポート",
     "copy": "資産をコピー",
-    "import_asset_tip": "資産のインポート時、アカウント/パスワードとキー/パスフレーズはどちらか一方のみ。両方ある場合は秘密鍵/パスワードを優先します。",
+    "import_asset_tip": "既存の認証情報を指定してインポートできます。指定しない場合はアカウント名とパスワードを使用します。鍵認証には、先に鍵の認証情報を作成してインポートファイルで指定してください。",
     "import_asset_group_tip": "既存グループは名前で照合し、不足するグループは自動作成されます。階層は Production/East のように / で区切ってください。",
     "import_asset_success": "資産のインポートに成功しました",
     "import_asset_error": "資産のインポートに失敗しました",
     "import_asset_error_title": "インポートファイルを確認してください。以下の資産が失敗しました：",
     "copy_public_key": "公開鍵をコピー",
-    "credential_delete_referenced_title": "認証情報は使用中のため削除できません",
+    "credential_delete_referenced_title": "参照されている認証情報は削除できません",
     "credential_delete_referenced_assets": "参照している資産：",
     "credential_delete_referenced_ssh_gateways": "参照している SSH ゲートウェイ：",
     "filesystem": "ファイルシステム",
@@ -1431,12 +1669,12 @@
     "public_access_switch": "匿名パブリックアクセスを許可",
     "public_validity": "公開アクセスの有効期限",
     "public_validity_tip": "期限切れ後は、直接許可とパスコードアクセスの両方が無効になります。",
-    "public_rule_relation_tip": "送信元 IP、地域、リクエストヘッダー、公開パスのいずれかに一致すると許可されます。",
+    "public_rule_relation_tip": "送信元 IP、地域、ヘッダー、公開パスのいずれかのルールに一致すると、パスコードなしでアクセスを許可します。",
     "public_access_rules": "直接許可ルール",
     "public_geo_rules": "地域ルール",
     "public_geo_rules_tip": "項目間は AND、同じ項目内の複数値は OR です。空の項目は制限しません。Enter で値を追加します。",
     "public_password_access": "パスコードアクセス",
-    "public_password_access_tip": "直接許可ルールがない場合、パスコードで認証します。",
+    "public_password_access_tip": "直接許可ルールに一致しない場合、パスコードで認証できます。ルールとパスコードが未設定の場合は匿名アクセスを許可します。ルールが設定されていても一致せず、パスコードも未設定の場合は NT アカウント認証が必要です。",
     "limit_ip": "送信元 IP",
     "limit_ip_tip": "単一 IP、CIDR、IP 範囲に対応します。複数値は改行、カンマ、またはセミコロンで区切ります。",
     "limit_country": "国",
@@ -1459,12 +1697,12 @@
     "modify_response": "レスポンスを変更",
     "certificates": {
       "type": "証明書タイプ",
-      "self_signed": "自己署名",
+      "self_signed": "システム CA による発行",
       "self_signed_tip_title": "ヒント：ルート証明書は手動で置換できます。再起動後に有効になります。",
       "self_signed_root_ca_cert_path": "ルート証明書パス",
       "self_signed_root_ca_key_path": "ルート秘密鍵パス",
-      "issued": "オンライン申請",
-      "imported": "ローカルインポート",
+      "issued": "ACME による発行",
+      "imported": "インポートした証明書",
       "not_after": "有効期限",
       "issuer": "発行元",
       "issuedStatus": "発行状態",
@@ -1476,10 +1714,10 @@
       "set_as_default": "デフォルトに設定",
       "download": "証明書をダウンロード",
       "renew": "証明書を更新",
-      "renew_confirm": "証明書を更新しますか？",
-      "renew_confirm_content": "証明書を再申請して更新します。続行しますか？",
+      "renew_confirm": "この証明書を更新しますか？",
+      "renew_confirm_content": "発行済みの証明書は更新可能な期間内にのみ更新し、期間外ならスキップします。発行に失敗していた場合は再申請します。続行しますか？",
       "issued_log": "証明書申請ログ",
-      "renew_before": "更新前リードタイム",
+      "renew_before": "有効期限の何日前から更新するか",
       "log_viewer": {
         "status": {
           "realtime": "リアルタイム",
@@ -1501,13 +1739,16 @@
           "no_data": "ログデータなし",
           "no_data_desc": "証明書操作中にログがリアルタイム表示されます"
         }
-      }
+      },
+      "renew_before_tip": "発行済みの証明書は、有効期限までの日数がこの値以下になると更新できます。0 は既定の 30 日を使用します。発行に失敗した場合は再申請できます。",
+      "renew_too_early": "証明書の更新可能な期間に入っていないため、更新をスキップしました。",
+      "renew_unsupported": "更新できるのは ACME 証明書のみです。"
     },
     "dns_providers": {
       "set": "DNS プロバイダーを設定",
       "remove": "DNS プロバイダーを削除",
       "remove_confirm_title": "DNS プロバイダー設定を削除",
-      "remove_confirm_content": "削除すると証明書を申請できません",
+      "remove_confirm_content": "設定を削除した後、この DNS プロバイダーで証明書の発行・更新時の DNS 検証を行うには、再設定してください。発行済みの証明書は削除されません。",
       "type": "プロバイダー種別",
       "tencentcloud": "Tencent Cloud",
       "alidns": "Alibaba Cloud",
@@ -1517,11 +1758,11 @@
     "dns_provider_config": "DNS プロバイダー設定",
     "terminal_settings": "ターミナル設定",
     "restricted_shell": "ネットワーク機器 / 制限付き Shell",
-    "restricted_shell_extra": "スイッチ、ルーター、ファイアウォールなどの非標準 Linux SSH 環境向けです。このような環境では SSH 子セッションを開始できません。有効にすると、ファイルシステム（SFTP）や実行統計（Stats）などの機能は使用できなくなります。",
+    "restricted_shell_extra": "スイッチ、ルーター、ファイアウォールなどの制限付き SSH 環境向けです。有効にすると、SFTP ファイル操作、実行時メトリクス、SSH 接続の生存確認、OS の自動検出が無効になります。",
     "sftp_directory_follow": "SFTP ディレクトリの自動追従",
     "sftp_directory_follow_extra": "有効にすると、SFTP ファイルシステムのディレクトリがターミナルの現在のディレクトリに自動的に追従します。",
-    "enable_alive_check": "生存チェック",
-    "enable_alive_check_extra": "接続中に対象資産がオンラインかどうかを定期的に確認し、接続異常をすばやく検出します。一部のハードウェアスイッチではこのチェックに対応していない場合があります。接続に失敗する、または頻繁に切断される場合は、この項目をオフにしてください。",
+    "enable_alive_check": "SSH 接続の生存確認",
+    "enable_alive_check_extra": "接続中に現在の SSH 接続を定期的に確認します。一部のネットワーク機器では対応していないため、接続に問題が発生する場合は無効にしてください。",
     "enable_detect_os": "OS の自動検出",
     "enable_detect_os_extra": "資産ロゴが空の場合、システムが OS を識別し、対応するアイコンを自動で設定します。一部のハードウェアスイッチではこの検出に対応していない場合があります。接続に失敗する、または検出結果が正しくない場合は、この項目をオフにしてください。",
     "connect_timeout": "接続タイムアウト",
@@ -1538,28 +1779,28 @@
       "mac_addr_invalid": "MAC アドレス形式が正しくありません",
       "broadcast": "ブロードキャストアドレス",
       "broadcast_placeholder": "ブロードキャストアドレスを入力してください。デフォルト：255.255.255.255",
-      "wakeup_delay": "起動遅延",
+      "wakeup_delay": "起動後の待機時間",
       "wakeup_delay_placeholder": "起動後の待機時間（秒）",
       "wakeup_delay_tooltip": "マジックパケット送信後、デバイス起動を待つ時間"
     },
     "security": {
-      "settings": "セキュリティ認証",
+      "settings": "セキュリティ",
       "mode": "セキュリティモード",
       "mode_extra": "RDP 接続のセキュリティモード。暗号化方式と認証タイプを決定します。",
-      "ignore_cert": "証明書検証を無視",
-      "ignore_cert_extra": "自己署名など検証不可の証明書でも無視します。",
+      "ignore_cert": "サーバー証明書の検証を省略",
+      "ignore_cert_extra": "検証できない自己署名証明書を含め、リモートサーバーの証明書検証を省略します。",
       "cert_tofu": "初回信頼 (TOFU)",
-      "cert_tofu_extra": "FreeRDP の TOFU ポリシーを有効化。初回接続時に未知の証明書を信頼します。",
+      "cert_tofu_extra": "初回接続時に未知の証明書を信頼して保存します。以降の接続では、保存した証明書との一致を確認します。",
       "cert_fingerprints": "証明書フィンガープリント",
-      "cert_fingerprints_extra": "カンマ区切りのフィンガープリント/ハッシュ一覧。接続時に証明書を検証します。",
+      "cert_fingerprints_extra": "ハッシュアルゴリズムと証明書フィンガープリントの組をカンマ区切りで指定します。サーバー証明書がいずれにも一致しない場合、接続は拒否されます。",
       "cert_fingerprints_placeholder": "例：sha256:1234567890abcdef...",
       "disable_auth": "認証を無効化",
-      "disable_auth_extra": "接続時の認証を無効化（リモートデスクトップ内のログイン認証には影響しません）。",
+      "disable_auth_extra": "接続時の認証を無効にします。リモートデスクトップ内のログイン要件はサーバーの設定に従います。NLA では認証を有効にする必要があります。",
       "modes": {
         "any": "自動選択",
         "any_desc": "クライアント/サーバーが対応するセキュリティプロトコルに基づき自動選択（デフォルト）",
         "nla": "ネットワーク レベル認証 (NLA)",
-        "nla_desc": "TLS 暗号化を使用。ユーザー名とパスワードが必要",
+        "nla_desc": "TLS で暗号化し、デスクトップセッションの開始前にユーザー名とパスワードを検証します。未設定の場合、対話認証に対応した guacd は入力を求めることができます。",
         "nla_ext": "拡張 NLA",
         "nla_ext_desc": "NLA と同様だが、サーバーが追加の「早期ユーザー認可結果」を送信する必要あり",
         "tls": "TLS 認証",
@@ -1571,19 +1812,19 @@
       }
     },
     "website_response_modify": {
-      "header_key_required": "キーを入力してください",
+      "header_key_required": "レスポンスヘッダー名を入力してください",
       "header_value_required": "値を入力してください",
       "rule_name_required": "ルール名を入力してください",
       "rule_name_placeholder": "ルール名",
       "match_conditions": "一致条件",
       "match_path": "リクエストパス",
-      "match_path_tip": "一致させるパス（例：/api/data。空なら全パス）",
+      "match_path_tip": "/api/* などのパスのワイルドカードで照合します。* は / をまたぎません。空欄の場合はすべてのパスに一致します。",
       "match_method": "リクエストメソッド",
       "match_method_tip": "一致させる HTTP メソッド（空なら全メソッド）",
       "match_method_placeholder": "メソッドを選択",
       "match_status": "レスポンスステータスコード",
       "match_status_tip": "一致させる HTTP ステータスコード（例：200, 404。0 は全て）",
-      "header_operations": "ヘッダー操作",
+      "header_operations": "レスポンスヘッダー操作",
       "rewrite_headers_label": "ヘッダー書き換え",
       "rewrite_headers_tip": "アップストリームの元のレスポンスヘッダー値を動的に書き換えます。後続の設定、追加、削除操作で結果を変更できます",
       "add_rewrite_header": "書き換えヘッダーを追加",
@@ -1600,12 +1841,12 @@
       "set_headers_label": "ヘッダー設定",
       "set_headers_tip": "レスポンスヘッダーを設定/上書き",
       "add_headers_label": "ヘッダー追加",
-      "add_headers_tip": "レスポンスヘッダーを追加（存在しない場合）",
-      "add_set_headers": "設定ヘッダーを追加",
-      "add_add_headers": "追加ヘッダーを追加",
+      "add_headers_tip": "ヘッダーが既に存在する場合も、新しい値を追加します。",
+      "add_set_headers": "上書き項目を追加",
+      "add_add_headers": "追加する値を設定",
       "remove_headers_label": "ヘッダー削除",
       "remove_headers_tip": "削除するレスポンスヘッダー（名前のみ指定）",
-      "remove_header_name_required": "ヘッダー名を入力してください",
+      "remove_header_name_required": "レスポンスヘッダー名を入力してください",
       "remove_header_name_placeholder": "削除するヘッダー名",
       "add_remove_header_button": "削除ヘッダーを追加",
       "body_replace_title": "レスポンスボディ置換",
@@ -1622,14 +1863,15 @@
     },
     "snippet": {
       "visibility": "可視性",
-      "visibility_public": "公開",
-      "visibility_private": "非公開"
+      "visibility_public": "共有",
+      "visibility_private": "個人用",
+      "visibility_tip": "共有スニペットはすべてのログインユーザーが表示・利用できます。個人用スニペットは作成者の個人一覧にのみ表示されます。管理者はリソース管理からすべてのスニペットを管理できます。"
     },
     "website_load_failed": "サイトデータの読み込みに失敗しました",
     "auto_fetch_favicon": "アイコン自動取得",
     "auto_fetch_favicon_failed": "アイコンの取得に失敗しました。対象URLを確認してください",
     "public_header_whitelist": "リクエストヘッダーのホワイトリスト",
-    "public_header_whitelist_tip": "追加をクリックしてヘッダー名を入力します。大文字・小文字は区別されません。",
+    "public_header_whitelist_tip": "指定したヘッダーが 1 つでも存在するとアクセスを許可します。値は検証せず、名前の大文字・小文字は区別しません。",
     "public_header_whitelist_placeholder": "例：X-Bypass-Token",
     "public_path_whitelist": "公開パス",
     "public_path_whitelist_tip": "追加をクリックしてパスを入力します。* は任意の文字列、? は任意の 1 文字、ワイルドカードのないパスは完全一致です。",
@@ -1642,7 +1884,7 @@
     "ai": {
       "settings": "AI 設定",
       "enabled": "AI を有効化",
-      "enabled_extra": "有効にすると、グローバル AI がこの SSH アセットを検索して操作できます。",
+      "enabled_extra": "有効にすると、AI アシスタントが現在のユーザーのアクセス権限の範囲内で、この SSH ホストを検索して操作できます。",
       "command_policy": "AI コマンド実行ポリシー",
       "command_policy_extra": "空の場合はグローバル AI 設定に従います。",
       "follow_global": "グローバル設定に従う"
@@ -1662,10 +1904,10 @@
       },
       "scope": "対象範囲",
       "pwd_length": "パスワード長",
-      "pwd_length_tip": "ランダムパスワードの長さ、8〜64 文字",
+      "pwd_length_tip": "生成するランダムパスワードの長さです。8～64 文字で指定します。",
       "pwd_symbol": "記号を含む",
       "keep_old_key": "旧公開鍵を保持",
-      "keep_old_key_tip": "有効にするとリモートで旧公開鍵を削除しません（安全）。無効にすると自動的に削除します",
+      "keep_old_key_tip": "有効にすると旧公開鍵が残るため、旧秘密鍵でも引き続きログインできます。無効にするとローテーション時に旧公開鍵を削除します。",
       "policy_warning": "ローテーションはリモートホストのアカウントパスワードや鍵を直接変更します。必ず代替のログイン手段を確保してください。",
       "cron_preset": "プリセット",
       "cron_presets": {
@@ -1686,9 +1928,29 @@
       },
       "trigger_label": "トリガー",
       "operator": "操作者",
-      "message": "メッセージ",
+      "message": "実行結果の詳細",
       "scope_empty_tip": "空欄の場合はすべての SSH 資産をローテーションします",
-      "scope_all": "すべての資産"
+      "scope_all": "すべての資産",
+      "messages": {
+        "only_ssh": "SSH 資産のみ対応しています。",
+        "account_type_mismatch": "アカウントの認証方式とローテーションの種類が一致しません。",
+        "aborted": "ローテーションを中止しました。",
+        "shared_aborted": "共有認証情報のローテーションを中止しました。旧鍵は引き続き有効です。",
+        "old_key_invalid": "旧秘密鍵から公開鍵を生成できませんでした：{{detail}}",
+        "database_save_failed": "リモートホストの公開鍵は更新されましたが、データベースへの保存に失敗しました。すぐに確認してください：{{detail}}",
+        "old_key_removal_failed": "新鍵は保存されましたが、旧公開鍵の削除に失敗しました：{{detail}}"
+      }
+    },
+    "username": "ログインユーザー名",
+    "public_password_placeholder": "アクセスパスコードを設定（任意）",
+    "host_placeholder": "ホスト名または IP アドレス",
+    "testing": "確認中",
+    "preconnection_setting": "RDP 事前接続",
+    "remote_app_setting": "RemoteApp",
+    "storage": {
+      "delete_title": "このストレージを削除しますか？",
+      "delete_content": "ストレージと、その中のすべてのファイルおよびフォルダを完全に削除します。",
+      "no_limit": "上限未設定"
     }
   },
   "group_tree": {
@@ -1727,9 +1989,9 @@
     "source_manual": "手動管理",
     "source_url": "URL 同期",
     "source_url_label": "ソース URL",
-    "source_url_tip": "HTTP および HTTPS URL を利用できます。同期に失敗した場合は最後に成功したバージョンを使用します。",
+    "source_url_tip": "公開 HTTP/HTTPS URL から空でない IP リスト（最大 1 MiB）を取得します。IP、CIDR、IP 範囲を 1 行ずつ指定でき、# コメントに対応します。同期成功時はリスト全体を置き換え、失敗時は最後に成功した内容を保持します。ローカル・プライベートアドレスは利用できません。",
     "source_headers": "リクエストヘッダー",
-    "source_headers_tip": "URL ソースのダウンロード時に送信する任意のヘッダーです。",
+    "source_headers_tip": "ソース URL から IP ルールをダウンロードする際のリクエストヘッダーです。省略できます。",
     "header_name": "ヘッダー名",
     "header_value": "ヘッダー値",
     "add_header": "ヘッダーを追加",
@@ -1746,28 +2008,29 @@
     "name": "グループ名",
     "name_placeholder": "グループ名を入力してください",
     "description_placeholder": "説明を入力してください",
-    "selection_mode": "選択モード",
-    "mode_priority": "優先度モード",
-    "mode_latency": "レイテンシモード",
-    "mode_random": "ランダムモード",
+    "selection_mode": "ゲートウェイ選択方式",
+    "mode_priority": "優先度順",
+    "mode_latency": "レイテンシ順",
+    "mode_random": "ランダム",
     "members": "ゲートウェイメンバー",
     "member": "メンバー",
     "add_member": "ゲートウェイメンバーを追加",
-    "priority_tooltip": "数値が小さいほど優先度が高い（優先度モードで有効）",
+    "priority_tooltip": "数値が小さいほど優先度が高くなります。優先度順で選択する場合のみ適用されます。",
     "create": "ゲートウェイグループを作成",
-    "edit": "ゲートウェイグループを編集"
+    "edit": "ゲートウェイグループを編集",
+    "selection_mode_hint": "有効なメンバーのみが選択対象です。オフラインの Agent は除外され、SSH ゲートウェイの到達性は実際の接続時に確認されます。優先度順では優先度の数値が最小の利用可能なメンバーを、ランダムでは利用可能なメンバーを無作為に選びます。レイテンシ順では参考値を比較します。Agent は直近の測定値（未取得時は 1 ms）、SSH は固定の 10 ms です。対象資産までのエンドツーエンドの遅延ではありません。"
   },
   "gateways": {
     "port": "ポート",
-    "config_mode": "設定モード",
-    "config_mode_direct": "直接設定",
-    "config_mode_credential": "認証情報を参照",
-    "config_mode_asset": "資産を参照",
+    "config_mode": "認証の設定方法",
+    "config_mode_direct": "手動設定",
+    "config_mode_credential": "保存した認証情報を使用",
+    "config_mode_asset": "SSH ホストを参照",
     "ssh_asset": "SSH 資産",
     "username": "ユーザー名",
     "account_type": {},
     "register": "登録",
-    "token_manage": "通信トークン管理",
+    "token_manage": "Agent ゲートウェイトークン",
     "gateway_delete_referenced_title": "ゲートウェイは使用中のため削除できません",
     "gateway_delete_referenced_assets": "参照している資産：",
     "gateway_delete_referenced_websites": "参照しているウェブサイト：",
@@ -1793,12 +2056,12 @@
       "swap": "スワップ"
     },
     "load": {
-      "normal": "システムはアイドル",
-      "moderate": "やや負荷",
-      "busy": "リソース逼迫"
+      "normal": "通常の負荷",
+      "moderate": "やや高い負荷",
+      "busy": "高い負荷"
     },
     "add_token": "トークンを追加",
-    "edit_token_remark": "トークン備考を編集",
+    "edit_token_remark": "トークンの備考を編集",
     "monitor": {
       "title": "ゲートウェイ監視",
       "system_info": "システム情報",
@@ -1826,32 +2089,34 @@
     "install_step_register": "登録コマンドを実行",
     "install_step_register_admin": "管理者として登録コマンドを実行",
     "install_windows_service_tip": "登録成功後、Windows サービスとして自動インストールされ起動します",
-    "install_system_service_tip": "登録成功後、システムサービスとして自動インストールされ起動します"
+    "install_system_service_tip": "登録成功後、システムサービスとして自動インストールされ起動します",
+    "token": "通信トークン",
+    "token_tip": "Agent ゲートウェイがサーバーへ接続する際の認証に使用します。複数のゲートウェイで共有できます。自動的には期限切れになりません。削除すると、そのトークンを使った新規接続や再接続は認証できなくなります。"
   },
   "settings": {
     "system": {
-      "setting": "システム",
+      "setting": "一般",
       "name": "システム名",
       "logo": "システムアイコン",
-      "copyright": "システム著作権",
+      "copyright": "著作権表示",
       "icp": "ICP 登録番号",
       "ip": {
-        "extractor": "IP アドレス取得方式",
+        "extractor": "クライアント IP の取得方式",
         "trust_list": "信頼済みプロキシ IP/CIDR リスト",
         "trust_placeholder": "入力後 Enter で確定"
       },
       "asset_access": {
         "mode": "資産アクセス入口",
         "access_page": "統一アクセスページ",
-        "standalone_page": "独立タブ"
+        "standalone_page": "別のブラウザタブ"
       },
       "watermark": {
-        "enabled_tip": "有効にすると、SSH、RDP、VNC、TELNET 資産へのアクセス時に、端末またはリモートデスクトップ画面へウォーターマーク情報を表示します。",
+        "enabled_tip": "SSH、RDP、VNC、TELNET の Web 端末またはリモートデスクトップ画面にウォーターマークを表示します。ユーザー設定で無効にしたアカウントは対象外です。",
         "content": "ウォーターマーク内容",
         "append": {},
         "font": {},
-        "append_user": "ユーザーを追加",
-        "append_asset": "資産を追加",
+        "append_user": "操作者のユーザー名とニックネームを追加",
+        "append_asset": "資産名と接続先のユーザー名を追加",
         "font_color": "文字色",
         "font_size": "文字サイズ"
       },
@@ -1859,11 +2124,12 @@
         "enabled": "録画トランスコード",
         "mode": "トランスコード時期",
         "immediate": "切断後すぐにトランスコード",
-        "idle": "アイドル時間帯にトランスコード",
-        "idle_time_range": "アイドル時間帯",
-        "idle_time_required": "アイドル時間帯を選択してください",
+        "idle": "指定した時間帯に変換",
+        "idle_time_range": "変換時間帯",
+        "idle_time_required": "変換時間帯を選択してください",
         "keep_raw": "元の録画ファイルを保持",
-        "tip": "トランスコード後の録画は MP4 として保存され、ダウンロードしてローカルプレーヤーで再生できます。未トランスコードの録画はシステムの Web ページ内でのみ再生できます。"
+        "tip": "変換後は MP4 ファイルを生成し、ローカルプレーヤーで再生できます。変換前の録画は Web 画面で再生できます。",
+        "idle_time_tip": "サーバー時刻を使用し、日付をまたぐ時間帯も指定できます。開始と終了が同じ時刻の場合は終日です。サーバーのアイドル状態は判定しません。"
       },
       "basic": "基本情報",
       "network": "ネットワーク"
@@ -1871,20 +2137,22 @@
     "security": {
       "setting": "セキュリティ",
       "protection": "ログイン保護",
-      "captcha": "画像認証",
-      "force_otp": "多要素認証を強制",
+      "captcha": "セキュリティ認証",
+      "force_otp": "OTP 認証の設定を必須にする",
       "access_require_mfa": "資産アクセスに多要素認証が必要",
-      "access_mfa_expires_at": "資産アクセス多要素認証の有効時間",
+      "access_mfa_expires_at": "リソースアクセス認証の有効期間",
       "disable_password_login": "パスワードログインを無効化",
-      "devices": "デバイス",
+      "devices": "ログインセッション",
       "session": {
         "login_session": "ログインセッション",
-        "session_count": "セッション数",
+        "session_count": "セッション数の上限",
         "client_certificate": "クライアント証明書",
         "duration": "セッション有効期間",
         "browser_close_logout": "ブラウザを閉じたときにログアウト",
-        "count_custom": "カスタムセッション数",
-        "count_limit": "セッション数上限"
+        "count_custom": "セッション数の上限を設定",
+        "count_limit": "アカウントごとのログインセッション上限",
+        "count_tip": "新しいログインで上限を超えると、古いログインセッションから無効になります。同じ端末に複数のセッションがある場合も、それぞれ数えます。",
+        "browser_close_tip": "セッション Cookie を使用します。通常はブラウザを閉じると削除されますが、前回のブラウジングセッションを復元するとログイン状態が保持される場合があります。"
       },
       "client_cert_valid_days": "クライアント証明書の有効期間",
       "password": {
@@ -1893,27 +2161,33 @@
         "recommend": "推奨",
         "customize": "カスタム",
         "expiration_period": "パスワード有効期限",
-        "too_short": "パスワード長は次より短くできません：",
-        "too_simple": "パスワードは大文字・小文字・数字・特殊文字のうち少なくとも {{count}} 種を含む必要があります",
+        "too_short": "パスワードは {{minLength}} 文字以上で入力してください",
+        "too_simple": "パスワードには、大文字、小文字、数字、特殊文字のうち {{count}} 種類以上を含めてください",
         "cannot_contain_username": "パスワードにユーザー名を含めることはできません",
         "cannot_be_palindrome": "パスワードは回文にできません",
         "cannot_be_weak": "弱いパスワードは禁止されています",
-        "character": "文字"
+        "character": "文字",
+        "min_length": "パスワードの最小文字数",
+        "min_character_types": "必要な文字の種類数",
+        "character_types_tip": "文字の種類は、大文字、小文字、数字、特殊文字の 4 種類です。",
+        "character_type_unit": "種類"
       },
       "login_lock": {
         "setting": "ログインロック",
-        "tip": "有効にすると、指定時間内にログイン失敗が続いた場合、アカウントまたは IP がログイン制限されます。解除は次をご参照ください：",
+        "tip": "アカウントと IP アドレスごとにログイン失敗回数を集計し、しきい値に達するとそれぞれの期間でログインを制限します。ロックの解除はこちら：",
         "enabled": "ログイン失敗でロック",
-        "failed_duration": "失敗カウント期間",
-        "failed_times": "失敗回数",
+        "failed_duration": "失敗回数の保持期間",
+        "failed_times": "ロックするまでの失敗回数",
         "account_duration": "アカウントロック期間",
-        "ip_duration": "IP ロック期間"
+        "ip_duration": "IP ロック期間",
+        "duration_tip": "0 にすると、この種類のロックは無効になります。",
+        "failed_duration_tip": "ログインに失敗するたびに計時を再開します。この期間中に同じアカウントまたは IP アドレスで新たな失敗がなければ、回数はリセットされます。"
       },
       "passkey": {
         "enabled": "Passkey ログイン",
-        "domain": "外部アクセスドメイン",
+        "domain": "Passkey ドメイン（RP ID）",
         "origins": "Passkey を許可するオリジン",
-        "origins_tip": "末尾に / を付けないでください",
+        "origins_tip": "スキーム、ホスト、既定以外のポートを含むオリジンを指定してください（例：https://nt.example.com:8443）。パスや末尾の / は含めないでください。",
         "origins_error": "有効なオリジンを入力してください",
         "auto_detect": "自動検出"
       },
@@ -1930,18 +2204,18 @@
       "recording_storage_local": "ローカルストレージ",
       "recording_path": "録画ディレクトリ",
       "recording_path_readonly_tip": "ローカル録画ディレクトリはここでは変更できません。設定ファイルを変更してサービスを再起動してください。",
-      "recording_s3_endpoint": "S3 Endpoint",
-      "recording_s3_endpoint_required": "S3 Endpoint を入力してください",
-      "recording_s3_region": "S3 Region",
+      "recording_s3_endpoint": "S3 エンドポイント",
+      "recording_s3_endpoint_required": "S3 エンドポイントを入力してください",
+      "recording_s3_region": "S3 リージョン",
       "recording_s3_region_tip": "AWS S3 では通常必要です。S3 互換ストレージでは、サービスが対応していれば空欄にできます。",
-      "recording_s3_access_key_id": "S3 Access Key ID",
-      "recording_s3_access_key_id_required": "S3 Access Key ID を入力してください",
-      "recording_s3_secret_access_key": "S3 Secret Access Key",
-      "recording_s3_secret_access_key_required": "S3 Secret Access Key を入力してください",
-      "recording_s3_bucket": "S3 Bucket",
-      "recording_s3_bucket_required": "S3 Bucket を入力してください",
-      "recording_s3_use_ssl": "SSL を使用",
-      "recording_s3_path_style": "Path Style",
+      "recording_s3_access_key_id": "S3 アクセスキー ID",
+      "recording_s3_access_key_id_required": "S3 アクセスキー ID を入力してください",
+      "recording_s3_secret_access_key": "S3 シークレットアクセスキー",
+      "recording_s3_secret_access_key_required": "S3 シークレットアクセスキーを入力してください",
+      "recording_s3_bucket": "S3 バケット",
+      "recording_s3_bucket_required": "S3 バケット名を入力してください",
+      "recording_s3_use_ssl": "HTTPS を使用",
+      "recording_s3_path_style": "パス形式のアドレスを使用",
       "recording_s3_advanced_settings": "詳細設定",
       "recording_s3_unit_bytes": "バイト",
       "recording_s3_size_invalid": "サイズは整数バイトに変換できる値で指定してください",
@@ -1958,9 +2232,9 @@
       "recording_s3_concurrency_required": "パート並列数を入力してください",
       "recording_s3_concurrency_range": "パート並列数は 1 から 100 までの整数で指定してください",
       "recording_s3_force_payload_signing": "S3 署名互換モード",
-      "recording_s3_force_payload_signing_tip": "実際の Payload SHA-256 と最小限の SignedHeaders を使用し、UNSIGNED-PAYLOAD、aws-chunked Trailer、または署名済みリクエストヘッダーの保持に対応していない S3 サービスやプロキシとの互換性を確保します。",
-      "recording_webdav_endpoint": "WebDAV Endpoint",
-      "recording_webdav_endpoint_required": "WebDAV Endpoint を入力してください",
+      "recording_s3_force_payload_signing_tip": "実際のリクエスト内容の SHA-256 を計算し、署名対象のヘッダーを減らします。UNSIGNED-PAYLOAD や aws-chunked Trailer に対応していない、またはヘッダーを書き換える S3 サービスやプロキシ向けの設定です。",
+      "recording_webdav_endpoint": "WebDAV エンドポイント",
+      "recording_webdav_endpoint_required": "WebDAV エンドポイントを入力してください",
       "recording_webdav_username": "WebDAV ユーザー名",
       "recording_webdav_username_required": "WebDAV ユーザー名を入力してください",
       "recording_webdav_password": "WebDAV パスワード",
@@ -2000,16 +2274,16 @@
       "reset_default": "元のテンプレートに戻す"
     },
     "log_retention": {
-      "setting": "ログ保持"
+      "setting": "ログ保存期間"
     },
     "identity_auth": {
       "setting": "認証"
     },
     "notification_integration": {
-      "setting": "通知と連携"
+      "setting": "通知・連携"
     },
     "maintenance": {
-      "setting": "システムメンテナンス"
+      "setting": "メンテナンス"
     },
     "geodata": {
       "setting": "GEO データベース",
@@ -2033,34 +2307,35 @@
       "already_latest": "現在のデータベースは最新です",
       "update_started": "GEO 更新タスクを開始しました",
       "update_success": "GEO データベースを更新しました",
-      "update_failed": "GEO データベースの更新に失敗しました"
+      "update_failed": "GEO データベースの更新に失敗しました",
+      "auto_update_time_tip": "サーバーのタイムゾーンで毎日実行します。"
     },
     "sshd": {
       "setting": "SSH プロキシ",
-      "tip": "有効にするとローカルでポートを待ち受け、SSH クライアントで認可済み SSH 資産へアクセスできます。アカウント/パスワードは本システムと同一です。",
+      "tip": "有効にすると、指定したアドレスで SSH 接続を受け付けます。本システムのアカウントでログインし、SSH クライアントから許可されたホストにアクセスできます。",
       "enabled": "SSH サービス",
       "addr": "リッスンアドレス",
-      "private_key": "認証秘密鍵",
+      "private_key": "サーバーのホスト秘密鍵",
       "private_key_button": "秘密鍵を設定",
       "private_key_status_set": "設定済み",
       "private_key_status_empty": "未設定",
-      "private_key_modal_title": "SSH 秘密鍵を設定",
-      "private_key_modal_tip": "生成するか、秘密鍵を貼り付けてください。",
+      "private_key_modal_title": "SSH ホスト秘密鍵を設定",
+      "private_key_modal_tip": "クライアントがサーバーの身元を確認するための SSH ホスト秘密鍵を生成するか、貼り付けてください。",
       "port_forwarding": {
         "enabled": "SSH ポート転送を許可",
         "host_port": "転送を許可する接続先",
         "host_port_tip": "複数の接続先はカンマで区切り、host:port 形式で入力します。port に * を指定すると任意のポートを許可します。VS Code Remote-SSH では 127.0.0.1:* を許可してください。"
       },
       "usage": "使用方法",
-      "usage_tip": "SSH サービスはアセット選択画面を開くことも、接続時に指定したアセットへ直接接続することもできます。",
+      "usage_tip": "SSH サービスは資産選択画面を開くことも、接続時に指定した資産へ直接接続することもできます。",
       "mode_proxy": "プロキシモード",
-      "mode_proxy_tip": "まず踏み台アカウントでログインし、端末のアセット一覧から接続先を選択します。",
+      "mode_proxy_tip": "まず踏み台アカウントでログインし、端末の資産一覧から接続先を選択します。",
       "direct_proxy": "直結モード",
-      "direct_proxy_tip": "接続時に接続先アセットを指定し、認証後すぐにそのアセットへ入ります。asset-name はアセット名、asset-alias は推奨されるアセット別名です。",
+      "direct_proxy_tip": "接続時に接続先資産を指定し、認証後すぐにその資産へ入ります。asset-name は資産名、asset-alias は推奨される資産別名です。",
       "direct_proxy_cli": "コマンドラインクライアント:",
       "direct_proxy_vscode": "VS Code Remote-SSH の ssh config 推奨設定:",
       "disable_password_auth": "パスワード認証を無効化",
-      "private_key_required_to_enable": "SSH サービスを有効にする前に認証秘密鍵を設定してください"
+      "private_key_required_to_enable": "SSH サービスを有効にする前にホスト秘密鍵を設定してください"
     },
     "rdp": {
       "setting": "RDP",
@@ -2068,7 +2343,7 @@
         "wallpaper": "壁紙を有効化",
         "theming": "テーマを有効化",
         "font_smoothing": "フォントのアンチエイリアスを有効化",
-        "full_window_drag": "ウィンドウドラッグを有効化",
+        "full_window_drag": "ドラッグ中にウィンドウの内容を表示",
         "desktop_composition": "デスクトップ合成を有効化",
         "menu_animations": "メニューアニメーションを有効化"
       },
@@ -2085,48 +2360,51 @@
       "public_addr": "公開アドレス",
       "public_addr_extra": "生成する .rdp ファイルで使用するアドレスです。空の場合はリッスンアドレスと現在のリクエストから推測します。",
       "ticket_ttl": "チケット有効期間（秒）",
-      "ticket_ttl_extra": "既定は 300 秒です。チケットは解決成功後に使用済みとしてマークされます。",
+      "ticket_ttl_extra": "既定は 300 秒です。チケットは検証成功時に消費され、再利用できません。",
       "certificate": "プロキシ証明書",
       "certificate_extra": "空の場合は専用の自己署名証明書を自動生成します。証明書リストから選択することもできます。",
       "certificate_auto": "証明書を自動生成",
       "usage": "使用方法",
       "usage_tip": "ユーザーが Web UI で RDP 資産を選択してチケットを作成し、RDP クライアントはプロキシアドレスへ接続します。プロキシが実際の資産へ解決します。",
       "ticket_flow": "チケット形式",
-      "ticket_flow_tip": ".rdp のユーザー名は NTICKET:<ticketId>、パスワードは接続時に入力するチケット secret です。",
+      "ticket_flow_tip": "生成した .rdp ファイルのユーザー名には、NTICKET:<ticketId>:<secret> の形式でチケット ID とシークレットが含まれます。チケットのパスワードを別途入力する必要はありません。有効期間内は接続に使用できるため、ファイルを適切に管理してください。",
       "rdp_file": ".rdp ファイル例"
     },
     "vnc": {
       "setting": "VNC",
       "cursor": {
-        "setting": "カーソル設定",
-        "remote": "リモート"
+        "setting": "カーソルの描画方式",
+        "remote": "リモートで描画",
+        "local": "ローカルで描画"
       },
-      "swap_red_blue": "赤青を入れ替え"
+      "swap_red_blue": "赤と青のカラーチャンネルを入れ替え"
     },
     "mail": {
-      "work_order_enabled": "作業申請の結果メール",
-      "work_order_tip": "却下、成功、失敗、結果確認が必要な場合に申請者へメールを送信します。メールサービスとユーザーのメールアドレスが必要です。通知ルールとは独立しています。",
       "setting": "メールサービス",
-      "enabled": "メールサービス",
-      "host": "メールサーバー",
-      "port": "メールポート",
-      "username": "メールアカウント",
-      "from": "送信者",
-      "password": "メールパスワード",
-      "tip": "テストメール送信にはメールを有効化してください。",
-      "mail": "メールアドレス",
+      "enabled": "メールサービスを有効化",
+      "host": "SMTP サーバー",
+      "port": "SMTP ポート",
+      "username": "SMTP ユーザー名",
+      "from": "差出人",
+      "password": "SMTP パスワードまたはアプリパスワード",
+      "tip": "テストには保存済みで有効なメールサービスを使用します。接続設定の変更を先に保存してください。成功は SMTP による受付を意味します。受信箱で到着を確認してください。",
+      "mail": "宛先メールアドレス",
       "title": "メール件名",
       "content": "メール本文",
-      "send": "メール送信"
+      "send": "テストメールを送信",
+      "use_tls": "TLS 暗号化を使用",
+      "skip_certificate_verify": "サーバー証明書の検証を省略",
+      "site_url": "システムの URL",
+      "site_url_tip": "個人通知のリンクに使用する任意の URL。空欄の場合、ログインして詳細を見るよう案内します。"
     },
     "notification": {
-      "work_order_quiet_tip": "作業申請イベントは個別に送信され、通知抑制時間の対象外です。",
+      "work_order_quiet_tip": "同じチャネルで送信に成功したイベント種別は、指定した期間中は再送信しません。SQL 実行申請のイベントは対象外です。",
       "channels": "通知チャネル",
       "rules": "通知ルール",
       "deliveries": "送信履歴",
       "channel": "通知チャネル",
       "channel_types": {
-        "work-order-mail": "作業申請者へのメール",
+        "work-order-mail": "SQL 申請者へのメール",
         "mail": "メール",
         "wecom": "WeCom ボット",
         "wecomApp": "WeCom アプリ",
@@ -2163,34 +2441,34 @@
         "access.recording.failed": "録画処理失敗",
         "database.sql.blocked": "データベース SQL ブロック",
         "database.sql.failed": "データベース SQL 実行失敗",
-        "database.work_order.created": "データベース作業申請の作成",
-        "database.work_order.approved": "データベース作業申請の承認",
-        "database.work_order.rejected": "データベース作業申請の却下",
-        "database.work_order.executed": "データベース作業の実行成功",
-        "database.work_order.failed": "データベース作業の実行失敗",
-        "database.work_order.unknown": "データベース作業の結果確認が必要",
+        "database.work_order.created": "SQL 実行申請の作成",
+        "database.work_order.approved": "SQL 実行申請の承認",
+        "database.work_order.rejected": "SQL 実行申請の却下",
+        "database.work_order.executed": "SQL 実行成功",
+        "database.work_order.failed": "SQL 実行失敗",
+        "database.work_order.unknown": "SQL 実行結果の確認が必要",
         "backup.succeeded": "バックアップ成功",
         "backup.failed": "バックアップ失敗",
-        "agent.online": "セキュリティゲートウェイ オンライン",
-        "agent.offline": "セキュリティゲートウェイ オフライン",
-        "system.cpu.warning": "CPU 使用率が高い",
-        "system.cpu.critical": "CPU 使用率が重大",
-        "system.cpu.recovered": "CPU 使用率が復旧",
-        "system.memory.warning": "メモリ使用率が高い",
-        "system.memory.critical": "メモリ使用率が重大",
-        "system.memory.recovered": "メモリ使用率が復旧",
-        "system.storage.warning": "ローカルストレージ使用率が高い",
-        "system.storage.critical": "ローカルストレージ容量が重大",
-        "system.storage.recovered": "ローカルストレージ使用率が復旧",
-        "system.notification.test": "テスト通知"
+        "agent.online": "Agent ゲートウェイがオンライン",
+        "agent.offline": "Agent ゲートウェイがオフライン",
+        "system.cpu.warning": "CPU 使用率が警告しきい値に到達",
+        "system.cpu.critical": "CPU 使用率が重大しきい値に到達",
+        "system.cpu.recovered": "CPU 使用率が回復",
+        "system.memory.warning": "メモリ使用率が警告しきい値に到達",
+        "system.memory.critical": "メモリ使用率が重大しきい値に到達",
+        "system.memory.recovered": "メモリ使用率が回復",
+        "system.storage.warning": "ローカルストレージ使用率が警告しきい値に到達",
+        "system.storage.critical": "ローカルストレージ使用率が重大しきい値に到達",
+        "system.storage.recovered": "ローカルストレージ使用率が回復",
+        "system.notification.test": "通知チャネルのテスト"
       },
       "event_groups": {
         "access_request": "アクセス申請",
-        "identity": "認証",
+        "identity": "ユーザーと認証",
         "access": "アクセスセッション",
         "database": "データベース",
         "backup": "バックアップ",
-        "agent": "セキュリティゲートウェイ",
+        "agent": "Agent ゲートウェイ",
         "system": "システム"
       },
       "new_rule": "通知ルールを作成",
@@ -2198,7 +2476,7 @@
       "recipients": "受信者",
       "recipients_placeholder": "複数の受信者はカンマ、セミコロン、改行で区切ってください",
       "webhook_url": "Webhook URL",
-      "robot_webhook_url": "Bot Webhook 完全 URL",
+      "robot_webhook_url": "ボットの Webhook URL",
       "webhook_url_required": "完全な Webhook URL を入力してください",
       "webhook_url_invalid": "http:// または https:// で始まる完全な URL を入力してください",
       "sign_secret": "署名シークレット",
@@ -2222,11 +2500,77 @@
       "test": "テスト",
       "test_success": "テスト通知を送信しました",
       "event_types_label": "イベントタイプ",
-      "quiet_minutes": "抑制時間（分）",
+      "quiet_minutes": "重複通知の抑制時間（分）",
       "event_type": "イベントタイプ",
-      "severity": "重要度",
-      "result": "レスポンス結果",
-      "error": "エラー"
+      "severity": "イベントの重要度",
+      "result": "送信結果",
+      "error": "エラー",
+      "personal_mail": "個人メール",
+      "personal_skipped": "スキップ（設定、メールまたは権限が変更されました）",
+      "personal_queued": "送信または再試行待ち",
+      "recipient": "受信ユーザー",
+      "delivery_target": "配信先",
+      "target_channel": "チャネルの固定受信者",
+      "target_personal": "業務関連ユーザー",
+      "recipient_mode": "受信者の種類",
+      "mode_requester": "申請者",
+      "mode_approvers": "承認権限を持つ全ユーザー",
+      "mode_specified": "指定ユーザー",
+      "specified_users": "指定受信者",
+      "specified_users_tip": "通知先の指定は承認権限を変更しません。ユーザーは対応する個人通知チャネルを有効にしてください。",
+      "personal_rule_tip": "一致する個人ルールは既定の個人通知に優先します。ルールがない場合、結果は申請者、承認待ちは承認権限を持つ管理者へ送ります。通知抑制時間は適用されません。",
+      "personal_events_only": "個人通知はアクセス申請とデータベース作業依頼のみ対応します",
+      "recipient_event_mismatch": "承認待ちは承認者または指定ユーザー、結果は申請者を選択し、別々のルールを作成してください。",
+      "personal_bindings": "個人通知のメンバー連携",
+      "binding_tip": "同一企業の WeCom でログインし、プラットフォームのアカウントに連携すると、UserId を入力せずにメンバーが自動連携されます。管理者設定が優先されます。自動連携に戻すには編集で「自動連携」を選択してください。ユーザーは個人通知設定で WeCom も有効にしてください。",
+      "wecom_member_id": "WeCom メンバー UserId",
+      "binding_source": "連携元",
+      "binding_manual": "管理者設定",
+      "binding_identity": "自動連携（WeCom ログイン）",
+      "binding_unavailable": "未連携または利用不可",
+      "binding_reset_tip": "空欄で保存すると管理者設定を削除し、同一企業のログイン情報に戻ります。",
+      "single_member_required": "メンバー UserId を1つ入力してください。@all と複数メンバーは指定できません",
+      "fixed_recipient_tip": "固定受信者への通知のみで使用します。個人通知はメンバー連携を使用します。",
+      "supports_personal": "個人通知と固定受信者への通知に対応しています。",
+      "channel_only": "グループ通知または Webhook 用です。個人チャットには対応していません。",
+      "personal_test": "個人通知のテスト",
+      "personal_failed": "配信失敗",
+      "skip_reasons": {
+        "mailbox_unavailable": "メールアドレスが未設定または不正です",
+        "channel_unavailable": "チャネルが無効またはメールサービスが利用できません",
+        "unsupported_channel": "未対応の個人通知チャネル",
+        "binding_unavailable": "メンバー未連携、無効、または企業が一致しません",
+        "recipient_unavailable": "ユーザーが存在しません",
+        "preference_disabled": "ユーザーまたは通知設定が無効です",
+        "record_or_permission_changed": "申請が処理済み、存在しない、または承認権限が変更されました",
+        "approval_notifications_disabled": "管理者が承認個人通知を無効にしました"
+      },
+      "wecom_member": "WeCom メンバー",
+      "binding_mode": "連携方法",
+      "binding_automatic": "自動連携",
+      "binding_automatic_tip": "メンバー UserId の入力は不要です。管理者が WeCom ログインを有効にし、ユーザーが WeCom でログインして「既存アカウントに連携」を選択します。ログイン先の企業は通知チャネルと一致する必要があります。自動連携を保存すると管理者設定が削除されます。通知の受信は引き続き個人通知設定で制御します。",
+      "binding_manual_tip": "予備の方法：管理者が WeCom の連絡先にあるメンバーアカウントを入力します。通常は自動連携を使用し、ユーザーが UserId を調べる必要はありません。",
+      "approval_title": "承認通知",
+      "approval_auto_tip": "既定で自動送信します。申請者には承認と実行結果、承認権限を持つ管理者には承認待ちの通知を送ります。利用可能な個人チャネルを自動選択し、ユーザー設定に従います。ルールは不要です。",
+      "approval_mail_ready": "メール利用可能",
+      "approval_mail_unavailable": "メール未設定",
+      "approval_wecom_ready": "WeCom 利用可能",
+      "approval_wecom_unavailable": "WeCom 未設定",
+      "approval_advanced": "詳細設定：承認待ち通知の対象",
+      "approval_scope_all": "承認権限を持つ全管理者",
+      "approval_scope_selected": "以下の承認者のみ",
+      "approval_scope_tip": "既定では承認権限を持つ全ユーザーに通知します。対象を絞る場合のみ指定してください。承認権限は変わらず、結果は常に申請者へ送信し、チャネルは自動選択します。",
+      "approval_access_scope": "アクセス申請の承認待ち",
+      "approval_work_order_scope": "データベース作業依頼の承認待ち",
+      "approval_legacy_tip": "動作を変えずに変換できない旧個人通知設定は引き続き有効です。詳細設定で確認してください。新しい承認通知設定を保存すると旧設定が置き換わります。",
+      "approval_legacy_rules": "引き続き有効な旧個人通知設定",
+      "approval_replace_title": "新しい自動承認通知設定を使用しますか？",
+      "approval_replace_tip": "保存すると旧個人通知ルールが無効になり、この画面の対象にチャネルを自動選択して通知します。承認と実行結果は申請者へ送ります。対象を確認してから続行してください。",
+      "rules_extra_tip": "承認の個人通知は自動で、ルールは不要です。このルールはグループ通知、固定メール受信者、Webhook 配信を追加する場合に使用します。",
+      "binding_advanced": "詳細設定：メンバー連携と個人通知テスト",
+      "member_associated": "連携済み",
+      "member_unassociated": "未連携",
+      "mail_fixed_tip": "承認の個人メールはシステム SMTP とユーザーのメールアドレスを自動使用します。メールサービスの設定は一度だけで済みます。以下の固定受信者は追加の通知ルール用です。"
     },
     "webauthn": {
       "setting": "Passkey"
@@ -2234,31 +2578,48 @@
     "ldap": {
       "setting": "LDAP",
       "url": "LDAP アドレス",
-      "user": "LDAP ユーザー",
-      "password": "LDAP パスワード",
-      "base_dn": "LDAP ベース DN",
+      "user": "LDAP サービスアカウント",
+      "password": "サービスアカウントのパスワード",
+      "base_dn": "検索ベース DN",
       "user_search": {
-        "size_limit": "LDAP 最大検索結果",
-        "size_limit_tooltip": "LDAP 最大検索結果。0 は無制限。",
-        "filter": "LDAP ユーザー検索フィルタ",
-        "filter_tooltip": "LDAP ユーザー検索フィルタ（例：(objectClass=person)）。"
+        "filter": "ログインを許可するユーザーフィルター",
+        "filter_tooltip": "同期とログインの両方でユーザーの適格性を確認するために使用します。"
       },
-      "user_property_mapping": "LDAP ユーザー属性マッピング"
+      "user_property_mapping": "LDAP ユーザー属性マッピング",
+      "ad_hint": "Active Directory のユーザー名には sAMAccountName を使用してください。LDAPS では証明書に一致するホスト名とコンテナ内の CA 信頼設定が必要です。",
+      "mapping_invalid": "保存された属性マッピングが無効です。属性フィールドを修正して保存してください。",
+      "directory_type": "ディレクトリの種類",
+      "preset_hint": "ディレクトリのプリセットを選択すると、ユーザーフィルターと属性マッピングが置き換わります。「カスタム」は現在の設定を保持します。",
+      "custom": "カスタム",
+      "username_attribute": "ユーザー名属性",
+      "nickname_attribute": "表示名属性",
+      "mail_attribute": "メール属性",
+      "attribute_invalid": "有効な LDAP 属性名を入力してください。",
+      "url_invalid": "認証情報や検索パスを含まない有効な ldap:// または ldaps:// サーバー URL を入力してください。",
+      "filter_hint": "同期とログインの両方でユーザーの適格性を確認するために使用します。",
+      "test_connection": "接続テスト",
+      "test_failed": "LDAP 接続テストに失敗しました。",
+      "test_success": "接続、サービスアカウントのバインド、検索に成功しました。",
+      "test_has_users": "一致するユーザーが見つかりました。このテストはユーザーのパスワードを検証せず、設定やユーザーを変更しません。",
+      "test_no_users": "一致するユーザーが見つかりません。Base DN とユーザーフィルターを確認してください。設定やユーザーは変更されていません。",
+      "login_hint": "LDAP ユーザーは「ディレクトリアカウント（LDAP）」でログインしてください。認証成功後、新規ユーザーを自動作成して既定の部門に追加します。事前のユーザー同期は不要です。",
+      "department": "新規ユーザーの既定部門",
+      "department_hint": "新規ユーザーにのみ適用します。既存の所属部門とアカウント状態は保持されます。"
     },
     "wechat_work": {
-      "setting": "企業微信",
+      "setting": "WeCom（企業微信）",
       "enabled": "企業微信ログインを有効化",
       "corp_id": "企業 ID",
       "corp_id_placeholder": "企業微信の企業 ID を入力してください",
       "agent_id": "アプリ ID",
       "agent_id_placeholder": "企業微信のアプリ ID を入力してください",
-      "secret": "アプリ Secret",
+      "secret": "アプリシークレット",
       "redirect_uri_placeholder": "https://your-domain.com/wechat-work/callback"
     },
     "oidc": {
       "setting": "OIDC",
       "enabled": "OIDC ログインを有効化",
-      "issuer": "Issuer",
+      "issuer": "発行者 URL（Issuer）",
       "issuer_placeholder": "OIDC プロバイダーの Issuer URL を入力してください",
       "client_id": "クライアント ID",
       "client_id_placeholder": "OIDC クライアント ID を入力してください",
@@ -2271,20 +2632,23 @@
     },
     "log": {
       "session": {
-        "saved_limit_days": "セッション保存期間"
+        "saved_limit_days": "セッション保存期間",
+        "retention_tip": "終了したセッションを接続開始時刻に基づいて判定します。削除時にはセッションとコマンドの記録を削除し、関連する録画ファイルも削除します。ファイル操作ログにも同じ保存期間を使用します。"
       },
       "login_log": {
-        "saved_limit_days": "ログインログ保存期間"
+        "saved_limit_days": "ログインログ保存期間",
+        "retention_tip": "ログインログと管理操作ログに同じ保存期間を使用します。"
       },
       "cron_log": {
-        "saved_limit_days": "定期タスクログ保存期間"
+        "saved_limit_days": "スケジュールタスクログ保存期間"
       },
       "access_log": {
         "saved_limit_days": "アクセスログ保存期間"
       },
       "database_sql_log": {
-        "saved_limit_days": "SQL ログ保存日数"
-      }
+        "saved_limit_days": "SQL ログ保存期間"
+      },
+      "retention_tip": "保存期間はログ削除タスクの実行時に適用されます。∞ はこの期間による削除を無効にしますが、手動での削除は可能です。"
     },
     "backup": {
       "setting": "バックアップと復元",
@@ -2293,62 +2657,72 @@
       "source": {
         "auto": "自動",
         "manual": "手動",
-        "before_restore": "復元前"
+        "before_restore": "復元前のバックアップ"
       },
       "create_confirm_title": "バックアップを作成",
       "create_task_success": "バックアップタスクを作成しました",
       "restore_task_success": "復元タスクを作成しました",
       "task_failed": "タスクに失敗しました",
       "restore_confirm_title": "バックアップ復元の確認",
-      "restore_confirm_content": "復元すると現在の PostgreSQL データベースが上書きされます。システムは復元前に安全バックアップを自動作成します。",
+      "restore_confirm_content": "現在の PostgreSQL データベースを上書きし、バックアップに含まれる CA ファイルを復元します。復元前にバックアップを作成します。完了後はサービスの再起動が必要です。",
       "backup_file": "バックアップファイル：{{name}}",
-      "exclude_tip": "含まれないもの：録画ファイル、Windows マウントディスクファイル",
+      "exclude_tip": "データベースと CA ファイル（存在する場合）を含みます。セッション録画と Windows のマウントドライブ内のファイルは含みません。",
       "restore": "復元",
       "file_name": "ファイル名",
       "backup_time": "バックアップ時間",
       "source_label": "ソース",
       "size": "サイズ",
       "version": "バージョン",
-      "delete_confirm_title": "バックアップファイルを削除しますか？",
+      "delete_confirm_title": "このバックアップファイルを削除しますか？",
       "backup_directory_tip": "バックアップディレクトリ：{{directory}}。バックアップには録画ファイルと Windows マウントディスクファイルは含まれません。",
       "schedule_enabled": "定期バックアップを有効化",
-      "retention_days": "自動バックアップ保持期間",
+      "retention_days": "自動バックアップの保存日数",
       "save_settings": "バックアップ設定を保存",
       "backup_now": "今すぐバックアップ",
       "upload_restore": "アップロードして復元",
       "upload_restore_task_success": "ローカルバックアップ復元タスクを作成しました",
       "upload_restore_confirm_title": "アップロードして復元の確認",
-      "upload_restore_confirm_content": "ローカルバックアップファイルをアップロードし、現在の PostgreSQL データベースを上書きします。サーバー間移行に使用します。システムは復元前に安全バックアップを自動作成します。",
+      "upload_restore_confirm_content": "ローカルのバックアップをアップロードして現在の PostgreSQL データベースを上書きし、含まれる CA ファイルを復元します。復元前にバックアップを作成します。完了後はサービスの再起動が必要です。",
       "legacy_import": "旧版 JSON データインポート",
       "legacy_import_tip": "旧バージョンからエクスポートされた JSON データのインポート専用です。現在のバージョンの完全バックアップ復元には使用できません。",
-      "success_actions": "バックアップ成功後のアクション",
+      "success_actions": "バックアップ後のアップロード",
       "success_actions_tip": "バックアップファイル作成後にリモートストレージへアップロードします。リモートアップロードに失敗してもローカルバックアップファイルは削除されません。",
       "saved_secret_placeholder": "保存済み、空欄のままなら変更しません",
       "upload_to_s3": "S3 にアップロード",
       "upload_to_sftp": "SFTP にアップロード",
       "upload_to_webdav": "WebDAV にアップロード",
-      "s3_endpoint": "Endpoint",
-      "s3_bucket": "Bucket",
-      "s3_access_key_id": "Access Key ID",
-      "s3_secret_access_key": "Secret Access Key",
-      "s3_region": "Region",
+      "s3_endpoint": "S3 エンドポイント",
+      "s3_bucket": "バケット",
+      "s3_access_key_id": "アクセスキー ID",
+      "s3_secret_access_key": "シークレットアクセスキー",
+      "s3_region": "リージョン",
       "s3_prefix": "オブジェクトプレフィックス",
       "s3_use_ssl": "HTTPS を使用",
-      "s3_path_style": "Path Style",
+      "s3_path_style": "パス形式のアドレスを使用",
       "sftp_mode": "接続方式",
-      "sftp_mode_asset": "資産を使用",
+      "sftp_mode_asset": "SSH ホストの設定を使用",
       "sftp_mode_custom": "手動設定",
       "sftp_asset": "SSH 資産",
       "sftp_directory": "リモートディレクトリ",
       "sftp_host": "ホスト",
       "sftp_port": "ポート",
       "sftp_username": "ユーザー名",
-      "sftp_auth_type": "認証タイプ",
-      "webdav_endpoint": "Endpoint",
+      "sftp_auth_type": "認証方式",
+      "webdav_endpoint": "WebDAV エンドポイント",
       "webdav_username": "ユーザー名",
       "webdav_password": "パスワード",
       "webdav_directory": "リモートディレクトリ",
-      "webdav_chinese_path_tip": "WebDAV サーバー側のパスエンコードや権限マッピングによるアップロード失敗を避けるため、中国語パスは使用しないでください。"
+      "webdav_chinese_path_tip": "WebDAV サービスでアクセスが許可された絶対パスを指定してください。サービスが非 ASCII パスを制限している場合は、対応するディレクトリを選択してください。",
+      "task_busy": "別のバックアップまたは復元タスクが実行中です。",
+      "task_backing_up": "PostgreSQL データベースをバックアップ中…",
+      "task_safety_backup": "復元前のバックアップを作成中…",
+      "task_restoring": "PostgreSQL データベースを復元中…",
+      "task_backup_completed": "バックアップが完了しました。",
+      "task_restore_completed": "復元が完了しました。サービスを再起動してから利用を続けてください。",
+      "task_backup_warnings": "バックアップは完了しましたが、アップロードに警告があります：{{details}}",
+      "task_safety_failed": "復元前のバックアップを作成できなかったため、復元を開始していません：{{details}}",
+      "task_pending": "タスク待機中",
+      "task_running": "タスク実行中"
     },
     "license": {
       "setting": "ライセンス",
@@ -2369,14 +2743,14 @@
       "domain_tip": "ドメイン紐付けライセンスの取得と現在のアクセスドメインの検証に使用します。スキーム、ポート、パスを含めずに入力してください。",
       "domain_error": "スキーム、ポート、パス、ワイルドカードを含まない有効なドメインを入力してください",
       "auto_detect_domain": "自動検出",
-      "license_binding_type": "ライセンス方式",
+      "license_binding_type": "ライセンスの関連付け方式",
       "binding_type_machine": "マシン ID",
       "binding_type_domain": "ドメイン",
       "max": {
         "asset_count": "最大資産数",
         "user_count": "最大ユーザー数"
       },
-      "expired_at": "有効期限",
+      "expired_at": "ライセンス有効期限",
       "type": {
         "label": "ライセンス種別",
         "options": {},
@@ -2394,7 +2768,9 @@
     "logo": {
       "setting": "資産ロゴ",
       "preset": "システムプリセット",
-      "custom": "カスタムロゴ"
+      "custom": "カスタムロゴ",
+      "empty_file": "空のファイルはアップロードできません。画像を選択してください。",
+      "file_too_large": "画像サイズは 1 MiB 以下にしてください。"
     },
     "about": {
       "setting": "この製品について",
@@ -2414,57 +2790,58 @@
       "version_check_failed": "バージョンの確認に失敗しました。しばらくしてから再試行してください"
     },
     "oidc_server": {
-      "setting": "ID プロバイダーサービス",
-      "server": "OIDC Server",
-      "description": "OIDC Server を構成して本システムを OpenID Connect の認証プロバイダーにし、他のアプリが本システムで SSO 認証できるようにします。",
-      "manage_tip_prefix": "有効化後、「",
-      "manage_link": "認証 - OIDC クライアント",
-      "manage_tip_suffix": "」で接続アプリを管理できます。",
+      "setting": "ID プロバイダー",
+      "server": "OIDC サーバー",
+      "description": "OIDC サーバーを有効にすると、他のアプリから Next Terminal でユーザー認証を行い、シングルサインオンを利用できます。",
       "endpoints_title": "標準エンドポイント：",
       "endpoint": {
-        "discovery": "Discovery",
-        "jwks": "JWKS",
-        "authorization": "Authorization",
-        "token": "Token",
-        "userinfo": "UserInfo"
+        "discovery": "ディスカバリー",
+        "jwks": "公開鍵セット（JWKS）",
+        "authorization": "認可",
+        "token": "トークン",
+        "userinfo": "ユーザー情報"
       },
-      "enable_label": "OIDC Server を有効化",
-      "issuer_label": "Issuer URL",
+      "enable_label": "OIDC サーバーを有効化",
+      "issuer_label": "発行者 URL（Issuer）",
       "issuer_tooltip": "OIDC Issuer 識別子。通常は本システムのアクセスアドレス + /api",
       "issuer_required": "Issuer URL を入力してください",
-      "ttl_required": "有効期限を入力してください",
-      "access_token_ttl_label": "Access Token 有効期限（秒）",
+      "ttl_required": "有効期間を秒単位で入力してください",
+      "access_token_ttl_label": "アクセストークンの有効期間（秒）",
       "access_token_ttl_tooltip": "Access Token の有効時間。デフォルト 3600 秒（1 時間）",
-      "refresh_token_ttl_label": "Refresh Token 有効期限（秒）",
+      "refresh_token_ttl_label": "リフレッシュトークンの有効期間（秒）",
       "refresh_token_ttl_tooltip": "Refresh Token の有効時間。デフォルト 604800 秒（7 日）",
-      "id_token_ttl_label": "ID Token 有効期限（秒）",
+      "id_token_ttl_label": "ID トークンの有効期間（秒）",
       "id_token_ttl_tooltip": "ID Token の有効時間。デフォルト 3600 秒（1 時間）",
       "auth_code_ttl_label": "認可コード有効期限（秒）",
-      "auth_code_ttl_tooltip": "認可コードの有効時間。デフォルト 600 秒（10 分）"
+      "auth_code_ttl_tooltip": "認可コードの有効時間。デフォルト 600 秒（10 分）",
+      "manage_tip": "有効にした後、<link>ユーザー管理 → OIDC クライアント</link>で接続するアプリを管理できます。"
     },
     "network": {
       "not_detected": "未検出",
-      "trust_ip_tip": "転送 IP ヘッダーを信頼するかどうかを判定するために使用します",
-      "custom_header": "カスタム Header",
-      "custom_header_name": "Header 名",
+      "trust_ip_tip": "信頼するリバースプロキシの IP または CIDR 範囲を指定し、転送ヘッダー内のクライアント IP を使用できるか判断します。",
+      "custom_header": "カスタムリクエストヘッダー",
+      "custom_header_name": "ヘッダー名",
       "custom_header_placeholder": "例：CF-Connecting-IP",
-      "custom_header_required": "Header 名を入力してください"
+      "custom_header_required": "リクエストヘッダー名を入力してください",
+      "direct_ip": "直接接続元の IP",
+      "header_option": "リクエストヘッダー {{header}}",
+      "direct_ip_tip": "サーバーに直接接続している相手の IP を使用します。リバースプロキシ経由の場合、通常はプロキシの IP になります。"
     },
     "ai": {
-      "setting": "AI アシスタント",
+      "setting": "AI",
       "enabled": "AI アシスタントを有効化",
-      "asset_enable_tip": "グローバル AI を有効にすると、AI アシスタントは現在のユーザーにアクセス権限がある SSH アセットを検索・操作できます。",
+      "asset_enable_tip": "グローバル AI を有効にすると、AI アシスタントは現在のユーザーにアクセス権限がある SSH 資産を検索・操作できます。",
       "disclaimer_title": "AI アシスタント免責事項",
       "disclaimer_description": "AI アシスタントが生成する内容やコマンドには、誤り、欠落、誤解を招く内容、または危険な操作が含まれる可能性があります。有効化後は出力結果を自分で評価し、コマンドを実行する前に意図と影響を確認してください。AI アシスタントの利用により生じるリスクと結果は利用者が負担します。",
       "disclaimer_accepted": "リスクを理解しました",
       "disclaimer_required": "先にリスクを理解したことを確認してください",
-      "profile": "AI 環境",
+      "profile": "モデルサービス設定",
       "profile_active": "現在",
-      "profile_empty": "AI 環境がありません。先に環境を作成してください。",
-      "new_profile": "AI 環境を作成",
-      "edit_profile": "AI 環境を編集",
+      "profile_empty": "モデルサービス設定がありません。先に作成してください。",
+      "new_profile": "モデルサービス設定を作成",
+      "edit_profile": "モデルサービス設定を編集",
       "model_count": "{{count}} 個のモデル",
-      "add_profile": "AI 環境を作成",
+      "add_profile": "モデルサービス設定を作成",
       "profile_name": "設定名",
       "api_preset": "プロバイダープリセット",
       "api_type": "API タイプ",
@@ -2514,7 +2891,7 @@
       "max_retries_tip": "モデルサービスへのリクエスト失敗時の最大自動再試行回数です。",
       "user_agent_tip": "空の場合は組み込みのデフォルト User-Agent を使用します。",
       "http_proxy": "HTTP プロキシ",
-      "http_proxy_tip": "空の場合は直接接続します。この API 環境の会話とモデル一覧の読み込みは、設定時にこのプロキシ経由でアクセスします。",
+      "http_proxy_tip": "空欄の場合はモデルサービスに直接接続します。設定すると、この構成の会話とモデル一覧のリクエストをプロキシ経由で送信します。",
       "behavior": "動作設定",
       "command_policy": "AI コマンド実行ポリシー",
       "command_policy_tip": "このポリシーは AI が開始するコマンドおよびその他のホスト操作を制御します。確認を減らすと効率は上がりますが、誤操作のリスクも高まります。",
@@ -2539,56 +2916,179 @@
       "command_timeout_tip": "1 回のコマンドに許可する最大実行時間です。超過すると実行を停止し、結果を AI に返します。",
       "approval_review_settings": "自動レビュー設定",
       "approval_review_settings_tip": "レビューは独立した AI リクエストとして実行され、追加のモデル利用枠を消費します。確実に判断できない場合は手動確認に切り替わります。",
-      "approval_review_profile": "レビュー環境",
-      "approval_review_profile_tip": "レビュー専用の API 環境を指定できます。空の場合は会話で使用中の AI 環境に従います。",
-      "follow_conversation_profile": "会話の環境に従う",
+      "approval_review_profile": "レビュー用サービス設定",
+      "approval_review_profile_tip": "レビュー用のモデルサービス設定を指定できます。未指定の場合は会話の設定を使用します。",
+      "follow_conversation_profile": "会話の設定を使用",
       "approval_review_model": "レビューモデル",
-      "approval_review_model_tip": "より高速で低コストなモデルをレビューに指定できます。空の場合はレビュー環境または会話モデルを使用します。",
+      "approval_review_model_tip": "レビュー用に高速で低コストなモデルを指定できます。未指定の場合はレビュー用サービス設定のモデルを使用し、レビュー用設定がない場合は会話のモデルを使用します。",
       "follow_conversation_model": "会話モデルに従う",
       "approval_review_timeout": "レビュータイムアウト",
       "approval_review_timeout_tip": "レビューリクエストの最大待機時間です。タイムアウト時に自動許可せず、手動確認へ切り替わります。",
-      "recent_output_lines": "最近の端末出力行数を含める",
+      "recent_output_lines": "AI に送信するターミナル出力行数",
       "include_command_snippets": "コマンドスニペットを含める",
       "include_command_snippets_tip": "有効にすると、AI は現在のユーザーに表示可能なコマンドスニペットの概要を読み取り、必要な場合のみ具体的な内容をリクエストします。",
-      "include_host_remark": "ホスト備考を含める",
+      "include_host_remark": "ホストの備考を含める",
       "include_host_remark_tip": "AI のホスト検索結果に対象識別用の備考を含めます。",
       "custom_system_prompt": "カスタムシステムプロンプト",
       "custom_system_prompt_tip": "組み込みシステムプロンプトの後に追加されます。最大 8000 文字です。",
-      "history": "会話履歴",
+      "history": "AI 会話履歴",
       "clear_history": "履歴を消去",
       "clear_history_tip": "現在のユーザーのグローバル AI 会話をすべて削除します。この操作は取り消せません。",
       "clear_history_confirm": "AI 会話履歴をすべて消去しますか？",
       "clear_history_success": "AI 会話履歴を消去しました"
+    },
+    "sms": {
+      "webhook": "Webhook",
+      "webhook_setup_tip": "カスタム JSON を POST します。HTTP 2xx で成功と判断し、その後の配信結果は確認しません。",
+      "webhook_headers": "カスタム Header",
+      "webhook_headers_tip": "任意の JSON オブジェクトで Header 名と文字列値を指定します。例: {\"X-API-Key\":\"your-key\"}。空欄は保存済みの設定を保持し、{} は削除します。Content-Type は application/json が既定で、上書きできます。",
+      "webhook_headers_invalid": "文字列値と重複のない Header 名を持つ有効な JSON オブジェクトを入力してください。Host、Content-Length など HTTP クライアントが管理する Header は指定できません。",
+      "webhook_body": "JSON リクエスト本文テンプレート",
+      "webhook_body_tip": "文字列変数 {{phone}}、{{code}}、{{minutes}}、{{language}} を使用できます。電話番号とコードは必須です。変数は文字列値でのみ使用し、数値と真偽値は型を保持します。",
+      "webhook_body_invalid": "文字列値に {{phone}} と {{code}} を含む有効な JSON を入力し、対応する変数のみ使用してください。",
+      "webhook_success": "Webhook リクエストが成功しました",
+      "title": "SMS サービス",
+      "tip": "アカウント認証と電話番号変更に使用します。プロバイダーで署名と認証テンプレートの承認を得てから、言語別テンプレートを保存してください。",
+      "enabled": "SMS を有効にする",
+      "provider": "SMS プロバイダー",
+      "tencent": "Tencent Cloud",
+      "aliyun": "Alibaba Cloud",
+      "aliyun-pnvs": "阿里雲番号認証（SMS 認証）",
+      "aliyun-pnvs_setup_tip": "番号認証の SMS 認証サービスを有効にし、コンソールで提供される署名と対応するテンプレートを使用して、AccessKey と TemplateCode を入力してください。中国本土の携帯電話番号のみ対応しています。",
+      "scheme_name": "スキーム名",
+      "scheme_name_tip": "任意。空欄の場合はデフォルトスキームを使用します。最大 20 文字。",
+      "pnvs_parameters_tip": "code、min、minutes に対応する JSON 配列。提供テンプレートでは通常 [\"code\",\"min\"] を使用します。テンプレートの変数名に合わせてください。有効期間パラメーターは 5 分です。",
+      "volcengine": "Volcengine",
+      "region": "リージョン",
+      "sign": "SMS 署名",
+      "parameters": "テンプレート引数",
+      "parameters_tip": "code と minutes に対応する JSON 配列です。Tencent は配列順、Alibaba と Volcengine は変数名を使用します。例：[\"code\",\"minutes\"]。",
+      "template_id": "認証テンプレート ID",
+      "official_docs": "公式設定ドキュメントを見る",
+      "tencent_setup_tip": "Secret ID、Secret Key、SMS SDK App ID を取得し、承認済みの SMS 署名と認証コードテンプレートを作成してください。",
+      "aliyun_setup_tip": "AccessKey を取得し、承認済みの SMS 署名と認証コードテンプレートを作成してください。テンプレート番号には TemplateCode を入力します。",
+      "volcengine_setup_tip": "AccessKey と SMS Account を取得し、承認済みの SMS 署名と認証コードテンプレートを作成してください。",
+      "template_code": "認証テンプレート CODE",
+      "language_tip": "未設定の言語は必須の簡体字中国語テンプレートにフォールバックします。",
+      "secret_tip": "空欄の場合は保存済みの秘密鍵を保持します。取得 API は秘密鍵を返しません。",
+      "login_enabled": "SMS ログインを許可",
+      "login_tip": "既定では無効です。登録済み電話番号でログインでき、セキュリティ認証が必須です。電話番号、IP と全体の送信上限を適用します。"
+    },
+    "mail_templates": {
+      "title": "アカウントメールテンプレート",
+      "tip": "ユーザーの言語を使用します。空欄は組み込みテンプレートを使用します。次の Go テンプレート変数のみ対応します。リセットは管理者による変更通知です。",
+      "email-change": "メール変更確認コード",
+      "verification": "追加認証コード",
+      "password-reset": "管理者パスワードリセット通知",
+      "password-changed": "パスワード変更完了通知",
+      "help": "テンプレートの説明",
+      "variable_usage": "変数は件名と本文に使用できます。用途に応じて使用してください。該当しない文字列は空になり、認証コードのないメールでは Minutes は 0 です。",
+      "variables": {
+        "RecipientName": "受信者のニックネーム。",
+        "SystemName": "システム設定で指定したシステム名。",
+        "NewEmail": "認証メールの送信先。メール変更時は確認対象の新しいアドレス。",
+        "Code": "メール変更とメール追加認証に使用する 6 桁の数字コード。",
+        "Minutes": "認証コードの有効期限（分）。現在は 5 分。",
+        "NewPassword": "管理者によるリセット後の新しいパスワード。管理者リセット通知でのみ使用可能。",
+        "IP": "認証またはパスワード変更を要求したクライアントの IP。管理者リセット通知では提供されません。",
+        "GenerateTime": "UTC の RFC 3339 形式によるメール生成時刻。例：2026-10-10T08:30:00Z。"
+      }
+    },
+    "verification_services": {
+      "title": "認証・メッセージサービス",
+      "description": "アカウントの認証コードとセキュリティメールの送信サービスを設定します。イベント通知は「通知と連携」のチャネルとルールで設定してください。",
+      "connection": "接続設定",
+      "test": "送信テスト",
+      "sms_templates": "クラウドテンプレート",
+      "sms_test": "SMS にはプロバイダーが承認した認証コードテンプレートが必要です。保存して有効化した後、電話番号を登録済みのユーザーが個人設定で SMS 認証を行い、受信を確認してください。"
+    },
+    "sms_policy": {
+      "login": "SMS ログイン",
+      "mfa": "SMS MFA",
+      "login_enabled": "SMS ログインを有効にする",
+      "mfa_enabled": "SMS MFA を有効にする",
+      "phone": "電話番号",
+      "ip": "IP",
+      "global": "全体の上限",
+      "phone-interval": "送信間隔（秒）",
+      "phone-hourly": "1 時間あたりの最大送信回数",
+      "ip-interval": "送信間隔（秒）",
+      "ip-hourly": "1 時間あたりの最大送信回数",
+      "global-hourly": "1 時間あたりの最大送信回数",
+      "global-daily": "24 時間あたりの最大送信回数",
+      "service_tip": "SMS サービスを有効にし、必要な設定を完了してください。",
+      "quota_tip": "ログインと MFA は別々に集計します。上限の期間は最初のリクエストから開始し、設定を保存しても使用量はリセットされません。送信失敗も使用量に含まれます。"
+    },
+    "email_mfa_policy": {
+      "ip": "IP",
+      "global": "全体の上限",
+      "phone-interval": "送信間隔（秒）",
+      "phone-hourly": "1 時間あたりの最大送信回数",
+      "ip-interval": "送信間隔（秒）",
+      "ip-hourly": "1 時間あたりの最大送信回数",
+      "global-hourly": "1 時間あたりの最大送信回数",
+      "global-daily": "24 時間あたりの最大送信回数",
+      "title": "メール MFA",
+      "enabled": "メール MFA を有効にする",
+      "phone": "メールアドレス",
+      "service_tip": "メールサービスを有効にし、必要な設定を完了してください。",
+      "quota_tip": "メール MFA は独立して集計します。上限の期間は最初のリクエストから開始し、設定を保存しても使用量はリセットされません。送信失敗も使用量に含まれます。"
+    },
+    "sms_test": {
+      "title": "SMS テスト",
+      "phone": "受信電話番号",
+      "language": "テンプレートの言語",
+      "send": "テスト SMS を送信",
+      "success": "プロバイダーが送信リクエストを受け付けました。SMS を確認してください。",
+      "tip": "保存済みの設定でテストコード 123456 を送信します。認証には使えません。選択した言語が未設定の場合は簡体字中国語のテンプレートを使用します。全体で毎分1回、毎時10回までで、送信失敗も含まれます。",
+      "save_first": "テスト送信の前に SMS サービスの設定を保存してください。"
+    },
+    "service_layout": {
+      "scenario": "用途",
+      "advanced": "詳細設定",
+      "save_first": "テストメールを送信する前にサービス設定を保存してください。"
     }
   },
   "access_request": {
+    "decision_approve": "承認",
+    "confirm_reject": "却下を確定",
+    "review_result": "審査結果",
+    "review": "承認審査",
+    "detail_title": "アクセス申請の詳細",
+    "request_no": "申請番号",
+    "start_immediately": "承認後すぐに有効",
+    "effective_at": "実際の開始日時",
+    "approved_at": "審査日時",
+    "review_comments": "審査コメント",
+    "detail_load_failed": "申請詳細の読み込みに失敗しました",
+    "rejection_reason": "却下理由",
     "new": "新規申請",
     "start_at": "有効開始日時（空欄の場合は承認後すぐに有効）",
     "start_at_label": "申請有効開始日時",
     "scope_title": "申請可能なリソース",
-    "scope_new": "部署の設定を追加",
+    "scope_new": "部門の設定を追加",
     "scope_empty": "許可なし",
-    "asset_groups": "申請可能なアセットグループ",
+    "asset_groups": "申請可能な資産グループ",
     "website_groups": "申請可能なサイトグループ",
     "databases": "申請可能なデータベース",
-    "scope_tip": "該当する部署の設定がない場合はすべてのリソースを申請できます。設定済みの空の範囲は申請不可です。複数部署の範囲は統合されます。",
-    "scope_unconfigured_tip": "設定のないユーザーはすべてのリソースを申請できます。設定後は選択した範囲に制限されます。",
-    "scope_delete_confirm": "この部署の設定を削除しますか？他に該当する設定がないユーザーはすべてのリソースを申請できるようになります。",
+    "scope_tip": "該当する部門の設定がない場合はすべてのリソースを申請できます。設定済みの空の範囲は申請不可です。複数部門の範囲は統合されます。",
+    "scope_unconfigured_tip": "所属部門に該当する範囲設定がなければ、すべてのリソースを申請できます。設定がある場合は、該当するいずれかの部門の範囲に含まれるリソースを申請できます。",
+    "scope_delete_confirm": "この部門の設定を削除しますか？他に該当する設定がないユーザーはすべてのリソースを申請できるようになります。",
     "resource": "申請リソース",
     "resource_type": "リソース種別",
     "request_reason": "申請理由",
     "request_reason_placeholder": "このリソースへのアクセス理由を入力してください",
-    "duration_minutes": "申請時間（分）",
-    "approved_duration_minutes": "承認時間（分）",
+    "duration_minutes": "申請するアクセス時間（分）",
+    "approved_duration_minutes": "承認されたアクセス時間（分）",
     "requester": "申請者",
     "approver": "承認者",
     "approve": "承認",
     "reject_reason": "却下理由を入力してください",
     "cancel_confirm": "このアクセス申請をキャンセルしますか？",
-    "resource_type_asset": "資産",
+    "resource_type_asset": "ホスト",
     "resource_type_database": "データベース資産",
-    "resource_type_website": "Web 資産",
-    "authorised": "承認済み",
+    "resource_type_website": "Web サイト",
+    "authorised": "アクセス許可済み",
     "requestable_resource_empty": "申請可能なリソースはありません",
     "status": {
       "pending": "承認待ち",
@@ -2596,7 +3096,10 @@
       "rejected": "却下",
       "cancelled": "キャンセル済み",
       "closed": "クローズ済み"
-    }
+    },
+    "unknown_status": "不明な状態（{{status}}）",
+    "decision_reject": "却下",
+    "closed_existing_authorization": "ユーザーには有効なアクセス権限があるため、この申請は終了しました。"
   },
   "db": {
     "asset": {
@@ -2612,14 +3115,14 @@
       "postgres_ssl_mode_extra": "verify-ca と verify-full はシステムで信頼された CA を使用します。ゲートウェイ経由でも資産のホスト名で証明書を検証します。"
     },
     "work_order": {
-      "new": "新規ワークオーダー",
+      "new": "SQL 実行申請を作成",
       "reason": "実行理由",
       "reason_placeholder": "この SQL を実行する理由を入力してください",
-      "database_placeholder": "ターゲットデータベース名を入力してください",
+      "database_placeholder": "接続先データベース名を入力してください",
       "requester": "申請者",
       "approver": "承認者",
       "approve": "承認",
-      "approve_confirm": "承認しますか？",
+      "approve_confirm": "この申請を承認して SQL を実行しますか？",
       "reject_reason": "却下理由を入力してください",
       "status": {
         "pending": "承認待ち",
@@ -2629,8 +3132,9 @@
         "failed": "実行失敗",
         "unknown": "結果の確認が必要"
       },
-      "database_username": "実行データベースアカウント",
-      "id": "作業依頼 ID"
+      "database_username": "実行アカウント",
+      "id": "申請 ID",
+      "unknown_tip": "SQL の実行またはコミット結果を確認できません。再実行する前に、対象データベースの実際の結果を確認してください。"
     },
     "sql_log": {
       "parameter_template_tip": "プリペアド SQL のテンプレートです。バインドしたパラメーターの元の値は記録されません。",
@@ -2644,7 +3148,7 @@
       },
       "source": {
         "proxy": "プロキシ",
-        "work_order": "ワークオーダー"
+        "work_order": "SQL 実行申請"
       }
     },
     "proxy": {
@@ -2676,7 +3180,7 @@
       "pg_applying": "設定を適用中",
       "pg_apply_error": "設定は保存されましたが、適用に失敗しました。現在の実行状態は上に表示されています。",
       "pg_enabled": "PostgreSQL プロキシを有効化",
-      "block_dml": "DML/DDL をブロック",
+      "block_dml": "書き込みと高リスク SQL をブロック",
       "block_dml_tip": "誤操作を防ぐため、書き込み、ロック付き読み取り、ファイル出力、許可されていない SET を拒否します。完全な読み取り専用アクセスはデータベース権限で設定してください。複数文とプリペアドステートメントプロトコルは未対応です。",
       "mysql_tls_mode": "クライアント TLS モード",
       "mysql_tls_disabled": "TLS 無効（平文）",
@@ -2690,26 +3194,25 @@
       "tip": "プロキシを有効化してクライアント接続と SQL 実行を許可します。",
       "stats": {
         "title": "統計",
-        "sessions": "アクティブセッション",
-        "queries": "クエリ数",
-        "blocked": "ブロック済み",
-        "audit_drops": "監査破棄",
-        "audit_errors": "監査エラー"
+        "sessions": "現在の接続数",
+        "queries": "累計クエリ数",
+        "blocked": "累計ブロック数",
+        "audit_drops": "破棄した監査レコード数",
+        "audit_errors": "監査書き込み失敗数"
       },
       "usage_title": "使用方法",
       "usage_tip": "ユーザーはデータベースクライアントからプロキシアドレスに接続し、プロキシが許可されたデータベース資産へ転送します。",
       "usage_client": "クライアント接続",
-      "pg_addr": "PG リッスンアドレス",
+      "pg_addr": "PostgreSQL リッスンアドレス",
       "pg_tls_enabled": "TLS 暗号化を有効化（クライアント〜プロキシ）",
       "pg_tls_enabled_tip": "有効にすると、下で選択した証明書を使用してクライアントから PG プロキシへの接続を暗号化します。証明書未選択の場合は専用の自己署名証明書を自動生成します。無効時は平文接続を使用できます。",
       "pg_certificate": "プロキシ証明書",
       "pg_certificate_extra": "空の場合は専用の自己署名証明書を自動生成します。証明書リストから選択することもできます。",
-      "public_addr": "公開アドレス",
+      "public_addr": "クライアント接続先アドレス",
       "public_addr_extra": "一般ユーザー向けのクイックアクセスに表示するアドレスです。空の場合はリッスンアドレスから推測します。",
-      "password_tip_prefix": "次へ進み、",
-      "password_tip_link": "プロフィール - アクセストークン",
-      "password_tip_suffix": "でデータベースパスワードを作成してください。",
-      "usage_client_pg": "PG クライアント接続"
+      "usage_client_pg": "PostgreSQL クライアント接続",
+      "password_tip": "<link>プロフィール → アクセストークン</link>でデータベースパスワードを作成してください。",
+      "pg_certificate_auto": "証明書を自動生成"
     }
   },
   "ai_assistant": {
@@ -2723,7 +3226,7 @@
     "unknown_error": "AI リクエストに失敗しました",
     "empty": "質問を入力して AI アシスタントを開始",
     "placeholder": "質問を入力、Shift + Enter で改行",
-    "command_confirm": "コマンド実行を確認",
+    "command_confirm": "操作の実行を確認",
     "command_shortcut_hint": "Enter で実行、Esc で拒否",
     "pending_placeholder": "Enter で実行確認、Esc で拒否",
     "approve": "実行",
@@ -2750,14 +3253,14 @@
     "context_system_prompt": "システムプロンプト",
     "context_tool_definitions": "ツール定義",
     "context_breakdown_unavailable": "メッセージ送信後にコンテキスト構成が表示されます",
-    "usage_detail": "累計入力 {{prompt}}、累計出力 {{completion}}",
+    "usage_detail": "累計入力 {{prompt}} トークン、累計出力 {{completion}} トークン",
     "cache_hit_rate": "平均キャッシュヒット率",
     "cache_read_tokens": "キャッシュ読み取り {{count}}",
     "cache_input_tokens": "キャッシュ入力 {{count}}",
     "cache_creation_tokens": "キャッシュ作成 {{count}}",
     "cache_request_count": "{{count}} 件のリクエスト",
     "compact": "コンテキストを圧縮",
-    "remember_approval": "この会話では同じコマンドを再確認しない",
+    "remember_approval": "この会話では同じコマンドを再確認しない（コマンド実行のみ）",
     "failed": "送信に失敗しました",
     "send_now": "今すぐ送信",
     "editing_message": "過去のメッセージを編集中",
@@ -2792,7 +3295,7 @@
       "title": "認証情報のローテーション",
       "description": "SSH 資産のパスワードと秘密鍵をまとめて更新し、固定認証情報の管理負担を減らします。",
       "benefit_1": "手動の一括更新と定期実行に対応します。",
-      "benefit_2": "同じ認証情報を共有する複数資産をまとめて処理します。",
+      "benefit_2": "複数の資産に関連付けた共通の認証情報をまとめて更新し、個別の変更を減らします。",
       "benefit_3": "更新結果と失敗理由を記録し、確認や後続対応に役立てます。"
     },
     "label": "プレミアム機能",
@@ -2817,10 +3320,10 @@
       "description": "複数のゲートウェイを再利用可能な接続グループにまとめます。",
       "benefit_1": "メンバーを一元管理し、資産側の重複設定を減らします。",
       "benefit_2": "優先順位、遅延、ランダムの選択方式に対応します。",
-      "benefit_3": "共通グループにより接続先の変更を管理しやすくします。"
+      "benefit_3": "複数の資産で同じグループを利用し、接続経路の変更をまとめて管理できます。"
     },
     "authorization_strategy": {
-      "title": "認可ポリシー",
+      "title": "操作権限ポリシー",
       "description": "担当業務に応じてファイル操作とクリップボードの権限を設定します。",
       "benefit_1": "アップロードとダウンロードを個別に制御します。",
       "benefit_2": "作成、編集、削除、名前変更の権限を分けられます。",
@@ -2830,12 +3333,12 @@
       "title": "コマンドフィルター",
       "description": "高リスクなコマンドを制限するための端末操作ルールを設定します。",
       "benefit_1": "コマンドの照合ルールを一元管理します。",
-      "benefit_2": "リソース認可を通じてルールを適用します。",
+      "benefit_2": "リソースのアクセス権限にコマンドルールを適用できます。",
       "benefit_3": "危険なコマンドを誤って実行する機会を減らします。"
     },
     "oidc": {
       "title": "OIDC シングルサインオン",
-      "description": "既存の OIDC ID プロバイダーと連携し、企業アカウントでログインします。",
+      "description": "既存の OIDC ID プロバイダーと連携し、各ユーザーの企業アカウントでログインできます。",
       "benefit_1": "企業のログイン入口を共用し、アカウント管理を減らします。",
       "benefit_2": "標準の OIDC プロトコルで連携します。",
       "benefit_3": "ログインユーザーの所属部門を設定できます。"
@@ -2863,21 +3366,21 @@
     },
     "session_sharing": {
       "title": "セッション共有",
-      "description": "現在のセッションのリンクを共有し、状況確認や共同調査を支援します。",
+      "description": "現在のセッションを閲覧専用リンクで共有し、状況確認や共同調査に役立てます。",
       "benefit_1": "現在の状況を直接共有して説明の手間を減らします。",
-      "benefit_2": "リンクから共有セッションに参加できます。",
+      "benefit_2": "リンクから共有セッションを閲覧できます。閲覧者はリモート資産を操作できません。",
       "benefit_3": "作業完了後に共有を解除できます。"
     },
     "website_geo": {
       "title": "Web サイトの地域ルール",
-      "description": "国、地域、都市に基づいて公開アクセスの範囲を限定します。",
+      "description": "リクエスト元の国、地域、都市に基づいて公開アクセスの許可条件を設定します。",
       "benefit_1": "国、地域、都市の条件を個別に設定します。",
-      "benefit_2": "既存の IP ルールと組み合わせられます。",
+      "benefit_2": "IP などの許可ルールと併用できます。いずれかのルールに一致すると公開アクセスを許可します。",
       "benefit_3": "サイトの地域別アクセス要件を一元管理します。"
     },
     "response_rewrite": {
       "title": "Web レスポンスの変更",
-      "description": "プロキシ層でサイトの返却内容を変更するルールを設定します。",
+      "description": "プロキシで Web サイトのレスポンス変更ルールを設定し、応答内容やヘッダーを変更します。",
       "benefit_1": "レスポンス変更ルールを一元管理します。",
       "benefit_2": "元のアプリのコード変更を減らせます。",
       "benefit_3": "サイトごとに異なるルールを適用できます。"
@@ -2892,7 +3395,7 @@
     "recording_conversion": {
       "title": "録画変換ポリシー",
       "description": "録画の利用開始時間とサーバー負荷に合わせて変換をスケジュールします。",
-      "benefit_1": "即時変換と空き時間の変換を選択できます。",
+      "benefit_1": "切断後すぐに変換するか、指定した時間帯に変換するか選択できます。",
       "benefit_2": "変換処理の時間帯を設定できます。",
       "benefit_3": "元の録画を保持するか選択できます。"
     },
@@ -2900,11 +3403,11 @@
       "title": "アクセス申請",
       "description": "一時的な資産アクセスを申請と承認のフローで管理します。",
       "benefit_1": "資産へのアクセス申請入口を統一します。",
-      "benefit_2": "承認フローで要望を処理し、個別連絡を減らします。",
+      "benefit_2": "承認フローでアクセス申請を処理し、個別の連絡を減らします。",
       "benefit_3": "リソース管理と申請を結び付け、処理を追跡しやすくします。"
     },
     "sql_work_order": {
-      "title": "SQL 変更申請の承認",
+      "title": "SQL 実行の承認",
       "description": "データベース変更を申請・承認・実行の流れで管理し、未確認の SQL 操作を減らします。",
       "benefit_1": "実行前に SQL と対象データベースを確認できます。",
       "benefit_2": "承認された変更をプラットフォームで実行し、手作業の引き継ぎを減らします。",
@@ -2912,6 +3415,14 @@
     }
   },
   "agent_access": {
+    "api_setting": "Agent・API 接続",
+    "enable_api": "Agent・API 接続を許可",
+    "enable_api_tip": "有効にすると、ユーザーは Agent、CLI、自動化用の個人 API Key を作成できます。呼び出しにはユーザーの権限とアクセスポリシーが適用されます。無効にすると既存の Key は一時停止し、再度有効にすると期限切れ・失効していない Key を利用できます。",
+    "disabled": "Agent・API 接続は無効です",
+    "disabled_tip": "システム設定の変更権限を持つ管理者に有効化を依頼してください。",
+    "key_disabled_tip": "API Key アクセスが無効になっています。既存の Key は一時停止されていますが、表示と失効は可能です。データベースパスワードには影響しません。",
+    "load_failed": "アクセス状態の読み込みに失敗しました",
+    "retry": "再試行",
     "title": "Agent 接続",
     "description": "OpenClaw、Hermes、または独自の Agent に Next Terminal Skill をインストールします。一度インストールすれば、以後は付属のスクリプトでリソースを照会・管理できます。",
     "create_key": "API Key を作成",
@@ -2922,7 +3433,7 @@
     "auth": "認証ヘッダー",
     "setup": "設定と API 呼び出し",
     "key_instruction": "Agent のローカル環境に NT_API_KEY を安全に設定してください。キーをチャットに貼り付けないでください。",
-    "setup_tip": "アカウントのアクセストークン画面で api タイプのトークンを作成し、Agent の永続的な環境に NT_API_KEY を設定します。インストーラーで Skill とスクリプトを永続的な Skill ディレクトリにインストールしてください。Python 3 のみ必要です。別の環境変数名を使う場合は --token-env で指定できます。",
+    "setup_tip": "アクセストークン画面で API トークンを作成し、Agent の永続的な環境に NT_API_KEY を設定します。永続的な Skill ディレクトリの next-terminal-api サブディレクトリに Skill とクライアントをインストールし、フレームワークの手順に従って読み込みます。Python 3 のみ必要です。別の環境変数名を使う場合は --token-env で指定できます。",
     "copy_prompt": "インストール手順をコピー",
     "permissions": "Agent は API Key の所有アカウントの権限を使用します。有効期限を設定し、Agent の利用を終了する際はアクセストークン画面でトークンを失効させてください。",
     "heading": "Agent でリソースを管理",
@@ -2939,6 +3450,12 @@
     "preview_prompt": "インストール手順を表示",
     "advanced": "API ドキュメント（開発者向け）",
     "advanced_tip": "インストールした Skill には API の探索・呼び出しスクリプトが含まれます。独自の連携を開発する場合は、こちらで API の仕様を確認できます。",
-    "prompt": "Next Terminal のリソース管理 Skill をインストールしてください。インスタンス URL は {{url}} です。\n\n1. この Agent フレームワークの永続的な Skill ディレクトリを確認し、その中の next-terminal-api サブディレクトリを使用してください。一時ディレクトリを使ったり、この会話の間だけドキュメントを読んだりしないでください。\n2. {{url}}/agent/next-terminal/install.py をダウンロードし、ローカルで python3 install.py --base-url {{url}} --directory <永続Skillディレクトリ>/next-terminal-api を実行してください。SKILL.md、scripts/nt_api.py、秘密情報を含まないインスタンス設定が保存されます。同名の Skill が別のインスタンスに接続している場合は、上書きする前にインストール先を確認してください。\n3. フレームワークの手順に従ってインストール済みの Skill を読み込むか、再読み込みしてください。API Key は永続的な環境変数 NT_API_KEY に設定済みです。キーの平文を出力・保存したり、チャットで要求したりしないでください。読み取れない場合は、どの実行環境で設定すべきか教えてください。\n4. インストール済みの scripts/nt_api.py check で接続を確認し、インストール先、読み込み状況、アカウント名を報告してください。失敗した場合は原因を説明し、成功したと報告しないでください。\n5. 以後の管理タスクでは、インストール済みの Skill とスクリプトを使用し、必要な API を調べて私が許可した操作を実行してください。\n\nインストールと確認が完了したら、具体的なタスクの指示を待ってください。\n\nscripts/nt_api.py permissions も実行してアカウント権限とシステムライセンスを取得し、API を選ぶ前に確認してください。完全な仕様書に表示されることは呼び出し権限を意味しません。"
+    "prompt": "Next Terminal のリソース管理 Skill をインストールしてください。インスタンス URL は {{url}} です。\n\n1. この Agent フレームワークの永続的な Skill ディレクトリを確認し、その中の next-terminal-api サブディレクトリを使用してください。一時ディレクトリを使ったり、この会話の間だけドキュメントを読んだりしないでください。\n2. {{url}}/agent/next-terminal/install.py をダウンロードし、ローカルで python3 install.py --base-url {{url}} --directory <永続Skillディレクトリ>/next-terminal-api を実行してください。SKILL.md、scripts/nt_api.py、秘密情報を含まないインスタンス設定が保存されます。同名の Skill が別のインスタンスに接続している場合は、上書きする前にインストール先を確認してください。\n3. フレームワークの手順に従ってインストール済みの Skill を読み込むか、再読み込みしてください。API Key は永続的な環境変数 NT_API_KEY に設定済みです。キーの平文を出力・保存したり、チャットで要求したりしないでください。読み取れない場合は、どの実行環境で設定すべきか教えてください。\n4. インストール済みの scripts/nt_api.py check で接続を確認し、インストール先、読み込み状況、アカウント名を報告してください。失敗した場合は原因を説明し、成功したと報告しないでください。\nscripts/nt_api.py permissions も実行してアカウント権限とシステムライセンスを取得し、API を選ぶ前に確認してください。完全な仕様書に表示されることは呼び出し権限を意味しません。\n5. 以後の管理タスクでは、インストール済みの Skill とスクリプトを使用し、必要な API を調べて私が許可した操作を実行してください。\n\nインストールと確認が完了したら、具体的なタスクの指示を待ってください。",
+    "go_settings": "接続設定へ",
+    "view_settings": "接続設定を表示",
+    "view_guide": "Agent 接続ガイドを表示",
+    "status_enabled": "接続状態：有効",
+    "disabled_admin_tip": "有効にすると、API Key を使用して Agent、CLI、自動化スクリプトから接続できます。既存のキーは保持され、再び有効にすると、期限内かつ未失効のキーを利用できます。",
+    "status_disabled": "接続状態：無効"
   }
 }

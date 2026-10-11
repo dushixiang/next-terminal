@@ -232,6 +232,9 @@ const parseLiteral = (expr) => {
     return null;
   }
   const body = text.slice(1, -1);
+  if ((quote === '`' ? skipTemplate(text, 0) : skipQuoted(text, 0, quote)) !== text.length) {
+    return null;
+  }
   if (quote === '`' && body.includes('${')) {
     return null;
   }
@@ -309,7 +312,7 @@ const concatToMatcher = (expr) => {
 const markEquivalentMenuModules = (used, allKeys) => {
   allKeys.forEach((key) => {
     const match = key.match(/^menus\.([^.]+)\.label$/);
-    if (match && used.has(key)) {
+    if (match && used.has(key) && allKeys.has(`audit.operation.modules.${match[1]}`)) {
       used.add(`audit.operation.modules.${match[1]}`);
     }
   });
@@ -357,9 +360,13 @@ const collectUsedKeys = (files, allKeys) => {
   const dynamicMatchers = [];
   const tPattern = /\b(?:t|i18n\.t)\s*\(/g;
   const fallbackPattern = /\btranslateWithFallback\s*\(/g;
+  const transKeyPattern = /\bi18nKey\s*=\s*(?:\{\s*)?(['"])([^'"]+)\1/g;
   for (const file of files) {
     const content = stripComments(fs.readFileSync(file, 'utf8'));
     let match;
+    while ((match = transKeyPattern.exec(content)) !== null) {
+      used.add(match[2]);
+    }
     while ((match = tPattern.exec(content)) !== null) {
       addUsageFromExpression(
         parseFirstArgument(content, tPattern.lastIndex - 1),
@@ -445,6 +452,50 @@ const collectRawChinese = (files) => {
   return findings;
 };
 
+const auditBackendTranslations = (flatLocales) => {
+  const repositoryRoot = path.resolve(projectRoot, '..');
+  const readSource = (file) => fs.readFileSync(path.join(repositoryRoot, file), 'utf8');
+  const codes = [...readSource('internal/xerrors/errors.go').matchAll(/orz\.NewError\((\d+),/g)].map(match => match[1]);
+  const events = [...readSource('internal/apps/sysconf/exp.go').matchAll(/Event\w+\s*=\s*"([^"]+)"/g)].map(match => match[1]);
+  const actions = [...readSource('internal/apps/access/models/filesystem_log.go').matchAll(/FileSystemAction = "([^"]+)"/g)].map(match => match[1]);
+  const issues = [];
+  const backendLocales = Object.fromEntries(locales.map(locale => {
+    const entries = readJson(path.join(repositoryRoot, 'internal/i18n/locales', `${locale}.json`));
+    const messages = new Map();
+    for (const item of entries) {
+      if (messages.has(item.id)) issues.push(`${locale}: duplicate notification template ${item.id}`);
+      if (typeof item.other !== 'string' || !item.other.trim()) issues.push(`${locale}: invalid notification template ${item.id}`);
+      if (/\.(title|summary)$/.test(item.id)) {
+        const literal = String(item.other).replace(/{{\s*\.([A-Za-z][A-Za-z0-9_]*)\s*}}/g, '');
+        if (literal.includes('{{') || literal.includes('}}')) issues.push(`${locale}: unsupported event template syntax ${item.id}`);
+      }
+      messages.set(item.id, item.other);
+    }
+    return [locale, messages];
+  }));
+  const reference = backendLocales['zh-CN'];
+  const parameters = text => [...String(text).matchAll(/{{\s*\.([A-Za-z][A-Za-z0-9_]*)\s*}}/g)].map(match => match[1]).sort().join(',');
+  for (const locale of locales) {
+    const required = [
+      ...codes.map(code => `errors.${code}`),
+      ...events.map(event => `settings.notification.event_types.${event}`),
+      ...actions.map(action => `audit.filesystem_actions.${action}`),
+    ];
+    for (const key of required) {
+      if (!flatLocales[locale][key]) issues.push(`${locale}: missing backend key ${key}`);
+    }
+    for (const [key, source] of reference) {
+      const text = backendLocales[locale].get(key);
+      if (!text) issues.push(`${locale}: missing notification template ${key}`);
+      else if (parameters(text) !== parameters(source)) issues.push(`${locale}: notification parameters differ ${key}`);
+    }
+    for (const key of backendLocales[locale].keys()) {
+      if (!reference.has(key)) issues.push(`${locale}: extra notification template ${key}`);
+    }
+  }
+  return issues;
+};
+
 const main = () => {
   const localeData = {};
   const flatLocales = {};
@@ -464,6 +515,23 @@ const main = () => {
     missingByLocale[locale] = Array.from(allKeys).filter(
       (key) => !(key in flatLocales[locale])
     );
+  });
+
+  const invalidValues = [];
+  const placeholderMismatches = [];
+  const placeholders = (value) => typeof value === 'string'
+    ? Array.from(value.matchAll(/{{\s*([^{}]+?)\s*}}/g), match => match[1]).sort()
+    : [];
+  locales.forEach((locale) => {
+    Object.entries(flatLocales[locale]).forEach(([key, value]) => {
+      if (typeof value !== 'string' || !value.trim()) {
+        invalidValues.push(`${locale}: ${key}`);
+      }
+      const source = flatLocales['zh-CN'][key];
+      if (source !== undefined && JSON.stringify(placeholders(source)) !== JSON.stringify(placeholders(value))) {
+        placeholderMismatches.push(`${locale}: ${key}`);
+      }
+    });
   });
 
   const duplicateGroups = new Map();
@@ -486,6 +554,7 @@ const main = () => {
 
   const codeFiles = walkFiles(srcRoot);
   const usedKeys = collectUsedKeys(codeFiles, allKeys);
+  const missingReferencedKeys = Array.from(usedKeys).filter((key) => !allKeys.has(key));
   const unusedKeys = Array.from(allKeys).filter((key) => !usedKeys.has(key));
 
   const fallbackUsages = collectFallbackUsages(codeFiles);
@@ -497,6 +566,10 @@ const main = () => {
     console.log(`${locale} keys: ${Object.keys(flatLocales[locale]).length}`);
   });
 
+  const backendIssues = auditBackendTranslations(flatLocales);
+  console.log(`\nBackend translation issues: ${backendIssues.length}`);
+  backendIssues.forEach(issue => console.log(`  - ${issue}`));
+
   console.log('\nMissing keys per locale:');
   locales.forEach((locale) => {
     console.log(`${locale}: ${missingByLocale[locale].length}`);
@@ -504,6 +577,13 @@ const main = () => {
       console.log(`  - ${key}`);
     });
   });
+
+  console.log(`\nInvalid translation values: ${invalidValues.length}`);
+  invalidValues.forEach(item => console.log(`  - ${item}`));
+  console.log(`Placeholder mismatches: ${placeholderMismatches.length}`);
+  placeholderMismatches.forEach(item => console.log(`  - ${item}`));
+  console.log(`Missing referenced translation keys: ${missingReferencedKeys.length}`);
+  missingReferencedKeys.forEach(key => console.log(`  - ${key}`));
 
   console.log('\nDuplicate value groups (same text across all locales):');
   console.log(`Groups: ${duplicateList.length}`);
@@ -527,7 +607,9 @@ const main = () => {
     console.log(`${path.relative(projectRoot, item.file)}:${item.line} ${item.type} ${item.key} :: ${item.text}`);
   });
 
-  if (Object.values(missingByLocale).some((items) => items.length > 0) || fallbackUsages.length > 0) {
+  if (Object.values(missingByLocale).some((items) => items.length > 0)
+    || invalidValues.length > 0 || placeholderMismatches.length > 0
+    || missingReferencedKeys.length > 0 || fallbackUsages.length > 0 || backendIssues.length > 0) {
     process.exitCode = 1;
   }
 };

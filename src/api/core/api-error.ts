@@ -38,3 +38,18 @@ export const getErrorMessage = (error: unknown): string => {
     }
     return String(error || 'Unknown error');
 };
+
+// 在渲染时使用当前语言翻译业务错误，保留未知错误的原始信息。
+export const getLocalizedErrorMessage = (error: unknown, translate: (key: string) => string): string => {
+    if (error && typeof error === 'object' && 'code' in error && typeof error.code === 'number' && error.code > 0) {
+        const key = `errors.${error.code}`;
+        const message = translate(key);
+        if (message && message !== key) {
+            return message;
+        }
+    }
+    if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string' && error.message) {
+        return error.message;
+    }
+    return getErrorMessage(error);
+};

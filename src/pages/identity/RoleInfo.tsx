@@ -1,9 +1,9 @@
 import {Descriptions, Spin, Tree} from "antd";
-import roleApi, {TreeNode} from "../../api/role-api";
+import roleApi from "../../api/role-api";
 import {useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {useNTTheme} from "@/hook/use-theme";
-import strings from "@/utils/strings";
+import {localizeRoleMenus} from "./role-menu-labels";
 import times from "@/components/time/times";
 
 const api = roleApi;
@@ -14,42 +14,13 @@ interface RoleInfoProps {
 
 const RoleInfo = ({id}: RoleInfoProps) => {
 
-    let {t} = useTranslation();
+    let {t, i18n} = useTranslation();
     let [theme] = useNTTheme();
 
 
-    const wrapGetMenu = async () => {
-        let menus = await roleApi.getMenus();
-        deepT('', menus);
-        return menus;
-    }
-
-    const deepT = (parent: string, menus: TreeNode[]) => {
-        for (let i = 0; i < menus.length; i++) {
-            const menu = menus[i];
-            if (!menu) {
-                continue;
-            }
-            if (menu.isLeaf) {
-                menu.title = t('permissions.' + menu.key);
-            } else {
-                let parentKey = parent.replace(/-/g, '_');
-                let key = menu.key.replace(/-/g, '_');
-                if (strings.hasText(parent)) {
-                    menu.title = t(`menus.${parentKey}.submenus.${key}`);
-                } else {
-                    menu.title = t(`menus.${key}.label`);
-                }
-            }
-            if (menu.children) {
-                deepT(menu.key, menu.children);
-            }
-        }
-    }
-
     let menusQuery = useQuery({
         queryKey: ['menus'],
-        queryFn: wrapGetMenu,
+        queryFn: roleApi.getMenus,
     });
 
     const roleQuery = useQuery({
@@ -77,7 +48,7 @@ const RoleInfo = ({id}: RoleInfoProps) => {
                             label: t('identity.role.permission'),
                             children: (() => {
                             if (menusQuery.isLoading) {
-                                return <div>Loading</div>
+                                return <div>{t('general.loading')}</div>
                             }
                             return (
                                 <>
@@ -86,7 +57,7 @@ const RoleInfo = ({id}: RoleInfoProps) => {
                                         checkable
                                         disabled={true}
                                         checkedKeys={roleMenus}
-                                        treeData={menusQuery.data ?? []}
+                                        treeData={localizeRoleMenus(menusQuery.data ?? [], t, i18n)}
                                         style={{
                                             backgroundColor: theme.backgroundColor,
                                         }}

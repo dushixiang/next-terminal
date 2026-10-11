@@ -3,6 +3,7 @@ import requests from "./core/requests";
 import type {GatewayHop} from "@/api/gateway-chain";
 
 export interface DatabaseAsset {
+    enabled: boolean;
     id: string;
     name: string;
     type: string;
@@ -25,6 +26,10 @@ export interface DatabaseAsset {
 }
 
 class DatabaseAssetApi extends Api<DatabaseAsset> {
+    updateEnabled = async (id: string, enabled: boolean) => {
+        return await requests.patch<void>(`/${this.group}/${id}/enabled`, {enabled});
+    }
+
     constructor() {
         super("admin/database-assets");
     }

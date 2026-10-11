@@ -97,6 +97,7 @@ const AssetRecordingConvertSetting = ({
                 <Form.Item
                     name={recordingConvertIdleTimeRangeField}
                     label={t('settings.system.recording_convert.idle_time_range')}
+                    extra={t('settings.system.recording_convert.idle_time_tip')}
                     required={isRecordingConvertEnabled && isIdleRecordingConvert}
                     rules={[{
                         required: isRecordingConvertEnabled && isIdleRecordingConvert,

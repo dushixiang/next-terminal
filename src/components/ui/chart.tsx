@@ -1,3 +1,4 @@
+import {useTranslation} from "react-i18next"
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 
@@ -138,6 +139,7 @@ const ChartTooltipContent = React.forwardRef<
     ref
   ) => {
     const { config } = useChart()
+    const {i18n} = useTranslation()
 
     const tooltipLabel = (() => {
       if (hideLabel || !payload?.length) {
@@ -241,11 +243,13 @@ const ChartTooltipContent = React.forwardRef<
                             {itemConfig?.label || item.name}
                           </span>
                         </div>
-                        {item.value && (
+                        {item.value != null && (
                           <span className="font-mono font-medium tabular-nums text-foreground">
                             {valueFormatter
                               ? valueFormatter(item.value, item.payload)
-                              : item.value.toLocaleString()}
+                              : typeof item.value === "number"
+                                ? item.value.toLocaleString(i18n.resolvedLanguage || i18n.language)
+                                : String(item.value)}
                           </span>
                         )}
                       </div>

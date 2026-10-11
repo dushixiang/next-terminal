@@ -39,8 +39,6 @@ const ClientCertificate = () => {
         modal.confirm({
             title: hasCert ? t('account.client_cert_regenerate') : t('account.client_cert_generate'),
             content: t('account.client_cert_once_tip'),
-            okText: t('actions.confirm'),
-            cancelText: t('actions.cancel'),
             onOk: async () => {
                 accountApi.downloadClientCert();
                 message.success(t('account.client_cert_download_started'));
@@ -63,8 +61,6 @@ const ClientCertificate = () => {
                         <Popconfirm
                             title={t('account.client_cert_revoke_confirm')}
                             onConfirm={() => revokeMutation.mutate()}
-                            okText={t('actions.confirm')}
-                            cancelText={t('actions.cancel')}
                         >
                             <Button danger loading={revokeMutation.isPending}>
                                 {t('account.client_cert_revoke')}

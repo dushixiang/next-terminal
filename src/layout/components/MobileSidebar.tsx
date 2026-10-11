@@ -48,6 +48,8 @@ const MobileSidebar: React.FC<MobileSidebarProps> = ({
                 <div className={'flex-1 overflow-hidden'}>
                     <ScrollArea className="h-full">
                         <Menu
+                            className="app-navigation-menu"
+                            inlineIndent={16}
                             onClick={onMenuClick}
                             selectedKeys={[current]}
                             onOpenChange={onSubMenuChange}

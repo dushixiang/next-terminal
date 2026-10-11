@@ -144,7 +144,7 @@ const StoragePage = () => {
             dataIndex: 'limitSize',
             key: 'limitSize',
             render: (text) => {
-                return renderSize(text as number);
+                return typeof text === 'number' && text < 0 ? t('assets.storage.no_limit') : renderSize(text as number);
             },
             width: 100,
         },
@@ -185,7 +185,8 @@ const StoragePage = () => {
                         {t('actions.edit')}
                     </NButton>
                     <Popconfirm
-                        title={t('general.confirm_delete')}
+                        title={t('assets.storage.delete_title')}
+                        description={t('assets.storage.delete_content')}
                         onConfirm={async () => {
                             await api.deleteById(record.id);
                             reloadTable();

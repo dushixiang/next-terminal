@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react';
 import {Alert, Button, Form, Input, Select, Switch, Typography} from 'antd';
 import {SettingProps} from './SettingPage';
-import {useTranslation} from 'react-i18next';
+import {Trans, useTranslation} from 'react-i18next';
 import DbProxyStats, {useDbProxyStats} from './DbProxyStats';
 import {Link} from 'react-router-dom';
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -132,7 +132,7 @@ const PostgresProxySetting = ({get, set}: SettingProps) => {
                 </div>
                 <div>
                     <div className="font-medium">{t('account.access_token_type_values.db_password')}</div>
-                    <Paragraph style={{marginBottom: 0}}>{t('db.proxy.password_tip_prefix')}<Link to="/info?activeKey=access-token">{t('db.proxy.password_tip_link')}</Link>{t('db.proxy.password_tip_suffix')}</Paragraph>
+                    <Paragraph style={{marginBottom: 0}}><Trans i18nKey="db.proxy.password_tip" components={{link: <Link to="/info?activeKey=access-token"/>}}/></Paragraph>
                 </div>
             </div>
         </div>

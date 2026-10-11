@@ -50,8 +50,6 @@ const UserClientCert = ({active, userId}: UserClientCertProps) => {
                         <Popconfirm
                             title={t('account.client_cert_revoke_confirm')}
                             onConfirm={() => revokeMutation.mutate()}
-                            okText={t('actions.confirm')}
-                            cancelText={t('actions.cancel')}
                         >
                             <Button danger loading={revokeMutation.isPending}>
                                 {t('account.client_cert_revoke')}

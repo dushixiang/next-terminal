@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import {type CSSProperties, useEffect, useRef, useState} from 'react';
 import {
     App,
@@ -475,7 +476,7 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                     <span className="text-sm font-medium">{t('ai_assistant.context_details')}</span>
                     <span className="text-xl font-semibold tabular-nums">{contextPercent}</span>
                 </div>
-                <div className="text-xs tabular-nums text-gray-500">{t('ai_assistant.context_usage_detail', {count: contextTokens.toLocaleString()})}</div>
+                <div className="text-xs tabular-nums text-gray-500">{t('ai_assistant.context_usage_detail', {count: contextTokens.toLocaleString(i18n.resolvedLanguage || i18n.language)})}</div>
                 {usage ? <div className="text-[11px] text-gray-500">{usage.context?.estimated || usage.estimated ? t('ai_assistant.context_estimated') : t('ai_assistant.context_actual')}</div> : null}
             </div>
             {contextRows.length > 0 ? (
@@ -486,7 +487,7 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                             <div key={row.key} className="flex items-center gap-2 text-xs">
                                 <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${row.color}`}/>
                                 <span className="min-w-0 flex-1 text-gray-500">{row.label}</span>
-                                <span className="tabular-nums">{row.tokens.toLocaleString()}</span>
+                                <span className="tabular-nums">{row.tokens.toLocaleString(i18n.resolvedLanguage || i18n.language)}</span>
                                 <span className="w-8 text-right tabular-nums text-gray-500">{percent}%</span>
                             </div>
                         );
@@ -505,9 +506,9 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                 {usage ? <div className="text-[10px] text-gray-500">{t('ai_assistant.usage_detail', {prompt: usage.prompt, completion: usage.completion})}</div> : null}
                 {usage?.cache ? (
                     <div className="flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-gray-500">
-                        <span>{t('ai_assistant.cache_read_tokens', {count: usage.cache.readTokens.toLocaleString()})}</span>
-                        <span>{t('ai_assistant.cache_input_tokens', {count: usage.cache.inputTokens.toLocaleString()})}</span>
-                        {usage.cache.creationTokens ? <span>{t('ai_assistant.cache_creation_tokens', {count: usage.cache.creationTokens.toLocaleString()})}</span> : null}
+                        <span>{t('ai_assistant.cache_read_tokens', {count: usage.cache.readTokens.toLocaleString(i18n.resolvedLanguage || i18n.language)})}</span>
+                        <span>{t('ai_assistant.cache_input_tokens', {count: usage.cache.inputTokens.toLocaleString(i18n.resolvedLanguage || i18n.language)})}</span>
+                        {usage.cache.creationTokens ? <span>{t('ai_assistant.cache_creation_tokens', {count: usage.cache.creationTokens.toLocaleString(i18n.resolvedLanguage || i18n.language)})}</span> : null}
                         <span>{t('ai_assistant.cache_request_count', {count: usage.cache.requestCount})}</span>
                     </div>
                 ) : null}
@@ -571,7 +572,7 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                 busy={busy}
                 scrollRequest={scrollRequest}
                 onCopy={text => {
-                    if (copy(text)) message.success(t('common.copy_success'));
+                    if (copy(text)) message.success(t('general.copy_success'));
                 }}
                 onSendNow={item => sendMessage({type: 'send_now', clientMessageId: item.clientMessageId || item.id})}
                 onRetry={retryUserMessage}
@@ -665,8 +666,6 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
             <Modal
                 title={t('ai_assistant.edit_confirm_title')}
                 open={editConfirmOpen}
-                okText={t('actions.confirm')}
-                cancelText={t('actions.cancel')}
                 onOk={confirmEditedMessage}
                 onCancel={() => setEditConfirmOpen(false)}
             >
@@ -865,7 +864,7 @@ const ToolTextBlock = ({title, text, muted, onCopy}: {title: string; text: strin
 
 const HistoryModal = ({open, search, conversations, currentId, loading, loadingId, deletingId, clearing, hasConversations, onClose, onSearch, onLoad, onDelete, onClear}: {open: boolean; search: string; conversations: AIConversation[]; currentId: string; loading: boolean; loadingId: string; deletingId: string; clearing: boolean; hasConversations: boolean; onClose: () => void; onSearch: (value: string) => void; onLoad: (item: AIConversation) => void; onDelete: (id: string) => void; onClear: () => void}) => {
     const {t} = useTranslation();
-    return <Modal title={t('ai_assistant.history')} open={open} footer={null} width={620} destroyOnHidden onCancel={onClose}><div className="mb-3 flex items-center gap-2"><Input.Search allowClear value={search} placeholder={t('ai_assistant.history_search')} onChange={event => onSearch(event.target.value)}/><Popconfirm title={t('ai_assistant.clear_confirm')} onConfirm={onClear}><Button danger loading={clearing} disabled={!hasConversations} icon={<Trash2Icon className="h-4 w-4"/>}>{t('actions.clear')}</Button></Popconfirm></div><div className="ai-assistant max-h-[55vh] overflow-y-auto">{loading ? <div className="flex justify-center py-8"><Spin/></div> : conversations.length === 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('ai_assistant.no_history')}/> : conversations.map(item => <div key={item.id} className="flex cursor-pointer items-center gap-3 border-b border-gray-100 px-2 py-3 last:border-b-0 dark:border-white/10" onClick={() => onLoad(item)}><div className="min-w-0 flex-1"><Typography.Text ellipsis className={item.id === currentId ? 'text-blue-500' : undefined}>{item.title || t('ai_assistant.new_chat')}</Typography.Text><div className="text-xs text-gray-500">{new Date(item.updatedAt).toLocaleString()}</div></div>{loadingId === item.id ? <Spin size="small"/> : null}<Popconfirm title={t('ai_assistant.delete_confirm')} onConfirm={() => onDelete(item.id)}><Button danger type="text" size="small" loading={deletingId === item.id} icon={<Trash2Icon className="h-4 w-4"/>} onClick={event => event.stopPropagation()}/></Popconfirm></div>)}</div></Modal>;
+    return <Modal title={t('ai_assistant.history')} open={open} footer={null} width={620} destroyOnHidden onCancel={onClose}><div className="mb-3 flex items-center gap-2"><Input.Search allowClear value={search} placeholder={t('ai_assistant.history_search')} onChange={event => onSearch(event.target.value)}/><Popconfirm title={t('ai_assistant.clear_confirm')} onConfirm={onClear}><Button danger loading={clearing} disabled={!hasConversations} icon={<Trash2Icon className="h-4 w-4"/>}>{t('actions.clear')}</Button></Popconfirm></div><div className="ai-assistant max-h-[55vh] overflow-y-auto">{loading ? <div className="flex justify-center py-8"><Spin/></div> : conversations.length === 0 ? <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('ai_assistant.no_history')}/> : conversations.map(item => <div key={item.id} className="flex cursor-pointer items-center gap-3 border-b border-gray-100 px-2 py-3 last:border-b-0 dark:border-white/10" onClick={() => onLoad(item)}><div className="min-w-0 flex-1"><Typography.Text ellipsis className={item.id === currentId ? 'text-blue-500' : undefined}>{item.title || t('ai_assistant.new_chat')}</Typography.Text><div className="text-xs text-gray-500">{new Date(item.updatedAt).toLocaleString(i18n.resolvedLanguage || i18n.language)}</div></div>{loadingId === item.id ? <Spin size="small"/> : null}<Popconfirm title={t('ai_assistant.delete_confirm')} onConfirm={() => onDelete(item.id)}><Button danger type="text" size="small" loading={deletingId === item.id} icon={<Trash2Icon className="h-4 w-4"/>} onClick={event => event.stopPropagation()}/></Popconfirm></div>)}</div></Modal>;
 };
 
 const itemsFromHistory = (messages: AIMessage[]): ChatItem[] => messages.flatMap((message): ChatItem[] => {

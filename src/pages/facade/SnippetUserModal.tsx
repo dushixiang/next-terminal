@@ -51,7 +51,7 @@ const SnippetUserModal = ({
       }]}>
     <Input.TextArea />
       </Form.Item>
-                <Form.Item name="visibility" label={t('assets.snippet.visibility')} initialValue="private" rules={[{
+                <Form.Item name="visibility" label={t('assets.snippet.visibility')} extra={t('assets.snippet.visibility_tip')} initialValue="private" rules={[{
         required: true
       }]}>
     <Radio.Group options={[{

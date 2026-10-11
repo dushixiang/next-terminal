@@ -22,6 +22,7 @@ import {useMutation, useQuery} from "@tanstack/react-query";
 import {
     App,
     Badge,
+    Switch,
     Button,
     Dropdown,
     Input,
@@ -286,6 +287,14 @@ const AssetPage = () => {
         }
     }, [assetPagingQuery.error, message]);
 
+    const toggleEnabledMutation = useMutation({
+        mutationFn: (record: Asset) => api.updateEnabled(record.id, !record.enabled),
+        onSuccess: () => {
+            message.success(t('general.success'));
+            assetPagingQuery.refetch();
+        },
+    });
+
     const columns: TableProps<Asset>['columns'] = [
         {
             title: t('assets.sort'),
@@ -317,6 +326,11 @@ const AssetPage = () => {
                     >
                         {text}
                     </span>
+                    {record.alias && (
+                        <Tooltip title={record.alias}>
+                            <div className={'text-gray-500 text-xs line-clamp-1'}>{record.alias}</div>
+                        </Tooltip>
+                    )}
                     {!isMobile && (
                         <Tooltip title={record.description}>
                             <div className={'text-gray-500 line-clamp-1'}>{record.description}</div>
@@ -327,11 +341,19 @@ const AssetPage = () => {
             fixed: 'left',
         },
         {
-            title: t('assets.alias'),
-            dataIndex: 'alias',
-            sorter: true,
-            width: isMobile ? 80 : 140,
-            hidden: isMobile,
+            title: t('general.enabled'),
+            dataIndex: 'enabled',
+            width: 80,
+            render: (_value, record) => (
+                <Switch
+                    checked={record.enabled}
+                    checkedChildren={t('general.yes')}
+                    unCheckedChildren={t('general.no')}
+                    loading={toggleEnabledMutation.isPending && toggleEnabledMutation.variables?.id === record.id}
+                    disabled={toggleEnabledMutation.isPending}
+                    onChange={() => toggleEnabledMutation.mutate(record)}
+                />
+            ),
         },
         {
             title: t('assets.group'),
@@ -461,15 +483,16 @@ const AssetPage = () => {
         const isCreatingRdpProxyTicket = createRdpProxyTicketMutation.isPending && createRdpProxyTicketMutation.variables?.assetId === id;
         return (
             <div className={cn('flex items-center gap-2', compact && 'gap-1')}>
-                <a
+                <Button
                     key={`btn-access-${id}`}
+                    disabled={!record.enabled}
+                    size="small"
                     href={buildAssetAccessHref(record)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="ant-btn ant-btn-default ant-btn-sm"
                 >
                     {compact ? t('assets.access').substring(0, 2) : t('assets.access')}
-                </a>
+                </Button>
                 <Dropdown
                     key={`perm-action-${id}`}
                     trigger={compact ? ['click'] : ['hover']}
@@ -478,7 +501,7 @@ const AssetPage = () => {
                             ...(isRdpAsset ? [{
                                 key: 'rdp-proxy',
                                 label: t('assets.rdp_proxy_access'),
-                                disabled: isCreatingRdpProxyTicket,
+                                disabled: !record.enabled || isCreatingRdpProxyTicket,
                             }] : []),
                             {key: 'copy', label: t('assets.copy')},
                             {key: 'edit', label: t('actions.edit')},

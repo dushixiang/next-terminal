@@ -224,6 +224,7 @@ const GeoDataSetting = () => {
                     <Form.Item
                         name="autoUpdateTime"
                         label={t('settings.geodata.auto_update_time')}
+                        extra={t('settings.geodata.auto_update_time_tip')}
                         rules={[{required: true}]}
                     >
                         <TimePicker format={timeFormat} allowClear={false}/>

@@ -288,6 +288,21 @@ const WebsitePage = () => {
             fixed: 'left',
         },
         {
+            title: t('general.enabled'),
+            dataIndex: 'enabled',
+            width: 80,
+            render: (_text, record) => (
+                <Switch
+                    checked={record.enabled}
+                    checkedChildren={t('general.yes')}
+                    unCheckedChildren={t('general.no')}
+                    loading={toggleEnabledMutation.isPending && toggleEnabledMutation.variables?.id === record.id}
+                    disabled={toggleEnabledMutation.isPending}
+                    onChange={() => toggleEnabledMutation.mutate(record)}
+                />
+            )
+        },
+        {
             title: t('assets.group'),
             dataIndex: 'groupFullName',
             key: 'groupFullName',
@@ -304,21 +319,6 @@ const WebsitePage = () => {
                     {text || t('assets.default_group')}
                 </div>
             },
-        },
-        {
-            title: t('general.enabled'),
-            dataIndex: 'enabled',
-            width: 80,
-            hidden: isMobile,
-            render: (_text, record) => (
-                <Switch
-                    checked={record.enabled}
-                    checkedChildren={t('general.yes')}
-                    unCheckedChildren={t('general.no')}
-                    loading={toggleEnabledMutation.isPending && toggleEnabledMutation.variables?.id === record.id}
-                    onChange={() => toggleEnabledMutation.mutate(record)}
-                />
-            )
         },
         {
             title: t('assets.public'),

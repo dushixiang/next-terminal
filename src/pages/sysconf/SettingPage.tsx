@@ -5,9 +5,9 @@ import SecuritySetting from "./SecuritySetting";
 import {useSearchParams} from "react-router-dom";
 import propertyApi from "../../api/property-api";
 import {useTranslation} from "react-i18next";
-import {maybe} from "@/utils/maybe.ts";
+import VerificationServiceSetting from "./VerificationServiceSetting";
 import accountApi from "@/api/account-api";
-import {useMutation, useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 import SystemSetting from "@/pages/sysconf/SystemSetting";
 import {useMobile} from "@/hook/use-mobile";
@@ -39,12 +39,13 @@ type SetPropertiesPayload = {
 const SettingPage = () => {
 
     const { isMobile } = useMobile();
+    const queryClient = useQueryClient();
     const [messageApi, contextHolder] = message.useMessage();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    let key = maybe(searchParams.get('activeKey'), 'system');
-
-    let [activeKey, setActiveKey] = useState(key);
+    const legacyService = searchParams.get('activeKey') === 'notification-integration' && ['mail', 'sms'].includes(searchParams.get('integrationActiveKey') || '');
+    const legacySMSLogin = searchParams.get('activeKey') === 'security' && searchParams.get('securityActiveKey') === 'sms-login';
+    const activeKey = legacySMSLogin ? 'identity-auth' : legacyService ? 'verification-services' : searchParams.get('activeKey') || 'system';
     let {t} = useTranslation();
     let [mfaOpen, setMfaOpen] = useState(false);
     let [pendingSet, setPendingSet] = useState<PendingSet | null>(null);
@@ -58,11 +59,13 @@ const SettingPage = () => {
         mutationFn: ({values, securityToken}: SetPropertiesPayload) => propertyApi.set(values, securityToken),
         onSuccess: () => {
             messageApi.success(t('general.success'));
+            queryClient.invalidateQueries({queryKey: ['info']});
+            queryClient.invalidateQueries({queryKey: ['infoQuery']});
+            queryClient.invalidateQueries({queryKey: ['form-request', 'api-key-access']});
         },
     });
 
     const handleTagChange = (key: string) => {
-        setActiveKey(key);
         setSearchParams({'activeKey': key});
     }
 
@@ -150,9 +153,14 @@ const SettingPage = () => {
             children: <IdentityProviderServiceSetting get={get} set={set}/>
         },
         {
+            label: t('settings.verification_services.title'),
+            key: 'verification-services',
+            children: <VerificationServiceSetting get={get} set={set}/>
+        },
+        {
             label: t('settings.notification_integration.setting'),
             key: 'notification-integration',
-            children: <NotificationIntegrationSetting get={get} set={set}/>
+            children: <NotificationIntegrationSetting/>
         },
         {
             label: t('settings.ai.setting'),
@@ -179,7 +187,7 @@ const SettingPage = () => {
                 onChange={handleTagChange} 
                 items={items}
                 size={isMobile ? 'small' : 'middle'}
-                className={isMobile ? 'mobile-setting-tabs' : undefined}
+                className={isMobile ? 'setting-tabs mobile-setting-tabs' : 'setting-tabs'}
             />
             {contextHolder}
             <MultiFactorAuthentication

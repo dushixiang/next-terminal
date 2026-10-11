@@ -176,7 +176,7 @@ const CredentialPage = () => {
                 }
             }
         }, {
-            title: t('menus.identity.submenus.user'),
+            title: t('assets.username'),
             dataIndex: 'username',
             key: 'username',
         }, {

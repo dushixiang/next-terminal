@@ -1,6 +1,6 @@
 import departmentApi,{ Department,TreeNode } from "@/api/department-api";
 import { useQuery } from "@tanstack/react-query";
-import { Form,Input,InputNumber,Modal,TreeSelect } from "antd";
+import { Form,Input,Modal,TreeSelect } from "antd";
 import { useEffect,useState } from 'react';
 import { useTranslation } from "react-i18next";
 
@@ -91,8 +91,8 @@ const DepartmentModal = ({id, open, confirmLoading, handleCancel, handleOk}: Dep
                     label={t('general.name')}
                     name="name"
                     rules={[
-                        {required: true, message: t('general.name') + t('general.required')},
-                        {max: 100, message: t('general.name') + t('general.max_length', {max: 100})}
+                        {required: true, message: t('identity.department.name_required')},
+                        {max: 100, message: t('identity.department.name_max_length', {max: 100})}
                     ]}
                 >
                     <Input placeholder={t('identity.department.name_placeholder')}/>
@@ -114,18 +114,6 @@ const DepartmentModal = ({id, open, confirmLoading, handleCancel, handleOk}: Dep
                     />
                 </Form.Item>
 
-                <Form.Item
-                    label={t('assets.sort')}
-                    name="weight"
-                    tooltip={t('identity.department.weight_tooltip')}
-                >
-                    <InputNumber
-                        min={0}
-                        max={9999}
-                        placeholder={t('identity.department.weight_placeholder')}
-                        style={{width: '100%'}}
-                    />
-                </Form.Item>
             </Form>
         </Modal>
     );

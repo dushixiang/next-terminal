@@ -207,8 +207,6 @@ const OidcClientPage = () => {
                         onConfirm={async () => {
                             regenerateSecretMutation.mutate(record.id);
                         }}
-                        okText={t('actions.confirm')}
-                        cancelText={t('actions.cancel')}
                     >
                         <NButton danger>
                             {t('identity.oidc_client.regenerate_secret')}
@@ -228,8 +226,6 @@ const OidcClientPage = () => {
                                 if (key === 'delete') {
                                     modal.confirm({
                                         title: t('general.confirm_delete'),
-                                        okText: t('actions.confirm'),
-                                        cancelText: t('actions.cancel'),
                                         onOk: async () => {
                                             await deleteItems([record.id]);
                                         },
@@ -327,8 +323,6 @@ const OidcClientPage = () => {
                                     await deleteItems(selectedRowKeys as string[]);
                                     onCleanSelected();
                                 }}
-                                okText={t('actions.confirm')}
-                                cancelText={t('actions.cancel')}
                             >
                                 <Button type="link" size={'small'}>{t('actions.batch_delete')}</Button>
                             </Popconfirm>

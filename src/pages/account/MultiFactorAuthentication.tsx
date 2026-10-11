@@ -1,10 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Button, Card, Input, Modal, Result, Space, Spin} from "antd";
-import accountApi, {AuthType} from "@/api/account-api";
+import React, {useEffect, useRef, useState} from 'react';
+import {Button, Input, Modal, Result, Space, Spin, Typography} from "antd";
+import accountApi, {AuthType, VerificationChallenge} from "@/api/account-api";
 import {startAuthentication} from "@simplewebauthn/browser";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
-import {KeyOutlined, SafetyOutlined} from "@ant-design/icons";
+import {KeyOutlined, SafetyOutlined, MailOutlined, MobileOutlined, RightOutlined} from "@ant-design/icons";
+
+import {useVerificationCountdown} from './use-verification-countdown';
 
 interface Props {
     open: boolean
@@ -21,6 +23,12 @@ interface Error {
 const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = false}: Props) => {
     const {t} = useTranslation();
 
+    const openRef = useRef(open);
+    openRef.current = open;
+    useEffect(() => () => {openRef.current = false;}, []);
+    const [deliveryChallenge, setDeliveryChallenge] = useState<VerificationChallenge>();
+    const [retryUntil, setRetryUntil] = useState(0);
+    const retrySeconds = useVerificationCountdown(retryUntil);
     const [authType, setAuthType] = useState<AuthType>('');
     const [error, setError] = useState<Error | null>(null);
     const [loading, setLoading] = useState(false);
@@ -29,26 +37,28 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
     const [otpKey, setOtpKey] = useState(0); // 用于强制重新挂载 InputOTP
 
     // 查询支持的认证类型
-    const {data: supportedAuthTypes = []} = useQuery({
+    const {data: supportedAuthTypes = [], isPending: supportLoading, isError: supportError, refetch: refetchSupport} = useQuery({
         queryKey: ['securityTokenSupportTypes'],
         queryFn: accountApi.getSecurityTokenSupportTypes,
         enabled: open,
     });
 
     // 认证类型配置
-    const authTypeConfigs = [
+    const authTypeConfigs: {key: Exclude<AuthType, '' | 'none'>; icon: React.ReactNode; title: string; description: string}[] = [
         {
             key: 'passkey' as const,
-            icon: <SafetyOutlined style={{fontSize: 32}}/>,
+            icon: <SafetyOutlined style={{fontSize: 22}}/>,
             title: t('account.passkey'),
             description: t('account.auth_type_passkey_desc'),
         },
         {
             key: 'otp' as const,
-            icon: <KeyOutlined style={{fontSize: 32}}/>,
+            icon: <KeyOutlined style={{fontSize: 22}}/>,
             title: t('account.auth_type_otp'),
             description: t('account.auth_type_otp_desc'),
         },
+        {key: 'email', icon: <MailOutlined style={{fontSize: 22}}/>, title: t('account.verification.email'), description: t('account.verification.email_desc')},
+        {key: 'sms', icon: <MobileOutlined style={{fontSize: 22}}/>, title: t('account.verification.sms'), description: t('account.verification.sms_desc')},
     ];
 
     // 重置状态
@@ -58,6 +68,8 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
         setOtpValue('');
         setShowSelector(false);
         setAuthType('');
+        setDeliveryChallenge(undefined);
+        setRetryUntil(0);
     };
 
     // 清除输入
@@ -69,11 +81,13 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
     // 处理认证类型切换
     const handleAuthTypeChange = (type: AuthType) => {
         clearInputs();
+        setDeliveryChallenge(undefined);
         setAuthType(type);
         setShowSelector(false);
     };
 
     const storeSecurityToken = (securityToken: string) => {
+        if (!openRef.current) return;
         sessionStorage.setItem('securityToken', securityToken);
         handleOk(securityToken);
     }
@@ -127,6 +141,23 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
         }
     });
 
+    const sendDeliveryCode = useMutation({
+        mutationFn: () => accountApi.sendVerificationCode({channel: authType === 'email' ? 'email' : 'sms', purpose: 'mfa'}),
+        onSuccess: challenge => {
+            if (!openRef.current) return;
+            setDeliveryChallenge(challenge);
+            setRetryUntil(Date.now() + challenge.retryAfter * 1000);
+            setOtpValue('');
+            setError(null);
+        },
+        onError: (e: Error) => setError(e),
+    });
+    const verifyDeliveryCode = useMutation({
+        mutationFn: (code: string) => accountApi.verifyAccountCode({challengeId: deliveryChallenge!.challengeId, purpose: 'mfa', code}),
+        onSuccess: result => result.token && storeSecurityToken(result.token),
+        onError: (e: Error) => {setError(e); setOtpValue(''); setOtpKey(key => key + 1);},
+    });
+
     const handleOTPComplete = (value: string) => {
         setError(null);
         if (value.length === 6 && !validateOTP.isPending) {
@@ -140,6 +171,8 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
             resetState();
             return;
         }
+
+        if (supportLoading || supportError) return;
 
         // 打开时显示选择器或设置状态
         if (supportedAuthTypes.length > 0) {
@@ -157,7 +190,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
             // 没有可用的认证方式
             setAuthType('none');
         }
-    }, [open, supportedAuthTypes, authType]);
+    }, [open, supportedAuthTypes, authType, supportLoading, supportError]);
 
     // Passkey 自动认证
     useEffect(() => {
@@ -175,47 +208,26 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
 
     // 渲染选择器
     const renderSelector = () => (
-        <div className={'space-y-4'}>
-            <div className={'text-center text-gray-600 font-medium'}>
-                {t('account.select_auth_type')}
-            </div>
-            <div className={'grid grid-cols-1 gap-3'}>
-                {authTypeConfigs.map((config) => {
-                    const isSupported = supportedAuthTypes.includes(config.key);
-                    return (
-                        <Card
-                            key={config.key}
-                            hoverable={isSupported}
-                            className={`cursor-pointer transition-all ${
-                                isSupported
-                                    ? 'hover:border-blue-500 hover:shadow-md'
-                                    : 'opacity-50 cursor-not-allowed bg-gray-50'
-                            }`}
-                            onClick={() => isSupported && handleAuthTypeChange(config.key)}
-                            style={{borderColor: isSupported ? '#d9d9d9' : '#f0f0f0'}}
-                        >
-                            <div className={'flex items-center gap-3'}>
-                                <div className={isSupported ? 'text-blue-500' : 'text-gray-400'}>
-                                    {config.icon}
-                                </div>
-                                <div className={'flex-1'}>
-                                    <div className={'font-medium text-base'}>
-                                        {config.title}
-                                        {!isSupported && (
-                                            <span className={'ml-2 text-xs text-gray-400'}>
-                                                ({t('account.auth_type_unavailable')})
-                                            </span>
-                                        )}
-                                    </div>
-                                    <div className={'text-sm text-gray-500 mt-1'}>
-                                        {config.description}
-                                    </div>
-                                </div>
-                            </div>
-                        </Card>
-                    );
-                })}
-            </div>
+        <div className="flex flex-col gap-2">
+            {authTypeConfigs.filter(config => supportedAuthTypes.includes(config.key)).map(config => (
+                <Button
+                    key={config.key}
+                    block
+                    onClick={() => handleAuthTypeChange(config.key)}
+                    style={{height: 'auto', padding: '14px 16px', whiteSpace: 'normal', textAlign: 'left'}}
+                >
+                    <div className="flex w-full items-center gap-3">
+                        {config.icon}
+                        <div className="min-w-0 flex-1">
+                            <div className="font-medium">{config.title}</div>
+                            <Typography.Text type="secondary" className="text-sm">
+                                {config.description}
+                            </Typography.Text>
+                        </div>
+                        <RightOutlined style={{fontSize: 12}}/>
+                    </div>
+                </Button>
+            ))}
         </div>
     );
 
@@ -223,7 +235,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
     const renderSwitchButton = () =>
         supportedAuthTypes.length > 1 && (
             <div className={'text-center'}>
-                <Button type="link" onClick={() => setShowSelector(true)}>
+                <Button type="link" disabled={sendDeliveryCode.isPending || verifyDeliveryCode.isPending || validateOTP.isPending} onClick={() => setShowSelector(true)}>
                     {t('account.mfa_change_way')}
                 </Button>
             </div>
@@ -232,7 +244,7 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
     // 渲染错误提示
     const renderError = () => {
         if (!error) {
-            return <div className={'min-h-[24px] text-sm'}/>;
+            return null;
         }
 
         let content: React.ReactNode = null;
@@ -245,8 +257,8 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
         }
 
         return (
-            <div className={'min-h-[24px] text-sm'}>
-                {content && <div className={'text-red-500'}>{content}</div>}
+            <div className="text-sm" role="alert">
+                {content && <Typography.Text type="danger">{content}</Typography.Text>}
             </div>
         );
     };
@@ -258,18 +270,19 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
             title={t('account.no_mfa_title')}
             subTitle={t('account.no_mfa_subtitle')}
             extra={
-                <Space>
+                <Space wrap>
+                    <Button onClick={() => window.location.href = window.location.pathname.startsWith('/x-') ? '/x-info' : '/info'}>{t('account.profile')}</Button>
                     <Button
                         color="geekblue"
                         variant={'filled'}
-                        onClick={() => window.location.href = '/info?activeKey=otp'}
+                        onClick={() => window.location.href = `${window.location.pathname.startsWith('/x-') ? '/x-info' : '/info'}?activeKey=otp`}
                     >
                         {t('account.enable_otp')}
                     </Button>
                     <Button
                         color="green"
                         variant={'filled'}
-                        onClick={() => window.location.href = '/info?activeKey=passkey'}
+                        onClick={() => window.location.href = `${window.location.pathname.startsWith('/x-') ? '/x-info' : '/info'}?activeKey=passkey`}
                     >
                         {t('account.enable_passkey')}
                     </Button>
@@ -281,8 +294,8 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
     // 渲染 OTP 输入
     const renderOTP = () => (
         <div className={'flex items-center justify-center'}>
-            <div className={'space-y-4'}>
-                <div className={'font-bold'}>{t('account.auth_type_otp')}</div>
+            <div className="space-y-4 text-center">
+                <div className="font-medium">{t('account.auth_type_otp')}</div>
                 <Input.OTP
                     key={otpKey}
                     length={6}
@@ -302,6 +315,20 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
             </div>
         </div>
     );
+
+    const renderDelivery = () => <div className="space-y-4 text-center">
+        <div className="font-medium">{t(authType === 'email' ? 'account.verification.email' : 'account.verification.sms')}</div>
+        {deliveryChallenge && <div><Typography.Text type="secondary">{t('account.verification.sent_to', {destination: deliveryChallenge.destination, minutes: deliveryChallenge.expiresIn / 60})}</Typography.Text></div>}
+        <Button type={deliveryChallenge ? "default" : "primary"} onClick={() => sendDeliveryCode.mutate()} loading={sendDeliveryCode.isPending}
+            disabled={retrySeconds > 0 || verifyDeliveryCode.isPending}>
+            {retrySeconds > 0 ? t('account.verification.resend_after', {seconds: retrySeconds}) : t('account.verification.send_code')}
+        </Button>
+        {deliveryChallenge && <div><Input.OTP key={otpKey} length={6} value={otpValue}
+            disabled={verifyDeliveryCode.isPending || sendDeliveryCode.isPending}
+            onChange={value => {setOtpValue(value); setError(null); if (/^\d{6}$/.test(value)) verifyDeliveryCode.mutate(value);}}/></div>}
+        {renderError()}
+        {renderSwitchButton()}
+    </div>;
 
     // 渲染 Passkey 失败
     const renderPasskeyError = () => (
@@ -338,20 +365,25 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
     const renderPasskeyPending = () => (
         <div className={'space-y-3 text-center'}>
             <div className={'text-lg font-medium'}>{t('account.mfa_authing')}</div>
-            <div className={'text-sm text-gray-500'}>
+            <div className="text-sm"><Typography.Text type="secondary">
                 {t('account.mfa_passkey_prompt')}
-            </div>
+            </Typography.Text></div>
             {renderSwitchButton()}
         </div>
     );
 
     // 渲染内容
     const renderContent = () => {
+        if (supportLoading) return <Spin/>;
+        if (supportError) return <Result status="error" title={t('account.verification.load_failed')} extra={<Button onClick={() => void refetchSupport()}>{t('actions.retry')}</Button>}/>;
         if (showSelector) return renderSelector();
 
         switch (authType) {
             case 'none':
                 return renderNoMFA();
+            case 'email':
+            case 'sms':
+                return renderDelivery();
             case 'otp':
                 return renderOTP();
             case 'passkey':
@@ -365,16 +397,15 @@ const MultiFactorAuthentication = ({open, handleOk, handleCancel, forceReauth = 
         <Modal
             title={t('account.mfa')}
             open={open}
+            width={440}
             mask={{closable: false}}
             destroyOnHidden
             footer={null}
             onCancel={handleCancel}
         >
             <Spin description={t('account.mfa_authing')} spinning={loading}>
-                <div className={'min-h-72 w-full flex items-center justify-center py-4'}>
-                    <div className={'space-y-4 w-full px-4'}>
-                        {renderContent()}
-                    </div>
+                <div className="w-full py-4">
+                    {renderContent()}
                 </div>
             </Spin>
         </Modal>

@@ -147,6 +147,7 @@ const NotificationRules = () => {
     ];
 
     return <div>
+        <Typography.Paragraph type="secondary">{t('settings.notification.rules_extra_tip')}</Typography.Paragraph>
         <NTable
             columns={columns}
             tableLayout="fixed"
@@ -192,7 +193,8 @@ const EventTypesSelect = ({value = [], onChange}: {
     onChange?: (value: string[]) => void;
 }) => {
     const {t} = useTranslation();
-    const allEvents = eventGroups.flatMap(group => group.events);
+    const groups = eventGroups;
+    const allEvents = groups.flatMap(group => group.events);
     const selectedCount = allEvents.filter(item => value.includes(item)).length;
 
     const updateGroup = (events: string[], selected: string[]) => {
@@ -207,7 +209,7 @@ const EventTypesSelect = ({value = [], onChange}: {
         >
             {t('dw.select_all')} ({selectedCount}/{allEvents.length})
         </Checkbox>
-        {eventGroups.map(group => {
+        {groups.map(group => {
             const selectedEvents = group.events.filter(item => value.includes(item));
             return <div key={group.key}>
                 <Divider style={{margin: '8px 0'}}/>
@@ -285,7 +287,7 @@ const NotificationRuleModal = ({
 
     const handleOk = async () => {
         const values = await form.validateFields();
-        onOk({...values, id} as NotificationRule);
+        onOk({...values, deliveryTarget: 'channel', recipientMode: '', recipientIds: [], id} as NotificationRule);
     };
 
     return <Modal
@@ -304,8 +306,7 @@ const NotificationRuleModal = ({
             <Form.Item name="enabled" label={t('general.status')} valuePropName="checked">
                 <Switch checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
             </Form.Item>
-            <Form.Item name="eventTypes" label={t('settings.notification.event_types_label')}
-                       rules={[{required: true}]}>
+            <Form.Item name="eventTypes" label={t('settings.notification.event_types_label')} rules={[{required: true}]}>
                 <EventTypesSelect/>
             </Form.Item>
             <Form.Item name="channelIds" label={t('settings.notification.channels')} rules={[{required: true}]}>

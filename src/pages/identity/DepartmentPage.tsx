@@ -1,6 +1,8 @@
 import { useRef,useState } from 'react';
 
-import departmentApi,{ Department } from '@/api/department-api';
+import departmentApi,{ Department, TreeNode } from '@/api/department-api';
+import { DragHandle } from "@/components/DraggableTable";
+import type { TreeProps } from "antd";
 import NButton from "@/components/NButton";
 import NLink from "@/components/NLink";
 import NTable,{ type NColumn,type NTableActionType } from "@/components/NTable";
@@ -35,6 +37,58 @@ const DepartmentPage = () => {
         queryFn: () => api.getTree(),
         enabled: viewMode === 'tree'
     });
+
+    const sortMutation = useMutation({
+        mutationFn: ({id, beforeId, afterId, parentId}: {id: string; beforeId?: string; afterId?: string; parentId?: string}) =>
+            api.updateSort(id, beforeId, afterId, parentId),
+        onSuccess: () => {
+            actionRef.current?.reload();
+            refetchTree();
+            showSuccess();
+        },
+        onError: () => {
+            actionRef.current?.reload();
+            refetchTree();
+            messageApi.error(t('general.error'));
+        },
+    });
+
+    const findTreeNode = (nodes: TreeNode[], key: string, parentId = ''):
+        {node: TreeNode; siblings: TreeNode[]; parentId: string} | undefined => {
+        for (const node of nodes) {
+            if (node.key === key) return {node, siblings: nodes, parentId};
+            const found = findTreeNode(node.children || [], key, node.key);
+            if (found) return found;
+        }
+    };
+
+    const canDrop = (dragKey: string, dropKey: string) => {
+        const dragged = findTreeNode(treeData || [], dragKey);
+        return !!dragged && !findTreeNode([dragged.node], dropKey);
+    };
+
+    const handleTreeDrop: TreeProps['onDrop'] = info => {
+        const id = String(info.dragNode.key);
+        const dropKey = String(info.node.key);
+        if (sortMutation.isPending || !canDrop(id, dropKey)) return;
+        const target = findTreeNode(treeData || [], dropKey);
+        if (!target) return;
+        if (!info.dropToGap) {
+            const children = (target.node.children || []).filter(node => node.key !== id);
+            sortMutation.mutate({id, parentId: dropKey, afterId: children[0]?.key});
+            return;
+        }
+        const items = target.siblings.filter(node => node.key !== id);
+        const targetIndex = items.findIndex(node => node.key === dropKey);
+        const position = Number(info.node.pos.split('-').pop());
+        const index = targetIndex + (info.dropPosition - position > 0 ? 1 : 0);
+        sortMutation.mutate({
+            id,
+            parentId: target.parentId,
+            beforeId: items[index - 1]?.key,
+            afterId: items[index]?.key,
+        });
+    };
 
     const postOrUpdate = async (values: any) => {
         if (values['id']) {
@@ -77,9 +131,11 @@ const DepartmentPage = () => {
 
     const columns: NColumn<Department>[] = [
         {
-            dataIndex: 'index',
-            valueType: 'indexBorder',
-            width: 48,
+            title: t('assets.sort'),
+            dataIndex: 'sort',
+            hideInSearch: true,
+            width: 60,
+            render: () => <DragHandle title={t('assets.sort')}/>,
         },
         {
             title: t('general.name'),
@@ -103,12 +159,6 @@ const DepartmentPage = () => {
         {
             title: t('identity.department.user_count'),
             dataIndex: 'userCount',
-            hideInSearch: true,
-            width: 100,
-        },
-        {
-            title: t('assets.sort'),
-            dataIndex: 'weight',
             hideInSearch: true,
             width: 100,
         },
@@ -203,14 +253,22 @@ const DepartmentPage = () => {
             <NTable
                 columns={columns}
                 actionRef={actionRef}
+                onDragSortEnd={(_beforeIndex, afterIndex, items) => {
+                    if (sortMutation.isPending) return;
+                    sortMutation.mutate({
+                        id: items[afterIndex].id,
+                        beforeId: items[afterIndex - 1]?.id,
+                        afterId: items[afterIndex + 1]?.id,
+                    });
+                }}
                 request={async (params = {}, sort, _filter) => {
                     let [sortOrder, sortField] = getSort(sort);
 
                     let queryParams = {
                         pageIndex: params.current,
                         pageSize: params.pageSize,
-                        sortOrder: sortOrder,
-                        sortField: sortField,
+                        sortOrder: sortOrder || "desc",
+                        sortField: sortField || "sort",
                         name: params.name,
                     }
                     let result = await api.getPaging(queryParams);
@@ -252,6 +310,11 @@ const DepartmentPage = () => {
                         showIcon
                         defaultExpandAll
                         treeData={treeData}
+                        draggable={!sortMutation.isPending}
+                        allowDrop={({dragNode, dropNode}) =>
+                            !sortMutation.isPending && canDrop(String(dragNode.key), String(dropNode.key))
+                        }
+                        onDrop={handleTreeDrop}
                         onSelect={(selectedKeys) => {
                             if (selectedKeys.length > 0) {
                                 navigate(`/department/${selectedKeys[0]}`);

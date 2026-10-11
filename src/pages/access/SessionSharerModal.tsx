@@ -80,6 +80,7 @@ const SessionSharerModal = ({ open, onClose, sessionId }: Props) => {
       footer={false}
     >
       <Disabled feature="session_sharing" compact disabled={!license.hasPremiumFeatures()}>
+        <Paragraph type="secondary">{t('access.session.share.tip')}</Paragraph>
         {sharer.ok ? (
           <div>
             <div className="bg-black p-4 rounded">
@@ -101,7 +102,7 @@ const SessionSharerModal = ({ open, onClose, sessionId }: Props) => {
             <Empty />
             <div className="pt-4 flex items-center justify-center">
               <Button type="primary" onClick={handleCreateShare} style={{ width: '100%' }}>
-                {t('access.session.share.action')}
+                {t('access.session.share.create')}
               </Button>
             </div>
           </div>

@@ -151,7 +151,6 @@ const AIProfileModal = ({mode, open, profile, confirmLoading, onCancel, onSave}:
             onCancel={onCancel}
             okText={t('actions.save')}
             confirmLoading={confirmLoading}
-            cancelText={t('actions.cancel')}
             width={820}
             destroyOnHidden
         >

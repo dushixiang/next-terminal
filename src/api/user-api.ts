@@ -2,6 +2,10 @@ import {Api} from "./core/api";
 import requests from "./core/requests";
 import type {RegionInfo} from "@/api/region-info";
 
+export interface LDAPTestResult {
+    hasUsers: boolean;
+}
+
 export interface User {
     id: string;
     username: string;
@@ -133,6 +137,10 @@ export interface SetupStatus {
 class UserApi extends Api<User> {
     constructor() {
         super("admin/users");
+    }
+
+    testLdap = async (values: Record<string, unknown>) => {
+        return await requests.post<LDAPTestResult>(`/${this.group}/test-ldap`, values, {errorMode: 'local'});
     }
 
     resetTOTP = async (keys: string[], securityToken: string) => {

@@ -79,7 +79,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
 
     const columns: TableProps<AgentGatewayToken>['columns'] = [
         {
-            title: 'Token',
+            title: t('gateways.token'),
             dataIndex: 'id',
             key: 'id',
             render: (text, record) => {
@@ -154,6 +154,7 @@ const AgentGatewayTokenDrawer = ({open, onClose}: Props) => {
                     </Button>
                 }
             >
+                <Paragraph type="secondary">{t('gateways.token_tip')}</Paragraph>
                 <Table<AgentGatewayToken>
                     columns={columns}
                     dataSource={tokenQuery.data}

@@ -1,9 +1,10 @@
 import {Layout, Tabs} from 'antd';
+import NotificationPreferences from "./NotificationPreferences";
 import ChangePassword from "./ChangePassword";
 import OTP from "./OTP";
 import {useTranslation} from "react-i18next";
 import AccessToken from "@/pages/account/AccessToken";
-import {useSearchParams} from "react-router-dom";
+import {Navigate, useLocation, useSearchParams} from "react-router-dom";
 import {maybe} from "@/utils/maybe";
 import ChangeInfo from "@/pages/account/ChangeInfo";
 import {isMobileByMediaQuery} from "@/utils/utils";
@@ -12,8 +13,6 @@ import Passkey from "@/pages/account/Passkey";
 import OidcServerAuthorizations from "@/pages/account/OidcServerAuthorizations";
 import ClientCertificate from "@/pages/account/ClientCertificate";
 import SSHKey from "@/pages/account/SSHKey";
-
-import AgentAccess from "./AgentAccess";
 
 const InfoPage = () => {
 
@@ -27,12 +26,12 @@ const InfoPage = () => {
     }
 
     const items = [
-        {label: t("agent_access.title"), key: "agent-access", children: <AgentAccess/>},
         {
-            label: t('account.change.info'),
+            label: t('account.profile'),
             key: 'change-info',
             children: <ChangeInfo/>
         },
+        {label: t('account.notifications.title'), key: 'notification-preferences', children: <NotificationPreferences/>},
         {
             label: t('account.change.password'),
             key: 'change-password',
@@ -71,6 +70,8 @@ const InfoPage = () => {
     ];
 
     let isMobile = isMobileByMediaQuery();
+    const location = useLocation();
+    if (activeKey === 'agent-access') return <Navigate replace to={location.pathname === '/x-info' ? '/x-agent-access' : '/agent-access'}/>;
 
     return (
         <>

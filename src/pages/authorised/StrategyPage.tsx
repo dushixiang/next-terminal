@@ -74,7 +74,7 @@ const StrategyPage = () => {
         key: 'name',
         sorter: true,
     }, {
-        title: t('general.upload'),
+        title: t('authorised.strategy.upload'),
         dataIndex: 'upload',
         key: 'upload',
         hideInSearch: true,
@@ -90,7 +90,7 @@ const StrategyPage = () => {
             return renderStatus(text);
         }
     }, {
-        title: t('actions.edit'),
+        title: t('authorised.strategy.edit'),
         dataIndex: 'edit',
         key: 'edit',
         hideInSearch: true,
@@ -98,7 +98,7 @@ const StrategyPage = () => {
             return renderStatus(text);
         }
     }, {
-        title: t('actions.delete'),
+        title: t('authorised.strategy.delete'),
         dataIndex: 'delete',
         key: 'delete',
         hideInSearch: true,
@@ -114,7 +114,7 @@ const StrategyPage = () => {
             return renderStatus(text);
         }
     }, {
-        title: t('actions.copy'),
+        title: t('authorised.strategy.copy'),
         dataIndex: 'copy',
         key: 'copy',
         hideInSearch: true,

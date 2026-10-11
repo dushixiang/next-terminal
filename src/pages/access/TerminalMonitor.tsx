@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import {baseWebSocketUrl} from '@/api/core/requests';
 import {Message, MessageTypeData} from '@/pages/access/Terminal';
 import {TerminalRuntime} from '@/pages/access/terminal/terminal-runtime';
@@ -28,7 +29,7 @@ const TerminalMonitor = () => {
                 theme: {background: '#141414'},
             },
         });
-        runtime.terminal.writeln('trying to connect to the server ...');
+        runtime.terminal.writeln(i18n.t('access.terminal.connecting'));
         const params = qs.stringify({
             cols: runtime.terminal.cols,
             rows: runtime.terminal.rows,
@@ -42,8 +43,8 @@ const TerminalMonitor = () => {
                     runtime.terminal.write(message.content);
                 }
             },
-            onError: () => runtime.terminal.writeln('\x1B[1;3;31mwebsocket error\x1B[0m '),
-            onClose: () => runtime.terminal.writeln('\x1B[1;3;31mconnection is closed.\x1B[0m '),
+            onError: () => runtime.terminal.writeln(`\x1B[1;3;31m${i18n.t('access.terminal.connection_error')}\x1B[0m `),
+            onClose: () => runtime.terminal.writeln(`\x1B[1;3;31m${i18n.t('access.terminal.connection_closed')}\x1B[0m `),
         });
         runtime.focus();
         return () => runtime.dispose();

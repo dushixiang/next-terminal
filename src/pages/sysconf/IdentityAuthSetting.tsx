@@ -3,6 +3,7 @@ import {useState} from "react";
 import {useSearchParams} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import {maybe} from "@/utils/maybe.ts";
+import SecuritySMSSetting from "./SecuritySMSSetting";
 import WebAuthnSetting from "@/pages/sysconf/WebAuthnSetting";
 import LdapSetting from "@/pages/sysconf/LdapSetting";
 import WechatWorkSetting from "@/pages/sysconf/WechatWorkSetting";
@@ -15,7 +16,7 @@ const IdentityAuthSetting = ({
                              }: SettingProps) => {
     const {t} = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
-    const [activeKey, setActiveKey] = useState(maybe(searchParams.get('identityActiveKey'), 'webauthn'));
+    const [activeKey, setActiveKey] = useState(maybe(searchParams.get('identityActiveKey'), searchParams.get('securityActiveKey') === 'sms-login' ? 'sms-login' : 'webauthn'));
 
     const handleTabChange = (key: string) => {
         setActiveKey(key);
@@ -46,6 +47,7 @@ const IdentityAuthSetting = ({
                 key: 'oidc',
                 children: <OidcSetting get={get} set={set}/>
             },
+            {label: t("settings.sms_policy.login"), key: "sms-login", children: <SecuritySMSSetting get={get} set={set} scope="login"/>},
         ]}
     />;
 };

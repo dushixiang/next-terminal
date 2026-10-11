@@ -158,7 +158,7 @@ const DatabaseAssetModal = ({
                         </Form.Item>
                     </Col>
                     <Col xs={24} md={12}>
-                        <Form.Item name={'username'} label={t('menus.identity.submenus.user')}
+                        <Form.Item name={'username'} label={t('assets.username')}
                                    rules={[{required: true}]} style={formItemStyle}>
                             <Input autoComplete='off'/>
                         </Form.Item>

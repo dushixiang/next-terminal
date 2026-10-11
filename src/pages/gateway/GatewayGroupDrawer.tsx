@@ -72,7 +72,7 @@ const GatewayGroupDrawer: React.FC<Props> = ({
     <Input.TextArea placeholder={t('gateway_group.description_placeholder')} />
       </Form.Item>
 
-                <Form.Item name="selectionMode" label={t('gateway_group.selection_mode')} rules={[{
+                <Form.Item name="selectionMode" label={t('gateway_group.selection_mode')} extra={t('gateway_group.selection_mode_hint')} rules={[{
         required: true
       }]}>
     <Radio.Group options={[{

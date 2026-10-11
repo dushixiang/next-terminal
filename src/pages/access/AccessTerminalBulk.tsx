@@ -4,6 +4,7 @@ import {FolderCodeIcon, TerminalIcon} from "lucide-react";
 import eventEmitter from "@/api/core/event-emitter";
 import {ScrollArea} from "@/components/ui/scroll-area";
 import SnippetSheet from "@/pages/access/SnippetSheet";
+import {useTranslation} from 'react-i18next';
 
 interface Props {
     assetIds: string[];
@@ -13,6 +14,7 @@ interface Props {
 const AccessTerminalBulk = ({assetIds, securityToken}: Props) => {
 
     const tabId = useId();
+    const {t} = useTranslation();
     let [inputValue, setInputValue] = useState('');
 
     // 添加一个状态来记录哪些元素是隐藏的
@@ -41,7 +43,7 @@ const AccessTerminalBulk = ({assetIds, securityToken}: Props) => {
                 </div>
                 <input
                     className="block p-3 pl-8 px-4 w-full z-20 text-sm text-gray-200 ring-[#1063FF] focus:ring-1 focus:outline-none rounded-md bg-border"
-                    placeholder="command"
+                    placeholder={t('access.terminal.bulk_command_placeholder')}
                     required
                     value={inputValue}
                     onChange={(e) => {

@@ -84,6 +84,9 @@ export enum LoginStatus {
 export interface LoginStatusResult {
     status: LoginStatus;
     passwordEnabled: boolean;
+    ldapEnabled?: boolean;
+    captchaEnabled?: boolean;
+    smsEnabled?: boolean;
     webauthnEnabled: boolean;
     wechatWorkEnabled: boolean;
     oidcEnabled: boolean;
@@ -91,16 +94,28 @@ export interface LoginStatusResult {
 
 export type Captcha = {
     enabled: boolean
-    captcha: string
+    key: string
+    image: string
+    tile: string
+    width: number
+    height: number
+    tileWidth: number
+    tileHeight: number
+    tileY: number
+}
+
+export type CaptchaProof = {key: string; expiresAt: number};
+export type CaptchaVerification = {key: string; expiresIn: number};
+
+export type LoginAccount = {
+    source?: 'password' | 'ldap'
+    username: string
+    password: string
     key: string
 }
 
-export type LoginAccount = {
-    username: string
-    password: string
-    captcha: string
-    key: string
-}
+export type NotificationPreferences = {wecomEnabled: boolean; emailEnabled: boolean; accessRequestResults: boolean; workOrderResults: boolean; pendingApprovals: boolean};
+export type NotificationPreferencesResponse = {preferences: NotificationPreferences; mail: string; mailEnabled: boolean; canReceivePendingApproval: boolean; wecomChannelEnabled: boolean; wecomBound: boolean};
 
 export type LoginResult = {
     token: string
@@ -129,7 +144,28 @@ export type BindCurrentExternalLogin = {
     bindToken: string
 }
 
+export type VerificationPurpose = 'mfa' | 'email-change' | 'phone-change';
+export type DeliveryChannel = 'email' | 'sms';
+export type VerificationChallenge = {challengeId: string; destination: string; expiresIn: number; retryAfter: number};
+export type SendVerificationCode = {channel: DeliveryChannel; purpose: VerificationPurpose; value?: string; password?: string};
+
+export type ChangeAccountInfo = {
+    nickname: string;
+    language?: string;
+}
+
 export type AccountInfo = {
+    mailVerificationEnabled: boolean;
+    smsVerificationEnabled: boolean;
+    mail: string;
+    phone: string;
+    status: 'enabled' | 'disabled';
+    recording: 'enabled' | 'disabled';
+    watermark: 'enabled' | 'disabled';
+    departments: {id: string; name: string; path: string}[];
+    roleDetails: {id: string; name: string}[];
+    createdAt: number;
+    lastLoginAt: number;
     id: string;
     username: string;
     nickname: string;
@@ -143,6 +179,7 @@ export type AccountInfo = {
     forceTotpEnabled: boolean
     needChangePassword: boolean
     accessRequestEnabled: boolean
+    apiKeyAccessEnabled: boolean
     dev: boolean
     passwordSet: boolean
 }
@@ -174,7 +211,7 @@ export interface WebauthnCredential {
     usedAt: number;
 }
 
-export type AuthType = 'passkey' | 'otp' | 'none' | '';
+export type AuthType = 'passkey' | 'otp' | 'email' | 'sms' | 'none' | '';
 
 export interface OidcConsentPageData {
     clientID: string;
@@ -195,6 +232,18 @@ export interface OidcUserConsentItem {
 class AccountApi {
 
     group = 'account';
+
+    getNotificationPreferences = async () => await requests.get<NotificationPreferencesResponse>(`/${this.group}/notification-preferences`);
+
+    setNotificationPreferences = async (values: NotificationPreferences) => await requests.put<void>(`/${this.group}/notification-preferences`, values);
+
+    getSMSLoginCaptcha = async () => await requests.get<Captcha>('/sms-login/captcha');
+
+    sendSMSLoginCode = async (values: {phone: string; key: string}) =>
+        await requests.post<VerificationChallenge>('/sms-login/code', values, {errorMode: 'local'});
+
+    loginBySMS = async (values: {phone: string; challengeId: string; code: string}) =>
+        await requests.post<LoginResult>('/sms-login', values, {errorMode: 'local'});
 
     login = async (account: LoginAccount) => {
         return await requests.post('/login', account, {errorMode: 'local'}) as LoginResult;
@@ -289,7 +338,7 @@ class AccountApi {
         await requests.post<void>(`/${this.group}/change-password`, values);
     }
 
-    changeInfo = async (values: any) => {
+    changeInfo = async (values: ChangeAccountInfo) => {
         return await requests.post<void>(`/${this.group}/change-info`, values);
     }
 
@@ -308,6 +357,9 @@ class AccountApi {
     getCaptcha = async () => {
         return await requests.get('/captcha') as Captcha;
     }
+
+    verifyCaptcha = async (values: {key: string; purpose: 'login' | 'sms'; x: number}) =>
+        await requests.post<CaptchaVerification>('/captcha/verify', values, {errorMode: 'local'});
 
     getWebauthnCredentials = async () => {
         return await requests.get(`/${this.group}/webauthn/credentials`) as WebauthnCredential[];
@@ -335,6 +387,14 @@ class AccountApi {
 
     webauthnLoginFinishV2 = async (token: string, val: any) => {
         return await requests.post(`/v2/webauthn-login-finish?token=${token}`, val) as LoginResult;
+    }
+
+    sendVerificationCode = async (values: SendVerificationCode, securityToken?: string) => {
+        return await requests.post<VerificationChallenge>(`/${this.group}/verification-code`, values, {securityToken, errorMode: 'local'});
+    }
+
+    verifyAccountCode = async (values: {challengeId: string; purpose: VerificationPurpose; code: string}) => {
+        return await requests.post<{token?: string}>(`/${this.group}/verification-code/verify`, values, {errorMode: 'local'});
     }
 
     getSecurityTokenSupportTypes = async () => {

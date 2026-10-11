@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react";
-import {App, Button, Card, Form, Input, InputNumber, Select, Spin, Switch, Tag, Typography, theme} from "antd";
+import {App, Button, Card, Collapse, Form, Input, InputNumber, Select, Space, Spin, Switch, Tag, Typography, theme} from "antd";
 import {
     AppWindow,
     BellRing,
@@ -13,7 +13,7 @@ import {
     type LucideIcon,
 } from "lucide-react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {notificationChannelApi, NotificationChannel} from "@/api/notification-api";
+import {notificationChannelApi, NotificationChannel, notificationRecipientApi} from "@/api/notification-api";
 import {
     channelDocumentLinks,
     channelTypeLabel,
@@ -22,6 +22,8 @@ import {
     robotWebhookPlaceholders
 } from "./constants";
 import {useTranslation} from "react-i18next";
+
+import PersonalNotificationBindings from "./PersonalNotificationBindings";
 
 const hiddenSecret = "******";
 
@@ -188,6 +190,11 @@ const NotificationChannelPanel = ({
     const isMail = channel.type === 'mail';
     const isWebhook = channel.type === 'webhook';
     const isWeComApp = channel.type === 'wecomApp';
+    const [testUser, setTestUser] = useState<string>();
+    const [personalTestOpen, setPersonalTestOpen] = useState(false);
+    const {message} = App.useApp();
+    const recipients = useQuery({queryKey: ['notification-recipients'], queryFn: notificationRecipientApi.getAll, enabled: isMail && personalTestOpen});
+    const personalTest = useMutation({mutationFn: (userId: string) => notificationRecipientApi.test(channel.type, userId), onSuccess: () => message.success(t('settings.notification.test_success'))});
     const showSecret = channel.type === 'feishu' || channel.type === 'dingtalk' || channel.type === 'webhook';
     const Icon = channelIcons[channel.type] || Webhook;
 
@@ -288,6 +295,7 @@ const NotificationChannelPanel = ({
                 </div>}
 
                 <div className={!enabled ? 'pointer-events-none opacity-50' : undefined}>
+                    <Typography.Paragraph type="secondary">{t(isMail ? 'settings.notification.mail_fixed_tip' : isWeComApp ? 'settings.notification.supports_personal' : 'settings.notification.channel_only')}</Typography.Paragraph>
                     <Form.Item name={['config', 'language']} label={t('settings.notification.language')}>
                         <Select disabled={!enabled} options={notificationLanguages.map(item => ({
                             label: t(`settings.notification.languages.${item}`, item),
@@ -338,6 +346,7 @@ const NotificationChannelPanel = ({
                         <Form.Item
                             name={['config', 'toUser']}
                             label={t('settings.notification.wecom_app_to_user')}
+                            extra={t('settings.notification.fixed_recipient_tip')}
                             initialValue="@all"
                             rules={[{required: enabled, message: t('settings.notification.wecom_app_to_user_required')}]}
                         >
@@ -358,6 +367,15 @@ const NotificationChannelPanel = ({
                         <Input.Password disabled={!enabled} autoComplete="new-password" placeholder="SEC..."/>
                     </Form.Item>}
                 </div>
+                {isMail && <Collapse ghost onChange={keys => setPersonalTestOpen(keys.length > 0)} items={[{
+                    key: 'test', label: t('settings.notification.personal_test'), children: <Space wrap>
+                        <Select style={{minWidth: 220}} value={testUser} onChange={setTestUser} showSearch={{optionFilterProp: 'label'}}
+                            placeholder={t('settings.notification.recipient')} loading={recipients.isPending}
+                            options={(recipients.data || []).map(user => ({value: user.id, label: user.name}))}/>
+                        <Button disabled={!testUser} loading={personalTest.isPending} onClick={() => testUser && personalTest.mutate(testUser)}>{t('settings.notification.test')}</Button>
+                    </Space>,
+                }]}/>}
+                {isWeComApp && <Collapse ghost items={[{key: 'bindings', label: t('settings.notification.binding_advanced'), children: <PersonalNotificationBindings/>}]}/>}
             </div>
         </Card>
     </Form>;

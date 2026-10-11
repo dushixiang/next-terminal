@@ -43,7 +43,7 @@ const AccountTypeForm: React.FC<AccountTypeFormProps> = ({
     switch (accountType) {
         case 'password':
             return <Space>
-                <Form.Item label={t('menus.identity.submenus.user')} name='username'>
+                <Form.Item label={t('assets.username')} name='username'>
                     <Input autoComplete={'off'}/>
                 </Form.Item>
                 <Form.Item label={t('assets.password')} name='password'>
@@ -70,7 +70,7 @@ const AccountTypeForm: React.FC<AccountTypeFormProps> = ({
             </Space>;
         case 'private-key':
             return <>
-                <Form.Item label={t('menus.identity.submenus.user')} name='username' required={true}>
+                <Form.Item label={t('assets.username')} name='username' required={true}>
                     <Input autoComplete='off' />
                 </Form.Item>
                 <Form.Item label={t('assets.private_key')} name='privateKey' required={true}>

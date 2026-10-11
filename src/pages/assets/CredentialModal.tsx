@@ -73,7 +73,7 @@ const CredentialModal = ({
                     value: 'private-key'
                 }]} />
             </Form.Item>
-            <Form.Item label={t('menus.identity.submenus.user')} name='username' required={true}>
+            <Form.Item label={t('assets.username')} name='username' required={true}>
                 <Input />
             </Form.Item>
             <Form.Item noStyle={true} shouldUpdate={true}>

@@ -54,7 +54,7 @@ const SecurityPasswordPolicySetting = ({
                 }
                 return <div className="rounded-md p-4 bg-gray-50 mt-4 dark:bg-[#141414]">
                     <Form.Item
-                        label={t('settings.security.password.too_short')} required>
+                        label={t('settings.security.password.min_length')} required>
                         <Space.Compact block>
                             <Form.Item name={["password-strength", "minLength"]} noStyle>
                                 <InputNumber min={1}/>
@@ -63,12 +63,13 @@ const SecurityPasswordPolicySetting = ({
                         </Space.Compact>
                     </Form.Item>
                     <Form.Item
-                        label={t('settings.security.password.too_simple')} required>
+                        label={t('settings.security.password.min_character_types')}
+                        extra={t('settings.security.password.character_types_tip')} required>
                         <Space.Compact block>
                             <Form.Item name={["password-strength", "minCharacterType"]} noStyle>
                                 <InputNumber min={1} max={3}/>
                             </Form.Item>
-                            <Space.Addon>{t('assets.type')}</Space.Addon>
+                            <Space.Addon>{t('settings.security.password.character_type_unit')}</Space.Addon>
                         </Space.Compact>
                     </Form.Item>
                     <Form.Item name={['password-strength', "mustNotContainUsername"]}

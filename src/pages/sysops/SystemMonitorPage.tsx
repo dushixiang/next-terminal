@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import {Alert, App, Button, Col, Empty, Progress, Row, Spin, Tag, Typography} from "antd";
 import type {ReactNode} from "react";
 import {
@@ -46,7 +47,7 @@ const formatDuration = (seconds: number) => {
     return `${minutes}m`;
 };
 
-const formatTime = (value?: number) => value ? new Date(value).toLocaleString() : '-';
+const formatTime = (value?: number) => value ? new Date(value).toLocaleString(i18n.resolvedLanguage || i18n.language) : '-';
 
 const percent = (value: number) => Math.max(0, Math.min(100, Math.round(value || 0)));
 
@@ -192,7 +193,7 @@ const SystemMonitorPage = () => {
                 <div className="flex flex-wrap items-center gap-2">
                     {overview && (
                         <div className="text-xs text-gray-500">
-                            {t('sysops.monitoring.generated_at')}: {new Date(overview.generatedAt).toLocaleString()}
+                            {t('sysops.monitoring.generated_at')}: {new Date(overview.generatedAt).toLocaleString(i18n.resolvedLanguage || i18n.language)}
                         </div>
                     )}
                     <Button

@@ -53,11 +53,6 @@ const DepartmentInfo = ({active, id}: DepartmentInfoProps) => {
                         ),
                     },
                     {
-                        key: 'weight',
-                        label: t('assets.sort'),
-                        children: department?.weight,
-                    },
-                    {
                         key: 'created-at',
                         label: t('general.created_at'),
                         children: department?.createdAt ? times.format(department.createdAt) : '-',

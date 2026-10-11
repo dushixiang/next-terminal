@@ -19,6 +19,7 @@ export function useFilteredMenus() {
         }
     };
     collectBreadcrumbs(menus);
+    breadcrumbNameMap.set('/agent-access', t('agent_access.title'));
 
     const filterMenus = (items: AppMenuItem[]): AppMenuItem[] => {
         return items.flatMap<AppMenuItem>(item => {

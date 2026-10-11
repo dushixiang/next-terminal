@@ -52,6 +52,8 @@ const DesktopSidebar: React.FC<DesktopSidebarProps> = ({
                 <div className={'flex-1 overflow-hidden'}>
                     <ScrollArea className="h-full [&>div>div]:!block">
                         <Menu
+                            className="app-navigation-menu"
+                            inlineIndent={16}
                             onClick={onMenuClick}
                             selectedKeys={[current]}
                             onOpenChange={onSubMenuChange}

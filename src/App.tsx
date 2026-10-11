@@ -79,6 +79,7 @@ const WebsiteFacadePage = lazy(() => import("@/pages/facade/WebsiteFacadePage"))
 const RedirectPage = lazy(() => import("@/layout/RedirectPage"));
 const UserLayout = lazy(() => import("@/layout/UserLayout"));
 const DashboardPage = lazy(() => import("@/pages/dashboard/DashboardPage"));
+const AgentAccessPage = lazy(() => import("@/pages/agent/AgentAccessPage"));
 const UserInfoPage = lazy(() => import("@/pages/facade/UserInfoPage"));
 const SnippetUserPage = lazy(() => import("@/pages/facade/SnippetUserPage"));
 const DatabaseAssetFacadePage = lazy(() => import("@/pages/facade/DatabaseAssetFacadePage"));
@@ -120,6 +121,7 @@ const routes = [
             {path: "/x-website", element: <WebsiteFacadePage/>,},
             {path: "/x-snippet", element: <SnippetUserPage/>,},
             {path: "/x-info", element: <UserInfoPage/>,},
+            {path: "/x-agent-access", element: <AgentAccessPage portal/>},
             {path: "/x-db-work-order", element: <DatabaseWorkOrderUserPage/>},
             {path: "/x-access-request", element: <AccessRequestUserPage/>},
         ]
@@ -186,6 +188,7 @@ const routes = [
 
             {path: "/setting", element: <SettingPage/>},
             {path: "/info", element: <InfoPage/>},
+            {path: "/agent-access", element: <AgentAccessPage/>},
         ],
     }
 ];
@@ -230,7 +233,13 @@ function App() {
             msg = error;
         }
 
-        message.error(msg);
+        message.error(error && msg !== error ? <div>
+            <div>{msg}</div>
+            <details style={{textAlign: 'left', marginTop: 4}}>
+                <summary>{t('actions.detail')}</summary>
+                <div style={{whiteSpace: 'pre-wrap', overflowWrap: 'anywhere'}}>{error}</div>
+            </details>
+        </div> : msg);
     }
 
     useEffect(() => {
@@ -243,7 +252,7 @@ function App() {
             eventEmitter.off("API:REDIRECT", redirect)
             eventEmitter.off("API:VALIDATE_ERROR", validate_error)
         }
-    }, []);
+    }, [t]);
 
     return <RouterProvider router={router}/>
 }

@@ -98,7 +98,7 @@ const RenderState: React.FC<RenderStateProps> = ({
 
         // 显示加载状态
         const stateText = state !== undefined 
-            ? stateLabels[state] 
+            ? stateLabels[state] || t('guacamole.state.unknown')
             : t('guacamole.state.unknown');
         const tunnelText = tunnelState === Guacamole.Tunnel.State.UNSTABLE
             ? undefined

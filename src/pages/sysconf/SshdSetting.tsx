@@ -167,7 +167,7 @@ const SshdSetting = ({
 
         <Modal title={t('settings.sshd.private_key_modal_title')} open={privateKeyModalOpen} onOk={handlePrivateKeySave}
                onCancel={() => setPrivateKeyModalOpen(false)} okText={t('actions.save')}
-               cancelText={t('actions.cancel')} confirmLoading={privateKeySaving} destroyOnHidden>
+               confirmLoading={privateKeySaving} destroyOnHidden>
             <Form form={privateKeyForm} layout="vertical">
                 <Form.Item name="privateKey" label={t('settings.sshd.private_key')} rules={[{
                     required: true

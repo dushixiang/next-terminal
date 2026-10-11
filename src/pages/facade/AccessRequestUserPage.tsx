@@ -175,7 +175,10 @@ const AccessRequestUserPage = () => {
             title: t('access_request.start_at_label'),
             dataIndex: 'requestedStartAt',
             width: 180,
-            render: (value: number) => value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-',
+            render: (value: number, record: AccessRequest) => {
+                const startAt = record.startAt || value;
+                return startAt ? dayjs(startAt).format('YYYY-MM-DD HH:mm') : '-';
+            },
         },
         {
             title: t('general.status'),

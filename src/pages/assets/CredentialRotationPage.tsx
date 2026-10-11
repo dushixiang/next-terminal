@@ -1,3 +1,4 @@
+import {rotationMessage} from "./rotation-message";
 import Disabled from "@/components/Disabled";
 import {useLicense} from "@/hook/LicenseContext";
 import credentialRotationApi, {RotationLog, RotationPolicy} from "@/api/credential-rotation-api";
@@ -73,7 +74,9 @@ const PolicyTable = () => {
             width: 110,
             render: (value) => value === 'private-key'
                 ? <Tag color="green" variant="filled">{t('assets.rotation.type.private_key')}</Tag>
-                : <Tag color="red" variant="filled">{t('assets.rotation.type.password')}</Tag>,
+                : value === 'password'
+                    ? <Tag color="red" variant="filled">{t('assets.rotation.type.password')}</Tag>
+                    : value || '-',
         }, {
             title: t('assets.rotation.scope'),
             dataIndex: 'scopeType',
@@ -227,7 +230,9 @@ const LogTable = () => {
             width: 110,
             render: (value) => value === 'private-key'
                 ? <Tag color="green" variant="filled">{t('assets.rotation.type.private_key')}</Tag>
-                : <Tag color="red" variant="filled">{t('assets.rotation.type.password')}</Tag>,
+                : value === 'password'
+                    ? <Tag color="red" variant="filled">{t('assets.rotation.type.password')}</Tag>
+                    : value || '-',
         }, {
             title: t('general.status'),
             dataIndex: 'status',
@@ -239,14 +244,16 @@ const LogTable = () => {
             },
             render: (value) => value === 'success'
                 ? <Tag color="green">{t('assets.rotation.status.success')}</Tag>
-                : <Tag color="red">{t('assets.rotation.status.failed')}</Tag>,
+                : value === 'failed'
+                    ? <Tag color="red">{t('assets.rotation.status.failed')}</Tag>
+                    : value || '-',
         }, {
             title: t('assets.rotation.message'),
             dataIndex: 'message',
             key: 'message',
             hideInSearch: true,
             ellipsis: true,
-            render: (value) => value || '-',
+            render: (value) => value ? <span title={value}>{rotationMessage(value, t)}</span> : '-',
         }, {
             title: t('assets.rotation.trigger_label'),
             dataIndex: 'triggerType',
@@ -255,7 +262,7 @@ const LogTable = () => {
             width: 120,
             render: (value) => value === 'scheduled'
                 ? t('assets.rotation.trigger.scheduled')
-                : t('assets.rotation.trigger.manual'),
+                : value === 'manual' ? t('assets.rotation.trigger.manual') : value || '-',
         }, {
             title: t('assets.rotation.operator'),
             dataIndex: 'operator',

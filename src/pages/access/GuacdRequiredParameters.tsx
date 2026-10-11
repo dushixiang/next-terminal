@@ -18,6 +18,13 @@ const GuacdRequiredParameters = ({
     t
   } = useTranslation();
   const [form] = Form.useForm();
+  const parameterLabels: Record<string, string> = {
+    username: t('assets.username'),
+    password: t('assets.password'),
+    domain: t('assets.rdp_domain'),
+    hostname: t('access.auth_hostname'),
+    port: t('network_proxy.port'),
+  };
   return <Modal title={t('access.required_auth')} mask={{
     closable: false
   }} open={open} onOk={() => {
@@ -30,11 +37,11 @@ const GuacdRequiredParameters = ({
             <Form form={form} layout="vertical">
                 {parameters?.map(parameter => {
         if (parameter == 'password') {
-          return <Form.Item key={parameter} label={t(parameter)} name={parameter}>
+          return <Form.Item key={parameter} label={parameterLabels[parameter] || parameter} name={parameter}>
     <Input.Password />
           </Form.Item>;
         } else {
-          return <Form.Item key={parameter} label={t(parameter)} name={parameter}>
+          return <Form.Item key={parameter} label={parameterLabels[parameter] || parameter} name={parameter}>
     <Input />
           </Form.Item>;
         }

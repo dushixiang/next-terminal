@@ -3,7 +3,7 @@ import NButton from "@/components/NButton";
 import DatabaseAssetModal from "@/pages/assets/DatabaseAssetModal";
 import { getSort } from "@/utils/sort";
 import { useMutation,useQuery } from "@tanstack/react-query";
-import { App,Button,Input,Popconfirm,Space,Table,type TableProps,Tag } from "antd";
+import { App,Button,Input,Popconfirm,Space,Switch,Table,type TableProps,Tag } from "antd";
 import dayjs from "dayjs";
 import { useState } from 'react';
 import { useTranslation } from "react-i18next";
@@ -83,6 +83,14 @@ const DatabaseAssetPage = () => {
         return gatewayType || '-';
     };
 
+    const toggleEnabledMutation = useMutation({
+        mutationFn: (record: DatabaseAsset) => api.updateEnabled(record.id, !record.enabled),
+        onSuccess: () => {
+            message.success(t('general.success'));
+            databaseAssetPagingQuery.refetch();
+        },
+    });
+
     const columns: TableProps<DatabaseAsset>['columns'] = [
         {
             title: '#',
@@ -96,6 +104,21 @@ const DatabaseAssetPage = () => {
             title: t('general.name'),
             dataIndex: 'name',
             ellipsis: true,
+        },
+        {
+            title: t('general.enabled'),
+            dataIndex: 'enabled',
+            width: 80,
+            render: (_value, record) => (
+                <Switch
+                    checked={record.enabled}
+                    checkedChildren={t('general.yes')}
+                    unCheckedChildren={t('general.no')}
+                    loading={toggleEnabledMutation.isPending && toggleEnabledMutation.variables?.id === record.id}
+                    disabled={toggleEnabledMutation.isPending}
+                    onChange={() => toggleEnabledMutation.mutate(record)}
+                />
+            ),
         },
         {
             title: t('db.asset.type'),
@@ -117,7 +140,7 @@ const DatabaseAssetPage = () => {
             render: (_, record) => `${record.host}:${record.port}`,
         },
         {
-            title: t('menus.identity.submenus.user'),
+            title: t('assets.username'),
             dataIndex: 'username',
         },
         {

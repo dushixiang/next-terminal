@@ -1,4 +1,4 @@
-import {Button, Form, Select, Space} from "antd";
+import {Button, Form, Select, Space, Typography} from "antd";
 import {SettingProps} from "./SettingPage";
 import {useTranslation} from "react-i18next";
 import {useFormRequest} from "@/hook/use-antd-form-query";
@@ -12,7 +12,9 @@ const LogSetting = ({
     const renderDaysSelect = (name: string, label: string, options: {
         value: string;
         label: string;
-    }[]) => <Form.Item label={label}>
+    }[]) => <Form.Item label={label} extra={name === 'session-saved-limit-days'
+        ? t('settings.log.session.retention_tip')
+        : name === 'login-log-saved-limit-days' ? t('settings.log.login_log.retention_tip') : undefined}>
         <Space.Compact>
             <Form.Item name={name} noStyle>
                 <Select options={options} style={{width: 100}}/>
@@ -24,6 +26,7 @@ const LogSetting = ({
     useFormRequest(form, ['settings', 'log'], get);
     return <div>
         <Form form={form} layout="vertical" onFinish={set}>
+            <Typography.Paragraph type="secondary">{t('settings.log.retention_tip')}</Typography.Paragraph>
             {renderDaysSelect('session-saved-limit-days', t('settings.log.session.saved_limit_days'), [{
                 value: '',
                 label: '∞'

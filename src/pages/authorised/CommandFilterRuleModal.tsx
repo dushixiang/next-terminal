@@ -66,7 +66,7 @@ const CommandFilterRuleModal = ({
           label: t('authorised.command_filter.rule.type.regexp')
         }]} />
       </Form.Item>
-                <Form.Item label={t('authorised.command_filter.rule.match_content')} name='command' rules={[{
+                <Form.Item label={t('authorised.command_filter.rule.match_content')} name='command' extra={t('authorised.command_filter.rule.match_tip')} rules={[{
         required: true
       }]}>
     <Input.TextArea rows={4} />
@@ -88,7 +88,7 @@ const CommandFilterRuleModal = ({
                 <Form.Item name='enabled' rules={[{
         required: true
       }]} valuePropName="checked">
-    <Checkbox>{t('general.status')}</Checkbox>
+    <Checkbox>{t('general.enabled')}</Checkbox>
       </Form.Item>
             </Form>
         </Modal>;

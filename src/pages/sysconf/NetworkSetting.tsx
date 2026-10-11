@@ -80,15 +80,15 @@ const NetworkSetting = ({
 
     return <div>
         <Form form={form} onFinish={wrapSet} layout="vertical">
-            <Form.Item name="ip-extractor" label={t('settings.system.ip.extractor')} required={true}>
+            <Form.Item name="ip-extractor" label={t('settings.system.ip.extractor')} extra={t('settings.network.direct_ip_tip')} required={true}>
                 <Select loading={clientIPsQuery.isLoading} options={[{
-                    label: `${t('assets.addr')}${clientIPs?.direct ? ` (${clientIPs.direct})` : ''}`,
+                    label: `${t('settings.network.direct_ip')}${clientIPs?.direct ? ` (${clientIPs.direct})` : ''}`,
                     value: 'direct'
                 }, {
-                    label: `Header(X-Real-IP)${clientIPs?.['x-real-ip'] ? ` (${clientIPs['x-real-ip']})` : ` (${t('settings.network.not_detected')})`}`,
+                    label: `${t('settings.network.header_option', {header: 'X-Real-IP'})}${clientIPs?.['x-real-ip'] ? ` (${clientIPs['x-real-ip']})` : ` (${t('settings.network.not_detected')})`}`,
                     value: 'x-real-ip'
                 }, {
-                    label: `Header(X-Forwarded-For)${clientIPs?.['x-forwarded-for'] ? ` (${clientIPs['x-forwarded-for']})` : ` (${t('settings.network.not_detected')})`}`,
+                    label: `${t('settings.network.header_option', {header: 'X-Forwarded-For'})}${clientIPs?.['x-forwarded-for'] ? ` (${clientIPs['x-forwarded-for']})` : ` (${t('settings.network.not_detected')})`}`,
                     value: 'x-forwarded-for'
                 }, {
                     label: t('settings.network.custom_header'),

@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import accessSettingApi from "@/api/access-setting-api";
 import {baseWebSocketUrl} from "@/api/core/requests";
 import portalApi, {ExportSession} from "@/api/portal-api";
@@ -456,7 +457,7 @@ const AccessTerminal = ({assetId, standalone = false, active: activeProp}: Props
 
         onError: (e) => {
             console.error(`websocket error`, e);
-            terminalRef.current?.writeln(`websocket error`);
+            terminalRef.current?.writeln(i18n.t('access.terminal.connection_error'));
             setPingDelay(null);
         },
 
@@ -982,7 +983,7 @@ const AccessTerminal = ({assetId, standalone = false, active: activeProp}: Props
                                                 {fileSystemEnabled && (
                                                     <button
                                                         type="button"
-                                                        title="FileSystem"
+                                                        title={t('fs.title')}
                                                         className="flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white transition-colors active:bg-white/20"
                                                         onClick={() => setMobileToolDrawer('fileSystem')}
                                                     >

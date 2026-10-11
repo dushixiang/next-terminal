@@ -221,7 +221,6 @@ const ScheduledTaskLogPage = ({open, jobId, handleCancel}: Props) => {
                             title: t('general.clear_confirm'),
                             content: t('sysops.logs.clear_confirm_content'),
                             okText: t('actions.clear'),
-                            cancelText: t('actions.cancel'),
                             okType: 'danger',
                             onOk: async () => {
                                 await scheduledTaskApi.clearLog(jobId);

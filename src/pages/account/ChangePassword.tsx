@@ -33,7 +33,7 @@ const ChangePassword = () => {
             return '';
         }
         if (newPassword.length < policy.minLength) {
-            return t('settings.security.password.too_short') + policy.minLength;
+            return t('settings.security.password.too_short', {minLength: policy.minLength});
         }
         if (policy.minCharacterType > 0) {
             let characterType = 0;

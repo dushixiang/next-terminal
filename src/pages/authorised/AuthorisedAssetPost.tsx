@@ -92,7 +92,6 @@ const AuthorisedAssetPost = ({open, onCancel, onSuccess}: AuthorisedAssetPostPro
             onCancel={handleCancel}
             onOk={() => form.submit()}
             okText={t("actions.save")}
-            cancelText={t("actions.cancel")}
             confirmLoading={postMutation.isPending}
         >
             <Form

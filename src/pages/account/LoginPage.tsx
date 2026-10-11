@@ -1,3 +1,4 @@
+import {getLocalizedErrorMessage} from '@/api/core/api-error';
 import brandingApi from "@/api/branding-api";
 import oidcApi from "@/api/oidc-api";
 import wechatWorkApi from "@/api/wechat-work-api";
@@ -8,13 +9,17 @@ import { StyleProvider } from '@ant-design/cssinjs';
 import { LockOutlined,UserOutlined } from "@ant-design/icons";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { useMutation,useQuery } from "@tanstack/react-query";
-import { Alert,Button,ConfigProvider,Divider,Form,Input,Select,Space,Spin,Typography } from "antd";
+import { Alert,Button,ConfigProvider,Divider,Form,Input,Segmented,Select,Typography } from "antd";
 import i18n from "i18next";
 import { LanguagesIcon,Moon,Sun } from "lucide-react";
 import { useEffect,useState } from 'react';
 import { useTranslation } from "react-i18next";
 import { useNavigate,useSearchParams } from "react-router-dom";
-import accountApi,{ LoginAccount,LoginResult,LoginStatus } from "../../api/account-api";
+import accountApi,{ CaptchaProof,LoginAccount,LoginResult,LoginStatus } from "../../api/account-api";
+
+import {passwordLoginRequest} from './login-request';
+import SMSLoginForm from './SMSLoginForm';
+import CaptchaChallenge from './CaptchaChallenge';
 
 const {Title} = Typography;
 
@@ -30,7 +35,10 @@ type LoginError = {
 };
 
 const LoginPage = () => {
+    const [loginMode, setLoginMode] = useState('password');
     const [optForm] = Form.useForm();
+    const [loginForm] = Form.useForm<LoginAccount & {verification?: CaptchaProof}>();
+    const selectedSource = Form.useWatch('source', loginForm) ?? 'password';
     let {t} = useTranslation();
     const {isDarkMode, toggleDarkMode} = useThemeToggle();
     const [ntTheme] = useNTTheme();
@@ -46,15 +54,11 @@ const LoginPage = () => {
         queryFn: brandingApi.getBranding,
     });
 
-    let queryCaptcha = useQuery({
-        queryKey: ['getCaptcha'],
-        queryFn: accountApi.getCaptcha,
-    });
-
     let queryLoginStatus = useQuery({
         queryKey: ['login-status'],
         queryFn: accountApi.getLoginStatus,
     });
+    const source = queryLoginStatus.data?.ldapEnabled ? selectedSource : 'password';
 
     useEffect(() => {
         if (queryLoginStatus.data) {
@@ -79,7 +83,7 @@ const LoginPage = () => {
             afterLoginSuccess(data, true);
         },
         onError: _error => {
-            queryCaptcha.refetch();
+            loginForm.setFieldValue('verification', undefined);
         }
     });
 
@@ -129,9 +133,14 @@ const LoginPage = () => {
         }
     }
 
-    const handleSubmit = async (params: any) => {
-        params['key'] = queryCaptcha.data?.key;
-        mutation.mutate(params);
+    const handleSubmit = ({verification, ...params}: LoginAccount & {verification?: CaptchaProof}) => {
+        if (mutation.isPending) return;
+        if (queryLoginStatus.data?.captchaEnabled && (!verification || verification.expiresAt <= Date.now())) {
+            loginForm.setFieldValue('verification', undefined);
+            loginForm.setFields([{name: 'verification', errors: [t('account.captcha_ui.required')]}]);
+            return;
+        }
+        mutation.mutate(passwordLoginRequest(params, queryLoginStatus.data?.ldapEnabled === true, verification?.key));
     };
 
     const handleOTPChange = (value: string) => {
@@ -205,6 +214,9 @@ const LoginPage = () => {
             case LoginStep.Default:
                 const loginStatus = queryLoginStatus.data;
                 const showPassword = loginStatus?.passwordEnabled !== false;
+                const showSMS = loginStatus?.smsEnabled === true;
+                const usingSMS = showSMS && (!showPassword || loginMode === 'sms');
+                const showLdap = loginStatus?.ldapEnabled;
                 const showWebauthn = loginStatus?.webauthnEnabled;
                 const showWechat = loginStatus?.wechatWorkEnabled;
                 const showOidc = loginStatus?.oidcEnabled;
@@ -225,49 +237,45 @@ const LoginPage = () => {
                                     : t('account.login.failed')}
                                 description={isLoginLocked
                                     ? t('account.login.too_many_failures.description')
-                                    : loginError.message || t('account.login.unknown_error')}
+                                    : getLocalizedErrorMessage(loginError, t)}
                             />
                         </div>
                     )}
 
+                    {showPassword && showSMS && <div className="mb-4"><Segmented block size="large" value={loginMode}
+                        options={[{value: 'password', label: t('account.login.sms.password_login')}, {value: 'sms', label: t('account.login.sms.login')}]}
+                        onChange={value => {setLoginMode(value); mutation.reset();}}/></div>}
+                    {usingSMS && <SMSLoginForm onSuccess={data => afterLoginSuccess(data, true)}/>}
                     {/* 密码登录表单 */}
-                    {showPassword && (
-                        <Form onFinish={handleSubmit} className="login-form" layout="vertical">
+                    {showPassword && !usingSMS && (
+                        <Form form={loginForm} initialValues={{source: 'password'}} onFinish={handleSubmit}
+                              className="login-form" layout="vertical" disabled={mutation.isPending}>
+                            {showLdap && <Form.Item name="source">
+                                <Segmented block size="large" options={[
+                                    {value: 'password', label: t('account.login.methods.local')},
+                                    {value: 'ldap', label: t('account.login.methods.ldap')},
+                                ]} onChange={() => {
+                                    mutation.reset();
+                                    loginForm.setFieldsValue({password: '', verification: undefined});
+                                }}/>
+                            </Form.Item>}
                             <Form.Item label={t('audit.operation.account')} name='username'
-                                       required={true}>
+                                       rules={[{required: true, whitespace: true}]}>
                                 <Input size={'large'}
                                        prefix={<UserOutlined/>}
-                                       placeholder={t('account.enter')}
-                                       autoComplete={'username webauthn'}
+                                       placeholder={t(source === 'ldap' ? 'account.login.ldap_username_hint' : 'account.enter')}
+                                       autoComplete={source === 'ldap' ? 'username' : 'username webauthn'}
                                 />
                             </Form.Item>
                             <Form.Item label={t('assets.password')}
                                        name='password'
-                                       required={true}>
+                                       rules={[{required: true}]}>
                                 <Input.Password size={'large'} prefix={<LockOutlined/>}
                                                 placeholder={t('account.enter')}/>
                             </Form.Item>
-                            {queryCaptcha.data?.enabled && (
-                                <Form.Item label={t('account.captcha')}
-                                           required={true}>
-                                    <Space.Compact>
-                                        <Form.Item name='captcha' noStyle>
-                                            <Input prefix={<LockOutlined/>}
-                                                   size={'large'}
-                                                   placeholder={t('account.enter')}
-                                            />
-                                        </Form.Item>
-                                        <Spin spinning={queryCaptcha.isLoading}>
-                                            <div style={{width: 100}}>
-                                                <img
-                                                    onClick={() => queryCaptcha.refetch()}
-                                                    src={queryCaptcha.data?.captcha}
-                                                    alt='captcha'
-                                                    style={{cursor: 'pointer'}}
-                                                />
-                                            </div>
-                                        </Spin>
-                                    </Space.Compact>
+                            {queryLoginStatus.data?.captchaEnabled && (
+                                <Form.Item name="verification" rules={[{required: true, message: t('account.captcha_ui.required')}]}>
+                                    <CaptchaChallenge disabled={mutation.isPending}/>
                                 </Form.Item>
                             )}
                             <Form.Item>
@@ -275,6 +283,7 @@ const LoginPage = () => {
                                         size={'large'}
                                         className="w-full"
                                         loading={mutation.isPending}
+                                        disabled={queryLoginStatus.isFetching || queryLoginStatus.isError}
                                 >
                                     {t('account.login.action')}
                                 </Button>
@@ -283,7 +292,7 @@ const LoginPage = () => {
                     )}
 
                     {/* 分隔线 */}
-                    {showPassword && hasAlternatives && (
+                    {(showPassword || showSMS) && hasAlternatives && (
                         <Divider className="my-4" plain>Or</Divider>
                     )}
 
@@ -386,7 +395,7 @@ const LoginPage = () => {
                             {isDarkMode ? <Sun className="h-4 w-4 mx-auto"/> : <Moon className="h-4 w-4 mx-auto"/>}
                         </button>
                         <Select
-                            placeholder="Language"
+                            placeholder={t('general.language')}
                             variant="borderless"
                             style={{
                                 width: 120,

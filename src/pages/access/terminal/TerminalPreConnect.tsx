@@ -107,7 +107,7 @@ const TerminalPreConnect = ({state, onSubmit, onCancel}: Props) => {
                 <Alert
                     type={state.retry ? 'error' : 'info'}
                     showIcon
-                    message={t('access.terminal.auth.auth_required')}
+                    title={t('access.terminal.auth.auth_required')}
                     description={<div className="space-y-1">{description}</div>}
                 />
             </div>

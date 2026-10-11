@@ -38,6 +38,7 @@ const SecuritySessionPolicySetting = ({
                 <Form.Item
                     name="login-session-browser-close-logout"
                     label={t('settings.security.session.browser_close_logout')}
+                    extra={t('settings.security.session.browser_close_tip')}
                     valuePropName="checked"
                 >
                     <Switch checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
@@ -62,7 +63,7 @@ const SecuritySessionPolicySetting = ({
                         onChange={setCustomSessionCount}
                     />
                 </Form.Item>
-                <Form.Item label={t('settings.security.session.count_limit')} required={customSessionCount}>
+                <Form.Item label={t('settings.security.session.count_limit')} extra={t('settings.security.session.count_tip')} required={customSessionCount}>
                     <Space.Compact block>
                         <Form.Item name="login-session-count-limit" noStyle>
                             <InputNumber precision={0} disabled={!customSessionCount} min={1}/>

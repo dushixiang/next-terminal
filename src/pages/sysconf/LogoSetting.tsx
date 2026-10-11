@@ -20,9 +20,8 @@ const LogoSetting = () => {
     });
 
     const beforeUpload: UploadProps['beforeUpload'] = (file) => {
-        const isTooLarge = file.size / 1024 / 1024;
-        if (!isTooLarge) {
-            message.error('Image must smaller than 1MB!');
+        if (file.size <= 0) {
+            message.error(t('settings.logo.empty_file'));
             return false;
         }
         return true;

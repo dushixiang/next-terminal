@@ -29,6 +29,17 @@ const CertificatePage = () => {
 
     const {message, modal} = App.useApp();
 
+    const renewalMessage = (error?: string) => {
+        switch (error) {
+            case 'certificate renewal time has not been reached yet':
+                return t('assets.certificates.renew_too_early');
+            case 'certificate type is not issued':
+                return t('assets.certificates.renew_unsupported');
+            default:
+                return error || t('general.failed');
+        }
+    };
+
     const certificatePagingQuery = useQuery({
         queryKey: ['certificates', pagination.current, pagination.pageSize, sort, keyword],
         queryFn: async () => {
@@ -250,9 +261,9 @@ const CertificatePage = () => {
                                                         message.success(t('general.success'));
                                                         reloadTable();
                                                     } else if (result.warning) {
-                                                        message.warning(result.error || t('general.failed'));
+                                                        message.warning(renewalMessage(result.error));
                                                     } else {
-                                                        message.error(result.error || t('general.failed'));
+                                                        message.error(renewalMessage(result.error));
                                                     }
                                                 } catch (error: any) {
                                                     const errorMsg = error?.response?.data?.message || error?.message || t('general.failed');

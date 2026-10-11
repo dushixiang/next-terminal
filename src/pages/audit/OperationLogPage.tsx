@@ -51,8 +51,17 @@ const OperationLogPage = () => {
         refetchOnWindowFocus: false,
     });
 
-    const moduleLabel = (key: string) => translateWithFallback(t, 'menus.' + normalizeKey(key) + '.label', key);
+    const moduleLabel = (key: string) => translateWithFallback(
+        t,
+        'audit.operation.modules.' + normalizeKey(key),
+        translateWithFallback(t, 'menus.' + normalizeKey(key) + '.label', key),
+    );
     const resourceLabel = (key: string) => {
+        const auditPath = 'audit.operation.resources.' + normalizeKey(key);
+        const auditLabel = t(auditPath);
+        if (auditLabel !== auditPath) {
+            return auditLabel;
+        }
         for (const moduleKey of optionsQuery.data?.modules || []) {
             const path = 'menus.' + normalizeKey(moduleKey.value) + '.submenus.' + normalizeKey(key);
             const text = t(path);

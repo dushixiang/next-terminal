@@ -1,3 +1,4 @@
+import {rotationMessage} from "./rotation-message";
 import {useTranslation} from 'react-i18next';
 import {Modal} from 'antd';
 import {CheckCircleFilled, CloseCircleFilled} from '@ant-design/icons';
@@ -28,7 +29,7 @@ const RotationResultModal = ({
                         : <CloseCircleFilled className="mt-0.5 text-red-500"/>}
                     <div className="min-w-0 flex-1">
                         <div className="font-medium">{item.assetName}</div>
-                        {item.message && <div className="text-sm break-all text-gray-500">{item.message}</div>}
+                        {item.message && <div className="text-sm break-all text-gray-500" title={item.message}>{rotationMessage(item.message, t)}</div>}
                     </div>
                 </div>
             ))}

@@ -10,7 +10,53 @@ export interface NotificationChannel {
     updatedAt: number;
 }
 
+export interface NotificationBinding {
+ userId: string;
+ channelId: string;
+ corpId: string;
+ address: string;
+ enabled: boolean;
+}
+export interface NotificationRecipient {
+ id: string;
+ name: string;
+ accessApprover: boolean;
+ workOrderApprover: boolean;
+ wecomAddress: string;
+ wecomSource: string;
+ binding?: NotificationBinding;
+}
+export const notificationRecipientApi = {
+ getAll: async () => await requests.get<NotificationRecipient[]>('/admin/notifications/recipients'),
+ setBinding: async (userId: string, values: {address: string; enabled: boolean}) =>
+  await requests.put<void>(`/admin/notifications/bindings/${userId}`, values),
+ test: async (channel: string, userId: string) =>
+  await requests.post<string>(`/admin/notifications/channels/${channel}/test-personal`, {userId}),
+};
+
+export interface ApprovalNotificationSettings {
+ enabled: boolean;
+ accessSpecified: boolean;
+ accessApproverIds: string[];
+ workOrderSpecified: boolean;
+ workOrderApproverIds: string[];
+}
+export interface ApprovalNotificationInfo {
+ settings: ApprovalNotificationSettings;
+ mailReady: boolean;
+ wecomReady: boolean;
+ legacyRules: NotificationRule[];
+}
+export const approvalNotificationApi = {
+ get: async () => await requests.get<ApprovalNotificationInfo>('/admin/notifications/approval'),
+ save: async (values: ApprovalNotificationSettings & {replaceLegacy?: boolean}) =>
+  await requests.put<void>('/admin/notifications/approval', values),
+};
+
 export interface NotificationRule {
+ deliveryTarget: 'channel' | 'personal';
+ recipientMode: 'requester' | 'eligibleApprovers' | 'specifiedUsers' | '';
+ recipientIds: string[];
     id: string;
     name: string;
     enabled: boolean;
@@ -23,6 +69,10 @@ export interface NotificationRule {
 }
 
 export interface NotificationDelivery {
+    skipReason?: string;
+    recipientId?: string;
+    personalCategory?: string;
+    nextRetryAt?: number;
     id: string;
     eventId: string;
     eventType: string;

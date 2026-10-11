@@ -61,7 +61,7 @@ const SshGatewayModal = ({
                 </>;
             case 'password':
                 return <>
-                    <Form.Item label={t('menus.identity.submenus.user')} name='username' rules={[{
+                    <Form.Item label={t('assets.username')} name='username' rules={[{
                         required: true
                     }]}>
                         <Input />
@@ -83,7 +83,7 @@ const SshGatewayModal = ({
                 </>;
             case 'private-key':
                 return <>
-                    <Form.Item label={t('menus.identity.submenus.user')} name='username' rules={[{
+                    <Form.Item label={t('assets.username')} name='username' rules={[{
                         required: true
                     }]}>
                         <Input />
@@ -162,7 +162,7 @@ const SshGatewayModal = ({
                                 }]}>
                                     <Input style={{
                                         width: '70%'
-                                    }} placeholder="hostname or ip" />
+                                    }} placeholder={t('assets.host_placeholder')} />
                                 </Form.Item>
                                 <Form.Item noStyle name='port' rules={[{
                                     required: true
@@ -204,7 +204,7 @@ const SshGatewayModal = ({
                                 }]}>
                                     <Input style={{
                                         width: '70%'
-                                    }} placeholder="hostname or ip" />
+                                    }} placeholder={t('assets.host_placeholder')} />
                                 </Form.Item>
                                 <Form.Item noStyle name='port' rules={[{
                                     required: true

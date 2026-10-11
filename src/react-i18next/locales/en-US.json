@@ -2,7 +2,60 @@
   "errors": {
     "10013": "Built-in data cannot be deleted",
     "10028": "The system administrator role cannot be edited",
-    "10029": "This role is assigned to users and cannot be deleted"
+    "10029": "This role is assigned to users and cannot be deleted",
+    "10004": "Incorrect account or password",
+    "10005": "Account disabled",
+    "10009": "Incorrect OTP code",
+    "10010": "Sign-in source IP is not allowed",
+    "10011": "Sign-in is not allowed at this time",
+    "10025": "Sign-in source location is not allowed",
+    "10026": "Sign-in denied by an identity access policy",
+    "10022": "Password sign-in disabled",
+    "60001": "The password does not meet the minimum length required by the current policy.",
+    "60002": "The password contains too few character types. Use the combination of digits, lowercase letters, uppercase letters, and special characters required by the policy.",
+    "60003": "The password must not contain the username.",
+    "60005": "The password must not read the same forwards and backwards.",
+    "20000": "Unable to retrieve license information.",
+    "20002": "The license has expired.",
+    "20003": "The concurrent session limit for this license has been reached.",
+    "20004": "The licensed user limit has been reached. No more users can be added.",
+    "20005": "The licensed asset limit has been reached. No more assets can be added.",
+    "20007": "This feature is not included in the current license.",
+    "30000": "The Agent gateway is not connected.",
+    "30001": "The Agent gateway tunnel does not exist.",
+    "10017": "The remote session has been closed.",
+    "10018": "Filesystem access is disabled for this asset.",
+    "40000": "Website reverse proxy access is disabled.",
+    "10006": "Security verification failed. Please try again.",
+    "10007": "Too many failed sign-in attempts. Sign-in is currently restricted.",
+    "10008": "Enter your OTP code.",
+    "10027": "Additional identity verification is required before accessing this asset.",
+    "50001": "Passkey sign-in is disabled for this system.",
+    "1000": "The token is invalid.",
+    "1001": "System setup has not been completed.",
+    "10000": "The requested record does not exist.",
+    "10001": "This name is already in use.",
+    "10002": "The request parameters are invalid.",
+    "10003": "This operation cannot be performed on your own account.",
+    "10012": "The email service configuration is incomplete.",
+    "10014": "You do not have permission to perform this operation.",
+    "10015": "This operation requires an SSH asset.",
+    "10016": "This connection protocol is not supported.",
+    "10019": "The website does not exist.",
+    "10020": "The website is disabled.",
+    "10024": "This domain name is already in use.",
+    "10021": "The password is incorrect.",
+    "10023": "This feature is disabled.",
+    "40001": "Asset import failed.",
+    "50000": "The system detected an attack.",
+    "50002": "OTP verification is not enabled for this account.",
+    "50003": "The image exceeds the size limit.",
+    "60004": "This password was identified as weak.",
+    "10030": "Verification channel is unavailable. Contact your administrator.",
+    "10031": "Verification requests are too frequent or the sending quota is exhausted. Please try again later.",
+    "10032": "Code delivery failed. Check channel settings or try later.",
+    "10033": "The code is incorrect, expired or already used. Request a new code.",
+    "10034": "Contact changes require verification."
   },
   "general": {
     "created_at": "Created At",
@@ -13,19 +66,19 @@
     "disabled": "Disabled",
     "yes": "Yes",
     "no": "No",
-    "less-zero-tip": "Less than 0 means unlimited",
+    "less-zero-tip": "A negative value means no limit",
     "success": "Success",
     "failed": "Failed",
     "default": "Default",
     "home": "Home",
     "clipboard_disabled": "Clipboard feature is disabled.",
     "copy_success": "Copied successfully",
-    "remark": "Remark",
-    "remark_label": "Remark:",
-    "enter_remark": "Please enter remark",
+    "remark": "Notes",
+    "remark_label": "Notes:",
+    "enter_remark": "Enter notes",
     "required": "Required",
-    "confirm_delete": "Confirm delete this item?",
-    "clear_confirm": "Confirm clear data?",
+    "confirm_delete": "Delete this item?",
+    "clear_confirm": "Clear all data?",
     "unbound": "Unbound",
     "bound": "Bound",
     "days": "days",
@@ -46,7 +99,7 @@
     "my_assets": "My Assets",
     "all": "All",
     "leave_confirm": "Are you sure you want to leave this page?",
-    "loading_detail": "Loading...",
+    "loading_detail": "Loading…",
     "status": "Status",
     "name": "Name",
     "read": "Read",
@@ -54,9 +107,10 @@
     "upload": "Upload",
     "offline": "Offline",
     "online": "Online",
-    "search_placeholder": "Search keyword",
+    "search_placeholder": "Search by keyword",
     "selected_items": "{{count}} selected",
-    "toggle_theme": "Toggle theme"
+    "toggle_theme": "Toggle theme",
+    "password_expired": "Your password needs to be updated. Change it to continue."
   },
   "access_control_denied": {
     "titles": {
@@ -66,10 +120,11 @@
       "ip": "Your current IP address is not allowed to access the system.",
       "time": "Access to the system is not allowed during the current time period.",
       "geo": "Access to the system is not allowed from your current location.",
-      "policy": "This access does not satisfy the system access control policy."
+      "policy": "This access does not satisfy the system access control policy.",
+      "unknown": "This request was denied, but the specific reason could not be determined."
     },
     "hints": {
-      "account": "A user or department policy group assigned to this account denied the request. Contact your system administrator if you believe this is a mistake."
+      "account": "Contact your system administrator to confirm the restriction or request an access change."
     },
     "retry": "Check Again",
     "logout": "Sign Out and Return to Login"
@@ -104,16 +159,16 @@
     "test_connection": "Test Connection"
   },
   "dashboard": {
-    "login_times": "Login Times",
-    "active_users": "Active Users",
-    "active_assets": "Active Assets",
+    "login_times": "Sign-in Attempts",
+    "active_users": "Connected Users",
+    "active_assets": "Connected Assets",
     "login_failed_times": "Login Failed Times",
     "user_online_count": "Online Users",
     "gateway_active_count": "Online Gateways",
     "asset_active_count": "Active Assets",
-    "date_counter": "Activity Stats",
+    "date_counter": "Daily Activity",
     "asset_type": "Asset Type",
-    "latest_session": "Latest Session"
+    "latest_session": "Recently Ended Sessions"
   },
   "stat": {
     "info": {
@@ -144,7 +199,7 @@
   "facade": {
     "asset_placeholder": "Asset name, protocol, tags, network address",
     "database_asset_placeholder": "Asset name, username, tag, type",
-    "database_access_work_order": "Go to SQL Work Orders",
+    "database_access_work_order": "Go to SQL Requests",
     "website_placeholder": "Website name, tag, type",
     "current_users": "Current users",
     "status_detail": "Status details",
@@ -154,36 +209,36 @@
   },
   "menus": {
     "dashboard": {
-      "label": "Overview"
+      "label": "Dashboard"
     },
     "ai": {
       "label": "AI Assistant"
     },
     "resource": {
-      "label": "Resource Management",
+      "label": "Resources",
       "submenus": {
-        "asset": "Host Assets",
-        "database_asset": "Database Assets",
-        "credential": "Access Credentials",
-        "snippet": "Command Snippets",
+        "asset": "Hosts",
+        "database_asset": "Databases",
+        "credential": "Credentials",
+        "snippet": "Commands",
         "storage": "Storage",
-        "website": "Web Assets",
-        "ip_set": "IP Address Sets",
-        "certificate": "Certificate Management"
+        "website": "Websites",
+        "ip_set": "IP Sets",
+        "certificate": "Certificates"
       }
     },
     "work_order": {
-      "label": "Work Order Management",
+      "label": "Requests",
       "submenus": {
-        "db_work_order": "SQL Work Orders",
+        "db_work_order": "SQL Requests",
         "access_request": "Access Requests"
       }
     },
     "gateway": {
-      "label": "Access Gateways",
+      "label": "Gateways",
       "submenus": {
-        "ssh_gateway": "SSH Gateway",
-        "agent_gateway": "Security Gateway",
+        "ssh_gateway": "SSH Gateways",
+        "agent_gateway": "Secure Gateways",
         "gateway_group": "Gateway Groups",
         "network_proxy": "Proxy Servers"
       }
@@ -191,19 +246,19 @@
     "log_audit": {
       "label": "Audit Logs",
       "submenus": {
-        "online_session": "Online Sessions",
-        "offline_session": "Offline Sessions",
+        "online_session": "Active Sessions",
+        "offline_session": "Session History",
         "filesystem_log": "File Logs",
         "access_log": "Access Logs",
-        "access_log_stats": "Access Log Stats",
+        "access_log_stats": "Access Stats",
         "login_log": "Login Logs",
-        "operation_log": "Operation Logs",
-        "exec_command_log": "Command Audit",
+        "operation_log": "Activity Logs",
+        "exec_command_log": "Command Logs",
         "database_sql_log": "SQL Logs"
       }
     },
     "sysops": {
-      "label": "System Ops",
+      "label": "Operations",
       "submenus": {
         "scheduled_task": "Scheduled Tasks",
         "tools": "Tools",
@@ -213,28 +268,28 @@
       }
     },
     "identity": {
-      "label": "Identity Management",
+      "label": "Identity",
       "submenus": {
         "user": "Users",
         "department": "Departments",
         "role": "Roles",
-        "access_policy": "Identity Access Policies",
-        "login_locked": "Login Lock",
+        "access_policy": "Access Policies",
+        "login_locked": "Lockouts",
         "oidc_client": "OIDC Clients"
       }
     },
     "authorised": {
-      "label": "Resource Authorization",
+      "label": "Permissions",
       "submenus": {
-        "command_filter": "Command Filter",
-        "strategy": "Authorization Strategy",
-        "authorised_asset": "Host Authorization",
-        "authorised_website": "Web Authorization",
-        "authorised_database_asset": "Database Authorization"
+        "command_filter": "Command Filters",
+        "strategy": "Policies",
+        "authorised_asset": "Hosts",
+        "authorised_website": "Websites",
+        "authorised_database_asset": "Databases"
       }
     },
     "setting": {
-      "label": "System Settings"
+      "label": "Settings"
     }
   },
   "fs": {
@@ -256,18 +311,18 @@
         "group": "Group",
         "owner": "Owner",
         "group_execute": "Execute",
-        "public": "Public"
+        "public": "Others"
       }
     },
     "delete_confirm": {
-      "title": "Are you sure you want to delete this file?",
-      "content": "This action will permanently delete the file. Continue?"
+      "title": "Delete the selected files or folders?",
+      "content": "The selected files and folders will be permanently deleted, including all folder contents. Continue?"
     },
     "navigation": {
-      "back_to_prev": "Back to Previous",
+      "back_to_prev": "Parent Directory",
       "show_hidden_file": "Show Hidden Files",
       "hide_hidden_file": "Hide Hidden Files",
-      "file_tran": "File Transfer"
+      "file_tran": "Transfer Progress"
     },
     "editor": {
       "refetch": "Reload",
@@ -293,16 +348,17 @@
     },
     "drag_upload_hint": "Drag files here to upload",
     "drag_upload_disabled": "Uploads are not allowed by current policy",
-    "upload_initializing": "User information is initializing. Please try again shortly."
+    "upload_initializing": "User information is initializing. Please try again shortly.",
+    "title": "Files"
   },
   "guacamole": {
     "state": {
-      "idle": "Initializing...",
-      "connecting": "Connecting to server...",
-      "waiting": "Waiting for server response...",
-      "connected": "Connected to server",
-      "disconnecting": "Closing session...",
-      "disconnected": "Session closed",
+      "idle": "Not connected",
+      "connecting": "Connecting…",
+      "waiting": "Waiting for the server…",
+      "connected": "Connected",
+      "disconnecting": "Disconnecting…",
+      "disconnected": "Disconnected",
       "unknown": "Unknown status"
     },
     "tunnel": {
@@ -314,9 +370,9 @@
   },
   "identity": {
     "setup": {
-      "user": "Initialize User",
-      "go_to_login": "Go to Login",
-      "success": "User initialized successfully",
+      "user": "Create Super Administrator",
+      "go_to_login": "Go to Sign In",
+      "success": "Super administrator created",
       "password_not_same": "Passwords do not match",
       "already_done_title": "Setup Complete",
       "already_done_subtitle": "This system has already been initialized. Please go to the login page."
@@ -343,7 +399,7 @@
       "enable_rule": "Enable This Rule",
       "rule_enabled_extra": "Disabled rules are excluded from matching within the group.",
       "ip_group": "Source IP",
-      "ip_group_extra": "Supports individual IPs, CIDRs, and IP ranges. Separate multiple values with commas or line breaks. 0.0.0.0/0 matches all IPs.",
+      "ip_group_extra": "Supports individual IPs, CIDR blocks, and IP ranges, separated by commas or newlines. 0.0.0.0/0 matches all IPv4 addresses; ::/0 matches all IPv6 addresses.",
       "ip_group_placeholder": "Enter one source IP per line, or separate values with commas\ne.g. 192.168.0.1\n192.168.1.0/24",
       "action": {
         "label": "Action on Match",
@@ -354,15 +410,15 @@
       "priority": "Priority",
       "priority_extra": "Smaller number means higher priority",
       "time_period": "Policy Active Hours",
-      "time_period_extra": "The rule matches only during the selected hours. Selecting no hours means it matches all day.",
+      "time_period_extra": "Matches selected periods in server time. Overnight periods continue into the following day. With no periods selected, the time condition matches all day.",
       "expiration_at": "Policy Valid Until",
       "geo": "Location Restriction",
-      "country": "Country Restriction",
-      "country_extra": "Only allow access users from the specified countries. Chinese and English names are supported.",
-      "province": "Province/State Restriction",
-      "province_extra": "Only allow access users from the specified provinces or states. Chinese and English names are supported.",
-      "city": "City Restriction",
-      "city_extra": "Only allow access users from the specified cities. Chinese and English names are supported.",
+      "country": "Country or Region",
+      "country_extra": "Match requests from these countries or regions. Chinese and English names are supported. The rule action determines whether access is allowed.",
+      "province": "Province or State",
+      "province_extra": "Match requests from these provinces or states. Chinese and English names are supported. The rule action determines whether access is allowed.",
+      "city": "City",
+      "city_extra": "Match requests from these cities. Chinese and English names are supported. The rule action determines whether access is allowed.",
       "binding_targets": "Binding Targets",
       "bound_users": "Users",
       "bound_departments": "Departments",
@@ -378,14 +434,14 @@
       "type": "Role Type",
       "types": {
         "default": "Built-in Role",
-        "new": "New Role"
+        "new": "Custom Role"
       },
       "permission": "Permissions"
     },
     "department": {
       "parent": "Parent Department",
       "root": "Root Department",
-      "weight_tooltip": "Higher number means higher order",
+      "weight_tooltip": "Higher values appear first",
       "weight_placeholder": "Please enter sort value",
       "name_placeholder": "Please enter department name",
       "parent_placeholder": "Please select parent department",
@@ -393,14 +449,16 @@
       "tree_view": "Tree View",
       "tree_structure": "Department Tree",
       "manage_users": "Manage Members",
-      "user_count": "Member Count"
+      "user_count": "Member Count",
+      "name_required": "Enter a department name",
+      "name_max_length": "The department name must not exceed {{max}} characters."
     },
     "user": {
       "locked_at": "Locked At",
       "locked_type": "Lock Type",
       "locked_type_username": "Account Lock",
       "locked_type_ip": "IP Lock",
-      "otp": "Two-Factor Authentication",
+      "otp": "OTP Authentication",
       "type": "User Type",
       "types": {
         "super_admin": "Super Admin",
@@ -437,26 +495,26 @@
         "action": "Reset Password",
         "success": "Password reset successfully",
         "new": "New Password",
-        "confirm_title": "Confirm reset user password?",
-        "confirm_content": "If no password is entered, a random one will be generated and sent by email."
+        "confirm_title": "Reset the selected users’ passwords?",
+        "confirm_content": "Leave the password blank to generate a random one. Existing web sign-in sessions will be invalidated. A password reset email is sent to users who have an email address."
       },
       "reset_otp": {
-        "action": "Reset 2FA",
-        "confirm_title": "Confirm reset user 2FA?",
-        "confirm_content": "After reset, the user can sign in without 2FA. The administrator must complete secondary authentication after confirmation."
+        "action": "Reset OTP",
+        "confirm_title": "Reset OTP for this user?",
+        "confirm_content": "This removes the user’s OTP setup. If the sign-in policy requires OTP, the user must set it up again at the next sign-in. The administrator must complete additional verification to continue."
       },
       "clear_passkeys": {
         "action": "Clear Passkeys",
         "confirm_title": "Clear all Passkeys for the user?",
-        "confirm_content": "This cannot be undone. The operation will be rejected if Passkey is the user's last sign-in method. The administrator must complete secondary authentication after confirmation."
+        "confirm_content": "This cannot be undone. The operation is rejected if passkeys are the user’s only sign-in method. The administrator must complete additional verification to continue."
       },
       "external_identity": {
         "title": "External Accounts",
-        "provider": "Type",
+        "provider": "Identity Provider",
         "provider_oidc": "OIDC",
         "provider_wechat": "WeCom",
         "provider_ldap": "LDAP",
-        "account_identifier": "Account ID",
+        "account_identifier": "Account Name",
         "display_name": "Display Name",
         "identifier": "Identifier",
         "last_login_at": "Last Login",
@@ -490,9 +548,9 @@
       "title": "OIDC Client List",
       "selected_count": "Selected {{count}} items",
       "client_id_label": "Client ID",
-      "client_id_required": "Please enter Client ID",
-      "client_id_placeholder": "Please enter a unique Client ID",
-      "client_id_tooltip": "Client ID cannot be modified after creation",
+      "client_id_required": "Enter a client ID",
+      "client_id_placeholder": "Enter a unique client ID",
+      "client_id_tooltip": "The client ID cannot be changed after creation.",
       "name_required": "Please enter name",
       "name_placeholder": "Please enter client name",
       "redirect_uris_required": "Please add at least one redirect URI",
@@ -500,7 +558,7 @@
       "redirect_uri_required": "Please enter redirect URI",
       "grant_types_required": "Please select at least one grant type",
       "response_types_required": "Please select at least one response type",
-      "scopes_required": "Please select at least one scope",
+      "scopes_required": "Select at least one scope",
       "access_control": "Access Control",
       "access_control_tip": "Control which users can use this OIDC client",
       "access_all_users": "All Users",
@@ -512,9 +570,9 @@
       "bound_departments": "Authorized Departments",
       "bound_departments_placeholder": "Please select departments authorized for this client",
       "bound_departments_required": "Please select at least one department",
-      "skip_consent": "Skip Authentication",
-      "skip_consent_enabled": "Enable skip authentication",
-      "skip_consent_tip": "After enabled, users who are logged in and pass access control will not see the authorization confirmation page.",
+      "skip_consent": "Skip Consent",
+      "skip_consent_enabled": "Skip the consent page",
+      "skip_consent_tip": "Users must still sign in and pass the client’s access controls. Enabling this option skips the consent page.",
       "description_placeholder": "Please enter client description"
     }
   },
@@ -524,7 +582,7 @@
     "clear": "Clear selection",
     "select_all": "Select all",
     "week": {
-      "label": "Week",
+      "label": "Day of Week",
       "days": {
         "sunday": "Sunday",
         "monday": "Monday",
@@ -538,45 +596,50 @@
   },
   "authorised": {
     "strategy": {
-      "download": "Download",
-      "rename": "Rename",
-      "paste": "Paste",
+      "download": "Download Files",
+      "rename": "Rename Files or Folders",
+      "paste": "Clipboard Paste",
       "create_dir": "Create Folder",
-      "create_file": "Create File"
+      "create_file": "Create File",
+      "upload": "Upload Files",
+      "edit": "Edit Files",
+      "delete": "Delete Files or Folders",
+      "copy": "Clipboard Copy"
     },
     "command_filter": {
       "options": {
         "rule": "Rule"
       },
       "rule": {
-        "priority_extra": "Smaller number means higher priority",
+        "priority_extra": "Rules are checked from lowest to highest priority number. The first matching rule determines whether the command is allowed or rejected. Commands with no matching rule are allowed.",
         "type": {
           "label": "Match Type",
           "options": {},
           "command": "Exact Match",
-          "regexp": "Regex Match"
+          "regexp": "Regular Expression"
         },
-        "match_content": "Match Content",
+        "match_content": "Match Pattern",
         "action": {
           "options": {}
-        }
+        },
+        "match_tip": "Exact match compares the entire command. A regular expression can match part of a command; use ^ and $ to require a match of the entire command."
       }
     },
     "label": {
       "asset_group": "Asset Group",
-      "website_group": "Web Asset Group",
-      "strategy": "Strategy",
+      "website_group": "Website Group",
+      "strategy": "Operation Policy",
       "authorised_at": "Authorized At",
       "never_expired": "Never Expires"
     },
-    "website_title": "Authorized Websites",
+    "website_title": "Website Access Permissions",
     "authorise_failed": "Authorization failed"
   },
   "sysops": {
     "spec": "cron expression",
-    "spec_run": "Simulate Run",
-    "spec_run_time": "Recent 10 run times",
-    "spec_tooltip": "Supports second-level scheduling. Unlike standard cron, the first field is seconds (Quartz compatible), but the year field is not supported.",
+    "spec_run": "Preview Schedule",
+    "spec_run_time": "Next 10 Scheduled Runs",
+    "spec_tooltip": "Use six cron fields: second, minute, hour, day of month, month, and day of week. The year field is not supported. Presets such as @daily are also supported.",
     "last_exec_at": "Last Run At",
     "command": "Command",
     "system_event": {
@@ -610,16 +673,17 @@
     },
     "options": {
       "exec": "Run Now",
-      "logs": "View Logs"
+      "logs": "View Logs",
+      "exec_tip": "Run once manually, even when scheduled execution is disabled."
     },
     "monitoring": {
       "title": "System Monitoring",
       "description": "View CPU, memory, local storage, and key backend service status in one place.",
-      "generated_at": "Data Time",
+      "generated_at": "Collected At",
       "load_failed": "Failed to load monitoring data",
       "health_title": "Health Checks",
       "alert_title": "Alert Overview",
-      "protocol_title": "Online Protocols",
+      "protocol_title": "Active Sessions by Protocol",
       "database_in_use": "In Use",
       "database_idle": "Idle",
       "database_wait": "Wait Count",
@@ -644,14 +708,14 @@
       "logical_cores": "logical cores",
       "available": "Available",
       "swap": "Swap",
-      "service_runtime": "Service Runtime",
-      "access_runtime": "Access Runtime",
+      "service_runtime": "Service Status",
+      "access_runtime": "Access Overview",
       "database_runtime": "Database Connections",
       "version": "Version",
       "goroutines": "Goroutines",
       "runtime_memory": "Runtime Memory",
       "last_triggered_at": "Last Triggered",
-      "acknowledge": "Acknowledge",
+      "acknowledge": "Acknowledge Alert",
       "critical_alert": "Critical system alert exists",
       "critical_alert_desc": "Handle CPU, memory, or local storage issues as soon as possible to avoid service impact.",
       "global_critical_title": "Critical System Alert",
@@ -685,15 +749,15 @@
         }
       },
       "health": {
-        "gateway": "Security Gateway",
+        "gateway": "Agent Gateway",
         "storage": "Recording Storage",
-        "scheduler": "Scheduled Tasks",
+        "scheduler": "Task Scheduler",
         "cpu": "CPU",
         "memory": "Memory"
       },
       "health_messages": {
         "scheduler": {
-          "ok": "Scheduler is initialized"
+          "ok": "Task scheduler initialized"
         },
         "gateway": {
           "ok": "Gateway is active",
@@ -732,7 +796,7 @@
       "renewed": "Renewed",
       "skipped": "Skipped",
       "reason": "Reason",
-      "clear_confirm_content": "Confirm clear all logs? This action cannot be undone."
+      "clear_confirm_content": "Clear all task logs? This cannot be undone."
     },
     "type": {
       "options": {
@@ -742,10 +806,10 @@
       }
     },
     "mode": {
-      "label": "Mode",
+      "label": "Execution Scope",
       "options": {
         "all_asset": "All Assets",
-        "custom_asset": "Custom Assets"
+        "custom_asset": "Selected Assets"
       }
     },
     "tools": {
@@ -753,7 +817,8 @@
       "target_placeholder": "Please enter IP or domain",
       "attempts": "Attempts",
       "attempts_tips": "Set number of requests",
-      "testing": "Start Test"
+      "testing": "Start Test",
+      "source_tip": "Tests run from the server and reflect connectivity from the server to the target. Ping checks ICMP responses; TCP Ping checks whether a connection can be established to the specified port."
     }
   },
   "audit": {
@@ -765,16 +830,16 @@
     "filename": "File Name",
     "login_at": "Login Time",
     "action": "Action Type",
-    "login_status": "Login Status",
+    "login_status": "Sign-In Result",
     "login_reason": "Failure Reason",
-    "user_agent": "Client",
+    "user_agent": "User Agent",
     "exec_command": {
-      "scope_tip": "Only non-interactive commands executed through SSH exec are recorded here, for example ssh user@host asset \"ls -la\". Commands entered in interactive terminals are available in offline session playback.",
+      "scope_tip": "Records non-interactive commands executed through SSH exec. See SSH Session Commands for interactive input, or session history playback for the terminal output.",
       "command": "Command",
       "result": "Result",
       "exit_code": "Exit Code",
-      "duration_ms": "Duration(ms)",
-      "started_at": "Executed At",
+      "duration_ms": "Duration (ms)",
+      "started_at": "Started At",
       "risk_level": "Risk Level",
       "status": {
         "forbidden": "Blocked"
@@ -789,7 +854,7 @@
       "remote_exec_commands": "Remote Exec Commands",
       "session_scope_tip": "Records commands submitted in interactive SSH terminals. Command results and exit codes are not available.",
       "input_at": "Entered At",
-      "locate_playback": "Locate Playback",
+      "locate_playback": "Play from Here",
       "remote_exec_detail": "Remote Exec Command Details",
       "clear_remote_exec": "Clear Remote Exec Records",
       "clear_remote_exec_confirm": "Clear all remote exec command records?"
@@ -798,21 +863,21 @@
       "requestId": "Request ID",
       "uri": "Request URI",
       "statusCode": "Status Code",
-      "clientStatusCode": "Client Status",
-      "upstreamStatusCode": "Upstream Status",
-      "downstreamResponseSize": "Downstream Size",
-      "upstreamContentLength": "Upstream Content Length",
+      "clientStatusCode": "Client Response Status",
+      "upstreamStatusCode": "Origin Response Status",
+      "downstreamResponseSize": "Response Bytes Sent",
+      "upstreamContentLength": "Origin Content-Length",
       "totalResponseTime": "Total Time",
-      "noUpstreamResponse": "No Upstream",
+      "noUpstreamResponse": "No Origin Response",
       "upstreamFailed": "Upstream Failed",
       "responseProcessingFailed": "Response Processing Failed",
       "userAgent": "User-Agent",
       "createdAt": "Request Time",
       "anonymous": "Anonymous",
-      "publicAllow": "Public Allow",
+      "publicAllow": "Public Access Allowed",
       "whitelist": "IP Whitelist",
       "tempAllow": "Temporary Allow",
-      "tempPass": "Temporary Password",
+      "tempPass": "Passcode Authentication",
       "deletedUser": "Deleted User",
       "clearConfirmTitle": "Confirm Clear",
       "clearConfirmContent": "Clear all access logs? This action cannot be undone.",
@@ -827,18 +892,18 @@
           "30days": "Last 30 Days"
         },
         "metrics": {
-          "pv": "PV Page Views",
-          "uv": "UV Visitors",
+          "pv": "Requests (PV)",
+          "uv": "Unique Visitors (UV)",
           "ip": "Unique IPs",
           "traffic": "Traffic",
           "requests": "Requests"
         },
         "realtime": {
           "title": "Realtime Metrics",
-          "currentOnline": "Currently Online",
-          "requestsPerSecond": "Requests per second",
-          "realtimeTraffic": "Realtime Traffic",
-          "errorRate": "Error Rate"
+          "currentOnline": "Active Visitors (Last 5 min)",
+          "requestsPerSecond": "Requests/s (1-min Average)",
+          "realtimeTraffic": "Traffic Rate (1-min Average)",
+          "errorRate": "Error Rate (Last 1 min)"
         },
         "charts": {
           "trafficTrend": "Traffic Trend",
@@ -863,7 +928,8 @@
           "success": "Success (2xx)",
           "redirect": "Redirect (3xx)",
           "clientError": "Client Error (4xx)",
-          "serverError": "Server Error (5xx)"
+          "serverError": "Server Error (5xx)",
+          "other": "Other Status Codes"
         }
       }
     },
@@ -882,7 +948,12 @@
         "sysconf": "System Config",
         "sysops": "Operations",
         "backup": "Backup",
-        "entrance": "Portal"
+        "entrance": "Portal",
+        "gateway": "Gateways",
+        "log_audit": "Audit logs",
+        "resource": "Resources",
+        "setting": "System settings",
+        "work_order": "Requests and approvals"
       },
       "actions": {
         "create": "Create",
@@ -916,7 +987,50 @@
         "audit": "Audit",
         "reset_password": "Reset Password",
         "reset_otp": "Reset OTP",
-        "authorize": "Authorize"
+        "authorize": "Authorize",
+        "acknowledge": "Acknowledge alert",
+        "batch_update": "Update in bulk",
+        "cancel": "Cancel request",
+        "change_connection": "Change connection method",
+        "change_gateway": "Change gateway",
+        "change_group": "Change group",
+        "change_status": "Change enabled status",
+        "check": "Check geolocation data",
+        "checking": "Check connection ports",
+        "clear_passkeys": "Clear passkeys",
+        "connect": "Connect session",
+        "credential_rotation_policies": "Create credential rotation policy",
+        "detect_os": "Detect operating system",
+        "edit": "Edit file",
+        "exec": "Run task",
+        "files": "Create backup",
+        "gen_private_key": "Generate private key",
+        "gen_rsa_private_key": "Generate RSA private key",
+        "ls": "List directory contents",
+        "mkdir": "Create directory",
+        "models": "Fetch AI models",
+        "monitor": "View live session",
+        "next_ten_runs": "Preview upcoming runs",
+        "playback": "Play recording",
+        "profiles": "Create AI profile",
+        "recording_convert": "Convert recording",
+        "regenerate_secret": "Regenerate client secret",
+        "rename": "Rename file or directory",
+        "request": "Generate license request",
+        "reset_totp": "Reset OTP",
+        "resize": "Resize session",
+        "restore": "Restore backup",
+        "retry": "Retry recording upload",
+        "retry_failed": "Retry failed recording uploads",
+        "rm": "Delete file or directory",
+        "rotate": "Rotate credential",
+        "rotate_credential": "Rotate asset credentials",
+        "rules": "Create rule",
+        "send_mail": "Send test email",
+        "set_register_addr": "Set Agent registration address",
+        "test_ldap": "Test LDAP authentication",
+        "upload_restore": "Upload and restore backup",
+        "wol": "Send Wake-on-LAN request"
       },
       "resources": {
         "user": "User",
@@ -926,7 +1040,7 @@
         "access_token": "Access Token",
         "role": "Role",
         "department": "Department",
-        "access_policy": "Access Control",
+        "access_policy": "Access Policy",
         "login_lock": "Login Lock",
         "login_log": "Login Log",
         "oidc_client": "OIDC Client",
@@ -935,32 +1049,32 @@
         "asset_group": "Asset Group",
         "database_asset": "Database Asset",
         "credential": "Credential",
-        "snippet": "Snippet",
+        "snippet": "Command Snippet",
         "storage": "Storage",
         "website": "Website",
         "website_group": "Website Group",
         "certificate": "Certificate",
         "dns_provider": "DNS Provider",
         "ssh_gateway": "SSH Gateway",
-        "agent_gateway": "Agent Gateway",
-        "agent_gateway_token": "Agent Gateway Token",
+        "agent_gateway": "Agent gateway",
+        "agent_gateway_token": "Agent gateway token",
         "gateway_group": "Gateway Group",
-        "strategy": "Strategy",
+        "strategy": "Operation policy",
         "command_filter": "Command Filter",
         "command_filter_rule": "Command Filter Rule",
         "authorised_asset": "Asset Authorization",
         "authorised_website": "Website Authorization",
         "authorised_database_asset": "Database Asset Authorization",
         "session": "Session",
-        "session_share": "Session Share",
+        "session_share": "Session sharing",
         "session_audit": "Session Audit",
         "filesystem": "Filesystem",
-        "filesystem_log": "Filesystem Log",
-        "access_setting": "Access Setting",
+        "filesystem_log": "File Activity Log",
+        "access_setting": "Access settings",
         "access_log": "Access Log",
-        "website_temp_allow": "Website Temporary Allow",
+        "website_temp_allow": "Temporary website access",
         "database_sql_log": "Database SQL Log",
-        "database_work_order": "Database Work Order",
+        "database_work_order": "SQL Request",
         "property": "System Property",
         "license": "License",
         "operation_log": "Operation Log",
@@ -968,7 +1082,19 @@
         "backup": "Backup",
         "job": "Scheduled Job",
         "job_log": "Job Log",
-        "tool": "Tool"
+        "tool": "Tool",
+        "access_request": "Access request",
+        "credential_rotation": "Credential rotation",
+        "db_work_order": "SQL execution request",
+        "exec_command_log": "Command execution log",
+        "ip_set": "IP address set",
+        "login_locked": "Login lock record",
+        "monitoring": "System monitoring",
+        "network_proxy": "Network proxy",
+        "offline_session": "Ended session",
+        "online_session": "Active session",
+        "scheduled_task": "Scheduled task",
+        "setting": "System settings"
       }
     },
     "options": {
@@ -993,18 +1119,39 @@
       "failed": "Transcoding failed",
       "start": "Transcode",
       "retry": "Retry transcoding",
-      "trigger_failed": "Failed to submit transcoding"
+      "trigger_failed": "Failed to Queue Transcoding"
     },
     "recording_upload_status": {
       "pending": "Waiting to upload",
       "uploading": "Uploading",
       "failed": "Upload to {{target}} failed",
       "retry": "Retry upload",
-      "retry_submitted": "Recording upload retry submitted",
+      "retry_submitted": "Recording Upload Retry Queued",
       "retry_failed": "Failed to submit recording upload retry",
       "retry_all": "Retry all failed uploads ({{count}})",
       "retry_all_confirm": "Retry all {{count}} failed recording uploads?",
       "retry_all_submitted": "Submitted {{accepted}} recording uploads; skipped {{skipped}}"
+    },
+    "filesystem_actions": {
+      "ls": "List directory contents",
+      "upload": "Upload file",
+      "download": "Download file",
+      "remove": "Delete file or directory",
+      "edit": "Edit file",
+      "create-dir": "Create directory",
+      "create-file": "Create file",
+      "rename": "Rename file or directory",
+      "chmod": "Change file permissions"
+    },
+    "login_reasons": {
+      "account_incorrect": "Incorrect account or password",
+      "account_disabled": "Account disabled",
+      "otp_incorrect": "Incorrect OTP code",
+      "ip_not_allowed": "Sign-in source IP is not allowed",
+      "time_not_allowed": "Sign-in is not allowed at this time",
+      "geo_not_allowed": "Sign-in source location is not allowed",
+      "policy_not_allowed": "Sign-in denied by an identity access policy",
+      "password_login_disabled": "Password sign-in disabled"
     }
   },
   "access": {
@@ -1021,12 +1168,12 @@
       },
       "mouse": {
         "label": "Mouse Settings",
-        "selection_copy": "Copy on select",
+        "selection_copy": "Copy Selected Text Automatically",
         "right_click_paste": "Right-click to paste"
       },
       "keyboard": {
         "label": "Keyboard Settings",
-        "intercept_search_shortcut": "Intercept search shortcut (Ctrl/Cmd+F)",
+        "intercept_search_shortcut": "Use Ctrl/Cmd+F to Search the Terminal",
         "mac_option_is_meta": "macOS Option as Meta key"
       }
     },
@@ -1037,13 +1184,15 @@
     "session": {
       "share": {
         "action": "Share Session",
-        "cancel": "Cancel Share"
+        "cancel": "Cancel Share",
+        "create": "Create share link",
+        "tip": "Anyone with the link can watch this session in read-only mode and reuse the link. Cancelling sharing invalidates the link and disconnects viewers without closing the original session."
       }
     },
     "clipboard": "Clipboard",
-    "combination_key": "Key Combination",
+    "combination_key": "Send Key Combination",
     "toggle_full_screen": "Toggle Full Screen",
-    "required_auth": "Login Parameters",
+    "required_auth": "Connection Authentication",
     "search": "Search",
     "snippet_expand": "Click to expand...",
     "guacamole": {
@@ -1054,7 +1203,7 @@
       "clipboard_placeholder": "Paste here..."
     },
     "tabs": {
-      "copySession": "Duplicate Session",
+      "copySession": "Open Another Connection",
       "closeLeft": "Close Tabs to the Left",
       "closeRight": "Close Tabs to the Right",
       "closeOthers": "Close Other Tabs",
@@ -1064,14 +1213,14 @@
       "title": "Wake-on-LAN",
       "message": "Asset {{name}} is offline. Wake it up?",
       "confirm": "Wake",
-      "waking": "Sending wake-up signal...",
+      "waking": "Sending a WOL magic packet...",
       "countdown_message": "Waiting for device to start, time remaining:",
-      "checking": "Checking if asset is online...",
-      "online": "Asset Online",
-      "online_desc": "Asset has been awakened and is online, you can connect now",
-      "offline": "Asset Offline",
-      "offline_desc": "Asset may not be fully started, please retry later",
-      "failed": "Wake failed",
+      "checking": "Checking connection port reachability...",
+      "online": "Connection port reachable",
+      "online_desc": "The asset’s connection port is reachable. You can try connecting; successful authentication is not guaranteed.",
+      "offline": "Connection port unreachable",
+      "offline_desc": "The connection port could not be reached. The device may still be starting, or the network or port may be unavailable. Try again later.",
+      "failed": "Wake request failed",
       "check_now": "Check Now",
       "connect": "Connect Now"
     },
@@ -1101,11 +1250,14 @@
         "auth_required": "Target host requires authentication",
         "username": "Username",
         "password": "Password",
-        "passphrase": "Passphrase",
+        "passphrase": "Private Key Passphrase",
         "answer": "Answer",
         "cancel": "Cancel",
         "connect": "Connect"
-      }
+      },
+      "bulk_command_placeholder": "Enter a command and press Enter to run it in all connected terminals",
+      "connection_error": "Connection error",
+      "connection_closed": "Connection closed"
     },
     "playback": {
       "shortcut_space": "Space: Play/Pause",
@@ -1116,16 +1268,26 @@
       "seek_forward": "Forward 10 seconds (→)",
       "fullscreen": "Full Screen (F)",
       "exit_fullscreen": "Exit Full Screen (F)"
-    }
+    },
+    "auth_hostname": "Hostname"
   },
   "account": {
+    "captcha_ui": {
+      "slide_hint": "Drag the slider to align the piece with the gap. Release to verify automatically.",
+      "refresh": "Refresh puzzle",
+      "required": "Please complete security verification",
+      "image": "Security verification puzzle",
+      "start": "Click to verify",
+      "verified": "Verified",
+      "title": "Security verification"
+    },
     "profile": "Profile",
     "logout": "Logout",
     "change": {
       "info": "Edit Profile",
       "password": "Change Password"
     },
-    "access_token": "Access Token",
+    "access_token": "Access Tokens",
     "access_token_create": "Create Token",
     "access_token_edit_name": "Edit Token Name",
     "access_token_name_required": "Please enter the token name",
@@ -1148,26 +1310,28 @@
     "client_cert_regenerate": "Regenerate",
     "client_cert_revoke": "Revoke",
     "client_cert_empty": "No client certificate",
-    "client_cert_once_tip": "The certificate can be downloaded only once. If lost, regenerate it.",
+    "client_cert_once_tip": "The PKCS#12 download contains the client certificate, private key, and root CA certificate. The import password is empty. Keep it secure; generating a new certificate revokes the previous active certificate.",
     "client_cert_download_started": "Certificate download started",
     "client_cert_revoke_confirm": "Revoke the client certificate?",
-    "client_cert_status_active": "Active",
+    "client_cert_status_active": "Not revoked",
     "client_cert_status_revoked": "Revoked",
     "client_cert_fingerprint": "Certificate Fingerprint",
     "client_cert_serial": "Serial Number",
     "client_cert_not_before": "Valid From",
     "client_cert_not_after": "Valid Until",
-    "client_cert_last_used": "Certificate Last Used",
-    "old_password": "Old Password",
+    "client_cert_last_used": "Last Used",
+    "old_password": "Current Password",
     "confirm_password": "Confirm Password",
-    "captcha": "Captcha",
+    "captcha": "Security verification",
     "login": {
       "action": "Login",
       "methods": {
         "passkey": "Use Passkey",
-        "otp": "Use OTP",
+        "otp": "Use an authenticator code",
         "wechat_work": "Sign in with WeCom",
-        "oidc": "Sign in with OIDC"
+        "oidc": "Sign in with OIDC",
+        "local": "Local account",
+        "ldap": "LDAP"
       },
       "back": "Back",
       "processing": "Processing login...",
@@ -1179,7 +1343,26 @@
       },
       "oidc_error": "OIDC login failed, please try again",
       "wechat_work_error": "WeCom login failed, please try again",
-      "back_to_login": "Back to Login"
+      "back_to_login": "Back to Login",
+      "ldap_username_hint": "Enter username",
+      "sms": {
+        "phone": "Phone number",
+        "phone_hint": "Use a phone number bound to an account. Mainland China numbers may use 11 digits; include the country code for other regions.",
+        "refresh_captcha": "Refresh puzzle",
+        "code": "SMS verification code",
+        "resend_after": "Resend in {{seconds}}s",
+        "send": "Get code",
+        "sent_hint": "If this phone is bound to an eligible account, a code will be sent. It expires in 5 minutes.",
+        "password_login": "Password login",
+        "login": "SMS login",
+        "phone_placeholder": "Enter your phone number",
+        "code_placeholder": "Enter the 6-digit SMS code",
+        "resend": "Resend code",
+        "captcha_title": "Security verification",
+        "captcha_hint": "Complete security verification to receive an SMS verification code.",
+        "confirm_send": "Verify and send",
+        "send_failed": "Unable to send SMS code"
+      }
     },
     "external_binding": {
       "title": "Link a local account",
@@ -1191,7 +1374,7 @@
       "nickname": "Display name",
       "password_optional": "Local password (optional)",
       "password_mismatch": "The passwords do not match",
-      "totp_optional": "Authenticator code (required when enabled)",
+      "totp_optional": "Authenticator code (required if OTP is enabled)",
       "create_and_login": "Create and sign in",
       "bind_and_login": "Link and sign in",
       "or": "Or",
@@ -1210,7 +1393,7 @@
     "ssh_key_algorithm": "Algorithm",
     "ssh_key_fingerprint": "Key Fingerprint",
     "ssh_key_comment": "Comment",
-    "ssh_key_last_used": "Key Last Used",
+    "ssh_key_last_used": "Last Used",
     "ssh_key_public_key_tip": "Paste a single OpenSSH-format public key. Private keys are not accepted.",
     "ssh_key_public_key_required": "Please enter the public key",
     "ssh_key_public_key_placeholder": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... desktop@macbook",
@@ -1219,49 +1402,49 @@
     "enter": "Please enter",
     "otp_bind_title": "Enabled",
     "otp_bind_sub_title": "Enter the dynamic code generated by your authenticator app when signing in.",
-    "otp_unbind": "Disable MFA",
-    "otp_unbind_title": "Are you sure you want to disable MFA?",
-    "otp_unbind_subtitle": "Disabling it may increase the risk of account compromise.",
-    "otp_description": "Two-factor authentication (OTP) provides extra protection for your account. Even if your password is leaked, attackers cannot access your account without your mobile device.",
-    "otp_authenticator_app_description": "Install any of the following apps on your phone:",
+    "otp_unbind": "Disable OTP",
+    "otp_unbind_title": "Disable OTP authentication?",
+    "otp_unbind_subtitle": "Disabling OTP removes its binding. If OTP is required by system policy, you must set it up again when signing in or continuing.",
+    "otp_description": "OTP adds a layer of protection to your account. When enabled, signing in requires both your password and a code from your authenticator app.",
+    "otp_authenticator_app_description": "Install an authenticator app",
     "otp_features": {
-      "offline_access": "Offline access: generate codes without network connection",
-      "time_based": "Time-based: codes refresh every 30 seconds for security"
+      "offline_access": "Generate codes without an internet connection",
+      "time_based": "Codes refresh every 30 seconds"
     },
     "otp_manual_setup": "Manual setup",
     "otp_manual_setup_desc": "If you can't scan the QR code, enter this key manually in your authenticator app:",
     "otp_scan_qr": "Scan QR Code",
     "otp_scan_instruction": "Please use the authenticator app to scan the QR code above",
-    "otp_verification_title": "Verify Binding",
+    "otp_verification_title": "Enter a code to finish setup",
     "otp_verification_instruction": "Please enter the 6-digit code from your authenticator app",
     "otp_security_tip": "Security Tip",
-    "otp_security_description": "After binding, your account will be protected by MFA. Please keep your authenticator device safe.",
+    "otp_security_description": "Keep your authenticator app and setup key secure. Anyone with the key can generate codes for your account.",
     "passkey_add": "Add Passkey",
     "passkey_add_time": "Added At",
     "passkey_used_time": "Last Used",
-    "passkey_delete_title": "Remove Passkey?",
-    "passkey_delete_content": "Passkey provides better protection for your account and assets; it's recommended to keep it.",
+    "passkey_delete_title": "Remove this passkey?",
+    "passkey_delete_content": "You will no longer be able to use this passkey to sign in or complete additional verification.",
     "mfa": "Multi-Factor Authentication",
     "mfa_authing": "Authenticating...",
     "mfa_auth_failed": "Authentication failed",
-    "mfa_change_way": "Change verification method",
-    "otp_required": "You must enable 2FA to continue",
-    "no_mfa_title": "Please bind a security authentication method",
-    "no_mfa_subtitle": "You haven't bound any security method and cannot view sensitive data.",
+    "mfa_change_way": "Use another method",
+    "otp_required": "Set up an OTP authenticator before continuing.",
+    "no_mfa_title": "Set up an authentication method",
+    "no_mfa_subtitle": "No additional verification method is available. Enable OTP or a passkey, or bind email or phone in your profile. Email and SMS services must be configured by an administrator.",
     "enable_otp": "Enable OTP",
     "enable_passkey": "Enable Passkey",
     "select_auth_type": "Please select an authentication method",
     "auth_type_passkey_desc": "Authenticate with biometrics or security key",
     "auth_type_otp": "OTP Code",
-    "auth_type_otp_desc": "Authenticate using a dynamic code",
+    "auth_type_otp_desc": "Enter a code from your authenticator app",
     "auth_type_unavailable": "Unavailable",
     "oidc_server_authorizations": "OIDC Authorizations",
     "oidc_server_authorizations_desc": "Manage third-party apps authorized to access your account",
     "oidc_server_no_authorizations": "You haven't authorized any apps",
-    "oidc_server_scopes": "Authorized Scopes",
+    "oidc_server_scopes": "Granted Permissions",
     "oidc_server_revoke": "Revoke Authorization",
     "oidc_server_authorization_revoke_title": "Confirm Revocation",
-    "oidc_server_authorization_revoke_content": "Are you sure you want to revoke {{clientId}}? It will no longer access your account info.",
+    "oidc_server_authorization_revoke_content": "Remove the saved consent for {{clientId}}? This does not revoke access tokens or refresh tokens that have already been issued.",
     "oidc_server_authorization_revoked": "Authorization revoked successfully",
     "oidc_consent": {
       "title": "Authorization Request",
@@ -1275,7 +1458,7 @@
         "profile": "Access your profile (nickname, username)",
         "email": "Access your email address",
         "phone": "Access your phone number",
-        "offline_access": "Offline access to your account",
+        "offline_access": "Continue accessing authorized information while you are offline",
         "default": "Access related information"
       },
       "warning": "After authorization, {{clientId}} can access the info you selected. You can revoke at any time in account settings.",
@@ -1288,25 +1471,80 @@
       "requested_scopes": "The following permissions will be granted",
       "allow": "Authorize",
       "deny": "Deny",
-      "warning": "Once approved, {{name}} will hold an access token for one year. You can revoke it anytime from the Access Tokens page.",
+      "warning": "Authorizing {{name}} issues an access token valid for one year. You can revoke it at any time on the Access Tokens page.",
       "load_error": "Unable to load authorization info. Please restart the flow.",
       "scope": {
         "account.read": "Read basic account information",
         "ssh_keys.manage": "Manage your SSH public keys",
         "assets.read": "Read the list of accessible assets",
-        "snippets.read": "Read your code snippets",
-        "token.revoke_self": "Revoke this access token (used when disconnecting)"
+        "snippets.read": "Read command snippets",
+        "token.revoke_self": "Revoke the access token issued by this authorization"
       }
     },
     "otp_code_required": "Please enter the code",
-    "otp_code_format": "Code must be 6 digits",
-    "mfa_passkey_prompt": "Please complete Passkey authentication in the browser popup"
+    "otp_code_format": "Enter a 6-digit code",
+    "mfa_passkey_prompt": "Please complete Passkey authentication in the browser popup",
+    "profile_details": {
+      "basic": "Basic information",
+      "edit": "Edit profile",
+      "not_filled": "Not provided",
+      "unassigned": "Not assigned",
+      "organization": "Organization and identity",
+      "roles": "Roles",
+      "organization_managed": "Organization, roles and account status are managed by administrators.",
+      "session_policy": "Session policies",
+      "policy_managed": "These user-level settings are managed by administrators. Actual session behavior also depends on global, asset and protocol settings.",
+      "security": "Security overview",
+      "mfa": "MFA authentication",
+      "force_mfa": "Require OTP authentication",
+      "last_login": "Last login",
+      "never_logged_in": "Never logged in",
+      "load_failed": "Failed to load profile",
+      "notification_language": "Email and SMS notification language"
+    },
+    "verification": {
+      "email": "Email verification",
+      "sms": "SMS verification",
+      "email_desc": "Send a code to your bound email address",
+      "sms_desc": "Send a code to your bound phone number",
+      "sent_to": "A code was sent to {{destination}} and is valid for {{minutes}} minutes.",
+      "resend_after": "Resend in {{seconds}} seconds",
+      "send_code": "Send code",
+      "load_failed": "Failed to load authentication methods",
+      "change_email": "Change email",
+      "change_phone": "Change phone number",
+      "contact_tip": "Verify your current identity, then your new contact. Your current contact remains valid until verification is complete.",
+      "channel_unavailable": "This channel is not configured. Contact your administrator.",
+      "no_identity_method": "No identity verification method is available. Set up OTP or a passkey, or contact your administrator.",
+      "new_email": "New email",
+      "new_phone": "New phone number",
+      "phone_format": "Include the country code, e.g. +8613800138000. Mainland China numbers may also use 11 digits.",
+      "current_password": "Current password",
+      "change_target": "Change destination"
+    },
+    "notifications": {
+      "title": "Notification preferences",
+      "mail": "Recipient email",
+      "no_mail": "Not bound",
+      "change_mail": "Change email",
+      "service_unavailable": "The mail service is disabled or incomplete. Business emails cannot be sent currently.",
+      "bind_first": "Bind an email to receive notifications without creating a personal notification channel.",
+      "email_enabled": "Receive business emails",
+      "access_results": "Access request approval results",
+      "work_order_results": "SQL work order approval and execution results",
+      "pending_approvals": "Pending approval reminders",
+      "security_unaffected": "Business notification preferences do not affect verification codes or required account security emails.",
+      "wecom_enabled": "Personal WeCom notifications",
+      "wecom_unavailable": "WeCom app channel is disabled. Contact your administrator.",
+      "wecom_unbound": "No member is associated yet. Sign in with WeCom and bind your current platform account; no member UserId is required.",
+      "wecom_bound": "WeCom member is bound."
+    }
   },
   "assets": {
     "alias": "Alias",
     "alias_placeholder": "Only letters, numbers, underscores or hyphens, and start with a letter",
     "alias_invalid": "Alias must start with a letter and contain only letters, numbers, underscores or hyphens",
-    "alias_tip": "When directly connecting to SSH Server, the alias can be used as the target name.",
+    "alias_tip": "Use this alias to select the target host when connecting through the SSH proxy.",
     "type": "Type",
     "content": "Content",
     "sort": "Sort",
@@ -1323,17 +1561,17 @@
     "network": "Network",
     "tags": "Tags",
     "addr": "Network Address",
-    "account_type": "Account Type",
+    "account_type": "Authentication Method",
     "asset_count": "Asset Count",
     "private_key": "Private Key",
     "password": "Password",
     "gateway": "Gateway",
-    "connection": "Connection",
-    "connection_mode": "Connection Mode",
+    "connection": "Connection Method",
+    "connection_mode": "Connection Method",
     "connection_direct": "Direct Connection",
     "connection_direct_tip": "Connect to the target address directly from the server.",
-    "connection_gateway": "Gateway Access",
-    "connection_proxy": "Proxy Access",
+    "connection_gateway": "Via Gateway",
+    "connection_proxy": "Via Proxy",
     "gateway_source": "Gateway Source",
     "gateway_custom": "Custom Gateway Chain",
     "proxy_tcp_tip": "Establish a TCP connection to the target through the proxy server.",
@@ -1343,9 +1581,9 @@
     "gateway_type": "Gateway Type",
     "display_settings": "Display Settings",
     "color_depth": "Color Depth",
-    "force_lossless": "Force Lossless",
-    "resize_method": "Resize Method",
-    "resize_method_extra": "How the RDP server should be updated when the client display size changes.",
+    "force_lossless": "Force Lossless Compression",
+    "resize_method": "Display Resize Method",
+    "resize_method_extra": "How to resize the RDP display when the remote desktop viewport changes size.",
     "resize_methods": {
       "display_update": "Display Update",
       "display_update_desc": "Use the RDP 8.1 \"Display Update\" channel to notify the server of display size changes",
@@ -1353,30 +1591,30 @@
       "reconnect_desc": "Automatically disconnect and reconnect with the new size when client display size changes"
     },
     "audio_settings": "Audio Settings",
-    "disable_audio": "Disable Audio",
-    "enable_audio_input": "Enable Audio Input",
+    "disable_audio": "Disable Audio Playback",
+    "enable_audio_input": "Enable Microphone Input",
     "rdp_domain": "Domain",
     "preconnection_id": "Preconnection ID",
     "preconnection_blob": "Preconnection Blob",
     "remote_app": "Remote App",
-    "remote_app_dir": "Remote App Directory",
-    "remote_app_args": "Remote App Arguments",
-    "rdp_drive": "Network Drive",
-    "rdp_drive_path": "Local Storage",
-    "rdp_drive_path_extra": "If not selected, the operator's default storage will be used",
-    "is_share": "Share",
-    "limit_size": "Size Limit",
-    "used_size": "Used Size",
+    "remote_app_dir": "RemoteApp Working Directory",
+    "remote_app_args": "RemoteApp Launch Arguments",
+    "rdp_drive": "Enable Drive Redirection",
+    "rdp_drive_path": "Mapped Storage",
+    "rdp_drive_path_extra": "Select storage to map into the remote desktop. Leave blank to use the current user’s default storage.",
+    "is_share": "Shared Storage",
+    "limit_size": "Storage Quota",
+    "used_size": "Used Space",
     "domain": "Domain",
     "domain_tip": "The domain used to access protected assets (e.g., www.example.com) must resolve to this system's IP.",
-    "scheme": "Asset Protocol",
-    "forward_host_or_ip": "Asset IP or Domain",
-    "forward_port": "Asset Port",
+    "scheme": "Origin Protocol",
+    "forward_host_or_ip": "Origin IP or Hostname",
+    "forward_port": "Origin Port",
     "origin_host": "Origin Host Header",
     "origin_host_follow_service": "Follow Access Domain",
     "origin_host_follow_origin": "Follow Origin",
     "origin_host_custom": "Specify Host Header",
-    "origin_host_custom_name": "Custom Origin Host Header",
+    "origin_host_custom_name": "Custom Host Header",
     "origin_timeout": "Origin Timeout",
     "origin_timeout_tip": "Maximum time the proxy waits for the origin to respond before returning an error.",
     "insecure_skip_verify": "Skip Certificate Verification",
@@ -1406,20 +1644,20 @@
     "custom_header": "Custom Headers",
     "custom_header_tip": "You can add multiple headers in the format: Key: Value.",
     "custom_certificate": "Custom Certificate",
-    "header_key": "Key",
+    "header_key": "Header Name",
     "header_value": "Value",
     "active": "Active",
     "access": "Access",
     "rdp_proxy_access": "Download RDP File",
     "import": "Import Assets",
     "copy": "Copy Asset",
-    "import_asset_tip": "When importing assets, account/password and key/passphrase are mutually exclusive; if both are provided, key/passphrase takes precedence.",
+    "import_asset_tip": "Reference an existing credential to import its authentication settings. Without a credential, the account and password are used. For key authentication, create a key credential first and reference it in the import file.",
     "import_asset_group_tip": "Existing groups are matched by name and missing groups are created automatically; separate nested groups with /, for example: Production/East.",
     "import_asset_success": "Assets imported successfully",
     "import_asset_error": "Failed to import assets",
     "import_asset_error_title": "Please check the import file; the following assets failed to import:",
     "copy_public_key": "Copy Public Key",
-    "credential_delete_referenced_title": "Credential is in use and cannot be deleted",
+    "credential_delete_referenced_title": "This credential is referenced and cannot be deleted",
     "credential_delete_referenced_assets": "Referenced assets:",
     "credential_delete_referenced_ssh_gateways": "Referenced SSH gateways:",
     "filesystem": "Filesystem",
@@ -1431,12 +1669,12 @@
     "public_access_switch": "Allow anonymous public access",
     "public_validity": "Public access validity",
     "public_validity_tip": "After expiry, both direct allow and passcode access stop working.",
-    "public_rule_relation_tip": "A match on source IP, location, request header, or public path allows access.",
+    "public_rule_relation_tip": "Matching any source IP, location, header, or public path rule allows access without a passcode.",
     "public_access_rules": "Direct allow rules",
     "public_geo_rules": "Location rules",
     "public_geo_rules_tip": "Fields use AND; multiple values within a field use OR. Empty fields do not restrict access. Press Enter to add a value.",
     "public_password_access": "Passcode access",
-    "public_password_access_tip": "When no direct allow rule is configured, require a passcode.",
+    "public_password_access_tip": "When no direct access rule matches, visitors can authenticate with the passcode. With no rules and no passcode, anonymous access is allowed. If rules are configured but none match and no passcode is set, NT account authentication is required.",
     "limit_ip": "Source IP",
     "limit_ip_tip": "Supports individual IPs, CIDR blocks, and IP ranges; separate multiple values with new lines, commas, or semicolons.",
     "limit_country": "Country",
@@ -1459,12 +1697,12 @@
     "modify_response": "Modify Response",
     "certificates": {
       "type": "Certificate Type",
-      "self_signed": "Self-signed",
+      "self_signed": "System CA certificate",
       "self_signed_tip_title": "Tip: You can replace the root certificate yourself; take effect after restart.",
       "self_signed_root_ca_cert_path": "Root Certificate Path",
       "self_signed_root_ca_key_path": "Root Private Key Path",
-      "issued": "Online Request",
-      "imported": "Local Import",
+      "issued": "ACME Issuance",
+      "imported": "Imported Certificate",
       "not_after": "Expiry Time",
       "issuer": "Issuer",
       "issuedStatus": "Issue Status",
@@ -1476,10 +1714,10 @@
       "set_as_default": "Set as Default",
       "download": "Download Certificate",
       "renew": "Renew Certificate",
-      "renew_confirm": "Confirm renew certificate?",
-      "renew_confirm_content": "The certificate will be re-issued and updated. Continue?",
+      "renew_confirm": "Renew this certificate?",
+      "renew_confirm_content": "Successfully issued certificates are updated only within the renewal window; earlier requests are skipped. Failed issuance will be retried. Continue?",
       "issued_log": "Certificate Request Logs",
-      "renew_before": "Renewal Lead Time",
+      "renew_before": "Days before expiry to renew",
       "log_viewer": {
         "status": {
           "realtime": "Realtime",
@@ -1501,13 +1739,16 @@
           "no_data": "No log data",
           "no_data_desc": "Logs will be displayed in realtime during certificate operations"
         }
-      }
+      },
+      "renew_before_tip": "Successfully issued certificates can be renewed within this many days of expiry. A value of 0 uses the default of 30 days. Failed issuance can be retried.",
+      "renew_too_early": "The certificate is not yet within its renewal window. Renewal was skipped.",
+      "renew_unsupported": "Only ACME certificates support renewal."
     },
     "dns_providers": {
       "set": "Set DNS Provider",
       "remove": "Remove DNS Provider",
       "remove_confirm_title": "Remove DNS provider settings",
-      "remove_confirm_content": "After removal, certificates cannot be requested",
+      "remove_confirm_content": "To use this DNS provider for certificate issuance or renewal after removing its settings, configure it again. Existing certificates will not be deleted.",
       "type": "Provider Type",
       "tencentcloud": "Tencent Cloud",
       "alidns": "Alibaba Cloud",
@@ -1517,11 +1758,11 @@
     "dns_provider_config": "DNS Provider Config",
     "terminal_settings": "Terminal Settings",
     "restricted_shell": "Network Device / Restricted Shell",
-    "restricted_shell_extra": "For switches, routers, firewalls, and other non-standard Linux SSH environments. These environments do not support SSH child sessions. Enabling this option disables features such as File System (SFTP) and runtime Stats.",
+    "restricted_shell_extra": "For restricted SSH environments such as switches, routers, and firewalls. Enabling this option disables SFTP file access, runtime metrics, SSH keepalive checks, and automatic OS detection.",
     "sftp_directory_follow": "Auto-follow SFTP Directory",
     "sftp_directory_follow_extra": "When enabled, the SFTP file system directory automatically follows the terminal's current directory.",
-    "enable_alive_check": "Keepalive Check",
-    "enable_alive_check_extra": "Periodically checks whether the target asset is online during a connection to detect connection issues promptly. Some hardware switches may not support this check; turn it off if connections fail or disconnect frequently.",
+    "enable_alive_check": "SSH Keepalive Check",
+    "enable_alive_check_extra": "Periodically probe the current SSH connection. Some network devices may not support this probe; disable it if connection issues occur.",
     "enable_detect_os": "Auto-detect Operating System",
     "enable_detect_os_extra": "When the asset logo is empty, the system attempts to identify the operating system and apply a matching icon automatically. Some hardware switches may not support this detection; turn it off if connections fail or detection behaves unexpectedly.",
     "connect_timeout": "Connection Timeout",
@@ -1533,7 +1774,7 @@
     "ai": {
       "settings": "AI Settings",
       "enabled": "Enable AI",
-      "enabled_extra": "When enabled, global AI can search and operate this SSH asset.",
+      "enabled_extra": "Allow the AI assistant to find and operate this SSH host within the current user’s access permissions.",
       "command_policy": "AI command policy",
       "command_policy_extra": "Empty means following the global AI setting.",
       "follow_global": "Follow global setting"
@@ -1546,28 +1787,28 @@
       "mac_addr_invalid": "Invalid MAC address format",
       "broadcast": "Broadcast Address",
       "broadcast_placeholder": "Please enter broadcast address, default: 255.255.255.255",
-      "wakeup_delay": "Wake Delay",
+      "wakeup_delay": "Wait After Wake-Up",
       "wakeup_delay_placeholder": "Wait time after wake-up (seconds)",
       "wakeup_delay_tooltip": "Time to wait after sending wake packet"
     },
     "security": {
-      "settings": "Security Authentication",
+      "settings": "Security",
       "mode": "Security Mode",
       "mode_extra": "Security mode for RDP connection, determines encryption and auth type.",
-      "ignore_cert": "Ignore Certificate Validation",
-      "ignore_cert_extra": "Ignore server certificate even if invalid (e.g., self-signed).",
+      "ignore_cert": "Skip server certificate validation",
+      "ignore_cert_extra": "Skip validation of the remote server certificate, including self-signed certificates that cannot be verified.",
       "cert_tofu": "Trust On First Use",
-      "cert_tofu_extra": "Enable FreeRDP TOFU policy: trust unknown certificates on first use.",
+      "cert_tofu_extra": "Trust and save an unknown certificate on first use. Subsequent connections check that the certificate matches the saved record.",
       "cert_fingerprints": "Certificate Fingerprints",
-      "cert_fingerprints_extra": "Comma-separated list of certificate fingerprints and hashes; server cert will be verified.",
+      "cert_fingerprints_extra": "Enter comma-separated hash algorithm and certificate fingerprint pairs. The server certificate must match one entry; otherwise the connection is rejected.",
       "cert_fingerprints_placeholder": "e.g., sha256:1234567890abcdef...",
       "disable_auth": "Disable Authentication",
-      "disable_auth_extra": "Disable authentication during connection (does not affect login within remote desktop session).",
+      "disable_auth_extra": "Disable authentication during connection setup. The server still controls login requirements within the remote desktop. Authentication must remain enabled for NLA.",
       "modes": {
         "any": "Auto",
         "any_desc": "Automatically choose based on client and server supported security protocols (default)",
         "nla": "Network Level Authentication (NLA)",
-        "nla_desc": "Use TLS encryption; requires username and password",
+        "nla_desc": "Uses TLS encryption and verifies the username and password before the desktop session starts. If credentials are not configured, guacd versions that support interactive authentication can prompt for them.",
         "nla_ext": "Extended NLA",
         "nla_ext_desc": "Same as NLA, but requires server to send additional \"early user authorization result\"",
         "tls": "TLS Authentication",
@@ -1579,19 +1820,19 @@
       }
     },
     "website_response_modify": {
-      "header_key_required": "Please enter key",
+      "header_key_required": "Enter a response header name",
       "header_value_required": "Please enter value",
       "rule_name_required": "Please enter rule name",
       "rule_name_placeholder": "Rule name",
       "match_conditions": "Match Conditions",
       "match_path": "Request Path",
-      "match_path_tip": "Path to match, e.g., /api/data (empty matches all paths)",
+      "match_path_tip": "Match request paths using path wildcards, such as /api/*. The * wildcard does not cross /. Leave blank to match all paths.",
       "match_method": "Request Method",
       "match_method_tip": "HTTP method to match (empty matches all methods)",
       "match_method_placeholder": "Select request method",
       "match_status": "Response Status Code",
       "match_status_tip": "HTTP status code to match, e.g., 200, 404 (0 matches all status codes)",
-      "header_operations": "Header Operations",
+      "header_operations": "Response Header Actions",
       "rewrite_headers_label": "Rewrite Headers",
       "rewrite_headers_tip": "Dynamically rewrite original upstream response header values. Later set, add, or remove operations can still modify the result",
       "add_rewrite_header": "Add Rewrite Header",
@@ -1608,12 +1849,12 @@
       "set_headers_label": "Set Headers",
       "set_headers_tip": "Set or override response headers",
       "add_headers_label": "Add Headers",
-      "add_headers_tip": "Add response headers (if not exist)",
-      "add_set_headers": "Add Set Header",
-      "add_add_headers": "Add Add Header",
+      "add_headers_tip": "Append a response header value, even if the header already exists.",
+      "add_set_headers": "Add Override",
+      "add_add_headers": "Add Value",
       "remove_headers_label": "Remove Headers",
       "remove_headers_tip": "Response headers to remove (header names only)",
-      "remove_header_name_required": "Please enter header name",
+      "remove_header_name_required": "Enter a response header name",
       "remove_header_name_placeholder": "Header name to remove",
       "add_remove_header_button": "Add header to remove",
       "body_replace_title": "Body Replacement",
@@ -1630,14 +1871,15 @@
     },
     "snippet": {
       "visibility": "Visibility",
-      "visibility_public": "Public",
-      "visibility_private": "Private"
+      "visibility_public": "Shared",
+      "visibility_private": "Personal",
+      "visibility_tip": "Shared snippets are available to all signed-in users. Personal snippets appear only in their creator’s personal list. Administrators can still manage all snippets through resource management."
     },
     "website_load_failed": "Failed to load website data",
     "auto_fetch_favicon": "Auto Fetch Icon",
     "auto_fetch_favicon_failed": "Failed to fetch icon, please check if the target address is correct",
     "public_header_whitelist": "Request Header Allowlist",
-    "public_header_whitelist_tip": "Click Add, then enter a header name; case-insensitive.",
+    "public_header_whitelist_tip": "Allow access when any listed header is present. Header values are not checked; names are case-insensitive.",
     "public_header_whitelist_placeholder": "For example: X-Bypass-Token",
     "public_path_whitelist": "Public paths",
     "public_path_whitelist_tip": "Click Add, then enter a path; * matches any sequence, ? matches one character, and paths without wildcards match exactly.",
@@ -1662,10 +1904,10 @@
       },
       "scope": "Scope",
       "pwd_length": "Password Length",
-      "pwd_length_tip": "Random password length, 8-64 characters",
+      "pwd_length_tip": "Length of the generated password, from 8 to 64 characters.",
       "pwd_symbol": "Include Symbols",
       "keep_old_key": "Keep Old Public Key",
-      "keep_old_key_tip": "When enabled, old public keys are kept on remote hosts (safer); when disabled, they will be removed automatically",
+      "keep_old_key_tip": "Keeping the old public key also keeps the old private key valid for sign-in. When disabled, rotation removes the old public key.",
       "policy_warning": "Rotation changes the account password or key on remote hosts. Make sure you keep an alternative way to log in.",
       "cron_preset": "Presets",
       "cron_presets": {
@@ -1686,9 +1928,29 @@
       },
       "trigger_label": "Trigger",
       "operator": "Operator",
-      "message": "Message",
+      "message": "Result Details",
       "scope_empty_tip": "Leave empty to rotate all SSH assets",
-      "scope_all": "All assets"
+      "scope_all": "All assets",
+      "messages": {
+        "only_ssh": "Only SSH assets are supported.",
+        "account_type_mismatch": "The account authentication method does not match the rotation type.",
+        "aborted": "Rotation was aborted.",
+        "shared_aborted": "Shared credential rotation was aborted. The old key remains active.",
+        "old_key_invalid": "Could not derive the public key from the old private key: {{detail}}",
+        "database_save_failed": "The public key was updated on the remote host, but saving it to the database failed. Check immediately: {{detail}}",
+        "old_key_removal_failed": "The new key was saved, but removing the old public key failed: {{detail}}"
+      }
+    },
+    "username": "Login Username",
+    "public_password_placeholder": "Set an access passcode (optional)",
+    "host_placeholder": "Hostname or IP address",
+    "testing": "Checking",
+    "preconnection_setting": "RDP preconnection",
+    "remote_app_setting": "RemoteApp",
+    "storage": {
+      "delete_title": "Delete this storage?",
+      "delete_content": "The storage and all files and folders it contains will be permanently deleted.",
+      "no_limit": "No limit configured"
     }
   },
   "group_tree": {
@@ -1727,9 +1989,9 @@
     "source_manual": "Manual",
     "source_url": "URL Synchronization",
     "source_url_label": "Source URL",
-    "source_url_tip": "HTTP and HTTPS URLs are allowed. The last successful version remains active if synchronization fails.",
+    "source_url_tip": "Use a public HTTP/HTTPS URL serving a non-empty IP list (up to 1 MiB), with one IP, CIDR block, or IP range per line. # comments are supported. Successful synchronization replaces the entire list; failures preserve the last successful version. Local and private addresses are not supported.",
     "source_headers": "Request Headers",
-    "source_headers_tip": "Optional headers sent while downloading the URL source.",
+    "source_headers_tip": "Optional request headers used to download IP rules from the source URL.",
     "header_name": "Header name",
     "header_value": "Header value",
     "add_header": "Add Header",
@@ -1746,28 +2008,29 @@
     "name": "Group Name",
     "name_placeholder": "Please enter group name",
     "description_placeholder": "Please enter description",
-    "selection_mode": "Selection Mode",
-    "mode_priority": "Priority Mode",
-    "mode_latency": "Latency Mode",
-    "mode_random": "Random Mode",
+    "selection_mode": "Gateway Selection",
+    "mode_priority": "By Priority",
+    "mode_latency": "By Latency",
+    "mode_random": "Random",
     "members": "Gateway Members",
     "member": "Member",
     "add_member": "Add Gateway Member",
-    "priority_tooltip": "Smaller number means higher priority",
+    "priority_tooltip": "Lower numbers have higher priority. Applies only when selecting by priority.",
     "create": "Create Gateway Group",
-    "edit": "Edit Gateway Group"
+    "edit": "Edit Gateway Group",
+    "selection_mode_hint": "Only enabled members are considered. Offline Agents are excluded; SSH gateway reachability is checked when connecting. Priority mode selects the available member with the lowest priority number; random mode selects an available member at random. Latency mode compares reference values: the latest Agent probe, or 1 ms if unavailable, and a fixed 10 ms for SSH. These values do not measure end-to-end latency to the target asset."
   },
   "gateways": {
     "port": "Port",
-    "config_mode": "Config Mode",
-    "config_mode_direct": "Direct Config",
-    "config_mode_credential": "Use Credential",
-    "config_mode_asset": "Use Asset",
+    "config_mode": "Authentication Configuration",
+    "config_mode_direct": "Manual Configuration",
+    "config_mode_credential": "Use a Saved Credential",
+    "config_mode_asset": "Use an SSH Host",
     "ssh_asset": "SSH Asset",
     "username": "Username",
     "account_type": {},
     "register": "Register",
-    "token_manage": "Token Management",
+    "token_manage": "Agent gateway tokens",
     "gateway_delete_referenced_title": "Gateway is in use and cannot be deleted",
     "gateway_delete_referenced_assets": "Referenced assets:",
     "gateway_delete_referenced_websites": "Referenced websites:",
@@ -1793,12 +2056,12 @@
       "swap": "Swap"
     },
     "load": {
-      "normal": "System Idle",
-      "moderate": "Moderately Busy",
-      "busy": "Resource Constrained"
+      "normal": "Normal Load",
+      "moderate": "Elevated Load",
+      "busy": "High Load"
     },
     "add_token": "Add Token",
-    "edit_token_remark": "Edit Token Remark",
+    "edit_token_remark": "Edit Token Notes",
     "monitor": {
       "title": "Gateway Monitor",
       "system_info": "System Info",
@@ -1817,8 +2080,8 @@
     },
     "register_title": "Register Gateway",
     "server_address": "Server Address",
-    "register_token": "Register Token",
-    "register_token_placeholder": "Please select register token",
+    "register_token": "Registration Token",
+    "register_token_placeholder": "Select a registration token",
     "install_auto": "Automatic Install",
     "install_manual": "Manual Install",
     "install_step_rename": "Rename and add execute permission",
@@ -1826,32 +2089,34 @@
     "install_step_register": "Run registration command",
     "install_step_register_admin": "Run registration command as administrator",
     "install_windows_service_tip": "After registration, it will be installed as a Windows service and started automatically",
-    "install_system_service_tip": "After registration, it will be installed as a system service and started automatically"
+    "install_system_service_tip": "After registration, it will be installed as a system service and started automatically",
+    "token": "Communication Token",
+    "token_tip": "Authenticate Agent gateways when they connect to the server. Multiple gateways can use the same token. Tokens do not expire automatically; deleting one prevents new connections and reconnections from authenticating with it."
   },
   "settings": {
     "system": {
-      "setting": "System",
+      "setting": "General",
       "name": "System Name",
       "logo": "System Logo",
-      "copyright": "Copyright",
+      "copyright": "Copyright Notice",
       "icp": "ICP Filing No.",
       "ip": {
-        "extractor": "IP Address Extraction",
+        "extractor": "Client IP Detection",
         "trust_list": "Trusted Proxy IP/CIDR List",
         "trust_placeholder": "Press Enter to confirm"
       },
       "asset_access": {
         "mode": "Asset Access Entry",
         "access_page": "Unified Access Page",
-        "standalone_page": "Standalone Tab"
+        "standalone_page": "Separate Browser Tab"
       },
       "watermark": {
-        "enabled_tip": "When enabled, watermark information is shown in terminal or remote desktop sessions for SSH, RDP, VNC, and TELNET assets.",
+        "enabled_tip": "Show a watermark in web terminal or remote desktop sessions for SSH, RDP, VNC, and TELNET. Accounts with watermarks disabled in their user settings are excluded.",
         "content": "Watermark Content",
         "append": {},
         "font": {},
-        "append_user": "Append User",
-        "append_asset": "Append Asset",
+        "append_user": "Include operator username and nickname",
+        "append_asset": "Include asset name and login username",
         "font_color": "Font Color",
         "font_size": "Font Size"
       },
@@ -1859,11 +2124,12 @@
         "enabled": "Recording Transcoding",
         "mode": "Transcoding Schedule",
         "immediate": "Transcode right after disconnect",
-        "idle": "Transcode during idle hours",
-        "idle_time_range": "Idle Hours",
-        "idle_time_required": "Select idle hours",
+        "idle": "Transcode During Scheduled Hours",
+        "idle_time_range": "Conversion Time Window",
+        "idle_time_required": "Select a conversion time window",
         "keep_raw": "Keep Original Recording File",
-        "tip": "After transcoding, recordings are saved as MP4 and can be downloaded for local playback. Recordings that are not transcoded can only be replayed in the system web page."
+        "tip": "Completed conversions produce MP4 files for local playback. Original recordings can be replayed in the web interface.",
+        "idle_time_tip": "Uses server time and supports overnight windows. Equal start and end times mean all day. This setting does not check whether the server is idle."
       },
       "basic": "Basic Info",
       "network": "Network"
@@ -1871,20 +2137,22 @@
     "security": {
       "setting": "Security",
       "protection": "Login Protection",
-      "captcha": "Captcha",
-      "force_otp": "Force MFA",
+      "captcha": "Security verification",
+      "force_otp": "Require OTP Setup",
       "access_require_mfa": "MFA required for asset access",
-      "access_mfa_expires_at": "Asset access MFA validity",
-      "disable_password_login": "Disable password login",
-      "devices": "Devices",
+      "access_mfa_expires_at": "Asset Verification Validity",
+      "disable_password_login": "Disable Password Sign-In",
+      "devices": "Login sessions",
       "session": {
-        "login_session": "Login Session",
-        "session_count": "Session Limits",
+        "login_session": "Login sessions",
+        "session_count": "Session limit",
         "client_certificate": "Client Certificate",
         "duration": "Session duration",
         "browser_close_logout": "Sign out when the browser closes",
-        "count_custom": "Custom max sessions",
-        "count_limit": "Session limit"
+        "count_custom": "Set a Custom Session Limit",
+        "count_limit": "Login sessions per account",
+        "count_tip": "When a new login exceeds the limit, the oldest login sessions are invalidated. Sessions are counted separately; one device can have multiple sessions.",
+        "browser_close_tip": "Uses a session cookie. Browsers usually clear it when they close, but restoring a previous browsing session may preserve the login."
       },
       "client_cert_valid_days": "Client certificate validity",
       "password": {
@@ -1893,27 +2161,33 @@
         "recommend": "Recommended",
         "customize": "Custom",
         "expiration_period": "Password Expiration",
-        "too_short": "Password length cannot be less than",
-        "too_simple": "Password must contain at least {{count}} of uppercase, lowercase, numbers, special characters",
+        "too_short": "Password must be at least {{minLength}} characters long",
+        "too_simple": "Password must include at least {{count}} character types: uppercase letters, lowercase letters, digits, or special characters",
         "cannot_contain_username": "Password cannot contain username",
         "cannot_be_palindrome": "Password cannot be a palindrome",
         "cannot_be_weak": "Weak passwords are not allowed",
-        "character": "characters"
+        "character": "characters",
+        "min_length": "Minimum Password Length",
+        "min_character_types": "Minimum Character Types",
+        "character_types_tip": "Character types are uppercase letters, lowercase letters, digits, and special characters.",
+        "character_type_unit": "types"
       },
       "login_lock": {
         "setting": "Login Lock",
-        "tip": "When enabled, continuous failures within the specified time will lock account or IP. To lift the restriction, please visit",
+        "tip": "Failed logins are counted separately for each account and IP address. Reaching the threshold applies the corresponding lock duration. Manage locks here:",
         "enabled": "Lock on login failures",
-        "failed_duration": "Failure count window",
-        "failed_times": "Failure count",
+        "failed_duration": "Failure counter retention",
+        "failed_times": "Failed Attempts Before Lockout",
         "account_duration": "Account lock duration",
-        "ip_duration": "IP lock duration"
+        "ip_duration": "IP lock duration",
+        "duration_tip": "Set to 0 to disable this type of lock.",
+        "failed_duration_tip": "Each failed login restarts the timer. The count expires when the account or IP address has no new failures for this duration."
       },
       "passkey": {
         "enabled": "Passkey login",
-        "domain": "External access domain",
+        "domain": "Passkey domain (RP ID)",
         "origins": "Allowed origins for Passkey",
-        "origins_tip": "Do not end with /",
+        "origins_tip": "Enter an origin with scheme, host, and port if non-default, for example https://nt.example.com:8443. Do not include a path or trailing slash.",
         "origins_error": "Please enter a valid origin",
         "auto_detect": "Auto Detect"
       },
@@ -1931,17 +2205,17 @@
       "recording_path": "Recording Directory",
       "recording_path_readonly_tip": "The local recording directory cannot be changed here. Update the configuration file and restart the service.",
       "recording_s3_endpoint": "S3 Endpoint",
-      "recording_s3_endpoint_required": "Enter S3 Endpoint",
+      "recording_s3_endpoint_required": "Enter the S3 endpoint",
       "recording_s3_region": "S3 Region",
       "recording_s3_region_tip": "Usually required for AWS S3. It may be left empty for S3-compatible storage when supported by the service.",
       "recording_s3_access_key_id": "S3 Access Key ID",
-      "recording_s3_access_key_id_required": "Enter S3 Access Key ID",
+      "recording_s3_access_key_id_required": "Enter the S3 access key ID",
       "recording_s3_secret_access_key": "S3 Secret Access Key",
-      "recording_s3_secret_access_key_required": "Enter S3 Secret Access Key",
+      "recording_s3_secret_access_key_required": "Enter the S3 secret access key",
       "recording_s3_bucket": "S3 Bucket",
-      "recording_s3_bucket_required": "Enter S3 Bucket",
-      "recording_s3_use_ssl": "Use SSL",
-      "recording_s3_path_style": "Path Style",
+      "recording_s3_bucket_required": "Enter the S3 bucket name",
+      "recording_s3_use_ssl": "Use HTTPS",
+      "recording_s3_path_style": "Use Path-Style Addressing",
       "recording_s3_advanced_settings": "Advanced Settings",
       "recording_s3_unit_bytes": "Bytes",
       "recording_s3_size_invalid": "The size must resolve to a whole number of bytes",
@@ -1958,9 +2232,9 @@
       "recording_s3_concurrency_required": "Enter the part concurrency",
       "recording_s3_concurrency_range": "The part concurrency must be an integer from 1 to 100",
       "recording_s3_force_payload_signing": "S3 Signing Compatibility Mode",
-      "recording_s3_force_payload_signing_tip": "Use the actual payload SHA-256 and minimal SignedHeaders for S3 services or proxies that do not support UNSIGNED-PAYLOAD, aws-chunked trailers, or preserve signed request headers.",
+      "recording_s3_force_payload_signing_tip": "Sign the actual payload SHA-256 with fewer signed headers. Use this for S3 services or proxies that do not support UNSIGNED-PAYLOAD or aws-chunked trailers, or that modify request headers.",
       "recording_webdav_endpoint": "WebDAV Endpoint",
-      "recording_webdav_endpoint_required": "Enter WebDAV Endpoint",
+      "recording_webdav_endpoint_required": "Enter the WebDAV endpoint",
       "recording_webdav_username": "WebDAV Username",
       "recording_webdav_username_required": "Enter WebDAV username",
       "recording_webdav_password": "WebDAV Password",
@@ -1968,20 +2242,20 @@
       "recording_convert": "Recording Transcoding"
     },
     "ai": {
-      "setting": "AI Assistant",
+      "setting": "AI",
       "enabled": "Enable AI Assistant",
       "asset_enable_tip": "After enabling global AI, the assistant can search and operate SSH assets that the current user is authorized to access.",
       "disclaimer_title": "AI Assistant Disclaimer",
       "disclaimer_description": "Content and commands generated by the AI assistant may be incorrect, incomplete, misleading, or dangerous. After enabling it, evaluate outputs yourself and confirm the intent and impact before running any command. Any risks and consequences arising from use of the AI assistant are borne by the user.",
       "disclaimer_accepted": "I understand the risk",
       "disclaimer_required": "Please check I understand the risk first",
-      "profile": "AI Environment",
+      "profile": "Provider Profile",
       "profile_active": "Active",
-      "profile_empty": "No AI environment yet. Create one first.",
-      "new_profile": "New AI Environment",
-      "edit_profile": "Edit AI Environment",
+      "profile_empty": "No provider profiles. Create one to get started.",
+      "new_profile": "New Provider Profile",
+      "edit_profile": "Edit Provider Profile",
       "model_count": "{{count}} models",
-      "add_profile": "New AI Environment",
+      "add_profile": "New Provider Profile",
       "profile_name": "Profile Name",
       "api_preset": "Provider Preset",
       "api_type": "API Type",
@@ -2002,7 +2276,7 @@
       "models_empty": "The model provider did not return any available models",
       "models_load_failed": "Failed to load model list",
       "models_load_config_required": "Please fill Base URL and API Key first",
-      "advanced_profile": "Advanced Profile",
+      "advanced_profile": "Advanced Settings",
       "custom_request_body": "Custom Request Body (JSON)",
       "custom_request_body_tip": "Merged into OpenAI request bodies for provider options such as reasoning_effort or thinking.",
       "custom_request_body_invalid": "Enter a valid JSON object",
@@ -2031,7 +2305,7 @@
       "max_retries_tip": "Maximum automatic retries when model provider requests fail.",
       "user_agent_tip": "Leave empty to use the built-in default User-Agent.",
       "http_proxy": "HTTP Proxy",
-      "http_proxy_tip": "Leave empty for direct access. Chat and model list requests for this API profile use the proxy when set.",
+      "http_proxy_tip": "Leave blank to connect directly. When configured, this profile uses the proxy for chat and model list requests.",
       "behavior": "Behavior",
       "command_policy": "AI command policy",
       "command_policy_tip": "This policy controls commands and other host operations initiated by AI. Fewer confirmations improve speed but increase the risk of unintended changes.",
@@ -2056,22 +2330,22 @@
       "command_timeout_tip": "Maximum runtime for one command. When it expires, execution is stopped and the result is returned to AI.",
       "approval_review_settings": "Auto-review settings",
       "approval_review_settings_tip": "Review uses a separate AI request and consumes additional model quota. Cases that cannot be judged reliably still require manual confirmation.",
-      "approval_review_profile": "Review Environment",
-      "approval_review_profile_tip": "Optionally use a separate API environment for review. Leave empty to follow the environment used by the conversation.",
-      "follow_conversation_profile": "Follow conversation environment",
+      "approval_review_profile": "Review Provider Profile",
+      "approval_review_profile_tip": "Select a provider profile for reviews. Leave blank to use the conversation profile.",
+      "follow_conversation_profile": "Use Conversation Profile",
       "approval_review_model": "Review Model",
-      "approval_review_model_tip": "You can choose a faster, lower-cost review model. Leave empty to use the review environment or conversation model.",
+      "approval_review_model_tip": "Choose a faster, lower-cost model for reviews. Leave blank to use the review provider profile’s model, or the conversation model if no review profile is selected.",
       "follow_conversation_model": "Follow conversation model",
       "approval_review_timeout": "Review timeout",
       "approval_review_timeout_tip": "Maximum wait for a review request. A timeout never auto-approves the operation; it falls back to manual confirmation.",
-      "recent_output_lines": "Recent terminal output lines",
+      "recent_output_lines": "Terminal Output Lines Sent to AI",
       "include_command_snippets": "Include command snippets",
       "include_command_snippets_tip": "When enabled, AI can read summaries of command snippets visible to the current user, and request specific content only when needed.",
-      "include_host_remark": "Include host remarks",
+      "include_host_remark": "Include Host Notes",
       "include_host_remark_tip": "Allow AI host search results to include remarks that help identify targets.",
       "custom_system_prompt": "Custom system prompt",
       "custom_system_prompt_tip": "Appended after the built-in system prompt. Maximum 8000 characters.",
-      "history": "Conversation History",
+      "history": "AI Conversation History",
       "clear_history": "Clear History",
       "clear_history_tip": "Delete all global AI conversations for the current user. This cannot be undone.",
       "clear_history_confirm": "Clear all AI conversations?",
@@ -2083,7 +2357,7 @@
       "enabled_tip": "When enabled, users can submit access requests from the resource portal. When disabled, the user entry is hidden and user-side access request APIs are blocked."
     },
     "proxy_service": {
-      "setting": "Proxy Service"
+      "setting": "Proxy Services"
     },
     "http_proxy": {
       "setting": "HTTP Reverse Proxy",
@@ -2116,10 +2390,10 @@
       "setting": "Authentication"
     },
     "notification_integration": {
-      "setting": "Notifications & Integrations"
+      "setting": "Notifications"
     },
     "maintenance": {
-      "setting": "System Maintenance"
+      "setting": "Maintenance"
     },
     "geodata": {
       "setting": "GEO Database",
@@ -2143,19 +2417,20 @@
       "already_latest": "The current database is up to date",
       "update_started": "The GEO update task has started",
       "update_success": "The GEO database was updated",
-      "update_failed": "Failed to update the GEO database"
+      "update_failed": "Failed to update the GEO database",
+      "auto_update_time_tip": "Runs daily in the server’s time zone."
     },
     "sshd": {
       "setting": "SSH Proxy",
-      "tip": "When enabled, a local port will be listened on. You can use an SSH client to access authorized SSH assets with the same account and password as this system.",
+      "tip": "When enabled, the system accepts SSH connections at the configured address. Sign in with your system account to access authorized hosts through an SSH client.",
       "enabled": "SSH Service",
       "addr": "Listen Address",
-      "private_key": "Auth Private Key",
+      "private_key": "Server Host Private Key",
       "private_key_button": "Set Private Key",
       "private_key_status_set": "Set",
       "private_key_status_empty": "Not set",
-      "private_key_modal_title": "Set SSH Private Key",
-      "private_key_modal_tip": "Generate or paste your private key.",
+      "private_key_modal_title": "Set SSH Host Private Key",
+      "private_key_modal_tip": "Generate or paste the SSH server host private key used to identify this server to clients.",
       "port_forwarding": {
         "enabled": "Allow SSH port forwarding",
         "host_port": "Allowed forwarding targets",
@@ -2170,7 +2445,7 @@
       "direct_proxy_cli": "Command-line clients:",
       "direct_proxy_vscode": "Recommended for VS Code Remote-SSH ssh config:",
       "disable_password_auth": "Disable password auth",
-      "private_key_required_to_enable": "Set an auth private key before enabling SSH service."
+      "private_key_required_to_enable": "Set a host private key before enabling the SSH service"
     },
     "rdp": {
       "setting": "RDP",
@@ -2178,7 +2453,7 @@
         "wallpaper": "Enable Wallpaper",
         "theming": "Enable Themes",
         "font_smoothing": "Enable Font Smoothing",
-        "full_window_drag": "Enable Window Drag",
+        "full_window_drag": "Show Window Contents While Dragging",
         "desktop_composition": "Enable Desktop Composition",
         "menu_animations": "Enable Menu Animations"
       },
@@ -2195,48 +2470,51 @@
       "public_addr": "Public Address",
       "public_addr_extra": "Address used in generated .rdp files. When empty, it is inferred from the listen address and current request.",
       "ticket_ttl": "Ticket TTL (seconds)",
-      "ticket_ttl_extra": "Defaults to 300 seconds. A ticket is marked as used after successful resolution.",
+      "ticket_ttl_extra": "Defaults to 300 seconds. A ticket is consumed as soon as it is validated and cannot be reused.",
       "certificate": "Proxy Certificate",
       "certificate_extra": "Leave empty to auto-generate a dedicated self-signed certificate, or select one from the certificate list.",
       "certificate_auto": "Auto-generate certificate",
       "usage": "Usage",
       "usage_tip": "Users choose an RDP asset in the web UI to create a ticket. The RDP client connects to the proxy address, and the proxy resolves it to the real asset.",
       "ticket_flow": "Ticket Format",
-      "ticket_flow_tip": "The .rdp username is NTICKET:<ticketId>, and the password is the ticket secret entered during connection.",
+      "ticket_flow_tip": "The generated .rdp file embeds the ticket ID and secret in the username: NTICKET:<ticketId>:<secret>. No separate ticket password is needed. Protect the file, as its ticket can be used to connect until it expires.",
       "rdp_file": ".rdp File Example"
     },
     "vnc": {
       "setting": "VNC",
       "cursor": {
-        "setting": "Cursor Settings",
-        "remote": "Remote"
+        "setting": "Cursor Rendering",
+        "remote": "Remote Rendering",
+        "local": "Local Rendering"
       },
-      "swap_red_blue": "Swap Red/Blue"
+      "swap_red_blue": "Swap Red and Blue Channels"
     },
     "mail": {
-      "work_order_enabled": "Work order result emails",
-      "work_order_tip": "Email requesters when work orders are rejected, succeed, fail or require verification. Requires the mail service and a user email address; independent of notification rules.",
       "setting": "Email Service",
-      "enabled": "Email Service",
-      "host": "Mail Server",
-      "port": "Mail Port",
-      "username": "Mail Account",
-      "from": "Sender",
-      "password": "Mail Password",
-      "tip": "You need to enable email before sending test email.",
-      "mail": "Email Address",
+      "enabled": "Enable Email Service",
+      "host": "SMTP Server",
+      "port": "SMTP Port",
+      "username": "SMTP Username",
+      "from": "From",
+      "password": "SMTP Password or App Password",
+      "tip": "Tests use the saved, enabled mail service. Save any pending connection changes first. Success means SMTP accepted the request; check the inbox to confirm delivery.",
+      "mail": "Recipient Email",
       "title": "Email Subject",
       "content": "Email Body",
-      "send": "Send Email"
+      "send": "Send Test Email",
+      "use_tls": "Use TLS Encryption",
+      "skip_certificate_verify": "Skip Server Certificate Verification",
+      "site_url": "System access URL",
+      "site_url_tip": "Optional URL for links in personal notifications. If blank, emails ask the recipient to sign in to view details."
     },
     "notification": {
-      "work_order_quiet_tip": "Work order events are sent individually and are not suppressed by the quiet window.",
+      "work_order_quiet_tip": "After a successful delivery, suppress the same event type on the same channel for this duration. SQL request events are exempt.",
       "channels": "Notification Channels",
       "rules": "Notification Rules",
       "deliveries": "Delivery Records",
       "channel": "Channel",
       "channel_types": {
-        "work-order-mail": "Work order requester email",
+        "work-order-mail": "SQL Requester Email",
         "mail": "Email",
         "wecom": "WeCom Bot",
         "wecomApp": "WeCom App",
@@ -2273,34 +2551,34 @@
         "access.recording.failed": "Recording Processing Failed",
         "database.sql.blocked": "Database SQL Blocked",
         "database.sql.failed": "Database SQL Failed",
-        "database.work_order.created": "Database Work Order Created",
-        "database.work_order.approved": "Database Work Order Approved",
-        "database.work_order.rejected": "Database Work Order Rejected",
-        "database.work_order.executed": "Database Work Order Executed",
-        "database.work_order.failed": "Database Work Order Failed",
-        "database.work_order.unknown": "Database Work Order Requires Verification",
+        "database.work_order.created": "SQL Request Created",
+        "database.work_order.approved": "SQL Request Approved",
+        "database.work_order.rejected": "SQL Request Rejected",
+        "database.work_order.executed": "SQL Execution Succeeded",
+        "database.work_order.failed": "SQL Execution Failed",
+        "database.work_order.unknown": "SQL Outcome Requires Verification",
         "backup.succeeded": "Backup Succeeded",
         "backup.failed": "Backup Failed",
-        "agent.online": "Security Gateway Online",
-        "agent.offline": "Security Gateway Offline",
-        "system.cpu.warning": "High CPU Usage",
-        "system.cpu.critical": "Critical CPU Usage",
-        "system.cpu.recovered": "CPU Usage Recovered",
-        "system.memory.warning": "High Memory Usage",
-        "system.memory.critical": "Critical Memory Usage",
-        "system.memory.recovered": "Memory Usage Recovered",
-        "system.storage.warning": "High Local Storage Usage",
-        "system.storage.critical": "Critical Local Storage Usage",
-        "system.storage.recovered": "Local Storage Usage Recovered",
-        "system.notification.test": "Test Notification"
+        "agent.online": "Agent gateway online",
+        "agent.offline": "Agent gateway offline",
+        "system.cpu.warning": "CPU usage reached warning threshold",
+        "system.cpu.critical": "CPU usage reached critical threshold",
+        "system.cpu.recovered": "CPU usage recovered",
+        "system.memory.warning": "Memory usage reached warning threshold",
+        "system.memory.critical": "Memory usage reached critical threshold",
+        "system.memory.recovered": "Memory usage recovered",
+        "system.storage.warning": "Local storage usage reached warning threshold",
+        "system.storage.critical": "Local storage usage reached critical threshold",
+        "system.storage.recovered": "Local storage usage recovered",
+        "system.notification.test": "Notification channel test"
       },
       "event_groups": {
         "access_request": "Access Requests",
-        "identity": "Identity",
+        "identity": "Users & Authentication",
         "access": "Access Sessions",
         "database": "Database",
         "backup": "Backup",
-        "agent": "Security Gateway",
+        "agent": "Agent Gateway",
         "system": "System"
       },
       "new_rule": "New Rule",
@@ -2308,7 +2586,7 @@
       "recipients": "Recipients",
       "recipients_placeholder": "Separate multiple recipients with commas, semicolons, or new lines",
       "webhook_url": "Webhook URL",
-      "robot_webhook_url": "Full Bot Webhook URL",
+      "robot_webhook_url": "Bot Webhook URL",
       "webhook_url_required": "Please enter the full Webhook URL",
       "webhook_url_invalid": "Please enter a full URL starting with http:// or https://",
       "sign_secret": "Signing Secret",
@@ -2332,11 +2610,77 @@
       "test": "Test",
       "test_success": "Test notification sent",
       "event_types_label": "Event Types",
-      "quiet_minutes": "Quiet Period (minutes)",
+      "quiet_minutes": "Repeat Notification Suppression (minutes)",
       "event_type": "Event Type",
-      "severity": "Severity",
-      "result": "Response Result",
-      "error": "Error"
+      "severity": "Event Severity",
+      "result": "Delivery Result",
+      "error": "Error",
+      "personal_mail": "Personal email",
+      "personal_skipped": "Skipped (preferences, email or permissions changed)",
+      "personal_queued": "Waiting to send or retry",
+      "recipient": "Recipient user",
+      "delivery_target": "Delivery target",
+      "target_channel": "Fixed channel recipients",
+      "target_personal": "Business participants",
+      "recipient_mode": "Recipient type",
+      "mode_requester": "Requester",
+      "mode_approvers": "All eligible approvers",
+      "mode_specified": "Specified users",
+      "specified_users": "Selected recipients",
+      "specified_users_tip": "Reminders do not change approval permissions. Users must enable the corresponding personal channel.",
+      "personal_rule_tip": "Matching personal rules replace default personal routing for this event. Otherwise results go to the requester and pending reminders to eligible approvers. Quiet periods do not apply.",
+      "personal_events_only": "Personal notifications only support access request and database work order events",
+      "recipient_event_mismatch": "Use approvers or specified users for pending events and requester for results. Create separate rules.",
+      "personal_bindings": "Personal notification member bindings",
+      "binding_tip": "Signing in with WeCom from the same corporation and binding the platform account automatically associates the member, without entering a UserId. Administrator bindings take priority; edit and select “Automatic association” to restore automatic matching. Users must also enable WeCom in notification preferences.",
+      "wecom_member_id": "WeCom member UserId",
+      "binding_source": "Binding source",
+      "binding_manual": "Administrator binding",
+      "binding_identity": "Automatic (WeCom login)",
+      "binding_unavailable": "Unbound or unavailable",
+      "binding_reset_tip": "Save an empty address to remove the manual binding and restore the login identity from the same corporation.",
+      "single_member_required": "Enter one member UserId; @all and multiple recipients are not allowed",
+      "fixed_recipient_tip": "Only used for fixed channel recipients. Personal notifications use member bindings.",
+      "supports_personal": "Supports personal and fixed recipient notifications.",
+      "channel_only": "Used for group notifications or webhook events; personal messaging is not supported.",
+      "personal_test": "Test personal notification",
+      "personal_failed": "Delivery failed",
+      "skip_reasons": {
+        "mailbox_unavailable": "Mailbox is missing or invalid",
+        "channel_unavailable": "Channel is disabled or mail service unavailable",
+        "unsupported_channel": "Unsupported personal notification channel",
+        "binding_unavailable": "WeCom member is unbound, disabled or belongs to a different corporation",
+        "recipient_unavailable": "User does not exist",
+        "preference_disabled": "User is disabled or notification preference is off",
+        "record_or_permission_changed": "Request was processed, record is missing or approval permission changed",
+        "approval_notifications_disabled": "Administrator disabled personal approval notifications"
+      },
+      "wecom_member": "WeCom member",
+      "binding_mode": "Association method",
+      "binding_automatic": "Automatic association",
+      "binding_automatic_tip": "No member UserId is required. An administrator must enable WeCom login; users then sign in with WeCom and select “Bind existing account”. The login corporation must match the notification channel. Saving automatic association removes any administrator binding. Notification preferences still control delivery.",
+      "binding_manual_tip": "Fallback: an administrator enters the member account from the WeCom directory. Automatic association usually avoids asking users for a UserId.",
+      "approval_title": "Approval notifications",
+      "approval_auto_tip": "Automatic by default: requesters receive approval and execution results; eligible administrators receive pending reminders. Available personal channels are selected automatically, respecting user preferences. No rules are required.",
+      "approval_mail_ready": "Email available",
+      "approval_mail_unavailable": "Email not configured",
+      "approval_wecom_ready": "WeCom available",
+      "approval_wecom_unavailable": "WeCom not configured",
+      "approval_advanced": "Advanced: pending reminder recipients",
+      "approval_scope_all": "All eligible administrators",
+      "approval_scope_selected": "Only the following approvers",
+      "approval_scope_tip": "All eligible approvers are notified by default. Select users only to narrow reminders. Approval permissions stay unchanged, results always go to the requester, and channels are automatic.",
+      "approval_access_scope": "Pending access requests",
+      "approval_work_order_scope": "Pending database work orders",
+      "approval_legacy_tip": "Some existing personal notification settings cannot be converted without changing behavior and remain active. Review them in advanced settings. Saving new approval settings replaces the existing settings.",
+      "approval_legacy_rules": "Existing personal settings still in effect",
+      "approval_replace_title": "Use the new automatic approval settings?",
+      "approval_replace_tip": "Saving disables existing personal notification rules and automatically selects channels for the recipients configured here. Approval and execution results go to the requester. Review the recipients before continuing.",
+      "rules_extra_tip": "Personal approval notifications are automatic and need no rules. Rules here add group messages, fixed email recipients or webhook delivery.",
+      "binding_advanced": "Advanced: member associations and personal tests",
+      "member_associated": "Associated",
+      "member_unassociated": "Not associated",
+      "mail_fixed_tip": "Personal approval emails automatically use system SMTP and user mailboxes. Configure the mail service once. Fixed recipients below are only for additional rule-based emails."
     },
     "webauthn": {
       "setting": "Passkey"
@@ -2344,16 +2688,33 @@
     "ldap": {
       "setting": "LDAP",
       "url": "LDAP URL",
-      "user": "LDAP User",
-      "password": "LDAP Password",
-      "base_dn": "LDAP Base DN",
+      "user": "LDAP service account",
+      "password": "Service Account Password",
+      "base_dn": "Search Base DN",
       "user_search": {
-        "size_limit": "LDAP max results",
-        "size_limit_tooltip": "LDAP max search results, 0 means unlimited.",
-        "filter": "LDAP user search filter",
-        "filter_tooltip": "LDAP user search filter, e.g., (objectClass=person)."
+        "filter": "Allowed user filter",
+        "filter_tooltip": "Used for both synchronization and login eligibility."
       },
-      "user_property_mapping": "LDAP user attribute mapping"
+      "user_property_mapping": "LDAP user attribute mapping",
+      "ad_hint": "For Active Directory, use sAMAccountName for the username mapping. For LDAPS, use a certificate-matching hostname and trust the CA inside the container.",
+      "mapping_invalid": "Invalid saved attribute mapping. Please correct the attribute fields before saving.",
+      "directory_type": "Directory type",
+      "preset_hint": "Selecting a directory preset replaces the user filter and attribute mappings. Custom keeps the current settings.",
+      "custom": "Custom",
+      "username_attribute": "Username attribute",
+      "nickname_attribute": "Display Name Attribute",
+      "mail_attribute": "Email attribute",
+      "attribute_invalid": "Enter a valid LDAP attribute name.",
+      "url_invalid": "Enter a valid ldap:// or ldaps:// server URL without credentials or a search path.",
+      "filter_hint": "Used for both synchronization and login eligibility.",
+      "test_connection": "Test connection",
+      "test_failed": "LDAP connection test failed.",
+      "test_success": "Connection, service account bind and search succeeded.",
+      "test_has_users": "Matching users were found. This test does not verify an individual user password or change settings or users.",
+      "test_no_users": "No matching users were found. Check the Base DN and user filter. No settings or users were changed.",
+      "login_hint": "LDAP users sign in using Directory account (LDAP). Successful authentication automatically creates new users in the default department; prior user synchronization is not required.",
+      "department": "New user default department",
+      "department_hint": "Only applies to newly created users. Existing department memberships and account status are preserved."
     },
     "wechat_work": {
       "setting": "WeCom",
@@ -2367,8 +2728,8 @@
     },
     "oidc": {
       "setting": "OIDC",
-      "enabled": "Enable OIDC login",
-      "issuer": "Issuer",
+      "enabled": "Enable OIDC Sign-In",
+      "issuer": "Issuer URL",
       "issuer_placeholder": "Please enter OIDC Issuer URL",
       "client_id": "Client ID",
       "client_id_placeholder": "Please enter OIDC Client ID",
@@ -2381,20 +2742,23 @@
     },
     "log": {
       "session": {
-        "saved_limit_days": "Session retention days"
+        "saved_limit_days": "Session Retention",
+        "retention_tip": "Ended sessions expire based on their connection start time. Cleanup deletes session and command records and removes associated recordings. File operation logs use the same retention period."
       },
       "login_log": {
-        "saved_limit_days": "Login log retention days"
+        "saved_limit_days": "Login Log Retention",
+        "retention_tip": "Login logs and administrative operation logs share this retention period."
       },
       "cron_log": {
-        "saved_limit_days": "Scheduled task log retention days"
+        "saved_limit_days": "Scheduled Task Log Retention"
       },
       "access_log": {
-        "saved_limit_days": "Access log retention days"
+        "saved_limit_days": "Access Log Retention"
       },
       "database_sql_log": {
-        "saved_limit_days": "SQL log retention days"
-      }
+        "saved_limit_days": "SQL Log Retention"
+      },
+      "retention_tip": "Retention is applied when the log cleanup task runs. Selecting ∞ disables cleanup based on this retention period; manual deletion is still possible."
     },
     "backup": {
       "setting": "Backup & Restore",
@@ -2403,62 +2767,72 @@
       "source": {
         "auto": "Automatic",
         "manual": "Manual",
-        "before_restore": "Before restore"
+        "before_restore": "Pre-Restore Backup"
       },
       "create_confirm_title": "Create Backup",
       "create_task_success": "Backup task created",
       "restore_task_success": "Restore task created",
       "task_failed": "Task failed",
       "restore_confirm_title": "Confirm Restore",
-      "restore_confirm_content": "Restore will overwrite the current PostgreSQL database. The system will automatically create a safety backup before restoring.",
+      "restore_confirm_content": "Restoring overwrites the current PostgreSQL database and restores any CA files included in the backup. A pre-restore backup is created first. Restart the service after restoring.",
       "backup_file": "Backup file: {{name}}",
-      "exclude_tip": "Excludes: session recordings and Windows mounted disk files",
+      "exclude_tip": "Includes the database and CA files, if present. Session recordings and Windows mounted drive files are excluded.",
       "restore": "Restore",
       "file_name": "File Name",
       "backup_time": "Backup Time",
       "source_label": "Source",
       "size": "Size",
       "version": "Version",
-      "delete_confirm_title": "Confirm delete backup file?",
+      "delete_confirm_title": "Delete this backup file?",
       "backup_directory_tip": "Backup directory: {{directory}}. Backups exclude session recordings and Windows mounted disk files.",
       "schedule_enabled": "Enable scheduled backup",
-      "retention_days": "Automatic backup retention",
+      "retention_days": "Automatic Backup Retention (days)",
       "save_settings": "Save Backup Settings",
       "backup_now": "Back Up Now",
       "upload_restore": "Upload and Restore",
       "upload_restore_task_success": "Local backup restore task created",
       "upload_restore_confirm_title": "Confirm Upload and Restore",
-      "upload_restore_confirm_content": "This will upload a local backup file and overwrite the current PostgreSQL database. Use it for cross-server migration. The system will automatically create a safety backup before restoring.",
+      "upload_restore_confirm_content": "Upload a local backup, overwrite the current PostgreSQL database, and restore any included CA files. A pre-restore backup is created first. Restart the service after restoring.",
       "legacy_import": "Legacy JSON Data Import",
       "legacy_import_tip": "Only used to import JSON data exported from older versions. It is not suitable for full backup restore in the current version.",
-      "success_actions": "Actions After Backup Success",
+      "success_actions": "Upload After Backup",
       "success_actions_tip": "Upload the backup file to remote storage after it is created. Remote upload failures will not delete the local backup file.",
       "saved_secret_placeholder": "Saved, leave blank to keep unchanged",
       "upload_to_s3": "Upload to S3",
       "upload_to_sftp": "Upload to SFTP",
       "upload_to_webdav": "Upload to WebDAV",
-      "s3_endpoint": "Endpoint",
+      "s3_endpoint": "S3 Endpoint",
       "s3_bucket": "Bucket",
       "s3_access_key_id": "Access Key ID",
       "s3_secret_access_key": "Secret Access Key",
       "s3_region": "Region",
       "s3_prefix": "Object Prefix",
       "s3_use_ssl": "Use HTTPS",
-      "s3_path_style": "Path Style",
+      "s3_path_style": "Use Path-Style Addressing",
       "sftp_mode": "Connection Mode",
-      "sftp_mode_asset": "Use Asset",
+      "sftp_mode_asset": "Use SSH Host Settings",
       "sftp_mode_custom": "Custom",
       "sftp_asset": "SSH Asset",
       "sftp_directory": "Remote Directory",
       "sftp_host": "Host",
       "sftp_port": "Port",
       "sftp_username": "Username",
-      "sftp_auth_type": "Auth Type",
-      "webdav_endpoint": "Endpoint",
+      "sftp_auth_type": "Authentication Method",
+      "webdav_endpoint": "WebDAV Endpoint",
       "webdav_username": "Username",
       "webdav_password": "Password",
       "webdav_directory": "Remote Directory",
-      "webdav_chinese_path_tip": "Do not use Chinese paths to avoid upload failures caused by WebDAV path encoding or permission mapping."
+      "webdav_chinese_path_tip": "Enter an absolute path that the WebDAV service allows you to access. If the service restricts non-ASCII paths, choose a directory it supports.",
+      "task_busy": "Another backup or restore task is already running.",
+      "task_backing_up": "Backing up the PostgreSQL database…",
+      "task_safety_backup": "Creating a backup before restoring…",
+      "task_restoring": "Restoring the PostgreSQL database…",
+      "task_backup_completed": "Backup completed.",
+      "task_restore_completed": "Restore completed. Restart the service before continuing.",
+      "task_backup_warnings": "Backup completed with upload warnings: {{details}}",
+      "task_safety_failed": "Could not create the pre-restore backup. Restore was not started: {{details}}",
+      "task_pending": "Task pending",
+      "task_running": "Task running"
     },
     "license": {
       "setting": "License",
@@ -2479,7 +2853,7 @@
       "domain_tip": "Used to request a domain-bound license and verify the current access domain. Enter a domain without scheme, port, or path.",
       "domain_error": "Enter a valid domain without scheme, port, path, or wildcard",
       "auto_detect_domain": "Auto Detect",
-      "license_binding_type": "License Method",
+      "license_binding_type": "License Binding Method",
       "binding_type_machine": "Machine ID",
       "binding_type_domain": "Domain",
       "max": {
@@ -2504,7 +2878,9 @@
     "logo": {
       "setting": "Asset Logo",
       "preset": "System Preset",
-      "custom": "Custom Logo"
+      "custom": "Custom Logo",
+      "empty_file": "The file is empty. Select an image to upload.",
+      "file_too_large": "The image must be no larger than 1 MiB."
     },
     "about": {
       "setting": "About",
@@ -2524,44 +2900,168 @@
       "version_check_failed": "Failed to check for updates. Please try again later"
     },
     "oidc_server": {
-      "setting": "Identity Provider Service",
+      "setting": "Identity Provider",
       "server": "OIDC Server",
-      "description": "Configure OIDC Server to make this system an OpenID Connect provider, allowing other apps to use this system for SSO.",
-      "manage_tip_prefix": "After enabling, you can manage apps in \"",
-      "manage_link": "Identity - OIDC Clients",
-      "manage_tip_suffix": "\".",
+      "description": "Enable the OIDC server so other applications can authenticate users through Next Terminal for single sign-on.",
       "endpoints_title": "Standard Endpoints:",
       "endpoint": {
         "discovery": "Discovery",
-        "jwks": "JWKS",
+        "jwks": "Public Keys (JWKS)",
         "authorization": "Authorization",
         "token": "Token",
-        "userinfo": "UserInfo"
+        "userinfo": "User Info"
       },
       "enable_label": "Enable OIDC Server",
       "issuer_label": "Issuer URL",
       "issuer_tooltip": "OIDC issuer identifier, usually this system's access address + /api",
       "issuer_required": "Please enter Issuer URL",
-      "ttl_required": "Please enter validity",
-      "access_token_ttl_label": "Access Token TTL (seconds)",
+      "ttl_required": "Enter a lifetime in seconds",
+      "access_token_ttl_label": "Access Token Lifetime (seconds)",
       "access_token_ttl_tooltip": "Access Token validity, default 3600 seconds (1 hour)",
-      "refresh_token_ttl_label": "Refresh Token TTL (seconds)",
+      "refresh_token_ttl_label": "Refresh Token Lifetime (seconds)",
       "refresh_token_ttl_tooltip": "Refresh Token validity, default 604800 seconds (7 days)",
-      "id_token_ttl_label": "ID Token TTL (seconds)",
+      "id_token_ttl_label": "ID Token Lifetime (seconds)",
       "id_token_ttl_tooltip": "ID Token validity, default 3600 seconds (1 hour)",
       "auth_code_ttl_label": "Authorization Code TTL (seconds)",
-      "auth_code_ttl_tooltip": "Authorization code validity, default 600 seconds (10 minutes)"
+      "auth_code_ttl_tooltip": "Authorization code validity, default 600 seconds (10 minutes)",
+      "manage_tip": "After enabling the server, manage connected applications under <link>Identity → OIDC Clients</link>."
     },
     "network": {
       "not_detected": "Not Detected",
-      "trust_ip_tip": "Determines whether forwarded IP headers are trusted",
-      "custom_header": "Custom Header",
+      "trust_ip_tip": "Enter trusted reverse proxy IP addresses or CIDR ranges to determine whether forwarded client IP headers can be used.",
+      "custom_header": "Custom Request Header",
       "custom_header_name": "Header Name",
       "custom_header_placeholder": "For example: CF-Connecting-IP",
-      "custom_header_required": "Please enter header name"
+      "custom_header_required": "Enter a request header name",
+      "direct_ip": "Direct peer IP",
+      "header_option": "Request header {{header}}",
+      "direct_ip_tip": "Use the IP of the peer connected directly to the server. Behind a reverse proxy, this is usually the proxy’s IP."
+    },
+    "sms": {
+      "webhook": "Webhook",
+      "webhook_setup_tip": "POST custom JSON; any HTTP 2xx response indicates success. Subsequent delivery is not checked.",
+      "webhook_headers": "Custom headers",
+      "webhook_headers_tip": "Optional JSON object mapping header names to string values, e.g. {\"X-API-Key\":\"your-key\"}. Leave blank to retain saved headers; enter {} to clear. Default Content-Type is application/json and can be overridden.",
+      "webhook_headers_invalid": "Enter a valid header JSON object with string values, unique names, and no HTTP client managed headers such as Host or Content-Length.",
+      "webhook_body": "JSON request body template",
+      "webhook_body_tip": "String variables: {{phone}}, {{code}}, {{minutes}}, {{language}}. Phone and code are required. Variables are supported in string values only; numbers and booleans retain their types.",
+      "webhook_body_invalid": "Enter valid JSON containing {{phone}} and {{code}} in string values, using only supported variables.",
+      "webhook_success": "Webhook request succeeded",
+      "title": "SMS service",
+      "tip": "Used for account verification and phone changes. Obtain an approved signature and verification template from your provider before saving language templates.",
+      "enabled": "Enable SMS",
+      "provider": "SMS provider",
+      "tencent": "Tencent Cloud",
+      "aliyun": "Alibaba Cloud",
+      "aliyun-pnvs": "Aliyun Number Verification (SMS Authentication)",
+      "aliyun-pnvs_setup_tip": "Enable SMS authentication in Number Verification, use a system-provided signature and matching template, and enter your AccessKey and TemplateCode. Only mainland China mobile numbers are supported.",
+      "scheme_name": "Scheme name",
+      "scheme_name_tip": "Optional. Leave blank to use the default scheme. Up to 20 characters.",
+      "pnvs_parameters_tip": "JSON array supporting code, min, and minutes. System-provided templates typically use [\"code\",\"min\"]. Match the template variable names; the validity parameter is 5 minutes.",
+      "volcengine": "Volcengine",
+      "region": "Region",
+      "sign": "SMS signature",
+      "parameters": "Template parameters",
+      "parameters_tip": "JSON array supporting code and minutes. Tencent uses positional parameters; Alibaba and Volcengine use named parameters, e.g. [\"code\",\"minutes\"].",
+      "template_id": "Verification template ID",
+      "official_docs": "View official setup documentation",
+      "tencent_setup_tip": "Obtain a Secret ID, Secret Key, and SMS SDK App ID, then create an approved SMS signature and verification template.",
+      "aliyun_setup_tip": "Obtain an AccessKey, then create an approved SMS signature and verification template. Use TemplateCode as the template identifier.",
+      "volcengine_setup_tip": "Obtain an AccessKey and SMS Account, then create an approved SMS signature and verification template.",
+      "template_code": "Verification template CODE",
+      "language_tip": "Unconfigured languages fall back to the required Simplified Chinese template.",
+      "secret_tip": "Leave blank to retain the saved secret. Queries never return the secret.",
+      "login_enabled": "Allow SMS login",
+      "login_tip": "Disabled by default. Allows login with a bound phone number, requires security verification, and enforces phone, IP and global sending limits."
+    },
+    "mail_templates": {
+      "title": "Account email templates",
+      "tip": "Templates follow the user language. Blank fields use built-in templates. Only the following Go template variables are supported. Password reset templates notify administrator resets.",
+      "email-change": "Email change verification",
+      "verification": "Additional verification",
+      "password-reset": "Administrator password reset notice",
+      "password-changed": "Password change success notice",
+      "help": "Template help",
+      "variable_usage": "Variables can be used in the subject and body. Use them for the applicable scenario: unavailable text values are empty; Minutes is 0 for emails without a verification code.",
+      "variables": {
+        "RecipientName": "Recipient’s nickname.",
+        "SystemName": "System name configured in system settings.",
+        "NewEmail": "Destination of the verification email; the new address being verified for an email change.",
+        "Code": "Six-digit verification code for email changes and additional email verification.",
+        "Minutes": "Code validity in minutes; currently 5 minutes.",
+        "NewPassword": "New password after an administrator reset; available only in administrator password reset notices.",
+        "IP": "Client IP of the verification or password change request; unavailable in administrator password reset notices.",
+        "GenerateTime": "Email generation time in UTC using RFC 3339, for example 2026-10-10T08:30:00Z."
+      }
+    },
+    "verification_services": {
+      "title": "Verification & Messaging Services",
+      "description": "Configure delivery of account verification codes and security emails. Configure event alerts and business notifications through channels and rules in Notifications & Integrations.",
+      "connection": "Connection",
+      "test": "Send test",
+      "sms_templates": "Cloud templates",
+      "sms_test": "SMS requires provider-approved verification templates. After saving and enabling, a user with a bound phone number can request SMS verification in the account center and confirm receipt."
+    },
+    "sms_policy": {
+      "login": "SMS login",
+      "mfa": "SMS MFA",
+      "login_enabled": "Enable SMS login",
+      "mfa_enabled": "Enable SMS MFA",
+      "phone": "Phone number",
+      "ip": "IP",
+      "global": "Global quota",
+      "phone-interval": "Send interval (seconds)",
+      "phone-hourly": "Maximum sends per hour",
+      "ip-interval": "Send interval (seconds)",
+      "ip-hourly": "Maximum sends per hour",
+      "global-hourly": "Maximum sends per hour",
+      "global-daily": "Maximum sends per 24 hours",
+      "service_tip": "Enable and fully configure the SMS service first.",
+      "quota_tip": "Login and MFA use separate counters. Quota windows start with the first request. Saving settings preserves usage; failed sends also consume quota."
+    },
+    "email_mfa_policy": {
+      "ip": "IP",
+      "global": "Global quota",
+      "phone-interval": "Send interval (seconds)",
+      "phone-hourly": "Maximum sends per hour",
+      "ip-interval": "Send interval (seconds)",
+      "ip-hourly": "Maximum sends per hour",
+      "global-hourly": "Maximum sends per hour",
+      "global-daily": "Maximum sends per 24 hours",
+      "title": "Email MFA",
+      "enabled": "Enable email MFA",
+      "phone": "Email address",
+      "service_tip": "Enable and fully configure the mail service first.",
+      "quota_tip": "Email MFA uses separate counters. Quota windows start with the first request. Saving settings preserves usage; failed sends also consume quota."
+    },
+    "sms_test": {
+      "title": "Test SMS",
+      "phone": "Recipient phone number",
+      "language": "Template language",
+      "send": "Send test SMS",
+      "success": "The provider accepted the request. Please check your phone.",
+      "tip": "Uses saved settings to send test code 123456, which cannot authenticate. Falls back to the Simplified Chinese template when the selected language is unconfigured. Global limit: one per minute and ten per hour, including failed sends.",
+      "save_first": "Save the SMS service settings before sending a test."
+    },
+    "service_layout": {
+      "scenario": "Business scenario",
+      "advanced": "Advanced options",
+      "save_first": "Save the service settings before sending a test email."
     }
   },
   "access_request": {
+    "decision_approve": "Approve",
+    "confirm_reject": "Confirm rejection",
+    "review_result": "Review result",
+    "review": "Review",
+    "detail_title": "Access request details",
+    "request_no": "Request number",
+    "start_immediately": "Effective immediately after approval",
+    "effective_at": "Effective from",
+    "approved_at": "Reviewed at",
+    "review_comments": "Review comments",
+    "detail_load_failed": "Failed to load request details",
+    "rejection_reason": "Rejection reason",
     "new": "New Request",
     "start_at": "Effective time (blank means immediately after approval)",
     "start_at_label": "Requested Effective Time",
@@ -2572,23 +3072,23 @@
     "website_groups": "Requestable Website Groups",
     "databases": "Requestable Databases",
     "scope_tip": "Without a matching department configuration, all resources are requestable. A configured empty scope denies requests. Multiple department scopes are combined.",
-    "scope_unconfigured_tip": "Users without a matching configuration can request all resources. Configured users are limited to their selected scope.",
+    "scope_unconfigured_tip": "Users can request any resource when none of their departments has a scope configuration. Otherwise, they can request resources included in any matching department scope.",
     "scope_delete_confirm": "Delete this department scope? Users with no other matching scope will be able to request all resources.",
     "resource": "Resource",
     "resource_type": "Resource Type",
     "request_reason": "Reason",
     "request_reason_placeholder": "Enter the reason for requesting access",
-    "duration_minutes": "Duration (minutes)",
-    "approved_duration_minutes": "Approved Duration (minutes)",
+    "duration_minutes": "Requested Access Duration (minutes)",
+    "approved_duration_minutes": "Approved Access Duration (minutes)",
     "requester": "Requester",
     "approver": "Approver",
     "approve": "Approve",
     "reject_reason": "Enter rejection reason",
     "cancel_confirm": "Cancel this access request?",
-    "resource_type_asset": "Asset",
+    "resource_type_asset": "Host",
     "resource_type_database": "Database Asset",
-    "resource_type_website": "Web Asset",
-    "authorised": "Authorised",
+    "resource_type_website": "Website",
+    "authorised": "Authorized",
     "requestable_resource_empty": "No requestable resources",
     "status": {
       "pending": "Pending",
@@ -2596,7 +3096,10 @@
       "rejected": "Rejected",
       "cancelled": "Cancelled",
       "closed": "Closed"
-    }
+    },
+    "unknown_status": "Unknown status ({{status}})",
+    "decision_reject": "Reject",
+    "closed_existing_authorization": "The user already has valid access permission, so this request was closed."
   },
   "ai_assistant": {
     "scroll_to_bottom": "Scroll to bottom",
@@ -2609,7 +3112,7 @@
     "unknown_error": "AI request failed",
     "empty": "Ask a question to start",
     "placeholder": "Ask a question. Shift + Enter for newline",
-    "command_confirm": "Confirm command execution",
+    "command_confirm": "Confirm this action",
     "command_shortcut_hint": "Enter to run, Esc to reject",
     "pending_placeholder": "Press Enter to run or Esc to reject",
     "approve": "Run",
@@ -2618,7 +3121,7 @@
     "cancel": "Stop generating",
     "reasoning": "Reasoning",
     "queued": "Queued",
-    "tool_pending": "Pending",
+    "tool_pending": "Awaiting approval",
     "tool_rejected": "Rejected",
     "tool_cancelled": "Cancelled",
     "tool_timed_out": "Timed out",
@@ -2636,14 +3139,14 @@
     "context_system_prompt": "System prompt",
     "context_tool_definitions": "Tool definitions",
     "context_breakdown_unavailable": "Context breakdown will appear after you send a message",
-    "usage_detail": "Cumulative input {{prompt}}, output {{completion}}",
+    "usage_detail": "Total input: {{prompt}} tokens; total output: {{completion}} tokens",
     "cache_hit_rate": "Average cache hit rate",
     "cache_read_tokens": "Cache read {{count}}",
     "cache_input_tokens": "Cache input {{count}}",
     "cache_creation_tokens": "Cache creation {{count}}",
     "cache_request_count": "{{count}} requests",
     "compact": "Compact context",
-    "remember_approval": "Do not ask again for the same command in this conversation",
+    "remember_approval": "Do not ask again for the same command in this conversation (commands only)",
     "failed": "Failed to send",
     "send_now": "Send now",
     "editing_message": "Editing a previous message",
@@ -2687,14 +3190,14 @@
       "postgres_ssl_mode_extra": "verify-ca and verify-full use system-trusted CAs. Certificate verification still uses the asset hostname when connected through a gateway."
     },
     "work_order": {
-      "new": "New Work Order",
+      "new": "New SQL Request",
       "reason": "Execution Reason",
       "reason_placeholder": "Please enter reason for executing this SQL",
-      "database_placeholder": "Please enter target database name",
+      "database_placeholder": "Enter the target database name",
       "requester": "Requester",
       "approver": "Approver",
       "approve": "Approve",
-      "approve_confirm": "Confirm approve?",
+      "approve_confirm": "Approve this request and execute its SQL?",
       "reject_reason": "Please enter rejection reason",
       "status": {
         "pending": "Pending",
@@ -2704,8 +3207,9 @@
         "failed": "Failed",
         "unknown": "Needs verification"
       },
-      "database_username": "Database execution account",
-      "id": "Work order ID"
+      "database_username": "Execution Account",
+      "id": "Request ID",
+      "unknown_tip": "The execution or commit outcome could not be confirmed. Verify the actual result in the target database before executing again."
     },
     "sql_log": {
       "parameter_template_tip": "Prepared SQL template; original bound parameter values are not recorded.",
@@ -2719,7 +3223,7 @@
       },
       "source": {
         "proxy": "Proxy",
-        "work_order": "Work Order"
+        "work_order": "SQL Request"
       }
     },
     "proxy": {
@@ -2751,7 +3255,7 @@
       "pg_applying": "Applying configuration",
       "pg_apply_error": "Configuration was saved but could not be applied. The current runtime state is shown above.",
       "pg_enabled": "Enable PostgreSQL Proxy",
-      "block_dml": "Block DML/DDL",
+      "block_dml": "Block Writes and High-risk SQL",
       "block_dml_tip": "Prevents accidental changes by blocking writes, locking reads, file exports and unapproved SET statements. Enforce full read-only access with database permissions. Multiple statements and the prepared statement protocol are unsupported.",
       "mysql_tls_mode": "Client TLS mode",
       "mysql_tls_disabled": "Disable TLS (plaintext)",
@@ -2765,26 +3269,25 @@
       "tip": "Enable proxy to allow client connections and execute SQL.",
       "stats": {
         "title": "Statistics",
-        "sessions": "Sessions",
-        "queries": "Queries",
-        "blocked": "Blocked",
-        "audit_drops": "Audit Drops",
-        "audit_errors": "Audit Errors"
+        "sessions": "Active Connections",
+        "queries": "Total Queries",
+        "blocked": "Total Blocked",
+        "audit_drops": "Dropped Audit Records",
+        "audit_errors": "Audit Write Failures"
       },
       "usage_title": "Usage",
       "usage_tip": "Users connect to the proxy address from a database client, and the proxy forwards traffic to authorized database assets.",
       "usage_client": "Client Connection",
-      "pg_addr": "PG Listen Address",
+      "pg_addr": "PostgreSQL Listen Address",
       "pg_tls_enabled": "Enable TLS Encryption (Client to Proxy)",
       "pg_tls_enabled_tip": "Encrypts client connections to the PG proxy using the certificate selected below; a dedicated self-signed certificate is generated automatically when none is selected. Plaintext remains available when disabled.",
       "pg_certificate": "Proxy Certificate",
       "pg_certificate_extra": "Leave empty to auto-generate a dedicated self-signed certificate, or select one from the certificate list.",
-      "public_addr": "Public Address",
+      "public_addr": "Client Connection Address",
       "public_addr_extra": "Address shown in the quick access entry for regular users. When empty, it is inferred from the listen address.",
-      "password_tip_prefix": "Go to ",
-      "password_tip_link": "Profile - Access Token",
-      "password_tip_suffix": " to generate a database password.",
-      "usage_client_pg": "PG Client Connection"
+      "usage_client_pg": "PostgreSQL Client Connection",
+      "password_tip": "Create a database password in <link>Profile → Access Tokens</link>.",
+      "pg_certificate_auto": "Auto-generate Certificate"
     }
   },
   "restricted_features": {
@@ -2792,7 +3295,7 @@
       "title": "Credential rotation",
       "description": "Centrally update SSH asset passwords and private keys to reduce the maintenance burden of long-lived credentials.",
       "benefit_1": "Rotate credentials in batches or through scheduled policies.",
-      "benefit_2": "Handle assets sharing a credential together to reduce per-host changes.",
+      "benefit_2": "Update shared credentials across linked assets without editing each asset separately.",
       "benefit_3": "Review rotation results and failure reasons for follow-up."
     },
     "label": "Premium feature",
@@ -2820,7 +3323,7 @@
       "benefit_3": "Reuse groups across assets to make future gateway changes easier."
     },
     "authorization_strategy": {
-      "title": "Authorization strategies",
+      "title": "Operation Policies",
       "description": "Control file operations and clipboard capabilities according to each team’s responsibilities.",
       "benefit_1": "Manage file upload and download permissions separately.",
       "benefit_2": "Set permissions for creating, editing, deleting and renaming files.",
@@ -2835,7 +3338,7 @@
     },
     "oidc": {
       "title": "OIDC single sign-on",
-      "description": "Connect an existing OIDC identity provider so your team can sign in with a shared corporate identity.",
+      "description": "Connect an existing OIDC identity provider so team members can sign in with their corporate accounts.",
       "benefit_1": "Reuse the corporate sign-in entry point to reduce account maintenance.",
       "benefit_2": "Integrate identity providers through standard OIDC.",
       "benefit_3": "Configure department assignment for users who sign in."
@@ -2863,21 +3366,21 @@
     },
     "session_sharing": {
       "title": "Session sharing",
-      "description": "Share the current session’s access link to help collaborators see the same context.",
+      "description": "Share a read-only viewing link for the current session to help collaborators review the same situation.",
       "benefit_1": "Share the current session instead of describing every step.",
-      "benefit_2": "Use a link to join a shared session for troubleshooting.",
+      "benefit_2": "View a shared session through its link. Viewers cannot control the remote asset.",
       "benefit_3": "Cancel sharing when the task is complete."
     },
     "website_geo": {
       "title": "Website location rules",
-      "description": "Limit public access by country, province or city to define where a website can be reached from.",
+      "description": "Allow public access based on the request’s country, region, or city.",
       "benefit_1": "Configure country, province and city conditions.",
-      "benefit_2": "Combine location conditions with existing IP rules.",
+      "benefit_2": "Use alongside IP and other allow rules. Matching any rule permits public access.",
       "benefit_3": "Maintain regional access requirements centrally."
     },
     "response_rewrite": {
       "title": "Website response modification",
-      "description": "Configure response rules at the proxy layer for websites that need adapted return content.",
+      "description": "Configure proxy rules to modify a website’s response content or headers.",
       "benefit_1": "Maintain response modification rules in one place.",
       "benefit_2": "Process responses at the proxy to reduce source application changes.",
       "benefit_3": "Apply separate rules for each website."
@@ -2892,7 +3395,7 @@
     "recording_conversion": {
       "title": "Recording conversion policies",
       "description": "Schedule session recording conversion to balance availability with server processing load.",
-      "benefit_1": "Convert recordings immediately or during idle hours.",
+      "benefit_1": "Convert after disconnection or during a configured time window.",
       "benefit_2": "Set a time window for conversion work.",
       "benefit_3": "Choose whether to retain original recordings."
     },
@@ -2900,11 +3403,11 @@
       "title": "Access requests",
       "description": "Route temporary asset access needs through an application and approval process.",
       "benefit_1": "Provide users with a single asset access request entry point.",
-      "benefit_2": "Handle access needs through approval instead of offline coordination.",
+      "benefit_2": "Review access requests in the platform to reduce separate coordination.",
       "benefit_3": "Connect requests with resource access management for easier tracking."
     },
     "sql_work_order": {
-      "title": "SQL Work Order Approval",
+      "title": "SQL Execution Approval",
       "description": "Review and approve database changes before the platform executes SQL.",
       "benefit_1": "Review SQL and the target database before execution.",
       "benefit_2": "Execute approved changes through the platform to reduce manual handoffs.",
@@ -2912,6 +3415,14 @@
     }
   },
   "agent_access": {
+    "api_setting": "Agent & API access",
+    "enable_api": "Allow Agent & API access",
+    "enable_api_tip": "Allow users to create personal API keys for agents, CLI tools, and automation. Calls remain subject to the user’s permissions and access policies. Disabling pauses existing API keys; enabling restores unexpired, non-revoked keys.",
+    "disabled": "Agent & API access is disabled",
+    "disabled_tip": "Contact an administrator with permission to modify system settings to enable this feature.",
+    "key_disabled_tip": "API Key access has been disabled. Existing API keys are paused and can still be viewed or revoked. Database passwords are unaffected.",
+    "load_failed": "Failed to load access status",
+    "retry": "Retry",
     "title": "Agent access",
     "description": "Install the Next Terminal Skill for OpenClaw, Hermes or custom agents. Install once, then query and manage resources with the installed client.",
     "create_key": "Create API key",
@@ -2922,9 +3433,9 @@
     "auth": "Authentication header",
     "setup": "Setup and requests",
     "key_instruction": "Configure NT_API_KEY securely in the agent environment; do not paste the key into a conversation.",
-    "setup_tip": "Create an api token on the account access tokens page and configure NT_API_KEY locally. Save the Skill as next-terminal/SKILL.md and the client as next-terminal/scripts/nt_api.py. Enter next-terminal and run the commands below. Only Python 3 is required. Use --token-env for a different environment variable name.",
+    "setup_tip": "Create an API token on the access tokens page and configure NT_API_KEY in the agent’s persistent environment. Install the Skill and client in the next-terminal-api subdirectory of the persistent Skill directory, then load it as required by the framework. Only Python 3 is needed. Use --token-env for a different environment variable name.",
     "copy_prompt": "Copy installation instructions",
-    "prompt": "Install the Next Terminal resource management Skill for {{url}}.\n\n1. Identify this agent framework’s persistent Skill directory and use its next-terminal-api subdirectory. Do not use temporary storage or only read the Skill for this conversation.\n2. Download {{url}}/agent/next-terminal/install.py and run python3 install.py --base-url {{url}} --directory <persistent-skill-directory>/next-terminal-api. It installs SKILL.md and scripts/nt_api.py and saves instance configuration without secrets. If an existing installation targets another instance, confirm the directory before overwriting it.\n3. Load or reload the installed Skill according to the framework. I configured NT_API_KEY in the persistent agent environment. Do not print, save or request the key in chat. If missing, tell me where to configure it.\n4. Run the installed scripts/nt_api.py check. Report the installation directory, Skill loading status and account name; report failures accurately.\n5. Use the installed Skill and client for subsequent authorized resource management tasks.\n\nAfter installation and verification, wait for my task.\n\nAlso run scripts/nt_api.py permissions to obtain account permissions and the effective license. Check them before selecting interfaces; visibility in the complete document does not authorize calls.",
+    "prompt": "Install the Next Terminal resource management Skill for {{url}}.\n\n1. Identify this agent framework’s persistent Skill directory and use its next-terminal-api subdirectory. Do not use temporary storage or only read the Skill for this conversation.\n2. Download {{url}}/agent/next-terminal/install.py and run python3 install.py --base-url {{url}} --directory <persistent-skill-directory>/next-terminal-api. It installs SKILL.md and scripts/nt_api.py and saves instance configuration without secrets. If an existing installation targets another instance, confirm the directory before overwriting it.\n3. Load or reload the installed Skill according to the framework. I configured NT_API_KEY in the persistent agent environment. Do not print, save or request the key in chat. If missing, tell me where to configure it.\n4. Run the installed scripts/nt_api.py check. Report the installation directory, Skill loading status and account name; report failures accurately.\nAlso run scripts/nt_api.py permissions to obtain account permissions and the effective license. Check them before selecting interfaces; visibility in the complete document does not authorize calls.\n5. Use the installed Skill and client for subsequent authorized resource management tasks.\n\nAfter installation and verification, wait for my task.",
     "permissions": "The agent inherits the API key account’s permissions. Set an expiry and revoke the token when retiring the agent.",
     "heading": "Connect your agent to manage resources",
     "step_key": "Create an API key",
@@ -2939,6 +3450,12 @@
     "verify_tip": "The agent will report the installation directory and connection result. Assign future resource management tasks without repeating setup.",
     "preview_prompt": "View installation instructions",
     "advanced": "API documentation (developers)",
-    "advanced_tip": "The installed Skill includes interface discovery and API requests. Use these references for custom integrations."
+    "advanced_tip": "The installed Skill includes interface discovery and API requests. Use these references for custom integrations.",
+    "go_settings": "Go to access settings",
+    "view_settings": "View access settings",
+    "view_guide": "View Agent setup guide",
+    "status_enabled": "Access status: Enabled",
+    "disabled_admin_tip": "Enable API Key access for Agents, CLI tools, and automation scripts. Existing keys are retained; unexpired, unrevoked keys resume working when access is enabled again.",
+    "status_disabled": "Access status: Disabled"
   }
 }

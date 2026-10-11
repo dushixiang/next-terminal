@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {Button, Form, Input, InputNumber, Switch, Typography} from "antd";
 import {SettingProps} from "./SettingPage";
-import {useTranslation} from "react-i18next";
+import {Trans, useTranslation} from "react-i18next";
 import {Link} from "react-router-dom";
 import {useFormRequest} from "@/hook/use-antd-form-query";
 
@@ -99,9 +99,7 @@ const OidcServerSetting = ({
                     <Paragraph style={{
                         marginBottom: 0
                     }}>
-                        {t('settings.oidc_server.manage_tip_prefix')}
-                        <Link to={'/oidc-client'}>{t('settings.oidc_server.manage_link')}</Link>
-                        {t('settings.oidc_server.manage_tip_suffix')}
+                        <Trans i18nKey="settings.oidc_server.manage_tip" components={{link: <Link to="/oidc-client"/>}}/>
                     </Paragraph>
                 </div>
                 <div>

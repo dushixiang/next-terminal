@@ -7,7 +7,7 @@ import {useSearchParams} from "react-router-dom";
 
 interface AccessDeniedDetail {
     scope: 'account';
-    reason: 'ip' | 'time' | 'geo' | 'policy';
+    reason: 'ip' | 'time' | 'geo' | 'policy' | 'unknown';
 }
 
 const errorDetails: Record<number, AccessDeniedDetail> = {
@@ -30,7 +30,7 @@ const AccessDeniedPage = () => {
     const [searchParams] = useSearchParams();
     const [logoutLoading, setLogoutLoading] = useState(false);
     const code = Number(searchParams.get('code'));
-    const detail = errorDetails[code] ?? {scope: 'account', reason: 'policy'};
+    const detail = errorDetails[code] ?? {scope: 'account', reason: 'unknown'};
     const returnPath = safeReturnPath(searchParams.get('from'));
 
     const logout = async () => {

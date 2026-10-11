@@ -9,6 +9,7 @@ export interface AssetGroupNode extends TreeDataNode {
 }
 
 export interface Asset {
+    enabled: boolean;
     id: string;
     logo: string;
     name: string;
@@ -90,6 +91,10 @@ export interface BatchUpdateAssetResult {
 }
 
 class AssetApi extends Api<Asset> {
+    updateEnabled = async (id: string, enabled: boolean) => {
+        return await requests.patch<void>(`/${this.group}/${id}/enabled`, {enabled});
+    }
+
     constructor() {
         super("admin/assets");
     }

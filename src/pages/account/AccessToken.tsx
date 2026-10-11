@@ -1,5 +1,7 @@
+import {useNavigate} from 'react-router-dom';
+import {agentAccessSettingUrl, canAccessAgentSettings} from '@/utils/agent-access';
 import {useState} from 'react';
-import {Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag, Typography} from "antd";
+import {Alert, Button, DatePicker, Form, Input, Modal, Popconfirm, Select, Space, Table, Tag, Typography} from "antd";
 import dayjs, {type Dayjs} from "dayjs";
 import {useTranslation} from "react-i18next";
 import {useMutation, useQuery} from "@tanstack/react-query";
@@ -7,12 +9,16 @@ import accountApi, {AccessTokenCreateResult, AccessTokenItem} from "@/api/accoun
 import times from "@/components/time/times";
 
 const AccessToken = () => {
+    const navigate = useNavigate();
     let {t} = useTranslation();
     const [form] = Form.useForm<{ name: string; type: string; expiresAt?: Dayjs }>();
     const [editForm] = Form.useForm<{ name: string }>();
     const [editingToken, setEditingToken] = useState<AccessTokenItem | null>(null);
     const [createdToken, setCreatedToken] = useState<AccessTokenCreateResult | null>(null);
     const [createModalOpen, setCreateModalOpen] = useState(false);
+
+    const infoQuery = useQuery({queryKey: ['info'], queryFn: accountApi.getUserInfo});
+    const apiKeyAccessEnabled = infoQuery.data?.apiKeyAccessEnabled === true;
 
     let tokenQuery = useQuery({
         queryKey: ['access-token'],
@@ -136,8 +142,6 @@ const AccessToken = () => {
                     <Popconfirm
                         title={t('general.confirm_delete')}
                         onConfirm={() => deleteMutation.mutate(record.id)}
-                        okText={t('actions.confirm')}
-                        cancelText={t('actions.cancel')}
                     >
                         <Button
                             type="link"
@@ -155,9 +159,17 @@ const AccessToken = () => {
 
     return (
         <div className={'space-y-4'}>
+            {infoQuery.data && !apiKeyAccessEnabled && <div><Alert type="info" showIcon title={t('agent_access.disabled')} description={t('agent_access.key_disabled_tip')} action={canAccessAgentSettings(infoQuery.data, 'GET') ? <Button onClick={() => navigate(agentAccessSettingUrl)}>{t(canAccessAgentSettings(infoQuery.data, 'PUT') ? 'agent_access.go_settings' : 'agent_access.view_settings')}</Button> : undefined}/></div>}
             <div className={'flex items-center justify-between'}>
                 <Typography.Title level={5} style={{marginTop: 0}}>{t('account.access_token')}</Typography.Title>
-                <Button type="primary" onClick={() => setCreateModalOpen(true)}>
+                <Button
+                    type="primary"
+                    disabled={infoQuery.isPending || infoQuery.isError}
+                    onClick={() => {
+                        form.setFieldsValue({type: apiKeyAccessEnabled ? 'api' : 'db-password'});
+                        setCreateModalOpen(true);
+                    }}
+                >
                     {t('account.access_token_create')}
                 </Button>
             </div>
@@ -176,7 +188,6 @@ const AccessToken = () => {
                 title={t('account.access_token')}
                 onCancel={() => setCreatedToken(null)}
                 onOk={() => setCreatedToken(null)}
-                okText={t('actions.confirm')}
             >
                 <Space orientation="vertical" size={8}>
                     <Typography.Text type="secondary">{t('account.access_token_once_tip')}</Typography.Text>
@@ -198,7 +209,11 @@ const AccessToken = () => {
                 confirmLoading={tokenMutation.isPending}
             >
                 <Form form={form} layout="vertical" initialValues={{type: 'api'}}
-                      onFinish={values => tokenMutation.mutate(values)}>
+                      onFinish={values => {
+                          if (values.type !== 'api' || apiKeyAccessEnabled) {
+                              tokenMutation.mutate(values);
+                          }
+                      }}>
                     <Form.Item
                         name="name"
                         label={t('general.name')}
@@ -209,7 +224,7 @@ const AccessToken = () => {
                     <Form.Item name="type" label={t('account.access_token_type')}>
                         <Select
                             options={[
-                                {value: 'api', label: t('account.access_token_type_values.api')},
+                                {value: 'api', label: t('account.access_token_type_values.api'), disabled: !apiKeyAccessEnabled},
                                 {value: 'db-password', label: t('account.access_token_type_values.db_password')}
                             ]}
                         />
@@ -243,8 +258,6 @@ const AccessToken = () => {
                     editForm.resetFields();
                 }}
                 onOk={() => editForm.submit()}
-                okText={t('actions.confirm')}
-                cancelText={t('actions.cancel')}
                 confirmLoading={updateMutation.isPending}
             >
                 <Form form={editForm} layout="vertical" onFinish={values => {

@@ -38,6 +38,7 @@ const SecurityLoginLockSetting = ({
 
         <div className={'flex md:items-center md:gap-2 md:flex-row flex-col'}>
             <Form.Item label={t("settings.security.login_lock.failed_duration")}
+                       extra={t("settings.security.login_lock.failed_duration_tip")}
                        required={lockEnabled}>
                 <Space.Compact block>
                     <Form.Item name="login-lock-failed-duration" noStyle>
@@ -53,6 +54,7 @@ const SecurityLoginLockSetting = ({
                 }}/>
             </Form.Item>
             <Form.Item label={t('settings.security.login_lock.account_duration')}
+                       extra={t('settings.security.login_lock.duration_tip')}
                        required={lockEnabled}>
                 <Space.Compact block>
                     <Form.Item name="login-lock-account-duration" noStyle>
@@ -62,6 +64,7 @@ const SecurityLoginLockSetting = ({
                 </Space.Compact>
             </Form.Item>
             <Form.Item label={t('settings.security.login_lock.ip_duration')}
+                       extra={t('settings.security.login_lock.duration_tip')}
                        required={lockEnabled}>
                 <Space.Compact block>
                     <Form.Item name="login-lock-ip-duration" noStyle>

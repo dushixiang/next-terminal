@@ -1,17 +1,21 @@
-import {App, Button, Card, Collapse, Descriptions, Flex, Space, Typography} from 'antd';
+import {App, Badge, Button, Card, Collapse, Descriptions, Flex, Space, Spin, Alert, Typography} from 'antd';
 import {CopyOutlined, KeyOutlined} from '@ant-design/icons';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router-dom';
 import copy from 'copy-to-clipboard';
 import {useQuery} from '@tanstack/react-query';
 import accountApi from '@/api/account-api';
+import {agentAccessSettingUrl, canAccessAgentSettings} from '@/utils/agent-access';
 
-const AgentAccess = () => {
+const AgentAccess = ({portal = false}: {portal?: boolean}) => {
     const {t} = useTranslation();
     const navigate = useNavigate();
     const {message} = App.useApp();
     const infoQuery = useQuery({queryKey: ['info'], queryFn: accountApi.getUserInfo});
     const isAdmin = infoQuery.data?.type === 'admin' || infoQuery.data?.type === 'super-admin';
+    const canViewSettings = !portal && canAccessAgentSettings(infoQuery.data, 'GET');
+    const canEditSettings = !portal && canAccessAgentSettings(infoQuery.data, 'PUT');
+    const settingsButton = canViewSettings ? <Button type="link" onClick={() => navigate(agentAccessSettingUrl)}>{t(canEditSettings ? 'agent_access.go_settings' : 'agent_access.view_settings')}</Button> : undefined;
     const origin = window.location.origin;
     const prompt = t('agent_access.prompt', {url: origin});
     const copyInstallation = () => {
@@ -21,7 +25,7 @@ const AgentAccess = () => {
     const steps = [
         {
             title: t('agent_access.step_key'), description: t('agent_access.step_key_tip'),
-            content: <Button icon={<KeyOutlined/>} onClick={() => navigate('/info?activeKey=access-token')}>{t('agent_access.create_key')}</Button>,
+            content: <Button icon={<KeyOutlined/>} onClick={() => navigate(`${portal ? '/x-info' : '/info'}?activeKey=access-token`)}>{t('agent_access.create_key')}</Button>,
         },
         {
             title: t('agent_access.step_configure'), description: t('agent_access.step_configure_tip'),
@@ -38,11 +42,16 @@ const AgentAccess = () => {
             </Space>,
         },
     ];
+    if (infoQuery.isPending) return <Spin/>;
+    if (infoQuery.isError) return <Alert type="error" showIcon title={t('agent_access.load_failed')} action={<Button onClick={() => infoQuery.refetch()}>{t('agent_access.retry')}</Button>}/>;
+    const accessEnabled = infoQuery.data?.apiKeyAccessEnabled === true;
+    const accessStatus = <Flex align="center" gap={8} wrap>
+        <Badge status={accessEnabled ? 'success' : 'default'} text={t(accessEnabled ? 'agent_access.status_enabled' : 'agent_access.status_disabled')}/>
+        {settingsButton}
+    </Flex>;
+    if (!accessEnabled) return <div className="max-w-4xl pb-6">{accessStatus}</div>;
     return <Flex vertical gap={20} className="max-w-4xl pb-6">
-        <div>
-            <Typography.Title level={4} style={{marginTop: 0, marginBottom: 8}}>{t('agent_access.heading')}</Typography.Title>
-            <Typography.Paragraph type="secondary" style={{marginBottom: 0}}>{t('agent_access.description')}</Typography.Paragraph>
-        </div>
+        {canViewSettings && accessStatus}
         <Flex vertical gap={12}>
             {steps.map((step, index) => <Card key={index} size="small" styles={{body: {padding: 20}}}>
                 <div className="flex gap-4">

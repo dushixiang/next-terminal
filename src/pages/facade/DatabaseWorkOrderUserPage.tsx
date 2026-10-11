@@ -52,6 +52,9 @@ const DatabaseWorkOrderUserPageContent = () => {
             unknown: {color: 'orange', label: t('db.work_order.status.unknown')},
         };
         const item = map[status] || {color: 'default', label: status};
+        if (status === 'unknown') {
+            return <Tooltip title={<div>{t('db.work_order.unknown_tip')}{error && <div>{error}</div>}</div>}><Tag color={item.color}>{item.label}</Tag></Tooltip>;
+        }
         if ((status === 'failed' || status === 'rejected' || status === 'unknown') && error) {
             return (
                 <Tooltip title={error}>

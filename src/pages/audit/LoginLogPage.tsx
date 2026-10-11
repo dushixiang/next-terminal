@@ -12,6 +12,18 @@ Tag
 import { useRef } from 'react';
 import { useTranslation } from "react-i18next";
 
+// 精确匹配系统固定错误，保留外部认证错误及带有额外细节的错误原文。
+const loginReasonKeys: Record<string, string> = {
+    'account or password is incorrect': 'account_incorrect',
+    'account is disabled': 'account_disabled',
+    'two-factor authorization code incorrect': 'otp_incorrect',
+    'your IP address is not allowed to access the system': 'ip_not_allowed',
+    'current time period is not allowed to access the system': 'time_not_allowed',
+    'your geographic location is not allowed to access the system': 'geo_not_allowed',
+    'access is not allowed by the system access policy': 'policy_not_allowed',
+    'password login is disabled': 'password_login_disabled',
+};
+
 const LoginLogPage = () => {
 
     const {t} = useTranslation();
@@ -59,6 +71,11 @@ const LoginLogPage = () => {
             dataIndex: 'reason',
             key: 'reason',
             hideInSearch: true,
+            render: (_, record) => {
+                const reason = record.reason || '';
+                const key = loginReasonKeys[reason];
+                return key ? <span title={reason}>{t(`audit.login_reasons.${key}`)}</span> : reason || '-';
+            },
         }, {
             title: t('audit.user_agent'),
             dataIndex: 'userAgent',

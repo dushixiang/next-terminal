@@ -4,6 +4,7 @@ import licenseApi, {SimpleLicense} from "@/api/license-api";
 import {Button, Result, Spin} from "antd";
 import {useLocation} from "react-router-dom";
 import {useTranslation} from "react-i18next";
+import {isLicensePublicPath} from './license-public-path';
 
 interface LicenseContextValue {
     license: SimpleLicense;
@@ -18,29 +19,14 @@ interface LicenseProviderProps {
     children: ReactNode;
 }
 
-// 不需要查询许可证的公开路径
-const PUBLIC_PATHS = [
-    '/login',
-    '/setup',
-    '/wechat-work/callback',
-    '/oidc/callback',
-    '/oidc/server/consent',
-    '/oauth/consent',
-    '/asset-authorization',
-];
-
-const isPathPublic = (pathname: string) => PUBLIC_PATHS.some(path => (
-    pathname === path || pathname.startsWith(`${path}/`)
-));
-
 /**
  * License Provider 组件
  * 在应用顶层提供许可证信息，避免多处重复查询
  */
 export function LicenseProvider({children}: LicenseProviderProps) {
     const {t} = useTranslation();
-    const {pathname} = useLocation();
-    const isPublicPath = isPathPublic(pathname);
+    const {pathname, search} = useLocation();
+    const isPublicPath = isLicensePublicPath(pathname, search);
 
     const query = useQuery({
         queryKey: ['simpleLicense'],

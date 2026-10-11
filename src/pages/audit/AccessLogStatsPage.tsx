@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import accessLogApi, {RealtimeMetrics, TopPages, TopReferers, WebsiteStats} from "@/api/access-log-api";
 import websiteApi from "@/api/website-api";
 import {
@@ -29,7 +30,7 @@ import {Area, AreaChart, Bar, BarChart, CartesianGrid, Cell, Pie, PieChart, XAxi
 // 数字格式化函数
 const formatNumber = (num: number | undefined): string => {
     if (num === undefined || num === null) return '0';
-    return num.toLocaleString();
+    return num.toLocaleString(i18n.resolvedLanguage || i18n.language);
 };
 
 const AccessLogStatsPage = () => {
@@ -158,7 +159,7 @@ const AccessLogStatsPage = () => {
             color: "hsl(0, 84%, 60%)", // 红色 - 服务器错误
         },
         "other": {
-            label: t('audit.accessLog.stats.statusCodes.other') || 'Other',
+            label: t('audit.accessLog.stats.statusCodes.other'),
             color: "hsl(215, 16%, 47%)", // 灰色 - 其他状态
         },
     } satisfies ChartConfig;

@@ -48,7 +48,7 @@ const StrategyModal = ({
 
                 <Space orientation={'vertical'}>
                     <Space>
-                        <Form.Item name={'upload'} label={t('general.upload')} valuePropName="checked">
+                        <Form.Item name={'upload'} label={t('authorised.strategy.upload')} valuePropName="checked">
     <Switch checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')} />
           </Form.Item>
                         <Form.Item name={'download'} label={t('authorised.strategy.download')} valuePropName="checked">
@@ -66,10 +66,10 @@ const StrategyModal = ({
                     </Space>
 
                     <Space>
-                        <Form.Item name={'edit'} label={t('actions.edit')} valuePropName="checked">
+                        <Form.Item name={'edit'} label={t('authorised.strategy.edit')} valuePropName="checked">
     <Switch checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')} />
           </Form.Item>
-                        <Form.Item name={'delete'} label={t('actions.delete')} valuePropName="checked">
+                        <Form.Item name={'delete'} label={t('authorised.strategy.delete')} valuePropName="checked">
     <Switch checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')} />
           </Form.Item>
                         <Form.Item name={'rename'} label={t('authorised.strategy.rename')} valuePropName="checked">
@@ -79,7 +79,7 @@ const StrategyModal = ({
 
 
                     <Space>
-                        <Form.Item name={'copy'} label={t('actions.copy')} valuePropName="checked">
+                        <Form.Item name={'copy'} label={t('authorised.strategy.copy')} valuePropName="checked">
     <Switch checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')} />
           </Form.Item>
                         <Form.Item name={'paste'} label={t('authorised.strategy.paste')} valuePropName="checked">

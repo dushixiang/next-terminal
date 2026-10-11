@@ -7,6 +7,7 @@ export interface Department {
     parentId: string;
     parentName: string;
     weight: number;
+    sort: string;
     createdAt: number;
 }
 
@@ -20,6 +21,10 @@ export interface TreeNode {
 class DepartmentApi extends Api<Department> {
     constructor() {
         super("admin/departments");
+    }
+
+    updateSort = async (id: string, beforeId?: string, afterId?: string, parentId?: string) => {
+        await requests.post<void>(`/${this.group}/sort`, {id, beforeId, afterId, parentId});
     }
 
     // 获取部门树形结构

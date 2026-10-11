@@ -7,6 +7,8 @@ import NTable, {NColumn} from "@/components/NTable";
 import {getSort} from "@/utils/sort";
 import {eventTypeLabel, severities, severityLabel} from "@/pages/sysconf/notification-integration/constants";
 
+import {systemEventText} from './system-event-text';
+
 const {Text} = Typography;
 
 const eventCategories = ['system', 'identity', 'auth', 'access', 'database', 'backup', 'agent'];
@@ -29,7 +31,9 @@ const formatJSON = (value?: Record<string, any>) => {
 };
 
 const SystemEventPage = () => {
-    const {t} = useTranslation();
+    const {t, i18n} = useTranslation();
+    const eventText = (event: SystemEvent, field: 'title' | 'summary') =>
+        systemEventText(i18n.resolvedLanguage || i18n.language, event[field === 'title' ? 'titleKey' : 'summaryKey'], event.args, event[field]);
     const [selectedId, setSelectedId] = useState<string>();
 
     const renderActor = (event?: Pick<SystemEvent, 'actor' | 'actorType'>) => {
@@ -98,7 +102,7 @@ const SystemEventPage = () => {
             dataIndex: 'summary',
             hideInSearch: true,
             ellipsis: true,
-            render: (_text, record) => record.summary || record.title || '-',
+            render: (_text, record) => record.summary || record.summaryKey ? eventText(record, 'summary') : eventText(record, 'title'),
         },
         {
             title: t('sysops.system_event.actor'),
@@ -192,9 +196,9 @@ const SystemEventPage = () => {
                     {key: 'actor', label: t('sysops.system_event.actor'), children: renderActor(detail)},
                     {key: 'target', label: t('sysops.system_event.target'), children: detail?.target || '-'},
                     {key: 'ip', label: t('sysops.system_event.ip'), children: detail?.ip || '-'},
-                    {key: 'created-at', label: t('sysops.system_event.created_at'), children: detail?.createdAt ? new Date(detail.createdAt).toLocaleString() : '-'},
-                    {key: 'title', label: t('sysops.system_event.title_field'), span: 2, children: detail?.title || '-'},
-                    {key: 'summary', label: t('sysops.system_event.summary'), span: 2, children: detail?.summary || '-'},
+                    {key: 'created-at', label: t('sysops.system_event.created_at'), children: detail?.createdAt ? new Date(detail.createdAt).toLocaleString(i18n.resolvedLanguage || i18n.language) : '-'},
+                    {key: 'title', label: t('sysops.system_event.title_field'), span: 2, children: detail ? eventText(detail, 'title') : '-'},
+                    {key: 'summary', label: t('sysops.system_event.summary'), span: 2, children: detail ? eventText(detail, 'summary') : '-'},
                     {key: 'args', label: t('sysops.system_event.args'), span: 2, children: <pre className="m-0 max-h-60 overflow-auto whitespace-pre-wrap break-all text-xs">{formatJSON(detail?.args)}</pre>},
                     {key: 'metadata', label: t('sysops.system_event.metadata'), span: 2, children: <pre className="m-0 max-h-60 overflow-auto whitespace-pre-wrap break-all text-xs">{formatJSON(detail?.metadata)}</pre>},
                 ]}

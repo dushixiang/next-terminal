@@ -21,7 +21,7 @@ const CodeBlock = ({children}: {children: ReactNode}) => {
     const text = codeText(children).replace(/\n$/, '');
     return <div className="group/code relative my-1.5 w-full min-w-0 max-w-full rounded bg-black/[0.04] dark:bg-white/[0.06]">
         <Tooltip title={t('actions.copy')}>
-            <button type="button" aria-label={t('actions.copy')} className="absolute right-1.5 top-1.5 z-10 rounded p-1 text-gray-500 opacity-70 hover:opacity-100 focus-visible:opacity-100 group-hover/code:opacity-100" onClick={() => {if (copy(text)) message.success(t('common.copy_success'));}}><CopyIcon className="h-3.5 w-3.5"/></button>
+            <button type="button" aria-label={t('actions.copy')} className="absolute right-1.5 top-1.5 z-10 rounded p-1 text-gray-500 opacity-70 hover:opacity-100 focus-visible:opacity-100 group-hover/code:opacity-100" onClick={() => {if (copy(text)) message.success(t('general.copy_success'));}}><CopyIcon className="h-3.5 w-3.5"/></button>
         </Tooltip>
         <pre className="w-full min-w-0 max-w-full overflow-x-auto px-2 py-1.5 pr-9 font-mono text-xs [&>code]:rounded-none [&>code]:bg-transparent [&>code]:p-0">{children}</pre>
     </div>;

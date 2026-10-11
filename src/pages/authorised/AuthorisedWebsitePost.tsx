@@ -90,7 +90,6 @@ const AuthorisedWebsitePost = ({open, onCancel, onSuccess}: AuthorisedWebsitePos
             onCancel={handleCancel}
             onOk={() => form.submit()}
             okText={t("actions.save")}
-            cancelText={t("actions.cancel")}
             confirmLoading={postMutation.isPending}
         >
             <Form

@@ -72,6 +72,10 @@ class PropertyApi {
         await requests.post<void>(`/${this.group}/send-mail`, values);
     }
 
+    sendSMS = async (values: {phone: string; language: string}) => {
+        await requests.post<void>(`/${this.group}/send-sms`, values);
+    }
+
     getLatestVersion = async () => {
         let data = await requests.get(`/${this.group}/latest-version`, {errorMode: 'silent'});
         return data as LatestVersion;

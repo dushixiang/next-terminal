@@ -63,6 +63,15 @@ const UserHeader = () => {
 
     ];
 
+    if (infoQuery.data?.apiKeyAccessEnabled) {
+        dropItems.push({
+            key: 'agent-access',
+            icon: <BookOpenIcon className='w-4 h-4'/>,
+            label: <Link to='/x-agent-access'>{t('agent_access.title')}</Link>,
+            danger: false,
+        });
+    }
+
     if (infoQuery.data?.type === 'admin' || infoQuery.data?.type === 'super-admin') {
         dropItems.push({
             key: 'api-docs',

@@ -6,7 +6,7 @@ import ScheduledTaskLogPage from "@/pages/sysops/ScheduledTaskLogPage";
 import ScheduledTaskModal from "@/pages/sysops/ScheduledTaskModal";
 import { getSort } from "@/utils/sort";
 import { useMutation } from "@tanstack/react-query";
-import { App,Button,Popconfirm,Space,Switch,Tag } from "antd";
+import { App,Button,Popconfirm,Space,Switch,Tag,Tooltip } from "antd";
 import { useRef,useState } from 'react';
 import { useTranslation } from "react-i18next";
 
@@ -120,6 +120,7 @@ const ScheduledTaskPage = () => {
             width: 200,
             render: (_text: unknown, record: ScheduledTask, index: number) => (
                 <Space>
+                    <Tooltip title={t('sysops.options.exec_tip')}>
                     <NButton
                         key="exec"
                         // disabled={execLoading[index]}
@@ -127,6 +128,7 @@ const ScheduledTaskPage = () => {
                     >
                         {t('sysops.options.exec')}
                     </NButton>
+                    </Tooltip>
                     <NButton
                         key="logs"
                         onClick={() => handleShowLog(record.id)}

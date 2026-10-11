@@ -736,7 +736,7 @@ const FileSystemPage = forwardRef<FileSystem, Props>(({
 
     return (
         <div>
-            <Drawer title="FileSystem"
+            <Drawer title={t('fs.title')}
                     placement={drawerPlacement}
                     onClose={onClose}
                     open={open}

@@ -85,7 +85,6 @@ const AuthorisedDatabaseAssetPost = ({open, onCancel, onSuccess}: AuthorisedData
             onCancel={handleCancel}
             onOk={() => form.submit()}
             okText={t("actions.save")}
-            cancelText={t("actions.cancel")}
             confirmLoading={postMutation.isPending}
         >
             <Form

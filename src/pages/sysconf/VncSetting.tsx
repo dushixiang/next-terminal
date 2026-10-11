@@ -45,7 +45,7 @@ const VncSetting = ({
           label: t('general.default')
         }, {
           value: 'local',
-          label: t('identity.user.sources.local')
+          label: t('settings.vnc.cursor.local')
         }, {
           value: 'remote',
           label: t('settings.vnc.cursor.remote')

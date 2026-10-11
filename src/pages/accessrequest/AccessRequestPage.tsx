@@ -1,12 +1,12 @@
+import {accessRequestReason} from "./access-request-text";
 import {useState} from "react";
+import AccessRequestDetailDrawer from "./AccessRequestDetailDrawer";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {
     App,
     Button,
     Drawer,
     Form,
-    Input,
-    InputNumber,
     Modal,
     Popconfirm,
     Select,
@@ -25,7 +25,6 @@ import {
     AccessRequest,
     AccessRequestResourceType,
     accessRequestAdminApi,
-    ApproveAccessRequestRequest,
     type AccessRequestScope
 } from "@/api/access-request-api";
 import {AssetGroupTreeSelect, DatabaseAssetSelect, DepartmentTreeSelect, UserSelect, WebsiteGroupTreeSelect} from "@/components/shared/QuerySelects";
@@ -51,8 +50,7 @@ const collectNames = (nodes: TreeDataNode[], names: Record<string, string> = {},
 const AccessRequestPage = () => {
     const {t} = useTranslation();
     const {message} = App.useApp();
-    const [approveForm] = Form.useForm<ApproveAccessRequestRequest>();
-    const [rejectForm] = Form.useForm<{reason: string}>();
+    const [detailId, setDetailId] = useState<string>();
     const [scopeForm] = Form.useForm<AccessRequestScope>();
     const [scopeOpen, setScopeOpen] = useState(false);
     const [scopeEditOpen, setScopeEditOpen] = useState(false);
@@ -61,10 +59,7 @@ const AccessRequestPage = () => {
     const [status, setStatus] = useState<string>();
     const [resourceType, setResourceType] = useState<AccessRequestResourceType>();
     const [requesterId, setRequesterId] = useState<string>();
-    const [approveOpen, setApproveOpen] = useState(false);
-    const [approveId, setApproveId] = useState<string>();
-    const [rejectOpen, setRejectOpen] = useState(false);
-    const [rejectId, setRejectId] = useState<string>();
+
 
     const scopesQuery = useQuery({
         queryKey: ['access-request-scopes'],
@@ -138,28 +133,6 @@ const AccessRequestPage = () => {
         requestPagingQuery.refetch();
     };
 
-    const approveMutation = useMutation({
-        mutationFn: (payload: {id: string, values: ApproveAccessRequestRequest}) => accessRequestAdminApi.approve(payload.id, payload.values),
-        onSuccess: () => {
-            reloadTable();
-            setApproveOpen(false);
-            setApproveId(undefined);
-            approveForm.resetFields();
-            message.success(t('general.success'));
-        }
-    });
-
-    const rejectMutation = useMutation({
-        mutationFn: (payload: {id: string, reason: string}) => accessRequestAdminApi.reject(payload.id, payload.reason),
-        onSuccess: () => {
-            reloadTable();
-            setRejectOpen(false);
-            setRejectId(undefined);
-            rejectForm.resetFields();
-            message.success(t('general.success'));
-        }
-    });
-
     const cancelMutation = useMutation({
         mutationFn: (id: string) => accessRequestAdminApi.cancel(id),
         onSuccess: () => {
@@ -184,10 +157,10 @@ const AccessRequestPage = () => {
             cancelled: {color: 'default', label: t('access_request.status.cancelled')},
             closed: {color: 'blue', label: t('access_request.status.closed')},
         };
-        const item = map[status] || {color: 'default', label: status};
+        const item = map[status] || {color: 'default', label: t('access_request.unknown_status', {status})};
         if ((status === 'rejected' || status === 'closed') && reason) {
             return (
-                <Tooltip title={reason}>
+                <Tooltip title={accessRequestReason(status, reason, t)}>
                     <Tag color={item.color}>{item.label}</Tag>
                 </Tooltip>
             );
@@ -268,7 +241,10 @@ const AccessRequestPage = () => {
             title: t('access_request.start_at_label'),
             dataIndex: 'requestedStartAt',
             width: 180,
-            render: (value: number) => value ? dayjs(value).format('YYYY-MM-DD HH:mm') : '-',
+            render: (value: number, record: AccessRequest) => {
+                const startAt = record.startAt || value;
+                return startAt ? dayjs(startAt).format('YYYY-MM-DD HH:mm') : '-';
+            },
         },
         {
             title: t('general.status'),
@@ -304,20 +280,15 @@ const AccessRequestPage = () => {
                 const actions = [] as React.ReactNode[];
                 if (record.status === 'pending') {
                     actions.push(
-                        <Button key="approve" type="link" size="small" onClick={() => {
-                            setApproveId(record.id);
-                            approveForm.setFieldsValue({durationMinutes: record.durationMinutes});
-                            setApproveOpen(true);
-                        }}>
-                            {t('access_request.approve')}
+                        <Button key="review" type="link" size="small" onClick={() => setDetailId(record.id)}>
+                            {t('access_request.review')}
                         </Button>
                     );
+                }
+                if (record.status !== 'pending') {
                     actions.push(
-                        <Button key="reject" type="link" danger size="small" onClick={() => {
-                            setRejectId(record.id);
-                            setRejectOpen(true);
-                        }}>
-                            {t('identity.policy.action.reject')}
+                        <Button key="detail" type="link" size="small" onClick={() => setDetailId(record.id)}>
+                            {t('actions.detail')}
                         </Button>
                     );
                 }
@@ -336,7 +307,7 @@ const AccessRequestPage = () => {
                     actions.push(
                         <Popconfirm
                             key="delete"
-                            title={`${t('actions.delete')}?`}
+                            title={t('general.confirm_delete')}
                             onConfirm={() => deleteMutation.mutate(record.id)}
                         >
                             <Button type="link" danger size="small">{t('actions.delete')}</Button>
@@ -403,6 +374,8 @@ const AccessRequestPage = () => {
                 scroll={{x: 'max-content'}}
             />
 
+            <AccessRequestDetailDrawer id={detailId} onClose={() => setDetailId(undefined)} />
+
             <Drawer
                 title={t('access_request.scope_title')}
                 extra={<Button type="primary" onClick={() => editScope()}>{t('access_request.scope_new')}</Button>}
@@ -457,96 +430,50 @@ const AccessRequestPage = () => {
                         },
                     ]}
                 />
+
+                <Modal
+                    title={t('access_request.scope_title')}
+                    open={scopeEditOpen}
+                    onCancel={() => { setScopeEditOpen(false); scopeForm.resetFields(); }}
+                    onOk={() => scopeForm.submit()}
+                    confirmLoading={scopeMutation.isPending}
+                    forceRender
+                >
+                    <Form<AccessRequestScope>
+                        form={scopeForm}
+                        layout="vertical"
+                        preserve={false}
+                        onFinish={(values) => scopeMutation.mutate({
+                            ...values,
+                            assetGroupIds: values.assetGroupIds || [],
+                            websiteGroupIds: values.websiteGroupIds || [],
+                            databaseAssetIds: values.databaseAssetIds || [],
+                        })}
+                    >
+                        <Form.Item name="departmentId" label={t('menus.identity.submenus.department')} rules={[{required: true}]}>
+                            <DepartmentTreeSelect style={{width: '100%'}} onChange={(departmentId: string) => {
+                                const scope = scopesQuery.data?.find(item => item.departmentId === departmentId);
+                                scopeForm.setFieldsValue({
+                                    assetGroupIds: scope?.assetGroupIds || [],
+                                    websiteGroupIds: scope?.websiteGroupIds || [],
+                                    databaseAssetIds: scope?.databaseAssetIds || [],
+                                });
+                            }} />
+                        </Form.Item>
+                        <Form.Item name="assetGroupIds" label={t('access_request.asset_groups')}>
+                            <AssetGroupTreeSelect multiple style={{width: '100%'}} />
+                        </Form.Item>
+                        <Form.Item name="websiteGroupIds" label={t('access_request.website_groups')}>
+                            <WebsiteGroupTreeSelect multiple style={{width: '100%'}} />
+                        </Form.Item>
+                        <Form.Item name="databaseAssetIds" label={t('access_request.databases')}>
+                            <DatabaseAssetSelect mode="multiple" style={{width: '100%'}} />
+                        </Form.Item>
+                        <div className="text-sm text-gray-500">{t('access_request.scope_tip')}</div>
+                    </Form>
+                </Modal>
             </Drawer>
 
-            <Modal
-                title={t('access_request.scope_title')}
-                open={scopeEditOpen}
-                onCancel={() => { setScopeEditOpen(false); scopeForm.resetFields(); }}
-                onOk={() => scopeForm.submit()}
-                confirmLoading={scopeMutation.isPending}
-                forceRender
-            >
-                <Form<AccessRequestScope>
-                    form={scopeForm}
-                    layout="vertical"
-                    preserve={false}
-                    onFinish={(values) => scopeMutation.mutate({
-                        ...values,
-                        assetGroupIds: values.assetGroupIds || [],
-                        websiteGroupIds: values.websiteGroupIds || [],
-                        databaseAssetIds: values.databaseAssetIds || [],
-                    })}
-                >
-                    <Form.Item name="departmentId" label={t('menus.identity.submenus.department')} rules={[{required: true}]}>
-                        <DepartmentTreeSelect style={{width: '100%'}} onChange={(departmentId: string) => {
-                            const scope = scopesQuery.data?.find(item => item.departmentId === departmentId);
-                            scopeForm.setFieldsValue({
-                                assetGroupIds: scope?.assetGroupIds || [],
-                                websiteGroupIds: scope?.websiteGroupIds || [],
-                                databaseAssetIds: scope?.databaseAssetIds || [],
-                            });
-                        }} />
-                    </Form.Item>
-                    <Form.Item name="assetGroupIds" label={t('access_request.asset_groups')}>
-                        <AssetGroupTreeSelect multiple style={{width: '100%'}} />
-                    </Form.Item>
-                    <Form.Item name="websiteGroupIds" label={t('access_request.website_groups')}>
-                        <WebsiteGroupTreeSelect multiple style={{width: '100%'}} />
-                    </Form.Item>
-                    <Form.Item name="databaseAssetIds" label={t('access_request.databases')}>
-                        <DatabaseAssetSelect mode="multiple" style={{width: '100%'}} />
-                    </Form.Item>
-                    <div className="text-sm text-gray-500">{t('access_request.scope_tip')}</div>
-                </Form>
-            </Modal>
-
-            <Modal
-                title={t('access_request.approve')}
-                open={approveOpen}
-                confirmLoading={approveMutation.isPending}
-                onCancel={() => setApproveOpen(false)}
-                onOk={() => approveForm.submit()}
-            >
-                <Form<ApproveAccessRequestRequest>
-                    form={approveForm}
-                    layout="vertical"
-                    onFinish={(values) => {
-                        if (approveId) {
-                            approveMutation.mutate({id: approveId, values});
-                        }
-                    }}
-                >
-                    <Form.Item label={t('access_request.approved_duration_minutes')} name="durationMinutes">
-                        <InputNumber min={1} max={1440} style={{width: '100%'}} />
-                    </Form.Item>
-                    <Form.Item label={t('general.remark')} name="reason">
-                        <Input.TextArea rows={3} />
-                    </Form.Item>
-                </Form>
-            </Modal>
-
-            <Modal
-                title={t('identity.policy.action.reject')}
-                open={rejectOpen}
-                confirmLoading={rejectMutation.isPending}
-                onCancel={() => setRejectOpen(false)}
-                onOk={() => rejectForm.submit()}
-            >
-                <Form<{reason: string}>
-                    form={rejectForm}
-                    layout="vertical"
-                    onFinish={(values) => {
-                        if (rejectId) {
-                            rejectMutation.mutate({id: rejectId, reason: values.reason});
-                        }
-                    }}
-                >
-                    <Form.Item label={t('access_request.reject_reason')} name="reason" rules={[{required: true}]}>
-                        <Input.TextArea rows={4} />
-                    </Form.Item>
-                </Form>
-            </Modal>
         </div>
     );
 };

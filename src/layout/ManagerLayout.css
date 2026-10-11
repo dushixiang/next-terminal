@@ -1,3 +1,19 @@
+/* 展开的导航保留完整名称；长译文换行，折叠后的图标菜单保持原样。 */
+.app-navigation-menu.ant-menu-inline .ant-menu-item,
+.app-navigation-menu.ant-menu-inline .ant-menu-submenu-title {
+    height: auto;
+    min-height: 40px;
+    line-height: 20px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.app-navigation-menu.ant-menu-inline .ant-menu-title-content {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+}
+
 /* 移动端样式优化 */
 @media (max-width: 768px) {
     .mobile-menu-drawer .ant-drawer-body {

@@ -243,8 +243,6 @@ const SSHKey = () => {
                 title={t('account.ssh_key_add')}
                 onCancel={() => setCreateOpen(false)}
                 onOk={handleCreateSubmit}
-                okText={t('actions.confirm')}
-                cancelText={t('actions.cancel')}
                 confirmLoading={createMutation.isPending}
             >
                 <Form form={form} layout="vertical">
@@ -274,8 +272,6 @@ const SSHKey = () => {
                 title={t('account.ssh_key_edit_name')}
                 onCancel={closeEditModal}
                 onOk={handleEditSubmit}
-                okText={t('actions.confirm')}
-                cancelText={t('actions.cancel')}
                 confirmLoading={updateNameMutation.isPending}
             >
                 <Form form={editForm} layout="vertical">

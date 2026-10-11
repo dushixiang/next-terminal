@@ -4,7 +4,7 @@ import {Form, Modal, Tree, Input} from "antd";
 import roleApi, { TreeNode } from "../../api/role-api";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
-import strings from '@/utils/strings';
+import {localizeRoleMenus} from './role-menu-labels';
 const api = roleApi;
 interface RoleProps {
   open: boolean;
@@ -34,7 +34,7 @@ const RoleModal = ({
   id
 }: RoleProps) => {
   let {
-    t
+    t, i18n
   } = useTranslation();
   const [form] = Form.useForm();
   let [checkedMenus, setCheckedMenus] = useState<string[]>([]);
@@ -47,36 +47,9 @@ const RoleModal = ({
     }
     return {};
   };
-  const wrapGetMenu = async () => {
-    let menus = await roleApi.getMenus();
-    deepT('', menus);
-    return menus;
-  };
-  const deepT = (parent: string, menus: TreeNode[]) => {
-    for (let i = 0; i < menus.length; i++) {
-      const menu = menus[i];
-      if (!menu) {
-        continue;
-      }
-      if (menu.isLeaf) {
-        menu.title = t('permissions.' + menu.key);
-      } else {
-        let parentKey = parent.replaceAll('-', '_');
-        let key = menu.key.replaceAll('-', '_');
-        if (strings.hasText(parent)) {
-          menu.title = t(`menus.${parentKey}.submenus.${key}`);
-        } else {
-          menu.title = t(`menus.${key}.label`);
-        }
-      }
-      if (menu.children) {
-        deepT(menu.key, menu.children);
-      }
-    }
-  };
   let menusQuery = useQuery({
     queryKey: ['menus'],
-    queryFn: wrapGetMenu,
+    queryFn: roleApi.getMenus,
     enabled: open
   });
   const onCheck = (checkedKeysValue: Key[] | { checked: Key[]; halfChecked: Key[] }) => {
@@ -122,7 +95,7 @@ const RoleModal = ({
                 <Form.Item label={t('identity.role.permission')} name='menus' rules={[{
         required: true
       }]}>
-                    <Tree checkable onCheck={onCheck} checkedKeys={checkedMenus} treeData={menusQuery.data ?? []} />
+                    <Tree checkable onCheck={onCheck} checkedKeys={checkedMenus} treeData={localizeRoleMenus(menusQuery.data ?? [], t, i18n)} />
                 </Form.Item>
             </Form>
         </Modal>;

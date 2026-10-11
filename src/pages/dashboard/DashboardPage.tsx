@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import {useEffect, useState} from 'react';
 import {useTranslation} from "react-i18next";
 import {useQuery} from "@tanstack/react-query";
@@ -230,7 +231,7 @@ const DashboardPage = () => {
                             minTickGap={32}
                             tickFormatter={(value) => {
                                 const date = new Date(value)
-                                return date.toLocaleDateString()
+                                return date.toLocaleDateString(i18n.resolvedLanguage || i18n.language)
                             }}
                         />
                         <ChartTooltip
@@ -238,7 +239,7 @@ const DashboardPage = () => {
                             content={
                                 <ChartTooltipContent
                                     labelFormatter={(value) => {
-                                        return new Date(String(value)).toLocaleDateString()
+                                        return new Date(String(value)).toLocaleDateString(i18n.resolvedLanguage || i18n.language)
                                     }}
                                     indicator="dot"
                                 />

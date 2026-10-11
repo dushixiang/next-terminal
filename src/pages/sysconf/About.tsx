@@ -73,7 +73,7 @@ const About = ({compact = false}: AboutProps) => {
                         isPending={versionQuery.isPending}
                         error={versionQuery.error}
                         value={version?.currentVersion}
-                        errorText={t('error')}
+                        errorText={t('general.error')}
                         isMobile={compact}
                     />
                     <VersionInfo
@@ -81,7 +81,7 @@ const About = ({compact = false}: AboutProps) => {
                         isPending={versionQuery.isPending}
                         error={versionQuery.error}
                         value={version?.latestVersion}
-                        errorText={t('error')}
+                        errorText={t('general.error')}
                         isMobile={compact}
                     />
                 </div>

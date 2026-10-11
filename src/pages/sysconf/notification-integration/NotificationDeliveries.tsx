@@ -52,7 +52,11 @@ const NotificationDeliveries = () => {
             dataIndex: 'channelId',
             hideInSearch: true,
             ellipsis: true,
-            render: (_text, record) => channelTypeLabel(record.channelId, t),
+            render: (_text, record) => record.channelId === 'personal-mail' ? t('settings.notification.personal_mail') : channelTypeLabel(record.channelId, t),
+        },
+        {
+            title: t('settings.notification.recipient'), dataIndex: 'recipientId', hideInSearch: true,
+            render: (_text, record) => record.request?.recipientName || record.recipientId || '-',
         },
         {
             title: t('general.created_at'),
@@ -67,6 +71,10 @@ const NotificationDeliveries = () => {
             hideInSearch: true,
             ellipsis: true,
             render: (_text, record) => {
+                if (record.recipientId && record.result === 'skipped') return <Tooltip title={t(`settings.notification.skip_reasons.${record.skipReason || 'record_or_permission_changed'}`)}>{t('settings.notification.personal_skipped')}</Tooltip>;
+                if (record.recipientId && record.nextRetryAt) return t('settings.notification.personal_queued');
+                if (record.recipientId && record.sentAt && !record.error) return t('general.success');
+                if (record.recipientId && record.error) return t('settings.notification.personal_failed');
                 if (!record.result) {
                     return '-';
                 }
@@ -92,9 +100,7 @@ const NotificationDeliveries = () => {
             render: (_text, record) => (
                 <Space size={8}>
                     <Popconfirm
-                        title={`${t('actions.delete')}?`}
-                        okText={t('actions.confirm')}
-                        cancelText={t('actions.cancel')}
+                        title={t('general.confirm_delete')}
                         onConfirm={() => deleteMutation.mutate(record.id)}
                     >
                         <Button type="link" danger size="small" loading={deleteMutation.isPending}>

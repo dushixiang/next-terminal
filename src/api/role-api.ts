@@ -18,7 +18,6 @@ export interface TreeNode {
     title: string;
     value?: string;
     children?: TreeNode[];
-    isLeaf: boolean;
 }
 
 class RoleApi extends Api<Role> {

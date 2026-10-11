@@ -85,7 +85,7 @@ const CertificateModal = ({
                             </>;
                         case 'issued':
                             return <>
-                                <Form.Item label={t("assets.certificates.renew_before")}>
+                                <Form.Item label={t("assets.certificates.renew_before")} extra={t("assets.certificates.renew_before_tip")}>
                                     <Space.Compact block>
                                         <Form.Item name='renewBefore' rules={[{
                                             required: true

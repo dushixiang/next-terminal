@@ -33,7 +33,7 @@ const LogoSelector: React.FC<LogoSelectorProps> = ({ logo, onLogoChange, extra }
 
     const beforeUpload: UploadProps['beforeUpload'] = (file) => {
         if (file.size > 1024 * 1024) {
-            message.error('Image must be smaller than 1MB!');
+            message.error(t('settings.logo.file_too_large'));
             return false;
         }
         return true;

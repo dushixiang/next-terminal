@@ -33,7 +33,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({status, onReconnect}) => 
     const hasMessage = status?.message && status.message.trim() !== '';
 
     return (
-        <div className="max-w-md w-[400px] bg-[#1E1E1E] border border-red-600 rounded-2xl p-6 shadow-2xl flex flex-col gap-3">
+        <div className="max-w-md w-full bg-[#1E1E1E] border border-red-600 rounded-2xl p-6 shadow-2xl flex flex-col gap-3">
             {/* 错误标题 */}
             <div className="flex items-center gap-2">
                 <XCircle className="text-red-500 w-7 h-7 animate-pulse"/>
@@ -51,7 +51,7 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({status, onReconnect}) => 
             )}
 
             {hasMessage && (
-                <div className="text-sm text-gray-300 break-words">
+                <div className="text-sm text-gray-300 break-words whitespace-pre-wrap">
                     <span className="font-semibold">{t('access.guacamole.message')}:</span>
                     <span className="ml-1">{status.message!}</span>
                 </div>

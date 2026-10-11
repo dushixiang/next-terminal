@@ -132,7 +132,7 @@ const PublicView: React.FC<PublicViewProps> = ({hasPremiumFeatures}) => {
                             autoComplete='new-password'
                             name='public-access-password'
                             spellCheck={false}
-                            placeholder="password123"/>
+                            placeholder={t('assets.public_password_placeholder')}/>
                     </Form.Item>
                 </div>
             </div>

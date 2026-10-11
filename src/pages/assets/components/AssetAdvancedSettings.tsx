@@ -223,12 +223,12 @@ export const getAssetAdvancedItems = (protocol: string, t: (key: string) => stri
         children: <RdpDomainSettings/>
     }, {
         key: 'PDU',
-        label: 'PDU',
+        label: t('assets.preconnection_setting'),
         forceRender: true,
         children: <PduSettings/>
     }, {
         key: 'remote-app',
-        label: 'Remote App',
+        label: t('assets.remote_app_setting'),
         forceRender: true,
         children: <RemoteAppSettings/>
     }, {

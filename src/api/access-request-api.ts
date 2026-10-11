@@ -15,6 +15,7 @@ export interface AccessRequest {
     approverName: string;
     status: string;
     requestReason: string;
+    /** 系统关闭时为原因码，其他情况为审批人输入的原文。 */
     reason: string;
     durationMinutes: number;
     requestedStartAt: number;
@@ -54,6 +55,7 @@ export interface AccessRequestScope {
 
 
 export interface ApproveAccessRequestRequest {
+    startAt?: number;
     durationMinutes?: number;
     commandFilterId?: string;
     strategyId?: string;

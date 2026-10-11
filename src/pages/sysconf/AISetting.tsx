@@ -548,8 +548,6 @@ const AISetting = ({get, set}: SettingProps) => {
                 open={disclaimerModalOpen}
                 onOk={handleDisclaimerOk}
                 onCancel={() => setDisclaimerModalOpen(false)}
-                okText={t('actions.confirm')}
-                cancelText={t('actions.cancel')}
             >
                 <Typography.Paragraph>{t('settings.ai.disclaimer_description')}</Typography.Paragraph>
                 <Checkbox checked={disclaimerChecked} onChange={event => setDisclaimerChecked(event.target.checked)}>

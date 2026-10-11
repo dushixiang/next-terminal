@@ -1,3 +1,4 @@
+import i18n from '@/react-i18next/i18n';
 import eventEmitter from '@/api/core/event-emitter';
 import {baseWebSocketUrl} from '@/api/core/requests';
 import {type ExportSession} from '@/api/portal-api';
@@ -49,9 +50,9 @@ const AccessTerminalBulkItem = ({assetId, securityToken, tabId, onClose}: Props)
                 rows: runtime.terminal.rows,
                 sessionId: nextSession.id,
             });
-            runtime.terminal.writeln('trying to connect to the server ...');
+            runtime.terminal.writeln(i18n.t('access.terminal.connecting'));
             runtime.connect(`${baseWebSocketUrl()}/access/terminal?${params}`, {
-                onError: () => runtime.terminal.writeln('websocket error'),
+                onError: () => runtime.terminal.writeln(i18n.t('access.terminal.connection_error')),
                 onMessage: (event) => {
                     const message = Message.parse(event.data);
                     if (message.type === MessageTypeData) {
@@ -172,8 +173,6 @@ const AccessTerminalBulkItem = ({assetId, securityToken, tabId, onClose}: Props)
                         runtimeRef.current?.closeSocket();
                         onClose?.();
                     }}
-                    okText={t('actions.confirm')}
-                    cancelText={t('actions.cancel')}
                 >
                     <XIcon className="ml-2 h-4 w-4 shrink-0 cursor-pointer text-gray-400 hover:text-red-400"/>
                 </Popconfirm>

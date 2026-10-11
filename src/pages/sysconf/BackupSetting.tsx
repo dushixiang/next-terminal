@@ -25,6 +25,7 @@ import {Download, Play, RefreshCw, RotateCcw, Save, Trash2, Upload} from "lucide
 import requests from "@/api/core/requests";
 import backupApi, {BackupConfigUpdate, BackupFile, BackupSuccessActions} from "@/api/backup-api";
 import {useTranslation} from "react-i18next";
+import {backupTaskMessage} from './backup-task-message';
 import {AssetTreeSelect} from "@/components/shared/QuerySelects";
 import PromptModal from "@/components/PromptModal";
 
@@ -248,11 +249,11 @@ const BackupSetting = () => {
             return;
         }
         if (task.status === 'success') {
-            messageApi.success(task.message || t('general.success'));
+            messageApi.success(backupTaskMessage(task, t));
             filesQuery.refetch();
         }
         if (task.status === 'failed') {
-            messageApi.error(task.message || t('settings.backup.task_failed'));
+            messageApi.error(backupTaskMessage(task, t));
         }
         setActiveTaskId('');
     }, [taskQuery.data, messageApi, filesQuery, t]);
@@ -389,7 +390,6 @@ const BackupSetting = () => {
             ),
             okText: t('settings.backup.restore'),
             okButtonProps: {danger: true},
-            cancelText: t('actions.cancel'),
             onOk: async () => {
                 await restoreMutation.mutateAsync(file.name);
             },
@@ -412,7 +412,6 @@ const BackupSetting = () => {
             ),
             okText: t('settings.backup.restore'),
             okButtonProps: {danger: true},
-            cancelText: t('actions.cancel'),
             onOk: async () => {
                 await uploadRestoreMutation.mutateAsync(file);
             },
@@ -495,7 +494,6 @@ const BackupSetting = () => {
                 maxLength={200}
                 showCount
                 okText={t('settings.backup.backup_now')}
-                cancelText={t('actions.cancel')}
             />
             <Space orientation="vertical" style={{width: '100%'}} size={16}>
                 <Alert
@@ -810,7 +808,7 @@ const BackupSetting = () => {
                 {task && activeTaskId && (
                     <Alert
                         type={task.status === 'failed' ? 'error' : 'info'}
-                        title={task.message || task.status}
+                        title={backupTaskMessage(task, t)}
                     />
                 )}
 

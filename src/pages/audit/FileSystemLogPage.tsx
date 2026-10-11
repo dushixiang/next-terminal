@@ -51,16 +51,10 @@ const FileSystemLogPage = () => {
             key: 'action',
             dataIndex: 'action',
             valueType: 'select',
-            valueEnum: {
-                // 'rm': {text: t('actions.delete')},
-                // 'edit': {text: t('actions.edit')},
-                'upload': {text: t('general.upload'),},
-                'download': {text: t('authorised.strategy.download'),},
-                'rename': {text: t('authorised.strategy.rename'),},
-                'remove': {text: t('actions.delete'),},
-                'create-dir': {text: t('authorised.strategy.create_dir'),},
-                'create-file': {text: t('authorised.strategy.create_file'),},
-            },
+            valueEnum: Object.fromEntries(
+                ['ls', 'upload', 'download', 'remove', 'edit', 'create-dir', 'create-file', 'rename', 'chmod']
+                    .map(action => [action, {text: t(`audit.filesystem_actions.${action}`)}]),
+            ),
             width: 140,
         },
         {
