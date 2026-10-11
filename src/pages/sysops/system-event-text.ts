@@ -1,7 +1,7 @@
-import zhCN from '../../../../internal/i18n/locales/zh-CN.json';
-import zhTW from '../../../../internal/i18n/locales/zh-TW.json';
-import enUS from '../../../../internal/i18n/locales/en-US.json';
-import jaJP from '../../../../internal/i18n/locales/ja-JP.json';
+import zhCN from '../../react-i18next/locales/system-events/zh-CN.json';
+import zhTW from '../../react-i18next/locales/system-events/zh-TW.json';
+import enUS from '../../react-i18next/locales/system-events/en-US.json';
+import jaJP from '../../react-i18next/locales/system-events/ja-JP.json';
 
 const templates = {
     'zh-CN': new Map(zhCN.map(item => [item.id, item.other])),
@@ -10,7 +10,7 @@ const templates = {
     'ja-JP': new Map(jaJP.map(item => [item.id, item.other])),
 };
 
-// 复用通知模板；只处理简单参数，缺少数据或未知模板时保留历史原文。
+// 使用前端自带的通知模板；只处理简单参数，缺少数据或未知模板时保留历史原文。
 export const systemEventText = (
     language: string,
     key: string | undefined,

@@ -460,7 +460,7 @@ const auditBackendTranslations = (flatLocales) => {
   const actions = [...readSource('internal/apps/access/models/filesystem_log.go').matchAll(/FileSystemAction = "([^"]+)"/g)].map(match => match[1]);
   const issues = [];
   const backendLocales = Object.fromEntries(locales.map(locale => {
-    const entries = readJson(path.join(repositoryRoot, 'internal/i18n/locales', `${locale}.json`));
+    const entries = readJson(path.join(localesDir, 'system-events', `${locale}.json`));
     const messages = new Map();
     for (const item of entries) {
       if (messages.has(item.id)) issues.push(`${locale}: duplicate notification template ${item.id}`);
