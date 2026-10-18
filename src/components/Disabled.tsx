@@ -1,3 +1,4 @@
+import {externalLinks} from "@/config/external-links";
 import {type CSSProperties, type ReactNode, useId} from 'react';
 import {Button, theme} from 'antd';
 import {ArrowUpRight, CheckCircle2, Sparkles} from 'lucide-react';
@@ -61,10 +62,10 @@ const Disabled = ({disabled, feature, compact = false, children, className, styl
                     <p className="m-0 text-xs leading-5" style={{color: token.colorTextSecondary}}>
                         {t('restricted_features.license_note')}
                     </p>
-                    <Button type="primary" href="https://www.next-terminal.com/pricing" target="_blank" rel="noopener noreferrer">
+                    {externalLinks.pricing && <Button type="primary" href={externalLinks.pricing} target="_blank" rel="noopener noreferrer">
                         {t('restricted_features.learn_more')}
                         <ArrowUpRight size={15} aria-hidden="true"/>
-                    </Button>
+                    </Button>}
                 </div>
             </div>
         </section>

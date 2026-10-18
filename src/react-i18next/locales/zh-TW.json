@@ -2932,10 +2932,21 @@
       "custom_system_prompt": "自訂系統提示詞",
       "custom_system_prompt_tip": "會追加到內建系統提示詞之後，最多 8000 字。",
       "history": "AI 對話紀錄",
-      "clear_history": "清除對話記錄",
-      "clear_history_tip": "刪除目前使用者的全部全域 AI 對話記錄，此操作無法復原。",
+      "clear_history": "清理我的歷史對話",
+      "clear_history_tip": "僅清理目前使用者的 AI 歷史對話，不影響其他使用者。",
       "clear_history_confirm": "確定要清除全部 AI 對話記錄嗎？",
-      "clear_history_success": "AI 對話記錄已清除"
+      "clear_history_success": "AI 對話記錄已清除",
+      "display_title": "對話展示",
+      "display_levels": {
+        "compact": "簡潔",
+        "standard": "標準",
+        "detailed": "詳細"
+      },
+      "display_hints": {
+        "compact": "預設收合執行過程，僅顯示基本狀態，完成後展示最終回答。",
+        "standard": "預設收合執行過程，顯示目前操作摘要，完成後展示最終回答。",
+        "detailed": "逐條展示助手訊息、思考過程和工具呼叫。"
+      }
     },
     "sms": {
       "webhook": "Webhook",
@@ -3288,7 +3299,33 @@
     "history_load_error": "載入對話失敗：{{message}}",
     "history_delete_error": "刪除對話失敗：{{message}}",
     "history_clear_error": "清空對話失敗：{{message}}",
-    "invalid_response": "收到無法解析的 AI 回應"
+    "invalid_response": "收到無法解析的 AI 回應",
+    "process_running": "正在執行",
+    "process_approval": "等待確認",
+    "process_completed": "執行完成",
+    "process_stopped": "執行已停止",
+    "process_failed": "執行失敗",
+    "process_tools": "{{count}} 次工具呼叫",
+    "settings": "設定",
+    "personal_preferences": "個人 AI 偏好",
+    "personal_preferences_tip": "僅對目前帳號生效，儲存後跨裝置同步。對話展示立即更新，攜帶命令片段從下次請求開始生效。",
+    "include_command_snippets_tip": "啟用後，AI 可讀取你有權存取的命令片段摘要，並依需要讀取具體內容。關閉後，後續請求不再提供命令片段；已進入歷史對話的內容仍會保留。",
+    "preferences_load_failed": "個人 AI 偏好載入失敗",
+    "tool_names": {
+      "terminal_execute": "執行命令",
+      "shell_io": "終端互動",
+      "file_read": "讀取檔案",
+      "file_write": "寫入檔案",
+      "file_edit": "編輯檔案",
+      "web_fetch": "讀取網頁",
+      "search_hosts": "搜尋資產",
+      "conversation_compact": "壓縮上下文",
+      "command_snippet_read": "讀取命令片段"
+    },
+    "file_path": "檔案路徑",
+    "tool_arguments": "工具參數",
+    "command_explanation": "操作說明",
+    "file_content": "檔案內容"
   },
   "restricted_features": {
     "credential_rotation": {

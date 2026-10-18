@@ -1,3 +1,4 @@
+import {externalLinks} from "@/config/external-links";
 import {App, Button, Spin, Tag, Tooltip, Typography} from "antd";
 import {CheckCircleOutlined, CopyOutlined, ExportOutlined, InfoCircleOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
@@ -8,7 +9,6 @@ import {cn} from "@/lib/utils";
 import {VersionInfo} from "@/components/VersionInfo";
 
 const UPGRADE_COMMAND = 'docker compose pull && docker compose up -d';
-const CHANGELOG_URL = 'https://www.next-terminal.com/changelog';
 
 interface AboutProps {
     compact?: boolean;
@@ -86,15 +86,15 @@ const About = ({compact = false}: AboutProps) => {
                     />
                 </div>
 
-                <Typography.Link
-                    href={CHANGELOG_URL}
+                {externalLinks.changelog && <Typography.Link
+                    href={externalLinks.changelog}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1"
                 >
                     {t('settings.about.view_changelog')}
                     <ExportOutlined/>
-                </Typography.Link>
+                </Typography.Link>}
 
                 <section>
                     <Typography.Text strong>{t('settings.about.upgrade_method')}</Typography.Text>

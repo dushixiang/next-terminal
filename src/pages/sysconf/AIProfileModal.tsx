@@ -196,18 +196,20 @@ const AIProfileModal = ({mode, open, profile, confirmLoading, onCancel, onSave}:
                 <Form.Item label={t('settings.ai.models')} extra={t('settings.ai.models_tip')}>
                     <Form.List name="models">
                         {(fields, {add, remove}) => (
-                            <Space orientation="vertical" className="w-full" size="small">
+                            <div className="grid gap-2">
                                 {fields.map(field => (
-                                    <Space.Compact key={field.key} className="w-full">
-                                        <Form.Item name={field.name} className="mb-0 flex-1"><Input placeholder="gpt-4o-mini" onBlur={handleModelsChange}/></Form.Item>
-                                        <Button danger icon={<Trash2Icon size={16}/>} disabled={fields.length <= 1} onClick={() => {
+                                    <div key={field.key} className="flex items-center gap-2">
+                                        <div className="min-w-0 flex-1">
+                                            <Form.Item name={field.name} noStyle><Input placeholder="gpt-4o-mini" onBlur={handleModelsChange}/></Form.Item>
+                                        </div>
+                                        <Button danger aria-label={t('actions.delete')} className="shrink-0" icon={<Trash2Icon size={16}/>} disabled={fields.length <= 1} onClick={() => {
                                             remove(field.name);
                                             setTimeout(handleModelsChange);
                                         }}/>
-                                    </Space.Compact>
+                                    </div>
                                 ))}
-                                <Button size="small" icon={<PlusIcon size={16}/>} onClick={() => add('')}>{t('settings.ai.add_model')}</Button>
-                            </Space>
+                                <Button size="small" className="w-fit" icon={<PlusIcon size={16}/>} onClick={() => add('')}>{t('settings.ai.add_model')}</Button>
+                            </div>
                         )}
                     </Form.List>
                 </Form.Item>

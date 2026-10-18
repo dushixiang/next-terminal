@@ -1,4 +1,6 @@
 import {useMutation, useQuery} from '@tanstack/react-query';
+import {App} from 'antd';
+import {useTranslation} from 'react-i18next';
 import assetApi from '@/api/asset-api';
 import GroupTree from '@/pages/assets/GroupTree';
 
@@ -8,6 +10,8 @@ interface Props {
 }
 
 const AssetTree = ({selected, onSelect}: Props) => {
+    const {modal} = App.useApp();
+    const {t} = useTranslation();
     const query = useQuery({
         queryKey: ['assets/tree'],
         queryFn: assetApi.getGroups,
@@ -26,7 +30,15 @@ const AssetTree = ({selected, onSelect}: Props) => {
             saving={saveMutation.isPending}
             onSelect={onSelect}
             onSave={data => saveMutation.mutateAsync(data)}
-            onDelete={key => deleteMutation.mutateAsync(key)}
+            onDelete={async key => {
+                modal.confirm({
+                    title: t('general.confirm_delete'),
+                    okText: t('actions.delete'),
+                    cancelText: t('actions.cancel'),
+                    okButtonProps: {danger: true},
+                    onOk: () => deleteMutation.mutateAsync(key),
+                });
+            }}
         />
     );
 };

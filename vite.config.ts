@@ -67,11 +67,11 @@ export default defineConfig(({mode}) => {
         server: {
             proxy: {
                 '/swagger/': {
-                    target: 'http://localhost:8888/',
+                    target: process.env.DEV_API_TARGET || 'http://localhost:8088/',
                     changeOrigin: true,
                 },
                 '/api/': {
-                    target: 'http://localhost:8888/',
+                    target: process.env.DEV_API_TARGET || 'http://localhost:8088/',
                     changeOrigin: true,
                     ws: true,
                 },

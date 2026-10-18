@@ -5,7 +5,6 @@ export interface Branding {
     name: string;
     version: string;
     icp: string;
-    hiddenUpgrade: boolean;
     debug: boolean;
 }
 

@@ -26,9 +26,9 @@ def warn(msg):    print(f"{YELLOW}[WARN]{RESET} {msg}")
 def error(msg):   print(f"{RED}[ERROR]{RESET} {msg}", file=sys.stderr)
 
 DEFAULT_POSTGRES_IMAGE = "postgres:16.4"
-CN_POSTGRES_IMAGE = "registry.cn-beijing.aliyuncs.com/dushixiang/postgres:16.4"
+CN_POSTGRES_IMAGE = os.environ.get("POSTGRES_IMAGE", "postgres:16")
 DEFAULT_PGLOADER_IMAGE = "ghcr.io/limetric/pgloader:latest"
-CN_PGLOADER_IMAGE = "docker.typeaudit.com/ghcr.io/limetric/pgloader:latest"
+CN_PGLOADER_IMAGE = os.environ.get("PGLOADER_IMAGE", DEFAULT_PGLOADER_IMAGE)
 
 # ── 通用输入工具 ──────────────────────────────────────────────────────────────
 

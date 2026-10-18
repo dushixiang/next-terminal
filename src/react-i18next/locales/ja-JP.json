@@ -2932,10 +2932,21 @@
       "custom_system_prompt": "カスタムシステムプロンプト",
       "custom_system_prompt_tip": "組み込みシステムプロンプトの後に追加されます。最大 8000 文字です。",
       "history": "AI 会話履歴",
-      "clear_history": "履歴を消去",
-      "clear_history_tip": "現在のユーザーのグローバル AI 会話をすべて削除します。この操作は取り消せません。",
+      "clear_history": "自分の会話履歴を削除",
+      "clear_history_tip": "現在のユーザーの AI 会話履歴のみを削除します。他のユーザーには影響しません。",
       "clear_history_confirm": "AI 会話履歴をすべて消去しますか？",
-      "clear_history_success": "AI 会話履歴を消去しました"
+      "clear_history_success": "AI 会話履歴を消去しました",
+      "display_title": "会話の表示",
+      "display_levels": {
+        "compact": "簡潔",
+        "standard": "標準",
+        "detailed": "詳細"
+      },
+      "display_hints": {
+        "compact": "実行過程を折りたたみ、基本状態と完了後の最終回答を表示します。",
+        "standard": "実行過程を折りたたみ、現在の操作概要と完了後の最終回答を表示します。",
+        "detailed": "アシスタントのメッセージ、思考過程、ツール呼び出しを個別に表示します。"
+      }
     },
     "sms": {
       "webhook": "Webhook",
@@ -3288,7 +3299,33 @@
     "history_load_error": "会話の読み込みに失敗しました：{{message}}",
     "history_delete_error": "会話の削除に失敗しました：{{message}}",
     "history_clear_error": "会話履歴のクリアに失敗しました：{{message}}",
-    "invalid_response": "解析できない AI 応答を受信しました"
+    "invalid_response": "解析できない AI 応答を受信しました",
+    "process_running": "実行中",
+    "process_approval": "承認待ち",
+    "process_completed": "完了",
+    "process_stopped": "停止",
+    "process_failed": "失敗",
+    "process_tools": "ツール呼び出し {{count}} 回",
+    "settings": "設定",
+    "personal_preferences": "個人 AI 設定",
+    "personal_preferences_tip": "現在のアカウントにのみ適用され、保存後に端末間で同期されます。表示は即座に更新され、コマンドスニペットの設定は次のリクエストから反映されます。",
+    "include_command_snippets_tip": "AI がアクセス権のあるコマンドスニペットの概要を参照し、必要に応じて内容を読み取れます。無効にすると以降のリクエストには提供されませんが、会話履歴に含まれる内容は残ります。",
+    "preferences_load_failed": "個人 AI 設定を読み込めませんでした",
+    "tool_names": {
+      "terminal_execute": "コマンド実行",
+      "shell_io": "ターミナル操作",
+      "file_read": "ファイル読取",
+      "file_write": "ファイル書込",
+      "file_edit": "ファイル編集",
+      "web_fetch": "Web ページ取得",
+      "search_hosts": "資産検索",
+      "conversation_compact": "コンテキスト圧縮",
+      "command_snippet_read": "コマンドスニペット読取"
+    },
+    "file_path": "ファイルパス",
+    "tool_arguments": "ツール引数",
+    "command_explanation": "操作の説明",
+    "file_content": "ファイル内容"
   },
   "restricted_features": {
     "credential_rotation": {

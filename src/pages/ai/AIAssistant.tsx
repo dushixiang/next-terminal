@@ -21,10 +21,22 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import copy from 'copy-to-clipboard';
 import {Virtuoso, type VirtuosoHandle} from 'react-virtuoso';
 import './AIAssistant.css';
+import {useAIPreferences, type AIDisplayLevel} from '@/api/ai-preferences-api';
+import AIPreferencesModal from './AIPreferencesModal';
+import {buildAIMessageRows, type AIProcessRow} from './aiMessagePresentation';
 import {
     AlertTriangleIcon,
     ArrowUpIcon,
     BrainIcon,
+    BookOpenIcon,
+    BotIcon,
+    CircleDashedIcon,
+    FileTextIcon,
+    FilePenLineIcon,
+    GlobeIcon,
+    SearchIcon,
+    ServerIcon,
+    WrenchIcon,
     CheckCircle2Icon,
     ChevronDownIcon,
     ChevronRightIcon,
@@ -37,6 +49,7 @@ import {
     PencilIcon,
     SparklesIcon,
     SquareIcon,
+    SettingsIcon,
     TerminalIcon,
     Trash2Icon,
     XCircleIcon,
@@ -58,7 +71,7 @@ import {MOBILE_TOOL_DRAWER_STYLES} from '@/pages/access/terminal-tool-drawer';
 
 type ConnectionState = 'connecting' | 'open' | 'closed' | 'error';
 
-type ChatItem =
+export type ChatItem =
     | {id: string; kind: 'user'; text: string; status?: 'queued' | 'failed'; clientMessageId?: string; persisted?: boolean}
     | {id: string; kind: 'assistant'; text: string; reasoning: string; reasoningStreaming?: boolean; streaming: boolean}
     | {id: string; kind: 'tool'; execution: AIToolExecution}
@@ -127,6 +140,7 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
     const [busy, setBusy] = useState(false);
     const [usage, setUsage] = useState<Usage | null>(null);
     const [historyOpen, setHistoryOpen] = useState(false);
+    const [preferencesOpen, setPreferencesOpen] = useState(false);
     const [historySearch, setHistorySearch] = useState('');
     const [loadingConversationId, setLoadingConversationId] = useState('');
     const [submittingDecisionId, setSubmittingDecisionId] = useState('');
@@ -134,6 +148,8 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
     const [editingMessageId, setEditingMessageId] = useState('');
     const [editConfirmOpen, setEditConfirmOpen] = useState(false);
     const [activeModel, setActiveModel] = useState('');
+
+    const preferences = useAIPreferences(open);
 
     const historyQueryKey = ['ai-conversations', 'global'];
     const modelOptionsQuery = useQuery({
@@ -545,6 +561,10 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                 placement="bottomRight"
                 menu={{
                     items: [{
+                        key: 'settings',
+                        label: t('ai_assistant.settings'),
+                        icon: <SettingsIcon className="h-3.5 w-3.5"/>,
+                    }, {
                         key: 'compact',
                         label: t('ai_assistant.compact'),
                         icon: <ChevronsDownUpIcon className="h-3.5 w-3.5"/>,
@@ -552,6 +572,7 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                     }],
                     onClick: ({key}) => {
                         if (key === 'compact') compactConversation();
+                        if (key === 'settings') setPreferencesOpen(true);
                     },
                 }}
             >
@@ -568,6 +589,8 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                 </div>
             ) : null}
             <MessageList
+                showHostInfo={!embedded && !drawer}
+                displayLevel={preferences.displayLevel}
                 items={items}
                 busy={busy}
                 scrollRequest={scrollRequest}
@@ -643,6 +666,7 @@ const AIAssistant = ({open = true, drawer = false, drawerPlacement = 'right', dr
                 </div>
             </div>
 
+            <AIPreferencesModal open={preferencesOpen} onClose={() => setPreferencesOpen(false)}/>
             <HistoryModal
                 open={historyOpen}
                 search={historySearch}
@@ -701,13 +725,17 @@ interface MessageListContext extends MessageActions {
     items: ChatItem[];
     busy: boolean;
     expanded: Map<string, boolean>;
+    displayLevel: AIDisplayLevel;
+    hostColors: Map<string, number>;
+    showHostInfo: boolean;
 }
 
 const messageListComponents = {
     Footer: ({context}: {context?: MessageListContext}) => <div className="px-3 pb-3">{context?.busy ? <LoadingBubble items={context.items}/> : null}</div>,
 };
 
-const MessageList = ({items, busy, scrollRequest, ...actions}: MessageActions & {items: ChatItem[]; busy: boolean; scrollRequest: number}) => {
+const MessageList = ({items, busy, scrollRequest, displayLevel, showHostInfo, ...actions}: MessageActions & {items: ChatItem[]; busy: boolean; scrollRequest: number; displayLevel: AIDisplayLevel; showHostInfo: boolean}) => {
+    const rows = buildAIMessageRows(items, displayLevel, busy);
     const {t} = useTranslation();
     const virtuosoRef = useRef<VirtuosoHandle>(null);
     const atBottomRef = useRef(true);
@@ -719,21 +747,31 @@ const MessageList = ({items, busy, scrollRequest, ...actions}: MessageActions & 
         virtuosoRef.current?.scrollToIndex({index: 'LAST', align: 'end'});
     }, [scrollRequest]);
     useEffect(() => {
-        const ids = new Set(items.map(item => item.id));
-        for (const id of expanded.keys()) if (!ids.has(id)) expanded.delete(id);
+        const ids = new Set(items.flatMap(item => [item.id, `${item.id}:reasoning`, `process:${item.kind === 'user' ? item.clientMessageId || item.id : item.id}`]));
+        for (const id of expanded.keys()) {
+            const anchor = id.replace(/:(running|approval|completed|stopped|failed)$/, '');
+            if (!ids.has(id) && !ids.has(anchor)) expanded.delete(id);
+        }
     }, [items, expanded]);
-    const context: MessageListContext = {...actions, items, busy, expanded};
+    const hostColors = new Map<string, number>();
+    for (const item of items) {
+        if (item.kind !== 'tool') continue;
+        const args = item.execution.arguments || {};
+        const key = toolStringArg(args, 'hostId') || toolStringArg(args, 'hostName');
+        if (key && !hostColors.has(key)) hostColors.set(key, hostColors.size);
+    }
+    const context: MessageListContext = {...actions, items, busy, expanded, displayLevel, hostColors, showHostInfo};
     return <div className="relative h-0 min-h-0 flex-1 overflow-hidden pt-3 text-sm">
         {items.length === 0 ? <div className="px-3 pt-10 text-center text-gray-400">{t('ai_assistant.empty')}{busy ? <LoadingBubble items={items}/> : null}</div> : (
                 <Virtuoso
                     ref={virtuosoRef}
                     className="h-full overflow-x-hidden"
-                    data={items}
+                    data={rows}
                     context={context}
                     computeItemKey={(_index, item) => item.kind === 'user' ? item.clientMessageId || item.id : item.id}
-                    itemContent={(_index, item, context) => <div className="px-3 pb-2"><MessageItem item={item} {...context}/></div>}
+                    itemContent={(index, item, context) => <div className={`px-3 ${item.kind === 'tool' ? 'pb-1' : item.kind === 'user' || item.kind === 'assistant' ? 'pb-6' : 'pb-3'} ${index > 0 && item.kind === 'user' ? 'pt-3' : ''}`}>{item.kind === 'process' ? <ProcessRow key={`${item.id}:${item.status}`} item={item} context={context}/> : <MessageItem item={item} {...context}/>}</div>}
                     components={messageListComponents}
-                    initialTopMostItemIndex={{index: items.length - 1, align: 'end'}}
+                    initialTopMostItemIndex={{index: rows.length - 1, align: 'end'}}
                     increaseViewportBy={{top: 400, bottom: 200}}
                     followOutput="auto"
                     atBottomThreshold={4}
@@ -750,6 +788,23 @@ const MessageList = ({items, busy, scrollRequest, ...actions}: MessageActions & 
     </div>;
 };
 
+const ProcessRow = ({item, context}: {item: AIProcessRow; context: MessageListContext}) => {
+    const {t} = useTranslation();
+    const [expanded, toggle] = useMessageExpanded(context.expanded, `${item.id}:${item.status}`, ['failed', 'stopped', 'approval'].includes(item.status));
+    const latest = item.items[item.items.length - 1];
+    const detail = latest?.kind === 'tool' ? formatToolExecution(latest.execution) : latest?.kind === 'assistant' ? latest.text.trim().split('\n').slice(-1)[0] : '';
+    return <div className="min-w-0">
+        <button type="button" aria-expanded={expanded} className="flex w-full min-w-0 items-center gap-1.5 py-1 text-left text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" onClick={toggle}>
+            {item.status === 'running' ? <LoaderCircleIcon className="h-3.5 w-3.5 shrink-0 animate-spin"/> : item.status === 'failed' || item.status === 'stopped' ? <XCircleIcon className="h-3.5 w-3.5 shrink-0"/> : item.status === 'approval' ? <AlertTriangleIcon className="h-3.5 w-3.5 shrink-0"/> : <CheckCircle2Icon className="h-3.5 w-3.5 shrink-0"/>}
+            <span className="shrink-0" role="status">{t(`ai_assistant.process_${item.status}`)}</span>
+            {item.toolCount > 0 ? <span className="shrink-0">· {t('ai_assistant.process_tools', {count: item.toolCount})}</span> : null}
+            {context.displayLevel === 'standard' && item.status === 'running' && detail ? <span className="truncate">· {detail}</span> : null}
+            {expanded ? <ChevronDownIcon className="ml-auto h-3.5 w-3.5 shrink-0"/> : <ChevronRightIcon className="ml-auto h-3.5 w-3.5 shrink-0"/>}
+        </button>
+        {expanded ? <div className="ml-1.5 space-y-1 border-l border-gray-200 py-1 pl-3 dark:border-white/10">{item.items.map(entry => <div key={entry.id} className={entry.kind === 'assistant' ? 'py-1' : undefined}><MessageItem item={entry} {...context} inProcess/></div>)}</div> : null}
+    </div>;
+};
+
 const useMessageExpanded = (states: Map<string, boolean>, id: string, initial: boolean) => {
     const [expanded, setExpanded] = useState(() => states.get(id) ?? initial);
     useEffect(() => {
@@ -762,80 +817,125 @@ const useMessageExpanded = (states: Map<string, boolean>, id: string, initial: b
     return [expanded, toggle] as const;
 };
 
-const MessageItem = ({item, expanded, actionsDisabled, onCopy, onSendNow, onRetry, onEdit}: MessageActions & {
+const MessageItem = ({item, expanded, hostColors, showHostInfo, inProcess = false, actionsDisabled, onCopy, onSendNow, onRetry, onEdit}: MessageActions & {
     item: ChatItem;
     expanded: Map<string, boolean>;
+    hostColors: Map<string, number>;
+    showHostInfo: boolean;
+    inProcess?: boolean;
 }) => {
     const {t} = useTranslation();
-
-    if (item.kind === 'tool') return <ToolItem key={item.id} execution={item.execution} onCopy={onCopy} expandedStates={expanded} itemId={item.id}/>;
-    if (item.kind === 'retry') return <div key={item.id} className="rounded bg-amber-50 px-3 py-2 text-xs text-amber-700 dark:bg-amber-950/30 dark:text-amber-300">{t('ai_assistant.retrying', {attempt: item.attempt, max: item.maxRetries, seconds: Math.ceil(item.delayMs / 1000), reason: item.reason})}</div>;
-    if (item.kind === 'error') return <div key={item.id} className="rounded bg-red-50 px-3 py-2 text-xs text-red-600 dark:bg-red-950/30 dark:text-red-400">{item.text}</div>;
+    if (item.kind === 'tool') {
+        const args = item.execution.arguments || {};
+        const key = toolStringArg(args, 'hostId') || toolStringArg(args, 'hostName');
+        return <ToolItem execution={item.execution} onCopy={onCopy} expandedStates={expanded} itemId={item.id} hostColorIndex={hostColors.get(key) || 0} showHostInfo={showHostInfo}/>;
+    }
+    if (item.kind === 'retry') return <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-2.5 py-2 text-xs text-amber-700 dark:text-amber-300">{t('ai_assistant.retrying', {attempt: item.attempt, max: item.maxRetries, seconds: Math.ceil(item.delayMs / 1000), reason: item.reason})}</div>;
+    if (item.kind === 'error') return <div className="rounded-lg border border-red-500/20 bg-red-500/8 px-2.5 py-2 text-xs text-red-600 dark:text-red-400">{item.text}</div>;
     if (item.kind === 'user') return (
-        <div key={item.id} className="flex min-w-0 justify-end">
-            <div className={`group/message relative min-w-0 max-w-[80%] whitespace-pre-wrap break-words rounded-2xl rounded-br-md border px-3.5 py-2.5 pr-8 shadow-sm ${item.status ? 'border-dashed border-blue-500/40 bg-blue-500/10' : 'ai-message-user'}`}>
-                <CopyButton onClick={() => onCopy(item.text)}/>
-                {!item.status && item.persisted ? (
-                    <Tooltip title={t('actions.edit')}><button type="button" aria-label={t('actions.edit')} disabled={actionsDisabled} className="absolute right-7 top-1 z-10 flex h-6 w-6 items-center justify-center rounded text-current opacity-0 transition-opacity hover:bg-black/10 focus-visible:opacity-100 disabled:cursor-not-allowed group-hover/message:opacity-70" onClick={() => onEdit(item)}><PencilIcon className="h-3.5 w-3.5"/></button></Tooltip>
-                ) : null}
-                {item.text}
-                {item.status ? (
-                    <div className="mt-1 flex items-center justify-between gap-2 text-[10px] font-medium text-gray-500">
-                        <span>{t(item.status === 'failed' ? 'ai_assistant.failed' : 'ai_assistant.queued')}</span>
-                        {item.status === 'queued' ? <button type="button" className="underline" onClick={() => onSendNow(item)}>{t('ai_assistant.send_now')}</button> : null}
-                        {item.status === 'failed' ? <button type="button" disabled={actionsDisabled} className="underline disabled:cursor-not-allowed disabled:opacity-50" onClick={() => onRetry(item)}>{t('actions.retry')}</button> : null}
-                    </div>
-                ) : null}
+        <div className="flex min-w-0 justify-end">
+            <div className="ai-message-user-wrap group/message relative min-w-0 max-w-[88%]">
+                <div className={`min-w-0 whitespace-pre-wrap break-words rounded-2xl rounded-br-md border px-3.5 py-2.5 shadow-sm ${item.status === 'queued' ? 'border-dashed border-blue-500/40 bg-blue-500/10' : item.status === 'failed' ? 'border-red-500/30 bg-red-500/10' : 'ai-message-user'}`}>
+                    {item.text}
+                    {item.status ? (
+                        <div className="mt-2 flex items-center justify-between gap-2 text-[10px] font-medium text-gray-500">
+                            <span>{t(item.status === 'failed' ? 'ai_assistant.failed' : 'ai_assistant.queued')}</span>
+                            {item.status === 'queued' ? <Button size="small" onClick={() => onSendNow(item)}>{t('ai_assistant.send_now')}</Button> : <Button size="small" disabled={actionsDisabled} onClick={() => onRetry(item)}>{t('actions.retry')}</Button>}
+                        </div>
+                    ) : null}
+                </div>
+                <MessageActionsBar onCopy={() => onCopy(item.text)}>
+                    {!item.status && item.persisted ? <Tooltip title={t('actions.edit')}><button type="button" aria-label={t('actions.edit')} disabled={actionsDisabled} className="ai-message-action" onClick={() => onEdit(item)}><PencilIcon className="h-3.5 w-3.5"/></button></Tooltip> : null}
+                </MessageActionsBar>
             </div>
         </div>
     );
     return (
-        <div key={item.id} className="ai-message-assistant group/message relative flex w-full min-w-0 flex-col overflow-hidden break-words rounded-2xl rounded-tl-md border px-3 py-3 shadow-sm">
-            {item.reasoning ? <ReasoningContent expandedStates={expanded} itemId={item.id} text={item.reasoning} streaming={item.streaming && Boolean(item.reasoningStreaming)} onCopy={onCopy}/> : null}
-            {item.text ? <AIMessageMarkdown text={item.text}/> : null}
-            {item.streaming && item.text ? <span className="ml-1 inline-block h-3.5 w-1.5 animate-pulse bg-current align-middle opacity-60"/> : null}
-            <div className="mt-1 flex w-full shrink-0 justify-end"><CopyButton placement="footer" onClick={() => onCopy(item.text || item.reasoning)}/></div>
+        <div className="group/message relative w-full min-w-0">
+            <div className={`w-full min-w-0 break-words ${inProcess ? 'text-gray-500 dark:text-gray-400' : 'ai-message-assistant rounded-xl rounded-tl-sm border px-3 py-2.5'}`}>
+                {item.reasoning ? <ReasoningContent expandedStates={expanded} itemId={item.id} text={item.reasoning} streaming={item.streaming && Boolean(item.reasoningStreaming)} onCopy={onCopy}/> : null}
+                {item.text ? <AIMessageMarkdown text={item.text}/> : null}
+                {item.streaming && item.text ? <span className="ml-0.5 inline-block h-3.5 w-1.5 animate-pulse bg-current align-middle opacity-60"/> : null}
+            </div>
+            {!inProcess ? <MessageActionsBar onCopy={() => onCopy(item.text || item.reasoning)}/> : null}
         </div>
     );
 };
 
-const CopyButton = ({onClick, placement = 'overlay'}: {onClick: () => void; placement?: 'overlay' | 'footer'}) => {
+const MessageActionsBar = ({onCopy, children}: {onCopy: () => void; children?: React.ReactNode}) => {
     const {t} = useTranslation();
-    return <Tooltip title={t('actions.copy')}><button type="button" aria-label={t('actions.copy')} className={`flex h-6 w-6 items-center justify-center rounded text-current transition-opacity hover:bg-black/10 focus-visible:opacity-100 dark:hover:bg-white/10 ${placement === 'footer' ? 'ai-message-copy-footer opacity-40 group-hover/message:opacity-100' : 'absolute right-1 top-1 z-10 opacity-0 group-hover/message:opacity-70'}`} onClick={onClick}><CopyIcon className="h-3.5 w-3.5"/></button></Tooltip>;
+    return <div className="ai-message-actions absolute -bottom-2 right-2 z-10 flex translate-y-1/2 items-center gap-0.5 rounded-md border p-0.5 shadow-sm">
+        <Tooltip title={t('actions.copy')}><button type="button" aria-label={t('actions.copy')} className="ai-message-action" onClick={onCopy}><CopyIcon className="h-3 w-3"/></button></Tooltip>
+        {children}
+    </div>;
 };
 
-const ToolItem = ({execution, onCopy, expandedStates, itemId}: {execution: AIToolExecution; onCopy: (text: string) => void; expandedStates: Map<string, boolean>; itemId: string}) => {
+const toolTypeIcons = {
+    terminal_execute: TerminalIcon,
+    shell_io: TerminalIcon,
+    file_read: FileTextIcon,
+    file_write: FilePenLineIcon,
+    file_edit: FilePenLineIcon,
+    web_fetch: GlobeIcon,
+    search_hosts: SearchIcon,
+    conversation_compact: ChevronsDownUpIcon,
+    command_snippet_read: BookOpenIcon,
+};
+const toolStringArg = (args: Record<string, unknown>, name: string): string => typeof args[name] === 'string' ? args[name] as string : '';
+const hostBadgeColors = [
+    'border-blue-500/30 border-l-blue-500 bg-blue-500/8',
+    'border-emerald-500/30 border-l-emerald-500 bg-emerald-500/8',
+    'border-violet-500/30 border-l-violet-500 bg-violet-500/8',
+    'border-amber-500/30 border-l-amber-500 bg-amber-500/8',
+    'border-rose-500/30 border-l-rose-500 bg-rose-500/8',
+    'border-cyan-500/30 border-l-cyan-500 bg-cyan-500/8',
+];
+
+const ToolItem = ({execution, onCopy, expandedStates, itemId, hostColorIndex, showHostInfo}: {execution: AIToolExecution; onCopy: (text: string) => void; expandedStates: Map<string, boolean>; itemId: string; hostColorIndex: number; showHostInfo: boolean}) => {
     const {t} = useTranslation();
-    const failed = ['failed', 'rejected', 'cancelled', 'timed_out', 'needs_revision'].includes(execution.state);
+    const args = execution.arguments || {};
+    const failed = ['failed', 'rejected', 'timed_out'].includes(execution.state);
     const active = ['reviewing', 'running'].includes(execution.state);
+    const pending = ['awaiting_approval', 'needs_revision'].includes(execution.state);
+    const toolName = t(`ai_assistant.tool_names.${execution.name}`, {defaultValue: execution.name});
+    const command = toolStringArg(args, 'command');
+    const path = toolStringArg(args, 'path');
+    const explanation = toolStringArg(args, 'explanation');
+    const hostName = showHostInfo ? toolStringArg(args, 'hostName') || toolStringArg(args, 'hostId') : '';
     const label = formatToolExecution(execution);
+    const detail = command || path || toolStringArg(args, 'url') || toolStringArg(args, 'keyword') || toolStringArg(args, 'snippetId');
+    const content = execution.name === 'file_write' ? toolStringArg(args, 'content') : '';
     const result = execution.result;
     const compactWithoutOutput = execution.name === 'conversation_compact' && !result?.output?.trim();
-    const [expanded, toggleExpanded] = useMessageExpanded(expandedStates, itemId, !result || execution.state === 'awaiting_approval' || result.exitCode !== 0);
-    const icon = active ? <LoaderCircleIcon className="h-3.5 w-3.5 animate-spin"/> : failed ? <XCircleIcon className="h-3.5 w-3.5"/> : execution.state === 'succeeded' ? <CheckCircle2Icon className="h-3.5 w-3.5"/> : <TerminalIcon className="h-3.5 w-3.5"/>;
+    const [expanded, toggleExpanded] = useMessageExpanded(expandedStates, itemId, false);
+    const Icon = toolTypeIcons[execution.name as keyof typeof toolTypeIcons] || WrenchIcon;
+    const icon = active ? <CircleDashedIcon className="h-3.5 w-3.5 animate-spin"/> : pending ? <AlertTriangleIcon className="h-3.5 w-3.5"/> : failed ? <XCircleIcon className="h-3.5 w-3.5"/> : execution.state === 'succeeded' ? <CheckCircle2Icon className="h-3.5 w-3.5"/> : <TerminalIcon className="h-3.5 w-3.5"/>;
     const statusColor = execution.state === 'reviewing' ? 'text-blue-600 dark:text-blue-400'
-        : execution.state === 'awaiting_approval' || execution.state === 'needs_revision' ? 'text-amber-700 dark:text-amber-300'
-            : failed && execution.state !== 'cancelled' ? 'text-red-600 dark:text-red-400'
-                : execution.state === 'succeeded' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500';
-    const canExpand = Boolean(label || (result && !compactWithoutOutput) || execution.fileDiff || execution.approvalReview);
+        : pending ? 'text-amber-700 dark:text-amber-300'
+            : failed ? 'text-red-600 dark:text-red-400'
+                : execution.state === 'succeeded' ? 'text-emerald-600 dark:text-emerald-400' : 'text-gray-500 dark:text-gray-400';
+    const canExpand = Boolean(detail || explanation || content || (result && !compactWithoutOutput) || execution.fileDiff || execution.approvalReview);
     return (
-        <div className="ai-message-tool overflow-hidden rounded-xl border shadow-sm">
-            <button type="button" disabled={!canExpand} title={label || execution.name} className="flex w-full items-center gap-2 px-2.5 py-2 text-left text-xs outline-none transition-colors hover:bg-black/[0.035] disabled:cursor-default dark:hover:bg-white/[0.06]" onClick={toggleExpanded}>
-                <span className={`flex shrink-0 items-center gap-1 rounded-sm bg-black/[0.05] px-1.5 py-0.5 text-[10px] leading-none dark:bg-white/10 ${statusColor}`}>
-                    {icon}<span>{t(`ai_assistant.tool_state_${execution.state}`)}</span>
+        <div className="ai-message-tool min-w-0 overflow-hidden rounded-lg border">
+            <button type="button" aria-expanded={canExpand ? expanded : undefined} aria-disabled={!canExpand} aria-label={label || toolName} title={[hostName, label].filter(Boolean).join('\n') || undefined} className="ai-message-tool-trigger flex w-full min-w-0 items-center gap-2 px-2.5 py-1.5 text-left text-xs outline-none aria-disabled:cursor-default focus-visible:ring-2 focus-visible:ring-blue-500/30" onClick={canExpand ? toggleExpanded : undefined}>
+                {hostName ? <span className={`inline-flex max-w-[35%] shrink-0 items-center gap-1.5 rounded border border-l-2 px-1.5 py-0.5 text-[10px] font-medium leading-none ${hostBadgeColors[hostColorIndex % hostBadgeColors.length]}`}><ServerIcon className="h-3 w-3 shrink-0"/><span className="truncate">{hostName}</span></span> : null}
+                <span className="flex min-w-0 flex-1 items-center gap-1.5">
+                    <Tooltip title={toolName}><span className="inline-flex shrink-0 text-gray-500 dark:text-gray-400" aria-label={toolName}><Icon className="h-3.5 w-3.5"/></span></Tooltip>
+                    <span className="min-w-0 truncate font-mono">{label}</span>
                 </span>
-                <span className="min-w-0 flex-1 truncate font-mono">{label || execution.name}</span>
-                {result && !compactWithoutOutput ? <span className="shrink-0 tabular-nums text-gray-500">{result.durationMs}ms</span> : null}
+                <Tooltip title={t(`ai_assistant.tool_state_${execution.state}`)}><span className={`inline-flex shrink-0 ${statusColor}`} aria-label={t(`ai_assistant.tool_state_${execution.state}`)}>{icon}</span></Tooltip>
+                {result && !compactWithoutOutput ? <span className="shrink-0 tabular-nums text-gray-500 dark:text-gray-400">{result.durationMs}ms</span> : null}
                 {canExpand ? expanded ? <ChevronDownIcon className="h-3.5 w-3.5 shrink-0 text-gray-500"/> : <ChevronRightIcon className="h-3.5 w-3.5 shrink-0 text-gray-500"/> : null}
             </button>
             {canExpand && expanded ? (
                 <div className="ai-message-tool-content space-y-2 border-t px-2.5 py-2.5">
                     {execution.approvalReview ? <div className="rounded-md border border-blue-500/20 bg-blue-500/5 px-2 py-1.5 text-xs">
-                        <div className="font-medium text-blue-600 dark:text-blue-400">{t('ai_assistant.approval_review')}{execution.approvalReview.riskLevel ? ` · ${execution.approvalReview.riskLevel}` : ''}</div>
-                        {execution.approvalReview.rationale ? <div className="mt-1 whitespace-pre-wrap break-words leading-relaxed text-gray-500">{execution.approvalReview.rationale}</div> : null}
+                        <div className="flex items-center gap-1.5 font-medium"><BotIcon className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400"/>{t('ai_assistant.approval_review')}{execution.approvalReview.riskLevel ? <span className="text-[10px] font-normal text-gray-500">{execution.approvalReview.riskLevel}</span> : null}</div>
+                        {execution.approvalReview.rationale ? <div className="mt-1 whitespace-pre-wrap break-words leading-relaxed text-gray-500 dark:text-gray-400">{execution.approvalReview.rationale}</div> : null}
                     </div> : null}
-                    {label ? <ToolTextBlock title={t('ai_assistant.full_command')} text={label} onCopy={() => onCopy(label)}/> : null}
-                    {execution.fileDiff ? <ToolTextBlock title={t('ai_assistant.file_changes')} text={formatFileDiff(execution)} onCopy={() => onCopy(formatFileDiff(execution))}/> : null}
+                    {detail ? <ToolTextBlock title={t(path ? 'ai_assistant.file_path' : command ? 'ai_assistant.full_command' : 'ai_assistant.tool_arguments')} text={detail} onCopy={() => onCopy(detail)}/> : null}
+                    {explanation ? <ToolTextBlock title={t('ai_assistant.command_explanation')} text={explanation} onCopy={() => onCopy(explanation)}/> : null}
+                    {execution.fileDiff ? <ToolTextBlock title={t('ai_assistant.file_changes')} text={formatFileDiff(execution)} onCopy={() => onCopy(formatFileDiff(execution))}/> : content ? <ToolTextBlock title={t('ai_assistant.file_content')} text={content} onCopy={() => onCopy(content)}/> : null}
                     {result && !compactWithoutOutput ? <ToolTextBlock title={t('ai_assistant.tool_output')} text={result.output || t('ai_assistant.no_output')} muted={!result.output} onCopy={() => onCopy(result.output)}/> : null}
                 </div>
             ) : null}
@@ -848,18 +948,28 @@ const LoadingBubble = ({items}: {items: ChatItem[]}) => {
     const last = items[items.length - 1];
     if (last?.kind === 'assistant' && last.streaming) return null;
     const label = last?.kind === 'tool' ? t('ai_assistant.running_tool') : last?.kind === 'user' ? t('ai_assistant.thinking') : t('ai_assistant.generating');
-    return <div className="flex justify-start"><div className="flex items-center gap-2 rounded-lg bg-[var(--ai-assistant-bubble-background)] px-3 py-2 text-xs text-gray-500 ring-1 ring-inset ring-[var(--ai-assistant-bubble-border)]"><span className="flex gap-1"><span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]"/><span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]"/><span className="h-1.5 w-1.5 animate-bounce rounded-full bg-current"/></span><span>{label}</span></div></div>;
+    return <div className="flex h-7 items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400" role="status"><LoaderCircleIcon className="h-3.5 w-3.5 shrink-0 animate-spin"/><span>{label}</span></div>;
 };
 
 const ReasoningContent = ({text, streaming, onCopy, expandedStates, itemId}: {text: string; streaming: boolean; onCopy: (text: string) => void; expandedStates: Map<string, boolean>; itemId: string}) => {
     const {t} = useTranslation();
     const [expanded, toggleExpanded] = useMessageExpanded(expandedStates, itemId, streaming);
-    return <div className="mb-2 w-full min-w-0 overflow-hidden rounded-md border border-gray-200 bg-white/45 dark:border-white/10 dark:bg-black/15"><div className="flex min-w-0 items-center gap-1.5 px-2 py-1.5 text-xs text-gray-500"><button type="button" className="flex min-w-0 flex-1 items-center gap-1.5 text-left outline-none" onClick={toggleExpanded}>{expanded ? <ChevronDownIcon className="h-3.5 w-3.5"/> : <ChevronRightIcon className="h-3.5 w-3.5"/>}<BrainIcon className="h-3.5 w-3.5"/><span className="truncate font-medium">{t('ai_assistant.reasoning')}</span>{streaming ? <LoaderCircleIcon className="h-3.5 w-3.5 animate-spin"/> : null}</button><Tooltip title={t('actions.copy')}><Button type="text" size="small" icon={<CopyIcon className="h-3.5 w-3.5"/>} onClick={() => onCopy(text)}/></Tooltip></div>{expanded ? <pre className="max-h-56 w-full min-w-0 overflow-x-hidden overflow-y-auto whitespace-pre-wrap [overflow-wrap:anywhere] border-t border-gray-200 px-2 py-2 text-xs leading-relaxed text-gray-500 dark:border-white/10">{text}</pre> : null}</div>;
+    return <div className="ai-message-reasoning mb-2 w-full min-w-0 overflow-hidden rounded-md border">
+        <button type="button" aria-expanded={expanded} className="flex w-full min-w-0 items-center gap-1.5 px-2 py-1.5 text-left text-xs text-gray-500 outline-none hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" onClick={toggleExpanded}>
+            <BrainIcon className="h-3.5 w-3.5 shrink-0"/><span className="min-w-0 flex-1 truncate font-medium">{t('ai_assistant.reasoning')}</span>
+            {streaming ? <CircleDashedIcon className="h-3.5 w-3.5 shrink-0 animate-spin"/> : null}
+            {expanded ? <ChevronDownIcon className="h-3.5 w-3.5 shrink-0"/> : <ChevronRightIcon className="h-3.5 w-3.5 shrink-0"/>}
+        </button>
+        {expanded ? <div className="border-t border-gray-200/70 dark:border-white/10">
+            <pre className="max-h-56 w-full min-w-0 overflow-auto whitespace-pre-wrap [overflow-wrap:anywhere] px-2 pt-2 text-xs leading-relaxed text-gray-500 dark:text-gray-400">{text}</pre>
+            <div className="flex justify-end px-2 py-1"><Tooltip title={t('actions.copy')}><button type="button" aria-label={t('actions.copy')} className="ai-message-action" onClick={() => onCopy(text)}><CopyIcon className="h-3.5 w-3.5"/></button></Tooltip></div>
+        </div> : null}
+    </div>;
 };
 
 const ToolTextBlock = ({title, text, muted, onCopy}: {title: string; text: string; muted?: boolean; onCopy: () => void}) => {
     const {t} = useTranslation();
-    return <div className="min-w-0"><div className="mb-1 flex items-center justify-between gap-2"><span className="text-[10px] font-medium text-gray-500">{title}</span><Tooltip title={t('actions.copy')}><Button type="text" size="small" icon={<CopyIcon className="h-3.5 w-3.5"/>} onClick={onCopy}/></Tooltip></div><pre className={`max-h-64 overflow-auto whitespace-pre-wrap break-words rounded bg-white/70 px-2 py-1.5 font-mono text-xs leading-relaxed dark:bg-black/20 ${muted ? 'text-gray-500' : ''}`}>{text}</pre></div>;
+    return <div className="min-w-0"><div className="mb-1 flex items-center justify-between gap-2"><span className="text-[10px] font-medium text-gray-500 dark:text-gray-400">{title}</span><Tooltip title={t('actions.copy')}><button type="button" aria-label={t('actions.copy')} className="ai-message-action shrink-0" onClick={onCopy}><CopyIcon className="h-3.5 w-3.5"/></button></Tooltip></div><pre className={`ai-message-tool-output max-h-64 overflow-auto whitespace-pre-wrap break-all rounded-lg border px-2.5 py-2 font-mono text-xs leading-relaxed ${muted ? 'text-gray-500 dark:text-gray-400' : ''}`}>{text}</pre></div>;
 };
 
 const HistoryModal = ({open, search, conversations, currentId, loading, loadingId, deletingId, clearing, hasConversations, onClose, onSearch, onLoad, onDelete, onClear}: {open: boolean; search: string; conversations: AIConversation[]; currentId: string; loading: boolean; loadingId: string; deletingId: string; clearing: boolean; hasConversations: boolean; onClose: () => void; onSearch: (value: string) => void; onLoad: (item: AIConversation) => void; onDelete: (id: string) => void; onClear: () => void}) => {
@@ -887,9 +997,9 @@ const usageFromConversation = (conversation: AIConversation): Usage | null => co
 
 const formatToolExecution = (execution: AIToolExecution) => {
     const args = execution.arguments || {};
-    if (typeof args.command === 'string' && args.command) return `$ ${args.command}`;
-    const detail = args.path || args.url || args.keyword || args.hostName || args.hostId;
-    return [execution.name, typeof detail === 'string' ? detail : ''].filter(Boolean).join(' ');
+    const detail = args.command || args.path || args.url || args.keyword || args.snippetId;
+    if (typeof detail === 'string' && detail) return detail;
+    return [toolStringArg(args, 'action'), toolStringArg(args, 'input')].filter(Boolean).join(' · ');
 };
 
 const formatFileDiff = (execution: AIToolExecution) => {

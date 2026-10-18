@@ -59,7 +59,6 @@ export interface AISettings {
     approvalReviewModel: string;
     approvalReviewTimeoutSecs: number;
     commandTimeoutSecs: number;
-    includeCommandSnippets: boolean;
     includeHostRemark: boolean;
     customSystemPrompt: string;
 }
@@ -95,7 +94,6 @@ const DEFAULT_AI_SETTINGS: AISettings = {
     approvalReviewModel: '',
     approvalReviewTimeoutSecs: 60,
     commandTimeoutSecs: 30,
-    includeCommandSnippets: false,
     includeHostRemark: false,
     customSystemPrompt: '',
 };
@@ -184,7 +182,6 @@ export const normalizeAISettings = (settings?: Partial<AISettings>): AISettings 
         approvalReviewModel: `${source.approvalReviewModel || ''}`.trim(),
         approvalReviewTimeoutSecs: clampInt(source.approvalReviewTimeoutSecs, 10, 300, DEFAULT_AI_SETTINGS.approvalReviewTimeoutSecs),
         commandTimeoutSecs: clampInt(source.commandTimeoutSecs, 5, 300, DEFAULT_AI_SETTINGS.commandTimeoutSecs),
-        includeCommandSnippets: source.includeCommandSnippets === true,
         includeHostRemark: source.includeHostRemark === true,
         customSystemPrompt: `${source.customSystemPrompt || ''}`.trim().slice(0, AI_CUSTOM_SYSTEM_PROMPT_MAX),
     };

@@ -2346,10 +2346,21 @@
       "custom_system_prompt": "自定义系统提示词",
       "custom_system_prompt_tip": "会追加到内置系统提示词之后，最多 8000 字。",
       "history": "AI 对话历史",
-      "clear_history": "清空历史会话",
-      "clear_history_tip": "删除当前用户的全部全局 AI 会话记录，此操作不可撤销。",
+      "clear_history": "清理我的历史对话",
+      "clear_history_tip": "仅清理当前用户的 AI 历史对话，不影响其他用户。",
       "clear_history_confirm": "确认清空全部 AI 历史会话？",
-      "clear_history_success": "AI 历史会话已清空"
+      "clear_history_success": "AI 历史会话已清空",
+      "display_title": "对话展示",
+      "display_levels": {
+        "compact": "简洁",
+        "standard": "标准",
+        "detailed": "详细"
+      },
+      "display_hints": {
+        "compact": "默认收起执行过程，仅显示基础状态，完成后展示最终回答。",
+        "standard": "默认收起执行过程，显示当前操作摘要，完成后展示最终回答。",
+        "detailed": "逐条展示助手消息、思考过程和工具调用。"
+      }
     },
     "access_request": {
       "setting": "访问申请",
@@ -3174,7 +3185,33 @@
     "history_load_error": "加载对话失败：{{message}}",
     "history_delete_error": "删除对话失败：{{message}}",
     "history_clear_error": "清空对话失败：{{message}}",
-    "invalid_response": "收到无法解析的 AI 响应"
+    "invalid_response": "收到无法解析的 AI 响应",
+    "process_running": "正在执行",
+    "process_approval": "等待确认",
+    "process_completed": "执行完成",
+    "process_stopped": "执行已停止",
+    "process_failed": "执行失败",
+    "process_tools": "{{count}} 次工具调用",
+    "settings": "设置",
+    "personal_preferences": "个人 AI 偏好",
+    "personal_preferences_tip": "仅对当前账号生效，保存后跨设备同步。对话展示立即更新，携带命令片段从下一次请求开始生效。",
+    "include_command_snippets_tip": "启用后，AI 可读取你有权访问的命令片段摘要，并按需读取具体内容。关闭后，后续请求不再提供命令片段；已进入历史对话的内容仍会保留。",
+    "preferences_load_failed": "个人 AI 偏好加载失败",
+    "tool_names": {
+      "terminal_execute": "执行命令",
+      "shell_io": "终端交互",
+      "file_read": "读取文件",
+      "file_write": "写入文件",
+      "file_edit": "编辑文件",
+      "web_fetch": "读取网页",
+      "search_hosts": "搜索资产",
+      "conversation_compact": "压缩上下文",
+      "command_snippet_read": "读取命令片段"
+    },
+    "file_path": "文件路径",
+    "tool_arguments": "工具参数",
+    "command_explanation": "操作说明",
+    "file_content": "文件内容"
   },
   "db": {
     "asset": {

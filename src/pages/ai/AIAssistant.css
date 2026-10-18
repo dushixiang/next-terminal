@@ -28,27 +28,77 @@
 }
 
 .ai-assistant .ai-message-user {
-    border-color: color-mix(in srgb, #1677ff 20%, transparent);
-    background: color-mix(in srgb, #1677ff 13%, white);
+    border-color: color-mix(in srgb, var(--primary) 20%, transparent);
+    background: color-mix(in srgb, var(--primary) 13%, var(--background));
 }
 
 .ai-assistant .ai-message-assistant {
-    border-color: color-mix(in srgb, currentColor 7%, transparent);
-    background: color-mix(in srgb, currentColor 3.5%, transparent);
+    border-color: color-mix(in srgb, var(--foreground) 7%, transparent);
+    background: color-mix(in srgb, var(--foreground) 3.5%, transparent);
+}
+
+.ai-assistant .ai-message-actions {
+    border-color: color-mix(in srgb, var(--foreground) 12%, transparent);
+    background: color-mix(in srgb, var(--background) 90%, transparent);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 150ms;
+}
+
+.ai-assistant .group\/message:hover > .ai-message-actions,
+.ai-assistant .group\/message:focus-within > .ai-message-actions {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.ai-assistant .ai-message-action {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    color: var(--muted-foreground);
+    cursor: pointer;
+}
+
+.ai-assistant .ai-message-action:hover {
+    background: color-mix(in srgb, var(--foreground) 6%, transparent);
+    color: var(--foreground);
+}
+
+.ai-assistant .ai-message-action:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 40%, transparent);
+    outline-offset: 1px;
+}
+
+.ai-assistant .ai-message-action:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
 }
 
 .ai-assistant .ai-message-tool {
-    border-color: color-mix(in srgb, currentColor 7%, transparent);
-    background: color-mix(in srgb, currentColor 3%, transparent);
+    border-color: color-mix(in srgb, var(--foreground) 7%, transparent);
+    background: color-mix(in srgb, var(--foreground) 3%, transparent);
+}
+
+.ai-assistant .ai-message-tool-trigger:hover {
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
 }
 
 .ai-assistant .ai-message-tool-content {
-    border-color: color-mix(in srgb, currentColor 6%, transparent);
-    background: color-mix(in srgb, currentColor 1.75%, transparent);
+    border-color: color-mix(in srgb, var(--foreground) 6%, transparent);
+    background: color-mix(in srgb, var(--foreground) 1.75%, transparent);
 }
 
-.dark .ai-assistant .ai-message-user {
-    background: color-mix(in srgb, #1677ff 13%, #1e1f22);
+.ai-assistant .ai-message-tool-output {
+    border-color: color-mix(in srgb, var(--foreground) 7%, transparent);
+    background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.ai-assistant .ai-message-reasoning {
+    border-color: color-mix(in srgb, var(--foreground) 12%, transparent);
+    background: color-mix(in srgb, var(--background) 45%, transparent);
 }
 
 .dark .ai-assistant {
@@ -105,7 +155,8 @@
 }
 
 @media (hover: none), (pointer: coarse) {
-    .ai-assistant .ai-message-copy-footer {
+    .ai-assistant .ai-message-actions {
         opacity: 1;
+        pointer-events: auto;
     }
 }

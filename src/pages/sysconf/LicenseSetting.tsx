@@ -1,3 +1,4 @@
+import {externalLinks} from "@/config/external-links";
 import {App, Button, Card, Col, Descriptions, Form, Input, Radio, Row, Space, Spin, Typography} from "antd";
 import dayjs from "dayjs";
 import {useMutation, useQuery} from "@tanstack/react-query";
@@ -237,11 +238,11 @@ const LicenseSetting = () => {
                     <Spin spinning={queryMachineId.isLoading || queryProperties.isLoading}>
                         <Card
                             title={t('settings.license.license_binding_type')}
-                            extra={!licence.isOEM() &&
+                            extra={externalLinks.licensePortal && !licence.isOEM() &&
                                 <Button
                                     type="link"
                                     icon={<ExportOutlined/>}
-                                    href={'https://license.next-terminal.com/license'}
+                                    href={externalLinks.licensePortal}
                                     target={'_blank'}
                                 >
                                     {t('settings.license.binding')}

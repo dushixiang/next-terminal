@@ -427,7 +427,7 @@ const AssetPage = () => {
         {
             title: t('actions.label'),
             key: 'option',
-            width: isMobile ? 80 : 120,
+            width: 120,
             render: (_text, record) => {
                 return renderAssetActions(record, isMobile);
             },
@@ -485,9 +485,11 @@ const AssetPage = () => {
             <div className={cn('flex items-center gap-2', compact && 'gap-1')}>
                 <Button
                     key={`btn-access-${id}`}
+                    type="link"
                     disabled={!record.enabled}
                     size="small"
                     href={buildAssetAccessHref(record)}
+                    style={{padding: 0}}
                     target="_blank"
                     rel="noopener noreferrer"
                 >

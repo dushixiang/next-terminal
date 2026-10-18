@@ -2346,10 +2346,21 @@
       "custom_system_prompt": "Custom system prompt",
       "custom_system_prompt_tip": "Appended after the built-in system prompt. Maximum 8000 characters.",
       "history": "AI Conversation History",
-      "clear_history": "Clear History",
-      "clear_history_tip": "Delete all global AI conversations for the current user. This cannot be undone.",
+      "clear_history": "Clear my conversation history",
+      "clear_history_tip": "Only clears your AI conversation history. Other users are unaffected.",
       "clear_history_confirm": "Clear all AI conversations?",
-      "clear_history_success": "AI conversation history cleared"
+      "clear_history_success": "AI conversation history cleared",
+      "display_title": "Conversation display",
+      "display_levels": {
+        "compact": "Compact",
+        "standard": "Standard",
+        "detailed": "Detailed"
+      },
+      "display_hints": {
+        "compact": "Collapse execution details, show basic status and display the final answer when complete.",
+        "standard": "Collapse execution details, show the current operation summary and display the final answer when complete.",
+        "detailed": "Show each assistant message, reasoning and tool call."
+      }
     },
     "access_request": {
       "setting": "Access Requests",
@@ -3174,7 +3185,33 @@
     "history_load_error": "Failed to load conversation: {{message}}",
     "history_delete_error": "Failed to delete conversation: {{message}}",
     "history_clear_error": "Failed to clear conversations: {{message}}",
-    "invalid_response": "Received an invalid AI response"
+    "invalid_response": "Received an invalid AI response",
+    "process_running": "Working",
+    "process_approval": "Awaiting approval",
+    "process_completed": "Completed",
+    "process_stopped": "Stopped",
+    "process_failed": "Failed",
+    "process_tools": "{{count}} tool calls",
+    "settings": "Settings",
+    "personal_preferences": "Personal AI preferences",
+    "personal_preferences_tip": "Applies only to your account and syncs across devices after saving. Display changes apply immediately; command snippet changes apply to your next request.",
+    "include_command_snippets_tip": "Allow AI to view summaries of command snippets you can access and read their content when needed. Turning this off stops providing snippets in future requests; content already in conversation history remains.",
+    "preferences_load_failed": "Failed to load AI preferences",
+    "tool_names": {
+      "terminal_execute": "Run command",
+      "shell_io": "Shell interaction",
+      "file_read": "Read file",
+      "file_write": "Write file",
+      "file_edit": "Edit file",
+      "web_fetch": "Fetch web page",
+      "search_hosts": "Search assets",
+      "conversation_compact": "Compact context",
+      "command_snippet_read": "Read command snippet"
+    },
+    "file_path": "File path",
+    "tool_arguments": "Tool arguments",
+    "command_explanation": "Operation explanation",
+    "file_content": "File content"
   },
   "db": {
     "asset": {

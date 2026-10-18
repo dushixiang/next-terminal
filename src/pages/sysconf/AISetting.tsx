@@ -10,7 +10,6 @@ import {
     Input,
     InputNumber,
     Modal,
-    Popconfirm,
     Radio,
     Select,
     Space,
@@ -25,7 +24,6 @@ import {useTranslation} from 'react-i18next';
 import {CheckCircleIcon, PencilIcon, PlusIcon, Trash2Icon} from 'lucide-react';
 import type {SettingProps} from './SettingPage';
 import AIProfileModal from './AIProfileModal';
-import aiApi from '@/api/ai-api';
 import aiSettingsApi, {
     AI_SETTINGS_PROPERTY_KEY,
     DEFAULT_AI_PROFILE,
@@ -93,14 +91,6 @@ const AISetting = ({get, set}: SettingProps) => {
             }
             queryClient.setQueryData(['settings', 'ai'], data);
             message.success(t('general.success'));
-        },
-    });
-
-    const clearHistoryMutation = useMutation({
-        mutationFn: aiApi.clearConversations,
-        onSuccess: async () => {
-            await queryClient.invalidateQueries({queryKey: ['ai-conversations']});
-            message.success(t('settings.ai.clear_history_success'));
         },
     });
 
@@ -491,14 +481,6 @@ const AISetting = ({get, set}: SettingProps) => {
                 </div>
 
                 <Form.Item
-                    name="includeCommandSnippets"
-                    label={t('settings.ai.include_command_snippets')}
-                    valuePropName="checked"
-                    extra={t('settings.ai.include_command_snippets_tip')}
-                >
-                    <Switch checkedChildren={t('general.enabled')} unCheckedChildren={t('general.disabled')}/>
-                </Form.Item>
-                <Form.Item
                     name="includeHostRemark"
                     label={t('settings.ai.include_host_remark')}
                     valuePropName="checked"
@@ -519,17 +501,6 @@ const AISetting = ({get, set}: SettingProps) => {
                         {t('actions.save')}
                     </Button>
                 </Form.Item>
-
-                <Divider titlePlacement="start">{t('settings.ai.history')}</Divider>
-                <div className="mb-6 flex items-center justify-between gap-4 rounded-lg border border-gray-200/70 p-4 dark:border-white/10">
-                    <div className="min-w-0">
-                        <Typography.Text strong>{t('settings.ai.clear_history')}</Typography.Text>
-                        <div className="mt-1 text-sm text-gray-500">{t('settings.ai.clear_history_tip')}</div>
-                    </div>
-                    <Popconfirm title={t('settings.ai.clear_history_confirm')} onConfirm={() => clearHistoryMutation.mutate()}>
-                        <Button danger loading={clearHistoryMutation.isPending}>{t('settings.ai.clear_history')}</Button>
-                    </Popconfirm>
-                </div>
             </Form>
 
             {profileModal ? (
